@@ -55,7 +55,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -6833,12 +6835,10 @@ namespace DXCoils {
                     PrintFlag = true;
                     FieldNum = 0;
                     if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) {
-                        SizingMethod = CoolingAirflowSizing;
                         CompName = DXCoil(DXCoilNum).Name + ":" + DXCoil(DXCoilNum).CoilPerformanceName(Mode);
                         FieldNum = 4;
                         DataBypassFrac = DXCoil(DXCoilNum).BypassedFlowFrac(Mode);
                     } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
-                        SizingMethod = HeatingAirflowSizing;
                         CompName = DXCoil(DXCoilNum).Name;
                         FieldNum = 3;
                         // doesn't look like this is needed for air flow sizing, only for heating capacity sizing
@@ -6848,31 +6848,24 @@ namespace DXCoils {
                             SizeSecDXCoil = true;
                         }
                     } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Heating) {
-                        SizingMethod = HeatingAirflowSizing;
                         CompName = DXCoil(DXCoilNum).Name;
                         FieldNum = 2;
                     } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Cooling) {
-                        SizingMethod = CoolingAirflowSizing;
                         CompName = DXCoil(DXCoilNum).Name;
                         FieldNum = 3;
                     } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating) {
-                        SizingMethod = HeatingAirflowSizing;
                         CompName = DXCoil(DXCoilNum).Name;
                     } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Cooling) {
-                        SizingMethod = CoolingAirflowSizing;
                         CompName = DXCoil(DXCoilNum).Name;
                     } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling) {
-                        SizingMethod = CoolingAirflowSizing;
                         DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
                         CompName = DXCoil(DXCoilNum).Name;
                         PrintFlag = false;
                     } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-                        SizingMethod = HeatingAirflowSizing;
                         DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
                         CompName = DXCoil(DXCoilNum).Name;
                         PrintFlag = false;
                     } else {
-                        SizingMethod = CoolingAirflowSizing;
                         CompName = DXCoil(DXCoilNum).Name;
                         FieldNum = 4;
                     }
@@ -6887,8 +6880,23 @@ namespace DXCoils {
                     DataIsDXCoil = true;
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) = TempSize;
+                    if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating ||
+                        DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating || DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Heating ||
+                        DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
+                        bool errorsFound = false;
+                        HeatingAirFlowSizer sizingHeatingAirFlow;
+                        sizingHeatingAirFlow.overrideSizingString(SizingString);
+                        // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) = sizingHeatingAirFlow.size(TempSize, errorsFound);
+                    } else {
+                        bool errorsFound = false;
+                        CoolingAirFlowSizer sizingCoolingAirFlow;
+                        sizingCoolingAirFlow.overrideSizingString(SizingString);
+                        // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                    }
                     DataIsDXCoil = false;
                     DataEMSOverrideON = false;
                     DataEMSOverride = 0.0;
@@ -7312,11 +7320,15 @@ namespace DXCoils {
                 if (Mode == DXCoil(DXCoilNum).NumOfSpeeds) {
                     FieldNum = 10 + (Mode - 1) * 13;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
-                    SizingMethod = CoolingAirflowSizing;
                     TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    bool errorsFound = false;
+                    CoolingAirFlowSizer sizingCoolingAirFlow;
+                    sizingCoolingAirFlow.overrideSizingString(SizingString);
+                    // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    TempSize = sizingCoolingAirFlow.size(TempSize, errorsFound);
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
                     DataEMSOverrideON = false;
                     DataEMSOverride = 0.0;
@@ -7334,7 +7346,6 @@ namespace DXCoils {
                 } else {
                     FieldNum = 10 + (Mode - 1) * 13;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
-                    SizingMethod = CoolingAirflowSizing;
                     if (IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of the highest speed flow
@@ -7345,8 +7356,11 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                    DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
+                    bool errorsFound = false;
+                    CoolingAirFlowSizer sizingCoolingAirFlow;
+                    sizingCoolingAirFlow.overrideSizingString(SizingString);
+                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = sizingCoolingAirFlow.size(TempSize, errorsFound);
                 }
                 DataEMSOverride = 0.0;
                 DataEMSOverrideON = false;
@@ -7622,23 +7636,29 @@ namespace DXCoils {
                 if (Mode == DXCoil(DXCoilNum).NumOfSpeeds) {
                     FieldNum = 12 + (Mode - 1) * 5;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
-                    SizingMethod = HeatingAirflowSizing;
                     TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
+                    bool errorsFound = false;
+                    HeatingAirFlowSizer sizingHeatingAirFlow;
+                    sizingHeatingAirFlow.overrideSizingString(SizingString);
+                    // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = sizingHeatingAirFlow.size(TempSize, errorsFound);
                     if (!IsAutoSize && !HardSizeNoDesRun) {
                         TempSize = AutoSize;
                         bPRINT = false;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                        MSRatedAirVolFlowRateDes = TempSize;
+                        errorsFound = false;
+                        HeatingAirFlowSizer sizingHeatingAirFlow2;
+                        sizingHeatingAirFlow2.overrideSizingString(SizingString);
+                        // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingHeatingAirFlow2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                        MSRatedAirVolFlowRateDes = sizingHeatingAirFlow2.size(TempSize, errorsFound);
                         bPRINT = true;
                     }
                 } else {
                     FieldNum = 12 + (Mode - 1) * 5;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
-                    SizingMethod = HeatingAirflowSizing;
                     if (IsAutoSize || !HardSizeNoDesRun) {
                         SizingMethod = AutoCalculateSizing;
                         // Auto size low speed flow to fraction of the highest speed capacity
@@ -7647,8 +7667,12 @@ namespace DXCoils {
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
                     }
                     TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                    DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
+                    bool errorsFound = false;
+                    HeatingAirFlowSizer sizingHeatingAirFlow;
+                    sizingHeatingAirFlow.overrideSizingString(SizingString);
+                    // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                    DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = sizingHeatingAirFlow.size(TempSize, errorsFound);
                 }
                 DataEMSOverride = 0.0;
                 DataEMSOverrideON = false;

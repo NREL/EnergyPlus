@@ -11238,6 +11238,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
+    DataSizing::DataFractionUsedForSizing = 0.0;
 
     // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in ReportSizingManager)
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;

@@ -121,7 +121,7 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
     this->selectSizerOutput(errorsFound);
     // report not written for OA coils and needs to be corrected
     if (this->curSysNum <= this->numPrimaryAirSys) {
-        if (this->getCoilReportObject)
+        if (this->isCoilReportObject)
             coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     }
     return this->autoSizedValue;

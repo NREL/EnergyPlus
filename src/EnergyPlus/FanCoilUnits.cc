@@ -54,6 +54,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -1375,7 +1378,6 @@ namespace FanCoilUnits {
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using DataHVACGlobals::SystemAirflowSizing;
         using DataPlant::PlantLoop;
         using Fans::GetFanDesignVolumeFlowRate;
         using FluidProperties::GetDensityGlycol;
@@ -1477,6 +1479,7 @@ namespace FanCoilUnits {
         DataSizing::DataFanPlacement = DataSizing::zoneFanPlacement::zoneBlowThru;
 
         if (CurZoneEqNum > 0) {
+
             if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
 
                 // initialize OA flow for sizing other inputs (e.g., inlet temp, capacity, etc.)
@@ -1517,8 +1520,13 @@ namespace FanCoilUnits {
                         } else {
                             TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         }
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        CoolingAirVolFlowDes = TempSize;
+                        CoolingAirFlowSizer sizingCoolingAirFlow;
+                        std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
+                        if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
+                        sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                        //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
 
                     } else if (SAFMethod == FlowPerCoolingCapacity) {
                         SizingMethod = CoolingCapacitySizing;
@@ -1530,12 +1538,16 @@ namespace FanCoilUnits {
                         }
                         DataAutosizedCoolingCapacity = TempSize;
                         DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                        SizingMethod = CoolingAirflowSizing;
                         PrintFlag = true;
                         TempSize = AutoSize;
                         DataScalableSizingON = true;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        CoolingAirVolFlowDes = TempSize;
+                        CoolingAirFlowSizer sizingCoolingAirFlow;
+                        std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
+                        if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
+                        sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                        //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
                     }
                 } else if (ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
                     // now do heating supply air flow rate sizing
@@ -1561,8 +1573,12 @@ namespace FanCoilUnits {
                         } else {
                             TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                         }
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        HeatingAirVolFlowDes = TempSize;
+                        bool errorsFound = false;
+                        HeatingAirFlowSizer sizingHeatingAirFlow;
+                        sizingHeatingAirFlow.overrideSizingString(SizingString);
+                        // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        HeatingAirVolFlowDes = sizingHeatingAirFlow.size(TempSize, errorsFound);
                     } else if (SAFMethod == FlowPerHeatingCapacity) {
                         SizingMethod = HeatingCapacitySizing;
                         TempSize = AutoSize;
@@ -1583,8 +1599,12 @@ namespace FanCoilUnits {
                         SizingMethod = HeatingAirflowSizing;
                         PrintFlag = true;
                         TempSize = AutoSize;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        HeatingAirVolFlowDes = TempSize;
+                        bool errorsFound = false;
+                        HeatingAirFlowSizer sizingHeatingAirFlow;
+                        sizingHeatingAirFlow.overrideSizingString(SizingString);
+                        // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                        sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        HeatingAirVolFlowDes = sizingHeatingAirFlow.size(TempSize, errorsFound);
                     }
                 }
 
@@ -1598,15 +1618,14 @@ namespace FanCoilUnits {
                 }
             } else {
                 // SizingString = "Supply Air Maximum Flow Rate [m3/s]";
-                SizingMethod = SystemAirflowSizing;
-                FieldNum = 1;
-                SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = FanCoil(FanCoilNum).MaxAirVolFlow;
                 PrintFlag = true;
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 if (FanCoil(FanCoilNum).MaxAirVolFlow == AutoSize) {
                     IsAutoSize = true;
-                    MaxAirVolFlowDes = TempSize;
+                    SystemAirFlowSizer sizerSystemAirFlow;
+                    //sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    MaxAirVolFlowDes = sizerSystemAirFlow.size(TempSize, ErrorsFound);
                 } else {
                     MaxAirVolFlowDes = 0.0;
                 }

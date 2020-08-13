@@ -152,7 +152,7 @@ Real64 WaterHeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
     }
     if (this->isEpJSON) this->sizingString = "rated_capacity";
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject)
+    if (this->isCoilReportObject)
         coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(
             this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
     return this->autoSizedValue;

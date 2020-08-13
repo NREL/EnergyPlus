@@ -54,6 +54,7 @@
 #include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -926,7 +927,10 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak)
     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingType) = DataSizing::SupplyAirFlowRate;
 
     // Now, we're ready to call the function
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    bool errorsFound = false;
+    SystemAirFlowSizer sizerSystemAirFlow;
+    sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerSystemAirFlow.size(SizingResult, errorsFound);
 
     // Check that the Design Day/Time is filled
     EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));

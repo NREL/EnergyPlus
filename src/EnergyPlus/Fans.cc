@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -1239,15 +1240,20 @@ namespace Fans {
         } else {
             FieldNum = 3;
         }
+        SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
+
         TempFlow = Fan(FanNum).MaxAirFlowRate;
         DataAutosizable = Fan(FanNum).MaxAirFlowRateIsAutosizable;
-        SizingString = FanNumericFields(FanNum).FieldNames(FieldNum) + " [m3/s]";
         CompType = Fan(FanNum).FanType;
         CompName = Fan(FanNum).FanName;
         DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
         DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
-        RequestSizing(state, CompType, CompName, SystemAirflowSizing, SizingString, TempFlow, bPRINT, RoutineName);
-        Fan(FanNum).MaxAirFlowRate = TempFlow;
+
+        bool errorsFound = false;
+        SystemAirFlowSizer sizerSystemAirFlow;
+        sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+        Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(TempFlow, errorsFound);
+
         DataAutosizable = true;
         DataEMSOverrideON = false;
         DataEMSOverride = 0.0;

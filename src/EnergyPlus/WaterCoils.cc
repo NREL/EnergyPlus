@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
@@ -61,6 +62,7 @@
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterflowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingWaterDesAirInletTempSizing.hh>
@@ -2199,11 +2201,13 @@ namespace WaterCoils {
                 bPRINT = false;       // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
                                       // should print this!)
                 TempSize = AutoSize;  // get the autosized air volume flow rate for use in other calculations
-                SizingString.clear(); // doesn't matter
-                RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * TempSize; // inlet air mass flow rate is the autosized value
-                DataAirFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air volume flow rate, save this value
-                DataFlowUsedForSizing = TempSize;
+                bool errorsFound = false;
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                DataAirFlowUsedForSizing = sizingCoolingAirFlow.size(TempSize, errorsFound);
+                DataFlowUsedForSizing = DataAirFlowUsedForSizing;
+                WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * DataAirFlowUsedForSizing; // inlet air mass flow rate is the autosized value
 
                 if (CurSysNum > 0 && CurOASysNum == 0) {
                     Real64 DesCoilExitHumRat(0.0); // fix coil sizing inconsistency
@@ -2343,15 +2347,17 @@ namespace WaterCoils {
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
                     bPRINT = false;       // do not print this sizing request since this coil does not have a design air flow rate input field (we
                                           // should print this!)
-                    SizingString.clear(); // doesn't matter
                 } else {
-                    FieldNum = 2; //  N2 , \field Design Air Flow Rate
                     bPRINT = true;
-                    SizingString = WaterCoilNumericFields(CoilNum).FieldNames(FieldNum) + " [m3/s]";
                 }
                 TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;
-                RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesAirVolFlowRate = TempSize;
+                CoolingAirFlowSizer sizingCoolingAirFlow2;
+                std::string stringOverride = "Design Air Flow Rate [m3/s]";
+                if (DataGlobals::isEpJSON) stringOverride = "design_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow2.overrideSizingString(stringOverride);
+                //sizingCoolingAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingCoolingAirFlow2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).DesAirVolFlowRate = sizingCoolingAirFlow2.size(TempSize, errorsFound);
                 WaterCoil(CoilNum).DesAirMassFlowRate = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
 
                 if (WaterCoil(CoilNum).DesAirVolFlowRate <= 0.0) {
@@ -2555,7 +2561,12 @@ namespace WaterCoils {
                     }
                     TempSize = AutoSize; // reset back
                 }
-                RequestSizing(state, CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
+                bool errorsFound = false;
+                HeatingAirFlowSizer sizingHeatingAirFlow;
+                sizingHeatingAirFlow.overrideSizingString(SizingString);
+                // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                TempSize = sizingHeatingAirFlow.size(TempSize, errorsFound);
                 // reset the design air volume flow rate for air loop coils only
                 if (CurSysNum > 0) WaterCoil(CoilNum).DesAirVolFlowRate = TempSize;
                 WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * TempSize; // inlet air mass flow rate is not the autosized value

@@ -387,7 +387,7 @@ Real64 WaterHeatingCoilUASizer::size(Real64 _originalValue, bool &errorsFound)
     if (this->dataErrorsFound) DataSizing::DataErrorsFound = true;
     if (this->isEpJSON) this->sizingString = "u-factor_times_area_value [W/K]";
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
+    if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         coilSelectionReportObj->setCoilUA(this->compName,
                                           this->compType,
                                           this->autoSizedValue,

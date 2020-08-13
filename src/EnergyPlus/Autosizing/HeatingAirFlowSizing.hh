@@ -45,29 +45,28 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+#ifndef HeatingAirFlowSizing_hh_INCLUDED
+#define HeatingAirFlowSizing_hh_INCLUDED
+
+#include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+struct HeatingAirFlowSizer : BaseSizerWithScalableInputs
 {
-    if (!this->checkInitialized(errorsFound)) {
-        return 0.0;
+    HeatingAirFlowSizer()
+    {
+        this->sizingType = AutoSizingType::HeatingAirFlowSizing;
+        this->sizingString = "Heating Supply Air Flow Rate [m3/s]";
     }
-    this->preSize(_originalValue);
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.empty())) {
-        this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
-        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
-        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else {
-        this->errorType = AutoSizingResultType::ErrorType1;
-    }
-    if (this->isEpJSON) this->sizingString = "design_inlet_water_temperature [C]";
-    this->selectSizerOutput(errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
-    return this->autoSizedValue;
-}
+    ~HeatingAirFlowSizer() = default;
+
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
+
+    void clearState();
+};
 
 } // namespace EnergyPlus
+
+#endif

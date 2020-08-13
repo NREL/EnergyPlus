@@ -53,6 +53,8 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -912,9 +914,7 @@ namespace WindowAC {
         // Using/Aliasing
         using namespace DataSizing;
         using DataHeatBalance::Zone;
-        using DataHVACGlobals::CoolingAirflowSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
-        using DataHVACGlobals::SystemAirflowSizing;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
         using ReportSizingManager::RequestSizing;
@@ -974,9 +974,7 @@ namespace WindowAC {
             if (state.dataWindowAC.WindAC(WindACNum).HVACSizingIndex > 0) {
                 zoneHVACIndex = state.dataWindowAC.WindAC(WindACNum).HVACSizingIndex;
                 // N1 , \field Maximum Supply Air Flow Rate
-                SizingMethod = CoolingAirflowSizing;
-                FieldNum = 1;
-                SizingString = state.dataWindowAC.WindACNumericFields(WindACNum).FieldNames(FieldNum) + " [m3/s]";
+                SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
                 PrintFlag = true;
                 SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                 ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
@@ -1000,8 +998,14 @@ namespace WindowAC {
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     }
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = TempSize;
+                    bool errorsFound = false;
+                    CoolingAirFlowSizer sizingCoolingAirFlow;
+                    std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
+                    if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
+                    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                    //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
                     SizingMethod = CoolingCapacitySizing;
@@ -1015,11 +1019,16 @@ namespace WindowAC {
                     RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DataCapacityUsedForSizing = TempSize;
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                    SizingMethod = CoolingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = TempSize;
+                    bool errorsFound = false;
+                    CoolingAirFlowSizer sizingCoolingAirFlow;
+                    std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
+                    if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
+                    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                    //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
                 }
                 // DataScalableSizingON = false;
 
@@ -1047,13 +1056,16 @@ namespace WindowAC {
                 // no scalble sizing method has been specified. Sizing proceeds using the method
                 // specified in the zoneHVAC object
                 // N1 , \field Maximum Supply Air Flow Rate
-                SizingMethod = SystemAirflowSizing;
                 FieldNum = 1;
                 PrintFlag = true;
                 SizingString = state.dataWindowAC.WindACNumericFields(WindACNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow;
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = TempSize;
+                bool errorsFound = false;
+                SystemAirFlowSizer sizerSystemAirFlow;
+                sizerSystemAirFlow.overrideSizingString(SizingString);
+                //sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                state.dataWindowAC.WindAC(WindACNum).MaxAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
             }
         }
 

@@ -31,6 +31,10 @@ SET( SRC
   Autosizing/Base.hh
   Autosizing/BaseSizerWithFanHeatInputs.cc
   Autosizing/BaseSizerWithFanHeatInputs.hh
+  Autosizing/BaseSizerWithScalableInputs.cc
+  Autosizing/BaseSizerWithScalableInputs.hh
+  Autosizing/CoolingAirFlowSizing.cc
+  Autosizing/CoolingAirFlowSizing.hh
   Autosizing/CoolingSHRSizing.cc
   Autosizing/CoolingSHRSizing.hh
   Autosizing/CoolingWaterDesAirInletHumRatSizing.cc
@@ -47,6 +51,8 @@ SET( SRC
   Autosizing/CoolingWaterflowSizing.hh
   Autosizing/CoolingWaterNumofTubesPerRowSizing.cc
   Autosizing/CoolingWaterNumofTubesPerRowSizing.hh
+  Autosizing/HeatingAirFlowSizing.cc
+  Autosizing/HeatingAirFlowSizing.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
   Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
@@ -59,6 +65,8 @@ SET( SRC
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh
   Autosizing/HeatingWaterflowSizing.cc
   Autosizing/HeatingWaterflowSizing.hh
+  Autosizing/SystemAirFlowSizing.cc
+  Autosizing/SystemAirFlowSizing.hh
   Autosizing/WaterHeatingCapacitySizing.cc
   Autosizing/WaterHeatingCapacitySizing.hh
   Autosizing/WaterHeatingCoilUASizing.cc

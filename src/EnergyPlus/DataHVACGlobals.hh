@@ -97,7 +97,6 @@ namespace DataHVACGlobals {
     extern int const CoolingCapacitySizing;                             // request sizing for cooling capacity
     extern int const HeatingCapacitySizing;                             // request sizing for heating capacity
     extern int const SystemCapacitySizing;                              // request sizing for system capacity
-    extern int const HeatingDefrostSizing;                              // request sizing for heating defrost capacity
     extern int const AutoCalculateSizing;                               // identifies an autocalulate input
 
     // Condenser Type (using same numbering scheme as for chillers)

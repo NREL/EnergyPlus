@@ -121,10 +121,10 @@ Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
             }
         }
     }
-    // bandaid - override sizing string for detailed coil model
+    // override sizing string
     if (this->isEpJSON) this->sizingString = "design_inlet_air_temperature [C]";
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) {
+    if (this->isCoilReportObject) {
         if (this->curSysNum <= this->numPrimaryAirSys) {
             coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
         }

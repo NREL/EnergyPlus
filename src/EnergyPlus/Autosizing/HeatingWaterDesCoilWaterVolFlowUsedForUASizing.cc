@@ -77,7 +77,7 @@ Real64 HeatingWaterDesCoilWaterVolFlowUsedForUASizer::size(Real64 _originalValue
     }
     if (this->isEpJSON) this->sizingString = "design_water_volume_flow_rate_used_for_ua_sizing";
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) {
+    if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(
             this->compName, this->compType, this->autoSizedValue, this->wasAutoSized, this->dataPltSizHeatNum, this->dataWaterLoopNum);
         if (this->termUnitSingDuct || this->zoneEqFanCoil || ((this->termUnitPIU || this->termUnitIU) && this->curTermUnitSizingNum > 0)) {

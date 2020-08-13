@@ -169,10 +169,10 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
             }
         }
     }
-    // bandaid - override sizing string for detailed coil model
+    // override sizing string
     if (this->isEpJSON) this->sizingString = "design_outlet_air_temperature [C]";
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) {
+    if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
     }
     return this->autoSizedValue;

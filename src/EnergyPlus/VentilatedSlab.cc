@@ -53,6 +53,9 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -1735,11 +1738,9 @@ namespace VentilatedSlab {
         // Using/Aliasing
         using namespace DataSizing;
         using DataHeatBalance::Zone;
-        using DataHVACGlobals::CoolingAirflowSizing;
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using DataHVACGlobals::SystemAirflowSizing;
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -1853,7 +1854,7 @@ namespace VentilatedSlab {
             PrintFlag = true;
             SizingString = VentSlabNumericFields(Item).FieldNames(FieldNum) + " [m3/s]";
             if (ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
-                SizingMethod = CoolingAirflowSizing;
+                SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
                 SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
                 ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
                 if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea ||
@@ -1876,8 +1877,14 @@ namespace VentilatedSlab {
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     }
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    CoolingAirVolFlowScalable = TempSize;
+                    bool errorsFound = false;
+                    CoolingAirFlowSizer sizingCoolingAirFlow;
+                    std::string stringOverride = "Maximum Air Flow Rate [m3/s]";
+                    if (DataGlobals::isEpJSON) stringOverride = "maximum_air_flow_rate [m3/s]";
+                    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                    //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, errorsFound);
 
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
                     SizingMethod = CoolingCapacitySizing;
@@ -1888,11 +1895,16 @@ namespace VentilatedSlab {
                     RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DataAutosizedCoolingCapacity = TempSize;
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                    SizingMethod = CoolingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    CoolingAirVolFlowScalable = TempSize;
+                    bool errorsFound = false;
+                    CoolingAirFlowSizer sizingCoolingAirFlow;
+                    std::string stringOverride = "Maximum Air Flow Rate [m3/s]";
+                    if (DataGlobals::isEpJSON) stringOverride = "maximum_air_flow_rate [m3/s]";
+                    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                    //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, errorsFound);
                 }
             }
             if (ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
@@ -1919,8 +1931,12 @@ namespace VentilatedSlab {
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     }
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    HeatingAirVolFlowScalable = TempSize;
+                    bool errorsFound = false;
+                    HeatingAirFlowSizer sizingHeatingAirFlow;
+                    sizingHeatingAirFlow.overrideSizingString(SizingString);
+                    // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(TempSize, errorsFound);
                 } else if (SAFMethod == FlowPerHeatingCapacity) {
                     SizingMethod = HeatingCapacitySizing;
                     TempSize = AutoSize;
@@ -1933,8 +1949,12 @@ namespace VentilatedSlab {
                     SizingMethod = HeatingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    HeatingAirVolFlowScalable = TempSize;
+                    bool errorsFound = false;
+                    HeatingAirFlowSizer sizingHeatingAirFlow;
+                    sizingHeatingAirFlow.overrideSizingString(SizingString);
+                    // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    HeatingAirVolFlowScalable = sizingHeatingAirFlow.size(TempSize, errorsFound);
                 }
             }
             // DataScalableSizingON = false;
@@ -1943,13 +1963,16 @@ namespace VentilatedSlab {
             // no scalble sizing method has been specified. Sizing proceeds using the method
             // specified in the zoneHVAC object
             // N1 , \field Maximum Supply Air Flow Rate
-            SizingMethod = SystemAirflowSizing;
             FieldNum = 1;
             PrintFlag = true;
             SizingString = VentSlabNumericFields(Item).FieldNames(FieldNum) + " [m3/s]";
             TempSize = VentSlab(Item).MaxAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            VentSlab(Item).MaxAirVolFlow = TempSize;
+            bool errorsFound = false;
+            SystemAirFlowSizer sizerSystemAirFlow;
+            sizerSystemAirFlow.overrideSizingString(SizingString);
+            //sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            VentSlab(Item).MaxAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
         }
 
         IsAutoSize = false;

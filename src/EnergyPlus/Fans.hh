@@ -67,7 +67,6 @@ namespace Fans {
 
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
-    using DataHVACGlobals::SystemAirflowSizing;
 
     struct FanEquipConditions
     {

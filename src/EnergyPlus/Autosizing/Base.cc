@@ -113,8 +113,11 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->primaryAirSystem = DataAirSystems::PrimaryAirSystem;
 
     this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
-    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
-        this->getCoilReportObject = true;
+    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if compType is not one of DataHVACGlobals::cAllCoilTypes
+        this->isCoilReportObject = true;
+    }
+    if (EnergyPlus::BaseSizer::isValidFanType(this->compType)) {  // fan reports fail if compType is not a valid fan type
+        this->isFanReportObject = true;
     }
 
     // global sizing data
@@ -160,6 +163,9 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataFanOpMode = DataSizing::DataFanOpMode;
     this->dataDesignCoilCapacity = DataSizing::DataDesignCoilCapacity;
     this->dataErrorsFound = DataSizing::DataErrorsFound;
+    this->dataBypassFrac = DataSizing::DataBypassFrac;
+    this->dataNonZoneNonAirloopValue = DataSizing::DataNonZoneNonAirloopValue;
+
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation)
@@ -172,7 +178,7 @@ void BaseSizer::initializeFromAPI(Real64 const elevation)
     this->callingRoutine = "called_from_API";
     Real64 barometricPressure = DataEnvironment::StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * elevation, 5.2559);
     this->stdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(barometricPressure, 20.0, 0.0);
-    this->getCoilReportObject = false;
+    this->isCoilReportObject = false;
 }
 
 void BaseSizer::addErrorMessage(std::string const &s)
@@ -423,6 +429,24 @@ bool BaseSizer::isValidCoilType(std::string const &_compType)
     return false;
 }
 
+bool BaseSizer::isValidFanType(std::string const &_compType)
+{
+    // if compType name is one of the fan objects, then return true
+    if (UtilityRoutines::SameString(_compType, "Fan:SystemModel")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:ComponentModel")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:OnOff")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:ConstantVolume")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:VariableVolume")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool BaseSizer::checkInitialized(bool &errorsFound)
 {
     if (!this->initialized) {
@@ -531,7 +555,8 @@ void BaseSizer::clearState()
 {
     stdRhoAir = 0.0;
 
-    getCoilReportObject = false; // provides access to coil reporting
+    isCoilReportObject = false; // provides access to coil reporting
+    isFanReportObject = false;   // provides access to fan reporting
     initialized = false;         // indicates initializeWithinEP was called
     errorType = AutoSizingResultType::NoError;
     sizingString = "";
@@ -613,6 +638,9 @@ void BaseSizer::clearState()
     dataFanOpMode = 0;
     dataDesignCoilCapacity = 0.0;
     dataErrorsFound = false;
+    dataBypassFrac = 0.0;
+
+    dataNonZoneNonAirloopValue = 0.0;
 
     printWarningFlag = false;
     callingRoutine = "";

@@ -47,6 +47,7 @@
 
 
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -157,19 +158,23 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     std::string CompType = this->object_name;
     std::string CompName = this->name;
     bool PrintFlag = true;
+    bool errorsFound = false;
 
-    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-    std::string SizingString = "Rated Evaporator Air Flow Rate";
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->ratedEvapAirFlowRate = TempSize;
+    CoolingAirFlowSizer sizingCoolingAirFlow;
+    std::string stringOverride = "Rated Evaporator Air Flow Rate";
+    if (DataGlobals::isEpJSON) stringOverride = "rated_evaporator_air_flow_rate";
+    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->ratedEvapAirFlowRate = sizingCoolingAirFlow.size(TempSize, errorsFound);
+
     Real64 const ratedInletAirTemp(26.6667);        // 26.6667C or 80F
     Real64 const ratedInletAirHumRat(0.0111847); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     this->ratedEvapAirMassFlowRate = this->ratedEvapAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(
             DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
-    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-    SizingString = "Rated Gross Total Cooling Capacity";
+    int SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+    std::string SizingString = "Rated Gross Total Cooling Capacity";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -180,9 +185,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     DataSizing::DataFractionUsedForSizing = 0.000114;
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
 
-    bool errorsFound = false;
     AutoCalculateSizer sizerCondAirFlow;
-    std::string stringOverride = "Rated Condenser Air Flow Rate";
+    stringOverride = "Rated Condenser Air Flow Rate";
     if(DataGlobals::isEpJSON) stringOverride = "rated_condenser_air_flow_rate";
     sizerCondAirFlow.overrideSizingString(stringOverride);
     sizerCondAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);

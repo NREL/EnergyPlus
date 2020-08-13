@@ -45,29 +45,65 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+//#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <string>
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
+void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
+                                                     const std::string &_compType,
+                                                     const std::string &_compName,
+                                                     const bool &_printWarningFlag,
+                                                     const std::string &_callingRoutine)
 {
-    if (!this->checkInitialized(errorsFound)) {
-        return 0.0;
+    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+
+    this->dataScalableSizingON = DataSizing::DataScalableSizingON;
+    this->dataHRFlowSizingFlag = DataSizing::HRFlowSizingFlag;
+    this->zoneCoolingOnlyFan = DataSizing::ZoneCoolingOnlyFan;
+    this->zoneHeatingOnlyFan = DataSizing::ZoneHeatingOnlyFan;
+    this->dataFracOfAutosizedCoolingAirflow = DataSizing::DataFracOfAutosizedCoolingAirflow;
+    this->dataFracOfAutosizedHeatingAirflow = DataSizing::DataFracOfAutosizedHeatingAirflow;
+    this->dataFlowPerCoolingCapacity = DataSizing::DataFlowPerCoolingCapacity;
+    this->dataAutosizedCoolingCapacity = DataSizing::DataAutosizedCoolingCapacity;
+    this->dataFlowPerHeatingCapacity = DataSizing::DataFlowPerHeatingCapacity;
+    this->dataAutosizedHeatingCapacity = DataSizing::DataAutosizedHeatingCapacity;
+
+    this->zoneHVACSizing = DataSizing::ZoneHVACSizing;
+
+    if (this->curZoneEqNum) {
+        if (this->zoneHVACSizingIndex > 0) {
+            int coolingSAFMethod = this->zoneHVACSizing(this->zoneHVACSizingIndex).CoolingSAFMethod;
+            this->zoneAirFlowSizMethod = coolingSAFMethod;
+            this->dataFractionUsedForSizing = 1.0;
+            this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
+            if (coolingSAFMethod == DataSizing::FlowPerFloorArea) {
+                DataSizing::DataScalableSizingON = true;
+                this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * DataHeatBalance::Zone(DataSizing::DataZoneNumber).FloorArea;
+            } else if (coolingSAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
+                DataSizing::DataFracOfAutosizedCoolingAirflow = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
+                DataSizing::DataScalableSizingON = true;
+            }
+        } else {
+            if (this->zoneEqSizing(this->curZoneEqNum).SizingMethod.size() > 0) {
+                this->zoneAirFlowSizMethod = this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing);
+            } else {
+                this->zoneAirFlowSizMethod = 0;
+            }
+            if (this->zoneAirFlowSizMethod == 0) {
+                // do nothing, sizing method not set
+            } else if (this->zoneAirFlowSizMethod == DataSizing::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::None) {
+            }
+        }
     }
-    this->preSize(_originalValue);
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.empty())) {
-        this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
-        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
-        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else {
-        this->errorType = AutoSizingResultType::ErrorType1;
-    }
-    if (this->isEpJSON) this->sizingString = "design_inlet_water_temperature [C]";
-    this->selectSizerOutput(errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
-    return this->autoSizedValue;
+}
+
+void BaseSizerWithScalableInputs::setHVACSizingIndexData(int const index) {
+    this->zoneHVACSizingIndex = index;
 }
 
 } // namespace EnergyPlus

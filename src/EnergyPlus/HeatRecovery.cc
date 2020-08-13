@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -1656,7 +1657,6 @@ namespace HeatRecovery {
         } else {
             SizingString = "Nominal Supply Air Flow Rate [m3/s]"; // desiccant balanced flow does not have an input for air volume flow rate
         }
-        SizingMethod = SystemAirflowSizing;
         if (CurZoneEqNum > 0) {
             if (ExchCond(ExchNum).NomSupAirVolFlow == AutoSize) {
                 SizingMethod = AutoCalculateSizing;
@@ -1682,8 +1682,11 @@ namespace HeatRecovery {
             }
         }
         TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
-        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-        ExchCond(ExchNum).NomSupAirVolFlow = TempSize;
+        bool errorsFound = false;
+        SystemAirFlowSizer sizerSystemAirFlow;
+        //sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+        sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+        ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
         DataConstantUsedForSizing = 0.0;
         DataFractionUsedForSizing = 0.0;
         if (ExchCond(ExchNum).ExchTypeNum == HX_AIRTOAIR_FLATPLATE) {
@@ -1692,21 +1695,22 @@ namespace HeatRecovery {
             CompName = ExchCond(ExchNum).Name;
             CompType = cHXTypes(ExchCond(ExchNum).ExchTypeNum);
             SizingString = HeatExchCondNumericFields(ExchNum).NumericFieldNames(FieldNum) + " [m3/s]";
-            SizingMethod = SystemAirflowSizing; // used if flow is hard sized without sizing run
             if (ExchCond(ExchNum).NomSecAirVolFlow == AutoSize) {
-                SizingMethod = AutoCalculateSizing;
                 DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
                 DataFractionUsedForSizing = 1.0;
             } else {
                 if (ZoneSizingRunDone || SysSizingRunDone) {
-                    SizingMethod = AutoCalculateSizing;
                     DataConstantUsedForSizing = ExchCond(ExchNum).NomSupAirVolFlow;
                     DataFractionUsedForSizing = 1.0;
                 }
             }
             TempSize = ExchCond(ExchNum).NomSecAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            ExchCond(ExchNum).NomSecAirVolFlow = TempSize;
+            bool errorsFound = false;
+            SystemAirFlowSizer sizerSystemAirFlow2;
+            sizerSystemAirFlow2.overrideSizingString(SizingString);
+            //sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(TempSize, errorsFound);
             DataConstantUsedForSizing = 0.0;
             DataFractionUsedForSizing = 0.0;
         }
@@ -1720,10 +1724,13 @@ namespace HeatRecovery {
             CompName = BalDesDehumPerfData(BalDesDehumPerfIndex).Name;
             CompType = BalDesDehumPerfData(BalDesDehumPerfIndex).PerfType;
             SizingString = BalDesDehumPerfNumericFields(BalDesDehumPerfIndex).NumericFieldNames(FieldNum) + " [m3/s]";
-            SizingMethod = SystemAirflowSizing;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = TempSize;
+            bool errorsFound = false;
+            SystemAirFlowSizer sizerSystemAirFlow3;
+            sizerSystemAirFlow3.overrideSizingString(SizingString);
+            //sizerSystemAirFlow3.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            sizerSystemAirFlow3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = sizerSystemAirFlow3.size(TempSize, errorsFound);
 
             DataAirFlowUsedForSizing = BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow;
             TempSize = BalDesDehumPerfData(BalDesDehumPerfIndex).NomProcAirFaceVel;

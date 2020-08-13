@@ -45,29 +45,61 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
+#ifndef BaseSizerWithScalableInputs_hh_INCLUDED
+#define BaseSizerWithScalableInputs_hh_INCLUDED
+
+#include <EnergyPlus/api/TypeDefs.h>
+//#include <EnergyPlus/Autosizing/Base.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
+#include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
+#include <string>
 
 namespace EnergyPlus {
 
-Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &errorsFound)
-{
-    if (!this->checkInitialized(errorsFound)) {
-        return 0.0;
+struct EnergyPlusData;
+
+struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
+
+    int zoneAirFlowSizMethod = 0;
+    bool zoneCoolingOnlyFan = false;
+    bool zoneHeatingOnlyFan = false;
+    bool dataScalableSizingON = false;
+    bool dataHRFlowSizingFlag = false;
+    Real64 dataFracOfAutosizedCoolingAirflow = 0.0;
+    Real64 dataFracOfAutosizedHeatingAirflow = 0.0;
+    Real64 dataFlowPerCoolingCapacity = 0.0;
+    Real64 dataAutosizedCoolingCapacity = 0.0;
+    Real64 dataFlowPerHeatingCapacity = 0.0;
+    Real64 dataAutosizedHeatingCapacity = 0.0;
+
+    int zoneHVACSizingIndex = 0;
+    Array1D<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
+
+    void initializeWithinEP(EnergyPlusData &state,
+                            std::string const &_compType,
+                            std::string const &_compName,
+                            bool const &_printWarningFlag,
+                            std::string const &_callingRoutine) override;
+
+    void clearState() {
+        BaseSizerWithFanHeatInputs::clearState();
+        zoneAirFlowSizMethod = 0;
+        zoneCoolingOnlyFan = false;
+        zoneHeatingOnlyFan = false;
+        dataScalableSizingON = false;
+        dataHRFlowSizingFlag = false;
+        dataFracOfAutosizedCoolingAirflow = 0.0;
+        dataFracOfAutosizedHeatingAirflow = 0.0;
+        dataFlowPerCoolingCapacity = 0.0;
+        dataAutosizedCoolingCapacity = 0.0;
+        dataFlowPerHeatingCapacity = 0.0;
+        dataAutosizedHeatingCapacity = 0.0;
     }
-    this->preSize(_originalValue);
-    if (!this->wasAutoSized && (this->dataPltSizCoolNum == 0 || this->plantSizData.empty())) {
-        this->autoSizedValue = _originalValue;
-    } else if (!this->wasAutoSized && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
-        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else if (this->wasAutoSized && this->dataPltSizCoolNum > 0 && this->dataPltSizCoolNum <= (int)this->plantSizData.size()) {
-        this->autoSizedValue = this->plantSizData(this->dataPltSizCoolNum).ExitTemp;
-    } else {
-        this->errorType = AutoSizingResultType::ErrorType1;
-    }
-    if (this->isEpJSON) this->sizingString = "design_inlet_water_temperature [C]";
-    this->selectSizerOutput(errorsFound);
-    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
-    return this->autoSizedValue;
-}
+
+    void setHVACSizingIndexData(int const index);
+
+};
 
 } // namespace EnergyPlus
+
+#endif

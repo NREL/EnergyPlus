@@ -62,6 +62,7 @@ enum class AutoSizingType
     ASHRAEMinSATCoolingSizing,
     ASHRAEMaxSATHeatingSizing,
     AutoCalculateSizing,
+    CoolingAirFlowSizing,
     CoolingSHRSizing,
     CoolingWaterDesAirInletHumRatSizing,
     CoolingWaterDesAirInletTempSizing,
@@ -70,6 +71,7 @@ enum class AutoSizingType
     CoolingWaterDesWaterInletTempSizing,
     CoolingWaterNumofTubesPerRowSizing,
     DesiccantDehumidifierBFPerfDataFaceVelocitySizing,
+    HeatingAirFlowSizing,
     HeatingAirflowUASizing,
     HeatingCoilDesAirInletHumRatSizing,
     HeatingCoilDesAirInletTempSizing,
@@ -80,6 +82,7 @@ enum class AutoSizingType
     HeatingWaterDesCoilWaterVolFlowUsedForUASizing,
     HeatingWaterflowSizing,
     MaxHeaterOutletTempSizing,
+    SystemAirFlowSizing,
     WaterHeatingCapacitySizing,
     WaterHeatingCoilUASizing,
     ZoneCoolingLoadSizing,
@@ -99,7 +102,8 @@ struct BaseSizer
 
     Real64 stdRhoAir = 0.0;
 
-    bool getCoilReportObject = false; // provides access to coil reporting
+    bool isCoilReportObject = false; // provides access to coil reporting
+    bool isFanReportObject = false;  // provides access to fan reporting
     bool initialized = false;     // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
     AutoSizingType sizingType = AutoSizingType::Unknown;
@@ -215,6 +219,11 @@ struct BaseSizer
     Real64 dataDesignCoilCapacity = 0.0;
     bool dataErrorsFound = false;
 
+    // CoolingAirFlowSizing
+    Real64 dataBypassFrac = 0.0;
+
+    Real64 dataNonZoneNonAirloopValue = 0.0;
+
     bool printWarningFlag = false;
     std::string callingRoutine = "";
     Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
@@ -263,6 +272,8 @@ protected:
     void selectSizerOutput(bool &errorsFound);
 
     bool isValidCoilType(std::string const &compType);
+
+    bool isValidFanType(std::string const &compType);
 
     bool checkInitialized(bool &errorsFound);
 
