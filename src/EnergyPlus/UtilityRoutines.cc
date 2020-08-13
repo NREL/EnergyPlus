@@ -1873,12 +1873,12 @@ namespace UtilityRoutines {
 
 
         if (UtilityRoutines::outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
             UtilityRoutines::outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-           if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout
@@ -1891,6 +1891,8 @@ namespace UtilityRoutines {
         if (present(OutUnit2)) {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
+        // std::string tmp = "  " + ErrorMessage + '\n';
+        // if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
     void SummarizeErrors()

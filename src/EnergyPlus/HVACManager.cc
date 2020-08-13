@@ -2538,7 +2538,7 @@ namespace HVACManager {
             }
             // Report infiltration latent gains and losses
             CpAir = PsyCpAirFnW(OutHumRat);
-            H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+            H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop));
             if (ZoneAirHumRat(ZoneLoop) > OutHumRat) {
 
                 ZnAirRpt(ZoneLoop).InfilLatentLoss = 0.001 * MCPI(ZoneLoop) / CpAir * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap *
@@ -2619,7 +2619,7 @@ namespace HVACManager {
                     if (VentZoneNum > 1) continue;
 
                     // Report ventilation latent gains and losses
-                    H2OHtOfVap = PsyHgAirFnWTdb(OutHumRat, Zone(ZoneLoop).OutDryBulbTemp);
+                    H2OHtOfVap = PsyHgAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop));
                     if (ZoneAirHumRat(ZoneLoop) > OutHumRat) {
                         ZnAirRpt(ZoneLoop).VentilLatentLoss = 0.001 * MCPV(ZoneLoop) / CpAir * (ZoneAirHumRat(ZoneLoop) - OutHumRat) * H2OHtOfVap *
                                                               TimeStepSys * SecInHour * 1000.0 * ADSCorrectionFactor;

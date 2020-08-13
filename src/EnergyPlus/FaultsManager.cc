@@ -1442,6 +1442,11 @@ namespace FaultsManager {
         // read faults input of Fault_type 109: Fouled Air Filters
         for (int jFault_AirFilter = 1; jFault_AirFilter <= NumFaultyAirFilter; ++jFault_AirFilter) {
 
+            // Read in fan if not done yet
+            if (state.fans.GetFanInputFlag) {
+                Fans::GetFanInput(state);
+            }
+
             cFaultCurrentObject = cFaults(9); // fault object string
             inputProcessor->getObjectItem(cFaultCurrentObject,
                                           jFault_AirFilter,
@@ -1514,13 +1519,8 @@ namespace FaultsManager {
                 ErrorsFound = true;
             }
 
-            // Check whether the specified fan curve covers the design operational point of the fan
-            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
-                ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
-                ShowContinueError("Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" does not cover ");
-                ShowContinueError("the operational point of Fan " + FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanName);
-                ErrorsFound = true;
-            }
+            // Checking  whether the specified fan curve covers the **design** operational point of the fan cannot be done here
+            // as the fan might be autosized and is not sized yet, so we call it in Fan::SizeFan instead
 
             // In the fan object, calculate by each time-step: 1) pressure increase value; 2) air flow rate decrease value.
         }
