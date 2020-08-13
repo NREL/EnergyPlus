@@ -2359,7 +2359,7 @@
 
   Output:Variable,*,Zone Radiant HVAC Pump Inlet Temperature,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Pump Electric Power,timestep;
+  Output:Variable,*,Zone Radiant HVAC Pump Electricity Rate,timestep;
 
   Output:Variable,*,Zone Radiant HVAC Pump Electric Energy,timestep;
 

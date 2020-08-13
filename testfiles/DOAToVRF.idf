@@ -3433,9 +3433,9 @@
 
   Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Heating Electric Energy,timestep;
 
@@ -3453,11 +3453,11 @@
 
   Output:Variable,*,VRF Heat Pump Operating Mode,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Defrost Electric Energy,timestep;
 
@@ -3465,9 +3465,9 @@
 
   Output:Variable,*,VRF Heat Pump Maximum Capacity Heating Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electric Power,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electricity Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Heating Electric Power,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Heating Electricity Rate,timestep;
 
   Output:Variable,TU1,Zone VRF Air Terminal Cooling Electric Energy,timestep;
 
@@ -3485,7 +3485,7 @@
 
   Output:Variable,TU1,Zone VRF Air Terminal Latent Heating Rate,timestep;
 
-  Output:Variable,TU1 VRF SUPPLY FAN,Fan Electric Power,timestep;
+  Output:Variable,TU1 VRF SUPPLY FAN,Fan Electricity Rate,timestep;
 
   Output:Meter,Cooling:Electricity,monthly;
 

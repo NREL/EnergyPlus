@@ -7748,7 +7748,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_1,              !- Name
     PSZ-AC:1_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     QdotEvap_2,              !- Name
@@ -7758,7 +7758,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_2,              !- Name
     PSZ-AC:2_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     QdotEvap_3,              !- Name
@@ -7768,7 +7768,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_3,              !- Name
     PSZ-AC:3_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     QdotEvap_4,              !- Name
@@ -7778,7 +7778,7 @@
   EnergyManagementSystem:Sensor,
     QdotElec_4,              !- Name
     PSZ-AC:4_CoolC DXCoil,   !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:GlobalVariable,
     QdotCond;                !- Erl Variable 1 Name
@@ -8104,7 +8104,7 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Electric Energy,hourly;
 
@@ -8112,7 +8112,7 @@
 
   Output:Variable,*,Cooling Coil Cold Weather Protection Electric Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Cold Weather Protection Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Cold Weather Protection Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Thermal Storage Mechanical Heat Transfer Rate,hourly;
 
@@ -8132,11 +8132,11 @@
 
   Output:Variable,*,Cooling Coil Evaporative Condenser Mains Supply Water Volume,hourly;
 
-  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electric Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
 

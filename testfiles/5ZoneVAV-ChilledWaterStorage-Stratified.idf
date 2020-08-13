@@ -5684,7 +5684,7 @@
 
   Output:Variable,*,Chiller Cycling Ratio,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Inlet Temperature,hourly;
 

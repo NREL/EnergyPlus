@@ -4048,7 +4048,7 @@
 
   Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller COP,hourly;
 
@@ -4058,7 +4058,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
   Output:Variable,*,Air System Outdoor Air Economizer Status,hourly;
 
@@ -4080,7 +4080,7 @@
 
   Output:Variable,*,Heat Exchanger Total Cooling Rate,hourly;
 
-  Output:Variable,*,Heat Exchanger Electric Power,hourly;
+  Output:Variable,*,Heat Exchanger Electricity Rate,hourly;
 
   Output:Variable,*,Heat Exchanger Sensible Effectiveness,hourly;
 

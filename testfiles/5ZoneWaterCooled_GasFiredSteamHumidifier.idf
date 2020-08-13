@@ -3634,7 +3634,7 @@
 
   Output:Variable,*,Humidifier Gas Use Energy,hourly;
 
-  Output:Variable,*,Humidifier Auxiliary Electric Power,hourly;
+  Output:Variable,*,Humidifier Auxiliary Electricity Rate,hourly;
 
   Output:Variable,*,Humidifier Auxiliary Electric Energy,hourly;
 

@@ -6785,7 +6785,7 @@
   EnergyManagementSystem:Sensor,
     Dining_LSr,              !- Name
     Dining,                  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Dining_Occ_Sensor,       !- Name
@@ -6822,7 +6822,7 @@
   EnergyManagementSystem:Sensor,
     Kitchen_LSr,             !- Name
     Kitchen,                 !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Kitchen_Occ_Sensor,      !- Name

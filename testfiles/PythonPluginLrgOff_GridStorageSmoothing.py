@@ -5,7 +5,7 @@ class BatteryControlDemandDemo(EnergyPlusPlugin):
 
     def get_handles(self):
         self.data['current_demand'] = self.api.exchange.get_variable_handle(
-            "Facility Total Electric Demand Power", "Whole Building"
+            "Facility Total Electricity Demand Rate", "Whole Building"
         )
         self.data["trend"] = self.api.exchange.get_trend_handle("CurntFacilityElectDemandTrend")
         self.data["var"] = self.api.exchange.get_global_handle("CurntFacilityElectDemand")

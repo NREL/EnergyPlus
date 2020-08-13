@@ -3656,7 +3656,7 @@
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Electric Energy,hourly,OnPeakEnergy;
 
@@ -3772,7 +3772,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,  !- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3780,7 +3780,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,  !- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count

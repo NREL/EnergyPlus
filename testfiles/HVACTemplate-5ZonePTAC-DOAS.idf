@@ -2014,7 +2014,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Latent Cooling Rate,hourly;
 
-  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electric Power,hourly;
+  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electricity Rate,hourly;
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio,hourly;
 
@@ -2022,7 +2022,7 @@
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
   Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
@@ -2030,7 +2030,7 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:VariableDictionary,IDF;
 

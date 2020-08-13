@@ -2301,7 +2301,7 @@
 
   Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 
-  Output:Variable,*,Pump Electric Power,timestep;
+  Output:Variable,*,Pump Electricity Rate,timestep;
 
   Output:Variable,*,Pump Mass Flow Rate,timestep;
 

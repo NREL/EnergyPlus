@@ -3905,9 +3905,9 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
@@ -3935,7 +3935,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly;
 
@@ -4011,15 +4011,15 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly;
 
@@ -4031,7 +4031,7 @@
 
   Output:Variable,*,Water Heater Heat Reclaim Efficiency Modifier Multiplier,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Power,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Pump Electric Energy,hourly;
 

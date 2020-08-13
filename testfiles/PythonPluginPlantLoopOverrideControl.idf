@@ -5052,7 +5052,7 @@
 !    Report Variable, *, Tower Water Inlet Temp, hourly;
 !    Report Variable, *, Tower Water Outlet Temp, hourly;
 !    Report Variable, *, Tower Heat Transfer, hourly;
-!    Report Variable, *, Tower Fan Electric Power, hourly;
+!    Report Variable, *, Tower Fan Electricity Rate, hourly;
 
   Sizing:Plant,
     Boiler Plant,            !- Plant or Condenser Loop Name
@@ -7785,7 +7785,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
@@ -7833,7 +7833,7 @@
     Heating:Gas,             !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-  Output:Variable,*,Pump Electric Power,hourly;
+  Output:Variable,*,Pump Electricity Rate,hourly;
 
   Output:Variable,*,Pump Outlet Temperature,hourly;
 

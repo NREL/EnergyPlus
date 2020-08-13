@@ -2196,15 +2196,15 @@
 
   Output:Variable,*,Chiller Heater Heating NaturalNaturalGas Energy,timestep;
 
-  Output:Variable,*,Chiller Heater Electric Power,timestep;
+  Output:Variable,*,Chiller Heater Electricity Rate,timestep;
 
   Output:Variable,*,Chiller Heater Electric Energy,timestep;
 
-  Output:Variable,*,Chiller Heater Cooling Electric Power,timestep;
+  Output:Variable,*,Chiller Heater Cooling Electricity Rate,timestep;
 
   Output:Variable,*,Chiller Heater Cooling Electric Energy,timestep;
 
-  Output:Variable,*,Chiller Heater Heating Electric Power,timestep;
+  Output:Variable,*,Chiller Heater Heating Electricity Rate,timestep;
 
   Output:Variable,*,Chiller Heater Heating Electric Energy,timestep;
 

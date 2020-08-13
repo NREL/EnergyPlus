@@ -3078,9 +3078,9 @@
 
   Output:Variable,*,Coil System Compressor Speed Ratio,Hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,Hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Hourly;
+  Output:Variable,*,Fan Electricity Rate,Hourly;
 
   Output:Variable,*,Heating Coil NaturalGas Rate,Hourly;
 

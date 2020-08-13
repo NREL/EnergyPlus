@@ -1782,7 +1782,7 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,TimeStep;
 
-  Output:Variable,*,Fan Electric Power,TimeStep;
+  Output:Variable,*,Fan Electricity Rate,TimeStep;
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep;
 
@@ -1790,15 +1790,15 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Energy,TimeStep;
 
-  Output:Variable,*,Cooling Coil Electric Power,TimeStep;
+  Output:Variable,*,Cooling Coil Electricity Rate,TimeStep;
 
   Output:Variable,*,Heating Coil Heating Rate,TimeStep;
 
   Output:Variable,*,Heating Coil Heating Energy,TimeStep;
 
-  Output:Variable,*,Heating Coil Electric Power,TimeStep;
+  Output:Variable,*,Heating Coil Electricity Rate,TimeStep;
 
-  Output:Variable,*,Heating Coil Defrost Electric Power,TimeStep;
+  Output:Variable,*,Heating Coil Defrost Electricity Rate,TimeStep;
 
   Output:Variable,*,Heating Coil NaturalGas Rate,TimeStep;
 

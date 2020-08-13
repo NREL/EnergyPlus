@@ -1976,7 +1976,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Electric Power,timestep;
+  Output:Variable,*,Heating Coil Electricity Rate,timestep;
 
   Output:Meter,Heating:NaturalGas,hourly;
 

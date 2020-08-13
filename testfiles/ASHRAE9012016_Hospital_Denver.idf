@@ -32157,12 +32157,12 @@
   EnergyManagementSystem:Sensor,
     Chiller1_Status,         !- Name
     CoolSys1 Chiller1,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electric Power;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Chiller2_Status,         !- Name
     CoolSys1 Chiller2,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electric Power;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SensedCurveInput,        !- Name

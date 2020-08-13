@@ -1800,7 +1800,7 @@
     10.0,                    !- Minimum Value of y
     30.0;                    !- Maximum Value of y
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 

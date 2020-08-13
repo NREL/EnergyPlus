@@ -1492,11 +1492,11 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Power,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Heating Rate,hourly;
 
@@ -1510,51 +1510,51 @@
 
   Output:Variable,WaterHeatingCoilOutletNode,System Node Temperature,hourly;
 
-  Output:Variable,*,Lights Electric Power,hourly;
+  Output:Variable,*,Lights Electricity Rate,hourly;
 
   Output:Variable,*,Lights Electric Energy,hourly;
 
-  Output:Variable,*,Electric Equipment Electric Power,hourly;
+  Output:Variable,*,Electric Equipment Electricity Rate,hourly;
 
   Output:Variable,*,Electric Equipment Electric Energy,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Fan Electric Energy,hourly;
 
   Output:Variable,*,Heating Coil Electric Energy,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Electric Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Crankcase Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Crankcase Heater Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Crankcase Heater Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Power,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Pump Electric Energy,hourly;
 

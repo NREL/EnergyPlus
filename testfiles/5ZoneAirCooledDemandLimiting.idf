@@ -3095,7 +3095,7 @@
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
@@ -3253,11 +3253,11 @@
 
   Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,TIMESTEP;
 
-  Output:Variable,*,Lights Electric Power,TIMESTEP;
+  Output:Variable,*,Lights Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Electric Equipment Electric Power,TIMESTEP;
+  Output:Variable,*,Electric Equipment Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Chiller Electric Power,TIMESTEP;
+  Output:Variable,*,Chiller Electricity Rate,TIMESTEP;
 
   Output:Variable,*,Demand Manager Meter Demand Power,TIMESTEP;
 

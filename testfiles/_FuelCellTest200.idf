@@ -817,11 +817,11 @@
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,*,Generator Produced Electric Power,timestep;
+  Output:Variable,*,Generator Produced Electricity Rate,timestep;
 
   Output:Variable,*,Generator Produced Electric Energy,timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,timestep;
 
   Output:Variable,*,Generator Electric Storage Charge State,timestep;
 
@@ -841,7 +841,7 @@
 
   Output:Variable,*,Generator Power Module Entering Air Enthalpy,timestep;
 
-  Output:Variable,*,Generator Blower Electric Power,timestep;
+  Output:Variable,*,Generator Blower Electricity Rate,timestep;
 
   Output:Variable,*,Generator Blower Electric Energy,timestep;
 
@@ -855,7 +855,7 @@
 
   Output:Variable,*,Generator Power Module Entering Fuel Enthalpy,timestep;
 
-  Output:Variable,*,Generator Fuel Compressor Electric Power,timestep;
+  Output:Variable,*,Generator Fuel Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Generator Fuel Compressor Electric Energy,timestep;
 
@@ -881,11 +881,11 @@
 
   Output:Variable,*,Generator Inverter Loss Power,timestep;
 
-  Output:Variable,*,Generator Produced DC Electric Power,timestep;
+  Output:Variable,*,Generator Produced DC Electricity Rate,timestep;
 
   Output:Variable,*,Generator DC Power Efficiency,timestep;
 
-  Output:Variable,*,Generator Ancillary AC Electric Power,timestep;
+  Output:Variable,*,Generator Ancillary AC Electricity Rate,timestep;
 
   Output:Variable,*,Generator Zone Sensible Heat Transfer Rate,timestep;
 
@@ -895,15 +895,15 @@
 
   Output:Variable,*,Generator Zone Radiation Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,timestep;
 
   Output:Variable,*,Facility Total Purchased Electric Energy,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Power,timestep;
+  Output:Variable,*,Facility Total Produced Electricity Rate,timestep;
 
   Output:Variable,*,Site Mains Water Temperature,timestep;
 
-  Output:Variable,*,Pump Electric Power,timestep;
+  Output:Variable,*,Pump Electricity Rate,timestep;
 
   Output:Variable,*,Generator Product Gas Ar Molar Flow Rate,timestep;
 

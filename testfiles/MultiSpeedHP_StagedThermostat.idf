@@ -2227,7 +2227,7 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Unitary System Total Cooling Rate,timestep;
 

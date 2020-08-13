@@ -1225,13 +1225,13 @@
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Zone Water to Air Heat Pump Total Heating Rate,timestep;
 
   Output:Variable,*,Zone Water to Air Heat Pump Total Cooling Rate,timestep;
 
-  Output:Variable,*,Zone Water to Air Heat Pump Electric Power,timestep;
+  Output:Variable,*,Zone Water to Air Heat Pump Electricity Rate,timestep;
 
   Output:Variable,*,Zone Water to Air Heat Pump Electric Energy,timestep;
 

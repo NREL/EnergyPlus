@@ -1376,7 +1376,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Energy,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

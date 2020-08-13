@@ -5837,13 +5837,13 @@
 
   Output:Variable,*,Refrigeration Case Return Air Latent Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Evaporator Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Evaporator Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Anti Sweat Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Anti Sweat Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Defrost Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Walk In Evaporator Total Cooling Rate,timestep;
 
@@ -5857,23 +5857,23 @@
 
   Output:Variable,*,Refrigeration Walk In Evaporator Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Ancillary Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Ancillary Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Walk In Ancillary Electric Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Fan Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Walk In Fan Electric Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Lighting Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Walk In Lighting Electric Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Heater Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Heater Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Walk In Heater Electric Energy,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Walk In Defrost Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Walk In Defrost Electric Energy,timestep;
 
@@ -5889,7 +5889,7 @@
 
   Output:Variable,*,Refrigeration Walk In Zone Latent Energy,timestep;
 
-  Output:Variable,*,Refrigeration Secondary Loop Pump Electric Power,timestep;
+  Output:Variable,*,Refrigeration Secondary Loop Pump Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Secondary Loop Pump Electric Energy,timestep;
 
@@ -5907,11 +5907,11 @@
 
   Output:Variable,*,Refrigeration Secondary Loop Pipe Heat Gain Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Condenser Fan Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Total Compressor Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Total Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Total Compressor Heat Transfer Rate,timestep;
 
@@ -5943,7 +5943,7 @@
 
   Output:Variable,*,Refrigeration System Condenser Total Recovered Heat Transfer Rate,timestep;
 
-  Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Electric Power,timestep;
+  Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Electricity Rate,timestep;
 
   Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Total Heat Transfer Rate,timestep;
 

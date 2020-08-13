@@ -3410,9 +3410,9 @@
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
@@ -3446,7 +3446,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Tower Inlet Temperature,hourly;
 
@@ -3456,7 +3456,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
 !Boiler report variables***********************************************************
 

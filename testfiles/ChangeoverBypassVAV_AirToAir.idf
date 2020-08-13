@@ -2008,7 +2008,7 @@
 
   Output:Variable,*,Unitary System Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Unitary System Electric Power,timestep;
+  Output:Variable,*,Unitary System Electricity Rate,timestep;
 
   Output:Variable,*,Unitary System Electric Energy,timestep;
 
@@ -2034,7 +2034,7 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Coil Upper Speed Level,timestep;
 
@@ -2052,7 +2052,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,timestep;
 

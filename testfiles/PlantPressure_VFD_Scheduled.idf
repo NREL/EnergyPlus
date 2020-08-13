@@ -439,7 +439,7 @@
 
   Output:Variable,*,Pump Electric Energy,hourly;
 
-  Output:Variable,*,Pump Electric Power,hourly;
+  Output:Variable,*,Pump Electricity Rate,hourly;
 
   Output:VariableDictionary,Regular;
 

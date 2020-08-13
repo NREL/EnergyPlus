@@ -13719,7 +13719,7 @@
   EnergyManagementSystem:Sensor,
     LGSTORE1_LSr,            !- Name
     LGSTORE1,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     LGSTORE1_Occ_Sensor,     !- Name
@@ -13764,7 +13764,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE1_LSr,            !- Name
     SMSTORE1,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE1_Occ_Sensor,     !- Name
@@ -13809,7 +13809,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE2_LSr,            !- Name
     SMSTORE2,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE2_Occ_Sensor,     !- Name
@@ -13854,7 +13854,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE3_LSr,            !- Name
     SMSTORE3,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE3_Occ_Sensor,     !- Name
@@ -13899,7 +13899,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE4_LSr,            !- Name
     SMSTORE4,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE4_Occ_Sensor,     !- Name
@@ -13944,7 +13944,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE5_LSr,            !- Name
     SMSTORE5,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE5_Occ_Sensor,     !- Name
@@ -13989,7 +13989,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE6_LSr,            !- Name
     SMSTORE6,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE6_Occ_Sensor,     !- Name
@@ -14034,7 +14034,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE7_LSr,            !- Name
     SMSTORE7,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE7_Occ_Sensor,     !- Name
@@ -14079,7 +14079,7 @@
   EnergyManagementSystem:Sensor,
     SMSTORE8_LSr,            !- Name
     SMSTORE8,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SMSTORE8_Occ_Sensor,     !- Name
@@ -14124,7 +14124,7 @@
   EnergyManagementSystem:Sensor,
     LGSTORE2_LSr,            !- Name
     LGSTORE2,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     LGSTORE2_Occ_Sensor,     !- Name

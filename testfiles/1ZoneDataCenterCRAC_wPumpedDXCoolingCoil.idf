@@ -944,7 +944,7 @@
 
   Output:Variable,*,Zone Mean Air Temperature,Hourly;
 
-  Output:Variable,*,Baseboard Electric Power,Hourly;
+  Output:Variable,*,Baseboard Electricity Rate,Hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -993,7 +993,7 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Rate,Hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,Hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,Hourly;
 
@@ -1001,11 +1001,11 @@
 
   Output:Variable,*,Coil System Frost Control Status,Hourly;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,Hourly;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,Hourly;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,Hourly;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,Hourly;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Hourly;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Hourly;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
 
@@ -1013,21 +1013,21 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Hourly;
+  Output:Variable,*,Fan Electricity Rate,Hourly;
 
   Output:Variable,*,Fan Rise in Air Temperature,Hourly;
 
   Output:Variable,*,Schedule Value,Hourly;
 
-  Output:Variable,*,ITE CPU Electric Power,Hourly;
+  Output:Variable,*,ITE CPU Electricity Rate,Hourly;
 
-  Output:Variable,*,ITE Fan Electric Power,Hourly;
+  Output:Variable,*,ITE Fan Electricity Rate,Hourly;
 
-  Output:Variable,*,ITE UPS Electric Power,Hourly;
+  Output:Variable,*,ITE UPS Electricity Rate,Hourly;
 
-  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,Hourly;
+  Output:Variable,*,ITE CPU Electricity Rate at Design Inlet Conditions,Hourly;
 
-  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,Hourly;
+  Output:Variable,*,ITE Fan Electricity Rate at Design Inlet Conditions,Hourly;
 
   Output:Variable,*,ITE UPS Heat Gain to Zone Rate,Hourly;
 
@@ -1100,12 +1100,12 @@
   EnergyManagementSystem:Sensor,
     Power_DX_Coil_Elec,      !- Name
     Main Cooling Coil 1,     !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Power_SupplyFan_Elec,    !- Name
     EC Plug Fan 1,           !- Output:Variable or Output:Meter Index Key Name
-    Fan Electric Power;      !- Output:Variable or Output:Meter Name
+    Fan Electricity Rate;      !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     DeltaT_SupplyFan,        !- Name
@@ -1189,12 +1189,12 @@
   EnergyManagementSystem:Sensor,
     IT_Equip_power,          !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Building Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total Building Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     whole_building_power,    !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:OutputVariable,
     PUE,                     !- Name

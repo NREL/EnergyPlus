@@ -6097,7 +6097,7 @@
 
   Output:Variable,*,Water System Groundwater Well Volume Flow Rate,timestep;
 
-  Output:Variable,*,Water System Groundwater Well Pump Electric Power,timestep;
+  Output:Variable,*,Water System Groundwater Well Pump Electricity Rate,timestep;
 
   Output:Variable,*,Water System Groundwater Well Volume,timestep;
 

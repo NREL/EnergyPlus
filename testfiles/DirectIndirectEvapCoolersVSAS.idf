@@ -5665,7 +5665,7 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,hourly;
 
-  Output:Variable,*,Evaporative Cooler Electric Power,hourly;
+  Output:Variable,*,Evaporative Cooler Electricity Rate,hourly;
 
   Output:Variable,*,Evaporative Cooler Water Volume,hourly;
 

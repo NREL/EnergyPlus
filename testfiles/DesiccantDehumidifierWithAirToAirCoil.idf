@@ -3169,7 +3169,7 @@
 
   Output:Variable,*,Fan Electric Energy,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Heat Exchanger Sensible Heating Rate,timestep;
 
@@ -3195,7 +3195,7 @@
 
   Output:Variable,*,Heat Exchanger Total Cooling Energy,timestep;
 
-  Output:Variable,*,Heat Exchanger Electric Power,timestep;
+  Output:Variable,*,Heat Exchanger Electricity Rate,timestep;
 
   Output:Variable,*,Heat Exchanger Electric Energy,timestep;
 
@@ -3205,7 +3205,7 @@
 
   Output:Variable,*,Dehumidifier Part Load Ratio,timestep;
 
-  Output:Variable,*,Dehumidifier Exhaust Fan Electric Power,timestep;
+  Output:Variable,*,Dehumidifier Exhaust Fan Electricity Rate,timestep;
 
   Output:Variable,*,Dehumidifier Exhaust Fan Electric Energy,timestep;
 

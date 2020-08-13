@@ -30639,7 +30639,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30676,7 +30676,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30713,7 +30713,7 @@
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_1_LSr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_1_OSr,    !- Name
@@ -30750,7 +30750,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30787,7 +30787,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_1_OSr,  !- Name
@@ -30824,7 +30824,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -30861,7 +30861,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -30898,7 +30898,7 @@
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_1_LSr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_1_OSr,    !- Name
@@ -30935,7 +30935,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -30972,7 +30972,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_1_OSr,  !- Name
@@ -31009,7 +31009,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31046,7 +31046,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31083,7 +31083,7 @@
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_1_LSr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_1_OSr,    !- Name
@@ -31120,7 +31120,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31157,7 +31157,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_1_LSr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_1_OSr,  !- Name
@@ -31194,7 +31194,7 @@
   EnergyManagementSystem:Sensor,
     AUX_GYM_ZN_1_FLR_1_LSr,  !- Name
     AUX_GYM_ZN_1_FLR_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     AUX_GYM_ZN_1_FLR_1_OSr,  !- Name
@@ -31231,7 +31231,7 @@
   EnergyManagementSystem:Sensor,
     AUDITORIUM_ZN_1_FLR_1_LSr,  !- Name
     AUDITORIUM_ZN_1_FLR_1,   !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     AUDITORIUM_ZN_1_FLR_1_OSr,  !- Name
@@ -31268,7 +31268,7 @@
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_1_LSr,  !- Name
     Main_Corridor_ZN_1_FLR_1,!- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_1_OSr,  !- Name
@@ -31305,7 +31305,7 @@
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_1_LSr,    !- Name
     Lobby_ZN_1_FLR_1,        !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_1_OSr,    !- Name
@@ -31342,7 +31342,7 @@
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_1_LSr,     !- Name
     Mech_ZN_1_FLR_1,         !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_1_OSr,     !- Name
@@ -31379,7 +31379,7 @@
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_1_LSr,!- Name
     BATHROOMS_ZN_1_FLR_1,    !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_1_OSr,!- Name
@@ -31416,7 +31416,7 @@
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_1_LSr,  !- Name
     Offices_ZN_1_FLR_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_1_OSr,  !- Name
@@ -31453,7 +31453,7 @@
   EnergyManagementSystem:Sensor,
     Gym_ZN_1_FLR_1_LSr,      !- Name
     Gym_ZN_1_FLR_1,          !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Gym_ZN_1_FLR_1_OSr,      !- Name
@@ -31490,7 +31490,7 @@
   EnergyManagementSystem:Sensor,
     Kitchen_ZN_1_FLR_1_LSr,  !- Name
     Kitchen_ZN_1_FLR_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Kitchen_ZN_1_FLR_1_OSr,  !- Name
@@ -31527,7 +31527,7 @@
   EnergyManagementSystem:Sensor,
     Cafeteria_ZN_1_FLR_1_LSr,!- Name
     Cafeteria_ZN_1_FLR_1,    !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Cafeteria_ZN_1_FLR_1_OSr,!- Name
@@ -31565,7 +31565,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31602,7 +31602,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31639,7 +31639,7 @@
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_2_LSr,    !- Name
     Corridor_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD1_ZN_1_FLR_2_OSr,    !- Name
@@ -31676,7 +31676,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31713,7 +31713,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_1_ZN_1_FLR_2_OSr,  !- Name
@@ -31750,7 +31750,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31787,7 +31787,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31824,7 +31824,7 @@
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_2_LSr,    !- Name
     Corridor_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD2_ZN_1_FLR_2_OSr,    !- Name
@@ -31861,7 +31861,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31898,7 +31898,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_2_ZN_1_FLR_2_OSr,  !- Name
@@ -31935,7 +31935,7 @@
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL1_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -31972,7 +31972,7 @@
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl1_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -32009,7 +32009,7 @@
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_2_LSr,    !- Name
     Corridor_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cPOD3_ZN_1_FLR_2_OSr,    !- Name
@@ -32046,7 +32046,7 @@
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     cCL2_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -32083,7 +32083,7 @@
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_2_LSr,  !- Name
     Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     mCl2_Pod_3_ZN_1_FLR_2_OSr,  !- Name
@@ -32120,7 +32120,7 @@
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_2_LSr,  !- Name
     Main_Corridor_ZN_1_FLR_2,!- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Main_Corridor_ZN_1_FLR_2_OSr,  !- Name
@@ -32157,7 +32157,7 @@
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_2_LSr,    !- Name
     Lobby_ZN_1_FLR_2,        !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Lobby_ZN_1_FLR_2_OSr,    !- Name
@@ -32194,7 +32194,7 @@
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_2_LSr,     !- Name
     Mech_ZN_1_FLR_2,         !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Mech_ZN_1_FLR_2_OSr,     !- Name
@@ -32231,7 +32231,7 @@
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_2_LSr,!- Name
     BATHROOMS_ZN_1_FLR_2,    !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     BATHROOMS_ZN_1_FLR_2_OSr,!- Name
@@ -32268,7 +32268,7 @@
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_2_LSr,  !- Name
     Offices_ZN_1_FLR_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Offices_ZN_1_FLR_2_OSr,  !- Name
@@ -32305,7 +32305,7 @@
   EnergyManagementSystem:Sensor,
     LMC_ZN_1_FLR_2_LSr,      !- Name
     Library_Media_Center_ZN_1_FLR_2,  !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     LMC_ZN_1_FLR_2_OSr,      !- Name

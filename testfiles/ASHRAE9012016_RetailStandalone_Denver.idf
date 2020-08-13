@@ -8464,7 +8464,7 @@
   EnergyManagementSystem:Sensor,
     Back_Space_LSr,          !- Name
     Back_Space,              !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Back_Space_Occ_Sensor,   !- Name
@@ -8501,7 +8501,7 @@
   EnergyManagementSystem:Sensor,
     Core_Retail_LSr,         !- Name
     Core_Retail,             !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Core_Retail_Occ_Sensor,  !- Name
@@ -8538,7 +8538,7 @@
   EnergyManagementSystem:Sensor,
     Point_Of_Sale_LSr,       !- Name
     Point_Of_Sale,           !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Point_Of_Sale_Occ_Sensor,!- Name
@@ -8575,7 +8575,7 @@
   EnergyManagementSystem:Sensor,
     Front_Retail_LSr,        !- Name
     Front_Retail,            !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Front_Retail_Occ_Sensor, !- Name
@@ -8612,7 +8612,7 @@
   EnergyManagementSystem:Sensor,
     Front_Entry_LSr,         !- Name
     Front_Entry,             !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Front_Entry_Occ_Sensor,  !- Name

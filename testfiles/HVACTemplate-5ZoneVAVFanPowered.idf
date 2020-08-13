@@ -2101,7 +2101,7 @@
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
@@ -2115,7 +2115,7 @@
 
   Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller COP,hourly;
 
@@ -2125,7 +2125,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
   Output:VariableDictionary,Regular;
 

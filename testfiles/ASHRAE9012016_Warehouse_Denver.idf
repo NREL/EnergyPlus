@@ -8079,7 +8079,7 @@
   EnergyManagementSystem:Sensor,
     Zone1_Office_LSr,        !- Name
     Zone1 Office,            !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Zone1_Office_Occ_Sensor, !- Name
@@ -8116,7 +8116,7 @@
   EnergyManagementSystem:Sensor,
     Zone2_Fine_Storage_LSr,  !- Name
     Zone2 Fine Storage,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
 !- no occupancy in Zone2, used Zone1 occupancy schedule here
 
@@ -8150,7 +8150,7 @@
   EnergyManagementSystem:Sensor,
     Zone3_Bulk_Storage_LSr,  !- Name
     Zone3 Bulk Storage,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
 !- no occupancy in Zone3, used Zone1 occupancy schedule here
 

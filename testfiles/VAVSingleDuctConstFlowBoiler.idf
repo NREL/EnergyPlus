@@ -2305,7 +2305,7 @@
 
   Output:Variable,*,Boiler Mass Flow Rate,timestep;
 
-  Output:Variable,*,Boiler Ancillary Electric Power,timestep;
+  Output:Variable,*,Boiler Ancillary Electricity Rate,timestep;
 
   Output:Variable,Cooling Coil Air Inlet Node,System Node Mass Flow Rate,timestep;
 

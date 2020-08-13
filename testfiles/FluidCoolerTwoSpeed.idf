@@ -2230,7 +2230,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Tower Fan Electric Energy,timestep;
 

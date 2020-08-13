@@ -1773,7 +1773,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 

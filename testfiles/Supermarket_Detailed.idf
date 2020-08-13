@@ -5178,17 +5178,17 @@
 
   Output:Variable,*,Refrigeration Case Return Air Latent Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Evaporator Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Evaporator Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Anti Sweat Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Anti Sweat Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Condenser Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Total Compressor Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Total Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Total Compressor Heat Transfer Rate,timestep;
 

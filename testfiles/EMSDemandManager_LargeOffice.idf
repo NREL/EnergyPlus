@@ -11749,7 +11749,7 @@
 
   Output:Meter,Gas:Facility,Timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
 
@@ -12009,7 +12009,7 @@
   EnergyManagementSystem:Sensor,
     CurntFacilityElectDemand,!- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:TrendVariable,
     Demand_Mgr_State_Trend,  !- Name

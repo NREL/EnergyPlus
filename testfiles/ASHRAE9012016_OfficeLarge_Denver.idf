@@ -16208,7 +16208,7 @@
   EnergyManagementSystem:Sensor,
     DataCenter_HeatC_Status, !- Name
     HEAT PUMP HEATING MODE AIRLOOP DATACENTER BASEMENT,  !- Output:Variable or Output:Meter Index Key Name
-    Heating Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Heating Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     DataCenter_AfterHumidifier_Temp,  !- Name
@@ -16844,12 +16844,12 @@
   EnergyManagementSystem:Sensor,
     Chiller1_Status,         !- Name
     CoolSys1 Chiller1,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electric Power;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Chiller2_Status,         !- Name
     CoolSys1 Chiller2,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electric Power;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SensedCurveInput,        !- Name
@@ -17060,7 +17060,7 @@
   EnergyManagementSystem:Sensor,
     Basement_LSr,            !- Name
     Basement,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Basement_Occ_Sensor,     !- Name
@@ -17097,7 +17097,7 @@
   EnergyManagementSystem:Sensor,
     Core_bottom_LSr,         !- Name
     Core_bottom,             !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Core_bottom_Occ_Sensor,  !- Name
@@ -17134,7 +17134,7 @@
   EnergyManagementSystem:Sensor,
     Core_mid_LSr,            !- Name
     Core_mid,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Core_mid_Occ_Sensor,     !- Name
@@ -17171,7 +17171,7 @@
   EnergyManagementSystem:Sensor,
     Core_top_LSr,            !- Name
     Core_top,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Core_top_Occ_Sensor,     !- Name
@@ -17208,7 +17208,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_3_LSr,  !- Name
     Perimeter_bot_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_3_Occ_Sensor,  !- Name
@@ -17245,7 +17245,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_2_LSr,  !- Name
     Perimeter_bot_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_2_Occ_Sensor,  !- Name
@@ -17282,7 +17282,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_1_LSr,  !- Name
     Perimeter_bot_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_1_Occ_Sensor,  !- Name
@@ -17319,7 +17319,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_4_LSr,  !- Name
     Perimeter_bot_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_4_Occ_Sensor,  !- Name
@@ -17356,7 +17356,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_3_LSr,  !- Name
     Perimeter_mid_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_3_Occ_Sensor,  !- Name
@@ -17393,7 +17393,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_2_LSr,  !- Name
     Perimeter_mid_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_2_Occ_Sensor,  !- Name
@@ -17430,7 +17430,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_1_LSr,  !- Name
     Perimeter_mid_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_1_Occ_Sensor,  !- Name
@@ -17467,7 +17467,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_4_LSr,  !- Name
     Perimeter_mid_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_4_Occ_Sensor,  !- Name
@@ -17504,7 +17504,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_3_LSr,  !- Name
     Perimeter_top_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_3_Occ_Sensor,  !- Name
@@ -17541,7 +17541,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_2_LSr,  !- Name
     Perimeter_top_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_2_Occ_Sensor,  !- Name
@@ -17578,7 +17578,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_1_LSr,  !- Name
     Perimeter_top_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_1_Occ_Sensor,  !- Name
@@ -17615,7 +17615,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_4_LSr,  !- Name
     Perimeter_top_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_4_Occ_Sensor,  !- Name

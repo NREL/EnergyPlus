@@ -1052,7 +1052,7 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,detailed;
 
-  Output:Variable,*,Water Heater Electric Power,detailed;
+  Output:Variable,*,Water Heater Electricity Rate,detailed;
 
   Output:Variable,*,Water Heater Electric Energy,detailed;
 

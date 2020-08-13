@@ -1470,7 +1470,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Electric Power,timestep;
+  Output:Variable,*,Heating Coil Electricity Rate,timestep;
 
   Output:Variable,Air Loop Inlet Node,System Node Mass Flow Rate,timestep;
 
@@ -1488,7 +1488,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Energy,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Coil System Part Load Ratio,timestep;
 

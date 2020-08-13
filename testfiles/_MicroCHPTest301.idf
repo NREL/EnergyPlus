@@ -746,11 +746,11 @@
 !    Water Heater Heating Rate ,  !- Variable_Name
 !    Timestep;                  !- Reporting_Frequency
 
-  Output:Variable,*,Generator Produced Electric Power,timestep;
+  Output:Variable,*,Generator Produced Electricity Rate,timestep;
 
   Output:Variable,*,Generator Produced Electric Energy,timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,timestep;
 
   Output:Variable,*,Generator Air Mass Flow Rate,timestep;
 
@@ -764,7 +764,7 @@
 
   Output:Variable,*,Generator Steady State Engine Heat Generation Rate,timestep;
 
-  Output:Variable,*,Generator Fuel Compressor Electric Power,timestep;
+  Output:Variable,*,Generator Fuel Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Generator Fuel Compressor Electric Energy,timestep;
 
@@ -788,15 +788,15 @@
 
   Output:Variable,*,Generator Zone Radiation Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,timestep;
 
   Output:Variable,*,Facility Total Purchased Electric Energy,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Power,timestep;
+  Output:Variable,*,Facility Total Produced Electricity Rate,timestep;
 
   Output:Variable,*,Site Mains Water Temperature,timestep;
 
-  Output:Variable,*,Pump Electric Power,timestep;
+  Output:Variable,*,Pump Electricity Rate,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

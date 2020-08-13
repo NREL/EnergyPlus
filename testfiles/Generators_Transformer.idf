@@ -2732,11 +2732,11 @@
 
   Output:Variable,*,Transformer Efficiency,timestep;
 
-  Output:Variable,*,Transformer Input Electric Power,timestep;
+  Output:Variable,*,Transformer Input Electricity Rate,timestep;
 
   Output:Variable,*,Transformer Input Electric Energy,timestep;
 
-  Output:Variable,*,Transformer Output Electric Power,timestep;
+  Output:Variable,*,Transformer Output Electricity Rate,timestep;
 
   Output:Variable,*,Transformer Output Electric Energy,timestep;
 

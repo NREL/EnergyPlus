@@ -3359,7 +3359,7 @@
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 

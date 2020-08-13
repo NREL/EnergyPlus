@@ -2179,7 +2179,7 @@
 
   Output:Variable,*,Zone Cooltower Mains Water Volume,hourly;
 
-  Output:Variable,*,Zone Cooltower Pump Electric Power,hourly;
+  Output:Variable,*,Zone Cooltower Pump Electricity Rate,hourly;
 
   Output:Variable,*,Zone Cooltower Pump Electric Energy,hourly;
 

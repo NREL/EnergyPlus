@@ -788,13 +788,13 @@
 
   Output:Variable,*,Water Heater Heater 2 Runtime Fraction,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Water Heating Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Water Heating Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Water Heating Rate,hourly;
 

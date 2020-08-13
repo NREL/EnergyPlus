@@ -2281,7 +2281,7 @@
 
   Output:Variable,*,District Heating Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Electric Power,timestep;
+  Output:Variable,*,Zone Radiant HVAC Electricity Rate,timestep;
 
   Output:Variable,*,Zone Radiant HVAC Electric Energy,timestep;
 

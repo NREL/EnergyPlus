@@ -35165,17 +35165,17 @@
   Output:Table:Monthly,
     Cooling Part Load Performance,  !- Name
     0,                       !- Digits After Decimal
-    Cooling Coil Electric Power,  !- Variable or Meter 1 Name
+    Cooling Coil Electricity Rate,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling Coil Electric Power,  !- Variable or Meter 2 Name
+    Cooling Coil Electricity Rate,  !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
     Fan Part Load Performance,  !- Name
     0,                       !- Digits After Decimal
-    Fan Electric Power,      !- Variable or Meter 1 Name
+    Fan Electricity Rate,      !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Fan Electric Power,      !- Variable or Meter 2 Name
+    Fan Electricity Rate,      !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:TimeBins,

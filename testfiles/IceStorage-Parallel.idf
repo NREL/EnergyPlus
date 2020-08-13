@@ -3774,7 +3774,7 @@
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Hourly;
+  Output:Variable,*,Fan Electricity Rate,Hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
@@ -3798,7 +3798,7 @@
 
   Output:Variable,*,Chiller Condenser Heat Transfer Rate,Hourly;
 
-  Output:Variable,*,Chiller Electric Power,Hourly;
+  Output:Variable,*,Chiller Electricity Rate,Hourly;
 
   Output:Variable,*,Chiller Evaporator Inlet Temperature,Hourly;
 
@@ -3832,7 +3832,7 @@
 
   Output:Variable,*,Ice Thermal Storage Cooling Charge Energy,Hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Power,Hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Rate,Hourly;
 
   Output:Variable,*,Ice Thermal Storage Ancillary Electric Energy,Hourly;
 
@@ -3850,7 +3850,7 @@
 
   Output:Variable,*,Boiler Efficiency,Hourly;
 
-  Output:Variable,*,Pump Electric Power,Hourly;
+  Output:Variable,*,Pump Electricity Rate,Hourly;
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,Hourly;
 
@@ -3858,7 +3858,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,Hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,Hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,Hourly;
 
   Output:Variable,Ice Tank Inlet,System Node Mass Flow Rate,Hourly;
 
@@ -3943,7 +3943,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,  !- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3951,7 +3951,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,  !- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count

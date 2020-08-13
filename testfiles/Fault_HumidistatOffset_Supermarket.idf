@@ -2392,19 +2392,19 @@
 
   Output:Variable,*,Refrigeration Case Return Air Latent Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Evaporator Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Evaporator Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Anti Sweat Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Anti Sweat Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Defrost Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Case Defrost Energy Correction Curve Value,timestep;
 
   Output:Variable,*,Refrigeration Case Latent Credit Curve Value,timestep;
 
-  Output:Variable,*,Refrigeration Compressor Rack Electric Power,timestep;
+  Output:Variable,*,Refrigeration Compressor Rack Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack Total Heat Transfer Rate,timestep;
 

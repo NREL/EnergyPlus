@@ -2389,7 +2389,7 @@
 
   Output:Variable,*,Dehumidifier Part Load Ratio,hourly;
 
-  Output:Variable,*,Dehumidifier Electric Power,hourly;
+  Output:Variable,*,Dehumidifier Electricity Rate,hourly;
 
   Output:Variable,*,Dehumidifier Electric Energy,hourly;
 
@@ -2441,7 +2441,7 @@
 
   Output:Variable,Desiccant Process Outlet Node,System Node Humidity Ratio,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Fan Rise in Air Temperature,hourly;
 

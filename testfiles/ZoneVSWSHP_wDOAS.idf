@@ -547,7 +547,7 @@
     10.0,                    !- Minimum Value of y
     30.0;                    !- Maximum Value of y
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 
@@ -1578,7 +1578,7 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
 
@@ -1586,7 +1586,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 

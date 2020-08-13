@@ -2527,7 +2527,7 @@
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,Cat Diesel,Generator Produced Electric Power,timestep;
+  Output:Variable,Cat Diesel,Generator Produced Electricity Rate,timestep;
 
   Output:Variable,Cat Diesel,Generator Diesel Rate,timestep;
 
@@ -2537,7 +2537,7 @@
 
   Output:Variable,Cat Diesel,Generator Exhaust Air Temperature,timestep;
 
-  Output:Variable,Solar Turbine,Generator Produced Electric Power,timestep;
+  Output:Variable,Solar Turbine,Generator Produced Electricity Rate,timestep;
 
   Output:Variable,Solar Turbine,Generator NaturalGas Rate,timestep;
 
@@ -2547,7 +2547,7 @@
 
   Output:Variable,Solar Turbine,Generator Exhaust Air Temperature,timestep;
 
-  Output:Variable,Capstone C65,Generator Produced Electric Power,timestep;
+  Output:Variable,Capstone C65,Generator Produced Electricity Rate,timestep;
 
   Output:Variable,Capstone C65,Generator Gas HHV Basis Rate,timestep;
 
@@ -2557,19 +2557,19 @@
 
   Output:Variable,Capstone C65,Generator LHV Basis Electric Efficiency,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Power,Timestep;
+  Output:Variable,*,Facility Total Produced Electricity Rate,Timestep;
 
   Output:Variable,*,Facility Total Produced Electric Energy,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,Timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,Timestep;
 
   Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,Timestep;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,Timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

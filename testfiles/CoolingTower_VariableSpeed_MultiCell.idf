@@ -10853,7 +10853,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,detailed;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,detailed;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,detailed;
 
   Output:Variable,*,Cooling Tower Fan Electric Energy,detailed;
 

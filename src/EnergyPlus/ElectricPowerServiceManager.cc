@@ -348,9 +348,9 @@ void ElectricPowerServiceManager::getPowerManagerInput(IOFiles &ioFiles)
                             "Plant");
 
         SetupOutputVariable(
-            "Facility Total Building Electricity Demand Power", OutputProcessor::Unit::W, totalBldgElecDemand_, "System", "Average", name_);
-        SetupOutputVariable("Facility Total HVAC Electricity Demand Power", OutputProcessor::Unit::W, totalHVACElecDemand_, "System", "Average", name_);
-        SetupOutputVariable("Facility Total Electricity Demand Power", OutputProcessor::Unit::W, totalElectricDemand_, "System", "Average", name_);
+            "Facility Total Building Electricity Demand Rate", OutputProcessor::Unit::W, totalBldgElecDemand_, "System", "Average", name_);
+        SetupOutputVariable("Facility Total HVAC Electricity Demand Rate", OutputProcessor::Unit::W, totalHVACElecDemand_, "System", "Average", name_);
+        SetupOutputVariable("Facility Total Electricity Demand Rate", OutputProcessor::Unit::W, totalElectricDemand_, "System", "Average", name_);
 
         SetupOutputVariable("Facility Total Produced Electricity Rate", OutputProcessor::Unit::W, electProdRate_, "System", "Average", name_);
         SetupOutputVariable("Facility Total Produced Electricity Energy", OutputProcessor::Unit::J, electricityProd_, "System", "Sum", name_);
@@ -2762,7 +2762,7 @@ ACtoDCConverter::ACtoDCConverter(std::string const &objectName)
         SetupOutputVariable("Converter AC Input Electricity Energy", OutputProcessor::Unit::J, aCEnergyIn_, "System", "Sum", name_);
         SetupOutputVariable("Converter DC Output Electricity Rate", OutputProcessor::Unit::W, dCPowerOut_, "System", "Average", name_);
         SetupOutputVariable("Converter DC Output Electricity Energy", OutputProcessor::Unit::J, dCEnergyOut_, "System", "Sum", name_);
-        SetupOutputVariable("Converter Electricity Loss Power", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_);
+        SetupOutputVariable("Converter Electricity Loss Rate", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_);
         SetupOutputVariable("Converter Electricity Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_);
         SetupOutputVariable("Converter Electricity Loss Decrement Energy",
                             OutputProcessor::Unit::J,

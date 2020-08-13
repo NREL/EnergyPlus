@@ -2343,7 +2343,7 @@
 
   Output:Variable,*,Boiler Mass Flow Rate,monthly;
 
-  Output:Variable,*,Boiler Ancillary Electric Power,monthly;
+  Output:Variable,*,Boiler Ancillary Electricity Rate,monthly;
 
   Output:Variable,Cooling Coil Air Inlet Node,System Node Mass Flow Rate,monthly;
 

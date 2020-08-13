@@ -640,7 +640,7 @@
 
   Output:Variable,*,Generator Turbine Attack Angle,Hourly;
 
-  Output:Variable,*,Generator Produced Electric Power,Hourly;
+  Output:Variable,*,Generator Produced Electricity Rate,Hourly;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
 
@@ -648,11 +648,11 @@
 
   Output:Variable,*,Site Wind Speed,Hourly;
 
-  Output:Variable,*,Electric Load Center Produced Electric Power,Hourly;
+  Output:Variable,*,Electric Load Center Produced Electricity Rate,Hourly;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Hourly;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,Hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,Hourly;
 
   Output:Surfaces:Drawing,dxf:wireframe;
 

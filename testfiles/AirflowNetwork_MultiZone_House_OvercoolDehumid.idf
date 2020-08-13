@@ -2340,7 +2340,7 @@
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,Timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,Timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,Timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,Timestep;
 

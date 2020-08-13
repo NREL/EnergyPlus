@@ -2267,7 +2267,7 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

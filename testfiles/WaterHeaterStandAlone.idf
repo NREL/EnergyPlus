@@ -414,7 +414,7 @@
 
   Output:Variable,*,Water Heater NaturalNaturalGas Energy,DETAILED;
 
-  Output:Variable,*,Water Heater Electric Power,DETAILED;
+  Output:Variable,*,Water Heater Electricity Rate,DETAILED;
 
   Output:Variable,*,Water Heater Electric Energy,DETAILED;
 
@@ -426,11 +426,11 @@
 
   Output:Variable,*,Water Heater On Cycle Parasitic NaturalNaturalGas Energy,DETAILED;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,DETAILED;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,DETAILED;
 
   Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,DETAILED;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,DETAILED;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,DETAILED;
 
   Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,DETAILED;
 

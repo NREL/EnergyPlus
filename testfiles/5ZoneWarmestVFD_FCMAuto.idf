@@ -3715,7 +3715,7 @@
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Fan Rise in Air Temperature,hourly;
 

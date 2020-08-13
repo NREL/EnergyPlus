@@ -7374,29 +7374,29 @@
 
   Output:Variable,*,Refrigeration Case Return Air Latent Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Evaporator Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Evaporator Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Anti Sweat Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Anti Sweat Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Lighting Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Case Defrost Electric Power,timestep;
+  Output:Variable,*,Refrigeration Case Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Transcritical System Total High Pressure Compressor Electric Power,timestep;
+  Output:Variable,*,Refrigeration Transcritical System Total High Pressure Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Transcritical System High Pressure Compressor Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Refrigeration Transcritical System Low Pressure Compressor Electric Power,timestep;
+  Output:Variable,*,Refrigeration Transcritical System Low Pressure Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Transcritical System Low Pressure Compressor Heat Transfer Rate,timestep;
 
   Output:Variable,*,Refrigeration Transcritical System Gas Cooler Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Refrigeration Transcritical System Gas Cooler Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Transcritical System Gas Cooler Fan Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Transcritical System Average COP,timestep;
 
-  Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Electric Power,timestep;
+  Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Electricity Rate,timestep;
 
   Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack Total Heat Transfer Rate,timestep;
 

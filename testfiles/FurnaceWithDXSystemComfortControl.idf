@@ -1490,7 +1490,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Energy,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Zone Thermal Comfort Control Type,hourly;
 

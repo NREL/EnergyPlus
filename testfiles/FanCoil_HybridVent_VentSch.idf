@@ -2293,11 +2293,11 @@
 
   Output:Variable,Zone3FanCoil,Fan Coil Heating Rate,Timestep;
 
-  Output:Variable,Zone3FanCoil,Fan Coil Fan Electric Power,Timestep;
+  Output:Variable,Zone3FanCoil,Fan Coil Fan Electricity Rate,Timestep;
 
   Output:Variable,Zone3FanCoil,Fan Coil Availability Status,Timestep;
 
   Output:Variable,*,Availability Manager Hybrid Ventilation Control Status,Timestep;
 
-  Output:Variable,Zone3FanCoilFan,Fan Electric Power,Timestep;
+  Output:Variable,Zone3FanCoilFan,Fan Electricity Rate,Timestep;
 

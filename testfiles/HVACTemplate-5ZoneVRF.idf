@@ -2113,13 +2113,13 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Power,hourly;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Rate,hourly;
 
   Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,hourly;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Power,hourly;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,hourly;
 
   Output:Variable,*,Zone VRF Air Terminal Total Heating Rate,hourly;
 
@@ -2129,15 +2129,15 @@
 
   Output:Variable,*,VRF Heat Pump Total Heating Rate,hourly;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,hourly;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,hourly;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Power,hourly;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,hourly;
 
   Output:Variable,*,VRF Heat Pump Cooling COP,hourly;
 
   Output:Variable,*,VRF Heat Pump Heating COP,hourly;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Power,hourly;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,hourly;
 
   Output:Variable,*,VRF Heat Pump Part Load Ratio,hourly;
 
@@ -2149,7 +2149,7 @@
 
   Output:Variable,*,VRF Heat Pump Condenser Inlet Temperature,hourly;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Power,hourly;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,hourly;
 
   Output:Variable,*,VRF Heat Pump Terminal Unit Cooling Load Rate,hourly;
 

@@ -2518,7 +2518,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Latent Cooling Rate,Hourly;
 
-  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electric Power,Hourly;
+  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electricity Rate,Hourly;
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio,Hourly;
 
@@ -2526,7 +2526,7 @@
 
   Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,Hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,Hourly;
 
   Output:Variable,*,Heating Coil Electric Energy,Hourly;
 

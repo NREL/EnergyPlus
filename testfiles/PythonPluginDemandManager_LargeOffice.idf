@@ -11105,7 +11105,7 @@
 
   Output:Meter,Gas:Facility,Timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
 

@@ -521,7 +521,7 @@
 
   Output:Variable,*,Heat Pump Source Side Outlet Temperature,Hourly;
 
-  Output:Variable,*,Heat Pump Electric Power,Hourly;
+  Output:Variable,*,Heat Pump Electricity Rate,Hourly;
 
   Output:Variable,*,Heat Pump Electric Energy,Hourly;
 

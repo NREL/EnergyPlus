@@ -5208,7 +5208,7 @@
 
   Output:Variable,*,Refrigeration System Condenser Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Pump Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Condenser Pump Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Pump Electric Energy,timestep;
 
@@ -5220,19 +5220,19 @@
 
   Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electric Energy,timestep;
 
-  Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Fan Electric Energy,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Condenser Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Compressor Rack Electric Power,timestep;
+  Output:Variable,*,Refrigeration Compressor Rack Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack Total Heat Transfer Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack COP,timestep;
 
-  Output:Variable,*,Refrigeration System Total Compressor Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Total Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Total Compressor Heat Transfer Rate,timestep;
 

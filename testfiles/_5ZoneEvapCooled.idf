@@ -3423,7 +3423,7 @@
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
@@ -3435,7 +3435,7 @@
 
   Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Chiller Basin Heater Electric Power,hourly;
+  Output:Variable,*,Chiller Basin Heater Electricity Rate,hourly;
 
   Output:Variable,*,Pump Mass Flow Rate,hourly;
 

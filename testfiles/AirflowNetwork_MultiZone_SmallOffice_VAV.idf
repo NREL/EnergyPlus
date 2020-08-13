@@ -3533,7 +3533,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Zone Air Temperature,timestep;
 

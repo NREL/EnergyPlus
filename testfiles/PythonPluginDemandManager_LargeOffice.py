@@ -13,7 +13,7 @@ class DetermineCurrentDemandManageState(EnergyPlusPlugin):
         self.need_to_get_handles = True
 
     def get_handles(self):
-        self.sensors['CurntFacilityElectDemand'] = self.api.exchange.get_variable_handle('Facility Total Electric Demand Power', 'Whole Building')
+        self.sensors['CurntFacilityElectDemand'] = self.api.exchange.get_variable_handle('Facility Total Electricity Demand Rate', 'Whole Building')
         self.globals['argDmndMngrState'] = self.api.exchange.get_global_handle('argDmndMngrState')
         self.globals['argCrntDmnd'] = self.api.exchange.get_global_handle('argCrntDmnd')
         self.globals['argTrendDirection'] = self.api.exchange.get_global_handle('argTrendDirection')
@@ -54,7 +54,7 @@ class DetermineCurrentDemandManageState(EnergyPlusPlugin):
             self.get_handles()
         if self.sensors['CurntFacilityElectDemand'] == -1:
             # try to look it up again
-            self.sensors['CurntFacilityElectDemand'] = self.api.exchange.get_variable_handle('Facility Total Electric Demand Power', 'Whole Building')
+            self.sensors['CurntFacilityElectDemand'] = self.api.exchange.get_variable_handle('Facility Total Electricity Demand Rate', 'Whole Building')
             # if it is still -1, then just return for now
             if self.sensors['CurntFacilityElectDemand'] == -1:
                 return 0

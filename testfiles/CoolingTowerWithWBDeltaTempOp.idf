@@ -2539,7 +2539,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Chiller Electric Power,timestep;
+  Output:Variable,*,Chiller Electricity Rate,timestep;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,timestep;
 
@@ -2565,7 +2565,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Tower Fan Electric Energy,timestep;
 

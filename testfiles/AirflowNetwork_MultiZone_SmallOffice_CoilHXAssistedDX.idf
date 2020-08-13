@@ -3231,7 +3231,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep,ReportSch;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep,ReportSch;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep,ReportSch;
 
   Output:Variable,*,Zone Air Temperature,timestep,ReportSch;
 
@@ -3241,7 +3241,7 @@
 
   Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep,ReportSch;
 
-  Output:Variable,*,Heat Exchanger Electric Power,timestep,ReportSch;
+  Output:Variable,*,Heat Exchanger Electricity Rate,timestep,ReportSch;
 
   Output:Variable,*,System Node Temperature,timestep,ReportSch;
 

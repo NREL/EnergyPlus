@@ -2923,7 +2923,7 @@
 
   Output:Variable,*,Cooling Tower Mass Flow Rate,timestep;
 
-  Output:Variable,*,Water Heater Electric Power,timestep;
+  Output:Variable,*,Water Heater Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack Condenser Mass Flow Rate,timestep;
 
