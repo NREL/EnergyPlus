@@ -501,10 +501,10 @@ namespace UtilityRoutines {
             FuelTypeOutput = "Coal";
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
+            FuelTypeOutput = "FuelOilNo1";
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
+            FuelTypeOutput = "FuelOilNo2";
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -593,12 +593,12 @@ namespace UtilityRoutines {
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+            FuelTypeOutput = "FuelOilNo1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+            FuelTypeOutput = "FuelOilNo2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -1844,12 +1844,12 @@ namespace UtilityRoutines {
 
 
         if (UtilityRoutines::outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
             UtilityRoutines::outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-           if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout
@@ -1862,7 +1862,7 @@ namespace UtilityRoutines {
         if (present(OutUnit2)) {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
-        std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
+        std::string tmp = "  " + ErrorMessage + '\n';
         if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 

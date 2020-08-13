@@ -118,8 +118,8 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Gasoline), "Gasoline");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Diesel), "Diesel");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Coal), "Coal");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_FuelOil_1), "FuelOil#1");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_FuelOil_2), "FuelOil#2");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_FuelOil_1), "FuelOilNo1");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_FuelOil_2), "FuelOilNo2");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Propane), "Propane");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_OtherFuel1), "OtherFuel1");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_OtherFuel2), "OtherFuel2");

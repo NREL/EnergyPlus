@@ -95,7 +95,12 @@ namespace LowTempRadiantSystem {
     // Setpoint Types:
     enum class LowTempRadiantSetpointTypes {
       halfFlowPower,        // Controls system where the setpoint is at the 50% flow/power point
-      zeroFlowPower,        // Controls system where the setpoint is at the 0% flow/power point
+      zeroFlowPower         // Controls system where the setpoint is at the 0% flow/power point
+    };
+    // Fluid to Slab Heat Transfer Types:
+    enum class FluidToSlabHeatTransferTypes {
+        ConvectionOnly,     // Convection only model (legacy code, original model)
+        ISOStandard         // Using ISO Standard 1185-2 (convection, conduction through pipe, contact resistance)
     };
     // Condensation control types:
     extern int const CondCtrlNone;      // Condensation control--none, so system never shuts down
@@ -205,8 +210,11 @@ namespace LowTempRadiantSystem {
     {
         // Members
         Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
-        Real64 TubeDiameter;             // tube diameter for embedded tubing
-        Real64 TubeLength;               // tube length embedded in radiant surface
+        Real64 TubeDiameterInner;        // inside tube diameter for embedded tubing (meters)
+        Real64 TubeDiameterOuter;        // outside tube diameter for embedded tubing (meters)
+        Real64 TubeLength;               // tube length embedded in radiant surface (meters)
+        Real64 TubeConductivity;         // tube conductivity in W/m-K
+        FluidToSlabHeatTransferTypes FluidToSlabHeatTransfer;   // Model used for calculating heat transfer between fluid and slab
         bool HeatingSystem;              // .TRUE. when the system is able to heat (parameters are valid)
         int HotWaterInNode;              // hot water inlet node
         int HotWaterOutNode;             // hot water outlet node
@@ -242,7 +250,8 @@ namespace LowTempRadiantSystem {
 
         // Default Constructor
         HydronicSystemBaseData()
-            : TubeDiameter(0.0), TubeLength(0.0),HeatingSystem(false), HotWaterInNode(0), HotWaterOutNode(0), HWLoopNum(0), HWLoopSide(0),
+        : TubeDiameterInner(0.0), TubeDiameterOuter(0.0), TubeLength(0.0), TubeConductivity(0.0), FluidToSlabHeatTransfer(FluidToSlabHeatTransferTypes::ConvectionOnly),
+              HeatingSystem(false), HotWaterInNode(0), HotWaterOutNode(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchNum(0), HWCompNum(0),CoolingSystem(false), ColdWaterInNode(0), ColdWaterOutNode(0), CWLoopNum(0), CWLoopSide(0),
               CWBranchNum(0), CWCompNum(0), GlycolIndex(0), CondErrIndex(0), CondCtrlType(1), CondDewPtDeltaT(1.0), CondCausedTimeOff(0.0),
               CondCausedShutDown(false), NumCircCalcMethod(0), CircLength(0.0), EMSOverrideOnWaterMdot(false), EMSWaterMdotOverrideValue(0.0),
@@ -250,11 +259,16 @@ namespace LowTempRadiantSystem {
         {
         }
 
-        Real64 calculateHXEffectivenessTerm(Real64 const Temperature,   // Temperature of water entering the radiant system, in C
+        FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(std::string const userInput);
+        
+        Real64 calculateHXEffectivenessTerm(int const SurfNum,          // Surface Number
+                                            Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                             Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
                                             Real64 const FlowFraction,  // Mass flow rate fraction for this surface in the radiant system
                                             Real64 const NumCircs      // Number of fluid circuits in this surface
         );
+        
+        Real64 calculateUFromISOStandard(int const SurfNum, Real64 const WaterMassFlow);
 
         Real64 sizeRadiantSystemTubeLength();
 
