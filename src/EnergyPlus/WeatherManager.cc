@@ -3284,25 +3284,8 @@ namespace WeatherManager {
                     TomorrowOutRelHum(ts, hour) = LastHrOutRelHum * WtPrevHour + Wthr.OutRelHum(hour) * WtNow;
                     TomorrowWindSpeed(ts, hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(hour) * WtNow;
                     TomorrowWindDir(ts, hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(hour), WtNow);
-                    TomorrowHorizIRSky(ts, hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(hour) * WtNow;
-                    if (Environment(Envrn).SkyTempModel == EmissivityCalcType::BruntModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::IdsoModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::BerdahlMartinModel ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::SkyTAlgorithmA ||
-                        Environment(Envrn).SkyTempModel == EmissivityCalcType::ClarkAllenModel) {
-                        TomorrowSkyTemp(ts, hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(hour) * WtNow;
-                    }
-                    TomorrowDifSolarRad(ts, hour) =
-                        LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad(hour) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
-                    TomorrowBeamSolarRad(ts, hour) =
-                        LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad(hour) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
-
-                    TomorrowLiquidPrecip(ts, hour) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(hour) * WtNow;
-                    TomorrowLiquidPrecip(ts, hour) /= double(DataGlobals::NumOfTimeStepInHour);
                     TomorrowTotalSkyCover(ts, hour) = LastHrTotalSkyCover * WtPrevHour + Wthr.TotalSkyCover(hour) * WtNow;
                     TomorrowOpaqueSkyCover(ts, hour) = LastHrOpaqueSkyCover * WtPrevHour + Wthr.OpaqueSkyCover(hour) * WtNow;
-
-                    // TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
                     // Sky emissivity now takes interpolated timestep inputs rather than interpolated calcation esky results
                     calcSky(TomorrowHorizIRSky(ts, hour),
                             TomorrowSkyTemp(ts, hour),
@@ -3311,6 +3294,14 @@ namespace WeatherManager {
                             TomorrowOutDewPointTemp(ts, hour),
                             TomorrowOutRelHum(ts, hour) * 0.01,
                             LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(hour) * WtNow);  
+
+                    TomorrowDifSolarRad(ts, hour) =
+                        LastHrDifSolarRad * WgtPrevHour + Wthr.DifSolarRad(hour) * WgtHourNow + NextHrDifSolarRad * WgtNextHour;
+                    TomorrowBeamSolarRad(ts, hour) =
+                        LastHrBeamSolarRad * WgtPrevHour + Wthr.BeamSolarRad(hour) * WgtHourNow + NextHrBeamSolarRad * WgtNextHour;
+
+                    TomorrowLiquidPrecip(ts, hour) = LastHrLiquidPrecip * WtPrevHour + Wthr.LiquidPrecip(hour) * WtNow;
+                    TomorrowLiquidPrecip(ts, hour) /= double(DataGlobals::NumOfTimeStepInHour);
 
                     TomorrowIsRain(ts, hour) =
                         TomorrowLiquidPrecip(ts, hour) >= (0.8 / double(DataGlobals::NumOfTimeStepInHour)); // Wthr%IsRain(Hour)
