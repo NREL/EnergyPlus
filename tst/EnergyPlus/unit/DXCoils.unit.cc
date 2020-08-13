@@ -489,7 +489,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     NumCurves = 11;
     PerfCurve.allocate(NumCurves);
 
-    PerfomanceCurveData *pCurve;
+    PerformanceCurveData *pCurve;
 
     int const nCapfT1 = 1;
     pCurve = &PerfCurve(nCapfT1);
@@ -662,7 +662,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.MSPLFFPLR(2) = nPLFfPLR2;
 
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
-        PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
+        PerformanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == BiQuadratic) {
             rCurve.ObjectType = "Curve:Biquadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
@@ -831,7 +831,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     NumCurves = 5;
     PerfCurve.allocate(NumCurves);
 
-    PerfomanceCurveData *pCurve;
+    PerformanceCurveData *pCurve;
 
     int const nCapfT2 = 1;
     pCurve = &PerfCurve(nCapfT2);
@@ -910,7 +910,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.PLFFPLR(1) = nPLFfPLR2;
 
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
-        PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
+        PerformanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == BiQuadratic) {
             rCurve.ObjectType = "Curve:Biquadratic";
             rCurve.InterpolationType = EvaluateCurveToLimits;
@@ -1320,7 +1320,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
 
     EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType); // it also covers a test for fuel type input
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
-    
+
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs

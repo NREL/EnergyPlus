@@ -74,12 +74,6 @@ namespace EnergyPlus {
 
 namespace CurveManager {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern std::string const Blank;
-
     // Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
     extern int const Linear;
     extern int const BiLinear;
@@ -110,10 +104,6 @@ namespace CurveManager {
 
     extern int NumCurves;
     extern bool GetCurvesInputFlag; // First time, input is "gotten"
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE
-
-    // Types
 
     struct TriQuadraticCurveDataStruct
     {
@@ -156,7 +146,7 @@ namespace CurveManager {
         }
     };
 
-    struct PerfomanceCurveData
+    struct PerformanceCurveData
     {
         // Members
         std::string Name;                                 // Curve Name
@@ -224,13 +214,14 @@ namespace CurveManager {
         Real64 CurveInput6; // curve input #6 (e.g., X6 variable)
 
         // Default Constructor
-        PerfomanceCurveData()
-            : ObjectType(""), CurveType(0), InterpolationType(0), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
-              NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), NormalizationValue(1.0), Coeff1(0.0), Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0),
-              Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0), Coeff11(0.0), Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0),
-              Var3Max(0.0), Var3Min(0.0), Var4Max(0.0), Var4Min(0.0), Var5Max(0.0), Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0),
-              CurveMax(0.0), CurveMinPresent(false), CurveMaxPresent(false), Var1MinPresent(false), Var1MaxPresent(false), Var2MinPresent(false),
-              Var2MaxPresent(false), Var3MinPresent(false), Var3MaxPresent(false), Var4MinPresent(false), Var4MaxPresent(false),
+        PerformanceCurveData()
+            : CurveType(0), InterpolationType(0), DataFormat(0), TableIndex(0), NumDims(0), NumIVLowErrorIndex(0),
+              NumIVHighErrorIndex(0), X1SortOrder(1), X2SortOrder(1), GridValueIndex(0), NormalizationValue(1.0), Coeff1(0.0),
+              Coeff2(0.0), Coeff3(0.0), Coeff4(0.0), Coeff5(0.0), Coeff6(0.0), Coeff7(0.0), Coeff8(0.0), Coeff9(0.0), Coeff10(0.0),
+              Coeff11(0.0), Coeff12(0.0), Var1Max(0.0), Var1Min(0.0), Var2Max(0.0), Var2Min(0.0), Var3Max(0.0), Var3Min(0.0), Var4Max(0.0),
+              Var4Min(0.0), Var5Max(0.0), Var5Min(0.0), Var6Max(0.0), Var6Min(0.0), CurveMin(0.0), CurveMax(0.0), CurveMinPresent(false),
+              CurveMaxPresent(false), Var1MinPresent(false), Var1MaxPresent(false), Var2MinPresent(false), Var2MaxPresent(false),
+              Var3MinPresent(false), Var3MaxPresent(false), Var4MinPresent(false), Var4MaxPresent(false),
               Var5MinPresent(false), Var5MaxPresent(false), Var6MinPresent(false), Var6MaxPresent(false), EMSOverrideOn(false),
               EMSOverrideCurveValue(0.0), CurveOutput(0.0), CurveInput1(0.0), CurveInput2(0.0), CurveInput3(0.0),
               CurveInput4(0.0), CurveInput5(0.0), CurveInput6(0.0)
@@ -251,8 +242,8 @@ namespace CurveManager {
         std::vector<double>& getArray(std::pair<std::size_t, std::size_t> colAndRow);
 
     private:
-        std::size_t numRows;
-        std::size_t numColumns;
+        std::size_t numRows = 0u;
+        std::size_t numColumns = 0u;
     };
 
     // Container for Btwxt N-d Objects
@@ -266,14 +257,14 @@ namespace CurveManager {
         int addGrid(std::string indVarListName, Btwxt::GriddedData grid) {
             grids.emplace_back(Btwxt::RegularGridInterpolator(grid));
             gridMap.emplace(indVarListName,grids.size() - 1 );
-            return grids.size() - 1;
+            return static_cast<int>(grids.size()) - 1;
         };
-        double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar = 1.0);
+        double normalizeGridValues(int gridIndex, int outputIndex, std::vector<double> target, double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(std::string indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
         std::pair<double, double> getGridAxisLimits(int gridIndex, int axisIndex);
-        double getGridValue(int gridIndex, int outputIndex, const std::vector<double> target);
+        double getGridValue(int gridIndex, int outputIndex, std::vector<double> target);
         std::map<std::string, const json&> independentVarRefs;
         std::map<std::string, TableFile> tableFiles;
         void clear();
@@ -283,13 +274,13 @@ namespace CurveManager {
     };
 
     // Object Data
-    extern Array1D<PerfomanceCurveData> PerfCurve;
+    extern Array1D<PerformanceCurveData> PerfCurve;
     extern BtwxtManager btwxtManager;
     // Functions
 
     void BtwxtMessageCallback(
-        const Btwxt::MsgLevel messageType,
-        const std::string message,
+        Btwxt::MsgLevel messageType,
+        std::string message,
         void *contextPtr
     );
 
@@ -299,8 +290,8 @@ namespace CurveManager {
 
     void ResetPerformanceCurveOutput();
 
-    Real64 CurveValue(int const CurveIndex,            // index of curve in curve array
-                      Real64 const Var1,               // 1st independent variable
+    Real64 CurveValue(int CurveIndex,            // index of curve in curve array
+                      Real64 Var1,               // 1st independent variable
                       Optional<Real64 const> Var2 = _, // 2nd independent variable
                       Optional<Real64 const> Var3 = _, // 3rd independent variable
                       Optional<Real64 const> Var4 = _, // 4th independent variable
@@ -314,15 +305,15 @@ namespace CurveManager {
 
     void InitCurveReporting();
 
-    Real64 PerformanceCurveObject(int const CurveIndex,            // index of curve in curve array
-                                  Real64 const Var1,               // 1st independent variable
+    Real64 PerformanceCurveObject(int CurveIndex,            // index of curve in curve array
+                                  Real64 Var1,               // 1st independent variable
                                   Optional<Real64 const> Var2 = _, // 2nd independent variable
                                   Optional<Real64 const> Var3 = _, // 3rd independent variable
                                   Optional<Real64 const> Var4 = _  // 4th independent variable
     );
 
-    Real64 BtwxtTableInterpolation(int const CurveIndex,            // index of curve in curve array
-                                   Real64 const Var1,               // 1st independent variable
+    Real64 BtwxtTableInterpolation(int CurveIndex,            // index of curve in curve array
+                                   Real64 Var1,               // 1st independent variable
                                    Optional<Real64 const> Var2 = _, // 2nd independent variable
                                    Optional<Real64 const> Var3 = _, // 3rd independent variable
                                    Optional<Real64 const> Var4 = _, // 4th independent variable
@@ -333,16 +324,16 @@ namespace CurveManager {
 
     bool IsCurveOutputTypeValid(std::string const &InOutputType); // index of curve in curve array
 
-    bool CheckCurveDims(int const CurveIndex,
+    bool CheckCurveDims(int CurveIndex,
                         std::vector<int> validDims,
                         std::string routineName,
                         std::string objectType,
                         std::string objectName,
                         std::string curveFieldText);
 
-    std::string GetCurveName(int const CurveIndex); // index of curve in curve array
+    std::string GetCurveName(int CurveIndex); // index of curve in curve array
 
-    Real64 GetNormalPoint(int const CurveIndex);
+    Real64 GetNormalPoint(int CurveIndex);
 
     int GetCurveIndex(std::string const &CurveName); // name of the curve
 
@@ -354,7 +345,7 @@ namespace CurveManager {
                       std::string const &ObjName // parent object of curve
     );
 
-    void GetCurveMinMaxValues(int const CurveIndex,         // index of curve in curve array
+    void GetCurveMinMaxValues(int CurveIndex,         // index of curve in curve array
                               Real64 &Var1Min,              // Minimum values of 1st independent variable
                               Real64 &Var1Max,              // Maximum values of 1st independent variable
                               Optional<Real64> Var2Min = _, // Minimum values of 2nd independent variable
@@ -363,7 +354,7 @@ namespace CurveManager {
                               Optional<Real64> Var3Max = _  // Maximum values of 2nd independent variable
     );
 
-    void SetCurveOutputMinMaxValues(int const CurveIndex,                // index of curve in curve array
+    void SetCurveOutputMinMaxValues(int CurveIndex,                // index of curve in curve array
                                     bool &ErrorsFound,                   // TRUE when errors occur
                                     Optional<Real64 const> CurveMin = _, // Minimum value of curve output
                                     Optional<Real64 const> CurveMax = _  // Maximum values of curve output
@@ -375,16 +366,16 @@ namespace CurveManager {
                                       int &PressureCurveType,
                                       int &PressureCurveIndex);
 
-    Real64 PressureCurveValue(int const PressureCurveIndex, Real64 const MassFlow, Real64 const Density, Real64 const Viscosity);
+    Real64 PressureCurveValue(int PressureCurveIndex, Real64 MassFlow, Real64 Density, Real64 Viscosity);
 
-    Real64 CalculateMoodyFrictionFactor(Real64 const ReynoldsNumber, Real64 const RoughnessRatio);
+    Real64 CalculateMoodyFrictionFactor(Real64 ReynoldsNumber, Real64 RoughnessRatio);
 
-    void checkCurveIsNormalizedToOne(std::string const callingRoutineObj, // calling routine with object type
-                                     std::string const objectName,        // parent object where curve is used
-                                     int const curveIndex,                // index to curve object
-                                     std::string const cFieldName,        // object field name
-                                     std::string const cFieldValue,       // user input curve name
-                                     Real64 const Var1,                   // required 1st independent variable
+    void checkCurveIsNormalizedToOne(std::string callingRoutineObj, // calling routine with object type
+                                     std::string objectName,        // parent object where curve is used
+                                     int curveIndex,                // index to curve object
+                                     std::string cFieldName,        // object field name
+                                     std::string cFieldValue,       // user input curve name
+                                     Real64 Var1,                   // required 1st independent variable
                                      Optional<Real64 const> Var2 = _,     // 2nd independent variable
                                      Optional<Real64 const> Var3 = _,     // 3rd independent variable
                                      Optional<Real64 const> Var4 = _,     // 4th independent variable

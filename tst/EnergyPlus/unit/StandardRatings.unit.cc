@@ -122,7 +122,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.OATempCompressorOnOffBlank = "true";
     NumCurves = 5;
     PerfCurve.allocate(NumCurves);
-    PerfomanceCurveData *pCurve;
+    PerformanceCurveData *pCurve;
 
     int const nCapfT = 1;
     pCurve = &PerfCurve(nCapfT);
@@ -194,7 +194,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.PLFFPLR(1) = nPLFfPLR;
 
     for (int CurveNum = 1; CurveNum <= NumCurves; ++CurveNum) {
-        PerfomanceCurveData &rCurve = PerfCurve(CurveNum);
+        PerformanceCurveData &rCurve = PerfCurve(CurveNum);
         if (rCurve.CurveType == Cubic) {
             rCurve.ObjectType = "Curve:Cubic";
         } else if (rCurve.CurveType == Quadratic) {
@@ -504,8 +504,8 @@ TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a 
-    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b 
+    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a
+    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b
     thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
     // reset output variables
@@ -767,8 +767,8 @@ TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
     // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
     // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
     // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
-    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a 
-    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b 
+    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a
+    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b
     thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
     thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
     // reset output variables

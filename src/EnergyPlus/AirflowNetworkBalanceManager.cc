@@ -6076,7 +6076,7 @@ namespace AirflowNetworkBalanceManager {
         Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
 
         int CurveNum = CurveManager::PerfCurve.size() + 1;
-        CurveManager::PerfCurve.push_back(CurveManager::PerfomanceCurveData());
+        CurveManager::PerfCurve.push_back(CurveManager::PerformanceCurveData());
 
         CurveManager::PerfCurve(CurveNum).Name = name;
         CurveManager::PerfCurve(CurveNum).ObjectType = "Table:Lookup";
