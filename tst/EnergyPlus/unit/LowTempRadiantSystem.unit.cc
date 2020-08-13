@@ -497,7 +497,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
         "    Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name",
         "    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model",
         "    0.012,                   !- Hydronic Tubing Inside Diameter {m}",
-        "    0.016,                   !- Hydronic Tubing Inside Diameter {m}",
+        "    0.016,                   !- Hydronic Tubing Outside Diameter {m}",
         "    autosize,                !- Hydronic Tubing Length {m}",
         "    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}",
         "    MeanAirTemperature,      !- Temperature Control Type",
