@@ -63,7 +63,6 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -674,12 +673,12 @@ Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
     }
 }
 
-void CoilCoolingDX::size(state) {
+void CoilCoolingDX::size(EnergyPlusData& state) {
     this->performance.parentName = this->name;
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlusData& state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -821,7 +820,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
             // report out fan information
             if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
                 if (this->supplyFanIndex >= 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
                                                                  coilCoolingDXObjectName,
                                                                  HVACFan::fanObjs[this->supplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -829,7 +828,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
                 }
             } else {
                 if (this->supplyFanIndex >= 1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, this->name,
                                                                  coilCoolingDXObjectName,
                                                                  Fans::Fan(this->supplyFanIndex).FanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -943,20 +942,20 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
 }
 
-void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
+void CoilCoolingDX::reportAllStandardRatings(IOFiles& ioFiles) {
 
     if (!coilCoolingDXs.empty()) {
         Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr auto Format_990(
                 "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                 "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
-        print(outputFiles.eio, "{}", Format_990);
+        print(ioFiles.eio, "{}", Format_990);
         for (auto &coil : coilCoolingDXs) {
             coil.performance.calcStandardRatings210240();
 
             static constexpr auto Format_991(
                     " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
-            print(outputFiles.eio, Format_991,
+            print(ioFiles.eio, Format_991,
                   "Coil:Cooling:DX", coil.name,
                   coil.performance.standardRatingCoolingCapacity,
                   coil.performance.standardRatingEER,
@@ -974,7 +973,7 @@ void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
             // Btu/W-h will convert to itself
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, coil.name,
                                                      coil.performance.standardRatingEER * ConvFromSIToIP, 2);
-            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, coil.name,
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERUserIP, coil.name,
                                                      coil.performance.standardRatingSEER * ConvFromSIToIP, 2);
             OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, coil.name,
                                                      coil.performance.standardRatingIEER * ConvFromSIToIP, 2);

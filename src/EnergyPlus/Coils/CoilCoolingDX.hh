@@ -53,7 +53,6 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
     // Forward declarations
@@ -79,10 +78,10 @@ struct CoilCoolingDX
     static int factory(std::string const &coilName);
     static void getInput();
     static void clear_state();
-    static void reportAllStandardRatings(OutputFiles &outputFiles);
+    static void reportAllStandardRatings(IOFiles& ioFiles);
     void instantiateFromInputSpec(const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit();
-    void simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR = -1.0);
+    void simulate(EnergyPlusData& state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode, Real64 LoadSHR = -1.0);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
                       int &evapOutletNodeIndex,

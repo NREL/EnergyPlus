@@ -184,8 +184,8 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                                                 int const fanOpMode,
                                                 DataLoopNode::NodeData &condInletNode,
                                                 DataLoopNode::NodeData &condOutletNode,
-                                                Real64 LoadSHR,
-                                                bool const singleMode)
+                                                bool const singleMode,
+                                                Real64 LoadSHR)
 {
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
@@ -205,7 +205,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 
         this->recoveredEnergyRate = 0.0;
         this->NormalSHR = 0.0;
-        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 
         //this->OperatingMode = 1;
         totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
@@ -232,7 +232,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 
         if (LoadSHR < SysNorSHR) {
             outletNode.MassFlowRate = inletNode.MassFlowRate;
-            this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+            this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
             totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
             minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
             sensSubRate = outletNode.MassFlowRate *
@@ -240,7 +240,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
             SysSubSHR = sensSubRate / totalCoolingRate;
             if (LoadSHR < SysSubSHR) {
                 outletNode.MassFlowRate = inletNode.MassFlowRate;
-                this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+                this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
                 totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
                 minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
                 sensRehRate = outletNode.MassFlowRate *
@@ -367,9 +367,6 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
         this->powerUse = 0.0;
         this->electricityConsumption = 0.0;
     }
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex,
-                                                           IOFiles &ioFiles) {
-
 }
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
@@ -503,5 +500,48 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
     } else {
         ShowSevereError("Standard Ratings: Coil:Cooling:DX " + this->name +  // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later
                         " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
+    }
+}
+void CoilCoolingDXCurveFitPerformance::setOperMode(CoilCoolingDXCurveFitOperatingMode& currentMode, int const mode)
+{
+    // set parent mode for each speed
+    int numSpeeds;
+    bool errorsFound = false;
+
+    numSpeeds = (int)currentMode.speeds.size();
+    for (int speedNum = 0; speedNum < numSpeeds; speedNum++) {
+        currentMode.speeds[speedNum].parentOperatingMode = mode;
+        if (mode == 2) {
+            if (currentMode.speeds[speedNum].indexSHRFT == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                    "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+            if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                    "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+        }
+        if (mode == 3) {
+            if (currentMode.speeds[speedNum].indexSHRFT == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Temperature Curve Name is required, but not available for "
+                    "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+            if (currentMode.speeds[speedNum].indexSHRFFF == 0) {
+                ShowSevereError(currentMode.speeds[speedNum].object_name + "=\"" + currentMode.speeds[speedNum].name + "\", Curve check:");
+                ShowContinueError("The input of Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name is required, but not available for "
+                    "SubcoolReheat mode. Please input");
+                errorsFound = true;
+            }
+        }
+    }
+    if (errorsFound) {
+        ShowFatalError("CoilCoolingDXCurveFitPerformance: Errors found in getting " + this->object_name +
+            " input. Preceding condition(s) causes termination.");
     }
 }

@@ -485,7 +485,8 @@ namespace UnitarySystems {
                                          std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 genericDXCoilResidual(Real64 const PartLoadRatio, // iteration routine for Coil:Cooling:DX
+        static Real64 genericDXCoilResidual(EnergyPlusData &state,
+                                            Real64 const PartLoadRatio, // iteration routine for Coil:Cooling:DX
                                             std::vector<Real64> const &Par);
 
         static Real64 DOE2DXCoilHumRatResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)

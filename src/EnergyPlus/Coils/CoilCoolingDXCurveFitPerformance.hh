@@ -91,8 +91,8 @@ struct CoilCoolingDXCurveFitPerformance
                   int const fanOpMode,
                   DataLoopNode::NodeData &condInletNode,
                   DataLoopNode::NodeData &condOutletNode,
-                  Real64 LoadSHR = 0.0,
-                  bool const singleMode);
+                  bool const singleMode,
+                  Real64 LoadSHR = 0.0);
 
     void calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
                    const DataLoopNode::NodeData &inletNode,

@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "../Coils/CoilCoolingDXFixture.hh"
@@ -151,7 +152,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     condInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(condInletNode.Temp, condInletNode.HumRat);
 
     // size it
-    thisCoil.size();
+    thisCoil.size(state);
 
     // for speed > 1 we use the mshp rated high speed flow...
     DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
@@ -166,7 +167,8 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     int speedNum = 1;
     Real64 speedRatio = 1.0;
     int fanOpMode = 1;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    bool singleMode = false;
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
 //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(2500, thisCoil.totalCoolingEnergyRate, 0.1); // expect the coil to run full out, at speed 1
     EXPECT_NEAR(19.485, evapOutletNode.Temp, 0.01);
@@ -175,7 +177,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     // alter values and run at rated conditions normal mode speed 2
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
     speedNum = 2;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
 //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(5000, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     EXPECT_NEAR(17.896, evapOutletNode.Temp, 0.01);
@@ -184,7 +186,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     // ok so now run at alternate mode, speed 1
     useAlternateMode = true;
     speedNum = 1;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
 //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(2250, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     EXPECT_NEAR(24.45, evapOutletNode.Temp, 0.01);
@@ -193,7 +195,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     // ok so now run at alternate mode, speed 2
     useAlternateMode = true;
     speedNum = 2;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
 //    std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     EXPECT_NEAR(4500, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     EXPECT_NEAR(20.39, evapOutletNode.Temp, 0.01);
@@ -286,7 +288,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     condInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(condInletNode.Temp, condInletNode.HumRat);
 
     // size it
-    thisCoil.size();
+    thisCoil.size(state);
 
     // for speed > 1 we use the mshp rated high speed flow...
     DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
@@ -303,7 +305,8 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     int speedNum = 1;
     Real64 speedRatio = 1.0;
     int fanOpMode = 1;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    bool singleMode = false;
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
         std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     } else {
@@ -314,7 +317,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     // alter values and run at rated conditions normal mode speed 2
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
     speedNum = 2;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
         std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     } else {
@@ -326,7 +329,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     // ok so now run at alternate mode, speed 1
     useAlternateMode = true;
     speedNum = 1;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
         std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     } else {
@@ -338,7 +341,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
     // ok so now run at alternate mode, speed 2
     useAlternateMode = true;
     speedNum = 2;
-    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    thisCoil.simulate(state, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, singleMode);
     if (!setExpectations) {
         std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     } else {

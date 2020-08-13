@@ -1770,7 +1770,7 @@ namespace HVACManager {
 
         if (stillNeedToReportStandardRatings) {
             if (!ZoneSizingCalc && !SysSizingCalc && !WarmupFlag) {
-                CoilCoolingDX::reportAllStandardRatings(OutputFiles::getSingleton());
+                CoilCoolingDX::reportAllStandardRatings(state.files);
             }
         }
     }

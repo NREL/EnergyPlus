@@ -246,7 +246,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
             }
         }
 
-        curSpeed.size(thisSpeedNum, numSpeeds);
+        curSpeed.size(state, thisSpeedNum, numSpeeds);
         thisSpeedNum++;
     }
 }
