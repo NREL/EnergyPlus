@@ -3335,14 +3335,14 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     int surfNum = 1;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 1);
+    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 1u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 1);
     EXPECT_FALSE(Err);
 
     surfNum = 2;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 2);
+    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 2u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 1);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[1], 2);
     EXPECT_FALSE(Err);
@@ -3350,7 +3350,7 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     surfNum = 3;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 3);
+    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 3u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 1);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[1], 2);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[2], 3);
@@ -3359,14 +3359,14 @@ TEST_F(EnergyPlusFixture, InitialAssociateWindowShadingControlFenestration_Multi
     surfNum = 4;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 1);
+    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 1u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 2);
     EXPECT_FALSE(Err);
 
     surfNum = 5;
     InitialAssociateWindowShadingControlFenestration(Err, surfNum);
     EXPECT_TRUE(SurfaceTmp(surfNum).HasShadeControl);
-    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 2);
+    EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList.size(), 2u);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[0], 2);
     EXPECT_EQ(SurfaceTmp(surfNum).windowShadingControlList[1], 3);
     EXPECT_FALSE(Err);
