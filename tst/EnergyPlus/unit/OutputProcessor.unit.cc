@@ -1215,8 +1215,8 @@ namespace OutputProcessor {
                                                                  {"GASOLINE", "Gasoline"},
                                                                  {"DIESEL", "Diesel"},
                                                                  {"COAL", "Coal"},
-                                                                 {"FUELOIL#1", "FuelOil#1"},
-                                                                 {"FUELOIL#2", "FuelOil#2"},
+                                                                 {"FUELOILNO1", "FuelOilNo1"},
+                                                                 {"FUELOILNO2", "FuelOilNo2"},
                                                                  {"PROPANE", "Propane"},
                                                                  {"PROPANEGAS", "Propane"},
                                                                  {"WATER", "Water"},
@@ -2928,8 +2928,8 @@ namespace OutputProcessor {
                                                            {"J", "ELEC", "PURCHASEDELECTRICEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "SOLDELECTRICEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "NATURALGASEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FUELOIL#1EMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FUELOIL#2EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELEC", "FUELOILNO1EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELEC", "FUELOILNO2EMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "COALEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "GASOLINEEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "PROPANEEMISSIONS", "endUseSub", "HVAC"},
@@ -3020,10 +3020,10 @@ namespace OutputProcessor {
                                                      "endUseSub:SoldElectricEmissions:Electricity",
                                                      "NaturalGasEmissions:Electricity",
                                                      "endUseSub:NaturalGasEmissions:Electricity",
-                                                     "FuelOil#1Emissions:Electricity",
-                                                     "endUseSub:FuelOil#1Emissions:Electricity",
-                                                     "FuelOil#2Emissions:Electricity",
-                                                     "endUseSub:FuelOil#2Emissions:Electricity",
+                                                     "FuelOilNo1Emissions:Electricity",
+                                                     "endUseSub:FuelOilNo1Emissions:Electricity",
+                                                     "FuelOilNo2Emissions:Electricity",
+                                                     "endUseSub:FuelOilNo2Emissions:Electricity",
                                                      "CoalEmissions:Electricity",
                                                      "endUseSub:CoalEmissions:Electricity",
                                                      "GasolineEmissions:Electricity",
@@ -3543,7 +3543,7 @@ namespace OutputProcessor {
         std::string const idf_objects = delimited_string({
             "Output:Variable,*,Chiller Electric Energy,runperiod;",
             "Output:Variable,*,Lights Electric Energy,runperiod;",
-            "Output:Variable,*,Environmental Impact Fuel Oil #2 CO2 Emissions Mass,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
@@ -3581,7 +3581,7 @@ namespace OutputProcessor {
                             1);
 
         Real64 fuel_oil_co2 = 0.;
-        SetupOutputVariable("Environmental Impact Fuel Oil #2 CO2 Emissions Mass",
+        SetupOutputVariable("Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
                             OutputProcessor::Unit::kg,
                             fuel_oil_co2,
                             "System",
@@ -3589,7 +3589,7 @@ namespace OutputProcessor {
                             "Site",
                             _,
                             "CO2",
-                            "FuelOil#2Emissions",
+                            "FuelOilNo2Emissions",
                             _,                    // EndUseSubKey
                             "");     
 
@@ -3634,10 +3634,10 @@ namespace OutputProcessor {
 
         // fuel oil CO2 emissions
         // testing a non-ABUPS end use with no sub end use specified
-        found = UtilityRoutines::FindItem("FuelOil#2Emissions:CO2", EnergyMeters);
+        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("CO2", EnergyMeters(found).ResourceType);
-        EXPECT_EQ("FuelOil#2Emissions", EnergyMeters(found).EndUse);
+        EXPECT_EQ("FuelOilNo2Emissions", EnergyMeters(found).EndUse);
         EXPECT_EQ("", EnergyMeters(found).EndUseSub);
     }
 
@@ -5376,6 +5376,31 @@ namespace OutputProcessor {
         EXPECT_EQ(" [ergs/century]", unitStringFromDDitem(8));
 
         EXPECT_EQ(" [swamps/county]", unitStringFromDDitem(9));
+    }
+
+    TEST_F(EnergyPlusFixture, OutputProcessor_GetCustomMeterInput)
+    {
+        std::string const idf_objects = delimited_string({
+            "Meter:Custom,",
+            "FuelOilNo1CustomMeter,      !- Name",
+            "FuelOilNo1,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo1:Facility;        !- Variable or Meter 1 Name",
+            
+            "Meter:Custom,",
+            "FuelOilNo2CustomMeter,      !- Name",
+            "FuelOilNo2,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo2:Facility;        !- Variable or Meter 1 Name",
+            });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        bool errors_found = false;
+
+        GetCustomMeterInput(errors_found);
+
+        EXPECT_FALSE(errors_found);
     }
 } // namespace OutputProcessor
 
