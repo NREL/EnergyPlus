@@ -421,7 +421,7 @@ CHECKED_AND_OKED = {
         ],
         # Docstring is explicit
         "ReportWeatherAndTimeInformation": [
-            "PrintEnvrnStamp"
+            "printEnvrnStamp"
         ]
     },
     "WindowAC.cc": {

@@ -1016,13 +1016,32 @@ This field is the name of the zone (Ref: Zone) in which the hydronic low tempera
 
 This field is the name of the surface (Ref: BuildingSurface) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
+\paragraph{Field: Fluid to Radiant Surface Heat Transfer Model}\label{field-fluid-to-radiant-surface-heat-transfer-model-000}
+
+This field is provides the opportunity to control how the heat transfer between the fluid circulating through this radiant system and the radiant system itself.  There are two options for this parameter: ConvectionOnly or ISOStandard.  The default value is ConvectionOnly.  More information on each of these options is provided below.
+
+\begin{itemize}
+\item
+  ConvectionOnly - This is the default mode and the method that was implemented when the radiant model was first introduced into EnergyPlus.  In this modeling option, it is assumed that the impact of the tube material on heat exchange between the fluid and the radiant system and that only the convection between the fluid and the radiant system is the only critical heat transfer mechanism to take into account.  The reasoning behind this included the fact that there are other simplifications in the method for calculating heat transfer and that this simplification would not result in any significant difference in the simulated heat transfer performance of the system.  Convection between the fluid and the pipe wall of the system is related to physical parameters of the system (pipe/tube inner diameter and length) as well as the flow characteristics.
+\item
+  ISOStandard - This method is based on the ISO Standard 11855, Part 2 (2012) document entitled ``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity'', Reference Number ISO 11855-2:2012(E).  This standard recommends equations (see Appendix B of this document) to include the effects of convective heat transfer between the fluid and the inside of the piping and conduction through the pipe wall.  This model requires both the inner and outer diameter of the pipe/tube, the length of the pipe/tube, and the thermal conductivity of the pipe/tube material.  Note that as part of the implementation of this model in EnergyPlus, flow within the piping/tubing is always assumed to be turbulent.
+\end{itemize}
+
 \paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-000}
 
-This field is the inside diameter of the tubes through which water is circulated for the system being defined by this statement. The inside diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.
+This field is the inside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The inner diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.  The default for this parameter is 0.013 which is approximately equivalent to the inner diameter of a typical 1/2" PEX pipe size.
 
-\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length}
+\paragraph{Field: Hydronic Tubing Outside Diameter}\label{field-hydronic-tubing-outside-diameter-000}
+
+This field is the outside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The outer diameter should be recorded in meters and is used to determine the conduction through the hydronic tubing and the contact resistance between the tube/pipe and the radiant system itself in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.016 which is approximately equivalent to the outer diameter a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-000}
 
 This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
+
+\paragraph{Field: Hydronic Tubing Conductivity}\label{field-hydronic-tubing-conductivity-000}
+
+This field is the thermal conductivity of the pipe/tube that is used in this radiant system in Watts per meter-Kelvin (W/m-K).  It is used to calculate the resistance to heat transfer through the pipe/tube wall in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.35 which is the value given for PEX piping in ISO Standard 11855-2(2012).
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type}
 
@@ -1161,8 +1180,11 @@ An example IDF with a hydronic low temperature radiant system is shown below.
       RADIANTSYSAVAILSCHED,    !- Availability Schedule Name
       SPACE1-1,                !- Zone Name
       C1-1,                    !- Surface Name or Radiant Surface Group Name
+      ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
       0.013,                   !- Hydronic Tubing Inside Diameter {m}
+      0.016,                   !- Hydronic Tubing Outside Diameter {m}
       autosize,                !- Hydronic Tubing Length {m}
+      0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
       OperativeTemperature,    !- Temperature Control Type
       HalfFlowPower,           !- Setpoint Control Type
       HeatingDesignCapacity,   !- Heating Design Capacity Method
@@ -1280,13 +1302,33 @@ This field is the name of the zone (Ref: Zone) in which the constant flow low te
 
 This field is the name of the surface (Ref: \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}) or surface list (Ref: \hyperref[zonehvaclowtemperatureradiantsurfacegroup]{ZoneHVAC:LowTemperatureRadiant:SurfaceGroup}) in which the hydronic tubing is embedded/contained. This specification attaches the source or sink from the radiant system to a particular surface and the contribution of the system to the heat balances of that surface. If this field is a surface list, then the source or sink is attached to all of the surfaces in the list with the radiant system surface group defining the breakdown of how flow rate is split between the various surfaces. Note also that surfaces in a list do not need to be in the same zone or in the zone being served by this system (see previous field). Base surfaces (e.g., \hyperref[buildingsurfacedetailed]{BuildingSurface:Detailed}), door surfaces and internal mass are valid. Window surfaces are not valid surface types for embedded radiant systems.
 
-\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-1-000}
+\paragraph{Field: Fluid to Radiant Surface Heat Transfer Model}\label{field-fluid-to-radiant-surface-heat-transfer-model-001}
 
-This field is the inside diameter of the tubes through which water is circulated for the system being defined by this statement. The inside diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.
+This field is provides the opportunity to control how the heat transfer between the fluid circulating through this radiant system and the radiant system itself.  There are two options for this parameter: ConvectionOnly or ISOStandard.  The default value is ConvectionOnly.  More information on each of these options is provided below.
 
-\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-1}
+\begin{itemize}
+\item
+  ConvectionOnly - This is the default mode and the method that was implemented when the radiant model was first introduced into EnergyPlus.  In this modeling option, it is assumed that the impact of the tube material on heat exchange between the fluid and the radiant system and that only the convection between the fluid and the radiant system is the only critical heat transfer mechanism to take into account.  The reasoning behind this included the fact that there are other simplifications in the method for calculating heat transfer and that this simplification would not result in any significant difference in the simulated heat transfer performance of the system.  Convection between the fluid and the pipe wall of the system is related to physical parameters of the system (pipe/tube inner diameter and length) as well as the flow characteristics.
+\item
+ISOStandard - This method is based on the ISO Standard 11855, Part 2 (2012) document entitled ``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity'', Reference Number ISO 11855-2:2012(E).  This standard recommends equations (see Appendix B of this document) to include the effects of convective heat transfer between the fluid and the inside of the piping and conduction through the pipe wall.  This model requires both the inner and outer diameter of the pipe/tube, the length of the pipe/tube, and the thermal conductivity of the pipe/tube material.  Note that as part of the implementation of this model in EnergyPlus, flow within the piping/tubing is always assumed to be turbulent.
+\end{itemize}
 
-This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat being transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
+\paragraph{Field: Hydronic Tubing Inside Diameter}\label{field-hydronic-tubing-inside-diameter-001}
+
+This field is the inside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The inner diameter should be recorded in meters and is used to determine the convective heat transfer from the water to the inside surface of the hydronic tubing.  The default for this parameter is 0.013 which is approximately equivalent to the inner diameter of a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Outside Diameter}\label{field-hydronic-tubing-outside-diameter-001}
+
+This field is the outside diameter of the tubes through which the fluid is circulated for the system being defined by this statement. The outer diameter should be recorded in meters and is used to determine the conduction through the hydronic tubing and the contact resistance between the tube/pipe and the radiant system itself in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.016 which is approximately equivalent to the outer diameter a typical 1/2" PEX pipe size.
+
+\paragraph{Field: Hydronic Tubing Length}\label{field-hydronic-tubing-length-001}
+
+This field is the total length of pipe embedded in the surface named above in the surface name field. The length of the tube should be entered in meters and is used to determine the effectiveness of heat transfer from the fluid being circulated through the tubes and the tube/surface. Longer tubing lengths result in more heat will be transferred to/from the radiant surface to the circulating fluid. Note that if the user elects to autosize this field that a standard zone thermostat such as would be used for a forced air system must be defined as autosizing calculations are based on the zone thermostat value and not on the radiant system control values. In addition, when the user opts to autosize this calculation, the tube spacing from the construction of each surface associated with this system is used along with each individual surface area to make an approximation of the tubing length.
+
+\paragraph{Field: Hydronic Tubing Conductivity}\label{field-hydronic-tubing-conductivity-001}
+
+This field is the thermal conductivity of the pipe/tube that is used in this radiant system in Watts per meter-Kelvin (W/m-K).  It is used to calculate the resistance to heat transfer through the pipe/tube wall in the ISOStandard option for the Fluid to Radiant Surface Heat Transfer Model (see above).  The default for this parameter is 0.35 which is the value given for PEX piping in ISO Standard 11855-2(2012).
+
 
 \paragraph{Field: Temperature Control Type}\label{field-temperature-control-type-1}
 
@@ -1438,8 +1480,11 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
       RadiantSysAvailSched,   !- availability schedule
       Resistive Zone,         !- Zone name
       Zn001:Flr001,           !- Surface name or group
-      0.012,                  !- Hydronic tubing inside diameter {m}
-      400.0,                  !- Hydronic tubing length {m}
+      ConvectionOnly,         !- Fluid to Radiant Surface Heat Transfer Model
+      0.013,                  !- Hydronic Tubing Inside Diameter {m}
+      0.016,                  !- Hydronic Tubing Outside Diameter {m}
+      autosize,               !- Hydronic Tubing Length {m}
+      0.35,                   !- Hydronic Tubing Conductivity {W/m-K}
       MeanAirTemperature,     !- temperature control type
       0.8,                    !- Running Mean Outdoor Dry-Bulb Temperature Weighting Factor
       0.0004,                 !- maximum water volumetric flow rate {m3/s}
