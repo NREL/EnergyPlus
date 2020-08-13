@@ -19,8 +19,8 @@ BIG TOWER1,Cooling Tower Heat Transfer Rate
 BIG TOWER2,Cooling Tower Heat Transfer Rate
 BIG TOWER1,Cooling Tower Fan Electricity Rate
 BIG TOWER2,Cooling Tower Fan Electricity Rate
-BIG TOWER1,Cooling Tower Fan Electric Energy
-BIG TOWER2,Cooling Tower Fan Electric Energy
+BIG TOWER1,Cooling Tower Fan Electricity Energy
+BIG TOWER2,Cooling Tower Fan Electricity Energy
 Environment,Site Outdoor Air Drybulb Temperature
 Environment,Site Outdoor Air Wetbulb Temperature
 Environment,Site Outdoor Air Barometric Pressure

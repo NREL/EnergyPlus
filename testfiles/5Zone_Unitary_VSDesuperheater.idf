@@ -2918,7 +2918,7 @@
 
   Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Fan Electricity Rate,hourly;
 
@@ -3002,7 +3002,7 @@
 
   Output:Variable,*,Unitary System Frost Control Status,hourly;
 
-  Output:Variable,*,Unitary System Heating Ancillary Electric Energy,hourly;
+  Output:Variable,*,Unitary System Heating Ancillary Electricity Energy,hourly;
 
   Output:Variable,*,Unitary System Cycling Ratio,hourly;
 

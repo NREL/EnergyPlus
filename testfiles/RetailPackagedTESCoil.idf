@@ -8106,11 +8106,11 @@
 
   Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-  Output:Variable,*,Cooling Coil Cold Weather Protection Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Cold Weather Protection Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Coil Cold Weather Protection Electricity Rate,hourly;
 
@@ -8134,11 +8134,11 @@
 
   Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Evaporative Condenser Pump Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Coil Ice Thermal Storage End Fraction,hourly;
 

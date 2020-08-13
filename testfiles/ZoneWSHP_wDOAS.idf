@@ -1207,7 +1207,7 @@
 
   Output:Variable,*,Cooling Coil Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,timestep;
 
@@ -1217,7 +1217,7 @@
 
   Output:Variable,*,Cooling Coil Source Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Heating Coil Electric Energy,timestep;
+  Output:Variable,*,Heating Coil Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
 
@@ -1269,7 +1269,7 @@
 
   Output:Variable,*,Zone Water to Air Heat Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Zone Water to Air Heat Pump Electric Energy,timestep;
+  Output:Variable,*,Zone Water to Air Heat Pump Electricity Energy,timestep;
 
   Output:Variable,*,Zone Water to Air Heat Pump Fan Part Load Ratio,timestep;
 

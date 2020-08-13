@@ -2825,7 +2825,7 @@
 
   Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Fan Electricity Rate,hourly;
 

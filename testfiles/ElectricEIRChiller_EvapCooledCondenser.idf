@@ -2574,7 +2574,7 @@ Output:Variable,
 
 Output:Variable,
     *,                       !- Key Value
-    Chiller Electric Energy, !- Variable Name
+    Chiller Electricity Energy, !- Variable Name
     timestep;                !- Reporting Frequency
 
 Output:Variable,

@@ -2391,7 +2391,7 @@
 
   Output:Variable,*,Dehumidifier Electricity Rate,hourly;
 
-  Output:Variable,*,Dehumidifier Electric Energy,hourly;
+  Output:Variable,*,Dehumidifier Electricity Energy,hourly;
 
   Output:Variable,*,Dehumidifier Regeneration Specific Energy,hourly;
 

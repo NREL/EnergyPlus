@@ -2214,7 +2214,7 @@
 
   Output:Variable,*,Zone Ventilation Mass,hourly;
 
-  Output:Variable,*,Zone Ventilation Fan Electric Energy,hourly;
+  Output:Variable,*,Zone Ventilation Fan Electricity Energy,hourly;
 
   Output:Variable,*,Zone Ventilation Air Inlet Temperature,hourly;
 
@@ -2248,7 +2248,7 @@
 
   Output:Variable,*,Zone Cooltower Pump Electricity Rate,hourly;
 
-  Output:Variable,*,Zone Cooltower Pump Electric Energy,hourly;
+  Output:Variable,*,Zone Cooltower Pump Electricity Energy,hourly;
 
   Output:Meter,Electricity:Facility,hourly;
 

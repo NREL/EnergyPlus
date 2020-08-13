@@ -3608,7 +3608,7 @@
 
   Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,hourly;
 
   Output:Variable,Chilled Water Loop,Plant Supply Side Cooling Demand Rate,hourly;
 

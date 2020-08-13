@@ -3666,15 +3666,15 @@
     MyGeneralLights,         !- Name
     Electricity,             !- Resource Type
     SPACE1-1 Lights 1,       !- Key Name 1
-    Lights Electric Energy,  !- Output Variable or Meter Name 1
+    Lights Electricity Energy,  !- Output Variable or Meter Name 1
     SPACE2-1 Lights 1,       !- Key Name 2
-    Lights Electric Energy,  !- Output Variable or Meter Name 2
+    Lights Electricity Energy,  !- Output Variable or Meter Name 2
     SPACE3-1 Lights 1,       !- Key Name 3
-    Lights Electric Energy,  !- Output Variable or Meter Name 3
+    Lights Electricity Energy,  !- Output Variable or Meter Name 3
     SPACE4-1 Lights 1,       !- Key Name 4
-    Lights Electric Energy,  !- Output Variable or Meter Name 4
+    Lights Electricity Energy,  !- Output Variable or Meter Name 4
     SPACE5-1 Lights 1,       !- Key Name 5
-    Lights Electric Energy;  !- Output Variable or Meter Name 5
+    Lights Electricity Energy;  !- Output Variable or Meter Name 5
 
   Meter:Custom,
     MyBuildingElectric,      !- Name

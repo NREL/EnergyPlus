@@ -4245,11 +4245,11 @@
 
   Output:Variable,*,VRF Heat Pump Heating Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Outdoor Unit Fan Power,timestep;
 
@@ -4261,11 +4261,11 @@
 
   Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature,timestep;
 
@@ -4293,9 +4293,9 @@
 
   Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Energy,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Energy,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Energy,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Energy,timestep;
 
   Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,timestep;
 

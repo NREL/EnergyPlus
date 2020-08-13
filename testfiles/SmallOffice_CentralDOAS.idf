@@ -5397,7 +5397,7 @@
 
   Output:Variable,*,Air System Total Cooling Energy,Timestep;
 
-  Output:Variable,*,Air System Fan Electric Energy,Timestep;
+  Output:Variable,*,Air System Fan Electricity Energy,Timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
 

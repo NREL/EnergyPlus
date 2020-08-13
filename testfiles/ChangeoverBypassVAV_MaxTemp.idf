@@ -1803,7 +1803,7 @@
 
   Output:Variable,*,Unitary System Electricity Rate,timestep;
 
-  Output:Variable,*,Unitary System Electric Energy,timestep;
+  Output:Variable,*,Unitary System Electricity Energy,timestep;
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
 

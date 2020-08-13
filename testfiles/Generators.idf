@@ -2559,11 +2559,11 @@
 
   Output:Variable,*,Facility Total Produced Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Energy,hourly;
+  Output:Variable,*,Facility Total Produced Electricity Energy,hourly;
 
   Output:Variable,*,Facility Total Purchased Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,hourly;
 
   Output:Variable,*,Facility Total Building Electricity Demand Rate,Timestep;
 

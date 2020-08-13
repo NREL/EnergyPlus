@@ -5233,7 +5233,7 @@
 
   Output:Variable,*,Zone Predicted Moisture Load Moisture Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
@@ -5283,23 +5283,23 @@
 
   Output:Variable,*,Refrigeration Walk In Ancillary Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Ancillary Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Ancillary Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration Walk In Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Fan Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Fan Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration Walk In Lighting Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Lighting Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Lighting Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration Walk In Heater Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Heater Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Heater Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration Walk In Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Walk In Defrost Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Walk In Defrost Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration Walk In Zone Sensible Cooling Rate,timestep;
 
@@ -5333,11 +5333,11 @@
 
   Output:Variable,SELFCONTAINEDDISPLAY,Refrigeration Compressor Rack COP,timestep;
 
-  Output:Variable,*,Zone Lights Electric Energy,timestep;
+  Output:Variable,*,Zone Lights Electricity Energy,timestep;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,timestep;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,SALESFLOOR OUTLET NODE,System Node Temperature,timestep;
 

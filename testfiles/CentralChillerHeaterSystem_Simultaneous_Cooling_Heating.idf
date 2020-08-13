@@ -3622,9 +3622,9 @@
 
   Output:Variable,*,Plant Supply Side Cooling Demand Rate,Timestep;
 
-  Output:Variable,*,Chiller Heater System Cooling Electric Energy,Timestep;
+  Output:Variable,*,Chiller Heater System Cooling Electricity Energy,Timestep;
 
-  Output:Variable,*,Chiller Heater System Heating Electric Energy,Timestep;
+  Output:Variable,*,Chiller Heater System Heating Electricity Energy,Timestep;
 
   Output:Variable,*,Chiller Heater System Cooling Electricity Rate,Timestep;
 

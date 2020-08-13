@@ -2268,7 +2268,7 @@
 
   Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 

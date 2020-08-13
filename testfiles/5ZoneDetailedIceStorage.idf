@@ -3401,9 +3401,9 @@
 
   Output:Variable,*,Chiller Electricity Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Energy,hourly,OnPeakEnergy;
+  Output:Variable,*,Chiller Electricity Energy,hourly,OnPeakEnergy;
 
-  Output:Variable,*,Chiller Electric Energy,hourly,OffPeakEnergy;
+  Output:Variable,*,Chiller Electricity Energy,hourly,OffPeakEnergy;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
@@ -3441,7 +3441,7 @@
 
   Output:Variable,*,Ice Thermal Storage Ancillary Electricity Rate,hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Energy,hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Energy,hourly;
 
   Output:Variable,Central Chiller Outlet Node,System Node Setpoint Temperature,hourly;
 

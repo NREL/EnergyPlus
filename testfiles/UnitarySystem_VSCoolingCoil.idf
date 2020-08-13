@@ -1818,7 +1818,7 @@
 
   Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
@@ -1834,7 +1834,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
-  Output:Variable,*,Heating Coil Defrost Electric Energy,hourly;
+  Output:Variable,*,Heating Coil Defrost Electricity Energy,hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

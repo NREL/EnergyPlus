@@ -7261,13 +7261,13 @@
 
   Output:Variable,*,Evaporative Cooler Water Volume,RunPeriod;
 
-  Output:Variable,*,Evaporative Cooler Electric Energy,runperiod;
+  Output:Variable,*,Evaporative Cooler Electricity Energy,runperiod;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,runperiod;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,runperiod;
 
-  Output:Variable,*,Zone Lights Electric Energy,runperiod;
+  Output:Variable,*,Zone Lights Electricity Energy,runperiod;
 
-  Output:Variable,*,Cooling Coil Electric Energy,runperiod;
+  Output:Variable,*,Cooling Coil Electricity Energy,runperiod;
 
   Output:Variable,*,Heating Coil NaturalNaturalGas Energy,runperiod;
 

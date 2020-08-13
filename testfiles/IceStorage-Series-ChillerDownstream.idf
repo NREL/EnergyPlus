@@ -3682,7 +3682,7 @@
 
   Output:Variable,*,Ice Thermal Storage Ancillary Electricity Rate,hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Energy,hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Energy,hourly;
 
   Output:Variable,Ice Tank Outlet,System Node Setpoint Temperature,hourly;
 

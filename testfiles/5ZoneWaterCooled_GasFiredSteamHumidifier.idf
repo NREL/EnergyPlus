@@ -3636,7 +3636,7 @@
 
   Output:Variable,*,Humidifier Auxiliary Electricity Rate,hourly;
 
-  Output:Variable,*,Humidifier Auxiliary Electric Energy,hourly;
+  Output:Variable,*,Humidifier Auxiliary Electricity Energy,hourly;
 
   Output:Variable,*,Air System Humidifier NaturalNaturalGas Energy,hourly;
 

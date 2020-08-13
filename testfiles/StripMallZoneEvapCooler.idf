@@ -5239,7 +5239,7 @@
 
   Output:Variable,*,Evaporative Cooler Wet Bulb Effectiveness,hourly;
 
-  Output:Variable,*,Evaporative Cooler Electric Energy,hourly;
+  Output:Variable,*,Evaporative Cooler Electricity Energy,hourly;
 
   Output:Variable,*,Evaporative Cooler Electricity Rate,hourly;
 

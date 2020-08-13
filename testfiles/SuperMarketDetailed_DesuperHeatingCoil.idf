@@ -5207,11 +5207,11 @@
 
   Output:Variable,*,Refrigeration Compressor Rack COP,timestep;
 
-  Output:Variable,*,Zone Lights Electric Energy,timestep;
+  Output:Variable,*,Zone Lights Electricity Energy,timestep;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,timestep;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Heat Transfer Rate,timestep;
 
@@ -5223,7 +5223,7 @@
 
   Output:Variable,*,Refrigeration System Condenser Total Recovered Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 

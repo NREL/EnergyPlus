@@ -3808,7 +3808,7 @@
 
   Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Tower Air Flow Rate Ratio,hourly;
 
@@ -3816,7 +3816,7 @@
 
   Output:Variable,*,Cooling Tower Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Tower Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Tower Make Up Water Volume,hourly;
 

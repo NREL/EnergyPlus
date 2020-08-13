@@ -4013,15 +4013,15 @@
 
   Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Electric Energy,hourly;
+  Output:Variable,*,Water Heater Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,hourly;
 
@@ -4033,7 +4033,7 @@
 
   Output:Variable,*,Water Heater Pump Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Energy,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Energy,hourly;
 
   Output:VariableDictionary,Regular;
 

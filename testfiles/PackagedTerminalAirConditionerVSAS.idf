@@ -2528,7 +2528,7 @@
 
   Output:Variable,*,Heating Coil Electricity Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Hourly;
+  Output:Variable,*,Heating Coil Electricity Energy,Hourly;
 
   Output:Variable,*,Heating Coil NaturalGas Rate,Hourly;
 

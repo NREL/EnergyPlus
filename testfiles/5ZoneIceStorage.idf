@@ -3620,9 +3620,9 @@
 
   Output:Variable,*,Chiller Electricity Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Energy,hourly,OnPeakEnergy;
+  Output:Variable,*,Chiller Electricity Energy,hourly,OnPeakEnergy;
 
-  Output:Variable,*,Chiller Electric Energy,hourly,OffPeakEnergy;
+  Output:Variable,*,Chiller Electricity Energy,hourly,OffPeakEnergy;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 

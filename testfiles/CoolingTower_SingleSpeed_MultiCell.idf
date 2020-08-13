@@ -10865,7 +10865,7 @@
 
   Output:Variable,*,Cooling Tower Fan Electricity Rate,detailed;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,detailed;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,detailed;
 
   Output:Variable,CoolSys1,Plant Supply Side Cooling Demand Rate,detailed;
 

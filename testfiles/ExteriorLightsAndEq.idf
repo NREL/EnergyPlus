@@ -402,7 +402,7 @@
     
   Output:Meter:MeterFileOnly, MyExteriorWater, monthly;
 
-  Output:Variable,*,Exterior Lights Electric Energy,timestep;
+  Output:Variable,*,Exterior Lights Electricity Energy,timestep;
 
   Output:Variable,*,Exterior Equipment NaturalNaturalGas Energy,timestep;
 

@@ -819,7 +819,7 @@
 
   Output:Variable,*,Generator Produced Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Produced Electric Energy,timestep;
+  Output:Variable,*,Generator Produced Electricity Energy,timestep;
 
   Output:Variable,*,Facility Total Electricity Demand Rate,timestep;
 
@@ -843,7 +843,7 @@
 
   Output:Variable,*,Generator Blower Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Blower Electric Energy,timestep;
+  Output:Variable,*,Generator Blower Electricity Energy,timestep;
 
   Output:Variable,*,Generator Blower Skin Heat Loss Rate,timestep;
 
@@ -857,7 +857,7 @@
 
   Output:Variable,*,Generator Fuel Compressor Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Fuel Compressor Electric Energy,timestep;
+  Output:Variable,*,Generator Fuel Compressor Electricity Energy,timestep;
 
   Output:Variable,*,Generator Fuel Compressor Skin Heat Loss Rate,timestep;
 
@@ -897,7 +897,7 @@
 
   Output:Variable,*,Facility Total Purchased Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,timestep;
 
   Output:Variable,*,Facility Total Produced Electricity Rate,timestep;
 

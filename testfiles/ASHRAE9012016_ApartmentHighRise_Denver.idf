@@ -52313,7 +52313,7 @@
     Electricity,             !- Resource Type
     InteriorEquipment:Electricity,  !- Source Meter Name
     T Corridor_Elevators_Equip,  !- Key Name 1
-    Electric Equipment Electric Energy;  !- Output Variable or Meter Name 1
+    Electric Equipment Electricity Energy;  !- Output Variable or Meter Name 1
 
   ElectricLoadCenter:Transformer,
     Transformer 1,           !- Name

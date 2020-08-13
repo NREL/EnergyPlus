@@ -2310,7 +2310,7 @@
 
   Output:Variable,*,Chiller Electricity Rate,timestep;
 
-  Output:Variable,*,Chiller Electric Energy,timestep;
+  Output:Variable,*,Chiller Electricity Energy,timestep;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,timestep;
 

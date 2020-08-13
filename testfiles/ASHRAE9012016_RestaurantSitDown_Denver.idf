@@ -6085,13 +6085,13 @@
   Output:Table:Monthly,
     Building Loads - Electric,  !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,

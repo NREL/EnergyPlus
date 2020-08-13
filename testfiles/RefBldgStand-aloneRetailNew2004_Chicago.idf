@@ -3776,7 +3776,7 @@
 
   Output:Variable,*,Air System Total Cooling Energy,HOURLY;
 
-  Output:Variable,*,Air System Fan Electric Energy,HOURLY;
+  Output:Variable,*,Air System Fan Electricity Energy,HOURLY;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 

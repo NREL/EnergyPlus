@@ -1562,11 +1562,11 @@
 
   Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Defrost Electric Energy,timestep;
+  Output:Variable,*,Heating Coil Defrost Electricity Energy,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

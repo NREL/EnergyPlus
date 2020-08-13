@@ -440,11 +440,11 @@
 
   Output:Variable,*,Inverter DC Input Electricity Rate,Timestep;
 
-  Output:Variable,*,Inverter DC Input Electric Energy,Timestep;
+  Output:Variable,*,Inverter DC Input Electricity Energy,Timestep;
 
   Output:Variable,*,Inverter AC Output Electricity Rate,Timestep;
 
-  Output:Variable,*,Inverter AC Output Electric Energy,Timestep;
+  Output:Variable,*,Inverter AC Output Electricity Energy,Timestep;
 
   Output:Variable,*,Inverter Conversion Loss Power,Timestep;
 
@@ -458,17 +458,17 @@
 
   Output:Variable,*,Inverter Ancillary AC Electricity Rate,Timestep;
 
-  Output:Variable,*,Inverter Ancillary AC Electric Energy,Timestep;
+  Output:Variable,*,Inverter Ancillary AC Electricity Energy,Timestep;
 
   Output:Variable,*,Generator Produced DC Electricity Rate,Timestep;
 
-  Output:Variable,*,Generator Produced DC Electric Energy,Timestep;
+  Output:Variable,*,Generator Produced DC Electricity Energy,Timestep;
 
   Output:Variable,*,Generator PV Cell Temperature,Timestep;
 
   Output:Variable,*,Electric Load Center Produced Electricity Rate,Timestep;
 
-  Output:Variable,*,Electric Load Center Produced Electric Energy,Timestep;
+  Output:Variable,*,Electric Load Center Produced Electricity Energy,Timestep;
 
   Output:Variable,*,Electric Load Center Supplied Electricity Rate,Timestep;
 
@@ -482,15 +482,15 @@
 
   Output:Variable,*,Facility Total Purchased Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,Timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,Timestep;
 
   Output:Variable,*,Facility Total Surplus Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Total Surplus Electric Energy,Timestep;
+  Output:Variable,*,Facility Total Surplus Electricity Energy,Timestep;
 
   Output:Variable,*,Facility Net Purchased Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Net Purchased Electric Energy,Timestep;
+  Output:Variable,*,Facility Net Purchased Electricity Energy,Timestep;
 
   Output:Variable,*,Facility Total Building Electricity Demand Rate,Timestep;
 
@@ -500,5 +500,5 @@
 
   Output:Variable,*,Facility Total Produced Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Energy,Timestep;
+  Output:Variable,*,Facility Total Produced Electricity Energy,Timestep;
 

@@ -1802,7 +1802,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,TimeStep;
 
-  Output:Variable,*,Heating Coil Defrost Electric Energy,TimeStep;
+  Output:Variable,*,Heating Coil Defrost Electricity Energy,TimeStep;
 
   Output:Variable,Outside Air Inlet Node,System Node Mass Flow Rate,TimeStep;
 

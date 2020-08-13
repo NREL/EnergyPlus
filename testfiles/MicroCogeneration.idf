@@ -5089,7 +5089,7 @@
 
   Output:Variable,*,Generator Produced Electricity Rate,hourly;
 
-  Output:Variable,*,Generator Produced Electric Energy,hourly;
+  Output:Variable,*,Generator Produced Electricity Energy,hourly;
 
   Output:Variable,*,Generator Produced Thermal Rate,hourly;
 

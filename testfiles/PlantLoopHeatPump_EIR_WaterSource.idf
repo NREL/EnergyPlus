@@ -726,7 +726,7 @@
 
   Output:Variable,*,Heat Pump Electricity Rate,Hourly;
 
-  Output:Variable,*,Heat Pump Electric Energy,Hourly;
+  Output:Variable,*,Heat Pump Electricity Energy,Hourly;
 
   Output:Variable,*,Heat Pump Load Side Mass Flow Rate,Hourly;
 

@@ -5613,7 +5613,7 @@
 
   Output:Variable,*,Zone Air Relative Humidity,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Water Heater Tank Temperature,timestep;
 

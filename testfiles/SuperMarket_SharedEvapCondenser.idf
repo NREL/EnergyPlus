@@ -5210,7 +5210,7 @@
 
   Output:Variable,*,Refrigeration System Condenser Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Pump Electric Energy,timestep;
+  Output:Variable,*,Refrigeration System Condenser Pump Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Evaporated Water Volume Flow Rate,timestep;
 
@@ -5218,11 +5218,11 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,timestep;
 
-  Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electric Energy,timestep;
+  Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Fan Electric Energy,timestep;
+  Output:Variable,*,Refrigeration System Condenser Fan Electricity Energy,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Fan Electricity Rate,timestep;
 

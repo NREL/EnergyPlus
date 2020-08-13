@@ -2126,7 +2126,7 @@
 
   Output:Variable,*,Unitary System Electricity Rate,hourly;
 
-  Output:Variable,*,Unitary System Electric Energy,hourly;
+  Output:Variable,*,Unitary System Electricity Energy,hourly;
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,hourly;
 
@@ -2220,11 +2220,11 @@
 
   Output:Variable,*,Heating Coil Defrost Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Defrost Electric Energy,hourly;
+  Output:Variable,*,Heating Coil Defrost Electricity Energy,hourly;
 
   Output:Variable,*,Heating Coil Crankcase Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly;
+  Output:Variable,*,Heating Coil Crankcase Heater Electricity Energy,hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 

@@ -39545,11 +39545,11 @@
 
   Output:Variable,*,Zone Hybrid Unitary HVAC Electricity Rate,hourly;
 
-  Output:Variable,*,Zone Hybrid Unitary HVAC Electric Energy,hourly;
+  Output:Variable,*,Zone Hybrid Unitary HVAC Electricity Energy,hourly;
 
   Output:Variable,*,Zone Hybrid Unitary HVAC Electricity Rate,timestep;
 
-  Output:Variable,*,Zone Hybrid Unitary HVAC Electric Energy,timestep;
+  Output:Variable,*,Zone Hybrid Unitary HVAC Electricity Energy,timestep;
 
   Output:Variable,*,Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate,timestep;
 

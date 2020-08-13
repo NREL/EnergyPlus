@@ -1975,11 +1975,11 @@
 
   Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electricity Rate,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electric Energy,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electricity Energy,hourly;
 
   Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electricity Energy,hourly;
 
   Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Part Load Ratio,hourly;
 

@@ -22518,7 +22518,7 @@
 
   Output:Variable,*,Chiller Part Load Ratio,HOURLY;
 
-  Output:Variable,*,Chiller Electric Energy,HOURLY;
+  Output:Variable,*,Chiller Electricity Energy,HOURLY;
 
   Output:Variable,*,Chiller COP,HOURLY;
 
@@ -22548,7 +22548,7 @@
 
   Output:Variable,*,Air System Total Cooling Energy,HOURLY;
 
-  Output:Variable,*,Air System Fan Electric Energy,HOURLY;
+  Output:Variable,*,Air System Fan Electricity Energy,HOURLY;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 

@@ -9422,7 +9422,7 @@
 
   Output:Variable,*,Chiller Part Load Ratio,HOURLY;
 
-  Output:Variable,*,Chiller Electric Energy,HOURLY;
+  Output:Variable,*,Chiller Electricity Energy,HOURLY;
 
   Output:Variable,*,Chiller COP,HOURLY;
 
@@ -9452,7 +9452,7 @@
 
   Output:Variable,*,Cooling Tower Fan Electricity Rate,HOURLY;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,HOURLY;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,HOURLY;
 
   Output:Variable,*,Cooling Tower Fan Speed Ratio,HOURLY;
 

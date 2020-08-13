@@ -7127,7 +7127,7 @@
         "Output:Variable 22": {
             "key_value": "*",
             "reporting_frequency": "Hourly",
-            "variable_name": "Air System Fan Electric Energy"
+            "variable_name": "Air System Fan Electricity Energy"
         },
         "Output:Variable 23": {
             "key_value": "*",

@@ -9234,7 +9234,7 @@
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
 
-  Output:Variable,*,Air System Fan Electric Energy,HOURLY;
+  Output:Variable,*,Air System Fan Electricity Energy,HOURLY;
 
   Output:Variable,*,Zone Mean Air Temperature,hourly;
 
@@ -9451,11 +9451,11 @@
 
   Output:Variable,*,Inverter DC Input Electricity Rate,hourly;
 
-  Output:Variable,*,Inverter DC Input Electric Energy,hourly;
+  Output:Variable,*,Inverter DC Input Electricity Energy,hourly;
 
   Output:Variable,*,Inverter AC Output Electricity Rate,hourly;
 
-  Output:Variable,*,Inverter AC Output Electric Energy,hourly;
+  Output:Variable,*,Inverter AC Output Electricity Energy,hourly;
 
   Output:Variable,*,Inverter Conversion Loss Power,hourly;
 
@@ -9469,7 +9469,7 @@
 
   Output:Variable,*,Inverter Ancillary AC Electricity Rate,hourly;
 
-  Output:Variable,*,Inverter Ancillary AC Electric Energy,hourly;
+  Output:Variable,*,Inverter Ancillary AC Electricity Energy,hourly;
 
   Output:Variable,*,Electric Storage Simple Charge State,hourly;
 
@@ -9491,17 +9491,17 @@
 
   Output:Variable,*,Converter AC Input Electricity Rate,hourly;
 
-  Output:Variable,*,Converter AC Input Electric Energy,hourly;
+  Output:Variable,*,Converter AC Input Electricity Energy,hourly;
 
   Output:Variable,*,Converter DC Output Electricity Rate,hourly;
 
-  Output:Variable,*,Converter DC Output Electric Energy,hourly;
+  Output:Variable,*,Converter DC Output Electricity Energy,hourly;
 
   Output:Variable,*,Converter Electricity Loss Rate,hourly;
 
-  Output:Variable,*,Converter Electric Loss Energy,hourly;
+  Output:Variable,*,Converter Electricity Loss Energy,hourly;
 
-  Output:Variable,*,Converter Electric Loss Decrement Energy,hourly;
+  Output:Variable,*,Converter Electricity Loss Decrement Energy,hourly;
 
   Output:Variable,*,Converter Thermal Loss Rate,hourly;
 
@@ -9509,11 +9509,11 @@
 
   Output:Variable,*,Converter Ancillary AC Electricity Rate,hourly;
 
-  Output:Variable,*,Converter Ancillary AC Electric Energy,hourly;
+  Output:Variable,*,Converter Ancillary AC Electricity Energy,hourly;
 
   Output:Variable,*,Electric Load Center Produced Electricity Rate,hourly;
 
-  Output:Variable,*,Electric Load Center Produced Electric Energy,hourly;
+  Output:Variable,*,Electric Load Center Produced Electricity Energy,hourly;
 
   Output:Variable,*,Electric Load Center Supplied Electricity Rate,hourly;
 
@@ -9527,15 +9527,15 @@
 
   Output:Variable,*,Facility Total Purchased Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,hourly;
 
   Output:Variable,*,Facility Total Surplus Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Surplus Electric Energy,hourly;
+  Output:Variable,*,Facility Total Surplus Electricity Energy,hourly;
 
   Output:Variable,*,Facility Net Purchased Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Net Purchased Electric Energy,hourly;
+  Output:Variable,*,Facility Net Purchased Electricity Energy,hourly;
 
   Output:Variable,*,Facility Total Building Electricity Demand Rate,hourly;
 
@@ -9545,7 +9545,7 @@
 
   Output:Variable,*,Facility Total Produced Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Produced Electric Energy,hourly;
+  Output:Variable,*,Facility Total Produced Electricity Energy,hourly;
 
 ! Begin EMS demo of controlling a big battery to smooth out building demand load factor
 

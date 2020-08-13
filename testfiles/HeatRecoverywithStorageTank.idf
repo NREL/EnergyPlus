@@ -2957,7 +2957,7 @@
 
   Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Electric Energy,hourly;
+  Output:Variable,*,Water Heater Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,hourly;
 
@@ -2967,7 +2967,7 @@
 
   Output:Variable,*,Facility Total Purchased Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,hourly;
 
   Output:Variable,*,Facility Total Building Electricity Demand Rate,hourly;
 

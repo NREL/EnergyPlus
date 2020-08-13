@@ -3834,7 +3834,7 @@
 
   Output:Variable,*,Ice Thermal Storage Ancillary Electricity Rate,Hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Energy,Hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Energy,Hourly;
 
   Output:Variable,Main Chiller ChW Outlet,System Node Setpoint Temperature,Hourly;
 

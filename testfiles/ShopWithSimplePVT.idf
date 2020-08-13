@@ -4596,7 +4596,7 @@
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
     Generator PV Array Efficiency,  !- Variable or Meter 3 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 3
-    Generator Produced DC Electric Energy,  !- Variable or Meter 4 Name
+    Generator Produced DC Electricity Energy,  !- Variable or Meter 4 Name
     SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -5305,11 +5305,11 @@
 
   Output:Variable,*,Inverter DC Input Electricity Rate,timestep;
 
-  Output:Variable,*,Inverter DC Input Electric Energy,timestep;
+  Output:Variable,*,Inverter DC Input Electricity Energy,timestep;
 
   Output:Variable,*,Inverter AC Output Electricity Rate,timestep;
 
-  Output:Variable,*,Inverter AC Output Electric Energy,timestep;
+  Output:Variable,*,Inverter AC Output Electricity Energy,timestep;
 
   Output:Variable,*,Inverter Thermal Loss Rate,timestep;
 
@@ -5331,7 +5331,7 @@
 
   Output:Variable,*,Electric Load Center Produced Electricity Rate,timestep;
 
-  Output:Variable,*,Electric Load Center Produced Electric Energy,timestep;
+  Output:Variable,*,Electric Load Center Produced Electricity Energy,timestep;
 
   Output:Variable,*,Electric Load Center Produced Thermal Rate,timestep;
 
@@ -5339,13 +5339,13 @@
 
   Output:Variable,*,Facility Total Purchased Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,timestep;
 
-  Output:Variable,*,Facility Total Surplus Electric Energy,timestep;
+  Output:Variable,*,Facility Total Surplus Electricity Energy,timestep;
 
   Output:Variable,*,Facility Net Purchased Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Net Purchased Electric Energy,timestep;
+  Output:Variable,*,Facility Net Purchased Electricity Energy,timestep;
 
   Output:Variable,*,Facility Total Building Electricity Demand Rate,timestep;
 
@@ -5355,11 +5355,11 @@
 
   Output:Variable,*,Facility Total Produced Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Energy,timestep;
+  Output:Variable,*,Facility Total Produced Electricity Energy,timestep;
 
   Output:Variable,*,Generator Produced DC Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Produced DC Electric Energy,timestep;
+  Output:Variable,*,Generator Produced DC Electricity Energy,timestep;
 
   Output:Variable,*,Generator PV Array Efficiency,timestep;
 

@@ -3250,7 +3250,7 @@
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,Timestep;
 
-  Output:Variable,*,Pump Electric Energy,Timestep;
+  Output:Variable,*,Pump Electricity Energy,Timestep;
 
   Output:Variable,*,Pump Electricity Rate,Timestep;
 

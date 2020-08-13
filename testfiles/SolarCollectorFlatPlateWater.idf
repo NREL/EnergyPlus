@@ -1054,7 +1054,7 @@
 
   Output:Variable,*,Water Heater Electricity Rate,detailed;
 
-  Output:Variable,*,Water Heater Electric Energy,detailed;
+  Output:Variable,*,Water Heater Electricity Energy,detailed;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,detailed;
 

@@ -1582,7 +1582,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Defrost Electric Energy,timestep;
+  Output:Variable,*,Heating Coil Defrost Electricity Energy,timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
