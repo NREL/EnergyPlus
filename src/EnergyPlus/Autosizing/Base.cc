@@ -315,7 +315,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
                                   Optional<Real64 const> UsrValue)
 {
 
-    if (UtilityRoutines::SameString(this->compType, "Fan:ZoneExhaust")) return;
+    if (UtilityRoutines::SameString(CompType, "Fan:ZoneExhaust")) return;
 
     static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
     static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
