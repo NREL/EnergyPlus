@@ -2625,6 +2625,7 @@ TEST_F(LowTempRadiantSystemTest, setOperatingModeBasedOnChangeoverDelayTest)
     thisRadSys.setOperatingModeBasedOnChangeoverDelay();
     expectedResult = LowTempRadiantSystem::CoolingMode;
     EXPECT_EQ(thisRadSys.OperatingMode, expectedResult);
+}
 
 TEST_F(LowTempRadiantSystemTest, getFluidToSlabHeatTransferInputTest)
 {

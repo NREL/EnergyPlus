@@ -1897,8 +1897,11 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     West Zone,               !- Zone Name
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     ZeroFlowPower,           !- Setpoint Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
@@ -1930,8 +1933,11 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     East Zone,               !- Zone Name
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     ZeroFlowPower,           !- Setpoint Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
@@ -1963,8 +1969,11 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     North Zone,              !- Zone Name
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
     ZeroFlowPower,           !- Setpoint Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
