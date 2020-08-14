@@ -2307,7 +2307,7 @@
 
   Output:Variable,*,Boiler Heating Energy,timestep;
 
-  Output:Variable,*,Boiler NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Boiler NaturalGas Energy,timestep;
 
   Output:Variable,*,Boiler Inlet Temperature,timestep;
 

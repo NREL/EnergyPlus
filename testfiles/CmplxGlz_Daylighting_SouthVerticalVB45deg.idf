@@ -86494,7 +86494,7 @@
 
   Output:Variable,*,Air System Fan Electricity Energy,Hourly;
 
-  Output:Variable,*,Air System NaturalNaturalGas Energy,Hourly;
+  Output:Variable,*,Air System NaturalGas Energy,Hourly;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PPD,Hourly;
 
@@ -86569,9 +86569,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Air System DX Cooling Coil Electricity Energy,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Air System Heating Coil NaturalNaturalGas Energy,  !- Variable or Meter 5 Name
+    Air System Heating Coil NaturalGas Energy,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Air System Heating Coil NaturalNaturalGas Energy,  !- Variable or Meter 6 Name
+    Air System Heating Coil NaturalGas Energy,  !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,

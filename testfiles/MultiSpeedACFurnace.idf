@@ -2184,11 +2184,11 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Energy,timestep;
 
   Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,timestep;
 
   Output:Variable,MIXED AIR NODE,System Node Mass Flow Rate,timestep;
 

@@ -2541,7 +2541,7 @@
 
   Output:Variable,Solar Turbine,Generator NaturalGas Rate,timestep;
 
-  Output:Variable,Solar Turbine,Generator NaturalNaturalGas Energy,timestep;
+  Output:Variable,Solar Turbine,Generator NaturalGas Energy,timestep;
 
   Output:Variable,Solar Turbine,Generator Gas Mass Flow Rate,timestep;
 

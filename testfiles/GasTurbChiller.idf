@@ -2331,7 +2331,7 @@
 
   Output:Variable,*,Chiller NaturalGas Rate,timestep;
 
-  Output:Variable,*,Chiller NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Chiller NaturalGas Energy,timestep;
 
   Output:Variable,*,Chiller Gas Mass Flow Rate,timestep;
 

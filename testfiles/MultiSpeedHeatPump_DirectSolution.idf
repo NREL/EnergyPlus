@@ -2235,7 +2235,7 @@
 
   Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Heating Coil Defrost NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Heating Coil Defrost NaturalGas Energy,timestep;
 
   Output:Variable,MIXED AIR NODE,System Node Mass Flow Rate,timestep;
 

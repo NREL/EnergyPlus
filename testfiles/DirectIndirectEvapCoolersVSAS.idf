@@ -5647,7 +5647,7 @@
 
   Output:Meter,Electricity:HVAC,hourly;
 
-  Output:Meter,Gas:Facility,hourly;
+  Output:Meter,NaturalGas:Facility,hourly;
 
   Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,hourly;
 

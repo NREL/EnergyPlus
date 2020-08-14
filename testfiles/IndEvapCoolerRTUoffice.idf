@@ -7222,7 +7222,7 @@
 
   Output:Variable,*,Cooling Coil Electricity Energy,runperiod;
 
-  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,runperiod;
+  Output:Variable,*,Heating Coil NaturalGas Energy,runperiod;
 
   Output:Meter,InteriorLights:Electricity,runperiod;
 
@@ -7230,7 +7230,7 @@
 
   Output:Meter,Electricity:HVAC,runperiod;
 
-  Output:Meter,GAS:HVAC,runperiod;
+  Output:Meter,NaturalGas:HVAC,runperiod;
 
   Output:Meter,Fans:Electricity,runperiod;
 

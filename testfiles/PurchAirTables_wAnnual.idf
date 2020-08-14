@@ -1460,9 +1460,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Facility,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Facility,            !- Variable or Meter 3 Name
+    NaturalGas:Facility,            !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Facility,            !- Variable or Meter 4 Name
+    NaturalGas:Facility,            !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -1550,17 +1550,17 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -1700,17 +1700,17 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -1894,7 +1894,7 @@
     ,                        !- Digits After Decimal
     Boiler Heating Energy,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Boiler NaturalNaturalGas Energy,       !- Variable or Meter 2 Name
+    Boiler NaturalGas Energy,       !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Boiler Heating Energy,   !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
@@ -2150,7 +2150,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Water Heater Burner Heating Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Water Heater NaturalNaturalGas Energy, !- Variable or Meter 4 Name
+    Water Heater NaturalGas Energy, !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 5 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 5
@@ -2172,7 +2172,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Generator Diesel Energy, !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Generator NaturalNaturalGas Energy,    !- Variable or Meter 3 Name
+    Generator NaturalGas Energy,    !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Generator Produced Electricity Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4
@@ -2528,10 +2528,10 @@
     Electricity:Facility,    !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
     ,                        !- Digits After Decimal 2
-    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 3 Name
+    NaturalGas:Facility,            !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     ,                        !- Digits After Decimal 3
-    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 4 Name
+    NaturalGas:Facility,            !- Variable or Meter or EMS Variable or Field 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
     ;                        !- Digits After Decimal 4
 
@@ -2545,10 +2545,10 @@
     Electricity:Facility,    !- Variable or Meter or EMS Variable or Field 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
     ,                        !- Digits After Decimal 2
-    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 3 Name
+    NaturalGas:Facility,            !- Variable or Meter or EMS Variable or Field 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     ,                        !- Digits After Decimal 3
-    Gas:Facility,            !- Variable or Meter or EMS Variable or Field 4 Name
+    NaturalGas:Facility,            !- Variable or Meter or EMS Variable or Field 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
     ;                        !- Digits After Decimal 4
 

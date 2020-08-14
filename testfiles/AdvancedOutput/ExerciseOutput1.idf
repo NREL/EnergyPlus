@@ -1395,15 +1395,15 @@
 
   Output:Variable,*,Zone Air Temperature,Monthly;
 
-  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Timestep;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Daily;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Monthly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil NaturalNaturalGas Energy,Annual;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Annual;
 
   Output:Variable,*,Heating Coil Electricity Energy,Timestep;
 
@@ -1415,15 +1415,15 @@
 
   Output:Variable,*,Heating Coil Electricity Energy,Annual;
 
-  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Timestep;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Hourly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Daily;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Ancillary NaturalNaturalGas Energy,Annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Annual;
 
   Output:Variable,*,Cooling Coil Electricity Energy,Timestep;
 
@@ -1545,9 +1545,9 @@
 
   Output:Meter,Heating:NaturalGas,Monthly;
 
-  Output:Meter,Gas:HVAC,Monthly;
+  Output:Meter,NaturalGas:HVAC,Monthly;
 
-  Output:Meter,Gas:Facility,Monthly;
+  Output:Meter,NaturalGas:Facility,Monthly;
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT ===========
 

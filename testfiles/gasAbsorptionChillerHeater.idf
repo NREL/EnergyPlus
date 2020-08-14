@@ -2128,9 +2128,9 @@
     0.0011,                  !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}
 
-  Output:Meter,Gas:Facility,timestep;
+  Output:Meter,NaturalGas:Facility,timestep;
 
-  Output:Meter,Gas:Plant,timestep;
+  Output:Meter,NaturalGas:Plant,timestep;
 
   Output:Meter,Cooling:NaturalGas,timestep;
 
@@ -2186,15 +2186,15 @@
 
   Output:Variable,*,Chiller Heater NaturalGas Rate,timestep;
 
-  Output:Variable,*,Chiller Heater NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Chiller Heater NaturalGas Energy,timestep;
 
   Output:Variable,*,Chiller Heater Cooling NaturalGas Rate,timestep;
 
-  Output:Variable,*,Chiller Heater Cooling NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Chiller Heater Cooling NaturalGas Energy,timestep;
 
   Output:Variable,*,Chiller Heater Heating NaturalGas Rate,timestep;
 
-  Output:Variable,*,Chiller Heater Heating NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Chiller Heater Heating NaturalGas Energy,timestep;
 
   Output:Variable,*,Chiller Heater Electricity Rate,timestep;
 

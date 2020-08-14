@@ -7708,7 +7708,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -7786,11 +7786,11 @@
 
   Output:Meter,InteriorEquipment:Electricity,HOURLY;
 
-  Output:Meter,Gas:Facility,HOURLY;
+  Output:Meter,NaturalGas:Facility,HOURLY;
 
   Output:Meter,Heating:NaturalGas,HOURLY;
 
-  Output:Meter,Water Heater:WaterSystems:Gas,HOURLY;
+  Output:Meter,Water Heater:WaterSystems:NaturalGas,HOURLY;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,HOURLY;
 
@@ -7798,7 +7798,7 @@
 
   Output:Variable,*,Site Outdoor Air Relative Humidity,HOURLY;
 
-  Output:Variable,*,Boiler NaturalNaturalGas Energy,HOURLY;
+  Output:Variable,*,Boiler NaturalGas Energy,HOURLY;
 
   Output:Variable,*,Boiler Inlet Temperature,HOURLY;
 

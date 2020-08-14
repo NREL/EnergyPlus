@@ -2206,7 +2206,7 @@
 
   Output:Variable,*,Zone Radiant HVAC NaturalGas Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC NaturalNaturalGas Energy,timestep;
+  Output:Variable,*,Zone Radiant HVAC NaturalGas Energy,timestep;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,timestep;
 

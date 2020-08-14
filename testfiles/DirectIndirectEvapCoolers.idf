@@ -5247,7 +5247,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,             !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -5278,7 +5278,7 @@
 
   Output:Meter,Electricity:HVAC,hourly;
 
-  Output:Meter,Gas:Facility,hourly;
+  Output:Meter,NaturalGas:Facility,hourly;
 
   Output:Variable,*,Site Diffuse Solar Radiation Rate per Area,hourly;
 

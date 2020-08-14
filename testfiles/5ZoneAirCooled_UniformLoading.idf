@@ -3296,7 +3296,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
