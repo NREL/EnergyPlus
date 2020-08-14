@@ -177,7 +177,10 @@ namespace DataRuntimeLanguage {
     // Curve and Table access function
     int const FuncCurveValue(68);
 
-    int const NumPossibleOperators(68); // total number of operators and built-in functions
+    // Weather data query functions
+    int const FuncTodayBeamSolarRad(69); // Access TodayBeamSolarRad(hour, timestep)
+
+    int const NumPossibleOperators(69); // total number of operators and built-in functions
 
     // DERIVED TYPE DEFINITIONS:
 

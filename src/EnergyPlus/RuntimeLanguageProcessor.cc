@@ -74,6 +74,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -1418,7 +1419,7 @@ namespace RuntimeLanguageProcessor {
                         i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) ||
                         i_parse("@TRENDMAX", FuncTrendMax) || i_parse("@TRENDMIN", FuncTrendMin) ||
                         i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
-                        i_parse("@CURVEVALUE", FuncCurveValue)) {
+                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@CURVEVALUE", FuncTodayBeamSolarRad)) {
                         // was a built in function operator
                     } else { // throw error
                         if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", String);
@@ -2436,6 +2437,17 @@ namespace RuntimeLanguageProcessor {
                                                                        Operand(6).Number)); // curve index | X value | Y value, 2nd
                                                                                             // independent | Z Value, 3rd independent | 4th
                                                                                             // independent | 5th independent
+                        }
+
+                    } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
+                        int iTimeStep = (Operand(1).Number);
+                        int iHour = (Operand(2).Number);
+                        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+                            ReturnValue = SetErlValueNumber(WeatherManager::TodayBeamSolarRad(iTimeStep, iHour));
+                        } else {
+                            ReturnValue.Type = ValueError;
+                            ReturnValue.Error = "TodayBeamSolarRad function called with invalid arguments: Hour=" + General::RoundSigDigits(iHour)
+                                + ", Timestep=" + General::RoundSigDigits(iTimeStep);
                         }
 
                     } else {
@@ -4053,6 +4065,10 @@ namespace RuntimeLanguageProcessor {
         PossibleOperators(FuncCurveValue).Symbol = "@CURVEVALUE";
         PossibleOperators(FuncCurveValue).NumOperands = 6;
         PossibleOperators(FuncCurveValue).Code = FuncCurveValue;
+
+        PossibleOperators(FuncTodayBeamSolarRad).Symbol = "@TODAYBEAMSOLARRAD";
+        PossibleOperators(FuncTodayBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayBeamSolarRad).Code = FuncTodayBeamSolarRad;
 
         AlreadyDidOnce = true;
     }
