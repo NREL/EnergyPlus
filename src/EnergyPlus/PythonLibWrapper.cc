@@ -70,6 +70,7 @@ extern "C" {
     PYTHONWRAP_API int EP_Wrap_PyRun_SimpleString(const char * c) {return PyRun_SimpleString(c);}
     PYTHONWRAP_API int EP_Wrap_Py_FinalizeEx() {return Py_FinalizeEx();}
     PYTHONWRAP_API void EP_Wrap_PyErr_Fetch(PyObject **a, PyObject **b, PyObject **c) {PyErr_Fetch(a, b, c);}
+    PYTHONWRAP_API void EP_Wrap_PyErr_NormalizeException(PyObject **a, PyObject **b, PyObject **c) {PyErr_NormalizeException(a, b, c);}
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_Repr(PyObject * o) {return PyObject_Repr(o);}
     PYTHONWRAP_API PyObject * EP_Wrap_PyUnicode_AsEncodedString(PyObject *a, const char *b, const char *c) {return PyUnicode_AsEncodedString(a, b, c);}
     PYTHONWRAP_API char * EP_Wrap_PyBytes_AsString(PyObject *o) {return PyBytes_AsString(o);}
@@ -85,6 +86,8 @@ extern "C" {
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallObject(PyObject *callable, PyObject *args) {return PyObject_CallObject(callable, args);}
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_GetAttrString(PyObject *o, const char *attr_name) {return PyObject_GetAttrString(o, attr_name);}
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction(PyObject *callable, const char *format) {return PyObject_CallFunction(callable, format);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction3Args(PyObject *callable, const char *format, PyObject * arg1, PyObject * arg2, PyObject * arg3) {return PyObject_CallFunction(callable, format, arg1, arg2, arg3);}
+
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod(PyObject *obj, const char *name, const char *format) {return PyObject_CallMethod(obj, name, format);}
     PYTHONWRAP_API int EP_Wrap_PyList_Check(PyObject *p) {return PyList_Check(p);} // NOLINT(hicpp-signed-bitwise)
     PYTHONWRAP_API unsigned long EP_Wrap_PyList_Size(PyObject *list) {return PyList_Size(list);}
