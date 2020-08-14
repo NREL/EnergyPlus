@@ -153,6 +153,9 @@ namespace UnitHeater {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitUnitHeaterOneTimeFlag(true);
         bool GetUnitHeaterInputFlag(true);
+        bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+        bool SetMassFlowRateToZero(false); // TRUE when mass flow rates need to be set to zero
+
     } // namespace
 
     bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
@@ -180,6 +183,8 @@ namespace UnitHeater {
         UnitHeatNumericFields.deallocate();
         InitUnitHeaterOneTimeFlag = true;
         GetUnitHeaterInputFlag = true;
+        ZoneEquipmentListChecked = false;
+        SetMassFlowRateToZero = false;
     }
 
     void SimUnitHeater(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
@@ -392,7 +397,7 @@ namespace UnitHeater {
                 ErrorsFound = true;
             } else {
                 if (!UtilityRoutines::SameString(UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
-                    GetFanType(state, state.fans,
+                    GetFanType(state,
                         UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).FanType_Num, errFlag, CurrentModuleObject, UnitHeat(UnitHeatNum).Name);
 
                     {
@@ -401,7 +406,7 @@ namespace UnitHeater {
                             (SELECT_CASE_var == FanType_SimpleOnOff)) {
                             // Get fan outlet node
                             UnitHeat(UnitHeatNum).FanOutletNode =
-                                GetFanOutletNode(state, state.fans, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
+                                GetFanOutletNode(state, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + UnitHeat(UnitHeatNum).Name + "\".");
                                 ErrorsFound = true;
@@ -412,7 +417,8 @@ namespace UnitHeater {
                             ErrorsFound = true;
                         }
                     }
-                    GetFanIndex(state, state.fans, UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).Fan_Index, errFlag, CurrentModuleObject);
+                    GetFanIndex(
+                        state, UnitHeat(UnitHeatNum).FanName, UnitHeat(UnitHeatNum).Fan_Index, errFlag, CurrentModuleObject);
                     if (errFlag) {
                         ErrorsFound = true;
                     } else {
@@ -436,7 +442,7 @@ namespace UnitHeater {
                             ShowContinueError("...this can lead to unexpected results where the fan flow rate is less than required.");
                         }
                         UnitHeat(UnitHeatNum).FanAvailSchedPtr =
-                            GetFanAvailSchPtr(state, state.fans, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
+                            GetFanAvailSchPtr(state, UnitHeat(UnitHeatNum).FanType, UnitHeat(UnitHeatNum).FanName, errFlag);
                     }
                 } else if (UtilityRoutines::SameString(UnitHeat(UnitHeatNum).FanType, "Fan:SystemModel")) {
                     UnitHeat(UnitHeatNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
@@ -748,7 +754,6 @@ namespace UnitHeater {
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
         static Array1D_bool MyZoneEqFlag;            // used to set up zone equipment availability managers
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         int HotConNode; // hot water control node number in unit heater loop
         int InNode;     // inlet node number in unit heater loop
@@ -758,7 +763,6 @@ namespace UnitHeater {
         Real64 SteamDensity;
         Real64 rho; // local fluid density
         bool errFlag;
-        static bool SetMassFlowRateToZero(false); // TRUE when mass flow rates need to be set to zero
         // FLOW:
 
         // Do the one time initializations

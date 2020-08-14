@@ -20,11 +20,11 @@ The Annual Building Utility Performance Summary report often called ABUPS -- (ke
 \item
   Building Area -- Shows the total floorspace of the building and the conditioned floorspace.
 \item
-  End Uses -- This shows the total use of electricity, natural gas, other fuels, purchased cooling, purchased heating and water for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource does not affect this table -- the amount of electricity used for lights does not change if the electricity is from the utility or from an on-site generator. The Other Fuel column includes fuel oil\#1, fuel oil\#2, gasoline, coal, propane, diesel, otherfuel1 and otherfuel2. The district heating column also~ includes steam.
+  End Uses -- This shows the total use of electricity, natural gas, other fuels, purchased cooling, purchased heating and water for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource does not affect this table -- the amount of electricity used for lights does not change if the electricity is from the utility or from an on-site generator. The district heating column also includes steam.
 \item
   End Uses By Subcategory -- Shows a breakdown of the major end uses by user-defined category. If an end-use subcategory was not input for an object, it is automatically added to the General subcategory for that major end-use category.
 \item
-  Utility Use Per Floor Area -- These two sub-tables show the results from the end-uses table divided by the total floor area defined for the building and for the total conditioned floor area. Only three categories for end-uses are used for these sub-tables, lighting, HVAC and other. HVAC includes fans, pumps, heating, cooling, heat rejection, humidification, and domestic hot water heating. The Other Fuel column includes fuel oil\#1, fuel oil\#2, gasoline, coal, propane, diesel, otherfuel1 and otherfuel2. The district heating column also~ includes steam.
+  Utility Use Per Floor Area -- These two sub-tables show the results from the end-uses table divided by the total floor area defined for the building and for the total conditioned floor area. Only three categories for end-uses are used for these sub-tables, lighting, HVAC and other. HVAC includes fans, pumps, heating, cooling, heat rejection, humidification, and domestic hot water heating. The district heating column also includes steam.
 \item
   Electric Loads Satisfied -- Shows the different methods that electric loads are satisfied in the building. The values shown for on site power generation are: Fuel-Fired Power Generation, High Temperature Geothermal, Photovoltaic Power, and Wind Power. The flows to and from the electric utility are shown next and finally the total electricity used at the site is compared to the total generated on site plus the net amount from the electric utility. The percentages shown are based on the total electricity used by the end-uses. Note that High Temperature Geothermal and Wind Power are not yet implemented in EnergyPlus.
 \item
@@ -56,7 +56,7 @@ The Source Energy End Use Components Summary report produces a report (key: Sour
 
 \begin{itemize}
 \item
-  Source Energy End Use Components -- This shows the total use of source electricity, source natural gas, source values of other fuels, source purchased cooling~~ and purchased heating for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource will affect this table -- the amount of electricity used for lights will change if the electricity is from the utility or from an on-site generator. The Other Fuel column includes FuelOil\#1, FuelOil\#2, Gasoline, Coal, Propane, Diesel, OtherFuel1 and OtherFuel2. The district heating column also~ includes steam.
+  Source Energy End Use Components -- This shows the total use of source electricity, source natural gas, source values of other fuels, source purchased cooling~~ and purchased heating for each major end-use category. The end-use categories are Heating, Cooling, Interior Lighting, Exterior Lighting, Interior Equipment, Exterior Equipment, Fans, Pumps, Heat Rejection, Humidification, Heat Recovery, Hot Water, Refrigeration, and Generators. Not all fuels have corresponding end uses. The values in this sub-table are from output meters. To determine which components are attached to each end-use meter, consult the meter details output file (*.mtd). The source of the resource will affect this table -- the amount of electricity used for lights will change if the electricity is from the utility or from an on-site generator. The district heating column also includes steam.
 \item
   Source Energy End Use Components normalized by Conditioned Floor Area -- This table shows the total end uses in source energy normalized by conditioned floor area.
 \item
@@ -576,7 +576,7 @@ The predefined monthly report options are shown below. The key name of the prede
   Propane:Facility (Maximum)
 \end{itemize}
 
-\paragraph{EnergyConsumptionDieselFuel OilMonthly}\label{energyconsumptiondieselfuel-oilmonthly}
+\paragraph{EnergyConsumptionDieselFuelOilMonthly}\label{energyconsumptiondieselfuel-oilmonthly}
 
 \begin{itemize}
 \item
@@ -584,13 +584,13 @@ The predefined monthly report options are shown below. The key name of the prede
 \item
   Diesel:Facility (Maximum)
 \item
-  FuelOil\#1:Facility (SumOrAverage)
+  FuelOilNo1:Facility (SumOrAverage)
 \item
-  FuelOil\#1:Facility (Maximum)
+  FuelOilNo1:Facility (Maximum)
 \item
-  FuelOil\#2:Facility (SumOrAverage)
+  FuelOilNo2:Facility (SumOrAverage)
 \item
-  FuelOil\#2:Facility (Maximum)
+  FuelOilNo2:Facility (Maximum)
 \end{itemize}
 
 \paragraph{EnergyConsumptionDisctrictHeatingCoolingMonthly}\label{energyconsumptiondisctrictheatingcoolingmonthly}
@@ -699,25 +699,25 @@ The predefined monthly report options are shown below. The key name of the prede
 
 \begin{itemize}
 \item
-  ExteriorEquipment:FuelOil\#1 (SumOrAverage)
+  ExteriorEquipment:FuelOilNo1 (SumOrAverage)
 \item
-  Cooling:FuelOil\#1 (SumOrAverage)
+  Cooling:FuelOilNo1 (SumOrAverage)
 \item
-  Heating:FuelOil\#1 (SumOrAverage)
+  Heating:FuelOilNo1 (SumOrAverage)
 \item
-  WaterSystems:FuelOil\#1 (SumOrAverage)
+  WaterSystems:FuelOilNo1 (SumOrAverage)
 \item
-  Cogeneration:FuelOil\#1 (SumOrAverage)
+  Cogeneration:FuelOilNo1 (SumOrAverage)
 \item
-  ExteriorEquipment:FuelOil\#2 (SumOrAverage)
+  ExteriorEquipment:FuelOilNo2 (SumOrAverage)
 \item
-  Cooling:FuelOil\#2 (SumOrAverage)
+  Cooling:FuelOilNo2 (SumOrAverage)
 \item
-  Heating:FuelOil\#2 (SumOrAverage)
+  Heating:FuelOilNo2 (SumOrAverage)
 \item
-  WaterSystems:FuelOil\#2 (SumOrAverage)
+  WaterSystems:FuelOilNo2 (SumOrAverage)
 \item
-  Cogeneration:FuelOil\#2 (SumOrAverage)
+  Cogeneration:FuelOilNo2 (SumOrAverage)
 \end{itemize}
 
 \paragraph{EndUseEnergyConsumptionCoalMonthly}\label{enduseenergyconsumptioncoalmonthly}
@@ -883,25 +883,25 @@ The predefined monthly report options are shown below. The key name of the prede
 
 \begin{itemize}
 \item
-  ExteriorEquipment:FuelOil\#1 (Maximum)
+  ExteriorEquipment:FuelOilNo1 (Maximum)
 \item
-  Cooling:FuelOil\#1 (Maximum)
+  Cooling:FuelOilNo1 (Maximum)
 \item
-  Heating:FuelOil\#1 (Maximum)
+  Heating:FuelOilNo1 (Maximum)
 \item
-  WaterSystems:FuelOil\#1 (Maximum)
+  WaterSystems:FuelOilNo1 (Maximum)
 \item
-  Cogeneration:FuelOil\#1 (Maximum)
+  Cogeneration:FuelOilNo1 (Maximum)
 \item
-  ExteriorEquipment:FuelOil\#2 (Maximum)
+  ExteriorEquipment:FuelOilNo2 (Maximum)
 \item
-  Cooling:FuelOil\#2 (Maximum)
+  Cooling:FuelOilNo2 (Maximum)
 \item
-  Heating:FuelOil\#2 (Maximum)
+  Heating:FuelOilNo2 (Maximum)
 \item
-  WaterSystems:FuelOil\#2 (Maximum)
+  WaterSystems:FuelOilNo2 (Maximum)
 \item
-  Cogeneration:FuelOil\#2 (Maximum)
+  Cogeneration:FuelOilNo2 (Maximum)
 \end{itemize}
 
 \paragraph{PeakEnergyEndUseCoalMonthly}\label{peakenergyendusecoalmonthly}

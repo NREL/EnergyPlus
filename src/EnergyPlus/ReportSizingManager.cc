@@ -55,13 +55,13 @@
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
@@ -69,10 +69,10 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -121,6 +121,11 @@ namespace ReportSizingManager {
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Functions
+    bool MyOneTimeFlag(true);
+
+    void clear_state() {
+        MyOneTimeFlag = true;
+    }
 
     void ReportSizingOutput(std::string const &CompType,    // the type of the component
                             std::string const &CompName,    // the name of the component
@@ -164,26 +169,25 @@ namespace ReportSizingManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
 
         // Formats
         static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
         // to do, make this a parameter. Unfortunately this function is used in MANY
         // places so it involves touching most of E+
-        auto &outputFiles = OutputFiles::getSingleton();
+        auto &ioFiles = IOFiles::getSingleton();
         if (MyOneTimeFlag) {
             static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
-            print(outputFiles.eio, Format_990);
+            print(ioFiles.eio, Format_990);
             MyOneTimeFlag = false;
         }
 
-        print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
+        print(ioFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
         // add to tabular output reports
         AddCompSizeTableEntry(CompType, CompName, VarDesc, VarValue);
 
         if (present(UsrDesc) && present(UsrValue)) {
-            print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
+            print(ioFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
             AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
         } else if (present(UsrDesc) || present(UsrValue)) {
             ShowFatalError("ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
@@ -2885,14 +2889,12 @@ namespace ReportSizingManager {
                         Real64 fanDeltaT = 0.0;
                         if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                             // water coils on main branch have no parent object to set DataFan* variables
-                            if (DataFanIndex == -1) {
-                                if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
-                                    DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
-                                    DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
-                                } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
-                                    DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-                                    DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
-                                }
+                            if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+                                DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                                DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
+                            } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+                                DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                                DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
                             }
                             // calculate fan heat to get fan air-side delta T
                             FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
@@ -2923,14 +2925,12 @@ namespace ReportSizingManager {
                         Real64 fanDeltaT = 0.0;
                         if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                             // water coils on main branch have no parent object to set DataFan* variables
-                            if (DataFanIndex == -1) {
-                                if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
-                                    DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
-                                    DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
-                                } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
-                                    DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-                                    DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
-                                }
+                            if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+                                DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                                DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
+                            } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+                                DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                                DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
                             }
                             // calculate fan heat to get fan air-side delta T
                             FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
@@ -2946,14 +2946,12 @@ namespace ReportSizingManager {
                         Real64 fanDeltaT = 0.0;
                         if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
                             // water coils on main branch have no parent object to set DataFan* variables
-                            if (DataFanIndex == -1) {
-                                if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
-                                    DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
-                                    DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
-                                } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
-                                    DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
-                                    DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
-                                }
+                            if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
+                                DataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
+                                DataFanIndex = PrimaryAirSystem(CurSysNum).SupFanNum;
+                            } else if (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum == DataAirSystems::objectVectorOOFanSystemModel) {
+                                DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
+                                DataFanIndex = PrimaryAirSystem(CurSysNum).supFanVecIndex;
                             }
                             // calculate fan heat to get fan air-side delta T
                             FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);

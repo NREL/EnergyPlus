@@ -58,12 +58,12 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -218,7 +218,7 @@ namespace StandardRatings {
 
     // Functions
 
-    void CalcChillerIPLV(OutputFiles &outputFiles,
+    void CalcChillerIPLV(IOFiles &ioFiles,
                          std::string const &ChillerName,         // Name of Chiller for which IPLV is calculated
                          int const ChillerType,                  // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                    // Reference capacity of chiller [W]
@@ -487,7 +487,7 @@ namespace StandardRatings {
         }
 
         // Writes the IPLV value to the EIO file and standard tabular output tables
-        ReportChillerIPLV(outputFiles, ChillerName, ChillerType, IPLV, IPLV * ConvFromSIToIP);
+        ReportChillerIPLV(ioFiles, ChillerName, ChillerType, IPLV, IPLV * ConvFromSIToIP);
     }
 
     Real64
@@ -581,7 +581,7 @@ namespace StandardRatings {
         return Residuum;
     }
 
-    void ReportChillerIPLV(OutputFiles &outputFiles,
+    void ReportChillerIPLV(IOFiles &ioFiles,
                            std::string const &ChillerName, // Name of Chiller for which IPLV is calculated
                            int const ChillerType,          // Type of Chiller - EIR or Reformulated EIR
                            Real64 const IPLVValueSI,       // IPLV value in SI units {W/W}
@@ -613,7 +613,7 @@ namespace StandardRatings {
         if (MyOneTimeFlag) {
             static constexpr auto Format_990(
                 "! <Chiller Standard Rating Information>, Component Type, Component Name, IPLV in SI Units {W/W}, IPLV in IP Units {Btu/W-h}");
-            print(outputFiles.eio, "{}\n", Format_990);
+            print(ioFiles.eio, "{}\n", Format_990);
             MyOneTimeFlag = false;
         }
 
@@ -622,12 +622,12 @@ namespace StandardRatings {
             auto const SELECT_CASE_var(ChillerType);
             if (SELECT_CASE_var == TypeOf_Chiller_ElectricEIR) {
 
-                print(outputFiles.eio, Format_991, "Chiller:Electric:EIR", ChillerName, IPLVValueSI, IPLVValueIP);
+                print(ioFiles.eio, Format_991, "Chiller:Electric:EIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:EIR");
 
             } else if (SELECT_CASE_var == TypeOf_Chiller_ElectricReformEIR) {
 
-                print(outputFiles.eio, Format_991, "Chiller:Electric:ReformulatedEIR", ChillerName, IPLVValueSI, IPLVValueIP);
+                print(ioFiles.eio, Format_991, "Chiller:Electric:ReformulatedEIR", ChillerName, IPLVValueSI, IPLVValueIP);
                 PreDefTableEntry(pdchMechType, ChillerName, "Chiller:Electric:ReformulatedEIR");
             }
         }
@@ -747,7 +747,7 @@ namespace StandardRatings {
     }
 
     void CalcDXCoilStandardRating(
-        OutputFiles &outputFiles,
+        IOFiles &ioFiles,
         std::string const &DXCoilName,                             // Name of DX coil for which HSPF is calculated
         std::string const &DXCoilType,                             // Type of DX coil for which HSPF is calculated
         int const DXCoilType_Num,                                  // Integer Type of DX coil - heating or cooling
@@ -963,7 +963,7 @@ namespace StandardRatings {
                                                         IEER);
 
                 // Writes the net rated cooling capacity, SEER, SEER Default, EER and IEER values to the EIO file and standard tabular output tables
-                ReportDXCoilRating(outputFiles,
+                ReportDXCoilRating(ioFiles,
                                    DXCoilType,
                                    DXCoilName,
                                    DXCoilType_Num,
@@ -993,7 +993,7 @@ namespace StandardRatings {
                                                            NetTotCoolingCapRated,
                                                            TotElectricPowerRated);
                     ReportDXCoolCoilDataCenterApplication(
-                        outputFiles, DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated);
+                        ioFiles, DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated);
                 }
             } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) { // Coil:Heating:DX:SingleSpeed
 
@@ -1024,7 +1024,7 @@ namespace StandardRatings {
                                                         DefrostControl);
 
                 // Writes the HSPF value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(outputFiles,
+                ReportDXCoilRating(ioFiles,
                                    DXCoilType,
                                    DXCoilName,
                                    DXCoilType_Num,
@@ -1066,7 +1066,7 @@ namespace StandardRatings {
                                                        SEER_User,
                                                        SEER_Standard);
                 // Writes the SEER value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(outputFiles,
+                ReportDXCoilRating(ioFiles,
                                    DXCoilType,
                                    DXCoilName,
                                    DXCoilType_Num,
@@ -1115,7 +1115,7 @@ namespace StandardRatings {
                                                        OATempCompressorOnOffBlank,
                                                        DefrostControl);
                 // Writes the HSPF value to the EIO file and standard tabular output tables
-                ReportDXCoilRating(outputFiles,
+                ReportDXCoilRating(ioFiles,
                                    DXCoilType,
                                    DXCoilName,
                                    DXCoilType_Num,
@@ -2355,7 +2355,7 @@ namespace StandardRatings {
         }
     }
 
-    void ReportDXCoilRating(OutputFiles &outputFiles,
+    void ReportDXCoilRating(IOFiles &ioFiles,
                             std::string const &CompType,    // Type of component
                             std::string const &CompName,    // Name of component
                             int const CompTypeNum,          // TypeNum of component
@@ -2424,12 +2424,12 @@ namespace StandardRatings {
                 if (MyCoolOneTimeFlag) {
                     static constexpr auto Format_990("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                                                           "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}\n");
-                    print(outputFiles.eio, "{}", Format_990);
+                    print(ioFiles.eio, "{}", Format_990);
                     MyCoolOneTimeFlag = false;
                 }
 
                 static constexpr auto Format_991(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
-                print(outputFiles.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
+                print(ioFiles.eio, Format_991, CompType, CompName, CoolCapVal, EERValueSI, EERValueIP, SEERUserIP, SEERStandardIP, IEERValueIP);
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
@@ -2448,12 +2448,12 @@ namespace StandardRatings {
                     static constexpr auto Format_992("! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating "
                                                           "(net) Rating Capacity {W}, Low Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region "
                                                           "Number\n");
-                    print(outputFiles.eio, "{}", Format_992);
+                    print(ioFiles.eio, "{}", Format_992);
                     MyHeatOneTimeFlag = false;
                 }
 
                 static constexpr auto Format_993(" DX Heating Coil Standard Rating Information, {}, {}, {:.1R}, {:.1R}, {:.2R}, {}\n");
-                print(outputFiles.eio, Format_993, CompType, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
+                print(ioFiles.eio, Format_993, CompType, CompName, HighHeatingCapVal, LowHeatingCapVal, HSPFValueIP, RegionNum);
 
                 PreDefTableEntry(pdchDXHeatCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXHeatCoilHighCap, CompName, HighHeatingCapVal, 1);
@@ -2467,12 +2467,12 @@ namespace StandardRatings {
                 if (MyCoolOneTimeFlag) {
                     static constexpr auto Format_994("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                                                           "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER User {Btu/W-h}, SEER Standard {Btu/W-h}, IEER {Btu/W-h}");
-                    print(outputFiles.eio, "{}\n", Format_994);
+                    print(ioFiles.eio, "{}\n", Format_994);
                     MyCoolOneTimeFlag = false;
                 }
 
                 static constexpr auto Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
-                print(outputFiles.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
+                print(ioFiles.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERUserIP, SEERStandardIP, ' ');
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
@@ -2486,7 +2486,7 @@ namespace StandardRatings {
         }
     }
 
-    void ReportDXCoolCoilDataCenterApplication(OutputFiles &outputFiles,
+    void ReportDXCoolCoilDataCenterApplication(IOFiles &ioFiles,
                                                std::string const &CompType,           // Type of component
                                                std::string const &CompName,           // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
@@ -2552,7 +2552,7 @@ namespace StandardRatings {
                         "Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, "
                         "Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric "
                         "Power Test D {W} \n");
-                    print(outputFiles.eio, "{}", Format_101);
+                    print(ioFiles.eio, "{}", Format_101);
                     MyCoolOneTimeFlag = false;
                 }
                 for (ClassNum = 1; ClassNum <= 4; ++ClassNum) {
@@ -2561,7 +2561,7 @@ namespace StandardRatings {
                     CompNameNew = CompName + "(" + ClassName + ")";
                     static constexpr auto Format_102(" DX Cooling Coil ASHRAE 127 Standard Ratings Information, {}, {}, {}, {:.1R}, {:.1R}, {:.1R}, "
                                                      "{:.1R}, {:.1R}, {:.1R}, {:.1R}, {:.1R}\n");
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           Format_102,
                           CompType,
                           CompName,

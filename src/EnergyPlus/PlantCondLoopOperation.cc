@@ -58,6 +58,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -153,7 +154,6 @@ namespace PlantCondLoopOperation {
     }
 
     void ManagePlantLoadDistribution(EnergyPlusData &state,
-                                     BranchInputManagerData &dataBranchInputManager,
                                      int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
@@ -264,12 +264,12 @@ namespace PlantCondLoopOperation {
         if ((CurSchemeType == UncontrolledOpSchemeType) || (CurSchemeType == CompSetPtBasedSchemeType)) {
             // No RangeVariable specified for these types
         } else if (CurSchemeType == EMSOpSchemeType) {
-            InitLoadDistribution(state, dataBranchInputManager, FirstHVACIteration);
+            InitLoadDistribution(state, FirstHVACIteration);
             // No RangeVariable specified for these types
         } else if (CurSchemeType == HeatingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand < SmallLoad) {
-                InitLoadDistribution(state, dataBranchInputManager, FirstHVACIteration);
+                InitLoadDistribution(state, FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -278,7 +278,7 @@ namespace PlantCondLoopOperation {
         } else if (CurSchemeType == CoolingRBOpSchemeType) {
             // For zero demand, we need to clean things out before we leave
             if (LoopDemand > (-1.0 * SmallLoad)) {
-                InitLoadDistribution(state, dataBranchInputManager, FirstHVACIteration);
+                InitLoadDistribution(state, FirstHVACIteration);
                 this_component.MyLoad = 0.0;
                 this_component.ON = false;
                 return;
@@ -1810,7 +1810,7 @@ namespace PlantCondLoopOperation {
     // Beginning Initialization Section of the Plant Loop Module
     //******************************************************************************
 
-    void InitLoadDistribution(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration)
+    void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1892,7 +1892,7 @@ namespace PlantCondLoopOperation {
                             auto &this_equip(this_equip_list.Comp(EquipNum));
                             ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
                             errFlag1 = false;
-                            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
                                                                     this_equip.Name,
                                                                     ThisTypeOfNum,
                                                                     DummyLoopNum,

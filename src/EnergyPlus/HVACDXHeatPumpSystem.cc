@@ -141,6 +141,7 @@ namespace HVACDXHeatPumpSystem {
 
     void clear_state()
     {
+        GetInputFlag = true;
         NumDXHeatPumpSystems = 0;
         EconomizerFlag = false;
         CheckEquipName.deallocate();

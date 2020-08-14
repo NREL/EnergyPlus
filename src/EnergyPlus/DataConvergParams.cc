@@ -129,6 +129,7 @@ namespace DataConvergParams {
     Real64 MinTimeStepSys((1.0 / 60.0)); // =1 minute
     Real64 MinTimeStepTol(1.0e-4);       // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
     Real64 MaxZoneTempDiff(0.3);         // 0.3 C = (1% OF 300 C) = max allowable difference between
+
     //   zone air temp at Time=T and Time=T-1
     Real64 MinSysTimeRemaining((1.0 / 3600.0)); // = 1 second
     int MaxIter(20);                            // maximum number of iterations allowed

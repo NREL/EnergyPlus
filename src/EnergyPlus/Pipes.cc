@@ -204,7 +204,7 @@ namespace Pipes {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");

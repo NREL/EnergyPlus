@@ -47,14 +47,14 @@
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Data/CommonIncludes.hh>
-#include <EnergyPlus/OutputFiles.hh>
 
 #include <memory>
 
 namespace EnergyPlus {
 
     EnergyPlusData::EnergyPlusData() {
-        OutputFiles::setSingleton(&outputFiles);
+        // todo, try to eliminate the need for the singleton
+        IOFiles::setSingleton(&files);
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);

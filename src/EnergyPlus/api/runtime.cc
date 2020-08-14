@@ -62,6 +62,8 @@ EnergyPlusState stateNew() {
 void stateReset(EnergyPlusState state) {
     auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::clearAllStates(*this_state);
+    // also clear out the input processor since the clearAllStates does not do that.
+//    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
 }
 
 void stateDelete(EnergyPlusState state) {
@@ -81,6 +83,10 @@ int energyplus(EnergyPlusState state, int argc, const char *argv[]) {
     return runEnergyPlusAsLibrary(*this_state, argc, argv);
 }
 
+void stopSimulation() {
+  EnergyPlus::DataGlobals::stopSimulation = true;
+}
+
 void issueWarning(const char * message) {
     EnergyPlus::ShowWarningError(message);
 }
@@ -98,6 +104,14 @@ void registerProgressCallback(EnergyPlusState EP_UNUSED(state), void (*f)(int co
 
 void registerStdOutCallback(EnergyPlusState EP_UNUSED(state), void (*f)(const char * message)) {
     EnergyPlus::DataGlobals::messageCallback = f;
+}
+
+void registerExternalHVACManager(EnergyPlusState EP_UNUSED(state), std::function<void (EnergyPlusState)> f) {
+  EnergyPlus::DataGlobals::externalHVACManager = f;
+}
+
+void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState)) {
+  registerExternalHVACManager(state, std::function<void (EnergyPlusState)>(f));
 }
 
 void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
@@ -267,4 +281,3 @@ void callbackUnitarySystemSizing(EnergyPlusState state, void (*f)(EnergyPlusStat
     auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::PluginManagement::registerNewCallback(*this_state, EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);
 }
-

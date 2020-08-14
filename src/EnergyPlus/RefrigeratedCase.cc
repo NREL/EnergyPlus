@@ -58,12 +58,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -71,13 +71,13 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -426,6 +426,11 @@ namespace RefrigeratedCase {
     Array1D<CoilCreditData> CoilSysCredit;
     Array1D<CaseWIZoneReportData> CaseWIZoneReport;
 
+    bool MyOneTimeFlag(true); // flag to skip first pass on next begin environment flag
+    bool InitRefrigerationMyBeginEnvrnFlag(true);
+    bool InitRefrigerationPlantConnectionsMyBeginEnvrnFlag(true);
+    bool FigureRefrigerationZoneGainsMyEnvrnFlag(true);
+
     void clear_state()
     {
         NumSimulationCondAir = 0;
@@ -506,6 +511,11 @@ namespace RefrigeratedCase {
         AirChillerSet.deallocate();
         CoilSysCredit.deallocate();
         CaseWIZoneReport.deallocate();
+
+        MyOneTimeFlag = true;
+        InitRefrigerationMyBeginEnvrnFlag = true;
+        InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
+        FigureRefrigerationZoneGainsMyEnvrnFlag = true;
     }
 
     void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
@@ -532,8 +542,6 @@ namespace RefrigeratedCase {
         // using manufacturer's data and rated performance curves.
         // Inter-system heat transfer via subcoolers and cascade condensers can be accommodated.
         // Secondary refrigeration cycles are also available.
-
-        static bool MyOneTimeFlag(true); // flag to skip first pass on next begin environment flag
 
         if (!ManageRefrigeration) return;
 
@@ -6338,7 +6346,7 @@ namespace RefrigeratedCase {
         }     // NumSimulationGasCooler > 0
 
         // echo input to eio file.
-        ReportRefrigerationComponents(state.outputFiles);
+        ReportRefrigerationComponents(state.files);
 
         if (ErrorsFound) {
             ShowFatalError(RoutineName + " Previous errors cause program termination");
@@ -8884,7 +8892,6 @@ namespace RefrigeratedCase {
         // addition/subtraction to/from each accumulating variable.  If the time step is repeated,
         // this most recent addition/subtraction is reversed before the rest of the refrigeration simulation begins.
 
-        static bool MyBeginEnvrnFlag(true);
         // Used to adjust accumulative variables when time step is repeated
         static Real64 MyCurrentTimeSaved(0.0);   // Used to determine whether the zone time step is a repetition
         static Real64 MyStepStartTimeSaved(0.0); // Used to determine whether the system time step is a repetition
@@ -8998,7 +9005,7 @@ namespace RefrigeratedCase {
         }
 
         // Accumulative and carry-over variables are not zeroed at start of each time step, only at begining of environment
-        if (DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag) {
+        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationMyBeginEnvrnFlag) {
             if (NumSimulationCases > 0) {
                 for (int i = RefrigCase.l(), e = RefrigCase.u(); i <= e; ++i) {
                     RefrigCase(i).reset_init_accum();
@@ -9058,11 +9065,11 @@ namespace RefrigeratedCase {
             }
 
             if (DataGlobals::NumOfTimeStepInHour > 0.0) TimeStepFraction = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
-            MyBeginEnvrnFlag = false;
+            InitRefrigerationMyBeginEnvrnFlag = false;
 
         } // ( DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag )
 
-        if (!DataGlobals::BeginEnvrnFlag) MyBeginEnvrnFlag = true;
+        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationMyBeginEnvrnFlag = true;
 
         // Avoid multiplying accumulation if go through zone/load time step more than once.
         if (!DataGlobals::WarmupFlag) { // because no accumulation is done during warm up
@@ -9225,7 +9232,6 @@ namespace RefrigeratedCase {
         // are entered from plant, for water cooled Condensers and Refrigeration Racks
 
         static std::string const RoutineName("InitRefrigerationPlantConnections");
-        static bool MyBeginEnvrnFlag(true);
 
         // initialize plant topology information, if applicable
         if (MyReferPlantScanFlag && allocated(DataPlant::PlantLoop)) {
@@ -9300,7 +9306,7 @@ namespace RefrigeratedCase {
             MyReferPlantScanFlag = false;
         }
 
-        if (DataGlobals::BeginEnvrnFlag && MyBeginEnvrnFlag) {
+        if (DataGlobals::BeginEnvrnFlag && InitRefrigerationPlantConnectionsMyBeginEnvrnFlag) {
 
             // do plant inits, if applicable
             if (!MyReferPlantScanFlag) {
@@ -9351,11 +9357,11 @@ namespace RefrigeratedCase {
                                        RefrigRack(RefCompRackLoop).PlantCompNum);
                 }
             }
-            MyBeginEnvrnFlag = false;
+            InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = false;
 
         } //(DataGlobals::BeginEnvrnFlag .AND. MyBeginEnvrnFlag)
 
-        if (!DataGlobals::BeginEnvrnFlag) MyBeginEnvrnFlag = true;
+        if (!DataGlobals::BeginEnvrnFlag) InitRefrigerationPlantConnectionsMyBeginEnvrnFlag = true;
     }
 
     void RefrigRackData::CalcRackSystem()
@@ -12725,7 +12731,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void ReportRefrigerationComponents(OutputFiles &outputFiles)
+    void ReportRefrigerationComponents(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12803,82 +12809,82 @@ namespace RefrigeratedCase {
 
         // write all headers applicable to this simulation
         if (DataHeatBalance::NumRefrigeratedRacks > 0) {
-            print(outputFiles.eio, "{}\n", Format_109); // Intro to refrigeration case racks
-            print(outputFiles.eio, "{}\n", Format_104); // Refrigeration Rack header
+            print(ioFiles.eio, "{}\n", Format_109); // Intro to refrigeration case racks
+            print(ioFiles.eio, "{}\n", Format_104); // Refrigeration Rack header
         }                                            //(NumRefrigeratedRacks > 0)
         if (DataHeatBalance::NumRefrigSystems > 0) {
-            print(outputFiles.eio, "{}\n", Format_117); // Intro to detailed systems
-            print(outputFiles.eio, "{}\n", Format_118); // Detailed system header
-            print(outputFiles.eio, "{}\n", Format_108); // Compressor header (Always have compressor if have detailed system)
+            print(ioFiles.eio, "{}\n", Format_117); // Intro to detailed systems
+            print(ioFiles.eio, "{}\n", Format_118); // Detailed system header
+            print(ioFiles.eio, "{}\n", Format_108); // Compressor header (Always have compressor if have detailed system)
         }                                            //(NumRefrigSystems > 0)
         if (NumSimulationSecondarySystems > 0) {
-            print(outputFiles.eio, "{}\n", Format_142); // Intro to Secondary systems
+            print(ioFiles.eio, "{}\n", Format_142); // Intro to Secondary systems
             int CountSecPhase = 0;
             int CountSecBrine = 0;
             for (int SecondaryID = 1; SecondaryID <= NumSimulationSecondarySystems; ++SecondaryID) {
                 if ((Secondary(SecondaryID).FluidType == SecFluidTypeAlwaysLiquid) && (CountSecBrine == 0)) {
-                    print(outputFiles.eio, "{}\n", Format_133); // Secondary system header for brine type systems
+                    print(ioFiles.eio, "{}\n", Format_133); // Secondary system header for brine type systems
                     ++CountSecBrine;
                 }
                 if ((Secondary(SecondaryID).FluidType == SecFluidTypePhaseChange) && (CountSecPhase == 0)) {
-                    print(outputFiles.eio, "{}\n", Format_146); // Secondary system header for liquid overfeed/phase change systems
+                    print(ioFiles.eio, "{}\n", Format_146); // Secondary system header for liquid overfeed/phase change systems
                     ++CountSecPhase;
                 }
             }
-            print(outputFiles.eio, "{}\n", Format_123); //  Secondary system load header
+            print(ioFiles.eio, "{}\n", Format_123); //  Secondary system load header
         }                                            //(NumSimulationSecondarySystems > 0)
         if (DataHeatBalance::NumRefrigChillerSets > 0) {
-            print(outputFiles.eio, "{}\n", Format_148); // Intro to Chiller set
-            print(outputFiles.eio, "{}\n", Format_149); // Chiller set header
-            print(outputFiles.eio, "{}\n", Format_151); // Intro to Air Chiller
-            print(outputFiles.eio, "{}\n", Format_152); // Air chiller header
+            print(ioFiles.eio, "{}\n", Format_148); // Intro to Chiller set
+            print(ioFiles.eio, "{}\n", Format_149); // Chiller set header
+            print(ioFiles.eio, "{}\n", Format_151); // Intro to Air Chiller
+            print(ioFiles.eio, "{}\n", Format_152); // Air chiller header
         }                                            //(NumRefrigSystems > 0)
         if (NumSimulationCases > 0) {
-            print(outputFiles.eio, "{}\n", Format_105); //  Case header
+            print(ioFiles.eio, "{}\n", Format_105); //  Case header
         }                                            //(NumSimulationCases > 0)
         if (NumSimulationWalkIns > 0) {
-            print(outputFiles.eio, "{}\n", Format_119); //  Walk-in header
-            print(outputFiles.eio, "{}\n", Format_134); //  Walk-in zone-specific header
+            print(ioFiles.eio, "{}\n", Format_119); //  Walk-in header
+            print(ioFiles.eio, "{}\n", Format_134); //  Walk-in zone-specific header
         }                                            //(NumSimulationWalkIns > 0)
         if (NumSimulationCondAir > 0) {
-            print(outputFiles.eio, "{}\n", Format_129); //  Condenser, Air-Cooled header
+            print(ioFiles.eio, "{}\n", Format_129); //  Condenser, Air-Cooled header
         }                                            //(NumSimulationCondAir > 0)
         if (NumSimulationCondEvap > 0) {
-            print(outputFiles.eio, "{}\n", Format_131); //  Condenser, Evaporative-Cooled header
+            print(ioFiles.eio, "{}\n", Format_131); //  Condenser, Evaporative-Cooled header
         }                                            //(NumSimulationCondEvap > 0)
         if (NumSimulationCondWater > 0) {
-            print(outputFiles.eio, "{}\n", Format_130); //  Condenser, Water-Cooled header
+            print(ioFiles.eio, "{}\n", Format_130); //  Condenser, Water-Cooled header
         }                                            //(NumSimulationCondWater > 0)
         if (NumSimulationCascadeCondensers > 0) {
-            print(outputFiles.eio, "{}\n", Format_132); //  Condenser, Cascade header
-            print(outputFiles.eio, "{}\n", Format_128); //  Cascade Load header
+            print(ioFiles.eio, "{}\n", Format_132); //  Condenser, Cascade header
+            print(ioFiles.eio, "{}\n", Format_128); //  Cascade Load header
         }                                            //(NumSimulationCascadeCondensers > 0)
         if (NumSimulationMechSubcoolers > 0) {
-            print(outputFiles.eio, "{}\n", Format_141); //  Mech subcooler loads served header
-            print(outputFiles.eio, "{}\n", Format_126); //  Mechanical Subcooler header
+            print(ioFiles.eio, "{}\n", Format_141); //  Mech subcooler loads served header
+            print(ioFiles.eio, "{}\n", Format_126); //  Mechanical Subcooler header
         }                                            //(NumSimulationMechSubcoolers > 0)
         if ((NumSimulationSubcoolers - NumSimulationMechSubcoolers) > 0) {
-            print(outputFiles.eio, "{}\n", Format_127); //  LSHX Subcooler header
+            print(ioFiles.eio, "{}\n", Format_127); //  LSHX Subcooler header
         }                                            //((NumSimulationSubcoolers - NumSimulationMechSubcoolers) > 0)
 
         if (NumTransRefrigSystems > 0) {
-            print(outputFiles.eio, "{}\n", Format_120); // Intro to detailed transcriticial refrigeration system
-            print(outputFiles.eio, "{}\n", Format_121); // Detailed system header
+            print(ioFiles.eio, "{}\n", Format_120); // Intro to detailed transcriticial refrigeration system
+            print(ioFiles.eio, "{}\n", Format_121); // Detailed system header
             if (NumSimulationCases > 0) {
-                print(outputFiles.eio, "{}\n", Format_105); //  Case header
+                print(ioFiles.eio, "{}\n", Format_105); //  Case header
             }                                            //(NumSimulationCases > 0)
             if (NumSimulationWalkIns > 0) {
-                print(outputFiles.eio, "{}\n", Format_119); //  Walk-in header
-                print(outputFiles.eio, "{}\n", Format_134); //  Walk-in zone-specific header
+                print(ioFiles.eio, "{}\n", Format_119); //  Walk-in header
+                print(ioFiles.eio, "{}\n", Format_134); //  Walk-in zone-specific header
             }                                            //(NumSimulationWalkIns > 0)
-            print(outputFiles.eio, "{}\n", Format_108);     // Compressor header (Always have compressor if have detailed system)
+            print(ioFiles.eio, "{}\n", Format_108);     // Compressor header (Always have compressor if have detailed system)
             if (NumSimulationGasCooler > 0) {
-                print(outputFiles.eio, "{}\n", Format_160); //  Gas Cooler, Air-Cooled header
+                print(ioFiles.eio, "{}\n", Format_160); //  Gas Cooler, Air-Cooled header
             }                                            //(NumSimulationGasCooler > 0)
         }                                                //(NumTransRefrigSystems > 0)
 
         if (DataHeatBalance::NumRefrigeratedRacks > 0) {
-            print(outputFiles.eio, "#Refrigeration Compressor Racks, {}\n", DataHeatBalance::NumRefrigeratedRacks);
+            print(ioFiles.eio, "#Refrigeration Compressor Racks, {}\n", DataHeatBalance::NumRefrigeratedRacks);
             for (int RackNum = 1; RackNum <= DataHeatBalance::NumRefrigeratedRacks; ++RackNum) {
                 if (RefrigRack(RackNum).HeatRejectionLocation == LocationOutdoors) {
                     ChrOut = "Outdoors";
@@ -12895,7 +12901,7 @@ namespace RefrigeratedCase {
                         ChrOut2 = "Water-Cooled";
                     }
                 }
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       " Refrigeration Compressor Rack,{},{},{},{},{},{:.3R}\n",
                       RefrigRack(RackNum).Name,
                       RefrigRack(RackNum).NumCases,
@@ -12906,7 +12912,7 @@ namespace RefrigeratedCase {
                 for (int CaseNum = 1; CaseNum <= RefrigRack(RackNum).NumCases; ++CaseNum) {
                     int CaseID = RefrigRack(RackNum).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
@@ -12926,7 +12932,7 @@ namespace RefrigeratedCase {
 
                 for (int WalkInNum = 1; WalkInNum <= RefrigRack(RackNum).NumWalkIns; ++WalkInNum) {
                     int WalkInID = RefrigRack(RackNum).WalkInNum(WalkInNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Refrigeration Walk In Cooler,  {},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
@@ -12940,7 +12946,7 @@ namespace RefrigeratedCase {
                           WalkIn(WalkInID).DefrostCapacity,
                           WalkIn(WalkInID).NumZones);
                     for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "      Walk-In Surfaces Facing Zone, {},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
                               WalkIn(WalkInID).ZoneName(ZoneID),
                               WalkIn(WalkInID).SurfaceArea(ZoneID),
@@ -12956,15 +12962,15 @@ namespace RefrigeratedCase {
 
                 for (int CoilNum = 1; CoilNum <= RefrigRack(RackNum).NumCoils; ++CoilNum) {
                     int CoilID = RefrigRack(RackNum).CoilNum(CoilNum);
-                    print(outputFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
+                    print(ioFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
                 } // numairchillers
             }     // numracks
         }         //(NumRefrigeratedRacks > 0)
 
         if (DataHeatBalance::NumRefrigSystems > 0) {
-            print(outputFiles.eio, "#Detailed Refrigeration Systems,{}\n", DataHeatBalance::NumRefrigSystems);
+            print(ioFiles.eio, "#Detailed Refrigeration Systems,{}\n", DataHeatBalance::NumRefrigSystems);
             for (int SystemNum = 1; SystemNum <= DataHeatBalance::NumRefrigSystems; ++SystemNum) {
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       " Detailed Refrigeration System,{},{},{},{},{},{},{},{},{},{},{},{:.2R},{},{:.1R}\n",
                       System(SystemNum).Name,
                       System(SystemNum).RefrigerantName,
@@ -12984,7 +12990,7 @@ namespace RefrigeratedCase {
                 for (int CaseNum = 1; CaseNum <= System(SystemNum).NumCases; ++CaseNum) {
                     int CaseID = System(SystemNum).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
@@ -13003,7 +13009,7 @@ namespace RefrigeratedCase {
                 } // NumCases on system
                 for (int WalkInNum = 1; WalkInNum <= System(SystemNum).NumWalkIns; ++WalkInNum) {
                     int WalkInID = System(SystemNum).WalkInNum(WalkInNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
@@ -13016,7 +13022,7 @@ namespace RefrigeratedCase {
                           WalkIn(WalkInID).DefrostCapacity,
                           WalkIn(WalkInID).NumZones);
                     for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "      Walk-In Surfaces Facing Zone, {},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
                               WalkIn(WalkInID).ZoneName(ZoneID),
                               WalkIn(WalkInID).SurfaceArea(ZoneID),
@@ -13032,12 +13038,12 @@ namespace RefrigeratedCase {
 
                 for (int CoilNum = 1; CoilNum <= System(SystemNum).NumCoils; ++CoilNum) {
                     int CoilID = System(SystemNum).CoilNum(CoilNum);
-                    print(outputFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
+                    print(ioFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
                 } // numairchillers
 
                 for (int CascadeLoadNum = 1; CascadeLoadNum <= System(SystemNum).NumCascadeLoads; ++CascadeLoadNum) {
                     int CascadeLoadID = System(SystemNum).CascadeLoadNum(CascadeLoadNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Cascade Load,{},{},{}\n",
                           System(Condenser(CascadeLoadID).CascadeSysID).Name,
                           CascadeLoadID,
@@ -13046,26 +13052,26 @@ namespace RefrigeratedCase {
 
                 for (int SecondaryNum = 1; SecondaryNum <= System(SystemNum).NumSecondarys; ++SecondaryNum) {
                     int SecondaryID = System(SystemNum).SecondaryNum(SecondaryNum);
-                    print(outputFiles.eio, "   Secondary Load,{},{}\n", Secondary(SecondaryID).Name, SecondaryID);
+                    print(ioFiles.eio, "   Secondary Load,{},{}\n", Secondary(SecondaryID).Name, SecondaryID);
                 } // secondary load on detailed system
 
                 for (int SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
                     if (Subcooler(SubcoolerNum).MechSourceSysID != SystemNum) continue;
                     print(
-                        outputFiles.eio, "   Mechanical Subcooler Load, {},{}\n", SubcoolerNum, Subcooler(SubcoolerNum).Name);
+                        ioFiles.eio, "   Mechanical Subcooler Load, {},{}\n", SubcoolerNum, Subcooler(SubcoolerNum).Name);
                 } // Num sim subcoolers, looking only for NumSMech Subcoolers served by this system
 
                 if (System(SystemNum).NumStages == 1) { // Single-stage compression system
                     for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
                         int CompID = System(SystemNum).CompressorNum(CompressorNum);
                         print(
-                            outputFiles.eio, "   Refrigeration Compressor,{},{},{:.0R}\n", CompID, Compressor(CompID).Name, Compressor(CompID).NomCap);
+                            ioFiles.eio, "   Refrigeration Compressor,{},{},{:.0R}\n", CompID, Compressor(CompID).Name, Compressor(CompID).NomCap);
                     }                                          // NumCompressors
                 } else if (System(SystemNum).NumStages == 2) { // Two-stage compression system
                     // Low-stage compressors
                     for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
                         int CompID = System(SystemNum).CompressorNum(CompressorNum);
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration Low-Stage Compressor,{},{},{:.0R}\n",
                               CompID,
                               Compressor(CompID).Name,
@@ -13074,7 +13080,7 @@ namespace RefrigeratedCase {
                     // High-stage compressors
                     for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumHiStageCompressors; ++CompressorNum) {
                         int CompID = System(SystemNum).HiStageCompressorNum(CompressorNum);
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration High-Stage Compressor,{},{},{:.0R}\n",
                               CompID,
                               Compressor(CompID).Name,
@@ -13086,7 +13092,7 @@ namespace RefrigeratedCase {
                 {
                     auto const SELECT_CASE_var(Condenser(CondID).CondenserType);
                     if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration Condenser:Air-Cooled,{},{},{:.1R},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
@@ -13094,14 +13100,14 @@ namespace RefrigeratedCase {
                               Condenser(CondID).RatedCapacity,
                               Condenser(CondID).RatedFanPower);
                     } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration Condenser:Evaporative-Cooled,{},{},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
                               Condenser(CondID).RatedCapacity,
                               Condenser(CondID).RatedFanPower);
                     } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration Condenser:Water-Cooled,{},{},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
@@ -13119,7 +13125,7 @@ namespace RefrigeratedCase {
                                 ChrOut = "Floating";
                             }
                         } // cascade temperature control
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Refrigeration Condenser:Cascade,{},{},{},{:.1R},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
@@ -13135,7 +13141,7 @@ namespace RefrigeratedCase {
                     {
                         auto const SELECT_CASE_var(Subcooler(SubcoolerID).SubcoolerType);
                         if (SELECT_CASE_var == LiquidSuction) {
-                            print(outputFiles.eio,
+                            print(ioFiles.eio,
                                   "   Refrigeration Liquid Suction Subcooler,{},{},{:.1R},{:.1R},{:.1R}\n",
                                   SubcoolerID,
                                   Subcooler(SubcoolerID).Name,
@@ -13143,7 +13149,7 @@ namespace RefrigeratedCase {
                                   Subcooler(SubcoolerID).LiqSuctDesignTliqIn,
                                   Subcooler(SubcoolerID).LiqSuctDesignTvapIn);
                         } else if (SELECT_CASE_var == Mechanical) {
-                            print(outputFiles.eio,
+                            print(ioFiles.eio,
                                   "   Refrigeration Mechanical Subcooler,{},{},{},{:.1R}\n",
                                   SubcoolerID,
                                   Subcooler(SubcoolerID).Name,
@@ -13157,9 +13163,9 @@ namespace RefrigeratedCase {
         }     //(NumRefrigSystems > 0)
 
         if (NumTransRefrigSystems > 0) {
-            print(outputFiles.eio, "#Detailed Transcritical Refrigeration Systems,{}\n", NumTransRefrigSystems);
+            print(ioFiles.eio, "#Detailed Transcritical Refrigeration Systems,{}\n", NumTransRefrigSystems);
             for (int TransSystemNum = 1; TransSystemNum <= NumTransRefrigSystems; ++TransSystemNum) {
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       " Detailed Transcritical Refrigeration System,{},{},{},{},{},{},{},{},{:.1R}\n",
                       TransSystem(TransSystemNum).Name,
                       TransSystem(TransSystemNum).RefrigerantName,
@@ -13174,7 +13180,7 @@ namespace RefrigeratedCase {
                 for (int CaseNum = 1; CaseNum <= TransSystem(TransSystemNum).NumCasesMT; ++CaseNum) {
                     int CaseID = TransSystem(TransSystemNum).CaseNumMT(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Medium Temperature Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
@@ -13194,7 +13200,7 @@ namespace RefrigeratedCase {
                 for (int CaseNum = 1; CaseNum <= TransSystem(TransSystemNum).NumCasesLT; ++CaseNum) {
                     int CaseID = TransSystem(TransSystemNum).CaseNumLT(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "   Low Temperature Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
@@ -13213,7 +13219,7 @@ namespace RefrigeratedCase {
                 } // NumCasesLT on system
                 for (int WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsMT; ++WalkInNum) {
                     int WalkInID = TransSystem(TransSystemNum).WalkInNumMT(WalkInNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Medium Temperature Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
@@ -13226,7 +13232,7 @@ namespace RefrigeratedCase {
                           WalkIn(WalkInID).DefrostCapacity,
                           WalkIn(WalkInID).NumZones);
                     for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "      Walk-In Surfaces Facing Zone,{},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
                               WalkIn(WalkInID).ZoneName(ZoneID),
                               WalkIn(WalkInID).SurfaceArea(ZoneID),
@@ -13241,7 +13247,7 @@ namespace RefrigeratedCase {
                 }     // NumWalkInsMT on system
                 for (int WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsLT; ++WalkInNum) {
                     int WalkInID = TransSystem(TransSystemNum).WalkInNumLT(WalkInNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Low Temperature Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
@@ -13254,7 +13260,7 @@ namespace RefrigeratedCase {
                           WalkIn(WalkInID).DefrostCapacity,
                           WalkIn(WalkInID).NumZones);
                     for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "      Walk-In Surfaces Facing Zone,{},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
                               WalkIn(WalkInID).ZoneName(ZoneID),
                               WalkIn(WalkInID).SurfaceArea(ZoneID),
@@ -13270,7 +13276,7 @@ namespace RefrigeratedCase {
 
                 for (int CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsHP; ++CompressorNum) {
                     int CompID = TransSystem(TransSystemNum).CompressorNumHP(CompressorNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   High Pressure Refrigeration Compressor,{},{},{:.0R}\n",
                           CompID,
                           Compressor(CompID).Name,
@@ -13278,7 +13284,7 @@ namespace RefrigeratedCase {
                 } // NumCompressorsHP
                 for (int CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsLP; ++CompressorNum) {
                     int CompID = TransSystem(TransSystemNum).CompressorNumLP(CompressorNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Low Pressure Refrigeration Compressor,{},{},{:.0R}\n",
                           CompID,
                           Compressor(CompID).Name,
@@ -13287,7 +13293,7 @@ namespace RefrigeratedCase {
 
                 if (TransSystem(TransSystemNum).NumGasCoolers >= 1) {
                     int GasCoolerID = TransSystem(TransSystemNum).GasCoolerNum(1);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Refrigeration GasCooler:Air-Cooled,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                           GasCoolerID,
                           GasCooler(GasCoolerID).Name,
@@ -13302,12 +13308,12 @@ namespace RefrigeratedCase {
         }     //(NumTransRefrigSystems > 0)
 
         if (NumSimulationSecondarySystems > 0) {
-            print(outputFiles.eio, "#Secondary Refrigeration Systems,{}\n", NumSimulationSecondarySystems);
+            print(ioFiles.eio, "#Secondary Refrigeration Systems,{}\n", NumSimulationSecondarySystems);
             for (int SecondaryID = 1; SecondaryID <= NumSimulationSecondarySystems; ++SecondaryID) {
                 {
                     auto const SELECT_CASE_var(Secondary(SecondaryID).FluidType);
                     if (SELECT_CASE_var == SecFluidTypeAlwaysLiquid) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "Secondary Refrigeration System: Fluid Always Liquid,{},{},{},{},{},{:.1R},{:.2R},{:.2R},{:.3R},{:.3R}\n",
                               SecondaryID,
                               Secondary(SecondaryID).Name,
@@ -13320,7 +13326,7 @@ namespace RefrigeratedCase {
                               Secondary(SecondaryID).TRangeDifRated,
                               Secondary(SecondaryID).PumpTotRatedPower);
                     } else if (SELECT_CASE_var == SecFluidTypePhaseChange) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "Secondary Refrigeration System: Liquid Overfeed,{},{},{},{},{},{:.1R},{:.2R},{:.2R},{:.3R},{:.3R}\n",
                               SecondaryID,
                               Secondary(SecondaryID).Name,
@@ -13337,7 +13343,7 @@ namespace RefrigeratedCase {
                 for (int CaseNum = 1; CaseNum <= Secondary(SecondaryID).NumCases; ++CaseNum) {
                     int CaseID = Secondary(SecondaryID).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "  Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
@@ -13357,7 +13363,7 @@ namespace RefrigeratedCase {
 
                 for (int WalkInNum = 1; WalkInNum <= Secondary(SecondaryID).NumWalkIns; ++WalkInNum) {
                     int WalkInID = Secondary(SecondaryID).WalkInNum(WalkInNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "  Walk In,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
@@ -13369,7 +13375,7 @@ namespace RefrigeratedCase {
                           WalkIn(WalkInID).HeaterPower,
                           WalkIn(WalkInID).DefrostCapacity);
                     for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               "    Walk In Surfaces Facing Zone,{},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
                               WalkIn(WalkInID).ZoneName(ZoneID),
                               WalkIn(WalkInID).SurfaceArea(ZoneID),
@@ -13385,15 +13391,15 @@ namespace RefrigeratedCase {
 
                 for (int CoilNum = 1; CoilNum <= Secondary(SecondaryID).NumCoils; ++CoilNum) {
                     int CoilID = Secondary(SecondaryID).CoilNum(CoilNum);
-                    print(outputFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
+                    print(ioFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
                 } // numairchillers
             }     // secondary
         }         // numsimulationsecondarys
 
         if (DataHeatBalance::NumRefrigChillerSets > 0) {
-            print(outputFiles.eio, "#ZoneHVAC/Refrigeration Air Chiller Sets,{}\n", DataHeatBalance::NumRefrigChillerSets);
+            print(ioFiles.eio, "#ZoneHVAC/Refrigeration Air Chiller Sets,{}\n", DataHeatBalance::NumRefrigChillerSets);
             for (int ChillerSetNum = 1; ChillerSetNum <= DataHeatBalance::NumRefrigChillerSets; ++ChillerSetNum) {
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       "ZoneHVAC/Refrigeration Air Chiller Set,{},{},{},{}\n",
                       AirChillerSet(ChillerSetNum).Name,
                       ChillerSetNum,
@@ -13402,7 +13408,7 @@ namespace RefrigeratedCase {
 
                 for (int CoilNum = 1; CoilNum <= AirChillerSet(ChillerSetNum).NumCoils; ++CoilNum) {
                     int CoilID = AirChillerSet(ChillerSetNum).CoilNum(CoilNum);
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                           "   Refrigeration Air Chiller,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                           CoilID,
                           WarehouseCoil(CoilID).Name,
@@ -14836,11 +14842,9 @@ namespace RefrigeratedCase {
         // PURPOSE OF THIS SUBROUTINE:
         // initialize zone gain terms at begin environment
 
-        static bool MyEnvrnFlag(true);
-
         CheckRefrigerationInput(state);
 
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag) {
+        if (DataGlobals::BeginEnvrnFlag && FigureRefrigerationZoneGainsMyEnvrnFlag) {
 
             if (DataHeatBalance::NumRefrigSystems > 0) {
                 for (auto &e : System) {
@@ -14885,9 +14889,9 @@ namespace RefrigeratedCase {
                     e.LatHVACCreditRate = 0.0;
                 }
             }
-            MyEnvrnFlag = false;
+            FigureRefrigerationZoneGainsMyEnvrnFlag = false;
         }
-        if (!DataGlobals::BeginEnvrnFlag) MyEnvrnFlag = true;
+        if (!DataGlobals::BeginEnvrnFlag) FigureRefrigerationZoneGainsMyEnvrnFlag = true;
     }
 
     void ZeroHVACValues()

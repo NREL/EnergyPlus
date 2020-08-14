@@ -53,13 +53,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -67,19 +67,18 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/General.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -264,9 +263,9 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -577,9 +576,9 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -888,9 +887,9 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -1266,9 +1265,9 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -1585,9 +1584,9 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -1941,9 +1940,9 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -2275,10 +2274,10 @@ namespace EnergyPlus {
 
         GetZoneData(ErrorsFound);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
         SetPredefinedTables();
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         GetFanCoilUnits(state);
 
         PlantLoop.allocate(TotNumLoops);
@@ -2338,7 +2337,7 @@ namespace EnergyPlus {
         DataEnvironment::DayOfYear_Schedule = 1;
         DataEnvironment::DayOfWeek = 2;
         DataGlobals::HourOfDay = 1;
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         UpdateScheduleValues();
 
         // fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
@@ -2649,9 +2648,9 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
-        GetFanInput(state, state.fans);
+        GetFanInput(state);
         EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
 
         GetFanCoilUnits(state);
@@ -3065,7 +3064,7 @@ namespace EnergyPlus {
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
 
         GetFanCoilUnits(state);
@@ -3465,7 +3464,7 @@ namespace EnergyPlus {
         GetZoneData(ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));
@@ -3830,7 +3829,7 @@ namespace EnergyPlus {
         GetZoneData(ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));
@@ -4195,7 +4194,7 @@ namespace EnergyPlus {
         GetZoneData(ErrorsFound);
         EXPECT_EQ("EAST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));
@@ -4515,7 +4514,7 @@ namespace EnergyPlus {
         GetZoneData(ErrorsFound);
         EXPECT_EQ("WEST ZONE", Zone(1).Name);
         GetZoneEquipmentData1(state);
-        ProcessScheduleInput(state.outputFiles);
+        ProcessScheduleInput(state.files);
         ScheduleInputProcessed = true;
         GetFanCoilUnits(state);
         auto &thisFanCoil(FanCoil(1));

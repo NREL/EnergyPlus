@@ -447,15 +447,15 @@ namespace AirLoopHVACDOAS {
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         thisDOAS.m_FanTypeNum = SimAirServingZones::Fan_ComponentModel;
-                        Fans::GetFanIndex(state, state.fans, CompName, thisDOAS.m_FanIndex, errorsFound);
+                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound, ObjexxFCL::Optional_string_const());
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;
                         }
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            Fans::GetFanInletNode(state, state.fans, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
+                            Fans::GetFanInletNode(state, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), InletNodeErrFlag);
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            Fans::GetFanOutletNode(state, state.fans, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
+                            Fans::GetFanOutletNode(state, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), OutletNodeErrFlag);
                         thisDOAS.m_FanInletNodeNum = OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum);
                         thisDOAS.m_FanOutletNodeNum = OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum);
                         if (!(CompNum == 1 || CompNum == OutsideAirSys(thisDOAS.m_OASystemNum).NumComponents)) {
@@ -793,18 +793,10 @@ namespace AirLoopHVACDOAS {
         int LoopOA;
         int NodeNum;
         Real64 SchAvailValue;
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
-        static bool MyOneTimeFlag(true); // Initialization flag
         std::string RoutineName = "AirLoopDOAS::initAirLoopDOAS";
         bool ErrorsFound = false;
 
-        if (MyOneTimeFlag) {
-            MyEnvrnFlag.allocate(state.dataAirLoopHVACDOAS->numAirLoopDOAS);
-            MyEnvrnFlag = true;
-            MyOneTimeFlag = false;
-        }
-
-        if (DataGlobals::BeginEnvrnFlag && MyEnvrnFlag(this->m_AirLoopDOASNum + 1)) {
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
             Real64 rho;
             DataSizing::CurSysNum = this->m_OASystemNum;
             for (int CompNum = 1; CompNum <= DataAirLoop::OutsideAirSys(this->m_OASystemNum).NumComponents; ++CompNum) {
@@ -867,14 +859,14 @@ namespace AirLoopHVACDOAS {
                 }
             }
 
-            MyEnvrnFlag(this->m_AirLoopDOASNum + 1) = false;
+            this->MyEnvrnFlag = false;
             if (ErrorsFound) {
                 ShowFatalError("initAirLoopDOAS: Previous errors cause termination.");
             }
         }
 
         if (!DataGlobals::BeginEnvrnFlag) {
-            MyEnvrnFlag(this->m_AirLoopDOASNum + 1) = true;
+            this->MyEnvrnFlag = true;
         }
 
         this->SumMassFlowRate = 0.0;
@@ -943,7 +935,7 @@ namespace AirLoopHVACDOAS {
         }
         bool errorsFound = false;
         if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::Fan_ComponentModel) {
-            Fans::SetFanData(state, state.fans, this->m_FanIndex, errorsFound, Name, sizingMassFlow / DataEnvironment::StdRhoAir, 0);
+            Fans::SetFanData(state, this->m_FanIndex, errorsFound, Name, sizingMassFlow / DataEnvironment::StdRhoAir, 0);
             Fans::Fan(this->m_FanIndex).MaxAirMassFlowRate = sizingMassFlow;
             DataLoopNode::Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = sizingMassFlow;
@@ -978,12 +970,12 @@ namespace AirLoopHVACDOAS {
             // Summer design day
             if (DesDayInput(i).DayType == summerDesignDayTypeIndex && SummerDesignDayFlag) {
                 this->SizingCoolOATemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_WetBulb) { // wet bulb temperature
+                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->SizingCoolOAHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(this->SizingCoolOATemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_DewPoint) { // dewpoint
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
                     this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_HumRatio) {
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
                     this->SizingCoolOAHumRat = DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
                 SummerDesignDayFlag = false;
@@ -991,12 +983,12 @@ namespace AirLoopHVACDOAS {
             // Winter design day
             if (DesDayInput(i).DayType == winterDesignDayTypeIndex && WinterDesignDayFlag) {
                 this->HeatOutTemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_WetBulb) { // wet bulb temperature
+                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::WetBulb) { // wet bulb temperature
                     this->HeatOutHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(this->HeatOutTemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_DewPoint) { // dewpoint
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::DewPoint) { // dewpoint
                     this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_HumRatio) {
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType::HumRatio) {
                     this->HeatOutHumRat = DesDayInput(i).HumIndValue;
                 } // else { // What about other cases?
                 WinterDesignDayFlag = false;
