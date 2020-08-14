@@ -1675,7 +1675,7 @@ namespace BranchInputManager {
         int Loop1;
         int Count;
         int Found;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string TestName;
         std::string BranchListName;
         std::string FoundSupplyDemandAir;
@@ -1901,7 +1901,7 @@ namespace BranchInputManager {
         int Loop1;
         int Count;
         int Found;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         std::string TestName;
         std::string BranchListName;
         std::string FoundSupplyDemandAir;
@@ -2392,7 +2392,7 @@ namespace BranchInputManager {
         }
     }
 
-    void TestBranchIntegrity(BranchInputManagerData &dataBranchInputManager, OutputFiles &outputFiles, bool &ErrFound)
+    void TestBranchIntegrity(BranchInputManagerData &dataBranchInputManager, IOFiles &ioFiles, bool &ErrFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2457,18 +2457,18 @@ namespace BranchInputManager {
 
         BranchNodes.allocate(dataBranchInputManager.NumOfBranches);
 
-        print(outputFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
         static constexpr auto Format_700("! <#Branch Lists>,<Number of Branch Lists>");
-        print(outputFiles.bnd, "{}\n", Format_700);
-        print(outputFiles.bnd, " #Branch Lists,{}\n", dataBranchInputManager.NumOfBranchLists);
+        print(ioFiles.bnd, "{}\n", Format_700);
+        print(ioFiles.bnd, " #Branch Lists,{}\n", dataBranchInputManager.NumOfBranchLists);
         static constexpr auto Format_702("! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>");
-        print(outputFiles.bnd, "{}\n", Format_702);
+        print(ioFiles.bnd, "{}\n", Format_702);
         static constexpr auto Format_704(
             "! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>");
-        print(outputFiles.bnd, "{}\n", Format_704);
+        print(ioFiles.bnd, "{}\n", Format_704);
 
         for (BCount = 1; BCount <= dataBranchInputManager.NumOfBranchLists; ++BCount) {
-            print(outputFiles.bnd,
+            print(ioFiles.bnd,
                   " Branch List,{},{},{},{},{}\n",
                   BCount,
                   dataBranchInputManager.BranchList(BCount).Name,
@@ -2502,7 +2502,7 @@ namespace BranchInputManager {
             for (Count = 1; Count <= dataBranchInputManager.BranchList(BCount).NumOfBranchNames; ++Count) {
                 Found = FoundBranches(Count);
                 if (Found == 0) {
-                    print(outputFiles.bnd,
+                    print(ioFiles.bnd,
                           "   Branch,{},{},(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**\n",
                           Count,
                           dataBranchInputManager.BranchList(BCount).BranchNames(Count));
@@ -2578,7 +2578,7 @@ namespace BranchInputManager {
                     BranchLoopName = dataBranchInputManager.Branch(Found).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       "   Branch,{},{},{},{},{},{}\n",
                       Count,
                       dataBranchInputManager.Branch(Found).Name,
@@ -2662,8 +2662,8 @@ namespace BranchInputManager {
         }
         if (BCount > 0) {
             static constexpr auto Format_706("! <# Orphaned Branches>,<Number of Branches not on Branch Lists>");
-            print(outputFiles.bnd, "{}\n", Format_706);
-            print(outputFiles.bnd, " #Orphaned Branches,{}\n", BCount);
+            print(ioFiles.bnd, "{}\n", Format_706);
+            print(ioFiles.bnd, " #Orphaned Branches,{}\n", BCount);
             ShowWarningError("There are orphaned Branches in input. See .bnd file for details.");
 
             BCount = 0;
@@ -2701,7 +2701,7 @@ namespace BranchInputManager {
                     BranchLoopName = dataBranchInputManager.Branch(Count).AssignedLoopName;
                     BranchLoopType = "**Unknown**";
                 }
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       " Branch,{},{},{},{},{},{}\n",
                       BCount,
                       dataBranchInputManager.Branch(Count).Name,

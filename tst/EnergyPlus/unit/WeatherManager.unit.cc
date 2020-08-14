@@ -153,10 +153,10 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 {
     // setup environment state
     Environment.allocate(4);
-    Environment(1).SkyTempModel = WP_ClarkAllenModel;
-    Environment(2).SkyTempModel = WP_BruntModel;
-    Environment(3).SkyTempModel = WP_IdsoModel;
-    Environment(4).SkyTempModel = WP_BerdahlMartinModel;
+    Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    Environment(2).SkyTempModel = EmissivityCalcType::BruntModel;
+    Environment(3).SkyTempModel = EmissivityCalcType::IdsoModel;
+    Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
 
     // init local variables
     Real64 OpagueSkyCover(0.0);
@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
     using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
-    WaterMainsTempsMethod = WeatherManager::CorrelationMethod;
+    WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
     WaterMainsTempsAnnualAvgAirTemp = 9.69;
     WaterMainsTempsMaxDiffAirTemp = 28.1;
     DayOfYear = 50;
@@ -202,49 +202,38 @@ TEST_F(EnergyPlusFixture, JGDate_Test)
     // used http://aa.usno.navy.mil/data/docs/JulianDate.php
     //
     int julianDate;
-    int gregorianYear;
-    int gregorianMonth;
-    int gregorianDay;
+    GregorianDate gregorianDate(2016, 5, 25); // when test was made
 
-    gregorianYear = 2016; // when test was made
-    gregorianMonth = 5;
-    gregorianDay = 25;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2457534, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(2016, gregorianYear);
-    EXPECT_EQ(5, gregorianMonth);
-    EXPECT_EQ(25, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(2016, gregorianDate.year);
+    EXPECT_EQ(5, gregorianDate.month);
+    EXPECT_EQ(25, gregorianDate.day);
 
-    gregorianYear = 2015; // a year before when test was made
-    gregorianMonth = 5;
-    gregorianDay = 25;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    gregorianDate.year--; // a year before
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2457168, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(2015, gregorianYear);
-    EXPECT_EQ(5, gregorianMonth);
-    EXPECT_EQ(25, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(2015, gregorianDate.year);
+    EXPECT_EQ(5, gregorianDate.month);
+    EXPECT_EQ(25, gregorianDate.day);
 
-    gregorianYear = 1966; // a fine date in history
-    gregorianMonth = 7;
-    gregorianDay = 16;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    gregorianDate = {1966, 7, 16}; // a fine date in history
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2439323, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(1966, gregorianYear);
-    EXPECT_EQ(7, gregorianMonth);
-    EXPECT_EQ(16, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(1966, gregorianDate.year);
+    EXPECT_EQ(7, gregorianDate.month);
+    EXPECT_EQ(16, gregorianDate.day);
 
-    gregorianYear = 2000; // complex leap year
-    gregorianMonth = 12;
-    gregorianDay = 31;
-    JGDate(GregorianToJulian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
+    gregorianDate = {2000, 12, 31}; // complex leap year
+    julianDate = computeJulianDate(gregorianDate);
     EXPECT_EQ(2451910, julianDate);
-    JGDate(JulianToGregorian, julianDate, gregorianYear, gregorianMonth, gregorianDay);
-    EXPECT_EQ(2000, gregorianYear);
-    EXPECT_EQ(12, gregorianMonth);
-    EXPECT_EQ(31, gregorianDay);
+    gregorianDate = computeGregorianDate(julianDate);
+    EXPECT_EQ(2000, gregorianDate.year);
+    EXPECT_EQ(12, gregorianDate.month);
+    EXPECT_EQ(31, gregorianDate.day);
 }
 
 TEST_F(EnergyPlusFixture, interpolateWindDirectionTest)
@@ -328,7 +317,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
+    SurfaceGeometry::GetOSCMData(state.files, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -352,7 +341,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(state.outputFiles, errorsFound);
+    SurfaceGeometry::GetOSCMData(state.files, errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -395,7 +384,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -442,7 +431,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -497,7 +486,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::CorrelationFromWeatherFileMethod);
+    EXPECT_EQ(WeatherManager::WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
@@ -508,7 +497,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
 
     // report water mains parameters to eio file
-    WeatherManager::ReportWaterMainsTempParameters();
+    WeatherManager::ReportWaterMainsTempParameters(state.files);
 
     std::string const eiooutput = delimited_string({"! <Site Water Mains Temperature Information>,"
                                                     "Calculation Method{},"
@@ -603,7 +592,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 TauB = DesDayInput(EnvrnNum).TauB;
     Real64 TauD = DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_EQ(4, DesDayInput(EnvrnNum).SolarModel);
+    EXPECT_EQ(DesignDaySolarModel::ASHRAE_Tau2017, DesDayInput(EnvrnNum).SolarModel);
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -755,7 +744,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::OpenOutputFiles(state.outputFiles);
+    SimulationManager::OpenOutputFiles(state.files);
     // reset eio stream
     has_eio_output(true);
 
@@ -778,8 +767,8 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    WeatherManager::SetUpDesignDay(state.outputFiles, 1);
-    EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
+    WeatherManager::SetUpDesignDay(state.files, 1);
+    EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType::Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;
@@ -805,10 +794,10 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
-    OutputReportTabular::WriteEioTables(state.dataCostEstimateManager, state.outputFiles);
+    OutputReportTabular::WriteEioTables(state.dataCostEstimateManager, state.files);
 
     // Close output files *after* the EIO has been written to
-    SimulationManager::CloseOutputFiles(state.outputFiles);
+    SimulationManager::CloseOutputFiles(state.files);
 
     EnergyPlus::sqlite->sqliteCommit();
 
@@ -952,8 +941,7 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz) {
 
 TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
-    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
-
+    state.files.inputWeatherFileName.fileName = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/WeatherManagerIROutputTest.epw";
     std::string const idf_objects = delimited_string({
                                                          "  Version,9.3;",
 
@@ -1029,11 +1017,11 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
     DataGlobals::NumOfTimeStepInHour = 1;
     Environment.allocate(1);
-    Environment(1).SkyTempModel = WP_ClarkAllenModel;
+    Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
 
     AllocateWeatherData();
-    OpenWeatherFile(ErrorsFound);
-    ReadWeatherForDay(0, 1, false);
+    OpenWeatherFile(state, ErrorsFound);
+    ReadWeatherForDay(state.files, 0, 1, false);
 
     Real64 expected_IRHorizSky = 345.73838855245953;
     EXPECT_NEAR(TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);

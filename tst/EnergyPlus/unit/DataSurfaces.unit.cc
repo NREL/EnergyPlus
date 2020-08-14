@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -159,15 +159,15 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
-    GetConstructData(ErrorsFound); // read construction data
+    GetConstructData(state.files, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt();
@@ -193,7 +193,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     EXPECT_LT(Surface(1).OutWetBulbTemp, -100.0); // this condition is fatal
 }
 
-TEST(SurfaceTest, Plane)
+TEST_F(EnergyPlusFixture, SurfaceTest_Plane)
 {
     {
         SurfaceData s;
@@ -221,7 +221,7 @@ TEST(SurfaceTest, Plane)
     }
 }
 
-TEST(SurfaceTest, Surface2D)
+TEST_F(EnergyPlusFixture, SurfaceTest_Surface2D)
 {
     {
         using Vector2D = Surface2D::Vector2D;
@@ -244,7 +244,7 @@ TEST(SurfaceTest, Surface2D)
     }
 }
 
-TEST(SurfaceTest, AverageHeightRectangle)
+TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightRectangle)
 {
     {
         SurfaceData s;
@@ -299,7 +299,7 @@ TEST(SurfaceTest, AverageHeightRectangle)
     }
 }
 
-TEST(SurfaceTest, AverageHeightTriangle)
+TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightTriangle)
 {
     {
         SurfaceData s;
@@ -326,7 +326,7 @@ TEST(SurfaceTest, AverageHeightTriangle)
     }
 }
 
-TEST(SurfaceTest, AverageHeightL)
+TEST_F(EnergyPlusFixture, SurfaceTest_AverageHeightL)
 {
     {
         SurfaceData s;

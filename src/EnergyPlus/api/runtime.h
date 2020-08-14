@@ -51,27 +51,40 @@
 #include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
 
+/// \brief This is typedef for an instance that stores the "state" of an EnergyPlus simulation.
+/// \details The state of an EnergyPlus simulation is held heavily in the global program state.  To alleviate issues
+///          with this design in the context of new applications and workflows, the global program state is being
+///          refactored into a single variable which will ultimately own and manage the entire state of the simulation.
+///          In order to keep track of the simulation during runtime API calls, a reference to a state must be kept and
+///          managed by the API client.  The client must call `stateNew` to create a new state instance, and pass this
+///          to any functions that need a state instance.  Once a simulation is complete, the client can call
+///          `stateReset`, which will reset the state instance passed in, along with any global variables that are not
+///          yet refactored into this state instance.  Once complete, the client has the ability to free the memory of
+///          the state by using the `stateDelete` function..
+typedef void * EnergyPlusState;
+
 #ifdef __cplusplus
 
 #include <functional>
 
-ENERGYPLUSLIB_API void callbackBeginNewEnvironment(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackEndOfZoneSizing(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackEndOfSystemSizing(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(std::function<void ()> f);
-ENERGYPLUSLIB_API void callbackUnitarySystemSizing(std::function<void ()> f);
-//ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(std::function<void ()> f);
+ENERGYPLUSLIB_API void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfZoneSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfSystemSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void (EnergyPlusState)>& f);
+ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+//ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 
 extern "C" {
 
@@ -84,40 +97,68 @@ extern "C" {
 ///          manipulation.  For example, it could leverage the functional API to look up a fluid property value, then
 ///          use the data exchange API to assign a new control property on a component using an actuator.
 ///          Once the callback functions have been registered, the client should then call the main `energyplus` function
-///          to initiate a new run.  If multiple runs are to be performed in series, the `cClearAllStates` function can be
+///          to initiate a new run.  If multiple runs are to be performed in series, the `stateReset` function can be
 ///          used to "reset" the simulation.  There are also methods to allow issuing warnings through internal EnergyPlus
 ///          methods and to callback with updates on simulation progress and output messages.
 /// \see energyplus
-/// \see cClearAllStates
+/// \see stateReset
 
-/// \brief Clears the simulation state of EnergyPlus
-/// \details After a simulation is complete, if a second is to be run using the same memory space, the simulation state
-///          must be cleared, or unexpected errors will occur.
+/// \brief Creates a new simulation state instance and returns it for the client to store while running simulations
+/// \details This function creates a new instance that is used in running simulations from the API.  The state created
+///          in this function is used by passing it into specific run functions.  When a simulation is complete, the
+///          state can be reset using the `stateReset` function, or deleted completely with the `stateDelete` function.
+/// \see EnergyPlusState
+/// \see stateReset
+/// \see stateDelete
+ENERGYPLUSLIB_API EnergyPlusState stateNew();
+/// \brief Resets the simulation state of EnergyPlus
+/// \details A simulation state is created by calling the `stateNew` function.  After a simulation is complete, if a
+///          second is to be run using the same memory space, the simulation state must be cleared with this function,
+///          or unexpected errors will occur.  Once the client is fully finished with the state, it can be deleted
+///          entirely with `stateDelete`.
+/// \param[in] state The simulation state of the simulation to clear.
 /// \remark This function will also clear any callback functions, so callback functions must be registered again.
-ENERGYPLUSLIB_API void cClearAllStates();
+ENERGYPLUSLIB_API void stateReset(EnergyPlusState state);
+/// \brief Deletes a simulation state instance once the client is fully finished with it.
+/// \details A simulation state is created by calling the `stateNew` function.  After the client is finished, the memory
+///          can be reset by calling the `stateReset` function, or released entirely by calling this delete function.
+/// \see EnergyPlusState
+/// \see stateNew
+/// \see stateReset
+ENERGYPLUSLIB_API void stateDelete(EnergyPlusState state);
 
 /// \brief Runs an EnergyPlus simulation
-/// \details This function launches an EnergyPlus simulation using the given arguments.  The arguments are identical to
-///          the command line for EnergyPlus(.exe).  Prior to calling this function, it is expected that most workflows
-///          will register callback functions to be called back from EnergyPlus at user-specified points in the simulation.
-///          If no callbacks are registered, EnergyPlus will proceed as in a regular command line fashion and return
-///          when complete.  An example usage of this API endpoint is as follows:
+/// \details This function launches an EnergyPlus simulation using the given arguments.  The first argument is an
+///          EnergyPlus "state", which is used for storing a running simulation state.  The rest of the arguments are
+///          identical to the command line for EnergyPlus(.exe).  Prior to calling this function, it is expected that
+///          most workflows will register callback functions to be called back from EnergyPlus at user-specified points
+///          in the simulation.  If no callbacks are registered, EnergyPlus will proceed as in a regular command line
+///          fashion and return when complete.  An example usage of this API endpoint is as follows:
 /// \code{.c}
 ///   void progressCallback(int const i) {
 ///     printf("Updated progress: %d", i);
 ///   }
 ///   int main(int argc, const char * argv[]) {
+///     EnergyPlusState state = stateNew();
 ///     registerProgressCallback(progressCallback);
-///     energyplus(argc, argv);
+///     energyplus(state, argc, argv);
+///     stateDelete(state);
 ///   }
 /// \endcode
-/// \remark If this function is called multiple times in the same thread, the client must call `cClearAllStates` in
+/// \remark If this function is called multiple times in the same thread, the client must call `stateReset` in
 ///         between each run, or unexpected errors will occur.
 /// \remark Prior to calling this function, it is also expected that most workflows will want to use the data exchange API
 ///         function `requestVariable` to pre-request Output:Variables to make them accessible in the data exchange functions.
-/// \see cClearAllStates
+/// \see stateReset
 /// \see requestVariable
-ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
+/// \see stateNew
+ENERGYPLUSLIB_API int energyplus(EnergyPlusState state, int argc, const char *argv[]);
+
+/// \brief Stop an EnergyPlus simulation early
+/// \details This function can be used by an API client to end a simulation before the end of the scheduled run periods.
+///          The simulation will end gracefully and all output files will be finalized and closed before the
+///          EnergyPlus process is complete.
+ENERGYPLUSLIB_API void stopSimulation();
 
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
@@ -134,7 +175,7 @@ ENERGYPLUSLIB_API void issueWarning(const char * message); // Issue the warning 
 ///          Severe errors should lead to program termination, so this should be followed with aborting the simulation in
 ///          one of these ways:
 ///          - If running as a Python Plugin, the function should return 1 to inform EnergyPlus to throw a fatal.
-///          - If running as an API, the client should abort however is appropriate.  If needed, `cClearAllStates` can be
+///          - If running as an API, the client should abort however is appropriate.  If needed, `stateReset` can be
 ///            called to reinitialize the program.
 ///
 /// \param[in] message The severe error message to be issued during the simulation.
@@ -163,7 +204,7 @@ ENERGYPLUSLIB_API void issueText(const char * message); // Issue additional supp
 ///              argument, which will be the percent complete for the current simulation run.
 /// \remark This function has limited usefulness in Python Plugin applications, but is highly valuable for being able
 ///         to report progress during an API workflow simulation.
-ENERGYPLUSLIB_API void registerProgressCallback(void (*f)(int const));
+ENERGYPLUSLIB_API void registerProgressCallback(EnergyPlusState state, void (*f)(int const));
 /// \brief Register a callback function to receive standard output messages being sent from the simulation.
 /// \details During an EnergyPlus simulation, there are a number of output messages being sent to standard output on the
 ///          command line.  This function can be used to get copies of those messages during the simulation which could
@@ -172,7 +213,7 @@ ENERGYPLUSLIB_API void registerProgressCallback(void (*f)(int const));
 ///              argument, which will be the message being sent to standard output.
 /// \remark This function has limited usefulness in Python Plugin applications, but is highly valuable for being able
 ///         to report messages during an API workflow simulation.
-ENERGYPLUSLIB_API void registerStdOutCallback(void (*f)(const char * message));
+ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, void (*f)(const char * message));
 
 
 /// \brief Register a callback function to be called at the beginning of each new environment.
@@ -183,7 +224,7 @@ ENERGYPLUSLIB_API void registerStdOutCallback(void (*f)(const char * message));
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackBeginNewEnvironment(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginNewEnvironment(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at each new environment once warmup is complete.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -192,7 +233,7 @@ ENERGYPLUSLIB_API void callbackBeginNewEnvironment(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(void (*f)());
+ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the beginning of each zone time step before the heat balance is initialized.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -201,7 +242,7 @@ ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the beginning of each zone time step after the heat balance is initialized.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -210,7 +251,7 @@ ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)(
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at each zone time step just before the predictor step.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -219,7 +260,7 @@ ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(void (*f)()
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(void (*f)());
+ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at each zone time step before HVAC managers are called.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -228,7 +269,7 @@ ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(void (*f)());
+ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at each zone time step after HVAC managers are called.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -237,7 +278,7 @@ ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(void (*f)());
+ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called inside the HVAC system iteration loop.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -246,7 +287,7 @@ ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(void (*f)());
+ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the end of each zone time step but before zones have reported data.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -255,7 +296,7 @@ ENERGYPLUSLIB_API void callbackInsideSystemIterationLoop(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the end of each zone time step after zones have reported data.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -264,7 +305,7 @@ ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepBeforeZoneReporting(void (*f)())
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the end of each HVAC system time step but before HVAC data has been reported.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -273,7 +314,7 @@ ENERGYPLUSLIB_API void callbackEndOfZoneTimeStepAfterZoneReporting(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the end of each HVAC system time step after HVAC data has been reported.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -282,7 +323,7 @@ ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepBeforeHVACReporting(void (*f)(
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the end of the zone sizing process.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -291,7 +332,7 @@ ENERGYPLUSLIB_API void callbackEndOfSystemTimeStepAfterHVACReporting(void (*f)()
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackEndOfZoneSizing(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfZoneSizing(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at the end of the HVAC system sizing process.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -300,7 +341,7 @@ ENERGYPLUSLIB_API void callbackEndOfZoneSizing(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackEndOfSystemSizing(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfSystemSizing(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called after some specific components have processed their input.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -310,7 +351,7 @@ ENERGYPLUSLIB_API void callbackEndOfSystemSizing(void (*f)());
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
 /// \remark Currently this calling point is called after each instance of a DX coil, fan, and unitary system object.
-ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(void (*f)());
+ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at unitary system sizing.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function
@@ -319,10 +360,14 @@ ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(void (*f)());
 /// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects no arguments.
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
-ENERGYPLUSLIB_API void callbackUnitarySystemSizing(void (*f)());
+ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, void (*f)(EnergyPlusState));
 // The user defined component model won't actually call out to this API endpoint -- it is coupled with a specific
 // plugin instance in the code.
-// ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(void (*f)());
+// ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, void (*f)());
+
+/// \brief Register a callback function to be used in place of the EnergyPlus ManageHVAC function.
+/// \details This callback is a placeholder for advanced use cases, and will be supported in a future release.
+ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState));
 
 #ifdef __cplusplus
 }

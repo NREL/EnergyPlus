@@ -98,7 +98,7 @@ namespace TARCOGOutput {
 
     // Functions
 
-    void WriteInputArguments(OutputFile &InArgumentsFile,
+    void WriteInputArguments(InputOutputFile &InArgumentsFile,
                              const std::string &DBGD,
                              Real64 const tout,
                              Real64 const tind,
@@ -522,7 +522,7 @@ namespace TARCOGOutput {
         // 1199  format('-----  *****  -----  *****  -----  *****  -----  *****  -----  *****  -----')
     }
 
-    void WriteModifiedArguments(OutputFile &InArgumentsFile,
+    void WriteModifiedArguments(InputOutputFile &InArgumentsFile,
                                 std::string const &EP_UNUSED(DBGD),
                                 Real64 const esky,
                                 Real64 const trmout,
@@ -638,7 +638,7 @@ namespace TARCOGOutput {
         //!!!!!!!!!!!!!!!!!!
     }
 
-    void WriteOutputArguments(OutputFile &OutArgumentsFile,
+    void WriteOutputArguments(InputOutputFile &OutArgumentsFile,
                               std::string const &EP_UNUSED(DBGD),
                               int const nlayer,
                               Real64 const tamb,
@@ -943,7 +943,7 @@ namespace TARCOGOutput {
         // 2323  format('         keff', i2,' =',  F12.5)
     }
 
-    void WriteOutputEN673(OutputFile &OutArgumentsFile,
+    void WriteOutputEN673(InputOutputFile &OutArgumentsFile,
                           std::string const &EP_UNUSED(DBGD),
                           int const nlayer,
                           Real64 const ufactor,
@@ -1500,7 +1500,7 @@ namespace TARCOGOutput {
                 files.FileMode = "SEQUENTIAL";
             }
 
-            const auto open_file = [&](OutputFile &of, const std::string &fileName, const bool forAppend) {
+            const auto open_file = [&](InputOutputFile &of, const std::string &fileName, const bool forAppend) {
                 of.fileName = files.DBGD + fileName;
                 of.open(forAppend);
 
