@@ -3840,7 +3840,7 @@ namespace SetPointManager {
 
         // One time initializations
 
-        if (ZoneEquipInputsFilled && AirLoopInputsFilled) { // check that the zone equipment and air loop data has been read in
+        if (ZoneEquipInputsFilled && dataAirLoop.AirLoopInputsFilled) { // check that the zone equipment and air loop data has been read in
 
             if (InitSetPointManagersOneTimeFlag) {
 
@@ -4080,7 +4080,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            WarmestSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            WarmestSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + WarmestSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + WarmestSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -4088,7 +4088,7 @@ namespace SetPointManager {
                         } else {
                             WarmestSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                         }
-                        if (AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
+                        if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + WarmestSetPtMgr(SetPtMgrNum).Name + "\", no zones with cooling found:");
                             ShowContinueError("Air Loop provides no cooling, Air Loop=\"" + WarmestSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
                             ErrorsFound = true;
@@ -4105,7 +4105,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumColdestSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            ColdestSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            ColdestSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + ColdestSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + ColdestSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -4113,8 +4113,8 @@ namespace SetPointManager {
                         } else {
                             ColdestSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                         }
-                        if (AirToZoneNodeInfo(AirLoopNum).NumZonesHeated == 0) {
-                            if (AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
+                        if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesHeated == 0) {
+                            if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
                                 ShowSevereError(cSetPointManagerType + "=\"" + ColdestSetPtMgr(SetPtMgrNum).Name +
                                                 "\", no zones with heating or cooling found:");
                                 ShowContinueError("Air Loop provides no heating or cooling, Air Loop=\"" + ColdestSetPtMgr(SetPtMgrNum).AirLoopName +
@@ -4134,7 +4134,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumWarmestSetPtMgrsTempFlow; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + WarmestSetPtMgrTempFlow(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -4144,7 +4144,7 @@ namespace SetPointManager {
                             WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum = AirLoopNum;
                             WarmestSetPtMgrTempFlow(SetPtMgrNum).SimReady = true;
                         }
-                        if (AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
+                        if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + WarmestSetPtMgrTempFlow(SetPtMgrNum).Name +
                                             "\", no zones with cooling found:");
                             ShowContinueError("Air Loop provides no cooling, Air Loop=\"" + WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopName + "\".");
@@ -4163,7 +4163,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            RABFlowSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            RABFlowSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         AllSetPtMgr(RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).AirLoopNum = AirLoopNum;
                         AllSetPtMgr(RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).AirLoopName = RABFlowSetPtMgr(SetPtMgrNum).AirLoopName;
                         if (AirLoopNum == 0) {
@@ -4177,7 +4177,7 @@ namespace SetPointManager {
                                 RABFlowSetPtMgr(SetPtMgrNum).SupMixInNode = PrimaryAirSystem(AirLoopNum).SupMixInNode;
                                 RABFlowSetPtMgr(SetPtMgrNum).MixOutNode = PrimaryAirSystem(AirLoopNum).MixOutNode;
                                 RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode = PrimaryAirSystem(AirLoopNum).RABSplitOutNode;
-                                RABFlowSetPtMgr(SetPtMgrNum).SysOutNode = AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(1);
+                                RABFlowSetPtMgr(SetPtMgrNum).SysOutNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(1);
                                 RABFlowSetPtMgr(SetPtMgrNum).CtrlNodes(1) = RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
                                 AllSetPtMgr(RABFlowSetPtMgr(SetPtMgrNum).AllSetPtMgrIndex).CtrlNodes(1) =
                                     RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
@@ -4199,7 +4199,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZClgAverageSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageCoolingSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -4208,7 +4208,7 @@ namespace SetPointManager {
                         } else {
                             MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                         }
-                        if (AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
+                        if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageCoolingSetPtMgr(SetPtMgrNum).Name +
                                             "\", no zones with cooling found:");
                             ShowContinueError("Air Loop provides no cooling, Air Loop=\"" + MZAverageCoolingSetPtMgr(SetPtMgrNum).AirLoopName +
@@ -4228,7 +4228,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZHtgAverageSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageHeatingSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -4238,7 +4238,7 @@ namespace SetPointManager {
                             MZAverageHeatingSetPtMgr(SetPtMgrNum).AirLoopNum = AirLoopNum;
                         }
                         // Commented out as we are using %NumZonesCooled instead of %NumZonesHeated for all systems for now
-                        // IF (AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated == 0) THEN
+                        // IF (dataAirLoop.AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated == 0) THEN
                         //  CALL ShowSevereError(TRIM(cSetPointManagerType)//': Air Loop provides no heating ' // &
                         //                       TRIM(MZAverageHeatingSetPtMgr(SetPtMgrNum)%Name))
                         //  CALL ShowContinueError('Occurs in Setpoint Manager='//TRIM(MZAverageHeatingSetPtMgr(SetPtMgrNum)%Name))
@@ -4257,7 +4257,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMinHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageMinHumSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -4269,10 +4269,10 @@ namespace SetPointManager {
                             HstatZoneFound = false;
                             for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
-                                     ZonesCooledIndex <= AirToZoneNodeInfo(MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
+                                     ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
                                     if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                        AirToZoneNodeInfo(MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
+                                        dataAirLoop.AirToZoneNodeInfo(MZAverageMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
                                     break;
@@ -4299,7 +4299,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZAverageMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZAverageMaxHumSetPtMgr(SetPtMgrNum).Name +
                                             "\", invalid Air Loop specified:");
@@ -4311,10 +4311,10 @@ namespace SetPointManager {
                             HstatZoneFound = false;
                             for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
-                                     ZonesCooledIndex <= AirToZoneNodeInfo(MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
+                                     ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
                                     if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                        AirToZoneNodeInfo(MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
+                                        dataAirLoop.AirToZoneNodeInfo(MZAverageMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
                                     break;
@@ -4341,7 +4341,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMinHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZMinHumSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + MZMinHumSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -4352,10 +4352,10 @@ namespace SetPointManager {
                             HstatZoneFound = false;
                             for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
-                                     ZonesCooledIndex <= AirToZoneNodeInfo(MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
+                                     ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
                                     if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                        AirToZoneNodeInfo(MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
+                                        dataAirLoop.AirToZoneNodeInfo(MZMinHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
                                     break;
@@ -4381,7 +4381,7 @@ namespace SetPointManager {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumMZMaxHumSetPtMgrs; ++SetPtMgrNum) {
                     if (NumPrimaryAirSys > 0) {
                         AirLoopNum = UtilityRoutines::FindItemInList(
-                            MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
+                            MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName, dataAirLoop.AirToZoneNodeInfo, &AirLoopZoneEquipConnectData::AirLoopName);
                         if (AirLoopNum == 0) {
                             ShowSevereError(cSetPointManagerType + "=\"" + MZMaxHumSetPtMgr(SetPtMgrNum).Name + "\", invalid Air Loop specified:");
                             ShowContinueError("Air Loop not found =\"" + MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopName + "\".");
@@ -4392,10 +4392,10 @@ namespace SetPointManager {
                             HstatZoneFound = false;
                             for (HStatZoneNum = 1; HStatZoneNum <= NumHumidityControlZones; ++HStatZoneNum) {
                                 for (ZonesCooledIndex = 1;
-                                     ZonesCooledIndex <= AirToZoneNodeInfo(MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
+                                     ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).NumZonesCooled;
                                      ++ZonesCooledIndex) {
                                     if (HumidityControlZone(HStatZoneNum).ActualZoneNum !=
-                                        AirToZoneNodeInfo(MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
+                                        dataAirLoop.AirToZoneNodeInfo(MZMaxHumSetPtMgr(SetPtMgrNum).AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex))
                                         continue;
                                     HstatZoneFound = true;
                                     break;
@@ -4812,14 +4812,14 @@ namespace SetPointManager {
                     if (WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
                         Node(NodeNum).TempSetPoint = 20.0; // Set the temperature setpoint
                         if (WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum != 0) {
-                            AirLoopFlow(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).ReqSupplyFrac = 1.0;           // PH 10/09/04 Set the flow
-                            AirLoopControlInfo(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).LoopFlowRateSet = true; // PH 10/09/04 Set the flag
+                            dataAirLoop.AirLoopFlow(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).ReqSupplyFrac = 1.0;           // PH 10/09/04 Set the flow
+                            dataAirLoop.AirLoopControlInfo(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).LoopFlowRateSet = true; // PH 10/09/04 Set the flag
                         }
                     }
                 }
             }
 
-            if (ZoneEquipInputsFilled && AirLoopInputsFilled) {
+            if (ZoneEquipInputsFilled && dataAirLoop.AirLoopInputsFilled) {
                 for (SetPtMgrNum = 1; SetPtMgrNum <= NumRABFlowSetPtMgrs; ++SetPtMgrNum) {
                     NodeNum = RABFlowSetPtMgr(SetPtMgrNum).RABSplitOutNode;
                     if (RABFlowSetPtMgr(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_MassFlow) {
@@ -5496,7 +5496,7 @@ namespace SetPointManager {
         RetNode = this->RetNode;
         OAMixOAInNode = this->OAInNode;
         AirLoopNum = this->AirLoopNum;
-        OAFrac = AirLoopFlow(AirLoopNum).OAFrac; // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
+        OAFrac = dataAirLoop.AirLoopFlow(AirLoopNum).OAFrac; // changed from MinOAFrac, now updates to current oa fraction for improve deadband control
         ZoneMassFlow = Node(ZoneInletNode).MassFlowRate;
         ZoneLoad = ZoneSysEnergyDemand(ZoneNum).TotalOutputRequired;
         ZoneLoadToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).OutputRequiredToCoolingSP;
@@ -6161,9 +6161,9 @@ namespace SetPointManager {
         TotCoolLoad = 0.0;
         SetPointTemp = this->MaxSetTemp;
 
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        for (ZonesCooledIndex = 1; ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
@@ -6242,11 +6242,11 @@ namespace SetPointManager {
         TotHeatLoad = 0.0;
         SetPointTemp = this->MinSetTemp;
 
-        if (AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
+        if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
             // dual-duct heated only zones
-            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++ZonesHeatedIndex) {
-                CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedIndex);
-                ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZonesHeatedIndex);
+            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesHeated; ++ZonesHeatedIndex) {
+                CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).HeatCtrlZoneNums(ZonesHeatedIndex);
+                ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).HeatZoneInletNodes(ZonesHeatedIndex);
                 ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
                 ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
@@ -6264,9 +6264,9 @@ namespace SetPointManager {
             }
         } else {
             // single-duct or central heated and cooled zones
-            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
-                CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
-                ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
+            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
+                CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
+                ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
                 ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
                 ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
                 ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
@@ -6312,8 +6312,6 @@ namespace SetPointManager {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
-        using DataAirLoop::AirLoopFlow;
         using DataHVACGlobals::SmallLoad;
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
@@ -6364,9 +6362,9 @@ namespace SetPointManager {
         CritZoneNumFlow = 0;
         ControlStrategy = this->Strategy;
 
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        for (ZonesCooledIndex = 1; ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneNum = ZoneEquipConfig(CtrlZoneNum).ActualZoneNum;
             ZoneMassFlowMax = Node(ZoneInletNode).MassFlowRateMax;
@@ -6560,18 +6558,18 @@ namespace SetPointManager {
         AirLoopNum = this->AirLoopNum;
         SetPointTemp = this->MinSetTemp;
 
-        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
-            // DO ZonesHeatedIndex=1,AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated
-            // Using AirToZoneNodeInfo(AirLoopNum)%Cool* structure variables since they include heating and cooling.
+        for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesHeatedIndex) {
+            // DO ZonesHeatedIndex=1,dataAirLoop.AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated
+            // Using dataAirLoop.AirToZoneNodeInfo(AirLoopNum)%Cool* structure variables since they include heating and cooling.
 
             // The data for number of zones heated is included in the data structure of the variable
-            // "AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" for all systems.  The data structure
-            // "AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated" applies to Dual Duct System only and
+            // "dataAirLoop.AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" for all systems.  The data structure
+            // "dataAirLoop.AirToZoneNodeInfo(AirLoopNum)%NumZonesHeated" applies to Dual Duct System only and
             // if used will limit the application of this setpoint manager to other systems.  Thus,
-            // the "AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" data is used instead.
+            // the "dataAirLoop.AirToZoneNodeInfo(AirLoopNum)%NumZonesCooled" data is used instead.
 
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesHeatedIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesHeatedIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
@@ -6659,9 +6657,9 @@ namespace SetPointManager {
         AirLoopNum = this->AirLoopNum;
         SetPointTemp = this->MaxSetTemp;
 
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        for (ZonesCooledIndex = 1; ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
@@ -6747,9 +6745,9 @@ namespace SetPointManager {
         AirLoopNum = this->AirLoopNum;
         SetPointHum = this->MinSetHum;
 
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        for (ZonesCooledIndex = 1; ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
@@ -6831,9 +6829,9 @@ namespace SetPointManager {
         AirLoopNum = this->AirLoopNum;
         SetPointHum = this->MaxSetHum;
 
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        for (ZonesCooledIndex = 1; ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
@@ -6907,9 +6905,9 @@ namespace SetPointManager {
         AirLoopNum = this->AirLoopNum;
         SetPointHum = this->MinSetHum;
 
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        for (ZonesCooledIndex = 1; ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToHumidifyingSP;
@@ -6986,9 +6984,9 @@ namespace SetPointManager {
         AirLoopNum = this->AirLoopNum;
         SetPointHum = this->MaxSetHum;
 
-        for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
-            CtrlZoneNum = AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
-            ZoneInletNode = AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
+        for (ZonesCooledIndex = 1; ZonesCooledIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled; ++ZonesCooledIndex) {
+            CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZonesCooledIndex);
+            ZoneInletNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolZoneInletNodes(ZonesCooledIndex);
             ZoneNode = ZoneEquipConfig(CtrlZoneNum).ZoneNode;
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             MoistureLoad = ZoneSysMoistureDemand(CtrlZoneNum).OutputRequiredToDehumidifyingSP;
@@ -8149,9 +8147,9 @@ namespace SetPointManager {
 
                 if (WarmestSetPtMgrTempFlow(SetPtMgrNum).CtrlTypeMode == iCtrlVarType_Temp) {
                     Node(NodeNum).TempSetPoint = WarmestSetPtMgrTempFlow(SetPtMgrNum).SetPt; // Set the supply air temperature setpoint
-                    AirLoopFlow(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).ReqSupplyFrac =
+                    dataAirLoop.AirLoopFlow(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).ReqSupplyFrac =
                         WarmestSetPtMgrTempFlow(SetPtMgrNum).Turndown;                                          // Set the supply air flow rate
-                    AirLoopControlInfo(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).LoopFlowRateSet = true; // PH 8/17/07
+                    dataAirLoop.AirLoopControlInfo(WarmestSetPtMgrTempFlow(SetPtMgrNum).AirLoopNum).LoopFlowRateSet = true; // PH 8/17/07
                 }
             }
         }

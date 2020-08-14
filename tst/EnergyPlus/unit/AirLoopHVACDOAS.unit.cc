@@ -4262,9 +4262,9 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOAS_TestOACompOutletNodeIndex)
 
     AirLoopHVACDOAS::AirLoopDOAS::getAirLoopDOASInput(state);
 
-    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
-    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).InletNodeNum(2), 2);
-    EXPECT_EQ(DataAirLoop::OutsideAirSys(1).OutletNodeNum(2), 23);
+    EXPECT_EQ(dataAirLoop.OutsideAirSys(1).ComponentType(2), "HUMIDIFIER:STEAM:ELECTRIC");
+    EXPECT_EQ(dataAirLoop.OutsideAirSys(1).InletNodeNum(2), 2);
+    EXPECT_EQ(dataAirLoop.OutsideAirSys(1).OutletNodeNum(2), 23);
 }
 
 } // namespace EnergyPlus

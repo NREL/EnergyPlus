@@ -2313,10 +2313,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     AirflowNetwork::AirflowNetworkNodeData(3).AirLoopNum = 1;
     AirflowNetwork::AirflowNetworkLinkageData(46).AirLoopNum = 1;
 
-    DataAirLoop::AirLoopAFNInfo.allocate(1);
-    //    DataAirLoop::LoopOnOffFanPartLoadRatio.allocate(1);
-    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    dataAirLoop.AirLoopAFNInfo.allocate(1);
+    //    dataAirLoop.LoopOnOffFanPartLoadRatio.allocate(1);
+    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     AirflowNetwork::PressureControllerData(1).OANodeNum = AirflowNetwork::DisSysCompReliefAirData(1).OutletNode;
     CalcAirflowNetworkAirBalance();
@@ -7037,7 +7037,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestExternalNodesWithNoInput)
 
     SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
-  
+
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
@@ -13167,12 +13167,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     AirflowNetwork::AirflowNetworkLinkageData(42).AirLoopNum = 1;
     AirflowNetwork::AirflowNetworkLinkageData(67).AirLoopNum = 2;
 
-    DataAirLoop::AirLoopAFNInfo.allocate(2);
-    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    DataAirLoop::AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
-    DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
-    DataAirLoop::AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
-    DataAirLoop::AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
+    dataAirLoop.AirLoopAFNInfo.allocate(2);
+    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    dataAirLoop.AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
+    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    dataAirLoop.AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
+    dataAirLoop.AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
 
     CalcAirflowNetworkAirBalance();
 
@@ -13223,7 +13223,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckNumOfFansInAirLoopTest)
     DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
     DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 3;
-    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3); 
+    DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp.allocate(3);
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "Fan:ConstantVolume";
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf = "Fan:VariableVolume";
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CVF";
@@ -15621,10 +15621,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
             AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
         }
     }
-    DataAirLoop::AirLoopAFNInfo.allocate(1);
-    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 1;
-    DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
-    DataAirLoop::AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
+    dataAirLoop.AirLoopAFNInfo.allocate(1);
+    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 1;
+    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    dataAirLoop.AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
     AirflowNetwork::AirflowNetworkLinkageData(17).AirLoopNum = 1;
     Node(4).MassFlowRate = 1.23;
 
@@ -15647,7 +15647,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     CalcAirflowNetworkAirBalance();
     EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
-    DataAirLoop::AirLoopAFNInfo.deallocate();
+    dataAirLoop.AirLoopAFNInfo.deallocate();
 }
 
 // Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
@@ -19976,9 +19976,9 @@ std::string const idf_objects = delimited_string({
         AirflowNetwork::DisSysCompReliefAirData(1).OutletNode = 1;
     }
 
-    DataAirLoop::AirLoopAFNInfo.allocate(1);
-    DataAirLoop::AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    DataAirLoop::AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    dataAirLoop.AirLoopAFNInfo.allocate(1);
+    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
 
     AirflowNetwork::AirflowNetworkFanActivated = false;
 

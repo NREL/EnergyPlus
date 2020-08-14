@@ -91,7 +91,7 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
 
     DataHeatBalance::Zone.allocate(1);
     DataSizing::OARequirements.allocate(1);
-    DataAirLoop::AirLoopControlInfo.allocate(1);
+    dataAirLoop.AirLoopControlInfo.allocate(1);
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     DataHeatBalance::Zone(1).FloorArea = 10.0;
@@ -112,9 +112,9 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    DataAirLoop::AirLoopFlow.allocate(1);
-    DataAirLoop::AirLoopFlow(1).OAFrac = 0.5;
-    DataAirLoop::AirLoopControlInfo(1).AirLoopDCVFlag = true;
+    dataAirLoop.AirLoopFlow.allocate(1);
+    dataAirLoop.AirLoopFlow(1).OAFrac = 0.5;
+    dataAirLoop.AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
     DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
@@ -133,12 +133,12 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     // Cleanup
     DataHeatBalance::Zone.deallocate();
     DataSizing::OARequirements.deallocate();
-    DataAirLoop::AirLoopControlInfo.deallocate();
+    dataAirLoop.AirLoopControlInfo.deallocate();
     DataHeatBalance::ZoneIntGain.deallocate();
 
     dd_airterminal.deallocate();
     DataZoneEquipment::ZoneEquipConfig.deallocate();
-    DataAirLoop::AirLoopFlow.deallocate();
+    dataAirLoop.AirLoopFlow.deallocate();
 }
 
 // TEST_F( EnergyPlusFixture, AirTerminalDualDuct_GetInputTest ) {
@@ -477,7 +477,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(HotInNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(HotInNode).Temp, DataLoopNode::Node(HotInNode).HumRat);
 
     // test with heating load and turndown fraction schedule value set 1.0
-    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; // 
+    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; //
     DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;

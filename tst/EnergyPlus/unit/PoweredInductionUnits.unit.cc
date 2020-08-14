@@ -584,7 +584,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     std::string const idf_objects = delimited_string({
         "  Zone,",
         "    SPACE2-1;                !- Name",
-        
+
         "ZoneHVAC:EquipmentConnections,",
         "    SPACE2-1,                !- Zone Name",
         "    SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name",
@@ -592,7 +592,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    SPACE2-1 ATU Sec Node,   !- Zone Air Exhaust Node or NodeList Name",
         "    SPACE2-1 Air Node,       !- Zone Air Node Name",
         "    SPACE2-1 Return Node;    !- Zone Return Air Node Name",
-        
+
         "ZoneHVAC:EquipmentList,",
         "    SPACE2-1 Equipment,      !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
@@ -606,7 +606,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    SPACE2-1 In Node,        !- Air Distribution Unit Outlet Node Name",
         "    AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type",
         "    SPACE2-1 Series PIU Reheat;           !- Air Terminal Name",
-        
+
         "AirTerminal:SingleDuct:SeriesPIU:Reheat,",
         "    SPACE2-1 Series PIU Reheat,     !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -624,7 +624,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
         "    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
         "    0.0001;                  !- Convergence Tolerance",
-        
+
         "Fan:ConstantVolume,",
         "    SPACE2-1 PIU Fan,        !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -635,13 +635,13 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    1.0,                     !- Motor In Airstream Fraction",
         "    SPACE2-1 ATU Fan Inlet Node,   !- Air Inlet Node Name",
         "    SPACE2-1 Zone Coil Air In Node;  !- Air Outlet Node Name",
-        
+
         "AirLoopHVAC:ZoneMixer,",
         "    SPACE2-1 PIU Mixer,      !- Name",
         "    SPACE2-1 ATU Fan Inlet Node,  !- Outlet Node Name",
         "    SPACE2-1 ATU In Node,    !- Inlet 1 Node Name",
         "    SPACE2-1 ATU Sec Node;   !- Inlet 2 Node Name",
-        
+
         "Coil:Heating:Electric,",
         "    SPACE2-1 Zone Coil,      !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -649,7 +649,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    2000,                    !- Nominal Capacity",
         "    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
         "    SPACE2-1 In Node;        !- Air Outlet Node Name",
-        
+
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -713,8 +713,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     // Needs an airloop, assume 20% outdoor air
     Real64 const AirLoopOAFraction = 0.20;
     thisSeriesAT.AirLoopNum = 1;
-    DataAirLoop::AirLoopFlow.allocate(1);
-    DataAirLoop::AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
+    dataAirLoop.AirLoopFlow.allocate(1);
+    dataAirLoop.AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
 
     DataZoneEquipment::ZoneEquipConfig(thisSeriesAT.CtrlZoneNum).InletNodeAirLoopNum(thisSeriesAT.ctrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions

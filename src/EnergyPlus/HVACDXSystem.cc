@@ -204,7 +204,6 @@ namespace HVACDXSystem {
         // This subroutine manages DXCoolingSystem component simulation.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DXCoils::SimDXCoil;
         using DXCoils::SimDXCoilMultiMode;
         using DXCoils::SimDXCoilMultiSpeed;
@@ -343,10 +342,10 @@ namespace HVACDXSystem {
             if (AirLoopNum > 0) { // Real airloopNum called from MixedAir and SimAirServingZones
                 if ((DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 || DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
                      DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
-                    AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
-                    AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
+                    dataAirLoop.AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
+                    dataAirLoop.AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
                 } else { // used for AirLoopHVACDOAS only
-                    AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
+                    dataAirLoop.AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
                 }
             }
         }
@@ -523,7 +522,7 @@ namespace HVACDXSystem {
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
-                    GetHXDXCoilIndex(state, 
+                    GetHXDXCoilIndex(state,
                         DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
@@ -552,7 +551,7 @@ namespace HVACDXSystem {
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_PackagedThermalStorageCooling;
-                    GetTESCoilIndex(state, 
+                    GetTESCoilIndex(state,
                         DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
@@ -776,7 +775,6 @@ namespace HVACDXSystem {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataEnvironment::OutBaroPress;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::DoSetPointTest;
@@ -935,7 +933,7 @@ namespace HVACDXSystem {
             if (AirLoopNum == 0) {
                 EconomizerFlag = false;
             } else {
-                EconomizerFlag = AirLoopControlInfo(AirLoopNum).EconoActive;
+                EconomizerFlag = dataAirLoop.AirLoopControlInfo(AirLoopNum).EconoActive;
             }
             if (ControlNode == 0) {
                 DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 0.0;
@@ -3507,7 +3505,7 @@ namespace HVACDXSystem {
         }
     }
 
-    void GetCoolingCoilTypeNameAndIndex(EnergyPlusData &state, 
+    void GetCoolingCoilTypeNameAndIndex(EnergyPlusData &state,
         std::string const &DXCoilSysName, int &CoolCoilType, int &CoolCoilIndex, std::string &CoolCoilName, bool &EP_UNUSED(ErrFound))
     {
         // SUBROUTINE INFORMATION:

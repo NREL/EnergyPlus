@@ -1310,8 +1310,8 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     SingleDuct::sd_airterminal.allocate(1);
     Zone.allocate(1);
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataAirLoop::AirLoopFlow.allocate(1);
-    DataAirLoop::AirLoopControlInfo.allocate(1);
+    dataAirLoop.AirLoopFlow.allocate(1);
+    dataAirLoop.AirLoopControlInfo.allocate(1);
     DataSizing::OARequirements.allocate(1);
     DataHeatBalance::ZoneIntGain.allocate(1);
 
@@ -1324,8 +1324,8 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
 
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
-    DataAirLoop::AirLoopFlow(1).OAFrac = 0.4;
-    DataAirLoop::AirLoopControlInfo(1).AirLoopDCVFlag = true;
+    dataAirLoop.AirLoopFlow(1).OAFrac = 0.4;
+    dataAirLoop.AirLoopControlInfo(1).AirLoopDCVFlag = true;
 
     DataSizing::OARequirements(1).Name = "CM DSOA WEST ZONE";
     DataSizing::OARequirements(1).OAFlowMethod = DataSizing::OAFlowSum;
@@ -1342,8 +1342,8 @@ TEST_F(EnergyPlusFixture, TestOAMassFlowRateUsingStdRhoAir)
     SingleDuct::sd_airterminal.deallocate();
     Zone.deallocate();
     DataZoneEquipment::ZoneEquipConfig.deallocate();
-    DataAirLoop::AirLoopFlow.deallocate();
-    DataAirLoop::AirLoopControlInfo.deallocate();
+    dataAirLoop.AirLoopFlow.deallocate();
+    dataAirLoop.AirLoopControlInfo.deallocate();
     DataSizing::OARequirements.deallocate();
     DataHeatBalance::ZoneIntGain.deallocate();
 }
@@ -2500,7 +2500,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     SysATMixer.allocate(ATMixerNum);
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataAirLoop::AirLoopFlow.allocate(1);
+    dataAirLoop.AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
     DataSizing::OARequirements.allocate(1);
     Zone.allocate(1);
@@ -2515,7 +2515,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
     SysATMixer(ATMixerNum).NoOAFlowInputFromUser = false;
     SysATMixer(ATMixerNum).OARequirementsPtr = 1;
 
-    DataAirLoop::AirLoopFlow(1).OAFrac = 1.0;
+    dataAirLoop.AirLoopFlow(1).OAFrac = 1.0;
 
     Zone(1).FloorArea = 10.0;
     OARequirements(1).OAFlowMethod = OAFlowSum;
@@ -2545,7 +2545,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest)
 
     SysATMixer.deallocate();
     DataZoneEquipment::ZoneEquipConfig.deallocate();
-    DataAirLoop::AirLoopFlow.deallocate();
+    dataAirLoop.AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
     DataSizing::OARequirements.deallocate();
     Zone.deallocate();
@@ -2564,7 +2564,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
 
     SysATMixer.allocate(ATMixerNum);
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
-    DataAirLoop::AirLoopFlow.allocate(1);
+    dataAirLoop.AirLoopFlow.allocate(1);
     DataLoopNode::Node.allocate(3);
     DataSizing::OARequirements.allocate(1);
     Zone.allocate(1);
@@ -2582,7 +2582,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    DataAirLoop::AirLoopFlow(1).OAFrac = 1.0;
+    dataAirLoop.AirLoopFlow(1).OAFrac = 1.0;
 
     Zone(1).FloorArea = 10.0;
     OARequirements(1).OAFlowMethod = OAFlowSum;
@@ -2628,7 +2628,7 @@ TEST_F(EnergyPlusFixture, TerminalUnitMixerInitTest2)
     EXPECT_NEAR(DataLoopNode::Node(SysATMixer(1).PriInNode).MassFlowRate, 0.5, 0.0001);
     SysATMixer.deallocate();
     DataZoneEquipment::ZoneEquipConfig.deallocate();
-    DataAirLoop::AirLoopFlow.deallocate();
+    dataAirLoop.AirLoopFlow.deallocate();
     DataLoopNode::Node.deallocate();
     DataSizing::OARequirements.deallocate();
     Zone.deallocate();

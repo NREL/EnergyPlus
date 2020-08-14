@@ -283,9 +283,9 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     DataAirSystems::PrimaryAirSystem.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataAirSystems::PrimaryAirSystem(1).Name = "System 1";
     DataAirSystems::PrimaryAirSystem(2).Name = "System 2";
-        DataAirLoop::AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    auto &thisAirLoopFlow1(DataAirLoop::AirLoopFlow(1));
-    auto &thisAirLoopFlow2(DataAirLoop::AirLoopFlow(2));
+        dataAirLoop.AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    auto &thisAirLoopFlow1(dataAirLoop.AirLoopFlow(1));
+    auto &thisAirLoopFlow2(dataAirLoop.AirLoopFlow(2));
 
     // Case 1 - No flow - no error
     thisAirLoopFlow1.SupFlow = 0.0;

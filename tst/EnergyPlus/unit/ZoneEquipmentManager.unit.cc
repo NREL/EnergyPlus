@@ -544,14 +544,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     DataAirSystems::PrimaryAirSystem.allocate(3);
-    DataAirLoop::AirLoopFlow.allocate(3);
+    dataAirLoop.AirLoopFlow.allocate(3);
 
     DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
-    DataAirLoop::AirLoopFlow(1).DesReturnFrac = 1.0;
+    dataAirLoop.AirLoopFlow(1).DesReturnFrac = 1.0;
     DataAirSystems::PrimaryAirSystem(2).OASysExists = false;
-    DataAirLoop::AirLoopFlow(2).DesReturnFrac = 1.0;
+    dataAirLoop.AirLoopFlow(2).DesReturnFrac = 1.0;
     DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
-    DataAirLoop::AirLoopFlow(3).DesReturnFrac = 1.0;
+    dataAirLoop.AirLoopFlow(3).DesReturnFrac = 1.0;
     DataGlobals::DoingSizing = false;
     DataGlobals::isPulseZoneSizing = false;
 
@@ -657,10 +657,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirLoop::AirLoopFlow.allocate(1);
+    dataAirLoop.AirLoopFlow.allocate(1);
 
     DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
-    DataAirLoop::AirLoopFlow(1).DesReturnFrac = 1.0;
+    dataAirLoop.AirLoopFlow(1).DesReturnFrac = 1.0;
     DataGlobals::DoingSizing = false;
     DataGlobals::isPulseZoneSizing = false;
 
@@ -778,17 +778,17 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     DataAirSystems::PrimaryAirSystem.allocate(3);
-    DataAirLoop::AirLoopFlow.allocate(3);
+    dataAirLoop.AirLoopFlow.allocate(3);
 
     // Add an outdoor air system to airloop 2
     DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
-    DataAirLoop::AirLoopFlow(1).DesReturnFrac = 1.0;
+    dataAirLoop.AirLoopFlow(1).DesReturnFrac = 1.0;
     DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
-    DataAirLoop::AirLoopFlow(2).DesReturnFrac = 0.9;
-    DataAirLoop::AirLoopFlow(2).MaxOutAir = 0.1;
-    DataAirLoop::AirLoopFlow(2).OAFlow = 0.1;
+    dataAirLoop.AirLoopFlow(2).DesReturnFrac = 0.9;
+    dataAirLoop.AirLoopFlow(2).MaxOutAir = 0.1;
+    dataAirLoop.AirLoopFlow(2).OAFlow = 0.1;
     DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
-    DataAirLoop::AirLoopFlow(3).DesReturnFrac = 1.0;
+    dataAirLoop.AirLoopFlow(3).DesReturnFrac = 1.0;
     DataGlobals::DoingSizing = false;
     DataGlobals::isPulseZoneSizing = false;
 
@@ -829,9 +829,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     // Case 3 - add exhaust flow, but set system 2 MaxOutAir to zero, expect sum of inlet flow back
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
     DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
-    DataAirLoop::AirLoopFlow(2).DesReturnFrac = 0.9;
-    DataAirLoop::AirLoopFlow(2).MaxOutAir = 0.0;
-    DataAirLoop::AirLoopFlow(2).OAFlow = 0.0;
+    dataAirLoop.AirLoopFlow(2).DesReturnFrac = 0.9;
+    dataAirLoop.AirLoopFlow(2).MaxOutAir = 0.0;
+    dataAirLoop.AirLoopFlow(2).OAFlow = 0.0;
 
     Node(inletNode2).MassFlowRate = 2.0;
     Node(inletNode1).MassFlowRate = 1.0;

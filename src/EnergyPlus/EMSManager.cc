@@ -1748,7 +1748,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::PriAirSysAvailMgr;
         using DataAirSystems::PrimaryAirSystem;
 
         // Locals
@@ -1771,11 +1770,11 @@ namespace EMSManager {
 
         lDummy = false;
 
-        if (allocated(PriAirSysAvailMgr)) {
-            numAirLoops = isize(PriAirSysAvailMgr);
+        if (allocated(dataAirLoop.PriAirSysAvailMgr)) {
+            numAirLoops = isize(dataAirLoop.PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, dataAirLoop.PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {

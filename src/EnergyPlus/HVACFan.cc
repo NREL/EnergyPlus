@@ -121,7 +121,7 @@ namespace HVACFan {
         }
     }
 
-    void FanSystem::simulate(EnergyPlusData &state, 
+    void FanSystem::simulate(EnergyPlusData &state,
         Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction = current flow/ max design flow
                                              // rate.  It is not exactly the same as the legacy speed ratio that was used with SimulateFanComponents.
         Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
@@ -1057,17 +1057,17 @@ namespace HVACFan {
 
         if (speedControl == SpeedControlMethod::Continuous) {
             if (AirLoopNum > 0) {
-                DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_fanRunTimeFractionAtSpeed[0];
+                dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_fanRunTimeFractionAtSpeed[0];
             }
         } else {
             if (AirLoopNum > 0) {
                 if (m_numSpeeds == 1) {
-                    DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_maxAirMassFlowRate;
+                    dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_maxAirMassFlowRate;
                 } else {
                     if (m_outletAirMassFlowRate <= m_massFlowAtSpeed[0]) {
-                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_massFlowAtSpeed[0];
+                        dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_massFlowAtSpeed[0];
                     } else {
-                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = 1.0;
+                        dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = 1.0;
                     }
                 }
             }

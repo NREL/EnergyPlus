@@ -600,7 +600,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataHeatBalance::Zone(1).Name = "KITCHEN";
 
-    DataAirLoop::AirLoopFlow.allocate(1);
+    dataAirLoop.AirLoopFlow.allocate(1);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataZoneEnergyDemands::DeadBandOrSetback.allocate(1);
@@ -706,12 +706,12 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     SetPointManager::SingZoneRhSetPtMgr(1).AirLoopNum = 1;
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    DataAirLoop::AirLoopInputsFilled = true;
+    dataAirLoop.AirLoopInputsFilled = true;
 
     SetPointManager::InitSetPointManagers();
 
-    DataAirLoop::AirLoopFlow(1).OAFrac = 1.0;
-    DataAirLoop::AirLoopFlow(1).OAMinFrac = 0.8;
+    dataAirLoop.AirLoopFlow(1).OAFrac = 1.0;
+    dataAirLoop.AirLoopFlow(1).OAMinFrac = 0.8;
 
     DataLoopNode::Node(zoneInletNode).MassFlowRate = 1.0; // set zone inlet mass flow
     DataLoopNode::Node(zoneInletNode).HumRat = 0.0008;
@@ -752,8 +752,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 18.0251495, 0.001);
 
-    DataAirLoop::AirLoopFlow(1).OAFrac = 0.8;
-    DataAirLoop::AirLoopFlow(1).OAMinFrac = 0.8;
+    dataAirLoop.AirLoopFlow(1).OAFrac = 0.8;
+    dataAirLoop.AirLoopFlow(1).OAMinFrac = 0.8;
 
     SetPointManager::SimSetPointManagers();
     SetPointManager::UpdateSetPointManagers();
@@ -761,8 +761,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 18.20035, 0.001);
 
     // warmer day outside
-    DataAirLoop::AirLoopFlow(1).OAFrac = 1.0;
-    DataAirLoop::AirLoopFlow(1).OAMinFrac = 0.8;
+    dataAirLoop.AirLoopFlow(1).OAFrac = 1.0;
+    dataAirLoop.AirLoopFlow(1).OAMinFrac = 0.8;
 
     DataLoopNode::Node(3).HumRat = 0.0006; // OA intake
     DataLoopNode::Node(3).Temp = 26.0;
@@ -776,8 +776,8 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
 
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 27.0, 0.001);
 
-    DataAirLoop::AirLoopFlow(1).OAFrac = 0.8;
-    DataAirLoop::AirLoopFlow(1).OAMinFrac = 0.8;
+    dataAirLoop.AirLoopFlow(1).OAFrac = 0.8;
+    dataAirLoop.AirLoopFlow(1).OAMinFrac = 0.8;
 
     SetPointManager::SimSetPointManagers();
     SetPointManager::UpdateSetPointManagers();
@@ -1212,8 +1212,8 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     SimAirServingZones::GetAirPathData(state);
     SimAirServingZones::InitAirLoops(state, true);
     // check the number of zones served by single duct or dual duct system
-    EXPECT_EQ(1, DataAirLoop::AirToZoneNodeInfo(1).NumZonesCooled); // cooled and heated zone (served by single-duct)
-    EXPECT_EQ(0, DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated); // no heated only zone (served by dual-duct)
+    EXPECT_EQ(1, dataAirLoop.AirToZoneNodeInfo(1).NumZonesCooled); // cooled and heated zone (served by single-duct)
+    EXPECT_EQ(0, dataAirLoop.AirToZoneNodeInfo(1).NumZonesHeated); // no heated only zone (served by dual-duct)
 
     SetPointManager::GetSetPointManagerInputs(state);
     SetPointManager::WarmestSetPtMgr(1).AirLoopNum = 1;
@@ -1398,7 +1398,7 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     SetPointManager::GetSetPointManagerInputs(state);
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    DataAirLoop::AirLoopInputsFilled = true;
+    dataAirLoop.AirLoopInputsFilled = true;
 
     ASSERT_THROW(SetPointManager::InitSetPointManagers(), std::runtime_error);
 
@@ -1416,7 +1416,7 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     DataZoneEquipment::ZoneEquipInputsFilled = false;
-    DataAirLoop::AirLoopInputsFilled = false;
+    dataAirLoop.AirLoopInputsFilled = false;
 }
 TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
 {
@@ -1465,7 +1465,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     SetPointManager::GetSetPointManagerInputs(state);
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    DataAirLoop::AirLoopInputsFilled = true;
+    dataAirLoop.AirLoopInputsFilled = true;
 
     ASSERT_THROW(SetPointManager::InitSetPointManagers(), std::runtime_error);
 
@@ -1483,7 +1483,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 
     DataZoneEquipment::ZoneEquipInputsFilled = false;
-    DataAirLoop::AirLoopInputsFilled = false;
+    dataAirLoop.AirLoopInputsFilled = false;
 }
 TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
 {
@@ -1541,7 +1541,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    DataAirLoop::AirLoopInputsFilled = true;
+    dataAirLoop.AirLoopInputsFilled = true;
 
     SetPointManager::InitSetPointManagers();
     EXPECT_FALSE(has_err_output(true));

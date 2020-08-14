@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
@@ -108,8 +107,6 @@ namespace SystemAvailabilityManager {
 
     // USE STATEMENTS:
     // Use statements for data only modules
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
@@ -360,26 +357,26 @@ namespace SystemAvailabilityManager {
 
         for (PriAirSysNum = 1; PriAirSysNum <= NumPrimaryAirSys; ++PriAirSysNum) { // loop over the primary air systems
 
-            PreviousStatus = PriAirSysAvailMgr(PriAirSysNum).AvailStatus; // Save the previous status for differential thermostat
-            PriAirSysAvailMgr(PriAirSysNum).AvailStatus = NoAction;       // initialize the availability to "take no action"
+            PreviousStatus = dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus; // Save the previous status for differential thermostat
+            dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus = NoAction;       // initialize the availability to "take no action"
 
-            for (PriAirSysAvailMgrNum = 1; PriAirSysAvailMgrNum <= PriAirSysAvailMgr(PriAirSysNum).NumAvailManagers;
+            for (PriAirSysAvailMgrNum = 1; PriAirSysAvailMgrNum <= dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).NumAvailManagers;
                  ++PriAirSysAvailMgrNum) { // loop over the avail managers in system
 
-                SimSysAvailManager(PriAirSysAvailMgr(PriAirSysNum).AvailManagerType(PriAirSysAvailMgrNum),
-                                   PriAirSysAvailMgr(PriAirSysNum).AvailManagerName(PriAirSysAvailMgrNum),
-                                   PriAirSysAvailMgr(PriAirSysNum).AvailManagerNum(PriAirSysAvailMgrNum),
+                SimSysAvailManager(dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailManagerType(PriAirSysAvailMgrNum),
+                                   dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailManagerName(PriAirSysAvailMgrNum),
+                                   dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailManagerNum(PriAirSysAvailMgrNum),
                                    PriAirSysNum,
                                    PreviousStatus,
                                    AvailStatus);
 
                 if (AvailStatus == ForceOff) {
-                    PriAirSysAvailMgr(PriAirSysNum).AvailStatus = ForceOff;
+                    dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus = ForceOff;
                     break; // Fans forced off takes precedence
                 } else if (AvailStatus == CycleOnZoneFansOnly) {
-                    PriAirSysAvailMgr(PriAirSysNum).AvailStatus = CycleOnZoneFansOnly; // zone fans only takes next precedence
-                } else if ((AvailStatus == CycleOn) && (PriAirSysAvailMgr(PriAirSysNum).AvailStatus == NoAction)) {
-                    PriAirSysAvailMgr(PriAirSysNum).AvailStatus = CycleOn; // cycle on is lowest precedence
+                    dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus = CycleOnZoneFansOnly; // zone fans only takes next precedence
+                } else if ((AvailStatus == CycleOn) && (dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus == NoAction)) {
+                    dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus = CycleOn; // cycle on is lowest precedence
                 }
 
             } // end of availability manager loop
@@ -389,16 +386,16 @@ namespace SystemAvailabilityManager {
                 for (HybridVentNum = 1; HybridVentNum <= NumHybridVentSysAvailMgrs; ++HybridVentNum) {
                     if (HybridVentSysAvailMgrData(HybridVentNum).AirLoopNum == PriAirSysNum &&
                         HybridVentSysAvailMgrData(HybridVentNum).VentilationCtrl == HybridVentCtrl_Open) {
-                        PriAirSysAvailMgr(PriAirSysNum).AvailStatus = ForceOff; // Force the system off
+                        dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus = ForceOff; // Force the system off
                     }
                 }
             }
 
             // loop over the zones served by the system and set the zone equipment availability
-            for (ZoneInSysNum = 1; ZoneInSysNum <= AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++ZoneInSysNum) {
+            for (ZoneInSysNum = 1; ZoneInSysNum <= dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++ZoneInSysNum) {
 
-                CtrldZoneNum = AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
-                ZoneEquipAvail(CtrldZoneNum) = PriAirSysAvailMgr(PriAirSysNum).AvailStatus;
+                CtrldZoneNum = dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
+                ZoneEquipAvail(CtrldZoneNum) = dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus;
             }
 
         } // end of primary air system loop
@@ -1661,33 +1658,33 @@ namespace SystemAvailabilityManager {
             GetAvailListsInput = false;
         }
 
-        if (!allocated(PriAirSysAvailMgr)) {
-            PriAirSysAvailMgr.allocate(NumAirLoops);
+        if (!allocated(dataAirLoop.PriAirSysAvailMgr)) {
+            dataAirLoop.PriAirSysAvailMgr.allocate(NumAirLoops);
         }
 
         Found = 0;
         if (NumAvailManagerLists > 0) Found = UtilityRoutines::FindItemInList(AvailabilityListName, SysAvailMgrListData);
 
         if (Found != 0) {
-            PriAirSysAvailMgr(Loop).NumAvailManagers = SysAvailMgrListData(Found).NumItems;
-            PriAirSysAvailMgr(Loop).AvailStatus = NoAction;
-            PriAirSysAvailMgr(Loop).StartTime = 0;
-            PriAirSysAvailMgr(Loop).StopTime = 0;
-            PriAirSysAvailMgr(Loop).ReqSupplyFrac = 1.0;
-            PriAirSysAvailMgr(Loop).AvailManagerName.allocate(PriAirSysAvailMgr(Loop).NumAvailManagers);
-            PriAirSysAvailMgr(Loop).AvailManagerType.allocate(PriAirSysAvailMgr(Loop).NumAvailManagers);
-            PriAirSysAvailMgr(Loop).AvailManagerNum.allocate(PriAirSysAvailMgr(Loop).NumAvailManagers);
-            for (Num = 1; Num <= PriAirSysAvailMgr(Loop).NumAvailManagers; ++Num) {
-                PriAirSysAvailMgr(Loop).AvailManagerName(Num) = SysAvailMgrListData(Found).AvailManagerName(Num);
-                PriAirSysAvailMgr(Loop).AvailManagerNum(Num) = 0;
-                PriAirSysAvailMgr(Loop).AvailManagerType(Num) = SysAvailMgrListData(Found).AvailManagerType(Num);
-                if (PriAirSysAvailMgr(Loop).AvailManagerType(Num) == 0) {
+            dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers = SysAvailMgrListData(Found).NumItems;
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailStatus = NoAction;
+            dataAirLoop.PriAirSysAvailMgr(Loop).StartTime = 0;
+            dataAirLoop.PriAirSysAvailMgr(Loop).StopTime = 0;
+            dataAirLoop.PriAirSysAvailMgr(Loop).ReqSupplyFrac = 1.0;
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerName.allocate(dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers);
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerType.allocate(dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers);
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerNum.allocate(dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers);
+            for (Num = 1; Num <= dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers; ++Num) {
+                dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerName(Num) = SysAvailMgrListData(Found).AvailManagerName(Num);
+                dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerNum(Num) = 0;
+                dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerType(Num) = SysAvailMgrListData(Found).AvailManagerType(Num);
+                if (dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerType(Num) == 0) {
                     ShowSevereError("GetAirPathData/GetAirLoopAvailabilityManager: Invalid AvailabilityManagerAssignmentList Type entered=\"" +
                                     SysAvailMgrListData(Found).cAvailManagerType(Num) + "\".");
                     ShowContinueError("Occurs in AvailabilityManagerAssignmentList=\"" + SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
                     ErrorsFound = true;
                 }
-                if (SysAvailMgrListData(Found).AvailManagerType(Num) == SysAvailMgr_DiffThermo && Num != PriAirSysAvailMgr(Loop).NumAvailManagers) {
+                if (SysAvailMgrListData(Found).AvailManagerType(Num) == SysAvailMgr_DiffThermo && Num != dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers) {
                     ShowWarningError("GetAirPathData/GetAirLoopAvailabilityManager: AvailabilityManager:DifferentialThermostat=\"" +
                                      SysAvailMgrListData(Found).AvailManagerName(Num) + "\".");
                     ShowContinueError(
@@ -1701,11 +1698,11 @@ namespace SystemAvailabilityManager {
                 ShowWarningError("GetAirPathData/GetAirLoopAvailabilityManager: AvailabilityManagerAssignmentList=" + AvailabilityListName +
                                  " not found in lists.  No availability will be used.");
             }
-            PriAirSysAvailMgr(Loop).NumAvailManagers = 0;
-            PriAirSysAvailMgr(Loop).AvailStatus = NoAction;
-            PriAirSysAvailMgr(Loop).AvailManagerName.allocate(PriAirSysAvailMgr(Loop).NumAvailManagers);
-            PriAirSysAvailMgr(Loop).AvailManagerType.allocate(PriAirSysAvailMgr(Loop).NumAvailManagers);
-            PriAirSysAvailMgr(Loop).AvailManagerNum.allocate(PriAirSysAvailMgr(Loop).NumAvailManagers);
+            dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers = 0;
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailStatus = NoAction;
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerName.allocate(dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers);
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerType.allocate(dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers);
+            dataAirLoop.PriAirSysAvailMgr(Loop).AvailManagerNum.allocate(dataAirLoop.PriAirSysAvailMgr(Loop).NumAvailManagers);
         }
     }
 
@@ -2289,12 +2286,12 @@ namespace SystemAvailabilityManager {
         } else {
             if (WarmupFlag && BeginDayFlag) {
                 // reset start/stop times at beginning of each day during warmup to prevent non-convergence due to rotating start times
-                PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
-                PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
+                dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
+                dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
             }
 
-            StartTime = PriAirSysAvailMgr(PriAirSysNum).StartTime;
-            StopTime = PriAirSysAvailMgr(PriAirSysNum).StopTime;
+            StartTime = dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StartTime;
+            StopTime = dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StopTime;
         }
         // CR 7913 changed to allow during warmup
         if ((GetCurrentScheduleValue(NCycSysAvailMgrData(SysAvailNum).SchedPtr) <= 0.0) ||
@@ -2414,10 +2411,10 @@ namespace SystemAvailabilityManager {
                         // If no zones cooled, Availstatus could be "unknown"
                         AvailStatus = NoAction;
 
-                        for (ZoneInSysNum = 1; ZoneInSysNum <= AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled;
+                        for (ZoneInSysNum = 1; ZoneInSysNum <= dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled;
                              ++ZoneInSysNum) { // loop over zones in system
 
-                            CtrldZoneNum = AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
+                            CtrldZoneNum = dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
                             ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
 
                             {
@@ -2521,11 +2518,11 @@ namespace SystemAvailabilityManager {
                     if (NCycSysAvailMgrData(SysAvailNum).CtrlType == ZoneFansOnly) AvailStatus = CycleOnZoneFansOnly;
                     // issue #6151
                     if (CyclingRunTimeControlType == Thermostat) { // Cycling Run Time is ignored
-                        PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
-                        PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
+                        dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
+                        dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps;
                     } else {
-                        PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
-                        PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps + NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps;
+                        dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StartTime = SimTimeSteps;
+                        dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).StopTime = SimTimeSteps + NCycSysAvailMgrData(SysAvailNum).CyclingTimeSteps;
                     }
                 }
             }
@@ -2760,13 +2757,13 @@ namespace SystemAvailabilityManager {
             if (FanStartTimeTmr == 0.0) FanStartTimeTmr = 24.0;
 
             // Pass the start time to ZoneTempPredictorCorrector
-            for (int counter = 1; counter <= AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++counter) {
-                int actZoneNum = ZoneEquipConfig(AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(counter)).ActualZoneNum;
+            for (int counter = 1; counter <= dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++counter) {
+                int actZoneNum = ZoneEquipConfig(dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(counter)).ActualZoneNum;
                 OptStartData.OccStartTime(actZoneNum) = FanStartTime;
                 OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
             }
-            for (int counter = 1; counter <= AirToZoneNodeInfo(PriAirSysNum).NumZonesHeated; ++counter) {
-                int actZoneNum = ZoneEquipConfig(AirToZoneNodeInfo(PriAirSysNum).HeatCtrlZoneNums(counter)).ActualZoneNum;
+            for (int counter = 1; counter <= dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).NumZonesHeated; ++counter) {
+                int actZoneNum = ZoneEquipConfig(dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).HeatCtrlZoneNums(counter)).ActualZoneNum;
                 OptStartData.OccStartTime(actZoneNum) = FanStartTime;
                 OptStartData.ActualZoneNum(actZoneNum) = actZoneNum;
             }
@@ -3697,7 +3694,7 @@ namespace SystemAvailabilityManager {
     void DefineOptStartSysAvailManager::SetOptStartFlag(int const AirLoopNum)
     {
         // Set the OptStartFlag true for all zones on the air loop
-        auto const &thisAirToZoneNodeInfo(DataAirLoop::AirToZoneNodeInfo(AirLoopNum));
+        auto const &thisAirToZoneNodeInfo(dataAirLoop.AirToZoneNodeInfo(AirLoopNum));
         for (int counter = 1; counter <= thisAirToZoneNodeInfo.NumZonesCooled; ++counter) {
             int actZoneNum = DataZoneEquipment::ZoneEquipConfig(thisAirToZoneNodeInfo.CoolCtrlZoneNums(counter)).ActualZoneNum;
             OptStartData.OptStartFlag(actZoneNum) = true;
@@ -3786,9 +3783,9 @@ namespace SystemAvailabilityManager {
                     LowLimCheck = true;
                 }
             } else {
-                for (ZoneInSysNum = 1; ZoneInSysNum <= AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++ZoneInSysNum) { // loop over zones in system
+                for (ZoneInSysNum = 1; ZoneInSysNum <= dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).NumZonesCooled; ++ZoneInSysNum) { // loop over zones in system
 
-                    CtrldZoneNum = AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
+                    CtrldZoneNum = dataAirLoop.AirToZoneNodeInfo(PriAirSysNum).CoolCtrlZoneNums(ZoneInSysNum);
                     ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
                     // if the room temperature is greater than the vent temp sched value, set the vent temp check to TRUE
                     if (TempTstatAir(ZoneNum) > VentTemp) {
@@ -3815,9 +3812,9 @@ namespace SystemAvailabilityManager {
 
         if (!present(ZoneEquipType)) {
             if (AvailStatus == CycleOn) {
-                AirLoopControlInfo(PriAirSysNum).LoopFlowRateSet = true;
-                AirLoopControlInfo(PriAirSysNum).NightVent = true;
-                AirLoopFlow(PriAirSysNum).ReqSupplyFrac = NVentSysAvailMgrData(SysAvailNum).VentFlowFrac;
+                dataAirLoop.AirLoopControlInfo(PriAirSysNum).LoopFlowRateSet = true;
+                dataAirLoop.AirLoopControlInfo(PriAirSysNum).NightVent = true;
+                dataAirLoop.AirLoopFlow(PriAirSysNum).ReqSupplyFrac = NVentSysAvailMgrData(SysAvailNum).VentFlowFrac;
             }
         }
 
@@ -5065,12 +5062,12 @@ namespace SystemAvailabilityManager {
                     if (ZoneAirCO2(ZoneNum) > ZoneCO2SetPoint(ZoneNum)) {
                         if (HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
                             AirLoopNum = HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum;
-                            for (Num = 1; Num <= PriAirSysAvailMgr(HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum).NumAvailManagers; ++Num) {
-                                SimSysAvailManager(PriAirSysAvailMgr(AirLoopNum).AvailManagerType(Num),
-                                                   PriAirSysAvailMgr(AirLoopNum).AvailManagerName(Num),
-                                                   PriAirSysAvailMgr(AirLoopNum).AvailManagerNum(Num),
+                            for (Num = 1; Num <= dataAirLoop.PriAirSysAvailMgr(HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum).NumAvailManagers; ++Num) {
+                                SimSysAvailManager(dataAirLoop.PriAirSysAvailMgr(AirLoopNum).AvailManagerType(Num),
+                                                   dataAirLoop.PriAirSysAvailMgr(AirLoopNum).AvailManagerName(Num),
+                                                   dataAirLoop.PriAirSysAvailMgr(AirLoopNum).AvailManagerNum(Num),
                                                    AirLoopNum,
-                                                   PriAirSysAvailMgr(AirLoopNum).AvailStatus,
+                                                   dataAirLoop.PriAirSysAvailMgr(AirLoopNum).AvailStatus,
                                                    AvailStatus);
                             }
                             if (AvailStatus == CycleOn) {
@@ -5225,7 +5222,7 @@ namespace SystemAvailabilityManager {
 
         if (HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
             if (HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == HybridVentCtrl_Close) {
-                PriAirSysAvailMgr(PriAirSysNum).AvailStatus = CycleOn;
+                dataAirLoop.PriAirSysAvailMgr(PriAirSysNum).AvailStatus = CycleOn;
             }
         }
 

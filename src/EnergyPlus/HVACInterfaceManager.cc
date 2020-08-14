@@ -162,8 +162,8 @@ namespace HVACInterfaceManager {
             Real64 totDemandSideMassFlow = 0.0;
             Real64 totDemandSideMinAvail = 0.0;
             Real64 totDemandSideMaxAvail = 0.0;
-            for (int demIn = 1; demIn <= DataAirLoop::AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++demIn) {
-                int demInNode = DataAirLoop::AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(demIn);
+            for (int demIn = 1; demIn <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++demIn) {
+                int demInNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(demIn);
                 totDemandSideMassFlow += Node(demInNode).MassFlowRate;
                 totDemandSideMinAvail += Node(demInNode).MassFlowRateMinAvail;
                 totDemandSideMaxAvail += Node(demInNode).MassFlowRateMaxAvail;

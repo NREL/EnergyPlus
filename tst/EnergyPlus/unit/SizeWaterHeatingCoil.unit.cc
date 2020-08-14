@@ -1145,7 +1145,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     FinalSysSizing.allocate(1);
     UnitarySysEqSizing.allocate(1);
     PrimaryAirSystem.allocate(1);
-    AirLoopControlInfo.allocate(1);
+    dataAirLoop.AirLoopControlInfo.allocate(1);
     TotNumLoops = 1;
     PlantLoop.allocate(TotNumLoops);
     PlantSizData.allocate(1);
@@ -1217,7 +1217,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     FinalSysSizing.deallocate();
     UnitarySysEqSizing.deallocate();
     PrimaryAirSystem.deallocate();
-    AirLoopControlInfo.deallocate();
+    dataAirLoop.AirLoopControlInfo.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)

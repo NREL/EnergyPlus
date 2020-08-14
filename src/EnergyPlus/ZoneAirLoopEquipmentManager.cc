@@ -573,7 +573,6 @@ namespace ZoneAirLoopEquipmentManager {
         // Simulates primary system air supplied to a zone and calculates
         // airflow requirements
 
-        using DataAirLoop::AirLoopFlow;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using DualDuct::SimulateDualDuct;
@@ -613,7 +612,7 @@ namespace ZoneAirLoopEquipmentManager {
                     MassFlowRateMinAvail = Node(InNodeNum).MassFlowRateMinAvail;
                     AirLoopNum = AirDistUnit(AirDistUnitNum).AirLoopNum;
                     if (AirLoopNum > 0) {
-                        DesFlowRatio = AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio;
+                        DesFlowRatio = dataAirLoop.AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio;
                     } else {
                         DesFlowRatio = 1.0;
                     }

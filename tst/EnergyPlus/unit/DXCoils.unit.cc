@@ -294,7 +294,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     SysSizingRunDone = true;
     FinalSysSizing.allocate(1);
     PrimaryAirSystem.allocate(1);
-    AirLoopControlInfo.allocate(1);
+    dataAirLoop.AirLoopControlInfo.allocate(1);
     CurSysNum = 1;
     NumDXCoils = 2;
     DXCoilNum = 2;
@@ -394,7 +394,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     UnitarySysEqSizing.deallocate();
     FinalSysSizing.deallocate();
     PrimaryAirSystem.deallocate();
-    AirLoopControlInfo.deallocate();
+    dataAirLoop.AirLoopControlInfo.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
@@ -1320,7 +1320,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
 
     EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType); // it also covers a test for fuel type input
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
-    
+
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
@@ -1707,7 +1707,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     // Case 1 test
     GetDXCoils(state);
 
-    EnergyPlus::DataAirLoop::AirLoopInputsFilled = true;
+    EnergyPlus::dataAirLoop.AirLoopInputsFilled = true;
 
     DataGlobals::SysSizingCalc = true;
 
@@ -1719,7 +1719,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     EXPECT_EQ("Cooling Coil Crankcase Heater Electric Energy", OutputProcessor::DDVariableTypes(11).VarNameOnly);
 
     DataGlobals::SysSizingCalc = false;
-    EnergyPlus::DataAirLoop::AirLoopInputsFilled = false;
+    EnergyPlus::dataAirLoop.AirLoopInputsFilled = false;
 }
 
 TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)

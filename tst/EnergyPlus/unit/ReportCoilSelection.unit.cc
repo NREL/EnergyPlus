@@ -164,11 +164,11 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ChWCoil)
     int curZoneEqNum = 0;
     isAutoSized = true; // true if autosized
     DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated = 2;
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated);
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 2;
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums(2) = 3;
+    dataAirLoop.AirToZoneNodeInfo.allocate(1);
+    dataAirLoop.AirToZoneNodeInfo(1).NumZonesHeated = 2;
+    dataAirLoop.AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(dataAirLoop.AirToZoneNodeInfo(1).NumZonesHeated);
+    dataAirLoop.AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 2;
+    dataAirLoop.AirToZoneNodeInfo(1).HeatCtrlZoneNums(2) = 3;
     DataGlobals::NumOfZones = 3;
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataHeatBalance::Zone(1).Name = "Zone 1";

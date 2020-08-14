@@ -1498,7 +1498,7 @@ namespace FourPipeBeam {
         this->supAirHeatingEnergy = this->supAirHeatingRate * ReportingConstant;
 
         this->primAirFlow = this->mDotSystemAir / DataEnvironment::StdRhoAir;
-        
+
         this->CalcOutdoorAirVolumeFlowRate();
     }
 
@@ -1506,7 +1506,7 @@ namespace FourPipeBeam {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->airLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->airLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * dataAirLoop.AirLoopFlow(this->airLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

@@ -170,7 +170,6 @@ namespace HVACDXHeatPumpSystem {
         // This subroutine manages DXHeatPumpSystem component simulation.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DXCoils::SimDXCoil;
         using General::TrimSigDigits;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -266,10 +265,10 @@ namespace HVACDXHeatPumpSystem {
         // set econo lockout flag
         if (AirLoopNum != -1) { // IF the sysem is not an equipment of outdoor air unit
 
-            if ((DXHeatPumpSystem(DXSystemNum).PartLoadFrac > 0.0) && AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
-                AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
+            if ((DXHeatPumpSystem(DXSystemNum).PartLoadFrac > 0.0) && dataAirLoop.AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
+                dataAirLoop.AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
             } else {
-                AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
+                dataAirLoop.AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
             }
         }
 
@@ -491,7 +490,6 @@ namespace HVACDXHeatPumpSystem {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -563,7 +561,7 @@ namespace HVACDXHeatPumpSystem {
 
         } else if (AirLoopNum != -1) { // Not Outdoor Air Unit
             ControlNode = DXHeatPumpSystem(DXSystemNum).DXSystemControlNodeNum;
-            EconomizerFlag = AirLoopControlInfo(AirLoopNum).EconoActive;
+            EconomizerFlag = dataAirLoop.AirLoopControlInfo(AirLoopNum).EconoActive;
             DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint;
         }
     }
@@ -734,7 +732,7 @@ namespace HVACDXHeatPumpSystem {
                             } else {
                                 if (DataGlobals::DoCoilDirectSolutions) {
                                     PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
-                                    SimDXCoil(state, 
+                                    SimDXCoil(state,
                                         CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
                                 } else {
                                     Par(1) = double(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);

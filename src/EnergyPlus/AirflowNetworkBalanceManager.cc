@@ -122,7 +122,6 @@ namespace AirflowNetworkBalanceManager {
     // Using/Aliasing
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
-    using DataAirLoop::AirToZoneNodeInfo;
     using DataContaminantBalance::CO2ZoneTimeMinus1;
     using DataContaminantBalance::Contaminant;
     using DataContaminantBalance::GCZoneTimeMinus1;
@@ -227,7 +226,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulation of air distribution system.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
@@ -261,12 +259,12 @@ namespace AirflowNetworkBalanceManager {
 
         if (present(FirstHVACIteration) && SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (FirstHVACIteration) {
-                if (allocated(AirLoopAFNInfo)) {
+                if (allocated(dataAirLoop.AirLoopAFNInfo)) {
                     for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
-                        AirLoopAFNInfo(i).AFNLoopHeatingCoilMaxRTF = 0.0;
-                        AirLoopAFNInfo(i).AFNLoopOnOffFanRTF = 0.0;
-                        AirLoopAFNInfo(i).AFNLoopDXCoilRTF = 0.0;
-                        AirLoopAFNInfo(i).LoopOnOffFanPartLoadRatio = 0.0;
+                        dataAirLoop.AirLoopAFNInfo(i).AFNLoopHeatingCoilMaxRTF = 0.0;
+                        dataAirLoop.AirLoopAFNInfo(i).AFNLoopOnOffFanRTF = 0.0;
+                        dataAirLoop.AirLoopAFNInfo(i).AFNLoopDXCoilRTF = 0.0;
+                        dataAirLoop.AirLoopAFNInfo(i).LoopOnOffFanPartLoadRatio = 0.0;
                     }
                 }
             }
@@ -282,8 +280,8 @@ namespace AirflowNetworkBalanceManager {
                     AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
                     break;
                 }
-                if (FanMassFlowRate > VerySmallMassFlow && AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
-                    AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
+                if (FanMassFlowRate > VerySmallMassFlow && dataAirLoop.AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
+                    dataAirLoop.AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
                     FanOperModeCyc = CycFanCycCoil;
                     AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
                     if (AFNSupplyFanType == FanType_SimpleOnOff) {
@@ -5651,7 +5649,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
@@ -5868,8 +5865,8 @@ namespace AirflowNetworkBalanceManager {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxExhaustMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+            if (dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
             solver.airmov();
@@ -5945,8 +5942,8 @@ namespace AirflowNetworkBalanceManager {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxReliefMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                MaxReliefMassFlowrate = MaxReliefMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+            if (dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                MaxReliefMassFlowrate = MaxReliefMassFlowrate / dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ReliefMassFlowRate = MinReliefMassFlowrate;
             solver.initialize();
@@ -8589,7 +8586,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine update variables used in the AirflowNetwork model.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
@@ -8825,7 +8821,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 OnOffFanRunTimeFraction = 0.0;
         dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction = 0.0;
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            MaxPartLoadRatio = max(MaxPartLoadRatio, AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio);
+            MaxPartLoadRatio = max(MaxPartLoadRatio, dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio);
             dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction = max(dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction, dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum));
         }
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
@@ -8839,18 +8835,18 @@ namespace AirflowNetworkBalanceManager {
             // Calculate the part load ratio, can't be greater than 1 for a simple ONOFF fan
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
                 Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow &&
-                AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                 // Hard code here
-                PartLoadRatio = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
-                dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
-                OnOffFanRunTimeFraction = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
-                                              AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
-                                              AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
-                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
-                                                              AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
-                                                              AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
+                PartLoadRatio = dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) = dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                OnOffFanRunTimeFraction = max(dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
+                                              dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
+                                              dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
+                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) = max(dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
+                                                              dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
+                                                              dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
             }
-            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            dataAirLoop.AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
 
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) < 1.0) {
                 for (std::size_t i = 0; i < dataAirflowNetworkBalanceManager.linkReport.size(); ++i) {
@@ -8880,19 +8876,19 @@ namespace AirflowNetworkBalanceManager {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
                 }
                 if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
-                    AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
+                    dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
                     OnOffRatio =
-                        std::abs((AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate - AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
-                                 AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate);
+                        std::abs((dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate - dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
+                                 dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate);
                     if (OnOffRatio > 0.1) {
                         ShowWarningError("The absolute percent difference of supply air mass flow rate between HVAC operation and No HVAC operation "
                                          "is above 10% with fan operation mode = ContFanCycCoil.");
                         ShowContinueError("The added zone loads using the AirflowNetwork model may not be accurate because the zone loads are "
                                           "calculated based on the mass flow rate during HVAC operation.");
                         ShowContinueError(
-                            "The mass flow rate during HVAC operation = " + RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, 2) +
+                            "The mass flow rate during HVAC operation = " + RoundSigDigits(dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, 2) +
                             " The mass flow rate during no HVAC operation = " +
-                            RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate, 2));
+                            RoundSigDigits(dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate, 2));
                         dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag = false;
                     }
                 }
@@ -9113,7 +9109,7 @@ namespace AirflowNetworkBalanceManager {
                         dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrGC *= OnOffFanRunTimeFraction;
                     }
                 }
-                if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                if (dataAirLoop.AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                     for (i = 1; i <= NumOfZones; ++i) {
                         dataAirflowNetworkBalanceManager.exchangeData(i).SumMCp += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
                         dataAirflowNetworkBalanceManager.exchangeData(i).SumMCpT += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
@@ -9444,7 +9440,6 @@ namespace AirflowNetworkBalanceManager {
 
         // Using/Aliasing
         using BranchNodeConnections::GetNodeConnectionType;
-        using DataAirLoop::AirToZoneNodeInfo;
         using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using MixedAir::GetNumOAMixers;
@@ -9942,10 +9937,10 @@ namespace AirflowNetworkBalanceManager {
             R1 = 0;
             R2 = 0;
             for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).AirLoopSupplyNodeNum(1)) S1 = i;
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).ZoneEquipSupplyNodeNum(1)) S2 = i;
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).ZoneEquipReturnNodeNum(1)) R1 = i;
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).AirLoopReturnNodeNum(1)) R2 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirLoop.AirToZoneNodeInfo(j).AirLoopSupplyNodeNum(1)) S1 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirLoop.AirToZoneNodeInfo(j).ZoneEquipSupplyNodeNum(1)) S2 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirLoop.AirToZoneNodeInfo(j).ZoneEquipReturnNodeNum(1)) R1 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == dataAirLoop.AirToZoneNodeInfo(j).AirLoopReturnNodeNum(1)) R2 = i;
             }
             for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
                 if (AirflowNetworkLinkageData(i).NodeNums[0] == R1 && AirflowNetworkLinkageData(i).NodeNums[1] == R2) {
@@ -11128,17 +11123,17 @@ namespace AirflowNetworkBalanceManager {
             }
 
             // Check connection between supply and demand
-            for (OutNum = 1; OutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
+            for (OutNum = 1; OutNum <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
                 // AirLoop supply outlet node
-                if (AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(OutNum) == NodeNumber) {
+                if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
-                if (AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) == NodeNumber) {
+                if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
                 // supply path
                 for (SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath) {
-                    if (SupplyAirPath(SupAirPath).InletNodeNum == AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum)) {
+                    if (SupplyAirPath(SupAirPath).InletNodeNum == dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum)) {
                         for (SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= SupplyAirPath(SupAirPath).NumOutletNodes; ++SupAirPathOutNodeNum) {
                             if (SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) == NodeNumber) {
                                 return AirLoopNum;
@@ -11167,14 +11162,14 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 // return path
-                if (AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(OutNum) == NodeNumber) {
+                if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
-                if (AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(OutNum) == NodeNumber) {
+                if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
                 for (int retPathNum = 1; retPathNum <= NumReturnAirPaths; ++retPathNum) {
-                    if (ReturnAirPath(retPathNum).OutletNodeNum == AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(1)) {
+                    if (ReturnAirPath(retPathNum).OutletNodeNum == dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(1)) {
                         if (ReturnAirPath(retPathNum).OutletNodeNum == NodeNumber) {
                             return AirLoopNum;
                         }

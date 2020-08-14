@@ -6039,7 +6039,6 @@ namespace DXCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopInputsFilled;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
         using General::TrimSigDigits;
@@ -6156,7 +6155,7 @@ namespace DXCoils {
 
         // CR7308 - Wait for zone and air loop equipment to be simulated, then print out report variables
         if (CrankcaseHeaterReportVarFlag) {
-            if (AirLoopInputsFilled) {
+            if (dataAirLoop.AirLoopInputsFilled) {
                 //     Set report variables for DX cooling coils that will have a crankcase heater (all DX coils not used in a HP AC unit)
                 for (DXCoilNumTemp = 1; DXCoilNumTemp <= NumDXCoils; ++DXCoilNumTemp) {
                     if ((DXCoil(DXCoilNumTemp).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) ||
@@ -6185,7 +6184,7 @@ namespace DXCoils {
                     }
                 }
                 CrankcaseHeaterReportVarFlag = false;
-            } //(AirLoopInputsFilled)THEN
+            } //(dataAirLoop.AirLoopInputsFilled)THEN
         }     //(CrankcaseHeaterReportVarFlag)THEN
 
         if (!SysSizingCalc && MySizeFlag(DXCoilNum)) {
@@ -13264,8 +13263,6 @@ namespace DXCoils {
         // Fills some of the report variables for the DX coils
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
-        using DataAirLoop::LoopDXCoilRTF;
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::DXElecHeatingPower;
         using DataHVACGlobals::TimeStepSys;
@@ -13378,9 +13375,9 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).OutletAirTemp;
         }
 
-        LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+        dataAirLoop.LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
         if (DXCoil(DXCoilNum).AirLoopNum > 0) {
-            AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
+            dataAirLoop.AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
                 max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
         }
     }

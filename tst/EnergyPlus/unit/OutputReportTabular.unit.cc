@@ -6891,7 +6891,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::FinalSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataSizing::CalcSysSizing.allocate(DataHVACGlobals::NumPrimaryAirSys);
     int numDesDays = 2;
-    DataAirLoop::AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    dataAirLoop.AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataGlobals::NumOfZones = 0;
     displayAirLoopComponentLoadSummary = true;
     CompLoadReportIsReq = true;
@@ -7024,13 +7024,13 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     DataSizing::CalcZoneSizing(2, 1).DOASHeatAddSeq.allocate(numTimeStepInDay);
     DataSizing::CalcZoneSizing(2, 1).DOASLatAddSeq.allocate(numTimeStepInDay);
 
-    DataAirLoop::AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    DataAirLoop::AirToZoneNodeInfo(1).NumZonesCooled = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated = 1;
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(1);
-    DataAirLoop::AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 1;
+    dataAirLoop.AirToZoneNodeInfo.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    dataAirLoop.AirToZoneNodeInfo(1).NumZonesCooled = 1;
+    dataAirLoop.AirToZoneNodeInfo(1).CoolCtrlZoneNums.allocate(1);
+    dataAirLoop.AirToZoneNodeInfo(1).CoolCtrlZoneNums(1) = 1;
+    dataAirLoop.AirToZoneNodeInfo(1).NumZonesHeated = 1;
+    dataAirLoop.AirToZoneNodeInfo(1).HeatCtrlZoneNums.allocate(1);
+    dataAirLoop.AirToZoneNodeInfo(1).HeatCtrlZoneNums(1) = 1;
 
 
     // same Design Days peak and timestep peak as the zone it serves. This is the critical part of the test

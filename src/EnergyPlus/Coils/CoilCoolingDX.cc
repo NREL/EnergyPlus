@@ -143,7 +143,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
 
     if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
-        !this->performance.original_input_specs.alternate_operating_mode_name.empty() && 
+        !this->performance.original_input_specs.alternate_operating_mode_name.empty() &&
         !this->performance.original_input_specs.alternate_operating_mode2_name.empty()) {
         this->CoolingCoilType = DataHVACGlobals::CoilDX_SubcoolReheat;
     }
@@ -391,11 +391,11 @@ void CoilCoolingDX::oneTimeInit() {
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio", 
-                            OutputProcessor::Unit::None, 
-                            this->performance.ModeRatio, 
-                            "System", 
-                            "Average", 
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio",
+                            OutputProcessor::Unit::None,
+                            this->performance.ModeRatio,
+                            "System",
+                            "Average",
                             this->name);
         SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
                             OutputProcessor::Unit::W,
@@ -568,10 +568,10 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     // Fishy global things that need to be set here, try to set the AFN stuff now
     // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
-    DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+    dataAirLoop.LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
     DataHVACGlobals::DXElecCoolingPower = this->elecCoolingPower;
     if (this->airLoopNum > 0) {
-        DataAirLoop::AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+        dataAirLoop.AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
         // The original calculation is below, but no heating yet
         //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     }

@@ -47,10 +47,8 @@
 
 // C++ Headers
 #include <string>
-#include <vector>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -454,21 +452,21 @@ void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
         }
         // fill list of zones connected to this air loop
         // this could be reworked to use different structure which is available now since std 62.1 changes
-        if (allocated(DataAirLoop::AirToZoneNodeInfo)) {
-            if (DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled > 0) {
-                int zoneCount = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled;
+        if (allocated(dataAirLoop.AirToZoneNodeInfo)) {
+            if (dataAirLoop.AirToZoneNodeInfo(c->airloopNum).NumZonesCooled > 0) {
+                int zoneCount = dataAirLoop.AirToZoneNodeInfo(c->airloopNum).NumZonesCooled;
                 c->zoneNum.resize(zoneCount);
                 c->zoneName.resize(zoneCount);
-                for (int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled; ++loopZone) {
-                    c->zoneNum[loopZone - 1] = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).CoolCtrlZoneNums(loopZone);
+                for (int loopZone = 1; loopZone <= dataAirLoop.AirToZoneNodeInfo(c->airloopNum).NumZonesCooled; ++loopZone) {
+                    c->zoneNum[loopZone - 1] = dataAirLoop.AirToZoneNodeInfo(c->airloopNum).CoolCtrlZoneNums(loopZone);
                     c->zoneName[loopZone - 1] = DataHeatBalance::Zone(c->zoneNum[loopZone - 1]).Name;
                 }
             }
 
-            if (DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesHeated > 0) {
-                int zoneCount = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesHeated;
+            if (dataAirLoop.AirToZoneNodeInfo(c->airloopNum).NumZonesHeated > 0) {
+                int zoneCount = dataAirLoop.AirToZoneNodeInfo(c->airloopNum).NumZonesHeated;
                 for (int loopZone = 1; loopZone <= zoneCount; ++loopZone) {
-                    int zoneIndex = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).HeatCtrlZoneNums(loopZone);
+                    int zoneIndex = dataAirLoop.AirToZoneNodeInfo(c->airloopNum).HeatCtrlZoneNums(loopZone);
                     // see if this zone is new or already in list
                     bool found = false;
                     for (auto &z : c->zoneNum) {
