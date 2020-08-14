@@ -151,6 +151,8 @@ namespace RuntimeLanguageProcessor {
     int DayOfWeekVariableNum(0);
     int DayOfYearVariableNum(0);
     int HourVariableNum(0);
+    int TimeStepsPerHourVariableNum(0);
+    int TimeStepNumVariableNum(0);
     int MinuteVariableNum(0);
     int HolidayVariableNum(0);
     int DSTVariableNum(0);
@@ -196,6 +198,8 @@ namespace RuntimeLanguageProcessor {
         DayOfWeekVariableNum = 0;
         DayOfYearVariableNum = 0;
         HourVariableNum = 0;
+        TimeStepsPerHourVariableNum = 0;
+        TimeStepNumVariableNum = 0;
         MinuteVariableNum = 0;
         HolidayVariableNum = 0;
         DSTVariableNum = 0;
@@ -279,6 +283,7 @@ namespace RuntimeLanguageProcessor {
             OffVariableNum = NewEMSVariable("OFF", 0, False);
             OnVariableNum = NewEMSVariable("ON", 0, True);
             PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(Pi));
+            TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(DataGlobals::NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
             YearVariableNum = NewEMSVariable("YEAR", 0);
@@ -287,6 +292,7 @@ namespace RuntimeLanguageProcessor {
             DayOfWeekVariableNum = NewEMSVariable("DAYOFWEEK", 0);
             DayOfYearVariableNum = NewEMSVariable("DAYOFYEAR", 0);
             HourVariableNum = NewEMSVariable("HOUR", 0);
+            TimeStepNumVariableNum = NewEMSVariable("TIMESTEPNUM", 0);
             MinuteVariableNum = NewEMSVariable("MINUTE", 0);
             HolidayVariableNum = NewEMSVariable("HOLIDAY", 0);
             DSTVariableNum = NewEMSVariable("DAYLIGHTSAVINGS", 0);
@@ -324,6 +330,7 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
         ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
         ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
+        ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(DataGlobals::TimeStep));
 
         ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
@@ -1419,7 +1426,7 @@ namespace RuntimeLanguageProcessor {
                         i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) ||
                         i_parse("@TRENDMAX", FuncTrendMax) || i_parse("@TRENDMIN", FuncTrendMin) ||
                         i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
-                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@CURVEVALUE", FuncTodayBeamSolarRad)) {
+                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad)) {
                         // was a built in function operator
                     } else { // throw error
                         if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", String);
@@ -2440,14 +2447,14 @@ namespace RuntimeLanguageProcessor {
                         }
 
                     } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
-                        int iTimeStep = (Operand(1).Number);
-                        int iHour = (Operand(2).Number);
+                        int iHour = (Operand(1).Number + 1); // Operand 1 is hour from 0:23
+                        int iTimeStep = Operand(2).Number;
                         if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
                             ReturnValue = SetErlValueNumber(WeatherManager::TodayBeamSolarRad(iTimeStep, iHour));
                         } else {
                             ReturnValue.Type = ValueError;
-                            ReturnValue.Error = "TodayBeamSolarRad function called with invalid arguments: Hour=" + General::RoundSigDigits(iHour)
-                                + ", Timestep=" + General::RoundSigDigits(iTimeStep);
+                            ReturnValue.Error = "TodayBeamSolarRad function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand(1).Number,1)
+                                + ", Minutes=" + General::RoundSigDigits(Operand(2).Number,1);
                         }
 
                     } else {

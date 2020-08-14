@@ -532,10 +532,6 @@ namespace WeatherManager {
 
         InitializeWeather(state.files, PrintEnvrnStamp);
 
-        // FLOW:
-
-        InitializeWeather(ioFiles, PrintEnvrnStamp);
-
         bool anyEMSRan = false;
         EMSManager::ManageEMS(
             state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point

@@ -119,6 +119,8 @@ namespace RuntimeLanguageProcessor {
     extern int DayOfWeekVariableNum;
     extern int DayOfYearVariableNum;
     extern int HourVariableNum;
+    extern int TimeStepsPerHourVariableNum;
+    extern int TimeStepNumVariableNum;
     extern int MinuteVariableNum;
     extern int HolidayVariableNum;
     extern int DSTVariableNum;
