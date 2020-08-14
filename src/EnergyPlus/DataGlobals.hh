@@ -51,6 +51,7 @@
 // C++ Headers
 #include <iosfwd>
 #include <string>
+#include <functional>
 
 // EnergyPlus Headers
 #include "IOFiles.hh"
@@ -77,6 +78,9 @@ namespace DataGlobals {
     extern bool isUBJSON;
     extern bool isBSON;
     extern bool preserveIDFOrder;
+    extern bool stopSimulation;
+    extern std::function<void (void *)> externalHVACManager;
+    extern bool externalHVACManagerInitialized;
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const BeginDay;

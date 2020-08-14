@@ -85,6 +85,10 @@ int energyplus(EnergyPlusState state, int argc, const char *argv[]) {
     return runEnergyPlusAsLibrary(*this_state, argc, argv);
 }
 
+void stopSimulation() {
+  EnergyPlus::DataGlobals::stopSimulation = true;
+}
+
 void issueWarning(const char * message) {
     EnergyPlus::ShowWarningError(message);
 }
@@ -102,6 +106,14 @@ void registerProgressCallback(EnergyPlusState EP_UNUSED(state), void (*f)(int co
 
 void registerStdOutCallback(EnergyPlusState EP_UNUSED(state), void (*f)(const char * message)) {
     EnergyPlus::DataGlobals::messageCallback = f;
+}
+
+void registerExternalHVACManager(EnergyPlusState EP_UNUSED(state), std::function<void (EnergyPlusState)> f) {
+  EnergyPlus::DataGlobals::externalHVACManager = f;
+}
+
+void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState)) {
+  registerExternalHVACManager(state, std::function<void (EnergyPlusState)>(f));
 }
 
 void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {

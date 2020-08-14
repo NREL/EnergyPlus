@@ -97,6 +97,9 @@ namespace DataGlobals {
     bool isUBJSON(false);
     bool isBSON(false);
     bool preserveIDFOrder(true);
+    bool stopSimulation(false);
+    std::function<void (void *)> externalHVACManager;
+    bool externalHVACManagerInitialized(false);
 
     // MODULE PARAMETER DEFINITIONS:
     int const BeginDay(1);
@@ -267,6 +270,9 @@ namespace DataGlobals {
         isCBOR = false;
         isMsgPack = false;
         preserveIDFOrder = true;
+        stopSimulation = false;
+        externalHVACManager = nullptr;
+        externalHVACManagerInitialized = false;
         BeginDayFlag = false;
         BeginEnvrnFlag = false;
         BeginHourFlag = false;
