@@ -737,6 +737,13 @@ namespace ReportSizingManager {
             if (!IsAutoSize && !SizingDesRunThisAirSys) {
                 HardSizeNoDesRun = true;
                 AutosizeUser = SizingResult;
+                if (PrintWarningFlag && SizingResult > 0.0) {
+                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                        SizingType == CoolingAirflowSizing && DataIsDXCoil) {
+                    } else {
+                        ReportSizingOutput(CompType, CompName, "User-Specified " + SizingString, SizingResult);
+                    }
+                }
             } else {
                 if (SizingType == CoolingCapacitySizing) {
                     DataFracOfAutosizedCoolingCapacity = 1.0;

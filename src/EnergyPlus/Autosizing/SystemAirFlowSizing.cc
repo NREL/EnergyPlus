@@ -877,20 +877,6 @@ Real64 SystemAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         } else if (this->dataNonZoneNonAirloopValue > 0) {
             this->autoSizedValue = this->dataNonZoneNonAirloopValue;
         }
-        // override sizing string
-        if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
-            this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
-            if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-        } else if (UtilityRoutines::SameString(this->compType, "Fan:SystemModel")) {
-            this->sizingString = "Design Maximum Air Flow Rate [m3/s]";
-            if (this->isEpJSON) this->sizingString = "design_maximum_air_flow_rate [m3/s]";
-        } else if (UtilityRoutines::SameString(this->compType, "HeatExchanger:AirToAir:SensibleAndLatent") ||
-                   (UtilityRoutines::SameString(this->compType, "HeatExchanger:AirToAir:FlatPlate"))) {
-            this->sizingString = "Nominal Supply Air Flow Rate [m3/s]";
-            if (this->isEpJSON) this->sizingString = "nominal_supply_air_flow_rate [m3/s]";
-        } else {
-            if (this->isEpJSON) this->sizingString = "supply_air_maximum_flow_rate [m3/s]";
-        }
 
         if (this->dataScalableSizingON) {
             std::string ScalableSM = "";
@@ -908,6 +894,28 @@ Real64 SystemAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
             this->sizingString = ScalableSM + this->sizingString;
         }
     }
+
+    // override sizing string
+    if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
+        this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
+        if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
+    } else if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:UnitVentilator")) {
+        this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
+        if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
+    } else if (UtilityRoutines::SameString(this->compType, "Fan:SystemModel")) {
+        this->sizingString = "Design Maximum Air Flow Rate [m3/s]";
+        //if (this->isEpJSON) this->sizingString = "design_maximum_air_flow_rate [m3/s]";
+    } else if (UtilityRoutines::SameString(this->compType, "Fan:VariableVolume")) {
+        this->sizingString = "Maximum Air Flow Rate [m3/s]";
+        if (this->isEpJSON) this->sizingString = "maximum_air_flow_rate [m3/s]";
+    } else if (UtilityRoutines::SameString(this->compType, "HeatExchanger:AirToAir:SensibleAndLatent") ||
+               (UtilityRoutines::SameString(this->compType, "HeatExchanger:AirToAir:FlatPlate"))) {
+        this->sizingString = "Nominal Supply Air Flow Rate [m3/s]";
+        if (this->isEpJSON) this->sizingString = "nominal_supply_air_flow_rate [m3/s]";
+    } else {
+        if (this->isEpJSON) this->sizingString = "supply_air_maximum_flow_rate [m3/s]";
+    }
+
     this->selectSizerOutput(errorsFound);
     if (this->isFanReportObject) {
         //  fill fan peak day and time here

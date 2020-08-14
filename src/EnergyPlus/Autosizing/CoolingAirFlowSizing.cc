@@ -72,6 +72,9 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         if (this->curZoneEqNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
                 this->autoSizedValue = _originalValue;
+                if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                    this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
+                }
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
             } else {
@@ -605,6 +608,10 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         } else if (this->curSysNum > 0) {
             if (!this->wasAutoSized && !this->sizingDesRunThisAirSys) {
                 this->autoSizedValue = _originalValue;
+                if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
+                    this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
+                    this->originalValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
+                }
             } else {
                 if (this->curOASysNum > 0) {
                     if (this->oaSysEqSizing(this->curOASysNum).AirFlow) {
@@ -646,6 +653,10 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         }
 
         // override sizing string
+        if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
+            this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
+            if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
+        }
         if (this->isEpJSON) this->sizingString = "cooling_supply_air_flow_rate [m3/s]";
         if (this->dataScalableSizingON) {
             std::string ScalableSM = "";

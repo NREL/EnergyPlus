@@ -69,7 +69,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUA_APIExampleUnitTest)
     EXPECT_EQ(sizer.curZoneEqNum, 1);
     EXPECT_TRUE(sizer.termUnitSingDuct);
     EXPECT_EQ(sizer.curTermUnitSizingNum, 1);
-    EXPECT_GT(sizer.termUnitSizing.size(), 0);
+    EXPECT_GT(int(sizer.termUnitSizing.size()), 0);
     EXPECT_EQ(sizer.termUnitSizing(1).AirVolFlow, 0.3);
     Real64 sizedValue = sizer.size(DataSizing::AutoSize, errorsFound);
     EXPECT_NEAR(sizedValue, 0.29599, 0.00001); // converts volume input to mass flow rate at elevation
