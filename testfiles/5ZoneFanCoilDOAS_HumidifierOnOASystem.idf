@@ -3801,7 +3801,7 @@
 
   Output:Variable,*,Humidifier Electricity Rate,hourly;
 
-!Output:Variable,*,Humidifier Gas USe Rate,hourly;
+!Output:Variable,*,Humidifier NaturalGas Use Rate,hourly;
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
