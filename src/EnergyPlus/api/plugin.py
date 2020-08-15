@@ -49,53 +49,53 @@ class EnergyPlusPlugin(object):
                 diff.remove(known_skip)
         return diff
 
-    def on_begin_new_environment(self) -> int:
+    def on_begin_new_environment(self, state) -> int:
         pass
 
-    def on_after_new_environment_warmup_is_complete(self) -> int:
+    def on_after_new_environment_warmup_is_complete(self, state) -> int:
         pass
 
-    def on_begin_zone_timestep_before_init_heat_balance(self) -> int:
+    def on_begin_zone_timestep_before_init_heat_balance(self, state) -> int:
         pass
 
-    def on_begin_zone_timestep_after_init_heat_balance(self) -> int:
+    def on_begin_zone_timestep_after_init_heat_balance(self, state) -> int:
         pass
 
-    def on_begin_timestep_before_predictor(self) -> int:
+    def on_begin_timestep_before_predictor(self, state) -> int:
         pass
 
-    def on_after_predictor_before_hvac_managers(self) -> int:
+    def on_after_predictor_before_hvac_managers(self, state) -> int:
         pass
 
-    def on_after_predictor_after_hvac_managers(self) -> int:
+    def on_after_predictor_after_hvac_managers(self, state) -> int:
         pass
 
-    def on_inside_hvac_system_iteration_loop(self) -> int:
+    def on_inside_hvac_system_iteration_loop(self, state) -> int:
         pass
 
-    def on_end_of_zone_timestep_before_zone_reporting(self) -> int:
+    def on_end_of_zone_timestep_before_zone_reporting(self, state) -> int:
         pass
 
-    def on_end_of_zone_timestep_after_zone_reporting(self) -> int:
+    def on_end_of_zone_timestep_after_zone_reporting(self, state) -> int:
         pass
 
-    def on_end_of_system_timestep_before_hvac_reporting(self) -> int:
+    def on_end_of_system_timestep_before_hvac_reporting(self, state) -> int:
         pass
 
-    def on_end_of_system_timestep_after_hvac_reporting(self) -> int:
+    def on_end_of_system_timestep_after_hvac_reporting(self, state) -> int:
         pass
 
-    def on_end_of_zone_sizing(self) -> int:
+    def on_end_of_zone_sizing(self, state) -> int:
         pass
 
-    def on_end_of_system_sizing(self) -> int:
+    def on_end_of_system_sizing(self, state) -> int:
         pass
 
-    def on_end_of_component_input_read_in(self) -> int:
+    def on_end_of_component_input_read_in(self, state) -> int:
         pass
 
-    def on_user_defined_component_model(self) -> int:
+    def on_user_defined_component_model(self, state) -> int:
         pass
 
-    def on_unitary_system_sizing(self) -> int:
+    def on_unitary_system_sizing(self, state) -> int:
         pass

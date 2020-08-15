@@ -51,18 +51,6 @@
 #include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
 
-/// \brief This is typedef for an instance that stores the "state" of an EnergyPlus simulation.
-/// \details The state of an EnergyPlus simulation is held heavily in the global program state.  To alleviate issues
-///          with this design in the context of new applications and workflows, the global program state is being
-///          refactored into a single variable which will ultimately own and manage the entire state of the simulation.
-///          In order to keep track of the simulation during runtime API calls, a reference to a state must be kept and
-///          managed by the API client.  The client must call `stateNew` to create a new state instance, and pass this
-///          to any functions that need a state instance.  Once a simulation is complete, the client can call
-///          `stateReset`, which will reset the state instance passed in, along with any global variables that are not
-///          yet refactored into this state instance.  Once complete, the client has the ability to free the memory of
-///          the state by using the `stateDelete` function..
-typedef void * EnergyPlusState;
-
 #ifdef __cplusplus
 
 #include <functional>
@@ -158,7 +146,7 @@ ENERGYPLUSLIB_API int energyplus(EnergyPlusState state, int argc, const char *ar
 /// \details This function can be used by an API client to end a simulation before the end of the scheduled run periods.
 ///          The simulation will end gracefully and all output files will be finalized and closed before the
 ///          EnergyPlus process is complete.
-ENERGYPLUSLIB_API void stopSimulation();
+ENERGYPLUSLIB_API void stopSimulation(EnergyPlusState state);
 
 /// \brief Asks EnergyPlus to issue a warning message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
@@ -168,7 +156,7 @@ ENERGYPLUSLIB_API void stopSimulation();
 ///         during Python Plugin applications.  In these applications, the user is still interfacing with EnergyPlus
 ///         as a black-box program and will rely on output messages primarily through EnergyPlus output files.  Using
 ///         this function to issue a message using standard EnergyPlus techniques will make the process familiar.
-ENERGYPLUSLIB_API void issueWarning(const char * message); // Issue the warning text to the err file
+ENERGYPLUSLIB_API void issueWarning(EnergyPlusState state, const char * message); // Issue the warning text to the err file
 /// \brief Asks EnergyPlus to issue a severe message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to alert the user using
 ///          this function, which will issue a severe error note in the standard error file and continue the simulation.
@@ -183,7 +171,7 @@ ENERGYPLUSLIB_API void issueWarning(const char * message); // Issue the warning 
 ///         during Python Plugin applications.  In these applications, the user is still interfacing with EnergyPlus
 ///         as a black-box program and will rely on output messages primarily through EnergyPlus output files.  Using
 ///         this function to issue a message using standard EnergyPlus techniques will make the process familiar.
-ENERGYPLUSLIB_API void issueSevere(const char * message); // Issue the severe text to the err file
+ENERGYPLUSLIB_API void issueSevere(EnergyPlusState state, const char * message); // Issue the severe text to the err file
 /// \brief Asks EnergyPlus to issue a plain text message to the error file.
 /// \details During an EnergyPlus simulation, if certain conditions arise, it may be useful to send information to the
 ///          user with this function, either to provide standard information, or supplemental information to a previously
@@ -193,7 +181,7 @@ ENERGYPLUSLIB_API void issueSevere(const char * message); // Issue the severe te
 ///         during Python Plugin applications.  In these applications, the user is still interfacing with EnergyPlus
 ///         as a black-box program and will rely on output messages primarily through EnergyPlus output files.  Using
 ///         this function to issue a message using standard EnergyPlus techniques will make the process familiar.
-ENERGYPLUSLIB_API void issueText(const char * message); // Issue additional supporting text to the err file
+ENERGYPLUSLIB_API void issueText(EnergyPlusState state, const char * message); // Issue additional supporting text to the err file
 
 
 /// \brief Register a callback function to receive updates on simulation progress

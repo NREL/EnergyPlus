@@ -24,12 +24,14 @@ class Runtime:
         self.api = api
         # self.api.energyplus.argtypes = [c_int, POINTER(c_char_p)]  # DEFERRED UNTIL run_energyplus call
         self.api.energyplus.restype = c_int
-        self.api.issueWarning.argtypes = [c_char_p]
+        self.api.issueWarning.argtypes = [c_void_p, c_char_p]
         self.api.issueWarning.restype = c_void_p
-        self.api.issueSevere.argtypes = [c_char_p]
+        self.api.issueSevere.argtypes = [c_void_p, c_char_p]
         self.api.issueSevere.restype = c_void_p
-        self.api.issueText.argtypes = [c_char_p]
+        self.api.issueText.argtypes = [c_void_p, c_char_p]
         self.api.issueText.restype = c_void_p
+        self.api.stopSimulation.argtypes = [c_void_p]
+        self.api.stopSimulation.restype = c_void_p
         self.py_progress_callback_type = CFUNCTYPE(c_void_p, c_int)
         self.api.registerProgressCallback.argtypes = [c_void_p, self.py_progress_callback_type]
         self.api.registerProgressCallback.restype = c_void_p
@@ -118,7 +120,10 @@ class Runtime:
         cli_args = cli_arg_type(*args_with_program_name)
         return self.api.energyplus(state, len(args_with_program_name), cli_args)
 
-    def issue_warning(self, message: Union[str, bytes]) -> None:
+    # def stop_simulation(self, state: c_void_p) -> None:
+    #     pass
+
+    def issue_warning(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
         This function allows a script to issue a warning through normal EnergyPlus methods.  The message will be listed
         in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness
@@ -134,9 +139,9 @@ class Runtime:
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueWarning(message)
+        self.api.issueWarning(state, message)
 
-    def issue_severe(self, message: Union[str, bytes]) -> None:
+    def issue_severe(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
         This function allows a script to issue an error through normal EnergyPlus methods.  The message will be listed
         in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness
@@ -156,9 +161,9 @@ class Runtime:
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueSevere(message)
+        self.api.issueSevere(state, message)
 
-    def issue_text(self, message: Union[str, bytes]) -> None:
+    def issue_text(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
         This function allows a script to issue a message through normal EnergyPlus methods.  The message will be listed
         in the standard EnergyPlus error file once the simulation is complete.  This function can be used alongside the
@@ -175,7 +180,7 @@ class Runtime:
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueText(message)
+        self.api.issueText(state, message)
 
     def callback_progress(self, state: c_void_p, f: FunctionType) -> None:
         """

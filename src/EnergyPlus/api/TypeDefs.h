@@ -51,4 +51,16 @@
 typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
 typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
 
+/// \brief This is typedef for an instance that stores the "state" of an EnergyPlus simulation.
+/// \details The state of an EnergyPlus simulation is held heavily in the global program state.  To alleviate issues
+///          with this design in the context of new applications and workflows, the global program state is being
+///          refactored into a single variable which will ultimately own and manage the entire state of the simulation.
+///          In order to keep track of the simulation during API calls, a reference to a state must be kept and
+///          managed by the API client.  The client must call `stateNew` to create a new state instance, and pass this
+///          to any functions that need a state instance.  Once a simulation is complete, the client can call
+///          `stateReset`, which will reset the state instance passed in, along with any global variables that are not
+///          yet refactored into this state instance.  Once complete, the client has the ability to free the memory of
+///          the state by using the `stateDelete` function..
+typedef void * EnergyPlusState;
+
 #endif

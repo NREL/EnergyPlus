@@ -99,7 +99,7 @@ namespace PluginManagement {
 
         // methods
         static void reportPythonError();
-        bool run(int iCallingPoint) const; // calls main() on this plugin instance
+        bool run(EnergyPlusData &state, int iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
@@ -167,7 +167,7 @@ namespace PluginManagement {
         static void updatePluginValues();
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
-        static void runSingleUserDefinedPlugin(int index);
+        static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects();
     };
 

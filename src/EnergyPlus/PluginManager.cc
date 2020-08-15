@@ -105,6 +105,8 @@ namespace PluginManagement {
     PyObjectWrap (*EP_PyObject_CallFunction)(PyObjectWrap, const char *) = nullptr;
     PyObjectWrap (*EP_PyObject_CallFunction3Args)(PyObjectWrap, const char *, PyObjectWrap, PyObjectWrap, PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyObject_CallMethod)(PyObjectWrap, const char *, const char *) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallMethod1Arg)(PyObjectWrap, const char *, const char *, PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallMethod2ObjArg)(PyObjectWrap, PyObjectWrap, PyObjectWrap, PyObjectWrap) = nullptr;
     int (*EP_PyList_Check)(PyObjectWrap) = nullptr;
     unsigned long (*EP_PyList_Size)(PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyList_GetItem)(PyObjectWrap, size_t) = nullptr;
@@ -112,6 +114,9 @@ namespace PluginManagement {
     int (*EP_PyLong_Check)(PyObjectWrap) = nullptr;
     long (*EP_PyLong_AsLong)(PyObjectWrap) = nullptr;
     void (*EP_Py_SetPythonHome)(const wchar_t *) = nullptr;
+    PyObjectWrap (*EP_Py_BuildValue)(const char *) = nullptr;
+    PyObjectWrap (*EP_PyLong_FromVoidPtr)(void *) = nullptr;
+    PyObjectWrap (*EP_PyString_FromString)(const char *) = nullptr;
 
     void checkWrapperDLLFunction(const char *err, std::string const &pyFuncName, bool &errFlag)
     {
@@ -277,6 +282,16 @@ namespace PluginManagement {
             ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod");
             dll_errors = true;
         }
+        *(void **)(&EP_PyObject_CallMethod1Arg) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod1Arg");
+        if (!EP_PyObject_CallMethod1Arg) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod1Arg");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_CallMethod2ObjArg) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod2ObjArg");
+        if (!EP_PyObject_CallMethod2ObjArg) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod2ObjArg");
+            dll_errors = true;
+        }
         *(void **)(&EP_PyList_Check) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyList_Check");
         if (!EP_PyList_Check) {
             ShowSevereError("Could not load Python function: EP_Wrap_PyList_Check");
@@ -310,6 +325,21 @@ namespace PluginManagement {
         *(void **)(&EP_Py_SetPythonHome) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_SetPythonHome");
         if (!EP_Py_SetPythonHome) {
             ShowSevereError("Could not load Python function: EP_Wrap_Py_SetPythonHome");
+            dll_errors = true;
+        }
+        *(void **)(&EP_Py_BuildValue) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_BuildValue");
+        if (!EP_Py_BuildValue) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_BuildValue");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyLong_FromVoidPtr) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyLong_FromVoidPtr");
+        if (!EP_PyLong_FromVoidPtr) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyLong_FromVoidPtr");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyString_FromString) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyString_FromString");
+        if (!EP_PyString_FromString) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyString_FromString");
             dll_errors = true;
         }
 #else
@@ -395,6 +425,12 @@ namespace PluginManagement {
         *(void **)(&EP_PyObject_CallMethod) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod", dll_errors);
+        *(void **)(&EP_PyObject_CallMethod1Arg) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod1Arg");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod1Arg", dll_errors);
+        *(void **)(&EP_PyObject_CallMethod2ObjArg) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod2ObjArg");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod2ObjArg", dll_errors);
         *(void **)(&EP_PyList_Check) = dlsym(wrapperDLLHandle, "EP_Wrap_PyList_Check");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyList_Check", dll_errors);
@@ -416,6 +452,15 @@ namespace PluginManagement {
         *(void **)(&EP_Py_SetPythonHome) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_SetPythonHome");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_Py_SetPythonHome", dll_errors);
+        *(void **)(&EP_Py_BuildValue) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_BuildValue");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_BuildValue", dll_errors);
+        *(void **)(&EP_PyLong_FromVoidPtr) = dlsym(wrapperDLLHandle, "EP_Wrap_PyLong_FromVoidPtr");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyLong_FromVoidPtr", dll_errors);
+        *(void **)(&EP_PyString_FromString) = dlsym(wrapperDLLHandle, "EP_Wrap_PyString_FromString");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyString_FromString", dll_errors);
 #endif
         if (dll_errors) {
             ShowFatalError("Python DLL problem causes program termination");
@@ -454,7 +499,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
             if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
-                bool const didOneRun = plugin.run(iCalledFrom);
+                bool const didOneRun = plugin.run(state, iCalledFrom);
                 if (didOneRun) anyRan = true;
             }
         }
@@ -1279,7 +1324,7 @@ namespace PluginManagement {
     }
 
 #if LINK_WITH_PYTHON == 1
-    bool PluginInstance::run(int iCalledFrom) const
+    bool PluginInstance::run(EnergyPlusData &state, int iCalledFrom) const
     {
         // returns true if a plugin actually ran
         const char *functionName = nullptr;
@@ -1359,7 +1404,12 @@ namespace PluginManagement {
         }
 
         // then call the main function
-        PyObjectWrap pFunctionResponse = (*EP_PyObject_CallMethod)(this->pClassInstance, functionName, nullptr);
+        //static const PyObjectWrap oneArgObjFormat = (*EP_Py_BuildValue)("O");
+        PyObjectWrap pStateInstance = (*EP_PyLong_FromVoidPtr)((void*)&state);
+        PyObjectWrap pFunctionName = (*EP_PyString_FromString)(functionName);
+        PyObjectWrap pFunctionResponse = (*EP_PyObject_CallMethod2ObjArg)(this->pClassInstance, pFunctionName, pStateInstance, nullptr);
+        (*EP_Py_DECREF)(pStateInstance);
+        (*EP_Py_DECREF)(pFunctionName);
         if (!pFunctionResponse) {
             std::string const functionNameAsString(functionName); // only convert to string if an error occurs
             EnergyPlus::ShowSevereError("Call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
@@ -1668,12 +1718,12 @@ namespace PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::runSingleUserDefinedPlugin(int index)
+    void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &state, int index)
     {
-        plugins[index].run(DataGlobals::emsCallFromUserDefinedComponentModel);
+        plugins[index].run(state, DataGlobals::emsCallFromUserDefinedComponentModel);
     }
 #else
-    void PluginManager::runSingleUserDefinedPlugin(int EP_UNUSED(index))
+    void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &EP_UNUSED(state), int EP_UNUSED(index))
     {
     }
 #endif
