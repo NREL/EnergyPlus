@@ -1271,38 +1271,55 @@ namespace PluginManagement {
                 std::string functionName = (*EP_PyUnicode_AsUTF8)(item);
                 if (functionName == this->sHookBeginNewEnvironment) {
                     this->bHasBeginNewEnvironment = true;
+                    this->pBeginNewEnvironment = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterNewEnvironmentWarmUpIsComplete) {
                     this->bHasAfterNewEnvironmentWarmUpIsComplete = true;
+                    this->pAfterNewEnvironmentWarmUpIsComplete = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookBeginZoneTimestepBeforeInitHeatBalance) {
                     this->bHasBeginZoneTimestepBeforeInitHeatBalance = true;
+                    this->pBeginZoneTimestepBeforeInitHeatBalance = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookBeginZoneTimestepAfterInitHeatBalance) {
                     this->bHasBeginZoneTimestepAfterInitHeatBalance = true;
+                    this->pBeginZoneTimestepAfterInitHeatBalance = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookBeginTimestepBeforePredictor) {
                     this->bHasBeginTimestepBeforePredictor = true;
+                    this->pBeginTimestepBeforePredictor = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterPredictorBeforeHVACManagers) {
                     this->bHasAfterPredictorBeforeHVACManagers = true;
+                    this->pAfterPredictorBeforeHVACManagers = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterPredictorAfterHVACManagers) {
                     this->bHasAfterPredictorAfterHVACManagers = true;
+                    this->pAfterPredictorAfterHVACManagers = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookInsideHVACSystemIterationLoop) {
                     this->bHasInsideHVACSystemIterationLoop = true;
+                    this->pInsideHVACSystemIterationLoop = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfZoneTimestepBeforeZoneReporting) {
                     this->bHasEndOfZoneTimestepBeforeZoneReporting = true;
+                    this->pEndOfZoneTimestepBeforeZoneReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfZoneTimestepAfterZoneReporting) {
                     this->bHasEndOfZoneTimestepAfterZoneReporting = true;
+                    this->pEndOfZoneTimestepAfterZoneReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfSystemTimestepBeforeHVACReporting) {
                     this->bHasEndOfSystemTimestepBeforeHVACReporting = true;
+                    this->pEndOfSystemTimestepBeforeHVACReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfSystemTimestepAfterHVACReporting) {
                     this->bHasEndOfSystemTimestepAfterHVACReporting = true;
+                    this->pEndOfSystemTimestepAfterHVACReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfZoneSizing) {
                     this->bHasEndOfZoneSizing = true;
+                    this->pEndOfZoneSizing = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfSystemSizing) {
                     this->bHasEndOfSystemSizing = true;
+                    this->pEndOfSystemSizing = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterComponentInputReadIn) {
                     this->bHasAfterComponentInputReadIn = true;
+                    this->pAfterComponentInputReadIn = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookUserDefinedComponentModel) {
                     this->bHasUserDefinedComponentModel = true;
+                    this->pUserDefinedComponentModel = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookUnitarySystemSizing) {
                     this->bHasUnitarySystemSizing = true;
+                    this->pUnitarySystemSizing = (*EP_PyString_FromString)(functionName.c_str());
                 } else {
                     // the Python _detect_function worker is supposed to ignore any other functions so they don't show up at this point
                     // I don't think it's appropriate to warn here, so just ignore and move on
@@ -1320,6 +1337,23 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         (*EP_Py_DECREF)(this->pClassInstance);
         (*EP_Py_DECREF)(this->pModule); // PyImport_Import returns a new reference, decrement it
+        if (this->bHasBeginNewEnvironment) (*EP_Py_DECREF)(this->pBeginNewEnvironment);
+        if (this->bHasAfterNewEnvironmentWarmUpIsComplete) (*EP_Py_DECREF)(this->pAfterNewEnvironmentWarmUpIsComplete);
+        if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) (*EP_Py_DECREF)(this->pBeginZoneTimestepBeforeInitHeatBalance);
+        if (this->bHasBeginZoneTimestepAfterInitHeatBalance) (*EP_Py_DECREF)(this->pBeginZoneTimestepAfterInitHeatBalance);
+        if (this->bHasBeginTimestepBeforePredictor) (*EP_Py_DECREF)(this->pBeginTimestepBeforePredictor);
+        if (this->bHasAfterPredictorBeforeHVACManagers) (*EP_Py_DECREF)(this->pAfterPredictorBeforeHVACManagers);
+        if (this->bHasAfterPredictorAfterHVACManagers) (*EP_Py_DECREF)(this->pAfterPredictorAfterHVACManagers);
+        if (this->bHasInsideHVACSystemIterationLoop) (*EP_Py_DECREF)(this->pInsideHVACSystemIterationLoop);
+        if (this->bHasEndOfZoneTimestepBeforeZoneReporting) (*EP_Py_DECREF)(this->pEndOfZoneTimestepBeforeZoneReporting);
+        if (this->bHasEndOfZoneTimestepAfterZoneReporting) (*EP_Py_DECREF)(this->pEndOfZoneTimestepAfterZoneReporting);
+        if (this->bHasEndOfSystemTimestepBeforeHVACReporting) (*EP_Py_DECREF)(this->pEndOfSystemTimestepBeforeHVACReporting);
+        if (this->bHasEndOfSystemTimestepAfterHVACReporting) (*EP_Py_DECREF)(this->pEndOfSystemTimestepAfterHVACReporting);
+        if (this->bHasEndOfZoneSizing) (*EP_Py_DECREF)(this->pEndOfZoneSizing);
+        if (this->bHasEndOfSystemSizing) (*EP_Py_DECREF)(this->pEndOfSystemSizing);
+        if (this->bHasAfterComponentInputReadIn) (*EP_Py_DECREF)(this->pAfterComponentInputReadIn);
+        if (this->bHasUserDefinedComponentModel) (*EP_Py_DECREF)(this->pUserDefinedComponentModel);
+        if (this->bHasUnitarySystemSizing) (*EP_Py_DECREF)(this->pUnitarySystemSizing);
 #endif
     }
 
@@ -1327,89 +1361,105 @@ namespace PluginManagement {
     bool PluginInstance::run(EnergyPlusData &state, int iCalledFrom) const
     {
         // returns true if a plugin actually ran
-        const char *functionName = nullptr;
+        PyObjectWrap pFunctionName = nullptr;
+        const char * functionName = nullptr;
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
+                pFunctionName = this->pBeginNewEnvironment;
                 functionName = this->sHookBeginNewEnvironment;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromZoneSizing) {
             if (this->bHasEndOfZoneSizing) {
+                pFunctionName = this->pEndOfZoneSizing;
                 functionName = this->sHookEndOfZoneSizing;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromSystemSizing) {
             if (this->bHasEndOfSystemSizing) {
+                pFunctionName = this->pEndOfSystemSizing;
                 functionName = this->sHookEndOfSystemSizing;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
             if (this->bHasAfterNewEnvironmentWarmUpIsComplete) {
+                pFunctionName = this->pAfterNewEnvironmentWarmUpIsComplete;
                 functionName = this->sHookAfterNewEnvironmentWarmUpIsComplete;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
             if (this->bHasBeginTimestepBeforePredictor) {
+                pFunctionName = this->pBeginTimestepBeforePredictor;
                 functionName = this->sHookBeginTimestepBeforePredictor;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeforeHVACManagers) {
             if (this->bHasAfterPredictorBeforeHVACManagers) {
+                pFunctionName = this->pAfterPredictorBeforeHVACManagers;
                 functionName = this->sHookAfterPredictorBeforeHVACManagers;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromAfterHVACManagers) {
             if (this->bHasAfterPredictorAfterHVACManagers) {
+                pFunctionName = this->pAfterPredictorAfterHVACManagers;
                 functionName = this->sHookAfterPredictorAfterHVACManagers;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromHVACIterationLoop) {
             if (this->bHasInsideHVACSystemIterationLoop) {
+                pFunctionName = this->pInsideHVACSystemIterationLoop;
                 functionName = this->sHookInsideHVACSystemIterationLoop;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
             if (this->bHasEndOfSystemTimestepBeforeHVACReporting) {
+                pFunctionName = this->pEndOfSystemTimestepBeforeHVACReporting;
                 functionName = this->sHookEndOfSystemTimestepBeforeHVACReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
             if (this->bHasEndOfSystemTimestepAfterHVACReporting) {
+                pFunctionName = this->pEndOfSystemTimestepAfterHVACReporting;
                 functionName = this->sHookEndOfSystemTimestepAfterHVACReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
             if (this->bHasEndOfZoneTimestepBeforeZoneReporting) {
+                pFunctionName = this->pEndOfZoneTimestepBeforeZoneReporting;
                 functionName = this->sHookEndOfZoneTimestepBeforeZoneReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
             if (this->bHasEndOfZoneTimestepAfterZoneReporting) {
+                pFunctionName = this->pEndOfZoneTimestepAfterZoneReporting;
                 functionName = this->sHookEndOfZoneTimestepAfterZoneReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromComponentGetInput) {
             if (this->bHasAfterComponentInputReadIn) {
+                pFunctionName = this->pAfterComponentInputReadIn;
                 functionName = this->sHookAfterComponentInputReadIn;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromUserDefinedComponentModel) {
             if (this->bHasUserDefinedComponentModel) {
+                pFunctionName = this->pUserDefinedComponentModel;
                 functionName = this->sHookUserDefinedComponentModel;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromUnitarySystemSizing) {
             if (this->bHasUnitarySystemSizing) {
+                pFunctionName = this->pUnitarySystemSizing;
                 functionName = this->sHookUnitarySystemSizing;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
             if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) {
+                pFunctionName = this->pBeginZoneTimestepBeforeInitHeatBalance;
                 functionName = this->sHookBeginZoneTimestepBeforeInitHeatBalance;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
             if (this->bHasBeginZoneTimestepAfterInitHeatBalance) {
+                pFunctionName = this->pBeginZoneTimestepAfterInitHeatBalance;
                 functionName = this->sHookBeginZoneTimestepAfterInitHeatBalance;
             }
         }
 
         // leave if we didn't find a match
-        if (!functionName) {
+        if (!pFunctionName) {
             return false;
         }
 
         // then call the main function
         //static const PyObjectWrap oneArgObjFormat = (*EP_Py_BuildValue)("O");
         PyObjectWrap pStateInstance = (*EP_PyLong_FromVoidPtr)((void*)&state);
-        PyObjectWrap pFunctionName = (*EP_PyString_FromString)(functionName);
         PyObjectWrap pFunctionResponse = (*EP_PyObject_CallMethod2ObjArg)(this->pClassInstance, pFunctionName, pStateInstance, nullptr);
         (*EP_Py_DECREF)(pStateInstance);
-        (*EP_Py_DECREF)(pFunctionName);
         if (!pFunctionResponse) {
             std::string const functionNameAsString(functionName); // only convert to string if an error occurs
             EnergyPlus::ShowSevereError("Call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
