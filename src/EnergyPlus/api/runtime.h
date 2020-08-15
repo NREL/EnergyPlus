@@ -50,6 +50,7 @@
 
 #include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/api/state.h>
 
 #ifdef __cplusplus
 
@@ -90,30 +91,6 @@ extern "C" {
 ///          methods and to callback with updates on simulation progress and output messages.
 /// \see energyplus
 /// \see stateReset
-
-/// \brief Creates a new simulation state instance and returns it for the client to store while running simulations
-/// \details This function creates a new instance that is used in running simulations from the API.  The state created
-///          in this function is used by passing it into specific run functions.  When a simulation is complete, the
-///          state can be reset using the `stateReset` function, or deleted completely with the `stateDelete` function.
-/// \see EnergyPlusState
-/// \see stateReset
-/// \see stateDelete
-ENERGYPLUSLIB_API EnergyPlusState stateNew();
-/// \brief Resets the simulation state of EnergyPlus
-/// \details A simulation state is created by calling the `stateNew` function.  After a simulation is complete, if a
-///          second is to be run using the same memory space, the simulation state must be cleared with this function,
-///          or unexpected errors will occur.  Once the client is fully finished with the state, it can be deleted
-///          entirely with `stateDelete`.
-/// \param[in] state The simulation state of the simulation to clear.
-/// \remark This function will also clear any callback functions, so callback functions must be registered again.
-ENERGYPLUSLIB_API void stateReset(EnergyPlusState state);
-/// \brief Deletes a simulation state instance once the client is fully finished with it.
-/// \details A simulation state is created by calling the `stateNew` function.  After the client is finished, the memory
-///          can be reset by calling the `stateReset` function, or released entirely by calling this delete function.
-/// \see EnergyPlusState
-/// \see stateNew
-/// \see stateReset
-ENERGYPLUSLIB_API void stateDelete(EnergyPlusState state);
 
 /// \brief Runs an EnergyPlus simulation
 /// \details This function launches an EnergyPlus simulation using the given arguments.  The first argument is an

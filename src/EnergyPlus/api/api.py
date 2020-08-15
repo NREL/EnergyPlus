@@ -5,6 +5,7 @@ import sys
 from pyenergyplus.func import Functional
 from pyenergyplus.datatransfer import DataExchange
 from pyenergyplus.runtime import Runtime
+from pyenergyplus.state import State
 
 
 def api_path() -> str:
@@ -66,9 +67,11 @@ class EnergyPlusAPI:
                                          other API calling structures, and 2) Avoid re-instantiating the functional API
                                          as this is already instantiated for Plugin workflows.
         """
-        self.api = cdll.LoadLibrary(api_path())  # TODO: Could allow a client to specify the DLL path explicitly
+        self.api = cdll.LoadLibrary(api_path())
         self.api.apiVersionFromEPlus.argtypes = [c_void_p]
         self.api.apiVersionFromEPlus.restype = c_char_p
+        # self.state provides access to the main EnergyPlus state management class, instantiated and ready to go
+        self.state = State(self.api)
         # self.functional provides access to a functional API class, instantiated and ready to go
         self.functional = Functional(self.api, running_as_python_plugin)
         # self.exchange provides access to a data exchange API class, instantiated and ready to go

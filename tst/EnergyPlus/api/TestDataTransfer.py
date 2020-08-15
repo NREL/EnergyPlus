@@ -35,7 +35,7 @@ def time_step_handler(state):
 
 
 api = EnergyPlusAPI()
-state = api.runtime.new_state()
+state = api.state.new_state()
 api.runtime.callback_end_zone_timestep_after_zone_reporting(state, time_step_handler)
 api.exchange.request_variable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT")
 api.exchange.request_variable(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT")

@@ -50,6 +50,7 @@
 
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/api/state.h>
 
 int outdoorDewPointActuator = -1;
 int outdoorTempSensor = -1;

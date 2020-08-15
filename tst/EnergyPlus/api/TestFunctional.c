@@ -48,7 +48,7 @@
 #include <stdio.h>
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/TypeDefs.h>
-#include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/api/state.h>
 
 int errorsOccurred = 0;
 void errorHandler(const char * message) {

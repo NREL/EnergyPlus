@@ -47,6 +47,7 @@
 
 
 #include <EnergyPlus/api/func.h>
+#include <EnergyPlus/api/state.h>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>

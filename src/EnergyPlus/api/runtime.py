@@ -75,12 +75,6 @@ class Runtime:
         self.api.callbackUnitarySystemSizing.restype = c_void_p
         self.api.registerExternalHVACManager.argtypes = [self.py_state_callback_type]
         self.api.registerExternalHVACManager.restype = c_void_p
-        self.api.stateNew.argtypes = []
-        self.api.stateNew.restype = c_void_p
-        self.api.stateReset.argtypes = [c_void_p]
-        self.api.stateReset.restype = c_void_p
-        self.api.stateDelete.argtypes = [c_void_p]
-        self.api.stateDelete.restype = c_void_p
 
     def run_energyplus(self, state: c_void_p, command_line_args: List[Union[str, bytes]]) -> int:
         """
@@ -415,30 +409,6 @@ class Runtime:
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.registerExternalHVACManager(state, cb_ptr)
-
-    def new_state(self) -> c_void_p:
-        """
-        This function creates a new state object that is required to pass into EnergyPlus Runtime API function calls
-
-        :return: A pointer to a new state object in memory
-        """
-        return self.api.stateNew()
-
-    def reset_state(self, state: c_void_p) -> None:
-        """
-        This function resets an existing state instance
-
-        :return: Nothing
-        """
-        self.api.stateReset(state)
-
-    def delete_state(self, state: c_void_p) -> None:
-        """
-        This function deletes an existing state instance
-
-        :return: Nothing
-        """
-        self.api.stateDelete(state)
 
     @staticmethod
     def clear_callbacks() -> None:

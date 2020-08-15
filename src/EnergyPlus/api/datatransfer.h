@@ -50,6 +50,7 @@
 
 #include <EnergyPlus/api/TypeDefs.h>
 #include <EnergyPlus/api/EnergyPlusAPI.h>
+#include <EnergyPlus/api/state.h>
 
 #ifdef __cplusplus
 extern "C" {

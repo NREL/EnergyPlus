@@ -47,8 +47,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/api/state.h>
 
 #ifdef _WIN32
 #define __PRETTY_FUNCTION__ __FUNCSIG__
