@@ -4160,69 +4160,69 @@
 
   Output:Variable,*,Environmental Impact Electricity Nuclear Low Level Waste Volume,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO2 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas CO2 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO2 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas CO2 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas CO Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas CO Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas CH4 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas CH4 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas CH4 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas CH4 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas NOx Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas NOx Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas NOx Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas NOx Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas N2O Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas N2O Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas N2O Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas N2O Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas SO2 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas SO2 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas SO2 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas SO2 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas PM Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas PM Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM10 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas PM10 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM10 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas PM10 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM2.5 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas PM2.5 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM2.5 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas PM2.5 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas NH3 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas NH3 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas NH3 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas NH3 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas NMVOC Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas NMVOC Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas NMVOC Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas NMVOC Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Hg Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Hg Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Hg Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Hg Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Pb Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Pb Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Pb Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Pb Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Water Consumption Volume,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Water Consumption Volume,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Water Consumption Volume,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Water Consumption Volume,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear High Level Waste Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear High Level Waste Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear High Level Waste Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear High Level Waste Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear Low Level Waste Volume,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear Low Level Waste Volume,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear Low Level Waste Volume,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear Low Level Waste Volume,annual;
 
   Output:Meter:MeterFileOnly,Cooling:Electricity,monthly;
 

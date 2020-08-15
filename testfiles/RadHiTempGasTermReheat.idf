@@ -2220,7 +2220,7 @@
 
   Output:Meter,Electricity:*,hourly;
 
-  Output:Meter,Gas:*,hourly;
+  Output:Meter,NaturalGas:*,hourly;
 
   Output:VariableDictionary,Regular;
 

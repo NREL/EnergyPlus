@@ -2543,17 +2543,17 @@
 
   Output:Variable,Solar Turbine,Generator NaturalGas Energy,timestep;
 
-  Output:Variable,Solar Turbine,Generator Gas Mass Flow Rate,timestep;
+  Output:Variable,Solar Turbine,Generator NaturalGas Mass Flow Rate,timestep;
 
   Output:Variable,Solar Turbine,Generator Exhaust Air Temperature,timestep;
 
   Output:Variable,Capstone C65,Generator Produced Electricity Rate,timestep;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Rate,timestep;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Rate,timestep;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Energy,timestep;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Energy,timestep;
 
-  Output:Variable,Capstone C65,Generator Gas Mass Flow Rate,timestep;
+  Output:Variable,Capstone C65,Generator NaturalGas Mass Flow Rate,timestep;
 
   Output:Variable,Capstone C65,Generator LHV Basis Electric Efficiency,timestep;
 
