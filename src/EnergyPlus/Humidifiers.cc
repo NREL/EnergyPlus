@@ -546,15 +546,15 @@ namespace Humidifiers {
                                     _,
                                     "System");
             } else if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Gas) {
-                SetupOutputVariable("Humidifier Gas Use Thermal Efficiency",
+                SetupOutputVariable("Humidifier NaturalGas Use Thermal Efficiency",
                                     OutputProcessor::Unit::None,
                                     Humidifier(HumNum).ThermalEff,
                                     "System",
                                     "Average",
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(
-                    "Humidifier Gas Use Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Gas Use Energy",
+                    "Humidifier NaturalGas Use Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier NaturalGas Use Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).GasUseEnergy,
                                     "System",

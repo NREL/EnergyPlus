@@ -3276,11 +3276,11 @@
 
   Output:Variable,Capstone C65,Generator Produced Electricity Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Rate,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Energy,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Energy,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas Mass Flow Rate,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas Mass Flow Rate,hourly;
 
   Output:Variable,Capstone C65,Generator LHV Basis Electric Efficiency,hourly;
 

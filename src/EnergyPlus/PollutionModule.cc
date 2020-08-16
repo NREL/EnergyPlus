@@ -2026,7 +2026,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas Nuclear Low Level Waste Volume",
+                    SetupOutputVariable("Environmental Impact NaturalGas Nuclear Low Level Waste Volume",
                                         OutputProcessor::Unit::m3,
                                         Pollution.NatGasComp.NucLoPollution,
                                         "System",

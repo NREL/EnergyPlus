@@ -2262,7 +2262,7 @@ namespace SystemReports {
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Humidifier Gas Energy",
+                SetupOutputVariable("Air System Humidifier NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     SysHumidGas(SysIndex),
                                     "HVAC",
