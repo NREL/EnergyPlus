@@ -62,8 +62,7 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_AssignResourceTypeNum)
 {
 
     EXPECT_EQ(DataGlobalConstants::iRT_Electricity, DataGlobalConstants::AssignResourceTypeNum("Electricity"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Gas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas"));
-    EXPECT_EQ(DataGlobalConstants::iRT_Gas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas"));
+    EXPECT_EQ(DataGlobalConstants::iRT_Natural_Gas, DataGlobalConstants::AssignResourceTypeNum("NaturalGas"));
     EXPECT_EQ(DataGlobalConstants::iRT_Gasoline, DataGlobalConstants::AssignResourceTypeNum("Gasoline"));
     EXPECT_EQ(DataGlobalConstants::iRT_Diesel, DataGlobalConstants::AssignResourceTypeNum("Diesel"));
     EXPECT_EQ(DataGlobalConstants::iRT_Coal, DataGlobalConstants::AssignResourceTypeNum("Coal"));
@@ -114,7 +113,7 @@ TEST_F(EnergyPlusFixture, DataGlobalConstants_GetResourceTypeChar)
 {
 
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Electricity), "Electricity");
-    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Gas), "NaturalGas");
+    EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Natural_Gas), "NaturalGas");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Gasoline), "Gasoline");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Diesel), "Diesel");
     EXPECT_EQ(DataGlobalConstants::GetResourceTypeChar(DataGlobalConstants::iRT_Coal), "Coal");
