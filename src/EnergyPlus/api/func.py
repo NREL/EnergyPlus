@@ -20,6 +20,15 @@ class Glycol:
     """
 
     def __init__(self, state: c_void_p, api: cdll, glycol_name: bytes):
+        """
+        Creates a new Glycol instance, should almost certainly always be called from the API's Functional class, not
+        directly from user code.  To get a Glycol instance from client code, call api.functional.glycol(state, "name"),
+        where state is an active EnergyPlus state returned from a call to `api.state.new_state()`.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`
+        :param api: An active CTYPES CDLL instance
+        :param glycol_name: The name of the glycol to instantiate -- currently only "water" is supported.
+        """
         self.api = api
         self.api.glycolNew.argtypes = [c_void_p, c_char_p]
         self.api.glycolNew.restype = c_void_p
@@ -35,13 +44,20 @@ class Glycol:
         self.api.glycolViscosity.restype = RealEP
         self.instance = self.api.glycolNew(state, glycol_name)
 
-    def delete(self, state: c_void_p):
+    def delete(self, state: c_void_p) -> None:
+        """
+        Frees the memory of the associated Glycol instance inside the EnergyPlus (C++) state.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
+        :return: Nothing
+        """
         self.api.glycolDelete(state, self.instance)
 
     def specific_heat(self, state: c_void_p, temperature: float) -> float:
         """
         Returns the specific heat of the fluid at the specified temperature.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The specific heat of the fluid, in J/kg-K
         """
@@ -51,6 +67,7 @@ class Glycol:
         """
         Returns the density of the fluid at the specified temperature.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The density of the fluid, in kg/m3
         """
@@ -60,6 +77,7 @@ class Glycol:
         """
         Returns the conductivity of the fluid at the specified temperature.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The conductivity of the fluid, in W/m-K
         """
@@ -69,6 +87,7 @@ class Glycol:
         """
         Returns the dynamic viscosity of the fluid at the specified temperature.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`
         :param temperature: Fluid temperature, in degrees Celsius
         :return: The dynamic viscosity of the fluid, in Pa-s (or kg/m-s)
         """
@@ -85,6 +104,16 @@ class Refrigerant:
     """
 
     def __init__(self, state: c_void_p, api: cdll, refrigerant_name: bytes):
+        """
+        Creates a new Refrigerant instance, should almost certainly always be called from the API's functional class,
+        not directly from user code.  To get a Refrigerant instance from client code, call
+        api.functional.refrigerant(state, "name"), where state is an active EnergyPlus state returned from a call to
+        `api.state.new_state()`.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`
+        :param api: An active CTYPES CDLL instance
+        :param refrigerant_name: The name of the refrigerant to instantiate -- currently only "steam" is supported.
+        """
         self.refrigerant_name = refrigerant_name
         self.api = api
         self.api.refrigerantNew.argtypes = [c_void_p, c_char_p]
@@ -104,12 +133,19 @@ class Refrigerant:
         self.instance = self.api.refrigerantNew(state, refrigerant_name)
 
     def delete(self, state: c_void_p):
+        """
+        Frees the memory of the associated Refrigerant instance inside the EnergyPlus (C++) state.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
+        :return: Nothing
+        """
         self.api.refrigerantDelete(state, self.instance)
 
     def saturation_pressure(self, state: c_void_p, temperature: float) -> float:
         """
         Returns the saturation pressure of the refrigerant at the specified temperature.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param temperature: Refrigerant temperature, in Celsius.
         :return: Refrigerant saturation pressure, in Pa
         """
@@ -119,6 +155,7 @@ class Refrigerant:
         """
         Returns the saturation temperature of the refrigerant at the specified pressure.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param pressure: Refrigerant pressure, in Pa
         :return: Refrigerant saturation temperature, in Celsius
         """
@@ -128,6 +165,7 @@ class Refrigerant:
         """
         Returns the refrigerant saturated enthalpy at the specified temperature and quality.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param temperature: Refrigerant temperature, in Celsius
         :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
         :return: Refrigerant saturated enthalpy, in J/kg
@@ -138,6 +176,7 @@ class Refrigerant:
         """
         Returns the refrigerant density at the specified temperature and quality.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param temperature: Refrigerant temperature, in Celsius
         :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
         :return: Refrigerant saturated density, in kg/m3
@@ -148,6 +187,7 @@ class Refrigerant:
         """
         Returns the refrigerant specific heat at the specified temperature and quality.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param temperature: Refrigerant temperature, in Celsius
         :param quality: Refrigerant quality, in fractional form from 0.0 to 1.0
         :return: Refrigerant saturated specific heat, in J/kg-K
@@ -158,11 +198,19 @@ class Refrigerant:
 class Psychrometrics:
     """
     This class provides access to the psychrometric functions within EnergyPlus.  Some property calculations are
-    available as functions of different independent variables, and so there are functions with suffixes like
+    available as functions of different independent variable combinations, leading to suffixed function names, such as
     `vapor_density_b` and `relative_humidity_c`.
     """
 
     def __init__(self, api: cdll):
+        """
+        Creates a new Psychrometrics instance, should almost certainly always be called from the API's functional class,
+        not directly from user code.  To get a Psychrometrics instance from client code, call
+        api.functional.psychrometrics(state), where state is an active EnergyPlus state returned from a call to
+        `api.state.new_state()`.
+
+        :param api: An active CTYPES CDLL instance
+        """
         self.api = api
         self.api.psyRhoFnPbTdbW.argtypes = [c_void_p, RealEP, RealEP, RealEP]
         self.api.psyRhoFnPbTdbW.restype = RealEP
@@ -211,6 +259,7 @@ class Psychrometrics:
         """
         Returns the psychrometric density at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param barometric_pressure: Barometric pressure, in Pa
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
@@ -222,6 +271,7 @@ class Psychrometrics:
         """
         Returns the psychrometric latent energy of air at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :return:
         """
@@ -231,6 +281,7 @@ class Psychrometrics:
         """
         Returns the psychrometric latent energy of the moisture in air at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :return:
         """
@@ -240,6 +291,7 @@ class Psychrometrics:
         """
         Returns the psychrometric enthalpy at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :return:
@@ -250,6 +302,7 @@ class Psychrometrics:
         """
         Returns the psychrometric enthalpy at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.
         :param barometric_pressure: Barometric pressure, in Pa
@@ -261,6 +314,7 @@ class Psychrometrics:
         """
         Returns the psychrometric specific heat at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :return:
         """
@@ -270,6 +324,7 @@ class Psychrometrics:
         """
         Returns the psychrometric dry bulb temperature at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param enthalpy: Psychrometric enthalpy, in J/kg
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :return:
@@ -280,6 +335,7 @@ class Psychrometrics:
         """
         Returns the psychrometric vapor density at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :param barometric_pressure: Barometric pressure, in Pa
@@ -291,6 +347,7 @@ class Psychrometrics:
         """
         Returns the psychrometric relative humidity at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param vapor_density: Psychrometric vapor density, in kg/m3
         :return:
@@ -301,6 +358,7 @@ class Psychrometrics:
         """
         Returns the psychrometric relative humidity at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :param barometric_pressure: Barometric pressure, in Pa
@@ -312,6 +370,7 @@ class Psychrometrics:
         """
         Returns the psychrometric wet bulb temperature at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :param barometric_pressure: Barometric pressure, in Pa
@@ -323,6 +382,7 @@ class Psychrometrics:
         """
         Returns the psychrometric specific volume at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :param barometric_pressure: Barometric pressure, in Pa
@@ -334,6 +394,7 @@ class Psychrometrics:
         """
         Returns the psychrometric saturation pressure at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :return:
         """
@@ -343,6 +404,7 @@ class Psychrometrics:
         """
         Returns the psychrometric saturation temperature at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param enthalpy: Psychrometric enthalpy, in J/kg
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
@@ -353,6 +415,7 @@ class Psychrometrics:
         """
         Returns the psychrometric vapor density at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.
         :return:
@@ -363,6 +426,7 @@ class Psychrometrics:
         """
         Returns the psychrometric humidity ratio at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param enthalpy: Psychrometric enthalpy, in J/kg
         :return:
@@ -373,6 +437,7 @@ class Psychrometrics:
         """
         Returns the psychrometric humidity ratio at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dew_point_temp: Psychrometric dew point temperature, in Celsius
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
@@ -384,6 +449,7 @@ class Psychrometrics:
         """
         Returns the psychrometric humidity ratio at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param relative_humidity_fraction: Psychrometric relative humidity, as a fraction from 0.0 to 1.0.
         :param barometric_pressure: Barometric pressure, in Pa
@@ -395,6 +461,7 @@ class Psychrometrics:
         """
         Returns the psychrometric humidity ratio at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param wet_bulb_temp: Psychrometric wet bulb temperature, in C
         :param barometric_pressure: Barometric pressure, in Pa
@@ -406,6 +473,7 @@ class Psychrometrics:
         """
         Returns the psychrometric dew point temperature at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param humidity_ratio: Humidity ratio, in kgWater/kgDryAir
         :param barometric_pressure: Barometric pressure, in Pa
         :return:
@@ -416,6 +484,7 @@ class Psychrometrics:
         """
         Returns the psychrometric dew point temperature at the specified conditions.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param dry_bulb_temp: Psychrometric dry bulb temperature, in C
         :param wet_bulb_temp: Psychrometric wet bulb temperature, in C
         :param barometric_pressure: Barometric pressure, in Pa
@@ -427,7 +496,6 @@ class Psychrometrics:
 class EnergyPlusVersion:
     """
     This is the EnergyPlus version.  Could also call into the DLL but it's the same effect.
-
     """
 
     def __init__(self):
@@ -439,7 +507,7 @@ class EnergyPlusVersion:
     def __str__(self) -> str:
         """
         Returns a string representation of this EnergyPlus version.
-        :return: EnergyPlus version, as major.minor.patch.build
+        :return: EnergyPlus version, as major.minor.patch-build
         """
         return "%s.%s.%s-%s" % (
             self.ep_version_major, self.ep_version_minor, self.ep_version_patch, self.ep_version_build
@@ -455,8 +523,8 @@ class Functional:
     The Functional API class itself is really just an organizational class that provides access to nested functional
     classes through member functions.  The functional API class is instantiated by the higher level EnergyPlusAPI class,
     and clients should *never* attempt to create an instance manually.  Instead, create an EnergyPlusAPI instance, and
-    call the `functional()` member function to create a Functional class instance.  For Python Plugin workflows, the
-    EnergyPlusPlugin base class also provides an instance of the Functional base class through the `self.functional`
+    use the `functional` member variable to access a Functional class instance.  For Python Plugin workflows, the
+    EnergyPlusPlugin base class also provides an instance of the Functional base class through the `self.api.functional`
     member variable.  Clients should use that directly when needing to make functional calls into the library.
     """
 
@@ -479,6 +547,7 @@ class Functional:
         """
         Returns a Glycol instance, which allows calculation of glycol properties.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param glycol_name: Name of the Glycol, for now only water is allowed
         :return: An instantiated Glycol structure
         """
@@ -491,6 +560,7 @@ class Functional:
         """
         Returns a Refrigerant instance, which allows calculation of refrigerant properties.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param refrigerant_name: Name of the Refrigerant, for now only steam is allowed
         :return: An instantiated Refrigerant structure
         """
@@ -503,6 +573,7 @@ class Functional:
         """
         Returns a Psychrometric instance, which allows calculation of psychrometric properties.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An instantiated Psychrometric structure
         """
         self.initialize(state)
@@ -512,11 +583,13 @@ class Functional:
     def ep_version() -> EnergyPlusVersion:
         return EnergyPlusVersion()
 
+    # TODO: Move this to the runtime API section?
     def callback_error(self, state, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus when an error message
         is added to the error file.  The user can then detect specific error messages or whatever.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes a string (bytes) argument and returns nothing
         :return: Nothing
         """

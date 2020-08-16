@@ -1102,7 +1102,7 @@ namespace PluginManagement {
         PyObjectWrap pyth_module = (*EP_PyImport_Import)(pModuleName);
         (*EP_Py_DECREF)(pModuleName);
 
-        if (pyth_module == NULL) {
+        if (pyth_module == nullptr) {
             EnergyPlus::ShowFatalError("Cannot find 'traceback' module in reportPythonError(), this is weird");
             return;
         }

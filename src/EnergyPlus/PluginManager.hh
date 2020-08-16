@@ -135,7 +135,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON
         PyObjectWrap pModule = nullptr;  // reference to module
         PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
-        // precalculated function names, should really be shared
+        // precalculated function names as PyObjects
         PyObjectWrap pBeginNewEnvironment = nullptr;
         PyObjectWrap pAfterNewEnvironmentWarmUpIsComplete = nullptr;
         PyObjectWrap pBeginZoneTimestepBeforeInitHeatBalance = nullptr;

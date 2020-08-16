@@ -22,14 +22,20 @@ class DataExchange:
     - When a Python script is used in the EnergyPlus Python Plugin System, and the user runs the EnergyPlus binary.  In
       this case, the plugin may need access to state data to make control decisions, and this class enables that.  The
       plugin base class automatically creates an instance of this class, so client plugins that inherit that class will
-      have a `self.transfer` instance of this class available, and should *not* attempt to create another one.
+      have a `self.api.exchange` instance of this class available, and should *not* attempt to create another one.
 
-    In the Python Plugin case, the client Python code may make use of the methods to get/set plugin global variables,
-    but only in the Python Plugin cases.  For the outside tool API usage, plugin global variables are not available, and
-    data should be shared in the outside calling code.
+    Client Python code may make use of the methods to get/set plugin global variables, but only in the Python Plugin
+    cases.  For the outside tool API usage, plugin global variables are not available, and data should be shared in the
+    outside calling code.
     """
 
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
+        """
+        Creates a new DataExchange API class instance
+
+        :param api: An active CTYPES CDLL instance
+        :param running_as_python_plugin: A flag for whether we are running in plugin mode
+        """
         self.api = api
         self.running_as_python_plugin = running_as_python_plugin
         self.api.listAllAPIDataCSV.argtypes = [c_void_p]
@@ -128,6 +134,7 @@ class DataExchange:
         """
         Lists out all API data stuff in an easily parseable CSV form
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: Returns a raw bytes CSV representation of the available API data
         """
         return self.api.listAllAPIDataCSV(state)
@@ -137,6 +144,7 @@ class DataExchange:
         Check whether the data exchange API is ready.
         Handles to variables, actuators, and other data are not reliably defined prior to this being true.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: Returns a boolean value to indicate whether variables, actuators, and other data are ready for access.
         """
         success = self.api.apiDataFullyReady(state)
@@ -150,6 +158,7 @@ class DataExchange:
         A number of functions will return 0 in erroneous situations, and this function allows for disambiguation
         between valid zero return values and the error condition.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: Returns true if the error flag was activated during prior calculations.
         """
         if self.api.apiErrorFlag(state) == 1:
@@ -161,6 +170,8 @@ class DataExchange:
         Resets the error flag for API calls.
         A number of functions will return 0 in erroneous situations, but activate an error flag.  In certain work flows,
         it may be useful to reset this error flag (unit testing, etc.).  This function allows resetting it to false.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         """
         self.api.resetErrorFlag(state)
 
@@ -176,6 +187,7 @@ class DataExchange:
         of a variable once the simulation has begun.  NOTE: Variables should be requested before *each* run of
         EnergyPlus, as the internal array is cleared when clearing the state of each run.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param variable_name: The name of the variable to retrieve, e.g. "Site Outdoor Air DryBulb Temperature", or
                               "Fan Air Mass Flow Rate"
         :param variable_key: The instance of the variable to retrieve, e.g. "Environment", or "Main System Fan"
@@ -205,6 +217,7 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param variable_name: The name of the variable to retrieve, e.g. "Site Outdoor Air DryBulb Temperature", or
                               "Fan Air Mass Flow Rate"
         :param variable_key: The instance of the variable to retrieve, e.g. "Environment", or "Main System Fan"
@@ -234,6 +247,7 @@ class DataExchange:
         Note also that the meter name passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param meter_name: The name of the variable to retrieve, e.g. "Electricity:Facility", or "Fans:Electricity"
         :return: An integer ID for this meter, or -1 if one could not be found.
         """
@@ -262,6 +276,7 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param component_type: The actuator category, e.g. "Weather Data"
         :param control_type: The name of the actuator to retrieve, e.g. "Outdoor Dew Point"
         :param actuator_key: The instance of the variable to retrieve, e.g. "Environment"
@@ -293,6 +308,7 @@ class DataExchange:
         to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this function to
         then get the value of the variable.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param variable_handle: An integer returned from the `get_variable_handle` function.
         :return: Floating point representation of the current variable value.  Returns zero if the handle is invalid.
                  Use the api_error_flag function to disambiguate between valid zero returns and error states.
@@ -312,6 +328,7 @@ class DataExchange:
         Caution: This function currently returns the instantaneous value of a meter, not the cumulative value.
         This will change in a future version of the API.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param meter_handle: An integer returned from the `get_meter_handle` function.
         :return: Floating point representation of the current meter value.  Returns zero if the handle is invalid.
                  Use the api_error_flag function to disambiguate between valid zero returns and error states.
@@ -334,6 +351,7 @@ class DataExchange:
         of 0.0 means FALSE -- and any other value defaults to FALSE.  A small tolerance is applied internally to allow
         for small floating point round-off.  A value *very close* to 1.0 will still evaluate to TRUE.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :param actuator_value: The floating point value to assign to the actuator
         :return: Nothing
@@ -353,6 +371,7 @@ class DataExchange:
         Resets the actuator internally to EnergyPlus.  This allows subsequent calculations to be used for the actuator
         instead of the externally set actuator value.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :return: Nothing
         """
@@ -367,6 +386,7 @@ class DataExchange:
         Gets the most recent value of an actuator.  In some applications, actuators are altered by multiple scripts, and
         this allows getting the most recent value.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :return: A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.
                  Returns zero if the handle is invalid.  Use the api_error_flag function to disambiguate between valid
@@ -388,6 +408,7 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param variable_type: The name of the variable to retrieve, e.g. "Zone Air Volume", or "Zone Floor Area"
         :param variable_key: The instance of the variable to retrieve, e.g. "Zone 1"
         :return: An integer ID for this output variable, or -1 if one could not be found.
@@ -412,6 +433,7 @@ class DataExchange:
         first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this
         function to then get the value of the variable.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param variable_handle: An integer returned from the `get_internal_variable_handle` function.
         :return: Floating point representation of the internal variable value.  Returns zero if the handle is invalid.
                  Use the api_error_flag function to disambiguate between valid zero returns and error states.
@@ -435,6 +457,8 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
+        :param var_name: Name of the construction to look up
         :return: An integer ID for this construction, or -1 if one could not be found.
         """
         if not self.running_as_python_plugin:
@@ -463,6 +487,7 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param var_name: The name of the global variable to retrieve, this name must be listed in the IDF object:
                          `PythonPlugin:GlobalVariables`
         :return: An integer ID for this global variable, or -1 if one could not be found.
@@ -494,6 +519,7 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param handle: An integer returned from the `get_global_handle` function.
         :return: Floating point representation of the global variable value
         """
@@ -516,6 +542,7 @@ class DataExchange:
         using the get_global_value and this set_global_value functions as needed.  Note all global variables are
         floating point values.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param handle: An integer returned from the `get_global_handle` function.
         :param value: Floating point value to assign to the global variable
         """
@@ -546,6 +573,7 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param trend_var_name: The name of the global variable to retrieve, this name must match the name of a
                                `PythonPlugin:TrendVariable` IDF object.
         :return: An integer ID for this trend variable, or -1 if one could not be found.
@@ -573,6 +601,7 @@ class DataExchange:
         declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
         function, then using the other trend variable worker functions as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param trend_handle: An integer returned from the `get_trend_handle` function.
         :param time_index: The number of time steps to search back in history to evaluate this function.
         :return: Floating point value representation of the specific evaluation.
@@ -602,6 +631,7 @@ class DataExchange:
         declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
         function, then using the other trend variable worker functions as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param trend_handle: An integer returned from the `get_trend_handle` function.
         :param count: The number of time steps to search back in history to evaluate this function.
         :return: Floating point value representation of the specific evaluation.
@@ -631,6 +661,7 @@ class DataExchange:
         declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
         function, then using the other trend variable worker functions as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param trend_handle: An integer returned from the `get_trend_handle` function.
         :param count: The number of time steps to search back in history to evaluate this function.
         :return: Floating point value representation of the specific evaluation.
@@ -660,6 +691,7 @@ class DataExchange:
         declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
         function, then using the other trend variable worker functions as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param trend_handle: An integer returned from the `get_trend_handle` function.
         :param count: The number of time steps to search back in history to evaluate this function.
         :return: Floating point value representation of the specific evaluation.
@@ -689,6 +721,7 @@ class DataExchange:
         declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
         function, then using the other trend variable worker functions as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param trend_handle: An integer returned from the `get_trend_handle` function.
         :param count: The number of time steps to search back in history to evaluate this function.
         :return: Floating point value representation of the specific evaluation.
@@ -720,6 +753,7 @@ class DataExchange:
         declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
         function, then using the other trend variable worker functions as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param trend_handle: An integer returned from the `get_trend_handle` function.
         :param count: The number of time steps to search back in history to evaluate this function.
         :return: Floating point value representation of the specific evaluation.
@@ -741,6 +775,7 @@ class DataExchange:
         Get the "current" calendar year of the simulation.  All simulations operate at a real year, either user
         specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer year (2020, for example)
         """
         return self.api.year(state)
@@ -749,6 +784,7 @@ class DataExchange:
         """
         Get the current month of the simulation (1-12)
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer month (1-12)
         """
         return self.api.month(state)
@@ -757,6 +793,7 @@ class DataExchange:
         """
         Get the current day of month (1-31)
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer day of the month (1-31)
         """
         return self.api.dayOfMonth(state)
@@ -765,6 +802,7 @@ class DataExchange:
         """
         Get the current hour of the simulation (0-23)
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer hour of the day (0-23)
         """
         return self.api.hour(state)
@@ -773,6 +811,7 @@ class DataExchange:
         """
         Get the current time of day in hours, where current time represents the end time of the current time step.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: A floating point representation of the current time in hours
         """
         return self.api.currentTime(state)
@@ -781,6 +820,7 @@ class DataExchange:
         """
         Get the current minutes into the hour (1-60)
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer number of minutes into the current hour (1-60)
         """
         return self.api.minutes(state)
@@ -789,6 +829,7 @@ class DataExchange:
         """
         Get the current day of the week (1-7)
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer day of week (1-7)
         """
         return self.api.dayOfWeek(state)
@@ -797,6 +838,7 @@ class DataExchange:
         """
         Get the current day of the year (1-366)
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer day of the year (1-366)
         """
         return self.api.dayOfYear(state)
@@ -806,6 +848,7 @@ class DataExchange:
         Get the current daylight savings time indicator as a logical value.  The C API returns an integer where 1 is
         yes and 0 is no, this simply wraps that with a bool conversion.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: A boolean DST indicator for the current time.
         """
         return self.api.daylightSavingsTimeIndicator(state) == 1
@@ -814,6 +857,7 @@ class DataExchange:
         """
         Gets a flag for the current day holiday type: 0 is no holiday, 1 is holiday type #1, etc.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: An integer indicator for current day holiday type.
         """
         return self.api.holidayIndex(state)
@@ -823,6 +867,7 @@ class DataExchange:
         Gets a flag for whether the sun is currently up.  The C API returns an integer where 1 is yes and 0 is no, this
         simply wraps that with a bool conversion.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: A boolean indicating whether the sun is currently up.
         """
         return self.api.sunIsUp(state) == 1
@@ -832,6 +877,7 @@ class DataExchange:
         Gets a flag for whether the it is currently raining.  The C API returns an integer where 1 is yes and 0 is no,
         this simply wraps that with a bool conversion.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: A boolean indicating whether it is currently raining.
         """
         return self.api.isRaining(state) == 1
@@ -842,15 +888,17 @@ class DataExchange:
         converging on warmup days.  The C API returns an integer where 1 is yes and 0 is no, this simply wraps that
         with a bool conversion.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: A boolean indicating whether the warmup flag is on.
         """
-        return self.api.warmupFlag() == 1
+        return self.api.warmupFlag(state) == 1
 
     def zone_time_step(self, state: c_void_p) -> float:
         """
         Gets the current zone time step value in EnergyPlus.  The zone time step is variable and fluctuates
         during the simulation.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: The current zone time step in fractional hours.
         """
         return self.api.systemTimeStep(state)
@@ -860,6 +908,7 @@ class DataExchange:
         Gets the current system time step value in EnergyPlus.  The system time step is variable and fluctuates
         during the simulation.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: The current system time step in fractional hours.
         """
         return self.api.systemTimeStep(state)
@@ -870,6 +919,7 @@ class DataExchange:
         is only expected to be useful in very specialized applications where you control the environment order
         carefully.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: The current environment number.
         """
         return self.api.currentEnvironmentNum(state)
@@ -878,6 +928,7 @@ class DataExchange:
         """
         Gets a simple sum of the values of the time part of the date/time function. Could be used in random seeding.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: Integer value of time portion of the date/time function.
         """
         return self.api.actualTime(state)
@@ -886,6 +937,7 @@ class DataExchange:
         """
         Gets a simple sum of the values of the date/time function. Could be used in random seeding.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: Integer value of the date/time function.
         """
         return self.api.actualDateTime(state)
@@ -894,6 +946,7 @@ class DataExchange:
         """
         Gets the current environment number.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :return: Integer value of current environment.
         """
         return self.api.kindOfSim(state)

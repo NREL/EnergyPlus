@@ -81,7 +81,6 @@ void issueText(EnergyPlusState, const char * message) {
 }
 
 void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {
-    // auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::DataGlobals::progressCallback = f;
 }
 

@@ -61,16 +61,23 @@ extern "C" {
 /// \brief This "functional" API category provides access to things which do not require a simulation to be running.
 /// \details Currently this includes accessing API version information, and looking up glycol, refrigerant, and psychrometric
 ///          properties.  Each category has some limitations as this is the first version of the API, but more functionality
-///          will be introduced throughout development cycles.
+///          will be introduced throughout development cycles.  The functionality of this API category is available
+///          without making a call to run EnergyPlus, however an `EnergyPlusState` object is still required for the
+///          API calls.  The state object can be instantiated with a call to `stateNew` and managed with methods in the
+///          state API category.
 /// \remark Make sure to call `initializeFunctionalAPI` prior to calling any functional API methods to ensure the internal
 ///         structures are in place in the code.
 /// \remark Glycol routines currently only operate on pure water; a future version will enable further property lookups.
 /// \remark Refrigerant routines currently only operate on steam; a future version will enable further property lookups.
+/// \see EnergyPlusState
+/// \see stateNew
+/// \see initializeFunctionalAPI
 
 /// \brief An initialization routine that sets up all functional API structures
 /// \details The functional API exposes classes and methods that can be used for outside calculations.
 ///          Some of these calculations rely on internal structures being allocated and set up.
 ///          Whenever any script is going to use a method from this functional API, this method must be called.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \remark When using the functional API from a Python Plugin workflow, this function should _not_ be called.
 ENERGYPLUSLIB_API void initializeFunctionalAPI(EnergyPlusState state);
 /// \brief Returns the version of this API, in Major.Minor form.
@@ -79,11 +86,14 @@ ENERGYPLUSLIB_API void initializeFunctionalAPI(EnergyPlusState state);
 ///          incremented.  If a breaking change ever occurs, the major number will be incremented.
 ///          This function can be used by users as a way to target a specific major version of the API and avoid
 ///          problems if the API ever changes.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API const char * apiVersionFromEPlus(EnergyPlusState state);
 /// \brief Allows a user to register an error callback function.
 /// \details If a user script registers a callback function here, then when EnergyPlus is sending an error message to
 ///          the error file, it will also send it here.  The user function will then have the ability to act on the
 ///          error message if needed.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] f A function that accepts an error string, and will be called by EnergyPlus when an error is emitted.
 /// \remark A future version of this method will enable additional functionality including an argument indicating the
 ///         error type, and allowing the return value from this callback to determine how EnergyPlus should behave.
 ENERGYPLUSLIB_API void registerErrorCallback(EnergyPlusState state, void (*f)(const char * errorMessage));
@@ -98,6 +108,7 @@ ENERGYPLUSLIB_API typedef void * Glycol;
 /// \brief Returns a new reference to a Glycol class
 /// \details The glycol class allows access to fluid properties.  Eventually ethylene and propylene glycol properties will
 ///          be made available but for now the only fluid is pure water.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] glycolName The name of the glycol.  Currently the only valid option is "water".  In future versions of the
 ///                       API, the function will accept other fluid types and glycol mixtures.
 /// \returns This functions allocates a new glycol class and returns a Glycol, which is a pointer to that new instance.
@@ -107,11 +118,13 @@ ENERGYPLUSLIB_API typedef void * Glycol;
 ENERGYPLUSLIB_API Glycol glycolNew(EnergyPlusState state, const char* glycolName);
 /// \brief Deletes an instance of a Glycol class
 /// \details When an instance of a Glycol class is created using `glycolNew`, it should be cleaned up when totally done with it.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] glycol An instance of a Glycol class to be deleted.  The Glycol class is initially created by calling `glycolNew`.
 /// \see Glycol
 /// \see glycolNew
 ENERGYPLUSLIB_API void glycolDelete(EnergyPlusState state, Glycol glycol);
 /// \brief Returns the fluid specific heat for the given Glycol instance at the specified temperature.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid specific heat, in J/kgK
@@ -119,6 +132,7 @@ ENERGYPLUSLIB_API void glycolDelete(EnergyPlusState state, Glycol glycol);
 /// \see glycolNew
 ENERGYPLUSLIB_API Real64 glycolSpecificHeat(EnergyPlusState state, Glycol glycol, Real64 temperature);
 /// \brief Returns the fluid density for the given Glycol instance at the specified temperature.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid density, in kg/m3
@@ -126,6 +140,7 @@ ENERGYPLUSLIB_API Real64 glycolSpecificHeat(EnergyPlusState state, Glycol glycol
 /// \see glycolNew
 ENERGYPLUSLIB_API Real64 glycolDensity(EnergyPlusState state, Glycol glycol, Real64 temperature);
 /// \brief Returns the fluid thermal conductivity for the given Glycol instance at the specified temperature.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid thermal conductivity, in W/mK
@@ -133,6 +148,7 @@ ENERGYPLUSLIB_API Real64 glycolDensity(EnergyPlusState state, Glycol glycol, Rea
 /// \see glycolNew
 ENERGYPLUSLIB_API Real64 glycolConductivity(EnergyPlusState state, Glycol glycol, Real64 temperature);
 /// \brief Returns the fluid dynamic viscosity for the given Glycol instance at the specified temperature.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid dynamic viscosity, in Pa-s (or kg/m-s)
@@ -150,6 +166,7 @@ ENERGYPLUSLIB_API typedef void * Refrigerant;
 /// \brief Returns a new reference to a Refrigerant class
 /// \details The refrigerant class allows access to refrigerant properties.  Eventually more refrigerant properties will
 ///          be made available but for now the only refrigerant is pure steam.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] refrigerantName The name of the refrigerant.  Currently the only valid option is "steam".  In future versions of the
 ///                            API, the function will accept other refrigerant types.
 /// \returns This functions allocates a new refrigerant class and returns a Refrigerant, which is a pointer to that new instance.
@@ -159,11 +176,13 @@ ENERGYPLUSLIB_API typedef void * Refrigerant;
 ENERGYPLUSLIB_API Refrigerant refrigerantNew(EnergyPlusState state, const char* refrigerantName);
 /// \brief Deletes an instance of a Refrigerant class
 /// \details When an instance of a Refrigerant class is created using `refrigerantNew`, it should be cleaned up when totally done with it.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] refrigerant An instance of a Refrigerant class to be deleted.  The Refrigerant class is initially created by calling `refrigerantNew`.
 /// \see Refrigerant
 /// \see refrigerantNew
 ENERGYPLUSLIB_API void refrigerantDelete(EnergyPlusState state, Refrigerant refrigerant);
 /// \brief Returns the refrigerant saturation pressure for the given Refrigerant instance at the specified temperature.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in degrees Celsius.
 /// \returns Refrigerant saturation pressure, in Pa
@@ -171,6 +190,7 @@ ENERGYPLUSLIB_API void refrigerantDelete(EnergyPlusState state, Refrigerant refr
 /// \see refrigerantNew
 ENERGYPLUSLIB_API Real64 refrigerantSaturationPressure(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature);
 /// \brief Returns the refrigerant saturation temperature for the given Refrigerant instance at the specified pressure.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] pressure The refrigerant pressure for property evaluation, in Pa.
 /// \returns Refrigerant saturation temperature, in C
@@ -178,6 +198,7 @@ ENERGYPLUSLIB_API Real64 refrigerantSaturationPressure(EnergyPlusState state, Re
 /// \see refrigerantNew
 ENERGYPLUSLIB_API Real64 refrigerantSaturationTemperature(EnergyPlusState state, Refrigerant refrigerant, Real64 pressure);
 /// \brief Returns the refrigerant saturated enthalpy for the given Refrigerant instance at the specified temperature and quality.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in C.
 /// \param[in] quality The refrigerant quality for property evaluation, in fractional form from 0.0 to 1.0.
@@ -186,6 +207,7 @@ ENERGYPLUSLIB_API Real64 refrigerantSaturationTemperature(EnergyPlusState state,
 /// \see refrigerantNew
 ENERGYPLUSLIB_API Real64 refrigerantSaturatedEnthalpy(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature, Real64 quality);
 /// \brief Returns the refrigerant saturated density for the given Refrigerant instance at the specified temperature and quality.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in C.
 /// \param[in] quality The refrigerant quality for property evaluation, in fractional form from 0.0 to 1.0.
@@ -194,6 +216,7 @@ ENERGYPLUSLIB_API Real64 refrigerantSaturatedEnthalpy(EnergyPlusState state, Ref
 /// \see refrigerantNew
 ENERGYPLUSLIB_API Real64 refrigerantSaturatedDensity(EnergyPlusState state, Refrigerant refrigerant, Real64 temperature, Real64 quality);
 /// \brief Returns the refrigerant saturated specific heat for the given Refrigerant instance at the specified temperature and quality.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in C.
 /// \param[in] quality The refrigerant quality for property evaluation, in fractional form from 0.0 to 1.0.
@@ -207,110 +230,131 @@ ENERGYPLUSLIB_API Real64 refrigerantSaturatedSpecificHeat(EnergyPlusState state,
 
 
 /// \brief Returns the psychrometric density at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] pb Barometric pressure, in Pa
 /// \param[in] tdb Dry bulb temperature, in Celsius
 /// \param[in] dw Humidity ratio, in kgWater/kgDryAir
 /// \returns Psychrometric density, in kg/m3
 ENERGYPLUSLIB_API Real64 psyRhoFnPbTdbW(EnergyPlusState state, Real64 pb, Real64 tdb, Real64 dw);
 /// \brief Returns the psychrometric latent energy of air at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] T Dry bulb temperature, in Celsius
 /// \returns Psychrometric latent energy of air, in J/kg
 ENERGYPLUSLIB_API Real64 psyHfgAirFnWTdb(EnergyPlusState state, Real64 T);
 /// \brief Returns the psychrometric latent energy of the moisture as a gas in the air at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] T Dry bulb temperature, in Celsius
 /// \returns Psychrometric latent energy of the moisture as a gas in the air, in J/kg
 ENERGYPLUSLIB_API Real64 psyHgAirFnWTdb(EnergyPlusState state, Real64 T);
 /// \brief Returns the psychrometric enthalpy at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \returns Psychrometric enthalpy, in J/kg
 ENERGYPLUSLIB_API Real64 psyHFnTdbW(EnergyPlusState state, Real64 TDB, Real64 W);
 /// \brief Returns the psychrometric specific heat at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \returns Psychrometric specific heat, in J/kg-K
 ENERGYPLUSLIB_API Real64 psyCpAirFnW(EnergyPlusState state, Real64 W);
 /// \brief Returns the psychrometric dry bulb temperature at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] H Enthalpy, in J/kg
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \returns Psychrometric dry bulb temperature, in Celsius
 ENERGYPLUSLIB_API Real64 psyTdbFnHW(EnergyPlusState state, Real64 H, Real64 W);
 /// \brief Returns the psychrometric vapor density at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] Tdb Dry bulb temperature, in Celsius
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric vapor density, in kg/m3
 ENERGYPLUSLIB_API Real64 psyRhovFnTdbWPb(EnergyPlusState state, Real64 Tdb, Real64 W, Real64 PB);
 /// \brief Returns the psychrometric wet bulb temperature at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] Tdb Dry bulb temperature, in Celsius
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric wet bulb temperature, in Celsius
 ENERGYPLUSLIB_API Real64 psyTwbFnTdbWPb(EnergyPlusState state, Real64 Tdb, Real64 W, Real64 PB);
 /// \brief Returns the psychrometric specific volume at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric specific volume, in m3/kg
 ENERGYPLUSLIB_API Real64 psyVFnTdbWPb(EnergyPlusState state, Real64 TDB, Real64 W, Real64 PB);
 /// \brief Returns the psychrometric humidity ratio at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] H Enthalpy, in J/kg
 /// \returns Psychrometric humidity ratio, in kgWater/kgDryAir
 ENERGYPLUSLIB_API Real64 psyWFnTdbH(EnergyPlusState state, Real64 TDB, Real64 H);
 /// \brief Returns the psychrometric saturation pressure at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] T Dry bulb temperature, in Celsius
 /// \returns Psychrometric saturation pressure, in Pascals
 ENERGYPLUSLIB_API Real64 psyPsatFnTemp(EnergyPlusState state, Real64 T);
 /// \brief Returns the psychrometric saturation temperature at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] H Enthalpy, in J/kg
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric saturation temperature, in Celsius
 ENERGYPLUSLIB_API Real64 psyTsatFnHPb(EnergyPlusState state, Real64 H, Real64 PB);
 /// \brief Returns the psychrometric vapor density at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] Tdb Dry bulb temperature, in Celsius
 /// \param[in] RH Relative humidity, as a fraction from 0.0 to 1.0
 /// \returns Psychrometric vapor density, in kg/m3
 ENERGYPLUSLIB_API Real64 psyRhovFnTdbRh(EnergyPlusState state, Real64 Tdb, Real64 RH);
 /// \brief Returns the psychrometric relative humidity at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] Tdb Dry bulb temperature, in Celsius
 /// \param[in] Rhovapor Vapor density, in kg/m3
 /// \returns Psychrometric relative humidity, as a fraction from 0.0 to 1.0
 ENERGYPLUSLIB_API Real64 psyRhFnTdbRhov(EnergyPlusState state, Real64 Tdb, Real64 Rhovapor);
 /// \brief Returns the psychrometric relative humidity at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric relative humidity, as a fraction from 0.0 to 1.0
 ENERGYPLUSLIB_API Real64 psyRhFnTdbWPb(EnergyPlusState state, Real64 TDB, Real64 W, Real64 PB);
 /// \brief Returns the psychrometric humidity ratio at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDP Dew point temperature, in Celsius
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric humidity ratio, in kgWater/kgDryAir
 ENERGYPLUSLIB_API Real64 psyWFnTdpPb(EnergyPlusState state, Real64 TDP, Real64 PB);
 /// \brief Returns the psychrometric humidity ratio at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] RH Relative humidity ratio, as a fraction from 0.0 to 1.0
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric humidity ratio, in kgWater/kgDryAir
 ENERGYPLUSLIB_API Real64 psyWFnTdbRhPb(EnergyPlusState state, Real64 TDB, Real64 RH, Real64 PB);
 /// \brief Returns the psychrometric humidity ratio at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] TWB Wet bulb temperature, in Celsius
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric humidity ratio, in kgWater/kgDryAir
 ENERGYPLUSLIB_API Real64 psyWFnTdbTwbPb(EnergyPlusState state, Real64 TDB, Real64 TWB, Real64 PB);
 /// \brief Returns the psychrometric enthalpy at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] RH Relative humidity ratio, as a fraction from 0.0 to 1.0
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric enthalpy, in J/kg
 ENERGYPLUSLIB_API Real64 psyHFnTdbRhPb(EnergyPlusState state, Real64 TDB, Real64 RH, Real64 PB);
 /// \brief Returns the psychrometric dew point temperature at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric dew point temperature, in Celsius
 ENERGYPLUSLIB_API Real64 psyTdpFnWPb(EnergyPlusState state, Real64 W, Real64 PB);
 /// \brief Returns the psychrometric dew point temperature at given conditions.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] TWB Wet bulb temperature, in Celsius
 /// \param[in] PB Barometric pressure, in Pascals

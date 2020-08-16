@@ -21,6 +21,11 @@ class Runtime:
     """
 
     def __init__(self, api: cdll):
+        """
+        Create a new Runtime class instance.
+
+        :param api: An active CTYPES CDLL instance.
+        """
         self.api = api
         # self.api.energyplus.argtypes = [c_int, POINTER(c_char_p)]  # DEFERRED UNTIL run_energyplus call
         self.api.energyplus.restype = c_int
@@ -84,8 +89,10 @@ class Runtime:
         program name is not passed in as an argument, rather only the command line options.
 
         An example call:
-        run_energyplus(['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
+        state = api.state.new_state()
+        run_energyplus(state, ['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param command_line_args: The command line arguments that would be passed into EnergyPlus if executing directly
                                   from the EnergyPlus executable.
         :return: An integer exit code from the simulation, zero is success, non-zero is failure
@@ -128,6 +135,7 @@ class Runtime:
         Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
         conversion as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param message: The warning message to be listed in the error file.
         :return: Nothing
         """
@@ -150,6 +158,7 @@ class Runtime:
         Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
         conversion as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param message: The error message to be listed in the error file.
         :return: Nothing
         """
@@ -169,6 +178,7 @@ class Runtime:
         Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
         conversion as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param message: The message to be listed in the error file.
         :return: Nothing
         """
@@ -181,6 +191,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of each
         day with a progress (percentage) indicator
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes an integer argument and returns nothing
         :return: Nothing
         """
@@ -195,6 +206,7 @@ class Runtime:
         conjunction with the progress callback, a progress bar and status text label can provide a nice EnergyPlus
         experience on a GUI.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes a string (bytes) argument and returns nothing
         :return: Nothing
         """
@@ -207,6 +219,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of
         each environment.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -219,6 +232,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the warmup of
         each environment.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -231,6 +245,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of the
         zone time step before init heat balance.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -243,6 +258,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of the
         zone time step after init heat balance.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -255,6 +271,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of
         system time step .
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -267,6 +284,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of the
         predictor step but before HVAC managers.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -279,6 +297,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of the
         predictor step after HVAC managers.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -291,6 +310,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus inside the system
         iteration loop.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -303,6 +323,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a zone
         time step but before zone reporting has been completed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -315,6 +336,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a zone
         time step and after zone reporting.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -327,6 +349,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a system
         time step, but before HVAC reporting.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -339,6 +362,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a system
         time step and after HVAC reporting.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -351,6 +375,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of the zone
         sizing process.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -363,6 +388,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of the system
         sizing process.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -375,6 +401,7 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of
         component get input processes.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -389,6 +416,7 @@ class Runtime:
         """
         This function allows a client to register a function to be called back by EnergyPlus in unitary system sizing.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
@@ -403,6 +431,7 @@ class Runtime:
         manage all HVAC through sensors and actuators. Right now this function is not well-supported, and this callback
         should be considered purely as a placeholder until a future release refines the use case.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state.new_state()`.
         :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """

@@ -56,20 +56,28 @@ extern "C" {
 #endif
 
 /// \brief This is typedef for an instance that stores the "state" of an EnergyPlus simulation.
-/// \details The state of an EnergyPlus simulation is held heavily in the global program state.  To alleviate issues
-///          with this design in the context of new applications and workflows, the global program state is being
-///          refactored into a single variable which will ultimately own and manage the entire state of the simulation.
-///          In order to keep track of the simulation during API calls, a reference to a state must be kept and
-///          managed by the API client.  The client must call `stateNew` to create a new state instance, and pass this
-///          to any functions that need a state instance.  Once a simulation is complete, the client can call
-///          `stateReset`, which will reset the state instance passed in, along with any global variables that are not
-///          yet refactored into this state instance.  Once complete, the client has the ability to free the memory of
-///          the state by using the `stateDelete` function..
+/// \details The state of an EnergyPlus simulation is at the center of accessing EnergyPlus through API methods.
+///          All, or nearly all, simulation methods require an active simulation state as an argument.  This is because
+///          those functions may set up data in various nooks and crannies of the state object in order to do its
+///          calculations.  As such, prior to calling any API methods, a state object should be instantiated by calling
+///          the `stateNew` method.  This instance should then be passed through all API methods that require a state
+///          object.  Callback methods that are registered will have a single argument - the current state of the
+///          program.  This allows the client to complete the loop with the current simulation state without having to
+///          keep a state as a global variable in client code.  If the client wants to clear the state and begin a new
+///          simulation process, that is possible by passing the state to `stateReset`.  Alternatively, if the client is
+///          finished with that `state` instance, the value can be freed with a call to `stateDelete`.
+///
+///          The state object is at the heart of accessing EnergyPlus via API, however, the client code should simply be a
+///          courier of this object, and never attempt to manipulate the object.  State manipulation occurs inside EnergyPlus,
+///          and attempting to modify it manually will likely not end well for the workflow.
+/// \see stateNew
+/// \see stateReset
+/// \see stateDelete
 typedef void * EnergyPlusState;
 
 /// \brief Creates a new simulation state instance and returns it for the client to store while running simulations
 /// \details This function creates a new instance that is used in running simulations from the API.  The state created
-///          in this function is used by passing it into specific run functions.  When a simulation is complete, the
+///          in this function is used by passing it into most API functions.  When a simulation is complete, the
 ///          state can be reset using the `stateReset` function, or deleted completely with the `stateDelete` function.
 /// \see EnergyPlusState
 /// \see stateReset

@@ -6,9 +6,7 @@ from pyenergyplus.api import EnergyPlusAPI
 class EnergyPlusPlugin(object):
     """
     The EnergyPlusPlugin class is the base class for all Python Plugin classes.
-    Derived classes should inherit from this class and override at least the main function.
-    Optionally, the initialize() method can be overridden to allow for one-time initializations to be made without
-    having to override the constructor and set one-time flags, etc.
+    Derived classes should inherit from this class and override at least one of the `on_*` functions.
 
     This base class instantiates the EnergyPlus API and makes it available to derived classes through the `self.api`
     member variable.  Scripts can then access the functional API through `self.api.functional` and the data exchange

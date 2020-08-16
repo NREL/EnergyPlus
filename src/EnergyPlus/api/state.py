@@ -3,11 +3,16 @@ from ctypes import cdll, c_void_p
 
 class State:
     """
-    This API class enables a client to hook into EnergyPlus at runtime and sense/actuate data in a running simulation.
-    The pattern is quite simple: create a callback function in Python, and register it with one of the registration
-    methods on this class to allow the callback to be called at a specific point in the simulation.  Inside the callback
-    function, the client can get sensor values and set actuator values using the DataTransfer API methods, and also
-    look up values and perform calculations using EnergyPlus internal methods via the Functional API methods.
+    This API class enables a client to create and manage state instances for using EnergyPlus API methods.
+    Nearly all EnergyPlus API methods require a state object to be passed in, and when callbacks are made, the current
+    state is passed as the only argument.  This allows client code to close the loop and pass the current state when
+    making API calls inside callbacks.
+
+    The state object is at the heart of accessing EnergyPlus via API, however, the client code should simply be a
+    courier of this object, and never attempt to manipulate the object.  State manipulation occurs inside EnergyPlus,
+    and attempting to modify it manually will likely not end well for the workflow.
+
+    This class allows a client to create a new state, reset it, and free the object when finished with it.
     """
 
     def __init__(self, api: cdll):
@@ -29,7 +34,8 @@ class State:
 
     def reset_state(self, state: c_void_p) -> None:
         """
-        This function resets an existing state instance
+        This function resets an existing state instance, thus resetting the simulation, including any registered
+        callback functions.
 
         :return: Nothing
         """
@@ -37,7 +43,7 @@ class State:
 
     def delete_state(self, state: c_void_p) -> None:
         """
-        This function deletes an existing state instance
+        This function deletes an existing state instance, freeing the memory.
 
         :return: Nothing
         """
