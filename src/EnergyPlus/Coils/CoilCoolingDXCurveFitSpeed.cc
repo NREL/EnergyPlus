@@ -348,7 +348,6 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->evap_air_flow_rate = sizingCoolingAirFlow.size(this->evap_air_flow_rate, errorsFound);
 
-    int SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
     std::string SizingString = "Gross Cooling Capacity [W]";
     CoolingCapacitySizer sizerCoolingCapacity;
     sizerCoolingCapacity.overrideSizingString(SizingString);

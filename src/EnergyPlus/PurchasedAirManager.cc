@@ -1919,8 +1919,11 @@ namespace PurchasedAirManager {
                     ZoneEqSizing(CurZoneEqNum).OAVolFlow = FinalZoneSizing(CurZoneEqNum).MinOA;
                     PrintFlag = false;
                     TempSize = PurchAir(PurchAirNum).MaxCoolTotCap;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    MaxCoolTotCapDes = TempSize;
+                    bool errorsFound = false;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    MaxCoolTotCapDes = sizerCoolingCapacity.size(TempSize, errorsFound);
                     ZoneCoolingOnlyFan = false;
                 }
                 if (MaxCoolTotCapDes < SmallLoad) {

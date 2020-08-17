@@ -54,6 +54,7 @@
 #include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -270,7 +271,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     std::string CallingRoutine; // calling routine
 
     DataConstantUsedForSizing = 1.0;
-    DataFractionUsedForSizing = 1.0;
+    DataFractionUsedForSizing = 0.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -313,7 +314,11 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    bool errorsFound = false;
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
 
     // confirm that sizing data is saved for use by parent object
@@ -331,7 +336,8 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
     EXPECT_NEAR(19234.6, SizingResult, 0.1);
 }
 
@@ -443,7 +449,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     std::string CallingRoutine; // calling routine
 
     DataConstantUsedForSizing = 1.0;
-    DataFractionUsedForSizing = 1.0;
+    DataFractionUsedForSizing = 0.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -488,7 +494,11 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    bool errorsFound = false;
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
     Real64 dxCoilSizeNoFan = SizingResult;
 
@@ -508,7 +518,8 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     Real64 expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain4;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
     // With Test Fan 3 fan heat - this fails before the #6126 fix in ReportSizingManager
@@ -528,7 +539,8 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain3;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 }
 
@@ -544,7 +556,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
     std::string CallingRoutine; // calling routine
 
     DataConstantUsedForSizing = 1.0;
-    DataFractionUsedForSizing = 1.0;
+    DataFractionUsedForSizing = 0.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -581,7 +593,11 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    bool errorsFound = false;
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
     EXPECT_NEAR(5664.6, SizingResult, 0.1);
 
     CompType = "COIL:COOLING:WATER";
@@ -592,7 +608,8 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintWarning, CallingRoutine);
+    SizingResult = sizerCoolingCapacity.size(SizingResult, errorsFound);
     EXPECT_NEAR(5770.4, SizingResult, 0.1);
 }
 

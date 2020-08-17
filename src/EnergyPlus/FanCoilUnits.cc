@@ -1998,8 +1998,10 @@ namespace FanCoilUnits {
                                     PrintFlag = false;
                                     TempSize = AutoSize;
                                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                                    ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = TempSize;
+                                    CoolingCapacitySizer sizerCoolingCapacity2;
+                                    sizerCoolingCapacity2.overrideSizingString(SizingString);
+                                    sizerCoolingCapacity2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                    ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = sizerCoolingCapacity2.size(TempSize, ErrorsFound);
                                     ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                                     TempSize = ZoneEqSizing(CurZoneEqNum).DesCoolingLoad * ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                                     DataScalableCapSizingON = true;
@@ -2007,8 +2009,10 @@ namespace FanCoilUnits {
                             }
                             SizingString = "Cooling Design Capacity [W]";
                             PrintFlag = false;
-                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                            DesCoilLoad = TempSize;
+                            CoolingCapacitySizer sizerCoolingCapacity3;
+                            sizerCoolingCapacity3.overrideSizingString(SizingString);
+                            sizerCoolingCapacity3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                            DesCoilLoad = sizerCoolingCapacity3.size(TempSize, ErrorsFound);
                             DataScalableCapSizingON = false;
                             DataFlowUsedForSizing = 0.0;
                         } else {
@@ -2016,8 +2020,10 @@ namespace FanCoilUnits {
                             PrintFlag = false;
                             TempSize = AutoSize;
                             DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                            DesCoilLoad = TempSize;
+                            CoolingCapacitySizer sizerCoolingCapacity;
+                            sizerCoolingCapacity.overrideSizingString(SizingString);
+                            sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                            DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                         }
                         FanCoil(FanCoilNum).DesCoolingLoad = DesCoilLoad;
                         if (DesCoilLoad >= SmallLoad) {
