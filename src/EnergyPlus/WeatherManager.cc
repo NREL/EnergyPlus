@@ -191,13 +191,9 @@ namespace WeatherManager {
 
     Array2D_bool TodayIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
     Array2D_bool TodayIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayRainAmount;      // ficitious indicator of Rain NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodaySnowAmount;      // ficitious indicator of Snow NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutWetBulbTemp;  // Wet bulb temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutHumRat;       // Humidity ratio of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayWindDir;         // Wind direction of outside air NOLINT(cert-err58-cpp)
@@ -210,8 +206,6 @@ namespace WeatherManager {
 
     Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
     Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowSnowAmount;      // ficitious indicator of Snow NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air NOLINT(cert-err58-cpp)
@@ -387,13 +381,9 @@ namespace WeatherManager {
         NumWPSkyTemperatures = 0;             // Number of WeatherProperty:SkyTemperature items in input file
         TodayIsRain.deallocate();             // Rain indicator, true=rain
         TodayIsSnow.deallocate();             // Snow indicator, true=snow
-        TodayRainAmount.deallocate();         // ficitious indicator of Rain
-        TodaySnowAmount.deallocate();         // ficitious indicator of Snow
         TodayOutDryBulbTemp.deallocate();     // Dry bulb temperature of outside air
-        TodayOutWetBulbTemp.deallocate();     // Wet bulb temperature of outside air
         TodayOutDewPointTemp.deallocate();    // Dew Point Temperature of outside air
         TodayOutBaroPress.deallocate();       // Barometric pressure of outside air
-        TodayOutHumRat.deallocate();          // Humidity ratio of outside air
         TodayOutRelHum.deallocate();          // Relative Humidity of outside air
         TodayWindSpeed.deallocate();          // Wind speed of outside air
         TodayWindDir.deallocate();            // Wind direction of outside air
@@ -405,8 +395,6 @@ namespace WeatherManager {
         TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
         TomorrowIsRain.deallocate();          // Rain indicator, true=rain
         TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
-        TomorrowRainAmount.deallocate();      // ficitious indicator of Rain
-        TomorrowSnowAmount.deallocate();      // ficitious indicator of Snow
         TomorrowOutDryBulbTemp.deallocate();  // Dry bulb temperature of outside air
         TomorrowOutDewPointTemp.deallocate(); // Dew Point Temperature of outside air
         TomorrowOutBaroPress.deallocate();    // Barometric pressure of outside air
