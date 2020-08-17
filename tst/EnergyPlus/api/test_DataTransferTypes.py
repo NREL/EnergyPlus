@@ -12,7 +12,7 @@ class TestPythonAPITypes(unittest.TestCase):
     """
 
     def setUp(self):
-        self.state = api.state.new_state()
+        self.state = api.state_manager.new_state()
 
     def test_get_actuator_handle(self):
 

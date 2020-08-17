@@ -20,7 +20,7 @@ def error_handler(message: bytes) -> None:
 
 
 api = EnergyPlusAPI()
-state = api.state.new_state()
+state = api.state_manager.new_state()
 api.runtime.callback_begin_new_environment(state, environment_handler)
 api.runtime.callback_progress(state, progress_handler)
 api.functional.callback_error(state, error_handler)

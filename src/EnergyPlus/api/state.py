@@ -1,7 +1,7 @@
 from ctypes import cdll, c_void_p
 
 
-class State:
+class StateManager:
     """
     This API class enables a client to create and manage state instances for using EnergyPlus API methods.
     Nearly all EnergyPlus API methods require a state object to be passed in, and when callbacks are made, the current

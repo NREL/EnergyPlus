@@ -4,7 +4,7 @@ from pyenergyplus.api import EnergyPlusAPI
 
 api = EnergyPlusAPI()
 
-state = api.state.new_state()
+state = api.state_manager.new_state()
 
 # GLYCOL TESTS
 glycol = api.functional.glycol(state, u"water")
