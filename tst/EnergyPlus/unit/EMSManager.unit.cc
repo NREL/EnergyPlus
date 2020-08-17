@@ -848,14 +848,17 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    // Find the variable in the list
+    int internalVarNum = RuntimeLanguageProcessor::FindEMSVariable("TempSetpoint1", 0);
+    ASSERT_GT(internalVarNum, 0);
     // Expect the variable to not yet be initialized
-    EXPECT_FALSE(ErlVariable(25).Value.initialized);
+    EXPECT_FALSE(ErlVariable(internalVarNum).Value.initialized);
     // next run a small program that sets the value
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
     // check that it worked and the value came thru
-    EXPECT_NEAR(ErlVariable(25).Value.Number, 21.0, 0.0000001);
+    EXPECT_NEAR(ErlVariable(internalVarNum).Value.Number, 21.0, 0.0000001);
     // check of state to see if now initialized
-    EXPECT_TRUE(ErlVariable(25).Value.initialized);
+    EXPECT_TRUE(ErlVariable(internalVarNum).Value.initialized);
 }
 
 TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
@@ -1102,7 +1105,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_TRUE(anyRan);
 
     int index(0);
-    int offset(25); // first 24 values in ErlExpression() are key words + 1 EMS global variable
+    int offset(27); // first 26 values in ErlExpression() are key words + 1 EMS global variable
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(1).Operator, FuncRound);
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(1).NumOperands, 1);
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(1).Operand.size(), 1u);

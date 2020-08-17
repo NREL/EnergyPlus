@@ -521,9 +521,11 @@ namespace WeatherManager {
         InitializeWeather(state.files, PrintEnvrnStamp);
 
         bool anyEMSRan = false;
-        EMSManager::ManageEMS(
-            state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
-
+        // Cannot call this during sizing, because EMS will not intialize properly until after simulation kickoff
+        if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            EMSManager::ManageEMS(
+                state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+        }
         SetCurrentWeather();
 
         ReportWeatherAndTimeInformation(state.files, PrintEnvrnStamp);
