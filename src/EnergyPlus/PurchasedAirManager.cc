@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -1668,11 +1669,16 @@ namespace PurchasedAirManager {
                             PrintFlag = false;
                             RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                             DataAutosizedCoolingCapacity = TempSize;
+                            bool errorsFound = false;
+                            CoolingCapacitySizer sizerCoolingCapacity;
+                            sizerCoolingCapacity.overrideSizingString(SizingString);
+                            sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                            DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, errorsFound);
                             DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                             PrintFlag = true;
                             TempSize = AutoSize;
                             DataScalableSizingON = true;
-                            bool errorsFound = false;
+                            errorsFound = false;
                             CoolingAirFlowSizer sizingCoolingAirFlow;
                             std::string stringOverride = "Maximum Cooling Air Flow Rate [m3/s]";
                             if (DataGlobals::isEpJSON) stringOverride = "maximum_cooling_air_flow_rate [m3/s]";
@@ -1715,8 +1721,11 @@ namespace PurchasedAirManager {
                     ZoneCoolingOnlyFan = true;
                     PrintFlag = false;
                     TempSize = PurchAir(PurchAirNum).MaxCoolTotCap;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    MaxCoolTotCapDes = TempSize;
+                    bool errorsFound = false;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    MaxCoolTotCapDes = sizerCoolingCapacity.size(TempSize, errorsFound);
                     ZoneCoolingOnlyFan = false;
                     if (MaxCoolTotCapDes < SmallLoad) {
                         MaxCoolTotCapDes = 0.0;
@@ -1899,7 +1908,11 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxCoolTotCap > 0.0) {
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolTotCap, PrintFlag, RoutineName);
+                        bool errorsFound = false;
+                        CoolingCapacitySizer sizerCoolingCapacity;
+                        sizerCoolingCapacity.overrideSizingString(SizingString);
+                        sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        PurchAir(PurchAirNum).MaxCoolTotCap = sizerCoolingCapacity.size(PurchAir(PurchAirNum).MaxCoolTotCap, errorsFound);
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;

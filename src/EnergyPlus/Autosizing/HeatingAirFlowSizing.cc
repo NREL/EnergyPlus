@@ -241,6 +241,14 @@ Real64 HeatingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
             }
         } else if (this->dataNonZoneNonAirloopValue > 0) {
             this->autoSizedValue = this->dataNonZoneNonAirloopValue;
+        } else {
+            std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+            ShowSevereError(msg);
+            this->addErrorMessage(msg);
+            msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->autoSizedValue, 1);
+            ShowContinueError(msg);
+            this->addErrorMessage(msg);
+            errorsFound = true;
         }
         // override sizing string
         if (this->isEpJSON) this->sizingString = "heating_supply_air_flow_rate [m3/s]";

@@ -60,7 +60,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
                                                      const bool &_printWarningFlag,
                                                      const std::string &_callingRoutine)
 {
-    BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+    BaseSizerWithFanHeatInputs::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
 
     this->dataScalableSizingON = DataSizing::DataScalableSizingON;
     this->dataHRFlowSizingFlag = DataSizing::HRFlowSizingFlag;
@@ -73,7 +73,51 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     this->dataFlowPerHeatingCapacity = DataSizing::DataFlowPerHeatingCapacity;
     this->dataAutosizedHeatingCapacity = DataSizing::DataAutosizedHeatingCapacity;
 
+    this->dataCoilSizingAirInTemp = DataSizing::DataCoilSizingAirInTemp;
+    this->dataCoilSizingAirInHumRat = DataSizing::DataCoilSizingAirInHumRat;
+    this->dataCoilSizingAirOutTemp = DataSizing::DataCoilSizingAirOutTemp;
+    this->dataCoilSizingAirOutHumRat = DataSizing::DataCoilSizingAirOutHumRat;
+    this->dataCoilSizingFanCoolLoad = DataSizing::DataCoilSizingFanCoolLoad;
+    this->dataCoilSizingCapFT = DataSizing::DataCoilSizingCapFT;
+    this->dataTotCapCurveIndex = DataSizing::DataTotCapCurveIndex;
+    this->dataTotCapCurveValue = DataSizing::DataTotCapCurveValue;
+    this->dataFracOfAutosizedCoolingCapacity = DataSizing::DataFracOfAutosizedCoolingCapacity;
+
     this->zoneHVACSizing = DataSizing::ZoneHVACSizing;
+
+    // set supply air fan properties
+    if (this->isCoilReportObject && this->curSysNum > 0 && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
+        int SupFanNum = this->primaryAirSystem(this->curSysNum).SupFanNum;
+        int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
+        switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
+        case DataAirSystems::structArrayLegacyFanModels: {
+            if (SupFanNum > 0) {
+                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                             this->compName,
+                                                             this->compType,
+                                                             Fans::Fan(SupFanNum).FanName,
+                                                             DataAirSystems::structArrayLegacyFanModels,
+                                                             this->primaryAirSystem(this->curSysNum).SupFanNum);
+            }
+            break;
+        }
+        case DataAirSystems::objectVectorOOFanSystemModel: {
+            if (this->primaryAirSystem(this->curSysNum).supFanVecIndex >= 0) {
+                coilSelectionReportObj->setCoilSupplyFanInfo(state,
+                                                             this->compName,
+                                                             this->compType,
+                                                             HVACFan::fanObjs[this->primaryAirSystem(this->curSysNum).supFanVecIndex]->name,
+                                                             DataAirSystems::objectVectorOOFanSystemModel,
+                                                             this->primaryAirSystem(this->curSysNum).supFanVecIndex);
+            }
+            break;
+        }
+        case DataAirSystems::fanModelTypeNotYetSet: {
+            // do nothing
+            break;
+        }
+        } // end switch
+    }
 
     if (this->curZoneEqNum) {
         if (this->zoneHVACSizingIndex > 0) {
@@ -83,7 +127,8 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
             if (coolingSAFMethod == DataSizing::FlowPerFloorArea) {
                 DataSizing::DataScalableSizingON = true;
-                this->dataConstantUsedForSizing = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * DataHeatBalance::Zone(DataSizing::DataZoneNumber).FloorArea;
+                this->dataConstantUsedForSizing =
+                    this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow * DataHeatBalance::Zone(DataSizing::DataZoneNumber).FloorArea;
             } else if (coolingSAFMethod == DataSizing::FractionOfAutosizedCoolingAirflow) {
                 DataSizing::DataFracOfAutosizedCoolingAirflow = this->zoneHVACSizing(this->zoneHVACSizingIndex).MaxCoolAirVolFlow;
                 DataSizing::DataScalableSizingON = true;
@@ -102,7 +147,8 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     }
 }
 
-void BaseSizerWithScalableInputs::setHVACSizingIndexData(int const index) {
+void BaseSizerWithScalableInputs::setHVACSizingIndexData(int const index)
+{
     this->zoneHVACSizingIndex = index;
 }
 

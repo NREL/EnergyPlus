@@ -63,6 +63,7 @@ enum class AutoSizingType
     ASHRAEMaxSATHeatingSizing,
     AutoCalculateSizing,
     CoolingAirFlowSizing,
+    CoolingCapacitySizing,
     CoolingSHRSizing,
     CoolingWaterDesAirInletHumRatSizing,
     CoolingWaterDesAirInletTempSizing,
@@ -221,6 +222,8 @@ struct BaseSizer
 
     // CoolingAirFlowSizing
     Real64 dataBypassFrac = 0.0;
+
+    Real64 dataIsDXCoil = false;
 
     Real64 dataNonZoneNonAirloopValue = 0.0;
 

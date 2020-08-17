@@ -48,6 +48,7 @@
 
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -173,12 +174,13 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     this->ratedEvapAirMassFlowRate = this->ratedEvapAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(
             DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
-    int SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
     std::string SizingString = "Rated Gross Total Cooling Capacity";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-    this->ratedGrossTotalCap = TempSize;
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->ratedGrossTotalCap = sizerCoolingCapacity.size(TempSize, errorsFound);
 
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;

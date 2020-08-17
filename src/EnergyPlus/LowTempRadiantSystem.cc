@@ -54,6 +54,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -2625,13 +2626,17 @@ namespace LowTempRadiantSystem {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CapSizingMethod == CoolingDesignCapacity && HydrRadSys(RadSysNum).ScaledCoolingCapacity > 0.0) {
                         TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        CoolingCapacitySizer sizerCoolingCapacity;
+                        sizerCoolingCapacity.overrideSizingString(SizingString);
+                        sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         DataScalableCapSizingON = true;
                         TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity * Zone(HydrRadSys(RadSysNum).ZonePtr).FloorArea;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        CoolingCapacitySizer sizerCoolingCapacity;
+                        sizerCoolingCapacity.overrideSizingString(SizingString);
+                        sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
                         if (HydrRadSys(RadSysNum).WaterVolFlowMaxCool == AutoSize) {
@@ -2675,8 +2680,10 @@ namespace LowTempRadiantSystem {
                         } else {
                             TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity;
                         }
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        CoolingCapacitySizer sizerCoolingCapacity;
+                        sizerCoolingCapacity.overrideSizingString(SizingString);
+                        sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
                         DataScalableCapSizingON = false;

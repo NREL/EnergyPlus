@@ -164,6 +164,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataDesignCoilCapacity = DataSizing::DataDesignCoilCapacity;
     this->dataErrorsFound = DataSizing::DataErrorsFound;
     this->dataBypassFrac = DataSizing::DataBypassFrac;
+    this->dataIsDXCoil = DataSizing::DataIsDXCoil;
     this->dataNonZoneNonAirloopValue = DataSizing::DataNonZoneNonAirloopValue;
 }
 
@@ -749,6 +750,7 @@ void BaseSizer::clearState()
     dataDesignCoilCapacity = 0.0;
     dataErrorsFound = false;
     dataBypassFrac = 0.0;
+    dataIsDXCoil = false;
 
     dataNonZoneNonAirloopValue = 0.0;
 

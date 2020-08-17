@@ -58,6 +58,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -4949,6 +4950,10 @@ namespace PackagedTerminalHeatPump {
                     }
                     RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DataAutosizedCoolingCapacity = TempSize;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;

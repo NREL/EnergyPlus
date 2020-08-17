@@ -35,6 +35,8 @@ SET( SRC
   Autosizing/BaseSizerWithScalableInputs.hh
   Autosizing/CoolingAirFlowSizing.cc
   Autosizing/CoolingAirFlowSizing.hh
+  Autosizing/CoolingCapacitySizing.cc
+  Autosizing/CoolingCapacitySizing.hh
   Autosizing/CoolingSHRSizing.cc
   Autosizing/CoolingSHRSizing.hh
   Autosizing/CoolingWaterDesAirInletHumRatSizing.cc

@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -1016,12 +1017,15 @@ namespace WindowAC {
                     if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                         DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DataCapacityUsedForSizing = TempSize;
+                    bool errorsFound = false;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DataCapacityUsedForSizing = sizerCoolingCapacity.size(TempSize, errorsFound);
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    bool errorsFound = false;
+                    errorsFound = false;
                     CoolingAirFlowSizer sizingCoolingAirFlow;
                     std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
                     if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";

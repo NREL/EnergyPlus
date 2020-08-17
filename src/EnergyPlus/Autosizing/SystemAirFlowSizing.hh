@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SystemAirFlowSizingSizing_hh_INCLUDED
-#define SystemAirFlowSizingSizing_hh_INCLUDED
+#ifndef SystemAirFlowSizing_hh_INCLUDED
+#define SystemAirFlowSizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>

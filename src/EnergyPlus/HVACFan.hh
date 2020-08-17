@@ -111,6 +111,9 @@ namespace HVACFan {
         void
         FanInputsForDesignHeatGain(EnergyPlusData &state, Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac);
 
+        void
+        getFanInputsForDesignHeatGain(EnergyPlusData& state, Real64& deltaP, Real64& motEff, Real64& totEff, Real64& motInAirFrac);
+
         // void
         // fanIsSecondaryDriver();
 

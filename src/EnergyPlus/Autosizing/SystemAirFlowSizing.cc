@@ -876,6 +876,14 @@ Real64 SystemAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
             }
         } else if (this->dataNonZoneNonAirloopValue > 0) {
             this->autoSizedValue = this->dataNonZoneNonAirloopValue;
+        } else {
+            std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+            ShowSevereError(msg);
+            this->addErrorMessage(msg);
+            msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->autoSizedValue, 1);
+            ShowContinueError(msg);
+            this->addErrorMessage(msg);
+            errorsFound = true;
         }
 
         if (this->dataScalableSizingON) {

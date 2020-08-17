@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -7007,8 +7008,16 @@ namespace DXCoils {
                 DataIsDXCoil = true;
                 DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                 DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                DXCoil(DXCoilNum).RatedTotCap(Mode) = TempSize;
+                if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical ||
+                    DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Heating || DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating) {
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    DXCoil(DXCoilNum).RatedTotCap(Mode) = TempSize;
+                } else {
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DXCoil(DXCoilNum).RatedTotCap(Mode) = sizerCoolingCapacity.size(TempSize, ErrorsFound);
+                }
                 DataIsDXCoil = false;
                 DataFlowUsedForSizing = 0.0;
                 DataCoolCoilCap = 0.0;
@@ -7404,7 +7413,10 @@ namespace DXCoils {
                         PrintFlag = false;
                         TempSize = DataSizing::AutoSize;
                         // Auto size capacity at the highest speed
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        CoolingCapacitySizer sizerCoolingCapacity;
+                        sizerCoolingCapacity.overrideSizingString(SizingString);
+                        sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        TempSize = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = TempSize;
                         DataFractionUsedForSizing = 1.0;
@@ -7413,7 +7425,10 @@ namespace DXCoils {
                         PrintFlag = true;
                     }
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    CoolingCapacitySizer sizerCoolingCapacity2;
+                    sizerCoolingCapacity2.overrideSizingString(SizingString);
+                    sizerCoolingCapacity2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    TempSize = sizerCoolingCapacity2.size(TempSize, ErrorsFound);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
@@ -7439,8 +7454,10 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DXCoil(DXCoilNum).MSRatedTotCap(Mode) = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                 }
                 DataEMSOverride = 0.0;
                 DataEMSOverrideON = false;

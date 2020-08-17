@@ -45,81 +45,26 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef BaseSizerWithScalableInputs_hh_INCLUDED
-#define BaseSizerWithScalableInputs_hh_INCLUDED
+#ifndef CoolingCapacitySizing_hh_INCLUDED
+#define CoolingCapacitySizing_hh_INCLUDED
 
-#include <EnergyPlus/api/TypeDefs.h>
-//#include <EnergyPlus/Autosizing/Base.hh>
-#include <EnergyPlus/Autosizing/BaseSizerWithFanHeatInputs.hh>
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
-#include <string>
+#include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
-struct EnergyPlusData;
-
-struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
-
-    int zoneAirFlowSizMethod = 0;
-    bool zoneCoolingOnlyFan = false;
-    bool zoneHeatingOnlyFan = false;
-    bool dataScalableSizingON = false;
-    bool dataHRFlowSizingFlag = false;
-    Real64 dataFracOfAutosizedCoolingAirflow = 0.0;
-    Real64 dataFracOfAutosizedHeatingAirflow = 0.0;
-    Real64 dataFlowPerCoolingCapacity = 0.0;
-    Real64 dataAutosizedCoolingCapacity = 0.0;
-    Real64 dataFlowPerHeatingCapacity = 0.0;
-    Real64 dataAutosizedHeatingCapacity = 0.0;
-
-    // capacity sizing
-    Real64 dataCoilSizingAirInTemp = 0.0;
-    Real64 dataCoilSizingAirInHumRat = 0.0;
-    Real64 dataCoilSizingAirOutTemp = 0.0;
-    Real64 dataCoilSizingAirOutHumRat = 0.0;
-    Real64 dataCoilSizingFanCoolLoad = 0.0;
-    Real64 dataCoilSizingCapFT = 0.0;
-    Real64 dataTotCapCurveIndex = 0.0;
-    Real64 dataTotCapCurveValue = 0.0;
-    Real64 dataFracOfAutosizedCoolingCapacity = 0.0;
-
-    int zoneHVACSizingIndex = 0;
-    Array1D<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
-
-    void initializeWithinEP(EnergyPlusData &state,
-                            std::string const &_compType,
-                            std::string const &_compName,
-                            bool const &_printWarningFlag,
-                            std::string const &_callingRoutine) override;
-
-    void clearState() {
-        BaseSizerWithFanHeatInputs::clearState();
-        zoneAirFlowSizMethod = 0;
-        zoneCoolingOnlyFan = false;
-        zoneHeatingOnlyFan = false;
-        dataScalableSizingON = false;
-        dataHRFlowSizingFlag = false;
-        dataFracOfAutosizedCoolingAirflow = 0.0;
-        dataFracOfAutosizedHeatingAirflow = 0.0;
-        dataFlowPerCoolingCapacity = 0.0;
-        dataAutosizedCoolingCapacity = 0.0;
-        dataFlowPerHeatingCapacity = 0.0;
-        dataAutosizedHeatingCapacity = 0.0;
-        dataCoilSizingAirInTemp = 0.0;
-        dataCoilSizingAirInHumRat = 0.0;
-        dataCoilSizingAirOutTemp = 0.0;
-        dataCoilSizingAirOutHumRat = 0.0;
-        dataCoilSizingFanCoolLoad = 0.0;
-        dataCoilSizingCapFT = 0.0;
-        dataTotCapCurveIndex = 0.0;
-        dataTotCapCurveValue = 0.0;
-        dataFracOfAutosizedCoolingCapacity = 0.0;
-        zoneHVACSizingIndex = 0;
-        zoneHVACSizing.clear();
+struct CoolingCapacitySizer : BaseSizerWithScalableInputs
+{
+    CoolingCapacitySizer()
+    {
+        this->sizingType = AutoSizingType::CoolingCapacitySizing;
+        this->sizingString = "Cooling Capacity [W]";
     }
+    ~CoolingCapacitySizer() = default;
 
-    void setHVACSizingIndexData(int const index);
+    Real64 size(Real64 originalValue, bool &errorsFound) override;
 
+    void clearState();
 };
 
 } // namespace EnergyPlus

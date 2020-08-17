@@ -74,6 +74,7 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
                 this->autoSizedValue = _originalValue;
                 if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
+                    this->originalValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
                 }
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
@@ -650,6 +651,14 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
             }
         } else if (this->dataNonZoneNonAirloopValue > 0) {
             this->autoSizedValue = this->dataNonZoneNonAirloopValue;
+        } else {
+            std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+            ShowSevereError(msg);
+            this->addErrorMessage(msg);
+            msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->autoSizedValue, 1);
+            ShowContinueError(msg);
+            this->addErrorMessage(msg);
+            errorsFound = true;
         }
 
         // override sizing string

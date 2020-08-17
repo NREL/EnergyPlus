@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -1892,8 +1893,10 @@ namespace VentilatedSlab {
                     PrintFlag = false;
                     DataScalableSizingON = true;
                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DataAutosizedCoolingCapacity = TempSize;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     PrintFlag = true;
                     TempSize = AutoSize;
@@ -2374,8 +2377,10 @@ namespace VentilatedSlab {
                                 }
                                 SizingString = "";
                                 PrintFlag = false;
-                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                                DesCoilLoad = TempSize;
+                                CoolingCapacitySizer sizerCoolingCapacity;
+                                sizerCoolingCapacity.overrideSizingString(SizingString);
+                                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                DesCoilLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                                 DataScalableCapSizingON = false;
                             } else {
                                 SizingString = "";

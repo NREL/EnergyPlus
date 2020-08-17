@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -1532,11 +1533,13 @@ namespace FanCoilUnits {
                         SizingMethod = CoolingCapacitySizing;
                         TempSize = AutoSize;
                         PrintFlag = false;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        CoolingCapacitySizer sizerCoolingCapacity;
+                        sizerCoolingCapacity.overrideSizingString(SizingString);
+                        sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                         if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                             DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                         }
-                        DataAutosizedCoolingCapacity = TempSize;
                         DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         PrintFlag = true;
                         TempSize = AutoSize;
@@ -1983,8 +1986,10 @@ namespace FanCoilUnits {
                                         PrintFlag = false;
                                         TempSize = AutoSize;
                                         DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                                        ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = TempSize;
+                                        CoolingCapacitySizer sizerCoolingCapacity;
+                                        sizerCoolingCapacity.overrideSizingString(SizingString);
+                                        sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                        ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                                         ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
                                     }
                                     TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity * Zone(DataZoneNumber).FloorArea;

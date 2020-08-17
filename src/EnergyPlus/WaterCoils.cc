@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirInletTempSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
@@ -2230,8 +2231,10 @@ namespace WaterCoils {
                 DataDesInletAirHumRat = sizerCWDesInHumRat.size(TempSize, ErrorsFound);
 
                 TempSize = AutoSize;
-                RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
-                DataCapacityUsedForSizing = TempSize;
+                CoolingCapacitySizer sizerCoolingCapacity;
+                sizerCoolingCapacity.overrideSizingString(SizingString);
+                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                DataCapacityUsedForSizing = sizerCoolingCapacity.size(TempSize, ErrorsFound);
                 TempSize = WaterCoil(CoilNum).MaxWaterVolFlowRate;
                 CoolingWaterflowSizer sizerCWWaterflow;
                 sizerCWWaterflow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
@@ -2331,8 +2334,10 @@ namespace WaterCoils {
                                                        // always print this!)
                 // air inlet/outlet conditions should be known. Don't include fan heat in capacity calculation.
                 DataDesAccountForFanHeat = false;
-                RequestSizing(state, CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName);
-                WaterCoil(CoilNum).DesWaterCoolingCoilRate = TempSize;
+                CoolingCapacitySizer sizerCoolingCapacity2;
+                sizerCoolingCapacity2.overrideSizingString(SizingString);
+                sizerCoolingCapacity2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                WaterCoil(CoilNum).DesWaterCoolingCoilRate = sizerCoolingCapacity2.size(TempSize, ErrorsFound);
                 WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
                 DataCapacityUsedForSizing = WaterCoil(CoilNum).DesWaterCoolingCoilRate;
 
@@ -2483,6 +2488,7 @@ namespace WaterCoils {
                 DataDesInletAirHumRat = 0.0;
                 DataDesInletWaterTemp = 0.0;
                 DataWaterCoilSizCoolDeltaT = 0.0;
+                DataDesAccountForFanHeat = true;
             } else {
                 // If there is no cooling Plant Sizing object and autosizing was requested, issue fatal error message
                 if (WaterCoil(CoilNum).RequestingAutoSize) {

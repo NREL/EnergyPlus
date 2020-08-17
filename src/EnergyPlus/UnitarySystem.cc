@@ -50,6 +50,7 @@
 #include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchInputManager.hh>
@@ -1627,9 +1628,11 @@ namespace UnitarySystems {
                         DataSizing::DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, this->m_CoolingCoilIndex, ErrFound);
                         DataSizing::DataIsDXCoil = true;
                     }
-                    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    CoolCapAtPeak = TempSize;
-                    SysCoolingFlow = TempSize * this->m_MaxCoolAirVolFlow;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    CoolCapAtPeak = sizerCoolingCapacity.size(TempSize, errorsFound);
+                    SysCoolingFlow = CoolCapAtPeak * this->m_MaxCoolAirVolFlow;
                     DataSizing::DataTotCapCurveIndex = 0;
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = CoolCapAtPeak;
@@ -1668,8 +1671,10 @@ namespace UnitarySystems {
                     DataSizing::DataTotCapCurveIndex = VariableSpeedCoils::GetVSCoilCapFTCurveIndex(this->m_CoolingCoilIndex, ErrFound);
                     DataSizing::DataIsDXCoil = true;
                 }
-                ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                CoolCapAtPeak = TempSize;
+                CoolingCapacitySizer sizerCoolingCapacity;
+                sizerCoolingCapacity.overrideSizingString(SizingString);
+                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                CoolCapAtPeak = sizerCoolingCapacity.size(TempSize, errorsFound);
                 DataSizing::DXCoolCap = CoolCapAtPeak;
                 EqSizing.CoolingCapacity = true;
                 EqSizing.DesCoolingLoad = CoolCapAtPeak;
@@ -1686,8 +1691,10 @@ namespace UnitarySystems {
                     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
                     DataSizing::DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                     TempSize = DataSizing::AutoSize;
-                    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    CoolCapAtPeak = TempSize;
+                    CoolingCapacitySizer sizerCoolingCapacity;
+                    sizerCoolingCapacity.overrideSizingString(SizingString);
+                    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    CoolCapAtPeak = sizerCoolingCapacity.size(TempSize, errorsFound);
                     DataSizing::DXCoolCap = CoolCapAtPeak;
                     EqSizing.CoolingCapacity = true;
                     EqSizing.DesCoolingLoad = CoolCapAtPeak;
@@ -2575,8 +2582,11 @@ namespace UnitarySystems {
             TempSize = this->m_DesignCoolingCapacity;
             DataSizing::DataFlowUsedForSizing = this->m_MaxCoolAirVolFlow;
             SizingString = "Nominal Cooling Capacity [W]";
-            ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            this->m_DesignCoolingCapacity = TempSize;
+            bool errorsFound = false;
+            CoolingCapacitySizer sizerCoolingCapacity;
+            sizerCoolingCapacity.overrideSizingString(SizingString);
+            sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            this->m_DesignCoolingCapacity = sizerCoolingCapacity.size(TempSize, errorsFound);
             DataSizing::DataConstantUsedForSizing = 0.0;
             DataSizing::DataFractionUsedForSizing = 0.0;
             DataSizing::DataFlowUsedForSizing = 0.0;

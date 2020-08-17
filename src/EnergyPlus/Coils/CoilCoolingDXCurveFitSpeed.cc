@@ -49,6 +49,7 @@
 #include <utility>
 
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
@@ -349,7 +350,10 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
 
     int SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
     std::string SizingString = "Gross Cooling Capacity [W]";
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->rated_total_capacity, PrintFlag, RoutineName);
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->rated_total_capacity = sizerCoolingCapacity.size(this->rated_total_capacity, errorsFound);
 
      //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
