@@ -160,34 +160,34 @@ namespace WeatherManager {
     extern Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air {C}
     extern Array2D<Real64> TodayOutWetBulbTemp;  // Wet bulb temperature of outside air - unused
     extern Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air {C}
-    extern Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air
+    extern Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air {Pa}
     extern Array2D<Real64> TodayOutHumRat;       // Humidity ratio of outside air - unused
-    extern Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air
-    extern Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air
-    extern Array2D<Real64> TodayWindDir;         // Wind direction of outside air
-    extern Array2D<Real64> TodaySkyTemp;         // Sky temperature
-    extern Array2D<Real64> TodayHorizIRSky;      // Horizontal IR from Sky
-    extern Array2D<Real64> TodayBeamSolarRad;    // Direct normal solar irradiance
-    extern Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance
-    extern Array2D<Real64> TodayAlbedo;          // Albedo
-    extern Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth (mm)
+    extern Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air {percent}
+    extern Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air {m/sec}
+    extern Array2D<Real64> TodayWindDir;         // Wind direction {deg, N=0, E=90, S=180, W=280}
+    extern Array2D<Real64> TodaySkyTemp;         // Sky temperature {C}
+    extern Array2D<Real64> TodayHorizIRSky;      // Horizontal IR from Sky {W/m2}
+    extern Array2D<Real64> TodayBeamSolarRad;    // Direct normal solar irradiance {W/m2}
+    extern Array2D<Real64> TodayDifSolarRad;     // Sky diffuse horizontal solar irradiance {W/m2}
+    extern Array2D<Real64> TodayAlbedo;          // Albedo {dimensionless}
+    extern Array2D<Real64> TodayLiquidPrecip;    // Liquid Precipitation Depth {mm}
 
     extern Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
     extern Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
     extern Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain - unused
     extern Array2D<Real64> TomorrowSnowAmount;      // ficitious indicator of Snow - unused
-    extern Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air
-    extern Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
-    extern Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air
-    extern Array2D<Real64> TomorrowOutRelHum;       // Relative Humidity of outside air
-    extern Array2D<Real64> TomorrowWindSpeed;       // Wind speed of outside air
-    extern Array2D<Real64> TomorrowWindDir;         // Wind direction of outside air
-    extern Array2D<Real64> TomorrowSkyTemp;         // Sky temperature
-    extern Array2D<Real64> TomorrowHorizIRSky;      // Horizontal IR from Sky
-    extern Array2D<Real64> TomorrowBeamSolarRad;    // Direct normal solar irradiance
-    extern Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance
-    extern Array2D<Real64> TomorrowAlbedo;          // Albedo
-    extern Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth
+    extern Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air {C}
+    extern Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air {C}
+    extern Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air {Pa}
+    extern Array2D<Real64> TomorrowOutRelHum;       // Relative Humidity of outside air {percent}
+    extern Array2D<Real64> TomorrowWindSpeed;       // Wind speed of outside air {m/sec}
+    extern Array2D<Real64> TomorrowWindDir;         // Wind direction {deg, N=0, E=90, S=180, W=280}
+    extern Array2D<Real64> TomorrowSkyTemp;         // Sky temperature {C}
+    extern Array2D<Real64> TomorrowHorizIRSky;      // Horizontal IR from Sky {W/m2}
+    extern Array2D<Real64> TomorrowBeamSolarRad;    // Direct normal solar irradiance {W/m2}
+    extern Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance {W/m2}
+    extern Array2D<Real64> TomorrowAlbedo;          // Albedo {dimensionless}
+    extern Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth {mm}
 
     extern Real64 TimeStepFraction; // Fraction of hour each time step represents
     extern Array1D_int EndDayOfMonth;
