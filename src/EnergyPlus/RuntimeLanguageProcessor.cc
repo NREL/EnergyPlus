@@ -1403,30 +1403,38 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
 
-                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) ||
-                        i_parse("@Cos", FuncCos) || i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) ||
-                        i_parse("@DegToRad", FuncDegToRad) || i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) ||
-                        i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) || i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) ||
-                        i_parse("@RANDOMUNIFORM", FuncRandU) || i_parse("@RANDOMNORMAL", FuncRandG) ||
-                        i_parse("@SEEDRANDOM", FuncRandSeed) || i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) ||
-                        i_parse("@CpAirFnW", FuncCpAirFnW) || i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) ||
-                        i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) || i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) ||
-                        i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
+                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) || i_parse("@Cos", FuncCos) ||
+                        i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) || i_parse("@DegToRad", FuncDegToRad) ||
+                        i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) || i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) ||
+                        i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) || i_parse("@RANDOMUNIFORM", FuncRandU) ||
+                        i_parse("@RANDOMNORMAL", FuncRandG) || i_parse("@SEEDRANDOM", FuncRandSeed) ||
+                        i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) || i_parse("@CpAirFnW", FuncCpAirFnW) ||
+                        i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) || i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) ||
+                        i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) || i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
                         i_parse("@HFnTdbRhPb", FuncHFnTdbRhPb) || i_parse("@TdbFnHW", FuncTdbFnHW) ||
                         i_parse("@RhovFnTdbRhLBnd0C", FuncRhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", FuncRhovFnTdbRh) ||
                         i_parse("@RhovFnTdbWPb", FuncRhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", FuncRhFnTdbRhovLBnd0C) ||
                         i_parse("@RhFnTdbRhov", FuncRhFnTdbRhov) || i_parse("@RhFnTdbWPb", FuncRhFnTdbWPb) ||
-                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) ||
-                        i_parse("@WFnTdpPb", FuncWFnTdpPb) || i_parse("@WFnTdbH", FuncWFnTdbH) ||
-                        i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
-                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) ||
-                        i_parse("@TsatFnPb", FuncTsatFnPb) || i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) ||
-                        i_parse("@RhoH2O", FuncRhoH2O) || i_parse("@FATALHALTEP", FuncFatalHaltEp) ||
-                        i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
-                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) ||
-                        i_parse("@TRENDMAX", FuncTrendMax) || i_parse("@TRENDMIN", FuncTrendMin) ||
-                        i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
-                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad)) {
+                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) || i_parse("@WFnTdpPb", FuncWFnTdpPb) ||
+                        i_parse("@WFnTdbH", FuncWFnTdbH) || i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
+                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) || i_parse("@TsatFnPb", FuncTsatFnPb) ||
+                        i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) || i_parse("@RhoH2O", FuncRhoH2O) ||
+                        i_parse("@FATALHALTEP", FuncFatalHaltEp) || i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
+                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) || i_parse("@TRENDMAX", FuncTrendMax) ||
+                        i_parse("@TRENDMIN", FuncTrendMin) || i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
+                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@TODAYISRAIN", FuncTodayIsRain) ||
+                        i_parse("@TODAYISSNOW", FuncTodayIsSnow) || i_parse("@TODAYOUTDRYBULBTEMP", FuncTodayOutDryBulbTemp) ||
+                        i_parse("@TODAYOUTDEWPOINTTEMP", FuncTodayOutDewPointTemp) || i_parse("@TODAYOUTBAROPRESS", FuncTodayOutBaroPress) ||
+                        i_parse("@TODAYOUTRELHUM", FuncTodayOutRelHum) || i_parse("@TODAYWINDSPEED", FuncTodayWindSpeed) ||
+                        i_parse("@TODAYWINDDIR", FuncTodayWindDir) || i_parse("@TODAYSKYTEMP", FuncTodaySkyTemp) ||
+                        i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad) || i_parse("@TODAYDIFSOLARRAD", FuncTodayDifSolarRad) ||
+                        i_parse("@TODAYLIQUIDPRECIP", FuncTodayLiquidPrecip) || i_parse("@TOMORROWISRAIN", FuncTomorrowIsRain) ||
+                        i_parse("@TOMORROWISSNOW", FuncTomorrowIsSnow) || i_parse("@TOMORROWOUTDRYBULBTEMP", FuncTomorrowOutDryBulbTemp) ||
+                        i_parse("@TOMORROWOUTDEWPOINTTEMP", FuncTomorrowOutDewPointTemp) ||
+                        i_parse("@TOMORROWOUTBAROPRESS", FuncTomorrowOutBaroPress) || i_parse("@TOMORROWOUTRELHUM", FuncTomorrowOutRelHum) ||
+                        i_parse("@TOMORROWWINDSPEED", FuncTomorrowWindSpeed) || i_parse("@TOMORROWWINDDIR", FuncTomorrowWindDir) ||
+                        i_parse("@TOMORROWSKYTEMP", FuncTomorrowSkyTemp) || i_parse("@TOMORROWBEAMSOLARRAD", FuncTomorrowBeamSolarRad) ||
+                        i_parse("@TOMORROWDIFSOLARRAD", FuncTomorrowDifSolarRad) || i_parse("@TOMORROWLIQUIDPRECIP", FuncTomorrowLiquidPrecip)) {
                         // was a built in function operator
                     } else { // throw error
                         if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", String);
@@ -2446,17 +2454,90 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent | 5th independent
                         }
 
+                    } else if (SELECT_CASE_var == FuncTodayIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodaySkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodaySkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TodayHorizIRSky, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
-                        int iHour = (Operand(1).Number + 1); // Operand 1 is hour from 0:23
-                        int iTimeStep = Operand(2).Number;
-                        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
-                            ReturnValue = SetErlValueNumber(WeatherManager::TodayBeamSolarRad(iTimeStep, iHour));
-                        } else {
-                            ReturnValue.Type = ValueError;
-                            ReturnValue.Error = "TodayBeamSolarRad function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand(1).Number,1)
-                                + ", Minutes=" + General::RoundSigDigits(Operand(2).Number,1);
-                        }
-
+                        TodayTomorrowWeather(
+                            FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TodayAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowLiquidPrecip, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowSkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowSkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowHorizIRSky, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowBeamSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowLiquidPrecip, ReturnValue);
                     } else {
                         // throw Error!
                         ShowFatalError("caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
@@ -2467,6 +2548,41 @@ namespace RuntimeLanguageProcessor {
         }
 
         return ReturnValue;
+    }
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            // For logicals return 1 or 0
+            if (TodayTomorrowWeatherSource(iTimeStep, iHour)) {
+                ReturnVal = SetErlValueNumber(1.0);
+            } else {
+                ReturnVal = SetErlValueNumber(0.0);
+            }
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
     }
 
     void GetRuntimeLanguageUserInput(IOFiles &ioFiles)

@@ -217,6 +217,12 @@ namespace RuntimeLanguageProcessor {
 
     ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
 
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
     void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
 
     void ReportRuntimeLanguage();

@@ -155,13 +155,13 @@ namespace WeatherManager {
 
     extern Array2D_bool TodayIsRain;             // Rain indicator, true=rain
     extern Array2D_bool TodayIsSnow;             // Snow indicator, true=snow
-    extern Array2D<Real64> TodayRainAmount;      // ficitious indicator of Rain
-    extern Array2D<Real64> TodaySnowAmount;      // ficitious indicator of Snow
-    extern Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air
-    extern Array2D<Real64> TodayOutWetBulbTemp;  // Wet bulb temperature of outside air
-    extern Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air
+    extern Array2D<Real64> TodayRainAmount;      // ficitious indicator of Rain - unused
+    extern Array2D<Real64> TodaySnowAmount;      // ficitious indicator of Snow - unused
+    extern Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air {C}
+    extern Array2D<Real64> TodayOutWetBulbTemp;  // Wet bulb temperature of outside air - unused
+    extern Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air {C}
     extern Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air
-    extern Array2D<Real64> TodayOutHumRat;       // Humidity ratio of outside air
+    extern Array2D<Real64> TodayOutHumRat;       // Humidity ratio of outside air - unused
     extern Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air
     extern Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air
     extern Array2D<Real64> TodayWindDir;         // Wind direction of outside air
@@ -174,8 +174,8 @@ namespace WeatherManager {
 
     extern Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain
     extern Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow
-    extern Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain
-    extern Array2D<Real64> TomorrowSnowAmount;      // ficitious indicator of Snow
+    extern Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain - unused
+    extern Array2D<Real64> TomorrowSnowAmount;      // ficitious indicator of Snow - unused
     extern Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air
     extern Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air
     extern Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air

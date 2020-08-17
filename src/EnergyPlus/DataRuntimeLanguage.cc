@@ -178,17 +178,38 @@ namespace DataRuntimeLanguage {
     int const FuncCurveValue(68);
 
     // Weather data query functions
-    int const FuncTodayBeamSolarRad(69); // Access TodayBeamSolarRad(hour, timestep)
+    int const FuncTodayIsRain(69);          // Access TodayIsRain(hour, timestep)
+    int const FuncTodayIsSnow(70);          // Access TodayIsSnow(hour, timestep)
+    int const FuncTodayOutDryBulbTemp(71);  // Access TodayOutDryBulbTemp(hour, timestep)
+    int const FuncTodayOutDewPointTemp(72); // Access TodayOutDewPointTemp(hour, timestep)
+    int const FuncTodayOutBaroPress(73);    // Access TodayOutBaroPress(hour, timestep)
+    int const FuncTodayOutRelHum(74);       // Access TodayOutRelHum(hour, timestep)
+    int const FuncTodayWindSpeed(75);       // Access TodayWindSpeed(hour, timestep)
+    int const FuncTodayWindDir(76);         // Access TodayWindDir(hour, timestep)
+    int const FuncTodaySkyTemp(77);         // Access TodaySkyTemp(hour, timestep)
+    int const FuncTodayHorizIRSky(78);      // Access TodayHorizIRSky(hour, timestep)
+    int const FuncTodayBeamSolarRad(79);    // Access TodayBeamSolarRad(hour, timestep)
+    int const FuncTodayDifSolarRad(80);     // Access TodayDifSolarRad(hour, timestep)
+    int const FuncTodayAlbedo(81);          // Access TodayAlbedo(hour, timestep)
+    int const FuncTodayLiquidPrecip(82);    // Access TodayLiquidPrecip(hour, timestep)
 
-    int const NumPossibleOperators(69); // total number of operators and built-in functions
+    int const FuncTomorrowIsRain(83);          // Access TomorrowIsRain(hour, timestep)
+    int const FuncTomorrowIsSnow(84);          // Access TomorrowIsSnow(hour, timestep)
+    int const FuncTomorrowOutDryBulbTemp(85);  // Access TomorrowOutDryBulbTemp(hour, timestep)
+    int const FuncTomorrowOutDewPointTemp(86); // Access TomorrowOutDewPointTemp(hour, timestep)
+    int const FuncTomorrowOutBaroPress(87);    // Access TomorrowOutBaroPress(hour, timestep)
+    int const FuncTomorrowOutRelHum(88);       // Access TomorrowOutRelHum(hour, timestep)
+    int const FuncTomorrowWindSpeed(89);       // Access TomorrowWindSpeed(hour, timestep)
+    int const FuncTomorrowWindDir(90);         // Access TomorrowWindDir(hour, timestep)
+    int const FuncTomorrowSkyTemp(91);         // Access TomorrowSkyTemp(hour, timestep)
+    int const FuncTomorrowHorizIRSky(92);      // Access TomorrowHorizIRSky(hour, timestep)
+    int const FuncTomorrowBeamSolarRad(93);    // Access TomorrowBeamSolarRad(hour, timestep)
+    int const FuncTomorrowDifSolarRad(94);     // Access TomorrowDifSolarRad(hour, timestep)
+    int const FuncTomorrowAlbedo(95);          // Access TomorrowAlbedo(hour, timestep)
+    int const FuncTomorrowLiquidPrecip(96);    // Access TomorrowLiquidPrecip(hour, timestep)
 
-    // DERIVED TYPE DEFINITIONS:
+    int const NumPossibleOperators(96); // total number of operators and built-in functions
 
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
     Array1D_int EMSProgram;
 
     int NumProgramCallManagers(0);      // count of Erl program managers with calling points
