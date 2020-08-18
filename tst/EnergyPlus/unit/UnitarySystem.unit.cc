@@ -14074,7 +14074,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 1.0);
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
-    EXPECT_NEAR(LatOutput, -751.3286, 0.1);
+    EXPECT_NEAR(LatOutput, -737.9931, 0.1);
 
     // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -14103,11 +14103,11 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       SenOutput,
                       LatOutput);
     EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 3);
-    EXPECT_NEAR(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.6548, 0.001);
+    EXPECT_NEAR(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.6607, 0.001);
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
-    EXPECT_NEAR(thisSys->CoilSHR, 0.44704, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.44387, 0.001);
     EXPECT_NEAR(SenOutput, -397.162, 0.1);
-    EXPECT_NEAR(LatOutput, -524.583, 0.1);
+    EXPECT_NEAR(LatOutput, -523.848, 0.1);
 
     // OperatingMode 2
     thisSys->m_ZoneSequenceCoolingNum = 0;
@@ -14131,7 +14131,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_NEAR(thisSys->LoadSHR, 0.98533, 0.001);
     EXPECT_NEAR(thisSys->CoilSHR, 0.97600, 0.001);
     EXPECT_NEAR(SenOutput, -2000.0, 0.5);
-    EXPECT_NEAR(LatOutput, -330.95, 0.1);
+    EXPECT_NEAR(LatOutput, -327.04, 0.1);
 }
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
 // 'Minimum Supply Air Temperature' == 'Autosize' produces a crash
