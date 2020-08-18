@@ -2152,19 +2152,15 @@ void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow 
 
     // Purpose:
     // returns total, sensible and latent heat rate of change of moist air transitioning
-    // between two states. The mosit air transition can be cooling and heating process
-    // in a cooling and heating coils, or moist air transfer from zone equipment outlet to
-    // zone air node condition.
+    // between two states. The moist air energy transfer can be cooling or heating process
+    // across a cooling, a heating coil, or an HVAC component.
 
     // Methodology:
     // Q_total = m_dot * (h2 - h1)
     // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDB2, W2, TDB1, W1);
-    // or Q_sensible = m_dot * cp_moistair_average * (TDB2 - TDB1)
-    //    cp_moistair_average = Psychrometrics::PsyCpAirFnW(0.5 * (W2 + W1));
-    //    cp_moistair_average = cp_dryair + 0.5 * (W2 + W1) * cp_watervapor
+    // or Q_sensible = m_dot * cp_moistair_MinHumRat * (TDB2 - TDB1)
+    //    cp_moistair_MinHumRat = Psychrometrics::PsyCpAirFnW(min(W2, W1));
     // Q_latent = Q_total - Q_latent;
-    // or Q_latent = m_dot * hg_average * (W2 - W1);
-    //    hg_average = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(TDB2, TDB1);
 
     TotalOutput = 0.0;
     LatentOutput = 0.0;
@@ -2188,14 +2184,15 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
 {
 
     // Purpose:
-    // returns total, sensible and latent heat rate of transfer between equipment outlet
-    // and zone air node. The mosit energy transfer can be cooling and heating depending
-    // on the zone equipment outlet and zone air node conditions.
+    // returns total, sensible and latent heat rate of transfer between the supply air zone inlet
+    // node and zone air node. The moist air energy transfer can be cooling or heating depending
+    // on the supply air zone inlet node and zone air node conditions.
 
     // Methodology:
     // Q_total = m_dot * (hEquip - hZone)
-    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDBEquip, WEquip, TDBZone, WZone);
-    // or Q_sensible = m_dot * cp_moistair_minHumRat * (TDBEquip - TDBZone)
+    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone);
+    // or Q_sensible = m_dot * cp_moistair_zoneHumRat * (TDBEquip - TDBZone)
+    //    cp_moistair_zoneHumRat = Psychrometrics::PsyCpAirFnW(WZone);
     // Q_latent = Q_total - Q_latent;
 
     TotalOutput = 0.0;
@@ -2204,9 +2201,8 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
     if (MassFlow > 0.0) {
         TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDBEquip, WEquip) -
                                   Psychrometrics::PsyHFnTdbW(TDBZone, WZone)); // total addition/removal rate, {W};
-        SensibleOutput =
-            MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDBEquip, WEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
-        LatentOutput = TotalOutput - SensibleOutput;                                                 // latent addition/removal rate, {W}
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
+        LatentOutput = TotalOutput - SensibleOutput;                                                          // latent addition/removal rate, {W}
     }
 }
 
@@ -2219,13 +2215,14 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
 {
 
     // Purpose:
-    // returns sensible heat rate of transfer between equipment outlet and zone
-    // air node. The mosit energy transfer can be cooling and heating depending
-    // on the zone equipment outlet and zone air node conditions.
+    // returns sensible heat rate of transfer between the supply air zone inlet node and
+    // zone air node. The moist air energy transfer can be cooling or heating depending
+    // on the supply air zone inlet node and zone air node conditions.
 
     // Methodology:
-    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, WZone, TDBZone, WZone);
-    // or Q_sensible = m_dot * cp_moistair_WZone * (TDBEquip - TDBZone)
+    // Q_sensible = m_dot * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone);
+    // or Q_sensible = m_dot * cp_moistair_zoneHumRat * (TDBEquip - TDBZone)
+    //    cp_moistair_zoneHumRat = Psychrometrics::PsyCpAirFnW(WZone);
 
     SensibleOutput = 0.0;
     if (MassFlow > 0.0) {
