@@ -51,7 +51,7 @@
 /// \file EnergyPlusAPI.h
 /// \brief This file provides a define that enables exposing methods on the API.  No client needs to directly import this file.
 
-#if _WIN32 || _MSC_VER
+#if (_WIN32 || _MSC_VER) && ! ENERGYPLUS_STATIC_API
 #if defined(energypluslib_EXPORTS) || defined(energyplusapi_EXPORTS) || defined(energypluslib2_EXPORTS)
 #define ENERGYPLUSLIB_API __declspec(dllexport)
 #else

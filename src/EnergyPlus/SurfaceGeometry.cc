@@ -745,15 +745,19 @@ namespace SurfaceGeometry {
             Surface(SurfNum).UNomFilm = cNominalUwithConvCoeffs;
             // populate the predefined report related to u-values with films
             // only exterior surfaces including underground
+            auto const SurfaceClass(Surface(SurfNum).Class);
             if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == Ground) ||
-                (Surface(SurfNum).ExtBoundCond == KivaFoundation)) {
-                {
-                    auto const SELECT_CASE_var(Surface(SurfNum).Class);
-                    if ((SELECT_CASE_var == SurfaceClass_Wall) || (SELECT_CASE_var == SurfaceClass_Floor) || (SELECT_CASE_var == SurfaceClass_Roof)) {
-                        PreDefTableEntry(pdchOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
-                    } else if (SELECT_CASE_var == SurfaceClass_Door) {
-                        PreDefTableEntry(pdchDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
-                    }
+                (Surface(SurfNum).ExtBoundCond == KivaFoundation) || (Surface(SurfNum).ExtBoundCond == GroundFCfactorMethod)) {
+                if ((SurfaceClass == SurfaceClass_Wall) || (SurfaceClass == SurfaceClass_Floor) || (SurfaceClass == SurfaceClass_Roof)) {
+                    PreDefTableEntry(pdchOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
+                } else if (SurfaceClass == SurfaceClass_Door) {
+                    PreDefTableEntry(pdchDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
+                }
+            }else{
+                if ((SurfaceClass == SurfaceClass_Wall) || (SurfaceClass == SurfaceClass_Floor) || (SurfaceClass == SurfaceClass_Roof)) {
+                    PreDefTableEntry(pdchIntOpUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
+                } else if (SurfaceClass == SurfaceClass_Door) {
+                    PreDefTableEntry(pdchIntDrUfactFilm, Surface(SurfNum).Name, NominalUwithConvCoeffs, 3);
                 }
             }
         } // surfaces

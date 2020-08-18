@@ -437,7 +437,7 @@ TEST_F(LowTempRadiantSystemTest, SizeLowTempRadiantConstantFlow)
     EXPECT_NEAR(ExpectedResult3, CFloRadSys(RadSysNum).TubeLength, 0.1);
 }
 
-TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
+TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
 {
 
     int RadSysNum(1);
@@ -495,8 +495,11 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
         "    RadiantSysAvailSched,    !- Availability Schedule Name",
         "    West Zone,               !- Zone Name",
         "    Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name",
+        "    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model",
         "    0.012,                   !- Hydronic Tubing Inside Diameter {m}",
+        "    0.016,                   !- Hydronic Tubing Outside Diameter {m}",
         "    autosize,                !- Hydronic Tubing Length {m}",
+        "    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}",
         "    MeanAirTemperature,      !- Temperature Control Type",
         "    HalfFlowPower,           !- Setpoint Type",
         "    FractionOfAutosizedHeatingCapacity,  !- Heating Design Capacity Method",
@@ -1822,9 +1825,11 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     Real64 TubeLength;
     Real64 TubeDiameter;
     Real64 HXEffectFuncResult;
+    int SurfNum;
 
     // Set values of items that will stay constant for all calls to HX Effectiveness function
     RadSysNum = 1;
+    SurfNum = 1;
     WaterMassFlow = 0.1;
     FlowFraction = 1.0;
     NumCircs = 1;
@@ -1832,9 +1837,11 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     TubeDiameter = 0.05;
     PlantLoop(1).FluidName = "WATER";
     HydrRadSys(RadSysNum).TubeLength = TubeLength;
-    HydrRadSys(RadSysNum).TubeDiameter = TubeDiameter;
+    HydrRadSys(RadSysNum).TubeDiameterInner = TubeDiameter;
+    HydrRadSys(RadSysNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
     CFloRadSys(RadSysNum).TubeLength = TubeLength;
-    CFloRadSys(RadSysNum).TubeDiameter = TubeDiameter;
+    CFloRadSys(RadSysNum).TubeDiameterInner = TubeDiameter;
+    CFloRadSys(RadSysNum).FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
 
     // Test 1: Heating for Hydronic System
     HXEffectFuncResult = 0.0;
@@ -1842,7 +1849,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
     // Test 2: Cooling for Hydronic System
@@ -1851,7 +1858,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = HydronicSystem;
     Temperature = 10.0;
     HydrRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = HydrRadSys(RadSysNum).calculateHXEffectivenessTerm(SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
     // Test 3: Heating for Constant Flow System
@@ -1860,7 +1867,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).HWLoopNum = 1;
-    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
     // Test 4: Cooling for Constant Flow System
@@ -1869,7 +1876,7 @@ TEST_F(LowTempRadiantSystemTest, LowTempRadCalcRadSysHXEffectTermTest)
     RadSysType = ConstantFlowSystem;
     Temperature = 10.0;
     CFloRadSys(RadSysNum).CWLoopNum = 1;
-    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(Temperature,WaterMassFlow, FlowFraction, NumCircs);
+    HXEffectFuncResult = CFloRadSys(RadSysNum).calculateHXEffectivenessTerm(SurfNum, Temperature, WaterMassFlow, FlowFraction, NumCircs);
     EXPECT_NEAR( HXEffectFuncResult, 62.344, 0.001);
 
 }
@@ -2459,5 +2466,57 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     EXPECT_NEAR(expectedResult, thisCFloSys.yesterdayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
     expectedResult = 14.75;  // Should be weighted average the "yesterday" values using the weighting factor
     EXPECT_NEAR(expectedResult, thisCFloSys.todayRunningMeanOutdoorDryBulbTemperature, acceptibleError);
+
+}
+
+TEST_F(LowTempRadiantSystemTest, getFluidToSlabHeatTransferInputTest)
+{
+    CFloRadSys.allocate(1);
+    auto &thisCFloSys (CFloRadSys(1));
+    std::string userInput;
+
+    //Test 1: Input is ConvectionOnly--so this field needs to get reset to ConvectionOnly
+    userInput = "ConvectionOnly";
+    thisCFloSys.FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
+    thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(userInput);
+    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly, thisCFloSys.FluidToSlabHeatTransfer);
+
+    //Test 2: Input is ISOStandard--so this field needs to get reset to ISOStandard
+    userInput = "ISOStandard";
+    thisCFloSys.FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ConvectionOnly;
+    thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(userInput);
+    EXPECT_EQ(FluidToSlabHeatTransferTypes::ISOStandard, thisCFloSys.FluidToSlabHeatTransfer);
+
+    //Test 3: Input is ISOStandard--so this field needs to get reset to ConvectionOnly (the default)
+    userInput = "WeWantSomethingElse!";
+    thisCFloSys.FluidToSlabHeatTransfer = FluidToSlabHeatTransferTypes::ISOStandard;
+    thisCFloSys.FluidToSlabHeatTransfer = thisCFloSys.getFluidToSlabHeatTransferInput(userInput);
+    EXPECT_EQ(FluidToSlabHeatTransferTypes::ConvectionOnly, thisCFloSys.FluidToSlabHeatTransfer);
+
+}
+
+TEST_F(LowTempRadiantSystemTest, calculateUFromISOStandardTest)
+{
+
+    // Test of the ISO Standard 11855-2 Method for calculating the U-value for heat transfer
+    // between the fluid being circulated through a radiant system and the radiant system
+    // material that the pipe/tube is embedded within
+    int SurfNum = 1;
+    DataSurfaces::Surface.allocate(1);
+    Surface(1).Construction = 1;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).ThicknessPerpend = 0.5;
+    CFloRadSys.allocate(1);
+    auto &thisCFloSys (CFloRadSys(1));
+    thisCFloSys.TubeDiameterInner = 0.01;
+    thisCFloSys.TubeDiameterOuter = 0.011;
+    thisCFloSys.TubeLength = 100.0;
+    thisCFloSys.TubeConductivity = 0.5;
+    Real64 WaterMassFlow = 0.001;
+
+    Real64 expectedResult = 28.00687;
+    Real64 allowedDifference = 0.00001;
+    Real64 actualResult = thisCFloSys.calculateUFromISOStandard(SurfNum, WaterMassFlow);
+    EXPECT_NEAR(expectedResult, actualResult, allowedDifference);
 
 }

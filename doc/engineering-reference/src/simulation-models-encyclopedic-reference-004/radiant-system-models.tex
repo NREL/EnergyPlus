@@ -639,9 +639,12 @@ where NTU is defined by:
 
 \begin{equation}
 NTU \equiv \frac{{UA}}{{{{\left( {\dot m{c_p}} \right)}_{water}}}}
+\label{eq:NTURadSysEquationGeneric}
 \end{equation}
 
-Since the water tubes were assumed to have no effect on the heat transfer process, the only term present in the overall heat transfer coefficient, UA, is a convection term.~ Thus, the equation for UA is:
+EnergyPlus includes two possible methods for calculating the heat exchange between the circulating fluid and the rest of the system and these are controlled by user input: {\emph{ConvectionOnly} and \emph{ISOStandard}.  Both are described in more detail below.
+
+\textbf{\emph{ConvectionOnly Heat Transfer Model}}.  In this model, the water tubes were assumed to have no effect on the heat transfer process.  So, the only term present in the overall heat transfer coefficient, UA, is a convection term.~ Thus, the equation for UA is:
 
 \begin{equation}
 UA = h\left( {\pi DL} \right)
@@ -671,6 +674,32 @@ where Pr is the Prandtl number of water and \(Re_D\) is the Reynolds number whic
 \end{equation}
 
 The parameter m is the absolute viscosity of water.~ For internal pipe flow, the flow is assumed to be turbulent for ReD \(\geq\) 2300.
+
+\textbf{\emph{ISOStandard Heat Transfer Model}}.  In this model, the convection between the fluid and the tubes and the conduction resistance of the tubes themselves are assumed to have an impact on the overall heat transfer.  The method used in EnergyPlus for this model is based on ISO Standard 11855-2(2012) which is entitled ``Building environment design — Design, dimensioning, installation and control of embedded radiant heating and cooling systems — Part 2: Determination of the design heating and cooling capacity''.  The key equations from the ISO Standard are summarized in Appendix B of Standard 11855-2 and are outlined below.
+
+In ISO Standard 11855-2, the heat convection for turbulent flow between the circulating fluid and the inside wall of the tube is characterized by the following equation:
+
+\begin{equation}
+{R_{conv}} = \frac{W^{0.13}}{8 \pi} {\left(\frac{D_{out}-D{in}}{\dot m L}\right)}^{0.87}
+\end{equation}
+
+where W is the tube separation in the direction perpendicular to the main heat transfer direction, \({D_{out}}\) is the outside tube diameter,  \({D_{in}}\) is the inside tube diameter,  \(\dot m\) is the fluid mass flow rate in the tube, and L is the tube length.
+
+The resistance of the pipe wall is characterized by this equation:
+
+\begin{equation}
+{R_{tube}} = \frac{W ln\frac{D_{out}}{D_{in}}}{2 \pi k_{tube}}
+\end{equation}
+
+where \(k_{tube}\) is the thermal conductivity of the tube material.
+
+Finally, the U-value for this model is calculated using:
+
+\begin{equation}
+U = \frac{1}{{R_{conv}} + {R_{tube}}}
+\end{equation}
+
+This U-value is then used in Equation~\ref{eq:NTURadSysEquationGeneric} to calculate NTU in the heat exchanger formulation shown above.
 
 Knowledge of the flow conditions allows Equations~\ref{eq:RadSysHX675} through~\ref{eq:RadSysHXReD681} to be calculated.~ This essentially eliminates \(\varepsilon\) as an unknown.~ The controls and the plant define the water mass flow rate and the inlet water temperature, leaving two equations (Equations~\ref{eq:RadSysHX673} and~\ref{eq:RadSysHX674}) and three unknowns.~ The third equation that can be used in conjunction with Equations~\ref{eq:RadSysHX673} and~\ref{eq:RadSysHX674} is Equation~\ref{eq:QTFDeriv672}, which is the CTF/QTF equation for the temperature at the source location.
 
