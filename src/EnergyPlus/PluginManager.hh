@@ -139,6 +139,7 @@ namespace PluginManagement {
         PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
         // precalculated function names as PyObjects
         PyObjectWrap pBeginNewEnvironment = nullptr;
+        PyObjectWrap pBeginZoneTimestepBeforeSetCurrentWeather = nullptr;
         PyObjectWrap pAfterNewEnvironmentWarmUpIsComplete = nullptr;
         PyObjectWrap pBeginZoneTimestepBeforeInitHeatBalance = nullptr;
         PyObjectWrap pBeginZoneTimestepAfterInitHeatBalance = nullptr;
