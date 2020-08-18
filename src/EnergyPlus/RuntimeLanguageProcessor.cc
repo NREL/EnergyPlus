@@ -1427,14 +1427,16 @@ namespace RuntimeLanguageProcessor {
                         i_parse("@TODAYOUTDEWPOINTTEMP", FuncTodayOutDewPointTemp) || i_parse("@TODAYOUTBAROPRESS", FuncTodayOutBaroPress) ||
                         i_parse("@TODAYOUTRELHUM", FuncTodayOutRelHum) || i_parse("@TODAYWINDSPEED", FuncTodayWindSpeed) ||
                         i_parse("@TODAYWINDDIR", FuncTodayWindDir) || i_parse("@TODAYSKYTEMP", FuncTodaySkyTemp) ||
-                        i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad) || i_parse("@TODAYDIFSOLARRAD", FuncTodayDifSolarRad) ||
+                        i_parse("@TODAYHORIZIRSKY", FuncTodayHorizIRSky) || i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad) ||
+                        i_parse("@TODAYDIFSOLARRAD", FuncTodayDifSolarRad) || i_parse("@TODAYALBEDO", FuncTodayAlbedo) ||
                         i_parse("@TODAYLIQUIDPRECIP", FuncTodayLiquidPrecip) || i_parse("@TOMORROWISRAIN", FuncTomorrowIsRain) ||
                         i_parse("@TOMORROWISSNOW", FuncTomorrowIsSnow) || i_parse("@TOMORROWOUTDRYBULBTEMP", FuncTomorrowOutDryBulbTemp) ||
                         i_parse("@TOMORROWOUTDEWPOINTTEMP", FuncTomorrowOutDewPointTemp) ||
                         i_parse("@TOMORROWOUTBAROPRESS", FuncTomorrowOutBaroPress) || i_parse("@TOMORROWOUTRELHUM", FuncTomorrowOutRelHum) ||
                         i_parse("@TOMORROWWINDSPEED", FuncTomorrowWindSpeed) || i_parse("@TOMORROWWINDDIR", FuncTomorrowWindDir) ||
-                        i_parse("@TOMORROWSKYTEMP", FuncTomorrowSkyTemp) || i_parse("@TOMORROWBEAMSOLARRAD", FuncTomorrowBeamSolarRad) ||
-                        i_parse("@TOMORROWDIFSOLARRAD", FuncTomorrowDifSolarRad) || i_parse("@TOMORROWLIQUIDPRECIP", FuncTomorrowLiquidPrecip)) {
+                        i_parse("@TOMORROWSKYTEMP", FuncTomorrowSkyTemp) || i_parse("@TOMORROWHORIZIRSKY", FuncTomorrowHorizIRSky) ||
+                        i_parse("@TOMORROWBEAMSOLARRAD", FuncTomorrowBeamSolarRad) || i_parse("@TOMORROWDIFSOLARRAD", FuncTomorrowDifSolarRad) ||
+                        i_parse("@TOMORROWALBEDO", FuncTomorrowAlbedo) || i_parse("@TOMORROWLIQUIDPRECIP", FuncTomorrowLiquidPrecip)) {
                         // was a built in function operator
                     } else { // throw error
                         if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", String);
@@ -4189,9 +4191,117 @@ namespace RuntimeLanguageProcessor {
         PossibleOperators(FuncCurveValue).NumOperands = 6;
         PossibleOperators(FuncCurveValue).Code = FuncCurveValue;
 
+        PossibleOperators(FuncTodayIsRain).Symbol = "@TODAYISRAIN";
+        PossibleOperators(FuncTodayIsRain).NumOperands = 2;
+        PossibleOperators(FuncTodayIsRain).Code = FuncTodayIsRain;
+
+        PossibleOperators(FuncTodayIsSnow).Symbol = "@TODAYISSNOW";
+        PossibleOperators(FuncTodayIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTodayIsSnow).Code = FuncTodayIsSnow;
+
+        PossibleOperators(FuncTodayOutDryBulbTemp).Symbol = "@TODAYOUTDRYBULBTEMP";
+        PossibleOperators(FuncTodayOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDryBulbTemp).Code = FuncTodayOutDryBulbTemp;
+
+        PossibleOperators(FuncTodayOutDewPointTemp).Symbol = "@TODAYOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTodayOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDewPointTemp).Code = FuncTodayOutDewPointTemp;
+
+        PossibleOperators(FuncTodayOutBaroPress).Symbol = "@TODAYOUTBAROPRESS";
+        PossibleOperators(FuncTodayOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTodayOutBaroPress).Code = FuncTodayOutBaroPress;
+
+        PossibleOperators(FuncTodayOutRelHum).Symbol = "@TODAYOUTRELHUM";
+        PossibleOperators(FuncTodayOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTodayOutRelHum).Code = FuncTodayOutRelHum;
+
+        PossibleOperators(FuncTodayWindSpeed).Symbol = "@TODAYWINDSPEED";
+        PossibleOperators(FuncTodayWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTodayWindSpeed).Code = FuncTodayWindSpeed;
+
+        PossibleOperators(FuncTodayWindDir).Symbol = "@TODAYWINDDIR";
+        PossibleOperators(FuncTodayWindDir).NumOperands = 2;
+        PossibleOperators(FuncTodayWindDir).Code = FuncTodayWindDir;
+
+        PossibleOperators(FuncTodaySkyTemp).Symbol = "@TODAYSKYTEMP";
+        PossibleOperators(FuncTodaySkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTodaySkyTemp).Code = FuncTodaySkyTemp;
+
+        PossibleOperators(FuncTodayHorizIRSky).Symbol = "@TODAYHORIZIRSKY";
+        PossibleOperators(FuncTodayHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTodayHorizIRSky).Code = FuncTodayHorizIRSky;
+
         PossibleOperators(FuncTodayBeamSolarRad).Symbol = "@TODAYBEAMSOLARRAD";
         PossibleOperators(FuncTodayBeamSolarRad).NumOperands = 2;
         PossibleOperators(FuncTodayBeamSolarRad).Code = FuncTodayBeamSolarRad;
+
+        PossibleOperators(FuncTodayDifSolarRad).Symbol = "@TODAYDIFSOLARRAD";
+        PossibleOperators(FuncTodayDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayDifSolarRad).Code = FuncTodayDifSolarRad;
+
+        PossibleOperators(FuncTodayAlbedo).Symbol = "@TODAYALBEDO";
+        PossibleOperators(FuncTodayAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTodayAlbedo).Code = FuncTodayAlbedo;
+
+        PossibleOperators(FuncTodayLiquidPrecip).Symbol = "@TODAYLIQUIDPRECIP";
+        PossibleOperators(FuncTodayLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTodayLiquidPrecip).Code = FuncTodayLiquidPrecip;
+
+        PossibleOperators(FuncTomorrowIsRain).Symbol = "@TOMORROWISRAIN";
+        PossibleOperators(FuncTomorrowIsRain).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsRain).Code = FuncTomorrowIsRain;
+
+        PossibleOperators(FuncTomorrowIsSnow).Symbol = "@TOMORROWISSNOW";
+        PossibleOperators(FuncTomorrowIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsSnow).Code = FuncTomorrowIsSnow;
+
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Symbol = "@TOMORROWOUTDRYBULBTEMP";
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Code = FuncTomorrowOutDryBulbTemp;
+
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTomorrowOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Code = FuncTomorrowOutDewPointTemp;
+
+        PossibleOperators(FuncTomorrowOutBaroPress).Symbol = "@TOMORROWOUTBAROPRESS";
+        PossibleOperators(FuncTomorrowOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutBaroPress).Code = FuncTomorrowOutBaroPress;
+
+        PossibleOperators(FuncTomorrowOutRelHum).Symbol = "@TOMORROWOUTRELHUM";
+        PossibleOperators(FuncTomorrowOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutRelHum).Code = FuncTomorrowOutRelHum;
+
+        PossibleOperators(FuncTomorrowWindSpeed).Symbol = "@TOMORROWWINDSPEED";
+        PossibleOperators(FuncTomorrowWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindSpeed).Code = FuncTomorrowWindSpeed;
+
+        PossibleOperators(FuncTomorrowWindDir).Symbol = "@TOMORROWWINDDIR";
+        PossibleOperators(FuncTomorrowWindDir).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindDir).Code = FuncTomorrowWindDir;
+
+        PossibleOperators(FuncTomorrowSkyTemp).Symbol = "@TOMORROWSKYTEMP";
+        PossibleOperators(FuncTomorrowSkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowSkyTemp).Code = FuncTomorrowSkyTemp;
+
+        PossibleOperators(FuncTomorrowHorizIRSky).Symbol = "@TOMORROWHORIZIRSKY";
+        PossibleOperators(FuncTomorrowHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTomorrowHorizIRSky).Code = FuncTomorrowHorizIRSky;
+
+        PossibleOperators(FuncTomorrowBeamSolarRad).Symbol = "@TOMORROWBEAMSOLARRAD";
+        PossibleOperators(FuncTomorrowBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowBeamSolarRad).Code = FuncTomorrowBeamSolarRad;
+
+        PossibleOperators(FuncTomorrowDifSolarRad).Symbol = "@TOMORROWDIFSOLARRAD";
+        PossibleOperators(FuncTomorrowDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowDifSolarRad).Code = FuncTomorrowDifSolarRad;
+
+        PossibleOperators(FuncTomorrowAlbedo).Symbol = "@TOMORROWALBEDO";
+        PossibleOperators(FuncTomorrowAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTomorrowAlbedo).Code = FuncTomorrowAlbedo;
+
+        PossibleOperators(FuncTomorrowLiquidPrecip).Symbol = "@TOMORROWLIQUIDPRECIP";
+        PossibleOperators(FuncTomorrowLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTomorrowLiquidPrecip).Code = FuncTomorrowLiquidPrecip;
 
         AlreadyDidOnce = true;
     }
