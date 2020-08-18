@@ -2,7 +2,7 @@ import sys
 from pyenergyplus.api import EnergyPlusAPI
 
 
-def environment_handler() -> None:
+def environment_handler(_state) -> None:
     print("OH HAI ENVIRONMENT")
     sys.stdout.flush()
 
