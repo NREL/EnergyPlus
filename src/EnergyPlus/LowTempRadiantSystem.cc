@@ -786,11 +786,9 @@ namespace LowTempRadiantSystem {
             thisRadSys.CircLength = Numbers(16);
             
             thisRadSys.schedNameChangeoverDelay = Alphas(18);
-            if (lAlphaBlanks(18)) {
-                thisRadSys.schedPtrChangeoverDelay = 0;
-            } else {
+            if (!lAlphaBlanks(18)) {
                 thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(Alphas(18));
-                if (thisRadSys.SchedPtr == 0) {
+                if (thisRadSys.schedPtrChangeoverDelay == 0) {
                     ShowWarningError(cAlphaFields(18) + " not found for " + Alphas(18));
                     ShowContinueError("This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
                     ShowContinueError("As a result, no changeover delay will be used for this radiant system.");
@@ -1035,11 +1033,9 @@ namespace LowTempRadiantSystem {
             thisCFloSys.CircLength = Numbers(12);
             
             thisCFloSys.schedNameChangeoverDelay = Alphas(22);
-            if (lAlphaBlanks(22)) {
-                thisCFloSys.schedPtrChangeoverDelay = 0;
-            } else {
+            if (!lAlphaBlanks(22)) {
                 thisCFloSys.schedPtrChangeoverDelay = GetScheduleIndex(Alphas(22));
-                if (thisCFloSys.SchedPtr == 0) {
+                if (thisCFloSys.schedPtrChangeoverDelay == 0) {
                     ShowWarningError(cAlphaFields(22) + " not found for " + Alphas(22));
                     ShowContinueError("This occurs for " + cAlphaFields(1) + " = " + Alphas(1));
                     ShowContinueError("As a result, no changeover delay will be used for this radiant system.");
@@ -2388,9 +2384,9 @@ namespace LowTempRadiantSystem {
             // It's not the beginning of the day, hour, or time step so the "last" value is simply the
             // same as the current value.  Note that these parameters only track down to the zone time
             // step level and will make decisions based on that.
-        this->lastDayOfSim  = DataGlobals::DayOfSim;
-        this->lastHourOfDay = DataGlobals::HourOfDay;
-        this->lastTimeStep  = DataGlobals::TimeStep;
+            this->lastDayOfSim  = DataGlobals::DayOfSim;
+            this->lastHourOfDay = DataGlobals::HourOfDay;
+            this->lastTimeStep  = DataGlobals::TimeStep;
         }
         
         // Now go ahead and reset the operating mode (this will be set to something else if the system is running)
