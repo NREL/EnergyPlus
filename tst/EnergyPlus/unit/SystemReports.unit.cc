@@ -68,7 +68,7 @@ using namespace EnergyPlus::DataGlobalConstants;
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, SeparateOutputVariables)
+TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
 {
     DataHVACGlobals::NumPrimaryAirSys = 1;
     PrimaryAirSystem.allocate(1);
@@ -81,12 +81,7 @@ TEST_F(EnergyPlusFixture, SeparateOutputVariables)
     int EnergyType;
     Real64 CompLoad(150.0);
     Real64 CompEnergyUse(100.0);
-    SysHumidNaturalGas.allocate(1);
-    SysHCCompNaturalGas.allocate(1);
-    SysHumidPropane.allocate(1);
-    SysHCCompPropane.allocate(1);
-    SysTotNaturalGas.allocate(1);
-        
+    
     PrimaryAirSystem(1).NumBranches = 1;
     PrimaryAirSystem(1).Branch.allocate(1);
     PrimaryAirSystem(1).Branch(1).TotalComponents = 2;
@@ -116,10 +111,18 @@ TEST_F(EnergyPlusFixture, SeparateOutputVariables)
     DataLoopNode::Node(1).MassFlowRate = 1.0;
     DataLoopNode::Node(2).MassFlowRate = 1.0;
 
+    SysHumidNaturalGas.allocate(1);
+    SysHCCompNaturalGas.allocate(1);
+    SysTotNaturalGas.allocate(1);
+    SysTotPropane.allocate(1);
+    SysHCCompPropane.allocate(1);
+    SysHumidPropane.allocate(1);
+
     SysHumidNaturalGas(1) = 0;
     SysHCCompNaturalGas(1) = 0;
     SysTotNaturalGas(1) = 0;
 
+    //Calculate SysHumidNaturalGas ("Air System Humidifier NaturalGas Energy" Output Variable)
     CalcSystemEnergyUse(
         CompLoadFlag, 
         AirLoopNum, 
@@ -127,6 +130,8 @@ TEST_F(EnergyPlusFixture, SeparateOutputVariables)
         PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
         CompLoad,
         CompEnergyUse);
+
+    // Calculate SysHCCompNaturalGas ("Air System Heating Coil NaturalGas Energy" Output Variable)
     CalcSystemEnergyUse(
         CompLoadFlag, 
         AirLoopNum, 
@@ -138,7 +143,7 @@ TEST_F(EnergyPlusFixture, SeparateOutputVariables)
     EXPECT_EQ(SysHumidNaturalGas(1), 100);
     EXPECT_EQ(SysHCCompNaturalGas(1), 100);
 
-    //allocate variables to use ReportSystemEnergyUse() for SysTotNaturalGas
+    // Allocate variables to call ReportSystemEnergyUse() function for SysTotNaturalGas ("Air System NaturalGas Energy")
     SysTotHTNG.allocate(1);
     SysFANCompHTNG.allocate(1);
     SysHCCompHTNG.allocate(1);
@@ -161,9 +166,6 @@ TEST_F(EnergyPlusFixture, SeparateOutputVariables)
     SysHumidElec.allocate(1);
     DesDehumidElec.allocate(1);
     SysEvapElec.allocate(1);
-    SysTotPropane.allocate(1);
-    SysHCCompPropane.allocate(1);
-    SysHumidPropane.allocate(1);
     SysTotSteam.allocate(1);
     SysHCCompSteam.allocate(1);
     SysTotH2OCOLD.allocate(1);
@@ -171,12 +173,39 @@ TEST_F(EnergyPlusFixture, SeparateOutputVariables)
     SysTotH2OHOT.allocate(1);
     SysHCCompH2OHOT.allocate(1);
 
+    // Calculate SysTotNaturalGas ("Air System NaturalGas Energy")
     ReportSystemEnergyUse();
     EXPECT_EQ(SysTotNaturalGas(1), 200);
 
     // Initialization for propane cases
     SysHumidNaturalGas(1) = 0;
     SysHCCompNaturalGas(1) = 0;
+    SysTotNaturalGas(1) = 0;
 
+    PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
+    PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).ResourceType = AssignResourceTypeNum("Propane");
+
+    // Calculate SysHumidPropane ("Air System Humidifier Propane Energy" Output Variable)
+    CalcSystemEnergyUse(CompLoadFlag,
+                        AirLoopNum,
+                        PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf,
+                        PrimaryAirSystem(1).Branch(1).Comp(1).MeteredVar(1).ResourceType,
+                        CompLoad,
+                        CompEnergyUse);
+
+    // Calculate SysHCCompPropane ("Air System Heating Coil Propane Energy" Output Variable)
+    CalcSystemEnergyUse(CompLoadFlag,
+                        AirLoopNum,
+                        PrimaryAirSystem(1).Branch(1).Comp(2).TypeOf,
+                        PrimaryAirSystem(1).Branch(1).Comp(2).MeteredVar(1).ResourceType,
+                        CompLoad,
+                        CompEnergyUse);
+   
+    EXPECT_EQ(SysHumidPropane(1), 100);
+    EXPECT_EQ(SysHCCompPropane(1), 100);
+
+    // Calculate SysTotPropane ("Air System Propane Energy")
+    ReportSystemEnergyUse();
+    EXPECT_EQ(SysTotPropane(1), 200);
 }
 } // namespace EnergyPlus
