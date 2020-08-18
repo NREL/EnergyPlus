@@ -64,6 +64,7 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
     bool zoneCoolingOnlyFan = false;
     bool zoneHeatingOnlyFan = false;
     bool dataScalableSizingON = false;
+    bool dataScalableCapSizingON = false;
     bool dataHRFlowSizingFlag = false;
     Real64 dataFracOfAutosizedCoolingAirflow = 0.0;
     Real64 dataFracOfAutosizedHeatingAirflow = 0.0;
@@ -82,6 +83,11 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
     Real64 dataTotCapCurveIndex = 0.0;
     Real64 dataTotCapCurveValue = 0.0;
     Real64 dataFracOfAutosizedCoolingCapacity = 0.0;
+    Real64 dataFracOfAutosizedHeatingCapacity = 0.0;
+    Real64 dataCoolCoilCap = 0.0;
+    Real64 dataCoilIsSuppHeater = false;
+    Real64 suppHeatCap = 0.0;
+    Real64 unitaryHeatCap = 0.0;
 
     int zoneHVACSizingIndex = 0;
     Array1D<DataSizing::ZoneHVACSizingData> zoneHVACSizing;
@@ -98,6 +104,7 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
         zoneCoolingOnlyFan = false;
         zoneHeatingOnlyFan = false;
         dataScalableSizingON = false;
+        dataScalableCapSizingON = false;
         dataHRFlowSizingFlag = false;
         dataFracOfAutosizedCoolingAirflow = 0.0;
         dataFracOfAutosizedHeatingAirflow = 0.0;
@@ -114,6 +121,11 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
         dataTotCapCurveIndex = 0.0;
         dataTotCapCurveValue = 0.0;
         dataFracOfAutosizedCoolingCapacity = 0.0;
+        dataFracOfAutosizedHeatingCapacity = 0.0;
+        dataCoolCoilCap = 0.0;
+        dataCoilIsSuppHeater = false;
+        suppHeatCap = 0.0;
+        unitaryHeatCap = 0.0;
         zoneHVACSizingIndex = 0;
         zoneHVACSizing.clear();
     }

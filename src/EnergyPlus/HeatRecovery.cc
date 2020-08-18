@@ -1620,8 +1620,6 @@ namespace HeatRecovery {
 
         // Using/Aliasing
         using namespace DataSizing;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:

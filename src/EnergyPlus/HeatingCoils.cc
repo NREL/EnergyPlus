@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -1507,7 +1508,7 @@ namespace HeatingCoils {
         // heating coil or other routine sets up any required data variables (e.g., DataCoilIsSuppHeater, TermUnitPIU, etc.),
         // sizing variable (e.g., HeatingCoil( CoilNum ).NominalCapacity in this routine since it can be multi-staged and new routine
         // currently only handles single values) and associated string representing that sizing variable.
-        // RequestSizing functions handles the actual sizing and reporting.
+        // Sizer functions handles the actual sizing and reporting.
 
         // REFERENCES:
         // na
@@ -1518,7 +1519,6 @@ namespace HeatingCoils {
         using General::TrimSigDigits;
         using namespace OutputReportPredefined;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1588,7 +1588,11 @@ namespace HeatingCoils {
                 bPRINT = true;
             }
         }
-        RequestSizing(state, CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName);
+        bool errorsFound = false;
+        HeatingCapacitySizer sizerHeatingCapacity;
+        sizerHeatingCapacity.overrideSizingString(SizingString);
+        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+        TempCap = sizerHeatingCapacity.size(TempCap, errorsFound);
         DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
         DataDesicRegCoil = false;     // reset global to false so other heating coils are not affected
         DataDesInletAirTemp = 0.0;    // reset global data to zero so other heating coils are not

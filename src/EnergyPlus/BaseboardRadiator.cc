@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -642,7 +643,6 @@ namespace BaseboardRadiator {
         using General::SolveRoot;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Acc(0.0001); // Accuracy of result
@@ -737,8 +737,11 @@ namespace BaseboardRadiator {
                         } else {
                             TempSize = baseboard.Baseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        bool errorsFound = false;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                         DataScalableCapSizingON = false;
                     } else {
                         DesCoilLoad = 0.0;
@@ -854,8 +857,11 @@ namespace BaseboardRadiator {
                         } else {
                             TempSize = baseboard.Baseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        bool errorsFound = false;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                         DataScalableCapSizingON = false;
                     } else {
                         DesCoilLoad = 0.0; // FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;

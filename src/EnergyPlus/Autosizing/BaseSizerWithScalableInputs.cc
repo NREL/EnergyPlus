@@ -63,6 +63,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     BaseSizerWithFanHeatInputs::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
 
     this->dataScalableSizingON = DataSizing::DataScalableSizingON;
+    this->dataScalableCapSizingON = DataSizing::DataScalableCapSizingON;
     this->dataHRFlowSizingFlag = DataSizing::HRFlowSizingFlag;
     this->zoneCoolingOnlyFan = DataSizing::ZoneCoolingOnlyFan;
     this->zoneHeatingOnlyFan = DataSizing::ZoneHeatingOnlyFan;
@@ -82,13 +83,18 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     this->dataTotCapCurveIndex = DataSizing::DataTotCapCurveIndex;
     this->dataTotCapCurveValue = DataSizing::DataTotCapCurveValue;
     this->dataFracOfAutosizedCoolingCapacity = DataSizing::DataFracOfAutosizedCoolingCapacity;
+    this->dataFracOfAutosizedHeatingCapacity = DataSizing::DataFracOfAutosizedHeatingCapacity;
+    this->dataCoolCoilCap = DataSizing::DataCoolCoilCap;
+    this->dataCoilIsSuppHeater = DataSizing::DataCoilIsSuppHeater;
+    this->suppHeatCap = DataSizing::SuppHeatCap;
+    this->unitaryHeatCap = DataSizing::UnitaryHeatCap;
 
     this->zoneHVACSizing = DataSizing::ZoneHVACSizing;
 
     // set supply air fan properties
     if (this->isCoilReportObject && this->curSysNum > 0 && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         int SupFanNum = this->primaryAirSystem(this->curSysNum).SupFanNum;
-        int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
+        //int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
         switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
             if (SupFanNum > 0) {
@@ -134,7 +140,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
                 DataSizing::DataScalableSizingON = true;
             }
         } else {
-            if (this->zoneEqSizing(this->curZoneEqNum).SizingMethod.size() > 0) {
+            if (int(this->zoneEqSizing.size()) > 0 && int(this->zoneEqSizing(this->curZoneEqNum).SizingMethod.size()) > 0) {
                 this->zoneAirFlowSizMethod = this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing);
             } else {
                 this->zoneAirFlowSizMethod = 0;

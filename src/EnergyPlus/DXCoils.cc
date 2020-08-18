@@ -59,6 +59,7 @@
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -6048,7 +6049,6 @@ namespace DXCoils {
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
         using General::TrimSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static Real64 SmallDifferenceTest(0.00000001);
@@ -6651,7 +6651,6 @@ namespace DXCoils {
         using General::RoundSigDigits;
         using General::TrimSigDigits;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
         using namespace OutputReportPredefined;
         using StandardRatings::CalcDXCoilStandardRating;
 
@@ -6786,8 +6785,6 @@ namespace DXCoils {
         // Sizer classes
         CoolingSHRSizer sizerCoolingSHR;
         bool ErrorsFound = false;
-
-        //  EXTERNAL ReportSizingOutput
 
         // NOTE: we are sizing COIL:DX:HeatingEmpirical on the COOLING load. Thus the cooling and
         // and heating capacities of a DX heat pump system will be identical. In real life the AHRI
@@ -6931,9 +6928,10 @@ namespace DXCoils {
                 //					DataIsDXCoil = true;
                 //					DataEMSOverrideON = DXCoil ( DXCoilNum ).RatedAirVolFlowRateEMSOverrideON ( Mode );
                 //					DataEMSOverride = DXCoil( DXCoilNum ).RatedAirVolFlowRateEMSOverrideValue( Mode );
-                //					RequestSizing( CompType, CompName, SizingMethod, trim(SizingString ), TempSize, false ,
-                // RoutineName
-                //); 					DataFlowUsedForSizing = TempSize;
+                //                  CoolingAirFlowSizer sizingCoolingAirFlow;
+                //                  sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                //                  sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                //                  DataAirFlowUsedForSizing = sizingCoolingAirFlow.size(TempSize, errorsFound);
                 //					DataIsDXCoil = false; // don't need this and next 2, they are just overwritten below. Delete
                 // on  next  pass so testing will show problems if any. 					DataEMSOverrideON = false;
                 //					DataEMSOverride = 0.0;
@@ -7010,8 +7008,10 @@ namespace DXCoils {
                 DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical ||
                     DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Heating || DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating) {
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DXCoil(DXCoilNum).RatedTotCap(Mode) = TempSize;
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    DXCoil(DXCoilNum).RatedTotCap(Mode) = sizerHeatingCapacity.size(TempSize, ErrorsFound);
                 } else {
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
@@ -7344,8 +7344,8 @@ namespace DXCoils {
                     if (!IsAutoSize && !HardSizeNoDesRun) {
                         TempSize = AutoSize;
                         bPRINT = false;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
-                        MSRatedAirVolFlowRateDes = TempSize;
+                        sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
+                        MSRatedAirVolFlowRateDes = sizingCoolingAirFlow.size(TempSize, errorsFound);
                         bPRINT = true;
                     }
                     if (IsAutoSize) {
@@ -7779,17 +7779,22 @@ namespace DXCoils {
                         TempSize = DataSizing::AutoSize;
                         DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                         DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        MSRatedTotCapDesAtMaxSpeed = TempSize;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        MSRatedTotCapDesAtMaxSpeed = sizerHeatingCapacity.size(TempSize, ErrorsFound);
                         SizingMethod = AutoCalculateSizing;
-                        DataConstantUsedForSizing = TempSize;
+                        DataConstantUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                         DataFractionUsedForSizing = 1.0;
                     }
                     PrintFlag = true;
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    TempSize = sizerHeatingCapacity.size(TempSize, ErrorsFound);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
@@ -7812,7 +7817,10 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    TempSize = sizerHeatingCapacity.size(TempSize, ErrorsFound);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                 }
                 PrintFlag = false;

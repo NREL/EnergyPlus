@@ -913,9 +913,6 @@ Real64 SystemAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
     } else if (UtilityRoutines::SameString(this->compType, "Fan:SystemModel")) {
         this->sizingString = "Design Maximum Air Flow Rate [m3/s]";
         //if (this->isEpJSON) this->sizingString = "design_maximum_air_flow_rate [m3/s]";
-    } else if (UtilityRoutines::SameString(this->compType, "Fan:VariableVolume")) {
-        this->sizingString = "Maximum Air Flow Rate [m3/s]";
-        if (this->isEpJSON) this->sizingString = "maximum_air_flow_rate [m3/s]";
     } else if (UtilityRoutines::SameString(this->compType, "HeatExchanger:AirToAir:SensibleAndLatent") ||
                (UtilityRoutines::SameString(this->compType, "HeatExchanger:AirToAir:FlatPlate"))) {
         this->sizingString = "Nominal Supply Air Flow Rate [m3/s]";

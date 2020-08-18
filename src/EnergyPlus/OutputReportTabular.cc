@@ -11453,7 +11453,7 @@ namespace OutputReportTabular {
         //   Create arrays for the call to WriteTable and then call it.
         //   The tables created do not have known headers for rows or
         //   columns so those are determined based on what calls have
-        //   been made to the ReportSizingOutput routine.  A table
+        //   been made to the Sizer routine.  A table
         //   is created for each type of component. Columns are created
         //   for each description within that table. Rows are created
         //   for each named object.

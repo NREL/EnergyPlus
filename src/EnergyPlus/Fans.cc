@@ -1191,7 +1191,6 @@ namespace Fans {
         using CurveManager::GetCurveIndex;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

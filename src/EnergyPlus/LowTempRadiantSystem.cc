@@ -55,6 +55,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -2332,7 +2333,6 @@ namespace LowTempRadiantSystem {
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeLowTempRadiantSystem");
@@ -2395,13 +2395,19 @@ namespace LowTempRadiantSystem {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CapSizingMethod == HeatingDesignCapacity && ElecRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
                         TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        bool errorsFound = false;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         DataScalableCapSizingON = true;
                         TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity * Zone(ElecRadSys(RadSysNum).ZonePtr).FloorArea;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        bool errorsFound = false;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                         DataScalableCapSizingON = false;
                         ElecRadSys(RadSysNum).MaxElecPower = TempSize;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
@@ -2443,8 +2449,10 @@ namespace LowTempRadiantSystem {
                         } else {
                             TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        ElecRadSys(RadSysNum).MaxElecPower = TempSize;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        ElecRadSys(RadSysNum).MaxElecPower = sizerHeatingCapacity.size(TempSize, ErrorsFound);
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
                         DataScalableCapSizingON = false;
@@ -2475,13 +2483,18 @@ namespace LowTempRadiantSystem {
                 if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                     if (CapSizingMethod == HeatingDesignCapacity && HydrRadSys(RadSysNum).ScaledHeatingCapacity > 0.0) {
                         TempSize = HydrRadSys(RadSysNum).ScaledHeatingCapacity;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        bool errorsFound = false;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                     } else if (CapSizingMethod == CapacityPerFloorArea) {
                         DataScalableCapSizingON = true;
                         TempSize = HydrRadSys(RadSysNum).ScaledHeatingCapacity * Zone(HydrRadSys(RadSysNum).ZonePtr).FloorArea;
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerHeatingCapacity.size(TempSize, ErrorsFound);
                         DataScalableCapSizingON = false;
                     } else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
                         if (HydrRadSys(RadSysNum).WaterVolFlowMaxHeat == AutoSize) {
@@ -2524,8 +2537,10 @@ namespace LowTempRadiantSystem {
                         } else {
                             TempSize = HydrRadSys(RadSysNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                        DesCoilLoad = TempSize;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        DesCoilLoad = sizerHeatingCapacity.size(TempSize, ErrorsFound);
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
                         DataScalableCapSizingON = false;

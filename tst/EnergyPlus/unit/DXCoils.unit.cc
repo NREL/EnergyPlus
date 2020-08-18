@@ -1466,7 +1466,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
     SetPredefinedTables();
     CurZoneEqNum = 1;
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     FinalZoneSizing.allocate(1);
     FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow = 0.1;
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.1;
@@ -2220,7 +2220,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DataEnvironment::StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::OASysEqSizing.allocate(1);
 
@@ -2446,7 +2446,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     DataEnvironment::StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::OASysEqSizing.allocate(1);
 
@@ -3552,7 +3552,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
 
     SizeDXCoil(state, 1);
@@ -3804,7 +3804,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     DataSizing::SysSizInput.allocate(1);
     DataSizing::SysSizInput(1).AirLoopNum = CurSysNum;
     DataSizing::NumSysSizInput = 1;
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
 
     // test SHR design size when all autosized

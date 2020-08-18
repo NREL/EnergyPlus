@@ -52,6 +52,7 @@
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -1761,10 +1762,12 @@ namespace UnitarySystems {
                 if (DataSizing::CurSysNum > 0)
                     DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                         false; // set to false to allow calculation of actual heating capacity
-                ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                HeatCapAtPeak = sizerHeatingCapacity.size(TempSize, errorsFound);
                 if (DataSizing::CurSysNum > 0) DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
-                HeatCapAtPeak = TempSize;
-                SysHeatingFlow = TempSize * this->m_MaxHeatAirVolFlow;
+                SysHeatingFlow = HeatCapAtPeak * this->m_MaxHeatAirVolFlow;
                 this->m_MaxHeatAirVolFlow = DataSizing::AutoSize;
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
@@ -1792,9 +1795,12 @@ namespace UnitarySystems {
                 if (DataSizing::CurSysNum > 0)
                     DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                         false; // set to false to allow calculation of actual heating capacity
-                ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                HeatCapAtPeak = sizerHeatingCapacity.size(TempSize, errorsFound);
                 if (DataSizing::CurSysNum > 0) DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
-                HeatCapAtPeak = TempSize;
                 EqSizing.HeatingCapacity = true;
                 EqSizing.DesHeatingLoad = HeatCapAtPeak;
             } else {
@@ -1809,9 +1815,12 @@ namespace UnitarySystems {
                         if (DataSizing::CurSysNum > 0)
                             DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                                 false; // set to false to allow calculation of actual heating capacity
-                        ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        bool errorsFound = false;
+                        HeatingCapacitySizer sizerHeatingCapacity;
+                        sizerHeatingCapacity.overrideSizingString(SizingString);
+                        sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                        HeatCapAtPeak = sizerHeatingCapacity.size(TempSize, errorsFound);
                         if (DataSizing::CurSysNum > 0) DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
-                        HeatCapAtPeak = TempSize;
                         EqSizing.HeatingCapacity = true;
                         EqSizing.DesHeatingLoad = HeatCapAtPeak;
                     }
@@ -2613,7 +2622,11 @@ namespace UnitarySystems {
             if (DataSizing::CurSysNum > 0)
                 DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                     false; // set to false to allow calculation of parent object heating capacity
-            ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            bool errorsFound = false;
+            HeatingCapacitySizer sizerHeatingCapacity;
+            sizerHeatingCapacity.overrideSizingString(SizingString);
+            sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
             if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) DataSizing::DXCoolCap = TempSize;
             if (DataSizing::CurSysNum > 0) DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
             this->m_DesignHeatingCapacity = TempSize;
@@ -2648,8 +2661,11 @@ namespace UnitarySystems {
             SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
             if (TempSize == DataSizing::AutoSize) {
                 IsAutoSize = true;
-                ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                this->m_DesignSuppHeatingCapacity = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
             }
 
             if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat && IsAutoSize) {
@@ -2660,8 +2676,11 @@ namespace UnitarySystems {
             }
 
             if (this->m_OKToPrintSizing) PrintFlag = true;
-            ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            this->m_DesignSuppHeatingCapacity = TempSize;
+            bool errorsFound = false;
+            HeatingCapacitySizer sizerHeatingCapacity;
+            sizerHeatingCapacity.overrideSizingString(SizingString);
+            sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
             IsAutoSize = false;
             DataSizing::DataConstantUsedForSizing = 0.0;
             DataSizing::DataFractionUsedForSizing = 0.0;

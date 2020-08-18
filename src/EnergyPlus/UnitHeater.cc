@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -977,7 +978,6 @@ namespace UnitHeater {
         using PlantUtilities::MyPlantSizingIndex;
         using Psychrometrics::CPHW;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetCoilSteamOutletNode;
         using WaterCoils::GetCoilWaterInletNode;
@@ -1096,7 +1096,11 @@ namespace UnitHeater {
                     PrintFlag = false;
                     DataScalableSizingON = true;
                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    bool errorsFound = false;
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
                     if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
@@ -1105,7 +1109,7 @@ namespace UnitHeater {
                     SizingMethod = HeatingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    bool errorsFound = false;
+                    errorsFound = false;
                     HeatingAirFlowSizer sizingHeatingAirFlow;
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
@@ -1198,8 +1202,11 @@ namespace UnitHeater {
                                     }
                                 }
                                 PrintFlag = false;
-                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                                DesCoilLoad = TempSize;
+                                bool errorsFound = false;
+                                HeatingCapacitySizer sizerHeatingCapacity;
+                                sizerHeatingCapacity.overrideSizingString(SizingString);
+                                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                                 DataScalableCapSizingON = false;
                             } else {
                                 SizingString = "";
@@ -1207,8 +1214,11 @@ namespace UnitHeater {
                                 TempSize = AutoSize;
                                 ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
                                 ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).DesHeatLoad;
-                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                                DesCoilLoad = TempSize;
+                                bool errorsFound = false;
+                                HeatingCapacitySizer sizerHeatingCapacity;
+                                sizerHeatingCapacity.overrideSizingString(SizingString);
+                                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                             }
 
                             if (DesCoilLoad >= SmallLoad) {
@@ -1311,8 +1321,11 @@ namespace UnitHeater {
                                 }
                                 SizingMethod = HeatingCapacitySizing;
                                 PrintFlag = false;
-                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                                DesCoilLoad = TempSize;
+                                bool errorsFound = false;
+                                HeatingCapacitySizer sizerHeatingCapacity;
+                                sizerHeatingCapacity.overrideSizingString(SizingString);
+                                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                                DesCoilLoad = sizerHeatingCapacity.size(TempSize, errorsFound);
                                 DataScalableCapSizingON = false;
                             } else {
                                 DesCoilLoad = FinalZoneSizing(CurZoneEqNum).DesHeatLoad;

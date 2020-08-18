@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -800,8 +801,6 @@ namespace HighTempRadiantSystem {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -877,8 +876,11 @@ namespace HighTempRadiantSystem {
                 } else {
                     TempSize = HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                HighTempRadSys(RadSysNum).MaxPowerCapac = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                HighTempRadSys(RadSysNum).MaxPowerCapac = sizerHeatingCapacity.size(TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }

@@ -45,22 +45,22 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef CoolingCapacitySizing_hh_INCLUDED
-#define CoolingCapacitySizing_hh_INCLUDED
+#ifndef HeatingCapacitySizing_hh_INCLUDED
+#define HeatingCapacitySizing_hh_INCLUDED
 
 #include <EnergyPlus/Autosizing/BaseSizerWithScalableInputs.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
-struct CoolingCapacitySizer : BaseSizerWithScalableInputs
+struct HeatingCapacitySizer : BaseSizerWithScalableInputs
 {
-    CoolingCapacitySizer()
+    HeatingCapacitySizer()
     {
-        this->sizingType = AutoSizingType::CoolingCapacitySizing;
-        this->sizingString = "Cooling Design Capacity [W]";
+        this->sizingType = AutoSizingType::HeatingCapacitySizing;
+        this->sizingString = "Heating Capacity [W]";
     }
-    ~CoolingCapacitySizer() = default;
+    ~HeatingCapacitySizer() = default;
 
     Real64 size(Real64 originalValue, bool &errorsFound) override;
 

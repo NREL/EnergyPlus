@@ -11207,7 +11207,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     DataEnvironment::StdBaroPress = 101325.0;
     Psychrometrics::InitializePsychRoutines();
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     DataSizing::UnitarySysEqSizing.allocate(1);
     DataSizing::OASysEqSizing.allocate(1);
     DataSizing::SysSizPeakDDNum.allocate(1);

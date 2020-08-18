@@ -116,7 +116,7 @@ namespace EnergyPlus {
                 break;
             }
             case DataAirSystems::objectVectorOOFanSystemModel: {
-                HVACFan::fanObjs[fanIndex]->getFanInputsForDesignHeatGain(state, deltaP, motEff, totEff, motInAirFrac);
+                HVACFan::fanObjs[fanIndex]->getFanInputsForDesignHeatGain(deltaP, motEff, totEff, motInAirFrac);
                 break;
             }
             case DataAirSystems::fanModelTypeNotYetSet: {

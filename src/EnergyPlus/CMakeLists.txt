@@ -57,6 +57,8 @@ SET( SRC
   Autosizing/HeatingAirFlowSizing.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
+  Autosizing/HeatingCapacitySizing.cc
+  Autosizing/HeatingCapacitySizing.hh
   Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
   Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh
   Autosizing/HeatingWaterDesAirInletHumRatSizing.cc

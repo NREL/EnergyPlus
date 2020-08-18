@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     UnitarySysEqSizing.allocate(1);
     OASysEqSizing.allocate(1);
 
@@ -479,7 +479,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     InitializePsychRoutines();
 
     DataFlowUsedForSizing = FinalSysSizing(CurSysNum).DesCoolVolFlow;
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     UnitarySysEqSizing.allocate(1);
     OASysEqSizing.allocate(1);
 
@@ -575,7 +575,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
     StdBaroPress = 101325.0;
     InitializePsychRoutines();
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     ZoneEqSizing.allocate(1);
     ZoneSizingInput.allocate(1);
     ZoneSizingInput(1).ZoneNum = ZoneNum;
@@ -934,7 +934,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak)
 
     DataSizing::ZoneSizingRunDone = true;
 
-    // Need this to prevent crash in RequestSizing
+    // Need this to prevent crash in Sizers
     ZoneEqSizing.allocate(1);
     ZoneSizingInput.allocate(1);
     ZoneSizingInput(1).ZoneNum = ZoneNum;

@@ -699,7 +699,6 @@ namespace SteamCoils {
         using PlantUtilities::RegisterPlantCompDesignFlow;
         //  USE BranchInputManager, ONLY: MyPlantSizingIndex
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -907,7 +907,6 @@ namespace CoolingPanelSimple {
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeCoolingPanel");

@@ -48,6 +48,7 @@
 // C++ Headers
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -453,8 +454,6 @@ namespace BaseboardElectric {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");
@@ -510,8 +509,11 @@ namespace BaseboardElectric {
                 } else {
                     TempSize = baseboard.Baseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                baseboard.Baseboard(BaseboardNum).NominalCapacity = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                baseboard.Baseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }

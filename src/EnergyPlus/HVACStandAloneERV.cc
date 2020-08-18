@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -1407,7 +1408,6 @@ namespace HVACStandAloneERV {
         using General::RoundSigDigits;
         using HeatRecovery::SetHeatExchangerData;
         using MixedAir::OAController;
-        using ReportSizingManager::ReportSizingOutput;
         using ScheduleManager::GetScheduleMaxValue;
 
         static std::string const RoutineName("SizeStandAloneERV: ");
@@ -1440,7 +1440,7 @@ namespace HVACStandAloneERV {
         std::string CompType("ZoneHVAC:EnergyRecoveryVentilator");
         std::string CompName(StandAloneERV(StandAloneERVNum).Name);
         bool PrintFlag = true;
-        int SizingMethod = AutoCalculateSizing;
+        bool ErrorsFound = false;
         DataSizing::DataFractionUsedForSizing = 1.0;
 
         if (StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == AutoSize) {
@@ -1494,7 +1494,11 @@ namespace HVACStandAloneERV {
             } else {
                 DataSizing::DataConstantUsedForSizing = StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
             }
-            if (TempSize > 0.0) ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            if (TempSize > 0.0) {
+                SystemAirFlowSizer sizerSystemAirFlow;
+                sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+            }
             StandAloneERV(StandAloneERVNum).SupplyAirVolFlow = TempSize;
         }
 
@@ -1524,7 +1528,11 @@ namespace HVACStandAloneERV {
             } else {
                 DataSizing::DataConstantUsedForSizing = StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
             }
-            if (TempSize > 0.0) ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            if (TempSize > 0.0) {
+                SystemAirFlowSizer sizerSystemAirFlow;
+                sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+            }
             StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow = TempSize;
             StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate = TempSize * StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
         }

@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -695,8 +696,6 @@ namespace ElectricBaseboardRadiator {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeElectricBaseboard");
@@ -752,15 +751,22 @@ namespace ElectricBaseboardRadiator {
                     DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     FracOfAutoSzCap = AutoSize;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, FracOfAutoSzCap, false, RoutineName);
+                    bool ErrorsFound = false;
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    FracOfAutoSzCap = sizerHeatingCapacity.size(FracOfAutoSzCap, ErrorsFound);
                     TempSize = FracOfAutoSzCap;
                     DataFracOfAutosizedHeatingCapacity = 1.0;
                     DataScalableCapSizingON = true;
                 } else {
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                ElecBaseboard(BaseboardNum).NominalCapacity = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                ElecBaseboard(BaseboardNum).NominalCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }

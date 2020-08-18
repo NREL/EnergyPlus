@@ -373,8 +373,6 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                         if (this->curOASysNum > 0) { // coil is in the OA stream
                             // need to find fan type in OA system
                         } else {
-                            int SupFanNum = this->primaryAirSystem(this->curSysNum).SupFanNum;
-                            int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
                             switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
                             case DataAirSystems::structArrayLegacyFanModels: {
                                 FanCoolLoad = this->calcFanDesHeatGain(DesVolFlow);
@@ -527,23 +525,20 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
         }
 
         // override sizing string
-        if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
-            this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
-            if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-        }
-        if (this->isEpJSON) this->sizingString = "cooling_supply_air_flow_rate [m3/s]";
-        if (this->dataScalableSizingON) {
+        if (this->isEpJSON) this->sizingString = "cooling_design_capacity [W]";
+        if (this->dataScalableCapSizingON) {
             std::string ScalableSM = "";
-            if (this->zoneAirFlowSizMethod == DataSizing::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::None) {
-                ScalableSM = "(scaled by flow / zone) ";
-            } else if (this->zoneAirFlowSizMethod == DataSizing::FlowPerFloorArea) {
-                ScalableSM = "(scaled by flow / area) ";
-            } else if (this->zoneAirFlowSizMethod == DataSizing::FractionOfAutosizedCoolingAirflow ||
-                       this->zoneAirFlowSizMethod == DataSizing::FractionOfAutosizedHeatingAirflow) {
-                ScalableSM = "(scaled by fractional multiplier) ";
-            } else if (this->zoneAirFlowSizMethod == DataSizing::FlowPerCoolingCapacity ||
-                       this->zoneAirFlowSizMethod == DataSizing::FlowPerHeatingCapacity) {
-                ScalableSM = "(scaled by flow / capacity) ";
+            auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing));
+            if (SELECT_CASE_var == DataSizing::HeatingDesignCapacity || SELECT_CASE_var == DataSizing::CoolingDesignCapacity) {
+                ScalableSM = "User-Specified ";
+                if (this->wasAutoSized) ScalableSM = "Design Size ";
+            } else if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
+                ScalableSM = "User-Specified (scaled by capacity / area) ";
+            } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||
+                       SELECT_CASE_var == DataSizing::FractionOfAutosizedCoolingCapacity) {
+                ScalableSM = "User-Specified (scaled by fractional multiplier) ";
+            } else {
+                ScalableSM = "Design Size ";
             }
             this->sizingString = ScalableSM + this->sizingString;
         }

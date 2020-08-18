@@ -4274,8 +4274,6 @@ namespace EvaporativeCoolers {
         // na
 
         // Using/Aliasing
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
         using namespace DataSizing;
         using DataHeatBalance::Zone;
         using DataHVACGlobals::CoolingCapacitySizing;

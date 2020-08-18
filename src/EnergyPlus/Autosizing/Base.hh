@@ -74,6 +74,7 @@ enum class AutoSizingType
     DesiccantDehumidifierBFPerfDataFaceVelocitySizing,
     HeatingAirFlowSizing,
     HeatingAirflowUASizing,
+    HeatingCapacitySizing,
     HeatingCoilDesAirInletHumRatSizing,
     HeatingCoilDesAirInletTempSizing,
     HeatingCoilDesAirOutletTempSizing,

@@ -918,7 +918,6 @@ namespace WindowAC {
         using DataHVACGlobals::CoolingCapacitySizing;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space

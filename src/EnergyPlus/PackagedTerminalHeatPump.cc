@@ -60,6 +60,7 @@
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -4797,7 +4798,6 @@ namespace PackagedTerminalHeatPump {
         using DataZoneEquipment::PkgTermHPWaterToAir_Num;
         using General::RoundSigDigits;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
         using VariableSpeedCoils::GetCoilAirFlowRateVariableSpeed;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using WaterCoils::SetCoilDesFlow;
@@ -4948,8 +4948,6 @@ namespace PackagedTerminalHeatPump {
                     if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                         DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    DataAutosizedCoolingCapacity = TempSize;
                     CoolingCapacitySizer sizerCoolingCapacity;
                     sizerCoolingCapacity.overrideSizingString(SizingString);
                     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
@@ -5005,7 +5003,11 @@ namespace PackagedTerminalHeatPump {
                     PrintFlag = false;
                     DataScalableSizingON = true;
                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    bool errorsFound = false;
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    TempSize = sizerHeatingCapacity.size(TempSize, errorsFound);
                     if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
@@ -5014,7 +5016,7 @@ namespace PackagedTerminalHeatPump {
                     SizingMethod = HeatingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    bool errorsFound = false;
+                    errorsFound = false;
                     HeatingAirFlowSizer sizingHeatingAirFlow;
                     sizingHeatingAirFlow.overrideSizingString(SizingString);
                     // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
