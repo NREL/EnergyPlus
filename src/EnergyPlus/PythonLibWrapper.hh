@@ -91,6 +91,8 @@ extern "C" {
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction(PyObject *callable, const char *format);
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction3Args(PyObject *callable, const char *format, PyObject * arg1, PyObject * arg2, PyObject * arg3);
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod(PyObject *obj, const char *name, const char *format);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod1Arg(PyObject *, const char *, const char *, PyObject *);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod2ObjArg(PyObject *, PyObject *, PyObject *, PyObject *);
     PYTHONWRAP_API int EP_Wrap_PyList_Check(PyObject *p);
     PYTHONWRAP_API unsigned long EP_Wrap_PyList_Size(PyObject *list);
     PYTHONWRAP_API PyObject * EP_Wrap_PyList_GetItem(PyObject *list, Py_ssize_t index);
@@ -99,6 +101,9 @@ extern "C" {
     PYTHONWRAP_API long EP_Wrap_PyLong_AsLong(PyObject *obj);
     PYTHONWRAP_API void EP_Wrap_Py_SetPath(const wchar_t *);
     PYTHONWRAP_API void EP_Wrap_Py_SetPythonHome(const wchar_t *home);
+    PYTHONWRAP_API PyObject * EP_Wrap_Py_BuildValue(const char *format);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyLong_FromVoidPtr(void *v);
+    PYTHONWRAP_API PyObject * EP_Wrap_PyString_FromString(const char *s);
 };
 
 
