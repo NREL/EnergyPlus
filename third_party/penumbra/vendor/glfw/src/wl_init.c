@@ -1,5 +1,5 @@
 //========================================================================
-// GLFW 3.4 Wayland - www.glfw.org
+// GLFW 3.3 Wayland - www.glfw.org
 //------------------------------------------------------------------------
 // Copyright (c) 2014 Jonas Ådahl <jadahl@gmail.com>
 //
@@ -22,6 +22,8 @@
 // 3. This notice may not be removed or altered from any source
 //    distribution.
 //
+//========================================================================
+// It is fine to use C99 in this file because it will not be built with VS
 //========================================================================
 
 #include "internal.h"
@@ -123,6 +125,7 @@ static void pointerHandleLeave(void* data,
     _glfw.wl.serial = serial;
     _glfw.wl.pointerFocus = NULL;
     _glfwInputCursorEnter(window, GLFW_FALSE);
+    _glfw.wl.cursorPreviousName = NULL;
 }
 
 static void setCursor(_GLFWwindow* window, const char* name)
@@ -167,6 +170,7 @@ static void setCursor(_GLFWwindow* window, const char* name)
     wl_surface_damage(surface, 0, 0,
                       image->width, image->height);
     wl_surface_commit(surface);
+    _glfw.wl.cursorPreviousName = name;
 }
 
 static void pointerHandleMotion(void* data,
@@ -176,48 +180,47 @@ static void pointerHandleMotion(void* data,
                                 wl_fixed_t sy)
 {
     _GLFWwindow* window = _glfw.wl.pointerFocus;
-    const char* cursorName;
+    const char* cursorName = NULL;
+    double x, y;
 
     if (!window)
         return;
 
     if (window->cursorMode == GLFW_CURSOR_DISABLED)
         return;
-    else
-    {
-        window->wl.cursorPosX = wl_fixed_to_double(sx);
-        window->wl.cursorPosY = wl_fixed_to_double(sy);
-    }
+    x = wl_fixed_to_double(sx);
+    y = wl_fixed_to_double(sy);
 
     switch (window->wl.decorations.focus)
     {
         case mainWindow:
-            _glfwInputCursorPos(window,
-                                wl_fixed_to_double(sx),
-                                wl_fixed_to_double(sy));
+            window->wl.cursorPosX = x;
+            window->wl.cursorPosY = y;
+            _glfwInputCursorPos(window, x, y);
+            _glfw.wl.cursorPreviousName = NULL;
             return;
         case topDecoration:
-            if (window->wl.cursorPosY < _GLFW_DECORATION_WIDTH)
+            if (y < _GLFW_DECORATION_WIDTH)
                 cursorName = "n-resize";
             else
                 cursorName = "left_ptr";
             break;
         case leftDecoration:
-            if (window->wl.cursorPosY < _GLFW_DECORATION_WIDTH)
+            if (y < _GLFW_DECORATION_WIDTH)
                 cursorName = "nw-resize";
             else
                 cursorName = "w-resize";
             break;
         case rightDecoration:
-            if (window->wl.cursorPosY < _GLFW_DECORATION_WIDTH)
+            if (y < _GLFW_DECORATION_WIDTH)
                 cursorName = "ne-resize";
             else
                 cursorName = "e-resize";
             break;
         case bottomDecoration:
-            if (window->wl.cursorPosX < _GLFW_DECORATION_WIDTH)
+            if (x < _GLFW_DECORATION_WIDTH)
                 cursorName = "sw-resize";
-            else if (window->wl.cursorPosX > window->wl.width + _GLFW_DECORATION_WIDTH)
+            else if (x > window->wl.width + _GLFW_DECORATION_WIDTH)
                 cursorName = "se-resize";
             else
                 cursorName = "s-resize";
@@ -225,7 +228,8 @@ static void pointerHandleMotion(void* data,
         default:
             assert(0);
     }
-    setCursor(window, cursorName);
+    if (_glfw.wl.cursorPreviousName != cursorName)
+        setCursor(window, cursorName);
 }
 
 static void pointerHandleButton(void* data,
@@ -237,7 +241,9 @@ static void pointerHandleButton(void* data,
 {
     _GLFWwindow* window = _glfw.wl.pointerFocus;
     int glfwButton;
-    uint32_t edges = XDG_TOPLEVEL_RESIZE_EDGE_NONE;
+
+    // Both xdg-shell and wl_shell use the same values.
+    uint32_t edges = WL_SHELL_SURFACE_RESIZE_NONE;
 
     if (!window)
         return;
@@ -249,39 +255,46 @@ static void pointerHandleButton(void* data,
                 break;
             case topDecoration:
                 if (window->wl.cursorPosY < _GLFW_DECORATION_WIDTH)
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_TOP;
+                    edges = WL_SHELL_SURFACE_RESIZE_TOP;
                 else
                 {
-                    xdg_toplevel_move(window->wl.xdg.toplevel, _glfw.wl.seat, serial);
+                    if (window->wl.xdg.toplevel)
+                        xdg_toplevel_move(window->wl.xdg.toplevel, _glfw.wl.seat, serial);
+                    else
+                        wl_shell_surface_move(window->wl.shellSurface, _glfw.wl.seat, serial);
                 }
                 break;
             case leftDecoration:
                 if (window->wl.cursorPosY < _GLFW_DECORATION_WIDTH)
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_TOP_LEFT;
+                    edges = WL_SHELL_SURFACE_RESIZE_TOP_LEFT;
                 else
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_LEFT;
+                    edges = WL_SHELL_SURFACE_RESIZE_LEFT;
                 break;
             case rightDecoration:
                 if (window->wl.cursorPosY < _GLFW_DECORATION_WIDTH)
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_TOP_RIGHT;
+                    edges = WL_SHELL_SURFACE_RESIZE_TOP_RIGHT;
                 else
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_RIGHT;
+                    edges = WL_SHELL_SURFACE_RESIZE_RIGHT;
                 break;
             case bottomDecoration:
                 if (window->wl.cursorPosX < _GLFW_DECORATION_WIDTH)
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_LEFT;
+                    edges = WL_SHELL_SURFACE_RESIZE_BOTTOM_LEFT;
                 else if (window->wl.cursorPosX > window->wl.width + _GLFW_DECORATION_WIDTH)
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT;
+                    edges = WL_SHELL_SURFACE_RESIZE_BOTTOM_RIGHT;
                 else
-                    edges = XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM;
+                    edges = WL_SHELL_SURFACE_RESIZE_BOTTOM;
                 break;
             default:
                 assert(0);
         }
-        if (edges != XDG_TOPLEVEL_RESIZE_EDGE_NONE)
+        if (edges != WL_SHELL_SURFACE_RESIZE_NONE)
         {
-            xdg_toplevel_resize(window->wl.xdg.toplevel, _glfw.wl.seat,
-                                serial, edges);
+            if (window->wl.xdg.toplevel)
+                xdg_toplevel_resize(window->wl.xdg.toplevel, _glfw.wl.seat,
+                                    serial, edges);
+            else
+                wl_shell_surface_resize(window->wl.shellSurface, _glfw.wl.seat,
+                                        serial, edges);
         }
     }
     else if (button == BTN_RIGHT)
@@ -796,6 +809,11 @@ static void registryHandleGlobal(void* data,
         _glfw.wl.shm =
             wl_registry_bind(registry, name, &wl_shm_interface, 1);
     }
+    else if (strcmp(interface, "wl_shell") == 0)
+    {
+        _glfw.wl.shell =
+            wl_registry_bind(registry, name, &wl_shell_interface, 1);
+    }
     else if (strcmp(interface, "wl_output") == 0)
     {
         _glfwAddOutputWayland(name, version);
@@ -1150,13 +1168,6 @@ int _glfwPlatformInit(void)
     if (_glfw.wl.seatVersion >= 4)
         _glfw.wl.timerfd = timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC);
 
-    if (!_glfw.wl.wmBase)
-    {
-        _glfwInputError(GLFW_PLATFORM_ERROR,
-                        "Wayland: Failed to find xdg-shell in your compositor");
-        return GLFW_FALSE;
-    }
-
     if (_glfw.wl.pointer && _glfw.wl.shm)
     {
         cursorTheme = getenv("XCURSOR_THEME");
@@ -1250,6 +1261,8 @@ void _glfwPlatformTerminate(void)
         wl_compositor_destroy(_glfw.wl.compositor);
     if (_glfw.wl.shm)
         wl_shm_destroy(_glfw.wl.shm);
+    if (_glfw.wl.shell)
+        wl_shell_destroy(_glfw.wl.shell);
     if (_glfw.wl.viewporter)
         wp_viewporter_destroy(_glfw.wl.viewporter);
     if (_glfw.wl.decorationManager)
