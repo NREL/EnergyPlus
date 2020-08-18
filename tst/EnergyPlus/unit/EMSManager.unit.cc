@@ -55,6 +55,7 @@
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -70,6 +71,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EMSManager;
@@ -1624,51 +1626,147 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
 
 }
-TEST_F(EnergyPlusFixture, WeatherDataActuators)
+TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)
 {
 
+    // GetNextEnvironment Will call ReadUserWeatherInput which calls inputProcessor, so let's use process_idf to create one Environment (Design Day)
     std::string const idf_objects = delimited_string({
 
-        "OutdoorAir:Node, Test node;",
+        "Site:Location,",
+        "   Atlanta Hartsfield Intl Ap_GA_USA Design_Conditions, !- Location Name",
+        "     33.63,    !- Latitude {N + S - }",
+        "    -84.43,    !- Longitude {W - E + }",
+        "     -5.00,    !- Time Zone Relative to GMT {GMT + / -}",
+        "    308.00;    !- Elevation {m}",
+
+        "  SizingPeriod:DesignDay,",
+        "    Atlanta Made Up Day,  !- Name",
+        "    7,                       !- Month",
+        "    21,                      !- Day of Month",
+        "    SummerDesignDay,         !- Day Type",
+        "    34.0,                    !- Maximum Dry-Bulb Temperature {C}",
+        "    11.6,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+        "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+        "    13.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "    ,                        !- Humidity Condition Day Schedule Name",
+        "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "    8,                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "    97620,                   !- Barometric Pressure {Pa}",
+        "    5.0,                     !- Wind Speed {m/s}",
+        "    180.0,                   !- Wind Direction {deg}",
+        "    No,                      !- Rain Indicator",
+        "    No,                      !- Snow Indicator",
+        "    No,                      !- Daylight Saving Time Indicator",
+        "    ASHRAETau2017,           !- Solar Model Indicator",
+        "    ,                        !- Beam Solar Day Schedule Name",
+        "    ,                        !- Diffuse Solar Day Schedule Name",
+        "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "    2.461;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
 
         "EnergyManagementSystem:Actuator,",
-        "TempSetpointLo,          !- Name",
-        "Test node,  !- Actuated Component Unique Name",
-        "System Node Setpoint,    !- Actuated Component Type",
-        "Temperature Minimum Setpoint;    !- Actuated Component Control Type",
+        "OutDryBulb,              !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Outdoor Dry Bulb;        !- Actuated Component Control Type",
 
         "EnergyManagementSystem:Actuator,",
-        "TempSetpointHi,          !- Name",
-        "Test node,  !- Actuated Component Unique Name",
-        "System Node Setpoint,    !- Actuated Component Type",
-        "Temperature Maximum Setpoint;    !- Actuated Component Control Type",
+        "OutDewPoint,             !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Outdoor Dew Point;       !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "OutRH,                   !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Outdoor Relative Humidity;  !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "DiffuseSolar,            !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Diffuse Solar;           !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "DirectSolar,              !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Direct Solar;        !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "WindSpeed,               !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Wind Speed;              !- Actuated Component Control Type",
+
+        "EnergyManagementSystem:Actuator,",
+        "WindDirection,           !- Name",
+        "Environment,             !- Actuated Component Unique Name",
+        "Weather Data,            !- Actuated Component Type",
+        "Wind Direction;          !- Actuated Component Control Type",
 
         "EnergyManagementSystem:ProgramCallingManager,",
         "Dual Setpoint Test Manager,  !- Name",
-        "BeginNewEnvironment,  !- EnergyPlus Model Calling Point",
-        "DualSetpointTestControl;  !- Program Name 1",
+        "BeginZoneTimestepBeforeSetCurrentWeather,  !- EnergyPlus Model Calling Point",
+        "OverrideWeather;  !- Program Name 1",
 
         "EnergyManagementSystem:Program,",
-        "DualSetpointTestControl,",
-        "Set TempSetpointLo = 16.0,",
-        "Set TempSetpointHi  = 20.0;",
+        "OverrideWeather,",
+        "Set OutDryBulb = 50.0,",
+        "Set OutDewPoint = 25.0,",
+        "Set OutRH = 50.0,",
+        "Set DiffuseSolar = 500.0,",
+        "Set DirectSolar = 1000.0,",
+        "Set WindSpeed = 5.5,",
+        "Set WindDirection = 32.1;",
 
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutAirNodeManager::SetOutAirNodes();
+    DataGlobals::BeginSimFlag = true;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    WeatherManager::LocationGathered = false;
 
     EMSManager::CheckIfAnyEMS(state.files);
+    bool available = false;
+    bool errorsFound = false;
+    WeatherManager::GetNextEnvironment(state, available, errorsFound);
+    ASSERT_FALSE(errorsFound);
 
     EMSManager::FinishProcessingUserInput = true;
 
-    bool anyRan;
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromSetupSimulation, anyRan, ObjexxFCL::Optional_int_const());
+    // Initialize all sorts of weather stuff
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::DayOfSim = 1;
+    DataGlobals::BeginEnvrnFlag = true;
+    DataGlobals::BeginDayFlag = true;
+    WeatherManager::ManageWeather(state);
 
-    EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyRan, ObjexxFCL::Optional_int_const());
+    EXPECT_NEAR(DataEnvironment::OutDryBulbTemp, 50.0, 0.000001);
+    EXPECT_NEAR(DataEnvironment::OutDewPointTemp, 25.0, 0.000001);
+    EXPECT_NEAR(DataEnvironment::OutRelHum, 50.0, 0.000001);
+    EXPECT_NEAR(DataEnvironment::DifSolarRad, 0.0, 0.000001);  // Sun is down
+    EXPECT_NEAR(DataEnvironment::BeamSolarRad, 0.0, 0.000001); // Sun is down
+    EXPECT_NEAR(DataEnvironment::WindSpeed, 5.5, 0.000001);
+    EXPECT_NEAR(DataEnvironment::WindDir, 32.1, 0.000001);
 
-    EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001);
+    DataGlobals::TimeStep = 3;
+    DataGlobals::HourOfDay = 8;
+    DataGlobals::DayOfSim = 1;
+    DataGlobals::BeginEnvrnFlag = false;
+    DataGlobals::BeginDayFlag = false;
+    WeatherManager::ManageWeather(state);
 
-    EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointLo, 16.0, 0.000001);
+    EXPECT_NEAR(DataEnvironment::OutDryBulbTemp, 50.0, 0.000001);
+    EXPECT_NEAR(DataEnvironment::OutDewPointTemp, 25.0, 0.000001);
+    EXPECT_NEAR(DataEnvironment::OutRelHum, 50.0, 0.000001);
+    EXPECT_NEAR(DataEnvironment::DifSolarRad, 500.0, 0.000001);   // Sun is up
+    EXPECT_NEAR(DataEnvironment::BeamSolarRad, 1000.0, 0.000001); // Sun is up
+    EXPECT_NEAR(DataEnvironment::WindSpeed, 5.5, 0.000001);
+    EXPECT_NEAR(DataEnvironment::WindDir, 32.1, 0.000001);
 }
