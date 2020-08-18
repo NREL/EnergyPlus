@@ -1489,7 +1489,7 @@ namespace PluginManagement {
         return true;
     }
 #else
-    bool PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
+    bool PluginInstance::run(EnergyPlusData &EP_UNUSED(state), int EP_UNUSED(iCalledFrom)) const
     {
         return false;
     }
