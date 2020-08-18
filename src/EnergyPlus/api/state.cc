@@ -45,44 +45,27 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <EnergyPlus/api/datatransfer.h>
-#include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/api/state.h>
 
-int outdoorDewPointActuator = -1;
-int outdoorTempSensor = -1;
-int outdoorDewPointSensor = -1;
-int handlesRetrieved = 0;
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/StateManagement.hh>
 
-void afterZoneTimeStepHandler(EnergyPlusState state)
-{
-    printf("STARTING A NEW TIME STEP\n");
-    if (handlesRetrieved == 0) {
-        if (!apiDataFullyReady(state)) return;
-        outdoorDewPointActuator = getActuatorHandle(state, "Weather Data", "Outdoor Dew Point", "Environment");
-        outdoorTempSensor = getVariableHandle(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-        outdoorDewPointSensor = getVariableHandle(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-        printf("Got handles %d, %d, %d", outdoorDewPointActuator, outdoorTempSensor, outdoorDewPointSensor);
-        if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
-            exit(1);
-        }
-        handlesRetrieved = 1;
-    }
-    setActuatorValue(state, outdoorDewPointActuator, -25.0);
-    Real64 oa_temp = getVariableValue(state, outdoorTempSensor);
-    printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
-    Real64 dp_temp = getVariableValue(state, outdoorDewPointSensor);
-    printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
+EnergyPlusState stateNew() {
+    auto *state = new EnergyPlus::EnergyPlusData;
+    return reinterpret_cast<EnergyPlusState>(state);
 }
 
-int main(int argc, const char * argv[]) {
-    EnergyPlusState state = stateNew();
-    callbackEndOfZoneTimeStepAfterZoneReporting(state, afterZoneTimeStepHandler);
-    requestVariable(state, "SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
-    requestVariable(state, "SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-    energyplus(state, argc, argv);
-    return 0;
+void stateReset(EnergyPlusState state) {
+    auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    EnergyPlus::clearAllStates(*this_state);
+    // also clear out the input processor since the clearAllStates does not do that.
+    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
+}
+
+void stateDelete(EnergyPlusState state) {
+    delete reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
 }
