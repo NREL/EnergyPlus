@@ -1,6 +1,6 @@
 \section{Begin Zone Timestep Before SetCurrentWeather}\label{begin-zone-timestep-before-setcurrentweather}
 
-The calling point referred to with the keyword ``BeginZoneTimestepBeforeSetCurrentWeather'' occurs near the beginning of each timestep during weather data setup. It is called from ``ManageWeather'' before ``SetCurrentWeather'' which sets the enviornment variables for a given timstep. ``SetCurrentWeather'' is where the Weather Data actuators may override certain environment variables.
+The calling point referred to with the keyword ``BeginZoneTimestepBeforeSetCurrentWeather'' occurs near the beginning of each timestep during weather data setup. It is called from ``ManageWeather'' before ``SetCurrentWeather'' which sets the environment variables for a given timstep. ``SetCurrentWeather'' is where the Weather Data actuators may override certain environment variables. Note that this calling point is not active during sizing.
 
 \section{After New Environment Warmup Is Complete}\label{after-new-environment-warmup-is-complete}
 

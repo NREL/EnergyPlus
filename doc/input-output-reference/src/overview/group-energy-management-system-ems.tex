@@ -114,7 +114,7 @@ This field describes when the Erl programs managed under this object are called 
 \item
   BeginNewEnvironment. This calling point occurs near the beginning of each environment period. Environment periods include sizing periods such as design days and run periods. This calling point will not be useful for control actions but is useful for initialization of Erl program variables and other one-time set up actions for EMS.
 \item
-  BeginZoneTimestepBeforeSetCurrentWeather. This calling point occurs near the beginning of each timestep during weather data setup. It is called from ``ManageWeather'' before ``SetCurrentWeather'' which sets the enviornment variables for a given timstep. ``SetCurrentWeather'' is where the Weather Data actuators may override certain environment variables.
+  BeginZoneTimestepBeforeSetCurrentWeather. This calling point occurs near the beginning of each timestep during weather data setup. It is called from ``ManageWeather'' before ``SetCurrentWeather'' which sets the environment variables for a given timstep. ``SetCurrentWeather'' is where the Weather Data actuators may override certain environment variables. Note that this calling point is not active during sizing.
 \item
   AfterNewEnvironmentWarmUpIsComplete. This calling point occurs at the beginning of each environment period but after warm up days are complete. Warm up days are used to condition the transient aspects of the model with the first day before proceeding. This calling point will not be useful for control actions but is useful for re-initializing Erl programs with fresh values after warm up is complete. Programs called from this point might be used to reset counters or summed variables that would change during warmup.
 \item
