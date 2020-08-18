@@ -46,11 +46,23 @@ cf #7742.
 
 Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
 
-Fields 1-7 remain the same.
+Fields 1-4 remain the same.
 
-NEW Field F8 (A6): Setpoint Control Type.  Leave blank or assign a value of “HalfFlowPower” (default).
+NEW Field F5 (A5): Fluid to Radiant Surface Heat Transfer Model.  Leave blank or assign a value of “ConvectionOnly”.
 
-Old Fields 8-29 remain the same, just shifted back one field to Fields 9-30.
+Old Field 5 becomes NEW Field F6.
+
+NEW Field F7 (N2): Hydronic Tubing Outside Diameter.  Leave blank or assign a value of “0.016”.
+
+Old Field 6 becomes NEW Field F8.
+
+NEW Field F9 (N4): Hydronic Tubing Conductivity.  Leave blank or assign a value of “0.35”.
+
+Old Field 7 becomes New Field F10.
+
+NEW Field F11 (A6): Setpoint Control Type.  Leave blank or assign a value of “HalfFlowPower” (default).
+
+Old Fields 8-29 remain the same, just shifted back one field to Fields 12-33.
 
 # Object Change: ‘ZoneHVAC:LowTemperatureRadiant:Electric’
 
@@ -66,11 +78,23 @@ Old Fields 10-11 remain the same, just shifted back one field to Fields 11-12.
 
 Summary: A new field was added into the middle of the object, everything else states the same (or shifted back if occurring after the new field).
 
-Fields 1-7 remain the same.
+Fields 1-4 remain the same.
 
-NEW Field F8 (N3): Running Mean Outdoor Air Temperature Weighting Factor.  Leave blank or assign a value of “0.8” (default).
+NEW Field F5 (A5): Fluid to Radiant Surface Heat Transfer Model.  Leave blank or assign a value of “ConvectionOnly”.
 
-Old Fields 8-29 remain the same, just shifted back one field to Fields 9-30.
+Old Field 5 becomes NEW Field F6.
+
+NEW Field F7 (N2): Hydronic Tubing Outside Diameter.  Leave blank or assign a value of “0.016”.
+
+Old Field 6 becomes NEW Field F8.
+
+NEW Field F9 (N4): Hydronic Tubing Conductivity.  Leave blank or assign a value of “0.35”.
+
+Old Field 7 becomes New Field F10.
+
+NEW Field F11 (N5): Running Mean Outdoor Air Temperature Weighting Factor.  Leave blank or assign a value of “0.8” (default).
+
+Old Fields 8-29 remain the same, just shifted back one field to Fields 12-33.
 
 # Minor Changes:
 
