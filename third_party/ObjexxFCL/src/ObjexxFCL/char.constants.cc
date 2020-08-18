@@ -16,7 +16,6 @@
 namespace ObjexxFCL {
 
 char const CMA( ',' );
-char const NL( '\n' );
 char const NUL( '\0' );
 char const SPC( ' ' );
 char const TAB( '\t' );
