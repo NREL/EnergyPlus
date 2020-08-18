@@ -62,6 +62,8 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <nlohmann/json.hpp>
+
 namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
@@ -856,29 +858,37 @@ namespace PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
-                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                std::string workingDirFlagUC = "YES";
+                try {
+                    workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (workingDirFlagUC == "YES") {
                     PluginManager::addToPythonPath(".", false);
                 }
-                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                std::string inputFileDirFlagUC = "YES";
+                try {
+                    inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (inputFileDirFlagUC == "YES") {
                     std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
                     PluginManager::addToPythonPath(sanitizedInputFileDir, false);
                 }
-                if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
-                }
-                if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
-                }
-                if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
-                }
-                if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
-                }
-                if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
+                try {
+                    auto const vars = fields.at("py_search_paths");
+                    for (const auto &var : vars) {
+                        try {
+                            PluginManager::addToPythonPath(PluginManager::sanitizedPath(var.at("search_path")), true);
+                        } catch (nlohmann::json::out_of_range &e) {
+                            // empty entry
+                        }
+                    }
+                } catch (nlohmann::json::out_of_range& e) {
+                    // catch when no paths are passed
+                    // nothing to do here
                 }
             }
         }
@@ -1388,6 +1398,8 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
+        if (path.empty()) return;
+
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if ((*EP_PyRun_SimpleString)(command.c_str()) == 0) {
             if (userDefinedPath) {
