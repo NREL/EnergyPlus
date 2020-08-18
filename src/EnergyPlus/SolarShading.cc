@@ -9983,6 +9983,13 @@ namespace SolarShading {
             IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
             ShadingType = WindowShadingControl(IShadingCtrl).ShadingType;
             SurfaceWindow(ISurf).ShadingFlag = ShadeOff; // Initialize shading flag to off
+            
+            // set the construction to the current windowshadingcontrol contstruction
+            if (WindowShadingControl(IShadingCtrl).ShadedConstruction != 0) {
+                SurfaceWindow(ISurf).ShadedConstruction = WindowShadingControl(IShadingCtrl).ShadedConstruction; 
+                Surface(ISurf).ShadedConstruction = WindowShadingControl(IShadingCtrl).ShadedConstruction;
+            }
+
             IZone = Surface(ISurf).Zone;
             // Setpoint for shading
             SetPoint = WindowShadingControl(IShadingCtrl).SetPoint;
