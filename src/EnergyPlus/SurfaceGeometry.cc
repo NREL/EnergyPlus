@@ -4562,7 +4562,6 @@ namespace SurfaceGeometry {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int WSCPtr;         // WindowShadingControl Index
         int ConstrNumSh;    // Construction number with Shade
         int ConstrNum;      // Construction number
         int ShDevNum;       // Shading Device number
@@ -4581,222 +4580,224 @@ namespace SurfaceGeometry {
         // Otherwise, create shaded construction if WindowShadingControl for this window has
         // interior or exterior shade/blind (but not between-glass shade/blind) specified.
 
-        WSCPtr = SurfaceTmp(SurfNum).activeWindowShadingControl; // only need to do the first since the rest should have the same shading type and construction
-        ConstrNumSh = 0;
-        if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
-            ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
-            if (ConstrNumSh > 0) {
-                SurfaceTmp(SurfNum).ShadedConstruction = ConstrNumSh;
-            } else {
+        for (int WSCPtr : SurfaceTmp(SurfNum).windowShadingControlList) {
+            ConstrNumSh = 0;
+            if (!ErrorsFound && SurfaceTmp(SurfNum).HasShadeControl) {
+                ConstrNumSh = WindowShadingControl(WSCPtr).ShadedConstruction;
+                if (ConstrNumSh > 0) {
+                    SurfaceTmp(SurfNum).ShadedConstruction = ConstrNumSh;
+                } else {
+                    if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
+                        WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
+                        ShDevNum = WindowShadingControl(WSCPtr).ShadingDevice;
+                        if (ShDevNum > 0) {
+                            CreateShadedWindowConstruction(SurfNum, WSCPtr, ShDevNum);
+                            ConstrNumSh = SurfaceTmp(SurfNum).ShadedConstruction;
+                        }
+                    }
+                }
+            }
+
+            // Error checks for shades and blinds
+
+            ConstrNum = SurfaceTmp(SurfNum).Construction;
+            if (!ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0) {
+
                 if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
-                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind ||
-                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
+                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
+                    TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
+                    TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
+                    if (TotShLayers - 1 != TotLayers) {
+                        ShowWarningError("WindowShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, "
+                            "shaded should have 1 more layers than unshaded.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                        ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
+                            "with the Window Construction rather than a shaded construction.");
+                    }
+                    for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
+                        if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay)) {
+                            ErrorsFound = true;
+                            ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
+                                SurfaceTmp(SurfNum).Name);
+                            ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                            ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                            break;
+                        }
+                    }
+                }
+
+                if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
                     WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
                     WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
-                    ShDevNum = WindowShadingControl(WSCPtr).ShadingDevice;
-                    if (ShDevNum > 0) {
-                        CreateShadedWindowConstruction(SurfNum, WSCPtr, ShDevNum);
-                        ConstrNumSh = SurfaceTmp(SurfNum).ShadedConstruction;
-                    }
-                }
-            }
-        }
-        
-
-        // Error checks for shades and blinds
-
-        ConstrNum = SurfaceTmp(SurfNum).Construction;
-        if (!ErrorsFound && WSCPtr > 0 && ConstrNum > 0 && ConstrNumSh > 0) {
-
-            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorShade ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_InteriorBlind) {
-                TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
-                TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                if (TotShLayers - 1 != TotLayers) {
-                    ShowWarningError("WindowShadingControl: Interior shade or blind: Potential problem in match of unshaded/shaded constructions, "
-                                     "shaded should have 1 more layers than unshaded.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
-                                      "with the Window Construction rather than a shaded construction.");
-                }
-                for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
-                    if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay)) {
-                        ErrorsFound = true;
-                        ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
-                                        SurfaceTmp(SurfNum).Name);
+                    TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
+                    TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
+                    if (TotShLayers - 1 != TotLayers) {
+                        ShowWarningError("WindowShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded "
+                            "constructions, shaded should have 1 more layer than unshaded.");
                         ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
                         ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                        break;
+                        ShowContinueError("If preceding two constructions have the same name, you have likely specified a WindowShadingControl (Field "
+                            "#3) with the Window Construction rather than a shaded construction.");
                     }
-                }
-            }
-
-            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorShade ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorScreen ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_ExteriorBlind) {
-                TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
-                TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                if (TotShLayers - 1 != TotLayers) {
-                    ShowWarningError("WindowShadingControl: Exterior shade, screen or blind: Potential problem in match of unshaded/shaded "
-                                     "constructions, shaded should have 1 more layer than unshaded.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions have the same name, you have likely specified a WindowShadingControl (Field "
-                                      "#3) with the Window Construction rather than a shaded construction.");
-                }
-                for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
-                    if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay + 1)) {
-                        ErrorsFound = true;
-                        ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
-                                        SurfaceTmp(SurfNum).Name);
-                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                        break;
-                    }
-                }
-            }
-
-            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                // Divider not allowed with between-glass shade or blind
-                if (SurfaceTmp(SurfNum).FrameDivider > 0) {
-                    if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
-                        ShowWarningError("A divider cannot be specified for window " + SurfaceTmp(SurfNum).Name);
-                        ShowContinueError(", which has a between-glass shade or blind.");
-                        ShowContinueError("Calculation will proceed without the divider for this window.");
-                        FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
-                    }
-                }
-                // Check consistency of gap widths between unshaded and shaded constructions
-                TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
-                TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
-                TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
-                if (TotShLayers - 2 != TotLayers) {
-                    ShowWarningError("WindowShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, "
-                                     "shaded should have 2 more layers than unshaded.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
-                    ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
-                                      "with the Window Construction rather than a shaded construction.");
-                }
-                if (dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers) != dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
-                    ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)).Name);
-                    ErrorsFound = true;
-                }
-                if (dataConstruction.Construct(ConstrNum).LayerPoint(1) != dataConstruction.Construct(ConstrNumSh).LayerPoint(1)) {
-                    ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
-                    ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
-                    ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
-                                      ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Name);
-                    ErrorsFound = true;
-                }
-                if (TotGlassLayers == 2 || TotGlassLayers == 3) {
-                    MatGap = dataConstruction.Construct(ConstrNum).LayerPoint(2 * TotGlassLayers - 2);
-                    MatGap1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 2);
-                    MatGap2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
-                    MatSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
-                    if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                        MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness - (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness));
-                        if (MatGapCalc > 0.001) {
-                            ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
-                            ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
-                            ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass blind.");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
-                                              " -");
-                            ShowContinueError("..( Material=" + dataMaterial.Material(MatGap1).Name +
-                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name + " thickness=" +
-                                              RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
+                    for (Lay = 1; Lay <= dataConstruction.Construct(ConstrNum).TotLayers; ++Lay) {
+                        if (dataConstruction.Construct(ConstrNum).LayerPoint(Lay) != dataConstruction.Construct(ConstrNumSh).LayerPoint(Lay + 1)) {
                             ErrorsFound = true;
-                        }
-                    } else { // Between-glass shade
-                        MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness -
-                                              (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness + dataMaterial.Material(MatSh).Thickness));
-                        if (MatGapCalc > 0.001) {
-                            ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
-                            ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
-                            ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass shade.");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
-                                              " -");
-                            ShowContinueError("...( Material=" + dataMaterial.Material(MatGap1).Name +
-                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name +
-                                              " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " +");
-                            ShowContinueError("..Material=" + dataMaterial.Material(MatSh).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatSh).Thickness, 3) +
-                                              " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
-                            ErrorsFound = true;
+                            ShowSevereError(" The glass and gas layers in the shaded and unshaded constructions do not match for window=" +
+                                SurfaceTmp(SurfNum).Name);
+                            ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                            ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                            break;
                         }
                     }
                 }
-            }
-        }
 
-        if (SurfaceTmp(SurfNum).Sides != 3) { // Rectangular Window
-            // Initialize the FrameDivider number for this window. W5FrameDivider will be positive if
-            // this window's construction came from the Window5 data file and that construction had an
-            // associated frame or divider. It will be zero if the window's construction is not from the
-            // Window5 data file, or the construction is from the data file, but the construction has no
-            // associated frame or divider. Note that if there is a FrameDivider candidate for this
-            // window from the Window5 data file it is used instead of the window's input FrameDivider.
-
-            if (SurfaceTmp(SurfNum).Construction != 0) {
-                SurfaceTmp(SurfNum).FrameDivider = dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).W5FrameDivider;
-
-                // Warning if FrameAndDivider for this window is over-ridden by one from Window5 Data File
-                if (SurfaceTmp(SurfNum).FrameDivider > 0 && !lAlphaFieldBlanks(FrameField)) {
-                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", " + cAlphaFieldNames(FrameField) + "=\"" +
-                                    cAlphaArgs(FrameField) + "\"");
-                    ShowContinueError("will be replaced with FrameAndDivider from Window5 Data File entry " +
-                                      dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Name);
-                }
-
-                if (!lAlphaFieldBlanks(FrameField) && SurfaceTmp(SurfNum).FrameDivider == 0) {
-                    SurfaceTmp(SurfNum).FrameDivider = UtilityRoutines::FindItemInList(cAlphaArgs(FrameField), FrameDivider);
-                    if (SurfaceTmp(SurfNum).FrameDivider == 0) {
-                        if (!dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
-                            ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
-                                            "=\"" + cAlphaArgs(FrameField) + "\"");
-                            ErrorsFound = true;
-                        } else {
-                            ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
-                                            "=\"" + cAlphaArgs(FrameField) + "\"");
-                            ShowContinueError("...Frame/Divider is not supported in Equivalent Layer Window model.");
-                        }
-                    }
+                if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
+                    WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
                     // Divider not allowed with between-glass shade or blind
-                    if (!ErrorsFound && WSCPtr > 0 && ConstrNumSh > 0) {
-                        if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
-                            WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
-                            if (SurfaceTmp(SurfNum).FrameDivider > 0) {
-                                if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
-                                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
-                                                    cAlphaFieldNames(FrameField) + "=\"" + cAlphaArgs(FrameField) + "\"");
-                                    ShowContinueError("Divider cannot be specified because the construction has a between-glass shade or blind.");
-                                    ShowContinueError("Calculation will proceed without the divider for this window.");
-                                    ShowContinueError("Divider width = [" +
-                                                      RoundSigDigits(FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth, 2) + "].");
-                                    FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
-                                }
-                            } // End of check if window has divider
-                        }     // End of check if window has a between-glass shade or blind
-                    }         // End of check if window has a shaded construction
-                }             // End of check if window has an associated FrameAndDivider
-            }                 // End of check if window has a construction
-        }
+                    if (SurfaceTmp(SurfNum).FrameDivider > 0) {
+                        if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
+                            ShowWarningError("A divider cannot be specified for window " + SurfaceTmp(SurfNum).Name);
+                            ShowContinueError(", which has a between-glass shade or blind.");
+                            ShowContinueError("Calculation will proceed without the divider for this window.");
+                            FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
+                        }
+                    }
+                    // Check consistency of gap widths between unshaded and shaded constructions
+                    TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
+                    TotLayers = dataConstruction.Construct(ConstrNum).TotLayers;
+                    TotShLayers = dataConstruction.Construct(ConstrNumSh).TotLayers;
+                    if (TotShLayers - 2 != TotLayers) {
+                        ShowWarningError("WindowShadingControl: Between Glass Shade/Blind: Potential problem in match of unshaded/shaded constructions, "
+                            "shaded should have 2 more layers than unshaded.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name);
+                        ShowContinueError("If preceding two constructions are same name, you have likely specified a WindowShadingControl (Field #3) "
+                            "with the Window Construction rather than a shaded construction.");
+                    }
+                    if (dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers) != dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)) {
+                        ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
+                            ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(TotLayers)).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
+                            ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(TotShLayers)).Name);
+                        ErrorsFound = true;
+                    }
+                    if (dataConstruction.Construct(ConstrNum).LayerPoint(1) != dataConstruction.Construct(ConstrNumSh).LayerPoint(1)) {
+                        ShowSevereError(cRoutineName + ": Mis-match in unshaded/shaded inside layer materials.  These should match.");
+                        ShowContinueError("Unshaded construction=" + dataConstruction.Construct(ConstrNum).Name +
+                            ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).Name);
+                        ShowContinueError("Shaded construction=" + dataConstruction.Construct(ConstrNumSh).Name +
+                            ", Material=" + dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Name);
+                        ErrorsFound = true;
+                    }
+                    if (TotGlassLayers == 2 || TotGlassLayers == 3) {
+                        MatGap = dataConstruction.Construct(ConstrNum).LayerPoint(2 * TotGlassLayers - 2);
+                        MatGap1 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 2);
+                        MatGap2 = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers);
+                        MatSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(2 * TotGlassLayers - 1);
+                        if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                            MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness - (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness));
+                            if (MatGapCalc > 0.001) {
+                                ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
+                                ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
+                                ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass blind.");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
+                                    " -");
+                                ShowContinueError("..( Material=" + dataMaterial.Material(MatGap1).Name +
+                                    " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name + " thickness=" +
+                                    RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
+                                ErrorsFound = true;
+                            }
+                        }
+                        else { // Between-glass shade
+                            MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness -
+                                (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness + dataMaterial.Material(MatSh).Thickness));
+                            if (MatGapCalc > 0.001) {
+                                ShowSevereError(cRoutineName + ": The gap width(s) for the unshaded window construction " + dataConstruction.Construct(ConstrNum).Name);
+                                ShowContinueError("are inconsistent with the gap widths for shaded window construction " + dataConstruction.Construct(ConstrNumSh).Name);
+                                ShowContinueError("for window " + SurfaceTmp(SurfNum).Name + ", which has a between-glass shade.");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap).Thickness, 3) +
+                                    " -");
+                                ShowContinueError("...( Material=" + dataMaterial.Material(MatGap1).Name +
+                                    " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap1).Thickness, 3) + " +");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatGap2).Name +
+                                    " thickness=" + RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " +");
+                                ShowContinueError("..Material=" + dataMaterial.Material(MatSh).Name + " thickness=" + RoundSigDigits(dataMaterial.Material(MatSh).Thickness, 3) +
+                                    " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
+                                ErrorsFound = true;
+                            }
+                        }
+                    }
+                }
+            }
 
-        if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
-            if (SurfaceTmp(SurfNum).FrameDivider > 0) {
-                // Equivalent Layer window does not have frame/divider model
-                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) + "=\"" +
-                                cAlphaArgs(FrameField) + "\"");
-                ShowContinueError("Frame/Divider is not supported in Equivalent Layer Window model.");
-                SurfaceTmp(SurfNum).FrameDivider = 0;
+            if (SurfaceTmp(SurfNum).Sides != 3) { // Rectangular Window
+                // Initialize the FrameDivider number for this window. W5FrameDivider will be positive if
+                // this window's construction came from the Window5 data file and that construction had an
+                // associated frame or divider. It will be zero if the window's construction is not from the
+                // Window5 data file, or the construction is from the data file, but the construction has no
+                // associated frame or divider. Note that if there is a FrameDivider candidate for this
+                // window from the Window5 data file it is used instead of the window's input FrameDivider.
+
+                if (SurfaceTmp(SurfNum).Construction != 0) {
+                    SurfaceTmp(SurfNum).FrameDivider = dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).W5FrameDivider;
+
+                    // Warning if FrameAndDivider for this window is over-ridden by one from Window5 Data File
+                    if (SurfaceTmp(SurfNum).FrameDivider > 0 && !lAlphaFieldBlanks(FrameField)) {
+                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", " + cAlphaFieldNames(FrameField) + "=\"" +
+                            cAlphaArgs(FrameField) + "\"");
+                        ShowContinueError("will be replaced with FrameAndDivider from Window5 Data File entry " +
+                            dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Name);
+                    }
+
+                    if (!lAlphaFieldBlanks(FrameField) && SurfaceTmp(SurfNum).FrameDivider == 0) {
+                        SurfaceTmp(SurfNum).FrameDivider = UtilityRoutines::FindItemInList(cAlphaArgs(FrameField), FrameDivider);
+                        if (SurfaceTmp(SurfNum).FrameDivider == 0) {
+                            if (!dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+                                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
+                                    "=\"" + cAlphaArgs(FrameField) + "\"");
+                                ErrorsFound = true;
+                            }
+                            else {
+                                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
+                                    "=\"" + cAlphaArgs(FrameField) + "\"");
+                                ShowContinueError("...Frame/Divider is not supported in Equivalent Layer Window model.");
+                            }
+                        }
+                        // Divider not allowed with between-glass shade or blind
+                        if (!ErrorsFound && WSCPtr > 0 && ConstrNumSh > 0) {
+                            if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
+                                WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
+                                if (SurfaceTmp(SurfNum).FrameDivider > 0) {
+                                    if (FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth > 0.0) {
+                                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " +
+                                            cAlphaFieldNames(FrameField) + "=\"" + cAlphaArgs(FrameField) + "\"");
+                                        ShowContinueError("Divider cannot be specified because the construction has a between-glass shade or blind.");
+                                        ShowContinueError("Calculation will proceed without the divider for this window.");
+                                        ShowContinueError("Divider width = [" +
+                                            RoundSigDigits(FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth, 2) + "].");
+                                        FrameDivider(SurfaceTmp(SurfNum).FrameDivider).DividerWidth = 0.0;
+                                    }
+                                } // End of check if window has divider
+                            }     // End of check if window has a between-glass shade or blind
+                        }         // End of check if window has a shaded construction
+                    }             // End of check if window has an associated FrameAndDivider
+                }                 // End of check if window has a construction
+            }
+
+            if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+                if (SurfaceTmp(SurfNum).FrameDivider > 0) {
+                    // Equivalent Layer window does not have frame/divider model
+                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) + "=\"" +
+                        cAlphaArgs(FrameField) + "\"");
+                    ShowContinueError("Frame/Divider is not supported in Equivalent Layer Window model.");
+                    SurfaceTmp(SurfNum).FrameDivider = 0;
+                }
             }
         }
     }
@@ -11393,6 +11394,8 @@ namespace SurfaceGeometry {
 
             ConstrNewSh = TotConstructs + 1;
             SurfaceTmp(SurfNum).ShadedConstruction = ConstrNewSh;
+            WindowShadingControl(WSCPtr).ShadedConstruction = ConstrNewSh;
+
             TotConstructs = ConstrNewSh;
             dataConstruction.Construct.redimension(TotConstructs);
             NominalRforNominalUCalculation.redimension(TotConstructs);
