@@ -10355,7 +10355,7 @@ namespace SolarShading {
     int selectActiveWindowShadingControl(int curSurface)
     {
         // J. Glazer - Aug 2020 - For a given surface, determine based on the schedules which window shading control object should be active
-        int selected = 0;
+        int selected = 1; // presume it is the first shading control - even if it is not active it needs to be some shading control which is then turned off in the WindowShadingManager
         if (Surface(curSurface).windowShadingControlList.size() == 1) {
             selected = Surface(curSurface).windowShadingControlList.front();
         } else {
