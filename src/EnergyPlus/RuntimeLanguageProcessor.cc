@@ -2497,7 +2497,7 @@ namespace RuntimeLanguageProcessor {
                             FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TodayAlbedo, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTodayLiquidPrecip) {
                         TodayTomorrowWeather(
-                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowLiquidPrecip, ReturnValue);
+                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TodayLiquidPrecip, ReturnValue);
                     } else if (SELECT_CASE_var == FuncTomorrowIsRain) {
                         TodayTomorrowWeather(
                             FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsRain, ReturnValue);
@@ -2584,6 +2584,30 @@ namespace RuntimeLanguageProcessor {
             ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
                               " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
                               ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            value = TodayTomorrowWeatherSource(timestep, iHour);
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            if (TodayTomorrowWeatherSource(timestep, iHour)) {
+                value = 1.0;
+            } else {
+                value = 0.0;
+            }
+            return 0;
+        } else {
+            return 1;
         }
     }
 

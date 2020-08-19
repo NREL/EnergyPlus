@@ -55,6 +55,8 @@ class Runtime:
         self.api.callbackBeginZoneTimeStepAfterInitHeatBalance.restype = c_void_p
         self.api.callbackBeginTimeStepBeforePredictor.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackBeginTimeStepBeforePredictor.restype = c_void_p
+        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather.argtypes = [c_void_p, self.py_state_callback_type]
+        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather.restype = c_void_p
         self.api.callbackAfterPredictorBeforeHVACManagers.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackAfterPredictorBeforeHVACManagers.restype = c_void_p
         self.api.callbackAfterPredictorAfterHVACManagers.argtypes = [c_void_p, self.py_state_callback_type]
@@ -293,6 +295,20 @@ class Runtime:
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackBeginTimeStepBeforePredictor(state, cb_ptr)
+
+    def callback_begin_zone_timestep_before_set_current_weather(self, state: c_void_p, f: FunctionType) -> None:
+        """
+        This function allows a client to register a function to be called back by EnergyPlus at the beginning of
+        zone time step, before weather is updated.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
+        :return: Nothing
+        """
+        self._check_callback_args(f, 1, 'callback_begin_zone_timestep_before_set_current_weather')
+        cb_ptr = self.py_state_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather(state, cb_ptr)
 
     def callback_after_predictor_before_hvac_managers(self, state: c_void_p, f: FunctionType) -> None:
         """

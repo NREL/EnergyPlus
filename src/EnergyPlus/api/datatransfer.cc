@@ -60,6 +60,8 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 char * listAllAPIDataCSV(EnergyPlusState) {
     std::string output = "**ACTUATORS**\n";
@@ -648,4 +650,258 @@ int actualDateTime(EnergyPlusState) {
     Array1D_int datevalues(8);
     ObjexxFCL::date_and_time(datestring, _, _, datevalues);
     return double(sum(datevalues));
+}
+
+int todayWeatherIsRainAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    int value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayIsRain, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+int todayWeatherIsSnowAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    int value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayIsSnow, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherOutDryBulbAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayOutDryBulbTemp, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherOutDewPointAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayOutDewPointTemp, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherOutBarometricPressureAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayOutBaroPress, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherOutRelativeHumidityAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayOutRelHum, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherWindSpeedAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayWindSpeed, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherWindDirectionAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayWindDir, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherSkyTemperatureAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodaySkyTemp, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherHorizontalIRSkyAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayHorizIRSky, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherBeamSolarRadiationAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayBeamSolarRad, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherDiffuseSolarRadiationAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayDifSolarRad, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherAlbedoAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayAlbedo, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 todayWeatherLiquidPrecipitationAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayLiquidPrecip, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+
+int tomorrowWeatherIsRainAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    int value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowIsRain, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+int tomorrowWeatherIsSnowAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    int value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowIsSnow, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherOutDryBulbAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowOutDryBulbTemp, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherOutDewPointAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowOutDewPointTemp, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherOutBarometricPressureAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowOutBaroPress, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherOutRelativeHumidityAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowOutRelHum, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherWindSpeedAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowWindSpeed, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherWindDirectionAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowWindDir, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherSkyTemperatureAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowSkyTemp, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherHorizontalIRSkyAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowHorizIRSky, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherBeamSolarRadiationAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowBeamSolarRad, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherDiffuseSolarRadiationAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowDifSolarRad, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherAlbedoAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowAlbedo, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
+}
+Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+    Real64 value = 0;
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TomorrowLiquidPrecip, value);
+    if (returnStatus != 0) {
+        EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
+        EnergyPlus::PluginManagement::apiErrorFlag = true;
+    }
+    return value;
 }
