@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::BoilerSteam Unit Tests
+// EnergyPlus::MicroturbineElectricGenerator Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
