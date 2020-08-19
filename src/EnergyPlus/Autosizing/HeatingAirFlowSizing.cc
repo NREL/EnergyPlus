@@ -253,19 +253,17 @@ Real64 HeatingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         // override sizing string
         if (this->isEpJSON) this->sizingString = "heating_supply_air_flow_rate [m3/s]";
         if (this->dataScalableSizingON) {
-            std::string ScalableSM = "";
             if (this->zoneAirFlowSizMethod == DataSizing::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::None) {
-                ScalableSM = "(scaled by flow / zone) ";
+                this->sizingStringScalable = "(scaled by flow / zone) ";
             } else if (this->zoneAirFlowSizMethod == DataSizing::FlowPerFloorArea) {
-                ScalableSM = "(scaled by flow / area) ";
+                this->sizingStringScalable = "(scaled by flow / area) ";
             } else if (this->zoneAirFlowSizMethod == DataSizing::FractionOfAutosizedCoolingAirflow ||
                        this->zoneAirFlowSizMethod == DataSizing::FractionOfAutosizedHeatingAirflow) {
-                ScalableSM = "(scaled by fractional multiplier) ";
+                this->sizingStringScalable = "(scaled by fractional multiplier) ";
             } else if (this->zoneAirFlowSizMethod == DataSizing::FlowPerCoolingCapacity ||
                        this->zoneAirFlowSizMethod == DataSizing::FlowPerHeatingCapacity) {
-                ScalableSM = "(scaled by flow / capacity) ";
+                this->sizingStringScalable = "(scaled by flow / capacity) ";
             }
-            this->sizingString = ScalableSM + this->sizingString;
         }
     }
     this->selectSizerOutput(errorsFound);

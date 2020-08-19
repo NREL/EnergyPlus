@@ -181,7 +181,7 @@ namespace ReportSizingManager {
         }
     }
 
-    void RequestSizing(EnergyPlusData &state, std::string const &CompType,       // type of component
+    void RequestSizing(std::string const &CompType,       // type of component
                        std::string const &CompName,       // name of component
                        int const SizingType,              // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
                        std::string const &SizingString,   // string containing info for eio report
@@ -354,15 +354,8 @@ namespace ReportSizingManager {
         Real64 TotCapTempModFac;                   // DX coil total capacity as a function of temperature curve pointer
         Real64 CoilOutTemp;                        // coil outlet air temperature [C]
         Real64 CoilOutHumRat;                      // coil outlet air humidity ratio [kg/kg]
-        Real64 DesCoilLoad;                        // design coil load based on sizing inputs and entering air conditions [W]
         Real64 DesVolFlow;                         // coil design air volume flow rate [m3/s]
-        Real64 DesMassFlow;                        // coil design mass flow rate [kg/s]
-        Real64 CpAir;                              // specific heat of air [J/kg-K]
-        Real64 OutAirFrac;                         // outdoor air fraction
-        Real64 MinPriFlowFrac;                     // minimum primary air flow fraction for induction units
         Real64 CpAirStd;                           // specific heat of air at standard conditions [J/kg-K]
-        Real64 NominalCapacityDes;                 // Autosized nominal capacity for reporting [W]
-        Real64 RatedVolFlowPerRatedTotCap;         // ratio of volume flow rate to capacity [m3/W]
         int SupFanNum;                             // index to supply fan
         int RetFanNum;                             // index to return fan
         Real64 SupFanDT;                           // supply air fan delta temperature [C]
@@ -373,8 +366,6 @@ namespace ReportSizingManager {
 
         std::string DDNameFanPeak;   // Name of the design day that produced the Peak
         std::string dateTimeFanPeak; // A String representing the DateTime of the Peak
-        Real64 DXFlowPerCapMinRatio(1.0);
-        Real64 DXFlowPerCapMaxRatio(1.0);
 
         AutosizeDes = 0.0;
         AutosizeUser = 0.0;
@@ -456,18 +447,6 @@ namespace ReportSizingManager {
                 }
             } else {
 
-                int tempZoneNum = CurZoneEqNum;
-                bool FinalZoneSizingNotAllocated = false;
-                if (!allocated(DataSizing::FinalZoneSizing)) {
-                    DataSizing::FinalZoneSizing.allocate(1);
-                    tempZoneNum = 1;
-                    FinalZoneSizingNotAllocated = true;
-                }
-                DataSizing::ZoneEqSizingData &zoneEqSizing = DataSizing::ZoneEqSizing(CurZoneEqNum);
-                DataSizing::ZoneSizingData &finalZoneSizing = DataSizing::FinalZoneSizing(tempZoneNum);
-
-                // get rid of temporary sizing array so next pass through will know there was no sizing data available
-                if (FinalZoneSizingNotAllocated) DataSizing::FinalZoneSizing.deallocate();
             }
 
         } else if (CurSysNum > 0) {

@@ -1498,6 +1498,7 @@ namespace FanCoilUnits {
                 FieldNum = 1;
                 PrintFlag = true;
                 SizingString = FanCoilNumericFields(FanCoilNum).FieldNames(FieldNum) + " [m3/s]";
+                if (DataGlobals::isEpJSON) SizingString = "maximum_supply_air_flow_rate [m3/s]";
                 if (ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod > 0) {
                     SizingMethod = CoolingAirflowSizing;
                     SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
@@ -1522,9 +1523,7 @@ namespace FanCoilUnits {
                             TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         }
                         CoolingAirFlowSizer sizingCoolingAirFlow;
-                        std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
-                        if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
-                        sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                        sizingCoolingAirFlow.overrideSizingString(SizingString);
                         //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
@@ -1545,9 +1544,7 @@ namespace FanCoilUnits {
                         TempSize = AutoSize;
                         DataScalableSizingON = true;
                         CoolingAirFlowSizer sizingCoolingAirFlow;
-                        std::string stringOverride = "Maximum Supply Air Flow Rate [m3/s]";
-                        if (DataGlobals::isEpJSON) stringOverride = "maximum_supply_air_flow_rate [m3/s]";
-                        sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                        sizingCoolingAirFlow.overrideSizingString(SizingString);
                         //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                         sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                         CoolingAirVolFlowDes = sizingCoolingAirFlow.size(TempSize, ErrorsFound);

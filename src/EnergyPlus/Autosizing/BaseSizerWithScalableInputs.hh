@@ -60,11 +60,8 @@ struct EnergyPlusData;
 
 struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
 
-    int zoneAirFlowSizMethod = 0;
     bool zoneCoolingOnlyFan = false;
     bool zoneHeatingOnlyFan = false;
-    bool dataScalableSizingON = false;
-    bool dataScalableCapSizingON = false;
     bool dataHRFlowSizingFlag = false;
     Real64 dataFracOfAutosizedCoolingAirflow = 0.0;
     Real64 dataFracOfAutosizedHeatingAirflow = 0.0;
@@ -100,11 +97,8 @@ struct BaseSizerWithScalableInputs : BaseSizerWithFanHeatInputs {
 
     void clearState() {
         BaseSizerWithFanHeatInputs::clearState();
-        zoneAirFlowSizMethod = 0;
         zoneCoolingOnlyFan = false;
         zoneHeatingOnlyFan = false;
-        dataScalableSizingON = false;
-        dataScalableCapSizingON = false;
         dataHRFlowSizingFlag = false;
         dataFracOfAutosizedCoolingAirflow = 0.0;
         dataFracOfAutosizedHeatingAirflow = 0.0;

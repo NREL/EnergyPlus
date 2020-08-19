@@ -1682,6 +1682,7 @@ namespace HeatRecovery {
         TempSize = ExchCond(ExchNum).NomSupAirVolFlow;
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
+        sizerSystemAirFlow.overrideSizingString(SizingString);
         //sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);

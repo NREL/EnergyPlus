@@ -141,7 +141,7 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
             }
         } else {
             if (int(this->zoneEqSizing.size()) > 0 && int(this->zoneEqSizing(this->curZoneEqNum).SizingMethod.size()) > 0) {
-                this->zoneAirFlowSizMethod = this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing);
+                this->zoneAirFlowSizMethod = this->zoneEqSizing(this->curZoneEqNum).SizingMethod(int(this->sizingType));
             } else {
                 this->zoneAirFlowSizMethod = 0;
             }
