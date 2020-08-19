@@ -226,10 +226,8 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     cNumericFields.deallocate();
 }
 
-TEST(SizingManagerTest, TimeIndexToHrMinString_test)
+TEST_F(EnergyPlusFixture, SizingManagerTest_TimeIndexToHrMinString_test)
 {
-    ShowMessage("Begin Test: SizingManagerTest, TimeIndexToHrMinString_test");
-
     DataGlobals::MinutesPerTimeStep = 15;
 
     EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));

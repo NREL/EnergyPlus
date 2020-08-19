@@ -62,6 +62,8 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <nlohmann/json.hpp>
+
 namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
@@ -85,6 +87,7 @@ namespace PluginManagement {
     int (*EP_PyRun_SimpleString)(const char *) = nullptr;
     int (*EP_Py_FinalizeEx)() = nullptr;
     void (*EP_PyErr_Fetch)(PyObjectWrap **, PyObjectWrap **, PyObjectWrap **) = nullptr;
+    void (*EP_PyErr_NormalizeException)(PyObjectWrap **, PyObjectWrap **, PyObjectWrap **) = nullptr;
     PyObjectWrap (*EP_PyObject_Repr)(PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyUnicode_AsEncodedString)(PyObjectWrap, const char *, const char *) = nullptr;
     char *(*EP_PyBytes_AsString)(PyObjectWrap) = nullptr;
@@ -100,6 +103,7 @@ namespace PluginManagement {
     PyObjectWrap (*EP_PyObject_CallObject)(PyObjectWrap, PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyObject_GetAttrString)(PyObjectWrap, const char *) = nullptr;
     PyObjectWrap (*EP_PyObject_CallFunction)(PyObjectWrap, const char *) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallFunction3Args)(PyObjectWrap, const char *, PyObjectWrap, PyObjectWrap, PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyObject_CallMethod)(PyObjectWrap, const char *, const char *) = nullptr;
     int (*EP_PyList_Check)(PyObjectWrap) = nullptr;
     unsigned long (*EP_PyList_Size)(PyObjectWrap) = nullptr;
@@ -183,6 +187,11 @@ namespace PluginManagement {
             ShowSevereError("Could not load Python function: EP_Wrap_PyErr_Fetch");
             dll_errors = true;
         }
+        *(void **)(&EP_PyErr_NormalizeException) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyErr_NormalizeException");
+        if (!EP_PyErr_NormalizeException) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyErr_NormalizeException");
+            dll_errors = true;
+        }
         *(void **)(&EP_PyObject_Repr) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_Repr");
         if (!EP_PyObject_Repr) {
             ShowSevereError("Could not load Python function: EP_Wrap_PyObject_Repr");
@@ -258,6 +267,11 @@ namespace PluginManagement {
             ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallFunction");
             dll_errors = true;
         }
+        *(void **)(&EP_PyObject_CallFunction3Args) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction3Args");
+        if (!EP_PyObject_CallFunction3Args) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallFunction3Args");
+            dll_errors = true;
+        }
         *(void **)(&EP_PyObject_CallMethod) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod");
         if (!EP_PyObject_CallMethod) {
             ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod");
@@ -327,6 +341,9 @@ namespace PluginManagement {
         *(void **)(&EP_PyErr_Fetch) = dlsym(wrapperDLLHandle, "EP_Wrap_PyErr_Fetch");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyErr_Fetch", dll_errors);
+        *(void **)(&EP_PyErr_NormalizeException) = dlsym(wrapperDLLHandle, "EP_Wrap_PyErr_NormalizeException");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyErr_NormalizeException", dll_errors);
         *(void **)(&EP_PyObject_Repr) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_Repr");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyObject_Repr", dll_errors);
@@ -372,6 +389,9 @@ namespace PluginManagement {
         *(void **)(&EP_PyObject_CallFunction) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallFunction", dll_errors);
+        *(void **)(&EP_PyObject_CallFunction3Args) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction3Args");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallFunction3Args", dll_errors);
         *(void **)(&EP_PyObject_CallMethod) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod", dll_errors);
@@ -560,10 +580,10 @@ namespace PluginManagement {
                         sResourceType = "Diesel";
                     } else if (resourceType == "COAL") {
                         sResourceType = "Coal";
-                    } else if (resourceType == "FUELOIL#1") {
-                        sResourceType = "FuelOil#1";
-                    } else if (resourceType == "FUELOIL#2") {
-                        sResourceType = "FuelOil#2";
+                    } else if (resourceType == "FUELOILNO1") {
+                        sResourceType = "FuelOilNo1";
+                    } else if (resourceType == "FUELOILNO2") {
+                        sResourceType = "FuelOilNo2";
                     } else if (resourceType == "OTHERFUEL1") {
                         sResourceType = "OtherFuel1";
                     } else if (resourceType == "OTHERFUEL2") {
@@ -748,6 +768,7 @@ namespace PluginManagement {
         EP_PyRun_SimpleString = nullptr;
         EP_Py_FinalizeEx = nullptr;
         EP_PyErr_Fetch = nullptr;
+        EP_PyErr_NormalizeException = nullptr;
         EP_PyObject_Repr = nullptr;
         EP_PyUnicode_AsEncodedString = nullptr;
         EP_PyBytes_AsString = nullptr;
@@ -763,6 +784,7 @@ namespace PluginManagement {
         EP_PyObject_CallObject = nullptr;
         EP_PyObject_GetAttrString = nullptr;
         EP_PyObject_CallFunction = nullptr;
+        EP_PyObject_CallFunction3Args = nullptr;
         EP_PyObject_CallMethod = nullptr;
         EP_PyList_Check = nullptr;
         EP_PyList_Size = nullptr;
@@ -836,29 +858,37 @@ namespace PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
-                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                std::string workingDirFlagUC = "YES";
+                try {
+                    workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (workingDirFlagUC == "YES") {
                     PluginManager::addToPythonPath(".", false);
                 }
-                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                std::string inputFileDirFlagUC = "YES";
+                try {
+                    inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (inputFileDirFlagUC == "YES") {
                     std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
                     PluginManager::addToPythonPath(sanitizedInputFileDir, false);
                 }
-                if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
-                }
-                if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
-                }
-                if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
-                }
-                if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
-                }
-                if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
+                try {
+                    auto const vars = fields.at("py_search_paths");
+                    for (const auto &var : vars) {
+                        try {
+                            PluginManager::addToPythonPath(PluginManager::sanitizedPath(var.at("search_path")), true);
+                        } catch (nlohmann::json::out_of_range &e) {
+                            // empty entry
+                        }
+                    }
+                } catch (nlohmann::json::out_of_range& e) {
+                    // catch when no paths are passed
+                    // nothing to do here
                 }
             }
         }
@@ -1009,11 +1039,69 @@ namespace PluginManagement {
         PyObjectWrap *exc_value = nullptr;
         PyObjectWrap *exc_tb = nullptr;
         (*EP_PyErr_Fetch)(&exc_type, &exc_value, &exc_tb);
+        // Normalizing the exception is needed. Without it, our custom EnergyPlusException go through just fine
+        // but any ctypes built-in exception for eg will have wrong types
+        (*EP_PyErr_NormalizeException)(&exc_type, &exc_value, &exc_tb);
         PyObjectWrap str_exc_value = (*EP_PyObject_Repr)(exc_value); // Now a unicode object
         PyObjectWrap pyStr2 = (*EP_PyUnicode_AsEncodedString)(str_exc_value, "utf-8", "Error ~");
+        (*EP_Py_DECREF)(str_exc_value);
         char *strExcValue = (*EP_PyBytes_AsString)(pyStr2); // NOLINT(hicpp-signed-bitwise)
+        (*EP_Py_DECREF)(pyStr2);
         EnergyPlus::ShowContinueError("Python error description follows: ");
         EnergyPlus::ShowContinueError(strExcValue);
+
+        // See if we can get a full traceback.
+        // Calls into python, and does the same as capturing the exception in `e`
+        // then `print(traceback.format_exception(e.type, e.value, e.tb))`
+        PyObjectWrap pModuleName = (*EP_PyUnicode_DecodeFSDefault)("traceback");
+        PyObjectWrap pyth_module = (*EP_PyImport_Import)(pModuleName);
+        (*EP_Py_DECREF)(pModuleName);
+
+        if (pyth_module == NULL) {
+            EnergyPlus::ShowFatalError("Cannot find 'traceback' module in reportPythonError(), this is weird");
+            return;
+        }
+
+        PyObjectWrap pyth_func = (*EP_PyObject_GetAttrString)(pyth_module, "format_exception");
+        (*EP_Py_DECREF)(pyth_module); // PyImport_Import returns a new reference, decrement it
+
+        if (pyth_func || (*EP_PyCallable_Check)(pyth_func)) {
+
+            PyObjectWrap pyth_val = (*EP_PyObject_CallFunction3Args)(pyth_func, "OOO", exc_type, exc_value, exc_tb);
+
+            // traceback.format_exception returns a list, so iterate on that
+            if (!pyth_val || !(*EP_PyList_Check)(pyth_val)) { // NOLINT(hicpp-signed-bitwise)
+                EnergyPlus::ShowFatalError("In reportPythonError(), traceback.format_exception did not return a list.");
+            }
+
+            unsigned long numVals = (*EP_PyList_Size)(pyth_val);
+            if (numVals == 0) {
+                EnergyPlus::ShowFatalError("No traceback available");
+                return;
+            }
+
+            EnergyPlus::ShowContinueError("Python traceback follows: ");
+
+            EnergyPlus::ShowContinueError("```");
+
+            for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
+                PyObjectWrap item = (*EP_PyList_GetItem)(pyth_val, itemNum);
+                if ((*EP_PyUnicode_Check)(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
+                    std::string traceback_line = (*EP_PyUnicode_AsUTF8)(item);
+                    if (!traceback_line.empty() && traceback_line[traceback_line.length()-1] == '\n') {
+                        traceback_line.erase(traceback_line.length()-1);
+                    }
+                    EnergyPlus::ShowContinueError(" >>> " + traceback_line);
+                }
+                // PyList_GetItem returns a borrowed reference, do not decrement
+            }
+
+            EnergyPlus::ShowContinueError("```");
+
+            // PyList_Size returns a borrowed reference, do not decrement
+            (*EP_Py_DECREF)(pyth_val); // PyObject_CallFunction returns new reference, decrement
+        }
+        (*EP_Py_DECREF)(pyth_func); // PyObject_GetAttrString returns a new reference, decrement it
 #endif
     }
 
@@ -1310,6 +1398,8 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
+        if (path.empty()) return;
+
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if ((*EP_PyRun_SimpleString)(command.c_str()) == 0) {
             if (userDefinedPath) {
