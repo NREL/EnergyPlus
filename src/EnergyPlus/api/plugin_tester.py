@@ -200,7 +200,8 @@ class EnergyPlusPluginTesting(object):
                         if func in expected_overrides:
                             method_to_call = getattr(plugin_instance, func)
                             try:
-                                response = method_to_call()
+                                dummy_state_arg = 0
+                                response = method_to_call(dummy_state_arg)
                                 print("   OK : Overridden %s() function execution works" % func)
                             except Exception as e:
                                 print("ERROR : %s() function not overridden, or is broken; reason: %s" % (func, str(e)))
