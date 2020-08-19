@@ -399,11 +399,7 @@ namespace General {
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
-    Real64 epexp(Real64 x);
-
-    Real64 epexp(Real64 x, Real64 defaultHigh);
-
-    Real64 epexp(Real64 numerator, Real64 denominator, Real64 defaultReturn);
+    Real64 epexp(Real64 numerator, Real64 denominator=1.0, Real64 overflowReturn=0.0, Real64 defaultHigh=std::numeric_limits<float>::max());
 
 } // namespace General
 

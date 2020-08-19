@@ -384,15 +384,15 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
 
     // Positive values
     x = 10.0;
-    y = epexp(x, 700.0);
+    y = epexp(x, 1.0, 0.0, 700.0);
     EXPECT_NEAR(22026.46579480, y, 0.00001);
 
     x = 800.0;
-    y = epexp(x, 700.0);
+    y = epexp(x, 1.0, 0.0, 700.0);
     EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
 }
 
-TEST_F(EnergyPlusFixture, General_EpexpTest_DivideByZeroTest)
+TEST_F(EnergyPlusFixture, General_EpexpTest_DivideByZero)
 {
     Real64 UThermal = 700.0;
     Real64 DuctSurfArea = 410;

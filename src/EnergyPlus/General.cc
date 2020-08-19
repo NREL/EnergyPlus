@@ -3656,33 +3656,18 @@ namespace General {
         return results;
     }
 
-    Real64 epexp(Real64 x)
+    Real64 epexp(Real64 numerator, Real64 denominator, Real64 overflowReturn, Real64 defaultHigh)
     {
-        if (x < -70.0) {
-            return 0.0;
-        }
-        return std::exp(x);
-    }
-
-    Real64 epexp(Real64 x, Real64 defaultHigh)
-    {
-        if (x < -70.0) {
-            return 0.0;
-        } else if (x > defaultHigh) {
-            return std::exp(defaultHigh);
-        }
-        return std::exp(x);
-    }
-
-    Real64 epexp(Real64 numerator, Real64 denominator, Real64 defaultReturn)
-    {
-        if (denominator == 0) {
-            return defaultReturn;
+        if (denominator == 0.0) {
+            return overflowReturn;
         } else {
-            if (numerator < -70.0) {
-                return defaultReturn;
+            Real64 x = numerator/denominator;
+            if (x < -70.0) {
+                return 0.0;
+            } else if (x > defaultHigh) {
+                return std::exp(defaultHigh);
             }
-            return std::exp(numerator/denominator);
+            return std::exp(x);
         }
     }
 } // namespace General
