@@ -11453,13 +11453,13 @@
 
   Meter:Custom,
     Wired_LTG_Electricity,   !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- FuResourceel Type
     ,                        !- Key Name 1
     Wired_LTG;               !- Output Variable or Meter Name 1
 
   Meter:CustomDecrement,
     Wired_Int_EQUIP,         !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     InteriorEquipment:Electricity,  !- Source Meter Name
     Core_bottom_Elevators_Equip,  !- Key Name 1
     Electric Equipment Electric Energy;  !- Output Variable or Meter Name 1

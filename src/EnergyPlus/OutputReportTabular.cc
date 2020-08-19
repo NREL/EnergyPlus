@@ -2259,8 +2259,8 @@ namespace OutputReportTabular {
             resourceTypeNames(7) = "Water";
             resourceTypeNames(8) = "Diesel";
             resourceTypeNames(9) = "Coal";
-            resourceTypeNames(10) = "FuelOil#1";
-            resourceTypeNames(11) = "FuelOil#2";
+            resourceTypeNames(10) = "FuelOilNo1";
+            resourceTypeNames(11) = "FuelOilNo2";
             resourceTypeNames(12) = "Propane";
             resourceTypeNames(13) = "OtherFuel1";
             resourceTypeNames(14) = "OtherFuel2";
@@ -2270,8 +2270,8 @@ namespace OutputReportTabular {
             sourceTypeNames(3) = "Gasoline";
             sourceTypeNames(4) = "Diesel";
             sourceTypeNames(5) = "Coal";
-            sourceTypeNames(6) = "FuelOil#1";
-            sourceTypeNames(7) = "FuelOil#2";
+            sourceTypeNames(6) = "FuelOilNo1";
+            sourceTypeNames(7) = "FuelOilNo2";
             sourceTypeNames(8) = "Propane";
             sourceTypeNames(9) = "PurchasedElectric";
             sourceTypeNames(10) = "SoldElectric";
@@ -2720,10 +2720,10 @@ namespace OutputReportTabular {
             curReport = AddMonthlyReport("EnergyConsumptionDieselFuelOilMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Diesel:Facility", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Diesel:Facility", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#1:Facility", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#1:Facility", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#2:Facility", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "FuelOil#2:Facility", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo1:Facility", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo1:Facility", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo2:Facility", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "FuelOilNo2:Facility", "", aggTypeMaximum);
         }
         if (namedMonthly(10).show) {
             curReport = AddMonthlyReport("EnergyConsumptionDistrictHeatingCoolingMonthly", 2);
@@ -2782,16 +2782,16 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(16).show) {
             curReport = AddMonthlyReport("EndUseEnergyConsumptionFuelOilMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#1", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#2", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo1", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo2", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo2", "", aggTypeSumOrAvg);
         }
         if (namedMonthly(17).show) {
             curReport = AddMonthlyReport("EndUseEnergyConsumptionCoalMonthly", 2);
@@ -2880,16 +2880,16 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(26).show) {
             curReport = AddMonthlyReport("PeakEnergyEndUseFuelOilMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#1", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOil#2", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOil#2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo1", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Heating:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:FuelOilNo2", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:FuelOilNo2", "", aggTypeMaximum);
         }
         if (namedMonthly(27).show) {
             curReport = AddMonthlyReport("PeakEnergyEndUseCoalMonthly", 2);
@@ -3338,8 +3338,8 @@ namespace OutputReportTabular {
         //                  + gatherTotalsSource(3)    & !gasoline
         //                  + gatherTotalsSource(4)    & !diesel
         //                  + gatherTotalsSource(5)    & !coal
-        //                  + gatherTotalsSource(6)    & !fuel oil #1
-        //                  + gatherTotalsSource(7)    & !fuel oil #2
+        //                  + gatherTotalsSource(6)    & !Fuel Oil No1
+        //                  + gatherTotalsSource(7)    & !Fuel Oil No2
         //                  + gatherTotalsSource(8)    &  !propane
         //                  + gatherTotalsBEPS(3)*sourceFactorElectric/efficiencyDistrictCooling  & !district cooling
         //                  + gatherTotalsBEPS(4)*sourceFactorNaturalGas/efficiencyDistrictHeating  & !district heating
@@ -3359,7 +3359,7 @@ namespace OutputReportTabular {
             ffSchedIndex(2) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("FuelOil#2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOilNo2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
             fuelfactorsused(7) = true;
@@ -3372,7 +3372,7 @@ namespace OutputReportTabular {
             ffSchedIndex(11) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("FuelOil#1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOilNo1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
             fuelfactorsused(6) = true;
@@ -4449,8 +4449,8 @@ namespace OutputReportTabular {
         //          Gasoline
         //          Diesel
         //          Coal
-        //          FuelOil#1
-        //          FuelOil#2
+        //          FuelOilNo1
+        //          FuelOilNo2
         //          Propane
         //          Water
         //          Steam
@@ -4597,8 +4597,8 @@ namespace OutputReportTabular {
         //          Gasoline 6
         //          Diesel 8
         //          Coal 9
-        //          FuelOil#1 10
-        //          FuelOil#2 11
+        //          FuelOilNo1 10
+        //          FuelOilNo2 11
         //          Propane 12
         //          Water 7
         //          Steam 5
@@ -4610,8 +4610,8 @@ namespace OutputReportTabular {
         //          sourceTypeNames(3)='Gasoline'
         //          sourceTypeNames(4)='Diesel'
         //          sourceTypeNames(5)='Coal'
-        //          sourceTypeNames(6)='FuelOil#1'
-        //          sourceTypeNames(7)='FuelOil#2'
+        //          sourceTypeNames(6)='FuelOilNo1'
+        //          sourceTypeNames(7)='FuelOilNo2'
         //          sourceTypeNames(8)='Propane'
         //          sourceTypeNames(9)='PurchasedElectric'
         //          sourceTypeNames(10)='SoldElectric'
@@ -4730,8 +4730,8 @@ namespace OutputReportTabular {
         //          Gasoline
         //          Diesel
         //          Coal
-        //          FuelOil#1
-        //          FuelOil#2
+        //          FuelOilNo1
+        //          FuelOilNo2
         //          Propane
         //          Water
         //          Steam
@@ -7611,8 +7611,8 @@ namespace OutputReportTabular {
                 collapsedEndUse(3, jEndUse) = gatherEndUseBEPS(6, jEndUse);   // gasoline
                 collapsedEndUse(4, jEndUse) = gatherEndUseBEPS(8, jEndUse);   // diesel
                 collapsedEndUse(5, jEndUse) = gatherEndUseBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = gatherEndUseBEPS(10, jEndUse);  // fuel oil #1
-                collapsedEndUse(7, jEndUse) = gatherEndUseBEPS(11, jEndUse);  // fuel oil #2
+                collapsedEndUse(6, jEndUse) = gatherEndUseBEPS(10, jEndUse);  // Fuel Oil No1
+                collapsedEndUse(7, jEndUse) = gatherEndUseBEPS(11, jEndUse);  // Fuel Oil No2
                 collapsedEndUse(8, jEndUse) = gatherEndUseBEPS(12, jEndUse);  // propane
                 collapsedEndUse(9, jEndUse) = gatherEndUseBEPS(13, jEndUse);  // otherfuel1
                 collapsedEndUse(10, jEndUse) = gatherEndUseBEPS(14, jEndUse); // otherfuel2
@@ -7627,8 +7627,8 @@ namespace OutputReportTabular {
             collapsedTotal(3) = gatherTotalsBEPS(6);                        // gasoline
             collapsedTotal(4) = gatherTotalsBEPS(8);                        // diesel
             collapsedTotal(5) = gatherTotalsBEPS(9);                        // coal
-            collapsedTotal(6) = gatherTotalsBEPS(10);                       // fuel oil #1
-            collapsedTotal(7) = gatherTotalsBEPS(11);                       // fuel oil #2
+            collapsedTotal(6) = gatherTotalsBEPS(10);                       // Fuel Oil No1
+            collapsedTotal(7) = gatherTotalsBEPS(11);                       // Fuel Oil No2
             collapsedTotal(8) = gatherTotalsBEPS(12);                       // propane
             collapsedTotal(9) = gatherTotalsBEPS(13);                       // other fuel 1
             collapsedTotal(10) = gatherTotalsBEPS(14);                      // other fuel 2
@@ -7665,8 +7665,8 @@ namespace OutputReportTabular {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 3) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 6);   // gasoline
                     collapsedEndUseSub(kEndUseSub, jEndUse, 4) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 8);   // diesel
                     collapsedEndUseSub(kEndUseSub, jEndUse, 5) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 9);   // coal
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 10);  // fuel oil #1
-                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 11);  // fuel oil #2
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 6) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 10);  // Fuel Oil No1
+                    collapsedEndUseSub(kEndUseSub, jEndUse, 7) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 11);  // Fuel Oil No2
                     collapsedEndUseSub(kEndUseSub, jEndUse, 8) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 12);  // propane
                     collapsedEndUseSub(kEndUseSub, jEndUse, 9) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 13);  // otherfuel1
                     collapsedEndUseSub(kEndUseSub, jEndUse, 10) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 14); // otherfuel2
@@ -7793,7 +7793,7 @@ namespace OutputReportTabular {
                                   gatherTotalsBEPS(6) + gatherTotalsBEPS(8) + gatherTotalsBEPS(9) + gatherTotalsBEPS(10) + gatherTotalsBEPS(11) +
                                   gatherTotalsBEPS(12) + gatherTotalsBEPS(13) + gatherTotalsBEPS(14)) /
                                  largeConversionFactor; // electricity | natural gas | district cooling | district heating | steam | gasoline | diesel
-                                                        // | coal | fuel oil #1 | fuel oil #2 | propane | otherfuel1 | otherfuel2
+                                                        // | coal | Fuel Oil No1 | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
 
             netElecPurchasedSold = gatherElecPurchased - gatherElecSurplusSold;
 
@@ -7802,8 +7802,8 @@ namespace OutputReportTabular {
                                                        gatherTotalsBEPS(6) + gatherTotalsBEPS(8) + gatherTotalsBEPS(9) + gatherTotalsBEPS(10) +
                                                        gatherTotalsBEPS(11) + gatherTotalsBEPS(12) + gatherTotalsBEPS(13) + gatherTotalsBEPS(14)) /
                                                           largeConversionFactor; // electricity (already in GJ) | natural gas | district cooling |
-                                                                                 // district heating | steam | gasoline | diesel | coal | fuel oil #1
-                                                                                 // | fuel oil #2 | propane | otherfuel1 | otherfuel2
+                                                                                 // district heating | steam | gasoline | diesel | coal | Fuel Oil No1
+                                                                                 // | Fuel Oil No2 | propane | otherfuel1 | otherfuel2
 
             if (efficiencyDistrictCooling == 0) efficiencyDistrictCooling = 1.0;
             if (efficiencyDistrictHeating == 0) efficiencyDistrictHeating = 1.0;
@@ -7840,13 +7840,13 @@ namespace OutputReportTabular {
             } else {
                 totalSourceEnergyUse += gatherTotalsBEPS(9) * sourceFactorCoal;
             }
-            // fuel oil #1
+            // Fuel Oil No1
             if (fuelfactorsused(6)) {
                 totalSourceEnergyUse += gatherTotalsSource(6);
             } else {
                 totalSourceEnergyUse += gatherTotalsBEPS(10) * sourceFactorFuelOil1;
             }
-            // fuel oil #2
+            // Fuel Oil No2
             if (fuelfactorsused(7)) {
                 totalSourceEnergyUse += gatherTotalsSource(7);
             } else {
@@ -7909,13 +7909,13 @@ namespace OutputReportTabular {
             } else {
                 netSourceEnergyUse += gatherTotalsBEPS(9) * sourceFactorCoal;
             }
-            // fuel oil #1
+            // Fuel Oil No1
             if (fuelfactorsused(6)) {
                 netSourceEnergyUse += gatherTotalsSource(6);
             } else {
                 netSourceEnergyUse += gatherTotalsBEPS(10) * sourceFactorFuelOil1;
             }
-            // fuel oil #2
+            // Fuel Oil No2
             if (fuelfactorsused(7)) {
                 netSourceEnergyUse += gatherTotalsSource(7);
             } else {
@@ -7997,8 +7997,8 @@ namespace OutputReportTabular {
             rowHead(6) = "Gasoline";
             rowHead(7) = "Diesel";
             rowHead(8) = "Coal";
-            rowHead(9) = "Fuel Oil #1";
-            rowHead(10) = "Fuel Oil #2";
+            rowHead(9) = "Fuel Oil No 1";
+            rowHead(10) = "Fuel Oil No 2";
             rowHead(11) = "Propane";
             rowHead(12) = "Other Fuel 1";
             rowHead(13) = "Other Fuel 2";
@@ -8419,7 +8419,7 @@ namespace OutputReportTabular {
                            SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
                     footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
                     PreDefTableEntry(pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
-                    // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- fuel oil #1 (6) | <- fuel oil #2 (7)
+                    // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- Fuel Oil No1 (6) | <- Fuel Oil No2 (7)
                     // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
                 } else if (SELECT_CASE_var == colPurchHeat) {
                     footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
@@ -9243,8 +9243,8 @@ namespace OutputReportTabular {
                 collapsedEndUse(3, jEndUse) = gatherEndUseBySourceBEPS(6, jEndUse);   // gasoline
                 collapsedEndUse(4, jEndUse) = gatherEndUseBySourceBEPS(8, jEndUse);   // diesel
                 collapsedEndUse(5, jEndUse) = gatherEndUseBySourceBEPS(9, jEndUse);   // coal
-                collapsedEndUse(6, jEndUse) = gatherEndUseBySourceBEPS(10, jEndUse);  // fuel oil #1
-                collapsedEndUse(7, jEndUse) = gatherEndUseBySourceBEPS(11, jEndUse);  // fuel oil #2
+                collapsedEndUse(6, jEndUse) = gatherEndUseBySourceBEPS(10, jEndUse);  // Fuel Oil No1
+                collapsedEndUse(7, jEndUse) = gatherEndUseBySourceBEPS(11, jEndUse);  // Fuel Oil No2
                 collapsedEndUse(8, jEndUse) = gatherEndUseBySourceBEPS(12, jEndUse);  // propane
                 collapsedEndUse(9, jEndUse) = gatherEndUseBySourceBEPS(13, jEndUse);  // otherfuel1
                 collapsedEndUse(10, jEndUse) = gatherEndUseBySourceBEPS(14, jEndUse); // otherfuel2
@@ -9259,8 +9259,8 @@ namespace OutputReportTabular {
             collapsedTotal(3) = gatherTotalsBySourceBEPS(6);                                // gasoline
             collapsedTotal(4) = gatherTotalsBySourceBEPS(8);                                // diesel
             collapsedTotal(5) = gatherTotalsBySourceBEPS(9);                                // coal
-            collapsedTotal(6) = gatherTotalsBySourceBEPS(10);                               // fuel oil #1
-            collapsedTotal(7) = gatherTotalsBySourceBEPS(11);                               // fuel oil #2
+            collapsedTotal(6) = gatherTotalsBySourceBEPS(10);                               // Fuel Oil No1
+            collapsedTotal(7) = gatherTotalsBySourceBEPS(11);                               // Fuel Oil No2
             collapsedTotal(8) = gatherTotalsBySourceBEPS(12);                               // propane
             collapsedTotal(9) = gatherTotalsBySourceBEPS(13);                               // otherfuel1
             collapsedTotal(10) = gatherTotalsBySourceBEPS(14);                              // otherfuel2
@@ -9793,8 +9793,8 @@ namespace OutputReportTabular {
                 columnHead(3) = "Gasoline [kBtuh]";
                 columnHead(4) = "Diesel [kBtuh]";
                 columnHead(5) = "Coal [kBtuh]";
-                columnHead(6) = "Fuel Oil #1 [kBtuh]";
-                columnHead(7) = "Fuel Oil #2 [kBtuh]";
+                columnHead(6) = "Fuel Oil No 1 [kBtuh]";
+                columnHead(7) = "Fuel Oil No 2 [kBtuh]";
                 columnHead(8) = "Propane [kBtuh]";
                 columnHead(9) = "Other Fuel 1 [kBtuh]";
                 columnHead(10) = "Other Fuel 2 [kBtuh]";
@@ -9814,8 +9814,8 @@ namespace OutputReportTabular {
                 columnHead(3) = "Gasoline [W]";
                 columnHead(4) = "Diesel [W]";
                 columnHead(5) = "Coal [W]";
-                columnHead(6) = "Fuel Oil #1 [W]";
-                columnHead(7) = "Fuel Oil #2 [W]";
+                columnHead(6) = "Fuel Oil No 1 [W]";
+                columnHead(7) = "Fuel Oil No 2 [W]";
                 columnHead(8) = "Propane [W]";
                 columnHead(9) = "Other Fuel 1 [W]";
                 columnHead(10) = "Other Fuel 2 [W]";
@@ -9897,8 +9897,8 @@ namespace OutputReportTabular {
                 columnHead(4) = "Gasoline [kBtuh]";
                 columnHead(5) = "Diesel [kBtuh]";
                 columnHead(6) = "Coal [kBtuh]";
-                columnHead(7) = "Fuel Oil #1 [kBtuh]";
-                columnHead(8) = "Fuel Oil #2 [kBtuh]";
+                columnHead(7) = "Fuel Oil No 1 [kBtuh]";
+                columnHead(8) = "Fuel Oil No 2 [kBtuh]";
                 columnHead(9) = "Propane [kBtuh]";
                 columnHead(10) = "Other Fuel 1 [kBtuh]";
                 columnHead(11) = "Other Fuel 2 [kBtuh]";
@@ -9919,8 +9919,8 @@ namespace OutputReportTabular {
                 columnHead(4) = "Gasoline [W]";
                 columnHead(5) = "Diesel [W]";
                 columnHead(6) = "Coal [W]";
-                columnHead(7) = "Fuel Oil #1 [W]";
-                columnHead(8) = "Fuel Oil #2 [W]";
+                columnHead(7) = "Fuel Oil No 1 [W]";
+                columnHead(8) = "Fuel Oil No 2 [W]";
                 columnHead(9) = "Propane [W]";
                 columnHead(10) = "Other Fuel 1 [W]";
                 columnHead(11) = "Other Fuel 2 [W]";
