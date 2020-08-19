@@ -392,4 +392,17 @@ TEST_F(EnergyPlusFixture, General_EpexpTest)
     EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
 }
 
+TEST_F(EnergyPlusFixture, General_EpexpTest_DivideByZeroTest)
+{
+    Real64 UThermal = 700.0;
+    Real64 DuctSurfArea = 410;
+    Real64 DirSign = 1.0;
+    Real64 AirflowNetworkLinkSimuFLOW = 0.0;
+    Real64 CpAir = 2.0;
+    Real64 defaultReturn = 0.0;
+    Real64 Ei = General::epexp(-UThermal * DuctSurfArea, DirSign * AirflowNetworkLinkSimuFLOW * CpAir, defaultReturn);
+
+    EXPECT_EQ(defaultReturn, Ei); // first wednesday of march
+}
+
 } // namespace EnergyPlus

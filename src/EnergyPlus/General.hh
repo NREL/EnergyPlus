@@ -398,6 +398,9 @@ namespace General {
     Real64 epexp(Real64 x);
 
     Real64 epexp(Real64 x, Real64 defaultHigh);
+
+    Real64 epexp(Real64 numerator, Real64 denominator, Real64 defaultReturn);
+
 } // namespace General
 
 } // namespace EnergyPlus

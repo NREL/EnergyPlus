@@ -3672,6 +3672,18 @@ namespace General {
         }
         return std::exp(x);
     }
+
+    Real64 epexp(Real64 numerator, Real64 denominator, Real64 defaultReturn)
+    {
+        if (denominator == 0) {
+            return defaultReturn;
+        } else {
+            if (numerator < -70.0) {
+                return defaultReturn;
+            }
+            return std::exp(numerator/denominator);
+        }
+    }
 } // namespace General
 
 } // namespace EnergyPlus
