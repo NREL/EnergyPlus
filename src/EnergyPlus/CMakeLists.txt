@@ -736,6 +736,7 @@ SET( API_HEADERS
   api/func.h
   api/runtime.h
   api/datatransfer.h
+  api/state.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
   api/TypeDefs.h
@@ -743,6 +744,7 @@ SET( API_HEADERS
 SET( API_CORE_SRC
   api/func.cc
   api/runtime.cc
+  api/state.cc
   api/datatransfer.cc
   api/EnergyPlusPgm.cc)
 
@@ -813,6 +815,9 @@ add_custom_command(
         -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
         -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
         -P "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
+        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
+        # ideally the whole process would be revamped
+        DEPENDS __ALWAYSRUNME
 )
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
@@ -942,6 +947,12 @@ if( BUILD_TESTING )
     add_test(NAME "API.PluginTesterTester"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_DataTransferTypes.py" "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py" COPYONLY)
+    add_test(NAME "API.test_DataTransferTypes"
+            COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
+            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
   endif()
 endif()
 
