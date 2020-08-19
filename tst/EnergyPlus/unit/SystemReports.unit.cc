@@ -78,7 +78,6 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     int AirLoopNum(1);
     std::string CompType1;
     std::string CompType2;
-    int EnergyType;
     Real64 CompLoad(150.0);
     Real64 CompEnergyUse(100.0);
     
@@ -143,7 +142,7 @@ TEST_F(EnergyPlusFixture, SeparateGasOutputVariables)
     EXPECT_EQ(SysHumidNaturalGas(1), 100);
     EXPECT_EQ(SysHCCompNaturalGas(1), 100);
 
-    // Allocate variables to call ReportSystemEnergyUse() function for SysTotNaturalGas ("Air System NaturalGas Energy")
+    // Allocate variables to run ReportSystemEnergyUse() function for SysTotNaturalGas ("Air System NaturalGas Energy")
     SysTotHTNG.allocate(1);
     SysFANCompHTNG.allocate(1);
     SysHCCompHTNG.allocate(1);
