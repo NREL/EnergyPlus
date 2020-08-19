@@ -13,7 +13,7 @@ def progress_handler(progress: int) -> None:
         sys.stdout.flush()
 
 
-def error_handler(message: bytes) -> None:
+def error_handler(severity: int, message: bytes) -> None:
     if b'Warning' in message:
         print("GOT A WARNING UH OH!")
         sys.stdout.flush()
