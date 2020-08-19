@@ -434,6 +434,18 @@ ENERGYPLUSLIB_API int minutes(EnergyPlusState state);
 /// \see apiDataFullyReady
 ENERGYPLUSLIB_API Real64 zoneTimeStep(EnergyPlusState state);
 
+/// \brief Returns the number of zone time steps in an hour, which is currently a constant value throughout a simulation.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int numTimeStepsInHour(EnergyPlusState state);
+
+/// \brief The current zone time step index, from 1 to the number of zone time steps per hour
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int zoneTimeStepNum(EnergyPlusState state);
+
 /// \brief Returns the duration of the current HVAC system simulation time step, in fractional hours
 /// \details The HVAC time step will vary throughout the simulation as needed to maintain convergence while being cautious about program runtime.
 ///          This function returns the current value of the time step

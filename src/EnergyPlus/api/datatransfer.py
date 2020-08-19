@@ -83,6 +83,10 @@ class DataExchange:
         self.api.daylightSavingsTimeIndicator.restype = c_int
         self.api.hour.argtypes = [c_void_p]
         self.api.hour.restype = c_int
+        self.api.numTimeStepsInHour.argtypes = [c_void_p]
+        self.api.numTimeStepsInHour.restype = c_int
+        self.api.zoneTimeStepNum.argtypes = [c_void_p]
+        self.api.zoneTimeStepNum.restype = c_int
         self.api.currentTime.argtypes = [c_void_p]
         self.api.currentTime.restype = RealEP
         self.api.minutes.argtypes = [c_void_p]
@@ -880,6 +884,24 @@ class DataExchange:
         :return: An integer number of minutes into the current hour (1-60)
         """
         return self.api.minutes(state)
+
+    def num_time_steps_in_hour(self, state: c_void_p) -> int:
+        """
+        Returns the number of zone time steps in an hour, which is currently a constant value throughout a simulation.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: An integer representation of the number of time steps in an hour
+        """
+        return self.api.numTimeStepsInHour(state)
+
+    def zone_time_step_number(self, state: c_void_p) -> int:
+        """
+        The current zone time step index, from 1 to the number of zone time steps per hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: The integer index of the current time step
+        """
+        return self.api.zoneTimeStepNum(state)
 
     def day_of_week(self, state: c_void_p) -> int:
         """

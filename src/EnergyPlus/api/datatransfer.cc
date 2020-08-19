@@ -581,6 +581,14 @@ int minutes(EnergyPlusState state) {
     return (int)(fractionalMinutesIntoTheDay);
 }
 
+int numTimeStepsInHour(EnergyPlusState EP_UNUSED(state)) {
+    return EnergyPlus::DataGlobals::NumOfTimeStepInHour;
+}
+
+int zoneTimeStepNum(EnergyPlusState EP_UNUSED(state)) {
+    return EnergyPlus::DataGlobals::TimeStep;
+}
+
 int holidayIndex(EnergyPlusState) {
     return EnergyPlus::DataEnvironment::HolidayIndex;
 }

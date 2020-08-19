@@ -32,8 +32,10 @@ def time_step_handler(state):
     print("Reading outdoor temp via getVariable, value is: %s" % oa_temp)
     dp_temp = api.exchange.get_variable_value(state, outdoor_dew_point_sensor)
     print("Actuated Dew Point temp value is: %s" % dp_temp)
-    tomorrow_db = api.exchange.tomorrow_weather_outdoor_dry_bulb_at_time(state, 3, 2)
-    print(f"Tomorrow's hour 3, timestep 2 temp is: {tomorrow_db}")
+    if api.exchange.zone_time_step_number(state) == 1:
+        n = api.exchange.num_time_steps_in_hour(state)
+        tomorrow_db = api.exchange.tomorrow_weather_outdoor_dry_bulb_at_time(state, 3, 2)
+        print(f"Num time steps in hour = {n}; Tomorrow's hour 3, timestep 2 temp is: {tomorrow_db}")
 
 
 api = EnergyPlusAPI()
