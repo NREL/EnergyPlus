@@ -65,7 +65,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -106,6 +106,7 @@ namespace UtilityRoutines {
 
     void clear_state()
     {
+        outputErrorHeader = true;
         appendPerfLog_headerRow = "";
         appendPerfLog_valuesRow = "";
     }
@@ -499,10 +500,10 @@ namespace UtilityRoutines {
             FuelTypeOutput = "Coal";
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
+            FuelTypeOutput = "FuelOilNo1";
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
+            FuelTypeOutput = "FuelOilNo2";
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -591,12 +592,12 @@ namespace UtilityRoutines {
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+            FuelTypeOutput = "FuelOilNo1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+            FuelTypeOutput = "FuelOilNo2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -690,13 +691,13 @@ namespace UtilityRoutines {
             AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
             ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-            SetupNodeVarsForReporting(state.outputFiles);
+            SetupNodeVarsForReporting(state.files);
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.outputFiles, ErrFound);
+            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
+            TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -706,8 +707,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.outputFiles);
-                ReportLoopConnections(state.outputFiles);
+                ReportAirLoopConnections(state.files);
+                ReportLoopConnections(state.files);
             }
 
         } else if (!ExitDuringSimulations) {
@@ -716,14 +717,14 @@ namespace UtilityRoutines {
         }
 
         if (AskForSurfacesReport) {
-            ReportSurfaces(state.outputFiles);
+            ReportSurfaces(state.files);
         }
 
         ReportSurfaceErrors();
         CheckPlantOnAbort();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(state.outputFiles);
+        CloseMiscOpenFiles(state.files);
         NumWarnings = fmt::to_string(TotalWarningErrors);
         NumSevere = fmt::to_string(TotalSevereErrors);
         NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
@@ -761,7 +762,11 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
+<<<<<<< HEAD
             auto tempfl = state.outputFiles.endFile.try_open(state.outputFiles.outputControl.end);
+=======
+            auto tempfl = state.files.endFile.try_open();
+>>>>>>> origin/develop
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -774,23 +779,32 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(state.files.json);
 
+<<<<<<< HEAD
         ResultsFramework::resultsFramework->writeOutputs();
+=======
+        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+            ResultsFramework::OutputSchema->writeTimeSeriesReports(state.files.json);
+        }
+
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->WriteReport(state.files.json);
+        }
+>>>>>>> origin/develop
 
 #ifdef EP_Detailed_Timings
-        epSummaryTimes(state.outputFiles.audit, Time_Finish - Time_Start);
+        epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-        CloseOutOpenFiles();
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
         if (NumExternalInterfaces > 0) CloseSocket(-1);
         return EXIT_FAILURE;
     }
 
-    void CloseMiscOpenFiles(OutputFiles &outputFiles)
+    void CloseMiscOpenFiles(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -830,82 +844,17 @@ namespace UtilityRoutines {
         //      INTEGER :: UnitNumber
         //      INTEGER :: ios
 
-        CloseReportIllumMaps(outputFiles);
-        CloseDFSFile(outputFiles);
+        CloseReportIllumMaps(ioFiles);
+        CloseDFSFile(ioFiles);
 
-        if (DebugOutput || outputFiles.debug.position() > 0) {
-            outputFiles.debug.close();
+        if (DebugOutput || ioFiles.debug.position() > 0) {
+            ioFiles.debug.close();
         } else {
-            outputFiles.debug.del();
+            ioFiles.debug.del();
         }
     }
 
-    void CloseOutOpenFiles()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   April 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine scans potential unit numbers and closes
-        // any that are still open.
-
-        // METHODOLOGY EMPLOYED:
-        // Use INQUIRE to determine if file is open.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        bool exists;
-        bool opened;
-        std::string name;
-        const std::string stdin_name("stdin");
-        const std::string stdout_name("stdout");
-        const std::string stderr_name("stderr");
-        bool not_special(false);
-        int UnitNumber;
-        int ios;
-
-        for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(UnitNumber, flags);
-                exists = flags.exists();
-                opened = flags.open();
-                ios = flags.ios();
-                name = flags.name();
-            }
-            if (exists && opened && ios == 0) {
-                not_special = name.compare(stdin_name) != 0;
-                not_special = not_special && (name.compare(stdout_name) != 0);
-                not_special = not_special && (name.compare(stderr_name) != 0);
-                if (not_special) ObjexxFCL::gio::close(UnitNumber);
-            }
-        }
-    }
-
-    int EndEnergyPlus(OutputFiles &outputFiles)
+    int EndEnergyPlus(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -965,7 +914,7 @@ namespace UtilityRoutines {
         ReportSurfaceErrors();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(outputFiles);
+        CloseMiscOpenFiles(ioFiles);
         NumWarnings = RoundSigDigits(TotalWarningErrors);
         strip(NumWarnings);
         NumSevere = RoundSigDigits(TotalSevereErrors);
@@ -1014,7 +963,11 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
+<<<<<<< HEAD
             auto tempfl = outputFiles.endFile.try_open(outputFiles.outputControl.end);
+=======
+            auto tempfl = ioFiles.endFile.try_open();
+>>>>>>> origin/develop
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
@@ -1022,21 +975,31 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(ioFiles.json);
 
+<<<<<<< HEAD
         ResultsFramework::resultsFramework->writeOutputs();
+=======
+        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+            ResultsFramework::OutputSchema->writeTimeSeriesReports(ioFiles.json);
+        }
+
+        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::OutputSchema->WriteReport(ioFiles.json);
+        }
+>>>>>>> origin/develop
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
 #endif
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
-        CloseOutOpenFiles();
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
         if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
         return EXIT_SUCCESS;
     }
 
+<<<<<<< HEAD
     int GetNewUnitNumber()
     {
 
@@ -1213,6 +1176,8 @@ namespace UtilityRoutines {
         return UnitNumber;
     }
 
+=======
+>>>>>>> origin/develop
     void ConvertCaseToUpper(std::string const &InputString, // Input string
                             std::string &OutputString       // Output string (in UpperCase)
     )
@@ -2044,7 +2009,6 @@ namespace UtilityRoutines {
 
         // Using/Aliasing
         using DataGlobals::DoingInputProcessing;
-        using DataGlobals::err_stream;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
@@ -2062,13 +2026,24 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
+        auto *err_stream = []() -> std::ostream *{
+            // NOTE: this is called in too many places to justify changing the interface right now,
+            // so we are using the Singleton (not ideal)
+            if (IOFiles::hasSingleton()) {
+                return IOFiles::getSingleton().err_stream.get();
+            } else {
+                return nullptr;
+            }
+        }();
+
+
         if (UtilityRoutines::outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
             UtilityRoutines::outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-            if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout
@@ -2081,7 +2056,7 @@ namespace UtilityRoutines {
         if (present(OutUnit2)) {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
-        std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
+        std::string tmp = "  " + ErrorMessage + '\n';
         if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 

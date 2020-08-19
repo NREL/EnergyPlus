@@ -93,11 +93,12 @@ namespace MoistureBalanceEMPDManager {
                                Material::MaterialProperties const &mat // material
     );
 
-    void GetMoistureBalanceEMPDInput();
+    void GetMoistureBalanceEMPDInput(IOFiles &ioFiles);
 
-    void InitMoistureBalanceEMPD();
+    void InitMoistureBalanceEMPD(IOFiles &ioFiles);
 
-    void CalcMoistureBalanceEMPD(int const SurfNum,
+    void CalcMoistureBalanceEMPD(IOFiles &ioFiles,
+                                 int const SurfNum,
                                  Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 const TempZone,   // Zone temperature at current time step.
                                  Real64 &TempSat          // Satutare surface temperature.
@@ -107,7 +108,7 @@ namespace MoistureBalanceEMPDManager {
 
     void UpdateMoistureBalanceEMPD(int const SurfNum); // Surface number
 
-    void ReportMoistureBalanceEMPD(OutputFiles &outputFiles);
+    void ReportMoistureBalanceEMPD(IOFiles &ioFiles);
 
 } // namespace MoistureBalanceEMPDManager
 

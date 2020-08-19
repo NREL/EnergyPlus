@@ -58,7 +58,6 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -93,12 +92,12 @@
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MatrixDataManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
@@ -198,6 +197,12 @@ namespace HeatBalanceManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool ManageHeatBalanceGetInputFlag(true);
+        bool DoReport(false);
+        bool ChangeSet(true); // Toggle for checking storm windows
+        bool FirstWarmupWrite(true);
+        bool WarmupConvergenceWarning(false);
+        bool SizingWarmupConvergenceWarning(false);
+        bool ReportWarmupConvergenceFirstWarmupWrite(true);
     } // namespace
 
     // Real Variables for the Heat Balance Simulation
@@ -282,6 +287,13 @@ namespace HeatBalanceManager {
         WarmupConvergenceValues.deallocate();
         UniqueMaterialNames.clear();
         UniqueConstructNames.clear();
+        surfaceOctree = SurfaceOctreeCube();
+        DoReport = false;
+        ChangeSet = true;
+        FirstWarmupWrite = true;
+        WarmupConvergenceWarning = false;
+        SizingWarmupConvergenceWarning = false;
+        ReportWarmupConvergenceFirstWarmupWrite = true;
     }
 
     void ManageHeatBalance(EnergyPlusData &state)
@@ -328,16 +340,13 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //////////// hoisted into namespace changed ManageHeatBalanceGetInputFlag////////////
-        // static bool GetInputFlag( true );
-        ////////////////////////////////////////////////
 
         // FLOW:
 
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors(state.outputFiles);
+            HeatBalanceIntRadExchange::InitSolarViewFactors(state.files);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -355,11 +364,14 @@ namespace HeatBalanceManager {
         }
 
         bool anyRan;
-        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, anyRan); // EMS calling point
+        ManageEMS(state,
+                  DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance,
+                  anyRan,
+                  ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.outputFiles);                                                                // Initialize all heat balance related parameters
-        ManageEMS(DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan); // EMS calling point
+        InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files); // Initialize all heat balance related parameters
+        ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
         // and then the Air Heat Balance Manager is called by the Surface Heat Balance
@@ -369,16 +381,16 @@ namespace HeatBalanceManager {
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance(state);
-        ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance(state.outputFiles);                                             // Do any heat balance related record keeping
+        ManageEMS(state, emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
+        RecKeepHeatBalance(state.files);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(state, state.outputFiles); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state, state.files); // Manage heat balance reporting until the new reporting is in place
 
-        ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
+        ManageEMS(state, emsCallFromEndZoneTimestepAfterZoneReporting, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         UpdateEMSTrendVariables();
         EnergyPlus::PluginManagement::PluginManager::updatePluginValues();
@@ -390,12 +402,12 @@ namespace HeatBalanceManager {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
                 state.dataGlobals.DayOfSimChr = "0";
 
-                ManageEMS(emsCallFromBeginNewEvironmentAfterWarmUp, anyRan); // calling point
+                ManageEMS(state, emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(state.outputFiles);
+            ReportWarmupConvergence(state.files);
         }
     }
 
@@ -439,22 +451,22 @@ namespace HeatBalanceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         bool ValidSimulationWithNoZones;
 
         // FLOW:
 
-        GetProjectControlData(state, state.outputFiles, ErrorsFound);
+        GetProjectControlData(state, ErrorsFound);
 
-        GetSiteAtmosphereData(state.outputFiles, ErrorsFound);
+        GetSiteAtmosphereData(state.files, ErrorsFound);
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
-        GetConstructData(ErrorsFound); // Read constructs from input file/transfer from legacy data structure
+        GetConstructData(state.files, ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
         GetBuildingData(state, ErrorsFound); // Read building data from input file
 
@@ -653,7 +665,7 @@ namespace HeatBalanceManager {
         // Construction:InternalSource
     }
 
-    void GetProjectControlData(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
+    void GetProjectControlData(EnergyPlusData &state, bool &ErrorsFound) // Set to true if errors detected during getting data
     {
 
         // SUBROUTINE INFORMATION:
@@ -855,8 +867,8 @@ namespace HeatBalanceManager {
             "Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum "
             "Number of Warmup Days\n");
         // Write Building Information to the initialization output file
-        print(outputFiles.eio, Format_721);
-        print(outputFiles.eio, Format_720,
+        print(state.files.eio, Format_721);
+        print(state.files.eio, Format_720,
             BuildingName , BuildingAzimuth , AlphaName(2) , LoadsConvergTol
             , TempConvergTol , AlphaName(3) , MaxNumberOfWarmupDays , MinNumberOfWarmupDays);
         // Above should be validated...
@@ -915,7 +927,7 @@ namespace HeatBalanceManager {
         }
         static constexpr auto Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
                                               "AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{}\n");
-        print(outputFiles.eio, Format_722, AlphaName(1));
+        print(state.files.eio, Format_722, AlphaName(1));
 
         // Get only the first (if more were input)
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
@@ -970,7 +982,7 @@ namespace HeatBalanceManager {
 
         static constexpr auto Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
                                               "AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{}\n");
-        print(outputFiles.eio, Format_723, AlphaName(1));
+        print(state.files.eio, Format_723, AlphaName(1));
 
         CurrentModuleObject = "HeatBalanceAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1057,7 +1069,7 @@ namespace HeatBalanceManager {
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
         static constexpr auto Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
-        print(outputFiles.eio, Format_724);
+        print(state.files.eio, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1127,9 +1139,9 @@ namespace HeatBalanceManager {
         // Write Solution Algorithm to the initialization output file for User Verification
         static constexpr auto Format_726(
             "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
-        print(outputFiles.eio, Format_726);
+        print(state.files.eio, Format_726);
         static constexpr auto Format_727(" Zone Air Solution Algorithm, {}\n");
-        print(outputFiles.eio, Format_727, AlphaName(1));
+        print(state.files.eio, Format_727, AlphaName(1));
 
         // A new object is added by L. Gu, 06/10
         CurrentModuleObject = "ZoneAirContaminantBalance";
@@ -1212,22 +1224,22 @@ namespace HeatBalanceManager {
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
-        print(outputFiles.eio, Format_728);
+        print(state.files.eio, Format_728);
         static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
-            print(outputFiles.eio, Format_730, "Yes", AlphaName(1));
+            print(state.files.eio, Format_730, "Yes", AlphaName(1));
         } else {
-            print(outputFiles.eio, Format_730, "No", "N/A");
+            print(state.files.eio, Format_730, "No", "N/A");
         }
 
         static constexpr auto Format_729(
             "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
         static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
-        print(outputFiles.eio, Format_729);
+        print(state.files.eio, Format_729);
         if (Contaminant.SimulateContaminants && Contaminant.GenericContamSimulation) {
-            print(outputFiles.eio, Format_731, "Yes", AlphaName(3));
+            print(state.files.eio, Format_731, "Yes", AlphaName(3));
         } else {
-            print(outputFiles.eio, Format_731, "No", "N/A");
+            print(state.files.eio, Format_731, "No", "N/A");
         }
 
         // A new object is added by B. Nigusse, 02/14
@@ -1326,11 +1338,11 @@ namespace HeatBalanceManager {
             "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
         static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
 
-        print(outputFiles.eio, Format_732);
+        print(state.files.eio, Format_732);
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            print(outputFiles.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
+            print(state.files.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
         } else {
-            print(outputFiles.eio, Format_733, "No", "N/A", "N/A", "N/A");
+            print(state.files.eio, Format_733, "No", "N/A", "N/A", "N/A");
         }
 
         // A new object is added by L. Gu, 4/17
@@ -1383,11 +1395,11 @@ namespace HeatBalanceManager {
         static constexpr auto Format_734(
             "! <HVACSystemRootFindingAlgorithm>, Value {{RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}}\n");
         static constexpr auto Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
-        print(outputFiles.eio, Format_734);
-        print(outputFiles.eio, Format_735, HVACSystemRootFinding.Algorithm);
+        print(state.files.eio, Format_734);
+        print(state.files.eio, Format_735, HVACSystemRootFinding.Algorithm);
     }
 
-    void GetSiteAtmosphereData(OutputFiles &outputFiles, bool &ErrorsFound)
+    void GetSiteAtmosphereData(IOFiles &ioFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1447,14 +1459,14 @@ namespace HeatBalanceManager {
         }
 
         // Write to the initialization output file
-        print(outputFiles.eio,
+        print(ioFiles.eio,
             "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
             "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        print(outputFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
+        print(ioFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, OutputFiles &outputFiles, bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -1518,7 +1530,6 @@ namespace HeatBalanceManager {
         Real64 ReflectivityVis;   // Glass reflectivity, visible
         Real64 TransmittivitySol; // Glass transmittivity, solar
         Real64 TransmittivityVis; // Glass transmittivity, visible
-        static bool DoReport(false);
         Real64 DenomRGas;   // Denominator for WindowGas calculations of NominalR
         Real64 Openness;    // insect screen openness fraction = (1-d/s)^2
         Real64 minAngValue; // minimum value of angle
@@ -3827,12 +3838,12 @@ namespace HeatBalanceManager {
 
         if (DoReport) {
 
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Material Details>,Material Name,ThermalResistance {{m2-K/w}},Roughness,Thickness {{m}},Conductivity "
                   "{{w/m-K}},Density {{kg/m3}},Specific Heat "
                   "{{J/kg-K}},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible\n");
 
-            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(ioFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
 
             // Formats
             static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
@@ -3843,9 +3854,9 @@ namespace HeatBalanceManager {
                 {
                     auto const SELECT_CASE_var(dataMaterial.Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        print(outputFiles.eio, Format_702, dataMaterial.Material(MaterNum).Name, dataMaterial.Material(MaterNum).Resistance);
+                        print(ioFiles.eio, Format_702, dataMaterial.Material(MaterNum).Name, dataMaterial.Material(MaterNum).Resistance);
                     } else {
-                        print(outputFiles.eio,
+                        print(ioFiles.eio,
                               Format_701,
                               dataMaterial.Material(MaterNum).Name,
                               dataMaterial.Material(MaterNum).Resistance,
@@ -4113,7 +4124,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void GetConstructData(bool &ErrorsFound) // If errors found in input
+    void GetConstructData(IOFiles &ioFiles, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -4555,7 +4566,7 @@ namespace HeatBalanceManager {
             }
             DisplayString("Searching Window5 data file for Construction=" + ConstructAlphas(0));
 
-            SearchWindow5DataFile(window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
+            SearchWindow5DataFile(ioFiles, window5DataFileName, ConstructAlphas(0), ConstructionFound, EOFonW5File, ErrorsFound);
 
             if (EOFonW5File || !ConstructionFound) {
                 DisplayString("--Construction not found");
@@ -5145,7 +5156,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, OutputFiles &outputFiles)
+    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5180,22 +5191,21 @@ namespace HeatBalanceManager {
         int StormWinNum; // Number of StormWindow object
         int SurfNum;     // Surface number
         int ZoneNum;
-        static bool ChangeSet(true); // Toggle for checking storm windows
 
         if (BeginSimFlag) {
             AllocateHeatBalArrays(); // Allocate the Module Arrays
             if (DataHeatBalance::AnyCTF || DataHeatBalance::AnyEMPD) {
                 DisplayString("Initializing Response Factors");
-                InitConductionTransferFunctions(outputFiles); // Initialize the response factors
+                InitConductionTransferFunctions(ioFiles); // Initialize the response factors
             }
 
             DisplayString("Initializing Window Optical Properties");
             InitEquivalentLayerWindowCalculations(dataWindowEquivalentLayer); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(dataWindowComplexManager, dataWindowManager, outputFiles);
-            InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
+            InitWindowOpticalCalculations(dataWindowComplexManager, dataWindowManager, ioFiles);
+            InitDaylightingDevices(ioFiles); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
-            InitSolarCalculations(); // Initialize the shadowing calculations
+            InitSolarCalculations(ioFiles); // Initialize the shadowing calculations
         }
 
         if (BeginEnvrnFlag) {
@@ -5247,7 +5257,7 @@ namespace HeatBalanceManager {
         }
 
         if (BeginSimFlag && DoWeathSim && ReportExtShadingSunlitFrac) {
-            OpenShadingFile(outputFiles);
+            OpenShadingFile(ioFiles);
         }
 
         if (BeginDayFlag) {
@@ -5260,12 +5270,12 @@ namespace HeatBalanceManager {
                 }
             }
             if (!DetailedSolarTimestepIntegration) {
-                PerformSolarCalculations(dataWindowComplexManager);
+                PerformSolarCalculations(dataWindowComplexManager, ioFiles);
             }
         }
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
-            PerformSolarCalculations(dataWindowComplexManager);
+            PerformSolarCalculations(dataWindowComplexManager, ioFiles);
         }
 
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
@@ -5273,15 +5283,15 @@ namespace HeatBalanceManager {
                 for (int TS = 1; TS <= NumOfTimeStepInHour; ++TS) {
                     static constexpr auto ShdFracFmt1(" {:02}/{:02} {:02}:{:02},");
                         if (TS == NumOfTimeStepInHour) {
-                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
+                            print(ioFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour, 0);
                         } else {
-                            print(outputFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
+                            print(ioFiles.shade, ShdFracFmt1, Month, DayOfMonth, iHour - 1, (60 / NumOfTimeStepInHour) * TS);
                         }
                     for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                         static constexpr auto ShdFracFmt2("{:10.8F},");
-                        print(outputFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
+                        print(ioFiles.shade, ShdFracFmt2, SunlitFrac(TS, iHour, SurfNum));
                     }
-                    print(outputFiles.shade, "\n");
+                    print(ioFiles.shade, "\n");
                 }
             }
         }
@@ -5488,7 +5498,7 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance(OutputFiles &outputFiles)
+    void RecKeepHeatBalance(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5508,8 +5518,6 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
         int SurfNum;
-        static bool FirstWarmupWrite(true);
-
 
         // FLOW:
 
@@ -5549,11 +5557,11 @@ namespace HeatBalanceManager {
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
                         static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {{deltaC}},Warmup Load Difference {{W}}\n"};
-                        print(outputFiles.eio, Format_732);
+                        print(ioFiles.eio, Format_732);
                         FirstWarmupWrite = false;
                     }
                     static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
-                    print(outputFiles.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
+                    print(ioFiles.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5605,8 +5613,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
-        static bool WarmupConvergenceWarning(false);
-        static bool SizingWarmupConvergenceWarning(false);
         bool ConvergenceChecksFailed;
 
         // Convergence criteria for warmup days:
@@ -5742,7 +5748,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void ReportWarmupConvergence(OutputFiles &outputFiles)
+    void ReportWarmupConvergence(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5778,7 +5784,6 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum;
-        static bool FirstWarmupWrite(true);
         Real64 AverageZoneTemp;
         Real64 AverageZoneLoad;
         Real64 StdDevZoneTemp;
@@ -5795,9 +5800,9 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
-            if (FirstWarmupWrite && NumOfZones > 0) {
-                print(outputFiles.eio, Format_730);
-                FirstWarmupWrite = false;
+            if (ReportWarmupConvergenceFirstWarmupWrite && NumOfZones > 0) {
+                print(ioFiles.eio, Format_730);
+                ReportWarmupConvergenceFirstWarmupWrite = false;
             }
 
             TempZoneRptStdDev = 0.0;
@@ -5829,7 +5834,7 @@ namespace HeatBalanceManager {
                 StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
 
                 static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_731,
                       Zone(ZoneNum).Name,
                       EnvHeader + ' ' + EnvironmentName,
@@ -5868,7 +5873,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
+    void ReportHeatBalance(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5918,13 +5923,13 @@ namespace HeatBalanceManager {
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     static constexpr auto EndOfHeaderString("End of Data Dictionary"); // End of data dictionary marker
-                    print(outputFiles.eso, "{}\n", EndOfHeaderString);
-                    print(outputFiles.mtr, "{}\n", EndOfHeaderString);
+                    print(ioFiles.eso, "{}\n", EndOfHeaderString);
+                    print(ioFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
-                    print(outputFiles.eso,
+                    print(ioFiles.eso,
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -5933,7 +5938,7 @@ namespace HeatBalanceManager {
                           TimeZoneNumber,
                           Elevation);
 
-                    print(outputFiles.mtr,
+                    print(ioFiles.mtr,
                           EnvironmentStampFormatStr,
                           "1",
                           "Warmup {" + cWarmupDay + "} " + EnvironmentName,
@@ -5965,7 +5970,7 @@ namespace HeatBalanceManager {
 
     //        End of Reporting subroutines for the HB Module
 
-    void OpenShadingFile(OutputFiles &outputFiles)
+    void OpenShadingFile(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5983,12 +5988,17 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
+<<<<<<< HEAD
         outputFiles.shade.ensure_open("OpenOutputFiles", outputFiles.outputControl.extshd);
         print(outputFiles.shade, "Surface Name,");
+=======
+        ioFiles.shade.ensure_open("OpenOutputFiles");
+        print(ioFiles.shade, "Surface Name,");
+>>>>>>> origin/develop
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            print(outputFiles.shade, "{},", Surface(SurfNum).Name);
+            print(ioFiles.shade, "{},", Surface(SurfNum).Name);
         }
-        print(outputFiles.shade, "()\n");
+        print(ioFiles.shade, "()\n");
     }
     void GetFrameAndDividerData(bool &ErrorsFound) // set to true if errors found in input
     {
@@ -6107,7 +6117,8 @@ namespace HeatBalanceManager {
         }
     }
 
-    void SearchWindow5DataFile(std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
+    void SearchWindow5DataFile(IOFiles &ioFiles,
+                               std::string const &DesiredFileName,         // File name that contains the Window5 constructions.
                                std::string const &DesiredConstructionName, // Name that will be searched for in the Window5 data file
                                bool &ConstructionFound,                    // True if DesiredConstructionName is in the Window5 data file
                                bool &EOFonFile,                            // True if EOF during file read
@@ -6149,9 +6160,7 @@ namespace HeatBalanceManager {
         // Using/Aliasing
         using namespace DataStringGlobals;
         using DataSystemVariables::CheckForActualFileName;
-        using DataSystemVariables::GoodIOStatValue;
         using DataSystemVariables::iUnicode_end;
-        using DataSystemVariables::TempFullFileName;
         using General::POLYF; // POLYF       ! Polynomial in cosine of angle of incidence
         using General::TrimSigDigits;
 
@@ -6159,17 +6168,14 @@ namespace HeatBalanceManager {
         static Array1D_string const NumName(5, {"1", "2", "3", "4", "5"});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int W5DataFileNum;
         int FileLineCount;            // counter for number of lines read (used in some error messages)
         Array1D_string DataLine(100); // Array of data lines
-        std::string NextLine;         // Line of data
         std::string WindowNameInW5DataFile;
         std::string W5Name;
         Array1D_string GasName(3);      // Gas name from data file
         std::string LayerName;          // Layer name from data file
         std::string MullionOrientation; // Horizontal, vertical or none
         int LineNum;
-        int ReadStat;                       // File read status
         Array1D_int NGlass(2);              // Number of glass layers in glazing system
         Array2D_int NumGases(4, 2);         // Number of gases in each gap of a glazing system
         Array2D_int MaterNumSysGlass(5, 2); // Material numbers for glazing system / glass combinations
@@ -6246,7 +6252,7 @@ namespace HeatBalanceManager {
         // ErrorsFound = .FALSE.
         EOFonFile = false;
 
-        CheckForActualFileName(OutputFiles::getSingleton(), DesiredFileName, exists, TempFullFileName);
+        CheckForActualFileName(ioFiles, DesiredFileName, exists, ioFiles.TempFullFileName.fileName);
         // INQUIRE(FILE=TRIM(DesiredFileName), EXIST=exists)
         if (!exists) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Could not locate Window5 Data File, expecting it as file name=" +
@@ -6256,47 +6262,35 @@ namespace HeatBalanceManager {
             ShowFatalError("Program terminates due to these conditions.");
         }
 
-        W5DataFileNum = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("read");
-            ObjexxFCL::gio::open(W5DataFileNum, TempFullFileName, flags);
-            if (flags.err()) goto Label999;
-        }
-        ObjexxFCL::gio::read(W5DataFileNum, fmtA) >> NextLine;
-        endcol = len(NextLine);
+        auto W5DataFile = ioFiles.TempFullFileName.open("SearchWindow5DataFile");
+        auto NextLine = W5DataFile.readLine();
+        endcol = len(NextLine.data);
         if (endcol > 0) {
-            if (int(NextLine[endcol - 1]) == iUnicode_end) {
+            if (int(NextLine.data[endcol - 1]) == iUnicode_end) {
                 ShowSevereError("SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName +
                                 " fiile, appears to be a Unicode or binary file.");
                 ShowContinueError("...This file cannot be read by this program. Please save as PC or Unix file and try again");
                 ShowFatalError("Program terminates due to previous condition.");
             }
         }
-
-        ObjexxFCL::gio::rewind(W5DataFileNum);
+        W5DataFile.rewind();
         FileLineCount = 0;
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-            ReadStat = flags.ios();
-        }
-        if (ReadStat < GoodIOStatValue) goto Label1000;
+        NextLine = W5DataFile.readLine();
+        int ReadStat = 0;
+        if (NextLine.eof) goto Label1000;
         ++FileLineCount;
-        if (!has_prefixi(NextLine, "WINDOW5")) {
+        if (!has_prefixi(NextLine.data, "WINDOW5")) {
             ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName);
-            ShowFatalError("Error reading Window5 Data File: first word of window entry is \"" + NextLine.substr(0, 7) + "\", should be Window5.");
+            ShowFatalError("Error reading Window5 Data File: first word of window entry is \"" + NextLine.data.substr(0, 7) + "\", should be Window5.");
         }
+
 
     Label10:;
         for (LineNum = 2; LineNum <= 5; ++LineNum) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
+            DataLine(LineNum) = NextLine.data;
             ++FileLineCount;
         }
 
@@ -6306,14 +6300,10 @@ namespace HeatBalanceManager {
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found
         Label20:;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            if (!has_prefixi(NextLine, "WINDOW5")) goto Label20;
+            if (!has_prefixi(NextLine.data, "WINDOW5")) goto Label20;
             // Beginning of next window entry found
             goto Label10;
         } else {
@@ -6323,43 +6313,31 @@ namespace HeatBalanceManager {
             // Create Material:WindowGlass, Material:WindowGas, Construction
             // and WindowFrameAndDividerObjects for this window
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            ObjexxFCL::gio::read(NextLine.substr(19), "*") >> NGlSys;
+            ObjexxFCL::gio::read(NextLine.data.substr(19), "*") >> NGlSys;
             if (NGlSys <= 0 || NGlSys > 2) {
                 ShowFatalError("Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " +
                                TrimSigDigits(NGlSys) + " glazing systems; only 1 or 2 are allowed.");
             }
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >>
+                    ObjexxFCL::gio::read(NextLine.data.substr(19), "*", flags) >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >>
                         UValCenter(IGlSys) >> SCCenter(IGlSys) >> SHGCCenter(IGlSys) >> TVisCenter(IGlSys);
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of glazing system values. For glazing system=" +
                                     TrimSigDigits(IGlSys));
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 }
                 if (WinHeight(IGlSys) == 0.0 || WinWidth(IGlSys) == 0.0) {
@@ -6395,12 +6373,9 @@ namespace HeatBalanceManager {
                 WinWidth(IGlSys) *= 0.001;
             }
             for (LineNum = 1; LineNum <= 11; ++LineNum) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(LineNum);
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat == -1) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
+                DataLine(LineNum) = NextLine.data;
             }
 
             // Mullion width and orientation
@@ -6481,26 +6456,18 @@ namespace HeatBalanceManager {
             FrameProjectionIn *= 0.001;
             FileLineCount += 11;
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
 
             // Divider data for each glazing system
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.substr(19), "*", flags) >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
+                    ObjexxFCL::gio::read(NextLine.data.substr(19), "*", flags) >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
                         DividerProjectionIn(IGlSys) >> DividerConductance(IGlSys) >> DivEdgeToCenterGlCondRatio(IGlSys) >> DividerSolAbsorp(IGlSys) >>
                         DividerVisAbsorp(IGlSys) >> DividerEmis(IGlSys) >> DividerType(IGlSys) >> HorDividers(IGlSys) >> VertDividers(IGlSys);
                     ReadStat = flags.ios();
@@ -6508,7 +6475,7 @@ namespace HeatBalanceManager {
                 if (ReadStat != 0) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of divider data values. For Glazing System=" +
                                     TrimSigDigits(IGlSys));
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 }
                 uppercase(DividerType(IGlSys));
@@ -6643,12 +6610,8 @@ namespace HeatBalanceManager {
             }
 
             // Glass objects
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             MaterNum = TotMaterialsPrev;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
@@ -6656,13 +6619,9 @@ namespace HeatBalanceManager {
                     ++MaterNum;
                     MaterNumSysGlass(IGlass, IGlSys) = MaterNum;
                     dataMaterial.Material(MaterNum).Group = WindowGlass;
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.substr(25), "*") >> dataMaterial.Material(MaterNum).Thickness >> dataMaterial.Material(MaterNum).Conductivity >>
+                    ObjexxFCL::gio::read(NextLine.data.substr(25), "*") >> dataMaterial.Material(MaterNum).Thickness >> dataMaterial.Material(MaterNum).Conductivity >>
                         dataMaterial.Material(MaterNum).Trans >> dataMaterial.Material(MaterNum).ReflectSolBeamFront >> dataMaterial.Material(MaterNum).ReflectSolBeamBack >>
                         dataMaterial.Material(MaterNum).TransVis >> dataMaterial.Material(MaterNum).ReflectVisBeamFront >> dataMaterial.Material(MaterNum).ReflectVisBeamBack >>
                         dataMaterial.Material(MaterNum).TransThermal >> dataMaterial.Material(MaterNum).AbsorpThermalFront >> dataMaterial.Material(MaterNum).AbsorpThermalBack >> LayerName;
@@ -6679,32 +6638,24 @@ namespace HeatBalanceManager {
                     if (dataMaterial.Material(MaterNum).Thickness <= 0.0) {
                         ShowSevereError("SearchWindow5DataFile: Material=\"" + dataMaterial.Material(MaterNum).Name +
                                         "\" has thickness of 0.0.  Will be set to thickness = .001 but inaccuracies may result.");
-                        ShowContinueError("Line being read=" + NextLine);
-                        ShowContinueError("Thickness field starts at column 26=" + NextLine.substr(25));
+                        ShowContinueError("Line being read=" + NextLine.data);
+                        ShowContinueError("Thickness field starts at column 26=" + NextLine.data.substr(25));
                         dataMaterial.Material(MaterNum).Thickness = 0.001;
                     }
                 }
             }
 
             // Gap objects
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
                     ++MaterNum;
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    ObjexxFCL::gio::read(NextLine.substr(23), "*") >> dataMaterial.Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
+                    ObjexxFCL::gio::read(NextLine.data.substr(23), "*") >> dataMaterial.Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
                     if (NGlSys == 1) {
                         dataMaterial.Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
@@ -6715,12 +6666,8 @@ namespace HeatBalanceManager {
                 }
             }
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
             for (IGlSys = 1; IGlSys <= NGlSys; ++IGlSys) {
                 for (IGap = 1; IGap <= NGaps(IGlSys); ++IGap) {
@@ -6729,13 +6676,9 @@ namespace HeatBalanceManager {
                     dataMaterial.Material(MaterNum).Group = WindowGas;
                     if (NumGases(IGap, IGlSys) > 1) dataMaterial.Material(MaterNum).Group = WindowGasMixture;
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                            ReadStat = flags.ios();
-                        }
+                        NextLine = W5DataFile.readLine();
                         ++FileLineCount;
-                        ObjexxFCL::gio::read(NextLine.substr(19), "*") >> GasName(IGas) >> dataMaterial.Material(MaterNum).GasFract(IGas) >>
+                        ObjexxFCL::gio::read(NextLine.data.substr(19), "*") >> GasName(IGas) >> dataMaterial.Material(MaterNum).GasFract(IGas) >>
                             dataMaterial.Material(MaterNum).GasWght(IGas) >> dataMaterial.Material(MaterNum).GasCon(_, IGas) >> dataMaterial.Material(MaterNum).GasVis(_, IGas) >>
                             dataMaterial.Material(MaterNum).GasCp(_, IGas);
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
@@ -6754,12 +6697,8 @@ namespace HeatBalanceManager {
             NominalRforNominalUCalculation.redimension(TotConstructs);
             NominalU.redimension(TotConstructs);
 
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                ReadStat = flags.ios();
-            }
-            if (ReadStat < GoodIOStatValue) goto Label1000;
+            NextLine = W5DataFile.readLine();
+            if (NextLine.eof) goto Label1000;
             ++FileLineCount;
 
             // Pre-calculate constants
@@ -6855,73 +6794,54 @@ namespace HeatBalanceManager {
 
                 // Fill Construct with system transmission, reflection and absorption properties
 
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 if (IGlSys == 1) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
-                    if (ReadStat < GoodIOStatValue) goto Label1000;
+                    NextLine = W5DataFile.readLine();
+                    if (NextLine.eof) goto Label1000;
                     ++FileLineCount;
                 }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                    ReadStat = flags.ios();
-                }
-                if (ReadStat < GoodIOStatValue) goto Label1000;
+                NextLine = W5DataFile.readLine();
+                if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
                 {
                     IOFlags flags;
-                    ObjexxFCL::gio::read(NextLine.substr(5), "*", flags) >> Tsol;
+                    ObjexxFCL::gio::read(NextLine.data.substr(5), "*", flags) >> Tsol;
                     ReadStat = flags.ios();
                 }
                 if (ReadStat != 0) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of TSol values.");
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 } else if (any_lt(Tsol, 0.0) || any_gt(Tsol, 1.0)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of TSol values. (out of range [0,1])");
-                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                    ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
                 }
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> NextLine;
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
                     ++FileLineCount;
                     {
                         IOFlags flags;
-                        ObjexxFCL::gio::read(NextLine.substr(5), "*", flags) >> AbsSol(_, IGlass);
+                        ObjexxFCL::gio::read(NextLine.data.substr(5), "*", flags) >> AbsSol(_, IGlass);
                         ReadStat = flags.ios();
                     }
                     if (ReadStat != 0) {
                         ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. For Glass=" +
                                         TrimSigDigits(IGlass));
-                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                         ErrorsFound = true;
                     } else if (any_lt(AbsSol(_, IGlass), 0.0) || any_gt(AbsSol(_, IGlass), 1.0)) {
                         ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. (out of range [0,1]) For Glass=" +
                                         TrimSigDigits(IGlass));
-                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.substr(0, 100));
+                        ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                         ErrorsFound = true;
                     }
                 }
                 for (ILine = 1; ILine <= 5; ++ILine) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(W5DataFileNum, fmtA, flags) >> DataLine(ILine);
-                        ReadStat = flags.ios();
-                    }
+                    NextLine = W5DataFile.readLine();
+                    DataLine(ILine) = NextLine.data;
                 }
                 {
                     IOFlags flags;
@@ -7118,16 +7038,10 @@ namespace HeatBalanceManager {
             }
         }
 
-        ObjexxFCL::gio::close(W5DataFileNum);
-        return;
-
-    Label999:;
-        ShowFatalError("HeatBalanceManager: SearchWindow5DataFile: Could not open Window5 Data File, expecting it as file name=" + DesiredFileName);
         return;
 
     Label1000:;
         EOFonFile = true;
-        ObjexxFCL::gio::close(W5DataFileNum);
     }
 
     void SetStormWindowControl()
@@ -7994,7 +7908,7 @@ namespace HeatBalanceManager {
         static Real64 Ros(0.0);            // theraml resistance of exterior film coefficient under summer conditions (m2-K/W)
         static Real64 InflowFraction(0.0); // inward flowing fraction for SHGC, intermediate value non dimensional
         static Real64 SolarAbsorb(0.0);    // solar aborptance
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         static Real64 TsolLowSide(0.0);      // intermediate solar transmission for interpolating
         static Real64 TsolHiSide(0.0);       // intermediate solar transmission for interpolating
         static Real64 DeltaSHGCandTsol(0.0); // intermediate difference
@@ -9329,31 +9243,31 @@ namespace HeatBalanceManager {
         if (ErrorsFound) ShowFatalError("Error in complex fenestration input.");
     }
 
-    void InitConductionTransferFunctions(OutputFiles &outputFiles)
+    void InitConductionTransferFunctions(IOFiles &ioFiles)
     {
-        static bool ErrorsFound(false); // Flag for input error condition
+        bool ErrorsFound(false); // Flag for input error condition
         bool DoCTFErrorReport(false);
         for (auto & construction : dataConstruction.Construct) {
             construction.calculateTransferFunction(ErrorsFound, DoCTFErrorReport);
         }
 
-        bool DoReport;
-        General::ScanForReports("Constructions", DoReport, "Constructions");
-        if (DoReport || DoCTFErrorReport) {
-            print(outputFiles.eio,
+        bool InitCTFDoReport;
+        General::ScanForReports("Constructions", InitCTFDoReport, "Constructions");
+        if (InitCTFDoReport || DoCTFErrorReport) {
+            print(ioFiles.eio,
                   "! <Construction CTF>,Construction Name,Index,#Layers,#CTFs,Time Step {{hours}},ThermalConductance "
                   "{{w/m2-K}},OuterThermalAbsorptance,InnerThermalAbsorptance,OuterSolarAbsorptance,InnerSolarAbsorptance,Roughness\n");
-            print(outputFiles.eio,
+            print(ioFiles.eio,
                   "! <Material CTF Summary>,Material Name,Thickness {{m}},Conductivity {{w/m-K}},Density {{kg/m3}},Specific Heat "
                   "{{J/kg-K}},ThermalResistance {{m2-K/w}}\n");
-            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
-            print(outputFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
+            print(ioFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+            print(ioFiles.eio, "! <CTF>,Time,Outside,Cross,Inside,Flux (except final one)\n");
 
             int cCounter = 0; // just used to keep construction index in output report
             for (auto & construction : dataConstruction.Construct) {
                 cCounter++;
                 if (!construction.IsUsedCTF) continue;
-                construction.reportTransferFunction(outputFiles, cCounter);
+                construction.reportTransferFunction(ioFiles, cCounter);
             }
         }
 

@@ -228,7 +228,7 @@ namespace ResultsFramework {
         json getVariablesJSON();
         json getJSON() const;
 
-        void writeReport(bool outputJSON, bool outputCBOR, bool outputMsgPack);
+        void writeReport(JsonOutputStreams &jsonOutputStreams, bool outputJSON, bool outputCBOR, bool outputMsgPack);
 
     protected:
         bool IDataFrameEnabled = false;
@@ -385,6 +385,7 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
+<<<<<<< HEAD:src/EnergyPlus/ResultsFramework.hh
         void writeOutputs();
 
         void addReportVariable(std::string const &keyedValue,
@@ -395,6 +396,10 @@ namespace ResultsFramework {
         void addReportMeter(std::string const &meter,
                             std::string const &units,
                             OutputProcessor::ReportingFrequency const reportingInterval);
+=======
+        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
+        void WriteReport(JsonOutputStreams &jsonOutputStreams);
+>>>>>>> origin/develop:src/EnergyPlus/ResultsSchema.hh
 
         SimInfo SimulationInformation;
 

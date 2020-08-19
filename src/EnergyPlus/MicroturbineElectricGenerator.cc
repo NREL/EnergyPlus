@@ -101,6 +101,12 @@ namespace MicroturbineElectricGenerator {
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
+    void clear_state() {
+        NumMTGenerators = 0;
+        GetMTInput = true;
+        MTGenerator.clear();
+    }
+
     PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
         // Process the input data for generator if it hasn't been done already

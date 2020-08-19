@@ -45,21 +45,144 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 #include "DataStringGlobals.hh"
+#include "FileSystem.hh"
 #include "UtilityRoutines.hh"
 #include "InputProcessing/InputProcessor.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
 
+<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
 #include "nlohmann/json.hpp"
 #include <ObjexxFCL/gio.hh>
+=======
+>>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 #include <fmt/format.h>
 #include <stdexcept>
 
 namespace EnergyPlus {
 
+<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
 OutputFile &OutputFile::ensure_open(const std::string &caller, bool output_to_file)
+=======
+InputFile &InputFile::ensure_open(const std::string &caller)
+{
+    if (!good()) {
+        open();
+    }
+    if (!good()) {
+        ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
+    }
+    return *this;
+}
+
+bool InputFile::good() const noexcept
+{
+    if (is) {
+        return is->good();
+    } else {
+        return false;
+    }
+}
+
+void InputFile::close()
+{
+    is.reset();
+}
+
+InputFile::ReadResult<std::string> InputFile::readLine() noexcept
+{
+    if (is) {
+        std::string line;
+        std::getline(*is, line);
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+        return {std::move(line), is->eof(), is->good()};
+    } else {
+        return {"", true, false};
+    }
+}
+
+InputFile::InputFile(std::string FileName) : fileName(std::move(FileName))
+{
+}
+
+std::ostream::pos_type InputFile::position() const noexcept
+{
+    return is->tellg();
+}
+
+void InputFile::open()
+{
+    is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
+    is->imbue(std::locale("C"));
+}
+
+std::string InputFile::error_state_to_string() const
+{
+    const auto state = rdstate();
+
+    if (!is_open()) {
+        return "file not opened'";
+    }
+
+    if (state == std::ios_base::failbit) {
+        return "io operation failed";
+    } else if (state == std::ios_base::badbit) {
+        return "irrecoverable stream error";
+    } else if (state == std::ios_base::eofbit) {
+        return "end of file reached";
+    } else {
+        return "no error";
+    }
+}
+
+std::istream::iostate InputFile::rdstate() const noexcept
+{
+    if (is) {
+        return is->rdstate();
+    } else {
+        return std::ios_base::badbit;
+    }
+}
+
+bool InputFile::is_open() const noexcept
+{
+    if (is) {
+        auto *ss = dynamic_cast<std::ifstream *>(is.get());
+        if (ss) {
+            return ss->is_open();
+        } else {
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
+void InputFile::backspace() noexcept
+{
+    if (is) {
+        is->clear();
+        std::streamoff g1(is->tellg()); // Current position
+        is->seekg(0, std::ios::beg);    // Beginning of file
+        std::streampos const g0(is->tellg());
+        is->seekg(g1, std::ios::beg); // Restore position
+        if (g1 > g0) --g1;
+        while (g1 > g0) {
+            is->seekg(--g1, std::ios::beg); // Backup by 1
+            if (is->peek() == '\n') {       // Found end of previous record
+                is->seekg(++g1, std::ios::beg);
+                break;
+            }
+        }
+    }
+}
+
+InputOutputFile &InputOutputFile::ensure_open(const std::string &caller)
+>>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 {
     if (!good()) {
         open(output_to_file);
@@ -70,7 +193,7 @@ OutputFile &OutputFile::ensure_open(const std::string &caller, bool output_to_fi
     return *this;
 }
 
-bool OutputFile::good() const
+bool InputOutputFile::good() const
 {
     if (print_to_dev_null && os->bad()) { // badbit is set
         return true;
@@ -81,32 +204,32 @@ bool OutputFile::good() const
     }
 }
 
-void OutputFile::close()
+void InputOutputFile::close()
 {
     os.reset();
 }
 
-void OutputFile::del()
+void InputOutputFile::del()
 {
     if (os) {
         os.reset();
-        std::remove(fileName.c_str());
+        FileSystem::removeFile(fileName);
     }
 }
 
-void OutputFile::open_as_stringstream()
+void InputOutputFile::open_as_stringstream()
 {
     os = std::unique_ptr<std::iostream>(new std::stringstream());
 }
 
-void OutputFile::flush()
+void InputOutputFile::flush()
 {
     if (os) {
         os->flush();
     }
 }
 
-std::string OutputFile::get_output()
+std::string InputOutputFile::get_output()
 {
     auto *ss = dynamic_cast<std::stringstream *>(os.get());
     if (ss) {
@@ -116,16 +239,22 @@ std::string OutputFile::get_output()
     }
 }
 
-OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
+InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout) 
+  : fileName{std::move(FileName)},
+    defaultToStdOut{DefaultToStdout}
 {
 }
 
-std::ostream::pos_type OutputFile::position() const noexcept
+std::ostream::pos_type InputOutputFile::position() const noexcept
 {
     return os->tellg();
 }
 
+<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
 void OutputFile::open(const bool forAppend, bool output_to_file)
+=======
+void InputOutputFile::open(const bool forAppend)
+>>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 {
     auto appendMode = [=]() {
         if (forAppend) {
@@ -134,6 +263,7 @@ void OutputFile::open(const bool forAppend, bool output_to_file)
             return std::ios_base::trunc;
         }
     }();
+<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
     if (!output_to_file) {
         os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
         print_to_dev_null = true;
@@ -141,9 +271,14 @@ void OutputFile::open(const bool forAppend, bool output_to_file)
         os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
         print_to_dev_null = false;
     }
+=======
+
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+    os->imbue(std::locale("C"));
+>>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 }
 
-std::vector<std::string> OutputFile::getLines()
+std::vector<std::string> InputOutputFile::getLines()
 {
     if (os) {
         // avoid saving and reloading the file by simply reading the current input stream
@@ -165,6 +300,7 @@ std::vector<std::string> OutputFile::getLines()
     return std::vector<std::string>();
 }
 
+<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
 void OutputFiles::OutputControl::getInput()
 {
     auto const instances = inputProcessor->epJSON.find("Output:Control");
@@ -325,6 +461,9 @@ int OutputFiles::open_gio(std::string const& filename, std::string const & heade
 }
 
 OutputFiles &OutputFiles::getSingleton()
+=======
+IOFiles &IOFiles::getSingleton()
+>>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 {
     assert(getSingletonInternal() != nullptr);
     if (getSingletonInternal() == nullptr) {
@@ -333,14 +472,14 @@ OutputFiles &OutputFiles::getSingleton()
     return *getSingletonInternal();
 }
 
-void OutputFiles::setSingleton(OutputFiles *newSingleton) noexcept
+void IOFiles::setSingleton(IOFiles *newSingleton) noexcept
 {
     getSingletonInternal() = newSingleton;
 }
 
-OutputFiles *&OutputFiles::getSingletonInternal()
+IOFiles *&IOFiles::getSingletonInternal()
 {
-    static OutputFiles *singleton{nullptr};
+    static IOFiles *singleton{nullptr};
     return singleton;
 }
 
