@@ -163,13 +163,13 @@ public:
     void preRequestRealVariable(std::string const &varName, std::string const &key, Real64 initialValue = 0.0, bool meterType = false)
     {
         this->realVariablePlaceholders.emplace_back(varName, key, initialValue, meterType);
-        requestVariable(varName.c_str(), key.c_str());
+        requestVariable((void*)&this->state, varName.c_str(), key.c_str());
     }
 
     void preRequestIntegerVariable(std::string const &varName, std::string const &key, int initialValue = 0)
     {
         this->intVariablePlaceholders.emplace_back(varName, key, initialValue);
-        requestVariable(varName.c_str(), key.c_str());
+        requestVariable((void*)&this->state, varName.c_str(), key.c_str());
     }
 
     void setupVariablesOnceAllAreRequested()
@@ -260,7 +260,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     ASSERT_TRUE(process_idf(idf_objects, false)); // this had to be here or I was getting a strange segfault during a JSON string dtor
 
     // first off, the function should return, even if there isn't anything meaningful in it (it will have headers)
-    char * charCsvDataEmpty = listAllAPIDataCSV();
+    char * charCsvDataEmpty = listAllAPIDataCSV((void*)&this->state);
     std::string strCsvDataEmpty = std::string(charCsvDataEmpty);
     free(charCsvDataEmpty); // free the char*
 
@@ -274,7 +274,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     this->setupInternalVariablesOnceAllAreRequested();
     this->addPluginGlobal("Plugin_Global_Var_Name");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
-    char * charCsvDataFull = listAllAPIDataCSV();
+    char * charCsvDataFull = listAllAPIDataCSV((void*)&this->state);
     std::string csvData = std::string(charCsvDataFull);
     free(charCsvDataFull); // free the char*
     std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
@@ -295,7 +295,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestApiDataFullyReady)
 {
     // basically, the data should not be ready at the beginning of a unit test -- ever, so just check that for now
-    EXPECT_EQ(1, apiDataFullyReady()); // 1 is false
+    EXPECT_EQ(1, apiDataFullyReady((void*)&this->state)); // 1 is false
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTypes)
@@ -303,8 +303,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTy
     this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1");
     this->preRequestRealVariable("Zone Mean Temperature", "Zone 1");
     this->setupVariablesOnceAllAreRequested();
-    int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
-    int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
+    int hChillerHT = getVariableHandle((void*)&this->state, "Chiller Heat Transfer", "Chiller 1");
+    int hZoneTemp = getVariableHandle((void*)&this->state, "Zone Mean Temperature", "Zone 1");
     EXPECT_GT(hChillerHT, -1);
     EXPECT_GT(hZoneTemp, -1);
 }
@@ -314,8 +314,8 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesIntege
     this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 1");
     this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 2");
     this->setupVariablesOnceAllAreRequested();
-    int hChillerMode1 = getVariableHandle("Chiller Operating Mode", "Chiller 1");
-    int hChillerMode2 = getVariableHandle("Chiller Operating Mode", "Chiller 2");
+    int hChillerMode1 = getVariableHandle((void*)&this->state, "Chiller Operating Mode", "Chiller 1");
+    int hChillerMode2 = getVariableHandle((void*)&this->state, "Chiller Operating Mode", "Chiller 2");
     EXPECT_GT(hChillerMode1, -1);
     EXPECT_GT(hChillerMode2, -1);
 }
@@ -328,15 +328,15 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesMixedT
     this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 1");
     this->setupVariablesOnceAllAreRequested();
     // Then try to get their handles
-    int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
-    int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
-    int hChillerMode = getVariableHandle("Chiller Operating Mode", "Chiller 1");
+    int hChillerHT = getVariableHandle((void*)&this->state, "Chiller Heat Transfer", "Chiller 1");
+    int hZoneTemp = getVariableHandle((void*)&this->state, "Zone Mean Temperature", "Zone 1");
+    int hChillerMode = getVariableHandle((void*)&this->state, "Chiller Operating Mode", "Chiller 1");
     EXPECT_GT(hChillerHT, -1);
     EXPECT_GT(hZoneTemp, -1);
     EXPECT_GT(hChillerMode, -1);
     // now try to get handles to variables that doesn't exist
-    int hChiller2HT = getVariableHandle("Chiller Heat Transfer", "Chiller 2");
-    int hZone2Temp = getVariableHandle("Zone Mean Radiant Temperature", "Zone 1");
+    int hChiller2HT = getVariableHandle((void*)&this->state, "Chiller Heat Transfer", "Chiller 2");
+    int hZone2Temp = getVariableHandle((void*)&this->state, "Zone Mean Radiant Temperature", "Zone 1");
     EXPECT_EQ(-1, hChiller2HT);
     EXPECT_EQ(-1, hZone2Temp);
 }
@@ -346,24 +346,24 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableValuesRealTyp
     this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1", 3.14);
     this->preRequestRealVariable("Zone Mean Temperature", "Zone 1", 2.718);
     this->setupVariablesOnceAllAreRequested();
-    int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
-    int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
+    int hChillerHT = getVariableHandle((void*)&this->state, "Chiller Heat Transfer", "Chiller 1");
+    int hZoneTemp = getVariableHandle((void*)&this->state, "Zone Mean Temperature", "Zone 1");
 
     // pretend like E+ ran a time step
     this->simulateTimeStepAndReport();
 
     // get the values for valid handles
-    Real64 curHeatTransfer = getVariableValue(hChillerHT);
-    Real64 curZoneTemp = getVariableValue(hZoneTemp);
+    Real64 curHeatTransfer = getVariableValue((void*)&this->state, hChillerHT);
+    Real64 curZoneTemp = getVariableValue((void*)&this->state, hZoneTemp);
     EXPECT_NEAR(3.14, curHeatTransfer, 0.0001);
     EXPECT_NEAR(2.718, curZoneTemp, 0.0001);
 
     // now test invalid handles
-    getVariableValue(-1);
-    EXPECT_EQ(1,apiErrorFlag());
-    resetErrorFlag();
-    getVariableValue(3);
-    EXPECT_EQ(1,apiErrorFlag());
+    getVariableValue((void*)&this->state, -1);
+    EXPECT_EQ(1,apiErrorFlag((void*)&this->state));
+    resetErrorFlag((void*)&this->state);
+    getVariableValue((void*)&this->state, 3);
+    EXPECT_EQ(1,apiErrorFlag((void*)&this->state));
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterHandles)
@@ -371,10 +371,10 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterHandles)
     this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true);
     this->setupVariablesOnceAllAreRequested();
     // Then try to get the meter handle
-    int hFacilityElectricity = getMeterHandle("Electricity:Facility");
+    int hFacilityElectricity = getMeterHandle((void*)&this->state, "Electricity:Facility");
     EXPECT_GT(hFacilityElectricity, -1);
     // now try to get handles to meters that doesn't exist
-    int hDummyMeter = getMeterHandle("EnergySomething");
+    int hDummyMeter = getMeterHandle((void*)&this->state, "EnergySomething");
     EXPECT_EQ(-1, hDummyMeter);
 }
 
@@ -382,21 +382,21 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
 {
     this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true);
     this->setupVariablesOnceAllAreRequested();
-    int hFacilityElectricity = getMeterHandle("Electricity:Facility");
+    int hFacilityElectricity = getMeterHandle((void*)&this->state, "Electricity:Facility");
     EXPECT_GT(hFacilityElectricity, -1);
     // pretend like E+ ran a time step
     this->simulateTimeStepAndReport();
     // get the value for a valid meter
-    Real64 curFacilityElectricity = getMeterValue(hFacilityElectricity);
+    Real64 curFacilityElectricity = getMeterValue((void*)&this->state, hFacilityElectricity);
     EXPECT_NEAR(3.14, curFacilityElectricity, 0.001);
     // TODO: Figure out how to get accrued meter value and test that here
 
     // test invalid handles
-    getMeterValue(-1);
-    EXPECT_EQ(1, apiErrorFlag());
-    resetErrorFlag();
-    getMeterValue(5);
-    EXPECT_EQ(1, apiErrorFlag());
+    getMeterValue((void*)&this->state, -1);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
+    resetErrorFlag((void*)&this->state);
+    getMeterValue((void*)&this->state, 5);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
@@ -405,9 +405,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
     this->preRequestActuator("Chiller", "Max Flow", "Chiller 2", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
+    int hActuator = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
-    int hActuator2 = getActuatorHandle("Chiller", "Max Flow", "Chiller 2");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 2");
     EXPECT_GT(hActuator2, -1);
     EXPECT_NE(hActuator, hActuator2);
 }
@@ -418,9 +418,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetIntActuatorHandles)
     this->preRequestActuator("Chiller", "Max Flow", "Chiller 2", ActuatorType::INTEGER);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
+    int hActuator = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
-    int hActuator2 = getActuatorHandle("Chiller", "Max Flow", "Chiller 2");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 2");
     EXPECT_GT(hActuator2, -1);
     EXPECT_NE(hActuator, hActuator2);
 }
@@ -431,9 +431,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBoolActuatorHandles)
     this->preRequestActuator("Chiller", "Max Flow", "Chiller 2", ActuatorType::BOOL);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
+    int hActuator = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
-    int hActuator2 = getActuatorHandle("Chiller", "Max Flow", "Chiller 2");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 2");
     EXPECT_GT(hActuator2, -1);
     EXPECT_NE(hActuator, hActuator2);
 }
@@ -445,11 +445,11 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMixedActuatorHandles)
     this->preRequestActuator("Chiller", "Max Flow", "Chiller 3", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
+    int hActuator = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
-    int hActuator2 = getActuatorHandle("Chiller", "Max Flow", "Chiller 2");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 2");
     EXPECT_GT(hActuator2, -1);
-    int hActuator3 = getActuatorHandle("Chiller", "Max Flow", "Chiller 3");
+    int hActuator3 = getActuatorHandle((void*)&this->state, "Chiller", "Max Flow", "Chiller 3");
     EXPECT_GT(hActuator2, -1);
     // cross check
     EXPECT_NE(hActuator, hActuator2);
@@ -462,19 +462,19 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBadActuatorHandles)
     this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle("Chiller:Electric", "Max Flow Rate", "Chiller 1");
+    int hActuator = getActuatorHandle((void*)&this->state, "Chiller:Electric", "Max Flow Rate", "Chiller 1");
     EXPECT_GT(hActuator, -1);
     // now try to get handles to invalid actuators
     {
-        int hActuatorBad = getActuatorHandle("Chiller:Electric", "Max Flow Rate", "InvalidInstance");
+        int hActuatorBad = getActuatorHandle((void*)&this->state, "Chiller:Electric", "Max Flow Rate", "InvalidInstance");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
-        int hActuatorBad = getActuatorHandle("Chiller:Electric", "InvalidVar", "Chiller 1");
+        int hActuatorBad = getActuatorHandle((void*)&this->state, "Chiller:Electric", "InvalidVar", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
-        int hActuatorBad = getActuatorHandle("InvalidType", "Max Flow Rate", "Chiller 1");
+        int hActuatorBad = getActuatorHandle((void*)&this->state, "InvalidType", "Max Flow Rate", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
 }
@@ -486,26 +486,26 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetRealActuators)
     this->preRequestActuator("d", "e", "f", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator1 = getActuatorHandle("a", "b", "c");
-    int hActuator2 = getActuatorHandle("d", "e", "f");
+    int hActuator1 = getActuatorHandle((void*)&this->state, "a", "b", "c");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "d", "e", "f");
     // just for good measure here
     EXPECT_GT(hActuator1, -1);
     EXPECT_GT(hActuator2, -1);
     // now let's set the values of the actuators
-    setActuatorValue(hActuator1, 3.14);
-    setActuatorValue(hActuator2, 6.28);
+    setActuatorValue((void*)&this->state, hActuator1, 3.14);
+    setActuatorValue((void*)&this->state, hActuator2, 6.28);
     // now make sure we don't get them mixed up
-    Real64 val1 = getActuatorValue(hActuator1);
-    Real64 val2 = getActuatorValue(hActuator2);
+    Real64 val1 = getActuatorValue((void*)&this->state, hActuator1);
+    Real64 val2 = getActuatorValue((void*)&this->state, hActuator2);
     EXPECT_DOUBLE_EQ(3.14, val1);
     EXPECT_DOUBLE_EQ(6.28, val2);
 
     // invalid handles
-    getActuatorValue(-1);
-    EXPECT_EQ(1, apiErrorFlag());
-    resetErrorFlag();
-    getActuatorValue(3);
-    EXPECT_EQ(1, apiErrorFlag());
+    getActuatorValue((void*)&this->state, -1);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
+    resetErrorFlag((void*)&this->state);
+    getActuatorValue((void*)&this->state, 3);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
@@ -515,27 +515,27 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
     this->preRequestActuator("d", "e", "f", ActuatorType::INTEGER);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator1 = getActuatorHandle("a", "b", "c");
-    int hActuator2 = getActuatorHandle("d", "e", "f");
+    int hActuator1 = getActuatorHandle((void*)&this->state, "a", "b", "c");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "d", "e", "f");
     // just for good measure here
     EXPECT_GT(hActuator1, -1);
     EXPECT_GT(hActuator2, -1);
     // now let's set the values of the actuators
-    setActuatorValue(hActuator1, 3);
-    setActuatorValue(hActuator2, -6.1); // should get rounded
+    setActuatorValue((void*)&this->state, hActuator1, 3);
+    setActuatorValue((void*)&this->state, hActuator2, -6.1); // should get rounded
     // now make sure we don't get them mixed up
-    Real64 val1 = getActuatorValue(hActuator1);
-    Real64 val2 = getActuatorValue(hActuator2);
+    Real64 val1 = getActuatorValue((void*)&this->state, hActuator1);
+    Real64 val2 = getActuatorValue((void*)&this->state, hActuator2);
     EXPECT_DOUBLE_EQ(3, val1);
     EXPECT_DOUBLE_EQ(-6, val2);
 
     // invalid handles
-    getActuatorValue(-1);
+    getActuatorValue((void*)&this->state, -1);
     // but the flag should be set
-    EXPECT_EQ(1, apiErrorFlag());
-    resetErrorFlag();
-    getActuatorValue(3);
-    EXPECT_EQ(1, apiErrorFlag());
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
+    resetErrorFlag((void*)&this->state);
+    getActuatorValue((void*)&this->state, 3);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
@@ -545,26 +545,26 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
     this->preRequestActuator("d", "e", "f", ActuatorType::BOOL);
     this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator1 = getActuatorHandle("a", "b", "c");
-    int hActuator2 = getActuatorHandle("d", "e", "f");
+    int hActuator1 = getActuatorHandle((void*)&this->state, "a", "b", "c");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "d", "e", "f");
     // just for good measure here
     EXPECT_GT(hActuator1, -1);
     EXPECT_GT(hActuator2, -1);
     // now let's set the values of the actuators
-    setActuatorValue(hActuator1, 0); // false
-    setActuatorValue(hActuator2, 1); // true
+    setActuatorValue((void*)&this->state, hActuator1, 0); // false
+    setActuatorValue((void*)&this->state, hActuator2, 1); // true
     // now make sure we don't get them mixed up
-    Real64 val1 = getActuatorValue(hActuator1);
-    Real64 val2 = getActuatorValue(hActuator2);
+    Real64 val1 = getActuatorValue((void*)&this->state, hActuator1);
+    Real64 val2 = getActuatorValue((void*)&this->state, hActuator2);
     EXPECT_DOUBLE_EQ(0, val1);
     EXPECT_DOUBLE_EQ(1, val2);
 
     // invalid handles
-    getActuatorValue(-1);
-    EXPECT_EQ(1, apiErrorFlag());
-    resetErrorFlag();
-    getActuatorValue(3);
-    EXPECT_EQ(1, apiErrorFlag());
+    getActuatorValue((void*)&this->state, -1);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
+    resetErrorFlag((void*)&this->state);
+    getActuatorValue((void*)&this->state, 3);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
@@ -574,19 +574,19 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
     this->preRequestActuator("d", "e", "f", ActuatorType::INTEGER);
     this->preRequestActuator("g", "h", "i", ActuatorType::BOOL);
     this->setupActuatorsOnceAllAreRequested();
-    int hActuator1 = getActuatorHandle("a", "b", "c");
-    int hActuator2 = getActuatorHandle("d", "e", "f");
-    int hActuator3 = getActuatorHandle("g", "h", "i");
-    resetActuator(hActuator1);
-    resetActuator(hActuator2);
-    resetActuator(hActuator3);
+    int hActuator1 = getActuatorHandle((void*)&this->state, "a", "b", "c");
+    int hActuator2 = getActuatorHandle((void*)&this->state, "d", "e", "f");
+    int hActuator3 = getActuatorHandle((void*)&this->state, "g", "h", "i");
+    resetActuator((void*)&this->state, hActuator1);
+    resetActuator((void*)&this->state, hActuator2);
+    resetActuator((void*)&this->state, hActuator3);
 
     // invalid handles
-    resetActuator(-1);
-    EXPECT_EQ(1, apiErrorFlag());
-    resetErrorFlag();
-    resetActuator(8);
-    EXPECT_EQ(1, apiErrorFlag());
+    resetActuator((void*)&this->state, -1);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
+    resetErrorFlag((void*)&this->state);
+    resetActuator((void*)&this->state, 8);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestAccessingInternalVariables)
@@ -595,21 +595,21 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestAccessingInternalVariabl
     this->preRequestInternalVariable("a", "b", 1.0);
     this->preRequestInternalVariable("c", "d", 2.0);
     this->setupInternalVariablesOnceAllAreRequested();
-    int hIntVar1 = getInternalVariableHandle("a", "b");
-    int hIntVar2 = getInternalVariableHandle("c", "d");
+    int hIntVar1 = getInternalVariableHandle((void*)&this->state, "a", "b");
+    int hIntVar2 = getInternalVariableHandle((void*)&this->state, "c", "d");
     EXPECT_GT(hIntVar1, -1);
     EXPECT_GT(hIntVar2, -1);
-    Real64 val1 = getInternalVariableValue(hIntVar1);
-    Real64 val2 = getInternalVariableValue(hIntVar2);
+    Real64 val1 = getInternalVariableValue((void*)&this->state, hIntVar1);
+    Real64 val2 = getInternalVariableValue((void*)&this->state, hIntVar2);
     EXPECT_DOUBLE_EQ(1.0, val1);
     EXPECT_DOUBLE_EQ(2.0, val2);
 
     // invalid handles
-    getInternalVariableValue(-1);
-    EXPECT_EQ(1, apiErrorFlag());
-    resetErrorFlag();
-    getInternalVariableValue(3);
-    EXPECT_EQ(1, apiErrorFlag());
+    getInternalVariableValue((void*)&this->state, -1);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
+    resetErrorFlag((void*)&this->state);
+    getInternalVariableValue((void*)&this->state, 3);
+    EXPECT_EQ(1, apiErrorFlag((void*)&this->state));
 }
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
@@ -620,21 +620,21 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestMiscSimData)
     // just stabilizing the API itself.
 
     // so make calls into these functions, don't worry about testing the individual values, if something throws then this unit test will fail
-    year();
-    month();
-    dayOfMonth();
-    dayOfWeek();
-    dayOfYear();
-    daylightSavingsTimeIndicator();
-    hour();
-    currentTime();
-    minutes();
-    systemTimeStep();
-    holidayIndex();
-    sunIsUp();
-    isRaining();
-    warmupFlag();
-    kindOfSim();
-    currentEnvironmentNum();
+    year((void*)&this->state);
+    month((void*)&this->state);
+    dayOfMonth((void*)&this->state);
+    dayOfWeek((void*)&this->state);
+    dayOfYear((void*)&this->state);
+    daylightSavingsTimeIndicator((void*)&this->state);
+    hour((void*)&this->state);
+    currentTime((void*)&this->state);
+    minutes((void*)&this->state);
+    systemTimeStep((void*)&this->state);
+    holidayIndex((void*)&this->state);
+    sunIsUp((void*)&this->state);
+    isRaining((void*)&this->state);
+    warmupFlag((void*)&this->state);
+    kindOfSim((void*)&this->state);
+    currentEnvironmentNum((void*)&this->state);
     // getConstructionHandle();
 }
