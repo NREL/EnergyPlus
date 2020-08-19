@@ -736,6 +736,7 @@ SET( API_HEADERS
   api/func.h
   api/runtime.h
   api/datatransfer.h
+  api/state.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
   api/TypeDefs.h
@@ -743,6 +744,7 @@ SET( API_HEADERS
 SET( API_CORE_SRC
   api/func.cc
   api/runtime.cc
+  api/state.cc
   api/datatransfer.cc
   api/EnergyPlusPgm.cc)
 

@@ -342,7 +342,7 @@ namespace DataGlobalConstants {
             if (SELECT_CASE_var == "ELECTRICITY") {
                 ResourceTypeNum = iRT_Electricity;
 
-            } else if (SELECT_CASE_var == "NATURALGAS") {
+            } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS")) {
                 ResourceTypeNum = iRT_Natural_Gas;
 
             } else if (SELECT_CASE_var == "GASOLINE") {

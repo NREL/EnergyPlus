@@ -7493,6 +7493,134 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 }
 
 
+// Test for interior surface report
+TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
+{
+    // Allocate some needed arrays
+    DataHeatBalance::Zone.allocate(2);
+    DataHeatBalance::Zone(1).ListMultiplier = 1;
+    DataHeatBalance::Zone(2).ListMultiplier = 1;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).Name = "A Construction";
+    dataConstruction.Construct(1).OutsideAbsorpSolar = 0.4;
+
+    DataHeatBalance::NominalU.allocate(1);
+    DataHeatBalance::NominalU(1) = 0.2;
+
+    DataSurfaces::TotSurfaces = 4 ;
+    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+
+    // first surface, interzonal walls and doors
+    for (int i = 1; i <= TotSurfaces; i++){
+        DataSurfaces::Surface(i).HeatTransSurf = true;
+        DataSurfaces::Surface(i).Azimuth = 180.;
+        DataSurfaces::Surface(i).Tilt = 90.;
+        DataSurfaces::Surface(i).Construction = 1;
+        // odd number - wall, even number - door
+        if (i % 2 == 1) {
+            DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).GrossArea = 200.;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        }else{
+            DataSurfaces::Surface(i).Name = "Interzonal_Door_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
+            DataSurfaces::Surface(i).BaseSurf = i - 1;
+            DataSurfaces::Surface(i).GrossArea = 50.;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Door;
+            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        }
+        if ((i + 1) / 2 == 1) {
+            // first pair of wall and door
+            DataSurfaces::Surface(i).Zone = 1;
+            DataSurfaces::Surface(i).ExtBoundCond = i + 2;
+        }else{
+            // second pair of wall and door
+            DataSurfaces::Surface(i).Zone = 2;
+            DataSurfaces::Surface(i).ExtBoundCond = i - 2;
+        }
+    }
+    DataSurfaces::Surface(1).ExtBoundCondName = "Interzonal_Wall_2";
+    DataSurfaces::Surface(2).ExtBoundCondName = "Interzonal_Door_2";
+    DataSurfaces::Surface(3).ExtBoundCondName = "Interzonal_Wall_1";
+    DataSurfaces::Surface(4).ExtBoundCondName = "Interzonal_Door_1";
+
+    // Setup pre def tables
+    OutputReportPredefined::SetPredefinedTables();
+
+    // Call the routine that fills up the table we care about
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+
+
+    // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
+    // SubTable 'Opaque Interior' (pdstIntOpaque)
+
+    for (int i = 1; i <= TotSurfaces; i++){
+        if (i % 2 == 1){
+            
+            /****************************************************************************
+            *                            Wall (odd entries)                             *
+            *****************************************************************************/
+        
+            // Check the wall gross area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpGrArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "200.00");
+            // Check the wall net area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpNetArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "150.00");
+            // Check the wall u value
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpUfactNoFilm,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.200");
+            // Check the wall construction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpCons,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "A Construction");
+            // Check the wall reflectance
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpRefl,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.60");
+            // Check the tilt
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpTilt,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "90.00");
+            // Check the azimuth
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpAzimuth,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "180.00");
+            // Check cardinal direction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpDir,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "S");
+        }else{
+
+            /****************************************************************************
+            *                           door (even entries)                           *
+            *****************************************************************************/
+        
+            // Check the door gross area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrGrArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "50.00");
+            // Check the wall u value
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrUfactNoFilm,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.200");
+            // Check the door construction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrCons,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "A Construction");
+            // Check the door parant surface name
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrParent,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       DataSurfaces::Surface(i-1).Name);
+        }
+    }
+}
+
+
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
 
     EnergyPlus::sqlite->sqliteBegin();

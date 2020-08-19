@@ -48,29 +48,10 @@
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/InputProcessing/IdfParser.hh>
-#include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
-#include <EnergyPlus/StateManagement.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-
-EnergyPlusState stateNew() {
-    auto *state = new EnergyPlus::EnergyPlusData;
-    return reinterpret_cast<EnergyPlusState>(state);
-}
-
-void stateReset(EnergyPlusState state) {
-    auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-    EnergyPlus::clearAllStates(*this_state);
-    // also clear out the input processor since the clearAllStates does not do that.
-    EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
-}
-
-void stateDelete(EnergyPlusState state) {
-    delete reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
-}
+#include <utility>
 
 int energyplus(EnergyPlusState state, int argc, const char *argv[]) {
 //    argv[0] = "energyplus";
@@ -85,31 +66,30 @@ int energyplus(EnergyPlusState state, int argc, const char *argv[]) {
     return runEnergyPlusAsLibrary(*this_state, argc, argv);
 }
 
-void stopSimulation() {
+void stopSimulation(EnergyPlusState) {
   EnergyPlus::DataGlobals::stopSimulation = true;
 }
 
-void issueWarning(const char * message) {
+void issueWarning(EnergyPlusState, const char * message) {
     EnergyPlus::ShowWarningError(message);
 }
-void issueSevere(const char * message) {
+void issueSevere(EnergyPlusState, const char * message) {
     EnergyPlus::ShowSevereError(message);
 }
-void issueText(const char * message) {
+void issueText(EnergyPlusState, const char * message) {
     EnergyPlus::ShowContinueError(message);
 }
 
-void registerProgressCallback(EnergyPlusState EP_UNUSED(state), void (*f)(int const)) {
-    // auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {
     EnergyPlus::DataGlobals::progressCallback = f;
 }
 
-void registerStdOutCallback(EnergyPlusState EP_UNUSED(state), void (*f)(const char * message)) {
+void registerStdOutCallback(EnergyPlusState, void (*f)(const char *)) {
     EnergyPlus::DataGlobals::messageCallback = f;
 }
 
-void registerExternalHVACManager(EnergyPlusState EP_UNUSED(state), std::function<void (EnergyPlusState)> f) {
-  EnergyPlus::DataGlobals::externalHVACManager = f;
+void registerExternalHVACManager(EnergyPlusState, std::function<void (EnergyPlusState)> f) {
+  EnergyPlus::DataGlobals::externalHVACManager = std::move(f);
 }
 
 void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState)) {
