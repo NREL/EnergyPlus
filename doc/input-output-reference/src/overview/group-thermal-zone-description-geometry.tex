@@ -4945,6 +4945,8 @@ Zone,Average,Zone Mean Air Temperature [C]
 HVAC,Average,Zone Air Temperature [C]
 Zone,Average,Zone Mean Radiant Temperature [C]
 Zone,Average,Zone Operative Temperature [C]
+Zone,Average,Zone Heat Index [C]
+Zone,Average,Zone Humidity Index [C]
 HVAC,Sum,Zone Air System Sensible Heating Energy [J]
 HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
 HVAC,Average,Zone Air System Sensible Heating Rate [W]
@@ -4977,6 +4979,15 @@ The Mean Radiant Temperature (MRT) in degrees Celsius of a space is really the m
 \subsubsection{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c-1}
 
 Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5*MAT + 0.5*MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems.~ See also Zone Thermostat Operative Temperature.
+
+\subsubsection{Zone Heat Index {[}C{]}}\label{zone-heat-index-c-1}
+
+Zone heat index (HI) is an index that combines air temperature and relative humidity in shaded areas, to posit a human-perceived equivalent temperature, as how hot it would feel if the humidity were some other value in the shade. The HI measures the temperature feels like to the human body when relative humidity is combined with the air temperature. Zone Heat Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
+
+
+\subsubsection{Zone Humdity Index {[}C{]}}\label{zone-humidity-index-c-1}
+
+The Humdity Index (humidex) is an index number used by Canadian meteorologists to describe how hot the weather feels to the average person, by combining the effect of heat and humidity. The humidex is a nominally dimensionless quantity (though generally recognized by the public as equivalent to the degree Celsius) based on the dew-point temperature. Zone Humdity Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
 
 \subsubsection{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j-1}
 

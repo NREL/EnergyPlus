@@ -71,12 +71,15 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
@@ -291,6 +294,12 @@ namespace OutputReportTabular {
     bool displayEconomicResultSummary(false);
     bool displayHeatEmissionsSummary(false);
     bool displayEioSummary(false);
+    bool displayThermalResilienceSummary(false);
+    bool displayCO2ResilienceSummary(false);
+    bool displayVisualResilienceSummary(false);
+    bool displayThermalResilienceSummaryExplicitly(false);
+    bool displayCO2ResilienceSummaryExplicitly(false);
+    bool displayVisualResilienceSummaryExplicitly(false);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
@@ -583,6 +592,12 @@ namespace OutputReportTabular {
         displayTariffReport = false;
         displayEconomicResultSummary = false;
         displayHeatEmissionsSummary = false;
+        displayThermalResilienceSummary = false;
+        displayCO2ResilienceSummary = false;
+        displayVisualResilienceSummary = false;
+        displayThermalResilienceSummaryExplicitly = false;
+        displayCO2ResilienceSummaryExplicitly = false;
+        displayVisualResilienceSummaryExplicitly = false;
         displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
@@ -2012,7 +2027,7 @@ namespace OutputReportTabular {
             for (iReport = 1; iReport <= NumAlphas; ++iReport) {
                 nameFound = false;
                 if (AlphArray(iReport).empty()) {
-                    ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
+                    ShowFatalError("Blank report name in Output:Table:SummaryReports");
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
@@ -2077,6 +2092,21 @@ namespace OutputReportTabular {
                     displayHeatEmissionsSummary = true;
                     WriteTabularFiles = true;
                     nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ThermalResilienceSummary")) {
+                    displayThermalResilienceSummary = true;
+                    displayThermalResilienceSummaryExplicitly = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "CO2ResilienceSummary")) {
+                    displayCO2ResilienceSummary = true;
+                    displayCO2ResilienceSummaryExplicitly = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
+                } else if (UtilityRoutines::SameString(AlphArray(iReport), "VisualResilienceSummary")) {
+                    displayVisualResilienceSummary = true;
+                    displayVisualResilienceSummaryExplicitly = true;
+                    WriteTabularFiles = true;
+                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2100,6 +2130,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2120,6 +2153,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2150,6 +2186,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -2173,6 +2212,9 @@ namespace OutputReportTabular {
                     displayEioSummary = true;
                     displayLEEDSummary = true;
                     displayHeatEmissionsSummary = true;
+                    displayThermalResilienceSummary = true;
+                    displayCO2ResilienceSummary = true;
+                    displayVisualResilienceSummary = true;
                     nameFound = true;
                     for (jReport = 1; jReport <= numReportName; ++jReport) {
                         reportName(jReport).show = true;
@@ -3748,6 +3790,9 @@ namespace OutputReportTabular {
         static std::string const Adaptive_Comfort_Summary("Adaptive Comfort Summary");
         static std::string const Initialization_Summary("Initialization Summary");
         static std::string const Annual_Heat_Emissions_Summary("Annual Heat Emissions Summary");
+        static std::string const Annual_Thermal_Resilience_Summary("Annual Thermal Resilience Summary");
+        static std::string const Annual_CO2_Resilience_Summary("Annual CO2 Resilience Summary");
+        static std::string const Annual_Visual_Resilience_Summary("Annual Visual Resilience Summary");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -3819,6 +3864,18 @@ namespace OutputReportTabular {
                     tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Heat_Emissions_Summary, Entire_Facility)
                                << "\">Annual Heat Emissions Summary</a>\n";
                 }
+//                if (displayThermalResilienceSummary) {
+//                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Thermal_Resilience_Summary, Entire_Facility)
+//                               << "\">Annual Thermal Resilience Summary</a>\n";
+//                }
+//                if (displayCO2ResilienceSummary) {
+//                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_CO2_Resilience_Summary, Entire_Facility)
+//                               << "\">Annual CO2 Resilience Summary</a>\n";
+//                }
+//                if (displayVisualResilienceSummary) {
+//                    tbl_stream << "<br><a href=\"#" << MakeAnchorName(Annual_Visual_Resilience_Summary, Entire_Facility)
+//                               << "\">Annual Visual Resilience Summary</a>\n";
+//                }
                 for (kReport = 1; kReport <= numReportName; ++kReport) {
                     if (reportName(kReport).show) {
                         tbl_stream << "<br><a href=\"#" << MakeAnchorName(reportName(kReport).namewithspaces, Entire_Facility) << "\">"
@@ -5698,6 +5755,10 @@ namespace OutputReportTabular {
             WriteEioTables(state.dataCostEstimateManager, state.files);
             WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
             WriteHeatEmissionTable(state.dataCostEstimateManager);
+
+            if (displayThermalResilienceSummary) WriteThermalResilienceTables();
+            if (displayCO2ResilienceSummary) WriteCO2ResilienceTables();
+            if (displayVisualResilienceSummary) WriteVisualResilienceTables();
 
             coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables(state.dataCostEstimateManager);                                // moved to come after zone load components is finished
@@ -11186,6 +11247,193 @@ namespace OutputReportTabular {
                 ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
             }
+        }
+    }
+
+    void WriteResilienceBinsTable(int const columnNum,
+                                  std::vector<int> const &columnHead,
+                                  Array1D<std::vector<double>> const &ZoneBins)
+    {
+        std::vector<double> columnMax(columnNum, 0);
+        std::vector<double> columnMin(columnNum, 0);
+        std::vector<double> columnSum(columnNum, 0);
+        for (int j = 0; j < columnNum; j++) {
+            columnMin[j] = ZoneBins(1)[j];
+        }
+        for (int i = 1; i <= NumOfZones; ++i) {
+            std::string ZoneName = Zone(i).Name;
+            for (int j = 0; j < columnNum; j++) {
+                double curValue = ZoneBins(i)[j];
+                if (curValue > columnMax[j]) columnMax[j] = curValue;
+                if (curValue < columnMin[j]) columnMin[j] = curValue;
+                columnSum[j] += curValue;
+                PreDefTableEntry(columnHead[j], ZoneName, RealToStr(curValue, 2));
+            }
+        }
+        for (int j = 0; j < columnNum; j++) {
+            PreDefTableEntry(columnHead[j], "Min", RealToStr(columnMin[j], 2));
+            PreDefTableEntry(columnHead[j], "Max", RealToStr(columnMax[j], 2));
+            PreDefTableEntry(columnHead[j], "Average", RealToStr(columnSum[j] / NumOfZones, 2));
+            PreDefTableEntry(columnHead[j], "Sum", RealToStr(columnSum[j], 2));
+        }
+
+    }
+
+    void WriteSETHoursTable(int const columnNum,
+                            std::vector<int> const &columnHead,
+                            Array1D<std::vector<double>> const &ZoneBins)
+    {
+        std::vector<double> columnMax(columnNum - 1, 0);
+        std::vector<double> columnMin(columnNum - 1, 0);
+        std::vector<double> columnSum(columnNum - 1, 0);
+        for (int j = 0; j < columnNum - 1; j++) {
+            columnMin[j] = ZoneBins(1)[j];
+        }
+        for (int i = 1; i <= NumOfZones; ++i) {
+            for (int j = 0; j < columnNum - 1; j++) {
+                double curValue = ZoneBins(i)[j];
+                if (curValue > columnMax[j]) columnMax[j] = curValue;
+                if (curValue < columnMin[j]) columnMin[j] = curValue;
+                columnSum[j] += curValue;
+                PreDefTableEntry(columnHead[j], Zone(i).Name, RealToStr(curValue, 2));
+            }
+            std::string startDateTime = DateToString(int(ZoneBins(i)[columnNum - 1]));
+            PreDefTableEntry(columnHead[columnNum - 1], Zone(i).Name, startDateTime);
+        }
+        for (int j = 0; j < columnNum - 1; j++) {
+            PreDefTableEntry(columnHead[j], "Min", RealToStr(columnMin[j], 2));
+            PreDefTableEntry(columnHead[j], "Max", RealToStr(columnMax[j], 2));
+            PreDefTableEntry(columnHead[j], "Average", RealToStr(columnSum[j] / NumOfZones, 2));
+        }
+        PreDefTableEntry(columnHead[columnNum - 1], "Min", "-");
+        PreDefTableEntry(columnHead[columnNum - 1], "Max", "-");
+        PreDefTableEntry(columnHead[columnNum - 1], "Average", "-");
+    }
+
+    void WriteThermalResilienceTables()
+    {
+
+        // Using/Aliasing
+        using DataHeatBalFanSys::ZoneHeatIndexHourBins;
+        using DataHeatBalFanSys::ZoneHeatIndexOccuHourBins;
+        using DataHeatBalFanSys::ZoneHumidexHourBins;
+        using DataHeatBalFanSys::ZoneHumidexOccuHourBins;
+        using DataHeatBalFanSys::ZoneLowSETHours;
+        using DataHeatBalFanSys::ZoneHighSETHours;
+
+        if (NumOfZones > 0) {
+            int columnNum = 5;
+            std::vector<int> columnHead = {pdchHIHourSafe,
+                                           pdchHIHourCaution,
+                                           pdchHIHourExtremeCaution,
+                                           pdchHIHourDanger,
+                                           pdchHIHourExtremeDanger};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHeatIndexHourBins);
+
+            columnHead = {pdchHIOccuHourSafe,
+                          pdchHIOccuHourCaution,
+                          pdchHIOccuHourExtremeCaution,
+                          pdchHIOccuHourDanger,
+                          pdchHIOccuHourExtremeDanger};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHeatIndexOccuHourBins);
+
+            columnHead = {pdchHumidexHourLittle,
+                          pdchHumidexHourSome,
+                          pdchHumidexHourGreat,
+                          pdchHumidexHourDanger,
+                          pdchHumidexHourStroke};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHumidexHourBins);
+
+            columnHead = {pdchHumidexOccuHourLittle,
+                          pdchHumidexOccuHourSome,
+                          pdchHumidexOccuHourGreat,
+                          pdchHumidexOccuHourDanger,
+                          pdchHumidexOccuHourStroke };
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneHumidexOccuHourBins);
+
+            bool hasPierceSET = true;
+            if (TotPeople == 0) {
+                hasPierceSET = false;
+                if (displayThermalResilienceSummaryExplicitly) {
+                    ShowWarningError("Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                     "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                     "but no People object is defined.");
+                }
+            }
+            for (int iPeople = 1; iPeople <= TotPeople; ++iPeople) {
+                if (!People(iPeople).Pierce) {
+                    hasPierceSET = false;
+                    if (displayThermalResilienceSummaryExplicitly) {
+                        ShowWarningError( "Writing Annual Thermal Resilience Summary - SET Hours reports: "
+                                          "Zone Thermal Comfort Pierce Model Standard Effective Temperature is required, "
+                                          "but no Pierce model is defined in " + People(iPeople).Name + " object.");
+                    }
+                }
+            }
+
+            if (hasPierceSET) {
+                columnNum = 4;
+                columnHead = {pdchHeatingSETHours, pdchHeatingSETOccuHours,
+                              pdchHeatingSETUnmetDuration, pdchHeatingSETUnmetTime};
+                WriteSETHoursTable(columnNum, columnHead, ZoneLowSETHours);
+
+                columnHead = {pdchCoolingSETHours, pdchCoolingSETOccuHours,
+                              pdchCoolingSETUnmetDuration, pdchCoolingSETUnmetTime};
+                WriteSETHoursTable(columnNum, columnHead, ZoneHighSETHours);
+            }
+        }
+    }
+
+    void WriteCO2ResilienceTables()
+    {
+
+        // Using/Aliasing
+        using DataHeatBalFanSys::ZoneCO2LevelHourBins;
+        using DataHeatBalFanSys::ZoneCO2LevelOccuHourBins;
+        if (NumOfZones > 0) {
+            int columnNum = 3;
+            std::vector<int> columnHead = {pdchCO2HourSafe,
+                                           pdchCO2HourCaution,
+                                           pdchCO2HourHazard};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneCO2LevelHourBins);
+
+            columnHead = {pdchCO2OccuHourSafe,
+                          pdchCO2OccuHourCaution,
+                          pdchCO2OccuHourHazard};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneCO2LevelOccuHourBins);
+        }
+    }
+
+    void WriteVisualResilienceTables()
+    {
+
+        // Using/Aliasing
+        using DataHeatBalFanSys::ZoneLightingLevelHourBins;
+        using DataHeatBalFanSys::ZoneLightingLevelOccuHourBins;
+
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+            if (DataDaylighting::ZoneDaylight(ZoneNum).DaylightMethod == DataDaylighting::NoDaylighting) {
+                if (displayVisualResilienceSummaryExplicitly) {
+                    ShowWarningError("Writing Annual Visual Resilience Summary - Lighting Level Hours reports: "
+                                     "Zone Average Daylighting Reference Point Illuminance output is required, "
+                                     "but no Daylight Method is defined in Zone:" + Zone(ZoneNum).Name);
+                }
+            }
+        }
+
+        if (NumOfZones > 0) {
+            int columnNum = 4;
+            std::vector<int> columnHead = {pdchIllumHourDark,
+                                           pdchIllumHourDim,
+                                           pdchIllumHourAdequate,
+                                           pdchIllumHourBright};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneLightingLevelHourBins);
+
+            columnHead = {pdchIllumOccuHourDark,
+                          pdchIllumOccuHourDim,
+                          pdchIllumOccuHourAdequate,
+                          pdchIllumOccuHourBright};
+            WriteResilienceBinsTable(columnNum, columnHead, ZoneLightingLevelOccuHourBins);
         }
     }
 

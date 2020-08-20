@@ -889,6 +889,65 @@ namespace OutputReportPredefined {
     int pdchLeedSchStPt11pmWednesday;
     int pdchLeedSchStPt11pmWedCnt;
 
+    int pdrThermalResilience;
+    int pdstHIHours;
+    int pdchHIHourSafe;
+    int pdchHIHourCaution;
+    int pdchHIHourExtremeCaution;
+    int pdchHIHourDanger;
+    int pdchHIHourExtremeDanger;
+    int pdstHIOccuHours;
+    int pdchHIOccuHourSafe;
+    int pdchHIOccuHourCaution;
+    int pdchHIOccuHourExtremeCaution;
+    int pdchHIOccuHourDanger;
+    int pdchHIOccuHourExtremeDanger;
+    int pdstHumidexHours;
+    int pdchHumidexHourLittle;
+    int pdchHumidexHourSome;
+    int pdchHumidexHourGreat;
+    int pdchHumidexHourDanger;
+    int pdchHumidexHourStroke;
+    int pdstHumidexOccuHours;
+    int pdchHumidexOccuHourLittle;
+    int pdchHumidexOccuHourSome;
+    int pdchHumidexOccuHourGreat;
+    int pdchHumidexOccuHourDanger;
+    int pdchHumidexOccuHourStroke;
+
+    int pdstHeatingSETHours;
+    int pdchHeatingSETHours;
+    int pdchHeatingSETOccuHours;
+    int pdchHeatingSETUnmetDuration;
+    int pdchHeatingSETUnmetTime;
+    int pdstCoolingSETHours;
+    int pdchCoolingSETHours;
+    int pdchCoolingSETOccuHours;
+    int pdchCoolingSETUnmetDuration;
+    int pdchCoolingSETUnmetTime;
+
+    int pdrCO2Resilience;
+    int pdstCO2Hours;
+    int pdchCO2HourSafe;
+    int pdchCO2HourCaution;
+    int pdchCO2HourHazard;
+    int pdstCO2OccuHours;
+    int pdchCO2OccuHourSafe;
+    int pdchCO2OccuHourCaution;
+    int pdchCO2OccuHourHazard;
+
+    int pdrVisualResilience;
+    int pdstIllumHours;
+    int pdchIllumHourDark;
+    int pdchIllumHourDim;
+    int pdchIllumHourAdequate;
+    int pdchIllumHourBright;
+    int pdstIllumOccuHours;
+    int pdchIllumOccuHourDark;
+    int pdchIllumOccuHourDim;
+    int pdchIllumOccuHourAdequate;
+    int pdchIllumOccuHourBright;
+
     // Internal data structures to store information provided by calls
 
     int const sizeIncrement(100);
@@ -1641,6 +1700,65 @@ namespace OutputReportPredefined {
         pdchLeedEuiOthr = 0;
         pdstLeedEneUsePerc = 0;
         pdchLeedEupPerc = 0;
+        pdrThermalResilience = 0;
+        pdstHIHours = 0;
+        pdchHIHourSafe = 0;
+        pdchHIHourCaution = 0;
+        pdchHIHourExtremeCaution = 0;
+        pdchHIHourDanger = 0;
+        pdchHIHourExtremeDanger = 0;
+        pdstHIOccuHours = 0;
+        pdchHIOccuHourSafe = 0;
+        pdchHIOccuHourCaution = 0;
+        pdchHIOccuHourExtremeCaution = 0;
+        pdchHIOccuHourDanger = 0;
+        pdchHIOccuHourExtremeDanger = 0;
+        pdstHumidexHours = 0;
+        pdchHumidexHourLittle = 0;
+        pdchHumidexHourSome = 0;
+        pdchHumidexHourGreat = 0;
+        pdchHumidexHourDanger = 0;
+        pdchHumidexHourStroke = 0;
+        pdstHumidexOccuHours = 0;
+        pdchHumidexOccuHourLittle = 0;
+        pdchHumidexOccuHourSome = 0;
+        pdchHumidexOccuHourGreat = 0;
+        pdchHumidexOccuHourDanger = 0;
+        pdchHumidexOccuHourStroke = 0;
+
+        pdstHeatingSETHours = 0;
+        pdchHeatingSETHours = 0;
+        pdchHeatingSETOccuHours = 0;
+        pdchHeatingSETUnmetDuration = 0;
+        pdchHeatingSETUnmetTime = 0;
+        pdstCoolingSETHours = 0;
+        pdchCoolingSETHours = 0;
+        pdchCoolingSETOccuHours = 0;
+        pdchCoolingSETUnmetDuration = 0;
+        pdchCoolingSETUnmetTime = 0;
+
+        pdrCO2Resilience = 0;
+        pdstCO2Hours = 0;
+        pdchCO2HourSafe = 0;
+        pdchCO2HourCaution = 0;
+        pdchCO2HourHazard = 0;
+        pdstCO2OccuHours = 0;
+        pdchCO2OccuHourSafe = 0;
+        pdchCO2OccuHourCaution = 0;
+        pdchCO2OccuHourHazard = 0;
+
+        pdrVisualResilience = 0;
+        pdstIllumHours = 0;
+        pdchIllumHourDark = 0;
+        pdchIllumHourDim = 0;
+        pdchIllumHourAdequate = 0;
+        pdchIllumHourBright = 0;
+        pdstIllumOccuHours = 0;
+        pdchIllumOccuHourDark = 0;
+        pdchIllumOccuHourDim = 0;
+        pdchIllumOccuHourAdequate = 0;
+        pdchIllumOccuHourBright = 0;
+
         sizeReportName = 0;
         numReportName = 0;
         sizeSubTable = 0;
@@ -2702,6 +2820,75 @@ namespace OutputReportPredefined {
         pdchLeedSchStPt11amWedCnt = newPreDefColumn(pdstLeedSchedSetPts, "Days with Same 11am Value");
         pdchLeedSchStPt11pmWednesday = newPreDefColumn(pdstLeedSchedSetPts, "11pm First Wednesday [C]");
         pdchLeedSchStPt11pmWedCnt = newPreDefColumn(pdstLeedSchedSetPts, "Days with Same 11pm Value");
+
+        pdrThermalResilience = newPreDefReport("ThermalResilienceSummary", "ThermR", "Annual Thermal Resilience Summary");
+
+        pdstHIHours = newPreDefSubTable(pdrThermalResilience, "Heat Index Hours");
+        pdchHIHourSafe = newPreDefColumn(pdstHIHours, "Safe (≤ 26.7°C) [hr]");
+        pdchHIHourCaution = newPreDefColumn(pdstHIHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
+        pdchHIHourExtremeCaution = newPreDefColumn(pdstHIHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
+        pdchHIHourDanger = newPreDefColumn(pdstHIHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
+        pdchHIHourExtremeDanger = newPreDefColumn(pdstHIHours, "Extreme Danger (> 51.7°C) [hr]");
+
+        pdstHIOccuHours = newPreDefSubTable(pdrThermalResilience, "Heat Index OccupantHours");
+        pdchHIOccuHourSafe = newPreDefColumn(pdstHIOccuHours, "Safe (≤ 26.7°C) [hr]");
+        pdchHIOccuHourCaution = newPreDefColumn(pdstHIOccuHours, "Caution (> 26.7, ≤ 32.2°C) [hr]");
+        pdchHIOccuHourExtremeCaution = newPreDefColumn(pdstHIOccuHours, "Extreme Caution (> 32.2, ≤ 39.4°C) [hr]");
+        pdchHIOccuHourDanger = newPreDefColumn(pdstHIOccuHours, "Danger (> 39.4, ≤ 51.7°C) [hr]");
+        pdchHIOccuHourExtremeDanger = newPreDefColumn(pdstHIOccuHours, "Extreme Danger (> 51.7°C) [hr]");
+
+        pdstHumidexHours = newPreDefSubTable(pdrThermalResilience, "Humidex Hours");
+        pdchHumidexHourLittle = newPreDefColumn(pdstHumidexHours, "Little to no Discomfort (≤ 29) [hr]");
+        pdchHumidexHourSome = newPreDefColumn(pdstHumidexHours, "Some Discomfort (> 29, ≤ 40) [hr]");
+        pdchHumidexHourGreat = newPreDefColumn(pdstHumidexHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
+        pdchHumidexHourDanger = newPreDefColumn(pdstHumidexHours, "Dangerous (> 45, ≤ 50) [hr]");
+        pdchHumidexHourStroke = newPreDefColumn(pdstHumidexHours, "Heat Stroke Quite Possible (> 50) [hr]");
+
+        pdstHumidexOccuHours = newPreDefSubTable(pdrThermalResilience, "Humidex OccupantHours");
+        pdchHumidexOccuHourLittle = newPreDefColumn(pdstHumidexOccuHours, "Little to no Discomfort (≤ 29) [hr]");
+        pdchHumidexOccuHourSome = newPreDefColumn(pdstHumidexOccuHours, "Some Discomfort (> 29, ≤ 40) [hr]");
+        pdchHumidexOccuHourGreat = newPreDefColumn(pdstHumidexOccuHours, "Great Discomfort; Avoid Exertion (> 40, ≤ 45) [hr]");
+        pdchHumidexOccuHourDanger = newPreDefColumn(pdstHumidexOccuHours, "Dangerous (> 45, ≤ 50) [hr]");
+        pdchHumidexOccuHourStroke = newPreDefColumn(pdstHumidexOccuHours, "Heat Stroke Quite Possible (> 50) [hr]");
+
+        pdstHeatingSETHours = newPreDefSubTable(pdrThermalResilience, "Heating SET Hours");
+        pdchHeatingSETHours = newPreDefColumn(pdstHeatingSETHours, "SET ≤ 12.2°C Hours (°C)");
+        pdchHeatingSETOccuHours = newPreDefColumn(pdstHeatingSETHours, "SET ≤ 12.2°C OccupantHours (°C)");
+        pdchHeatingSETUnmetDuration = newPreDefColumn(pdstHeatingSETHours, "Longest SET ≤ 12.2°C Duration [hr]");
+        pdchHeatingSETUnmetTime = newPreDefColumn(pdstHeatingSETHours, "Start Time of the Longest SET ≤ 12.2°C Duration");
+
+        pdstCoolingSETHours = newPreDefSubTable(pdrThermalResilience, "Cooling SET Hours");
+        pdchCoolingSETHours = newPreDefColumn(pdstCoolingSETHours, "SET > 30°C Hours (°C)");
+        pdchCoolingSETOccuHours = newPreDefColumn(pdstCoolingSETHours, "SET > 30°C OccupantHours (°C)");
+        pdchCoolingSETUnmetDuration = newPreDefColumn(pdstCoolingSETHours, "Longest SET > 30°C Duration [hr]");
+        pdchCoolingSETUnmetTime = newPreDefColumn(pdstCoolingSETHours, "Start Time of the Longest SET > 30°C Duration");
+
+        pdrCO2Resilience = newPreDefReport("CO2ResilienceSummary", "CO2R", "Annual CO2 Resilience Summary");
+
+        pdstCO2Hours = newPreDefSubTable(pdrCO2Resilience, "CO2 Level Hours");
+        pdchCO2HourSafe = newPreDefColumn(pdstCO2Hours, "Safe (<= 1000 ppm) [hr]");
+        pdchCO2HourCaution = newPreDefColumn(pdstCO2Hours, "Caution (> 1000, <= 5000 ppm) [hr]");
+        pdchCO2HourHazard = newPreDefColumn(pdstCO2Hours, "Hazard (> 5000 ppm) [hr]");
+
+        pdstCO2OccuHours = newPreDefSubTable(pdrCO2Resilience, "CO2 Level OccupantHours");
+        pdchCO2OccuHourSafe = newPreDefColumn(pdstCO2OccuHours, "Safe (<= 1000 ppm) [hr]");
+        pdchCO2OccuHourCaution = newPreDefColumn(pdstCO2OccuHours, "Caution (> 1000, <= 5000 ppm) [hr]");
+        pdchCO2OccuHourHazard = newPreDefColumn(pdstCO2OccuHours, "Hazard (> 5000 ppm) [hr]");
+
+        pdrVisualResilience = newPreDefReport("VisualResilienceSummary", "VisualR", "Annual Visual Resilience Summary");
+
+        pdstIllumHours = newPreDefSubTable(pdrVisualResilience, "Illuminance Level Hours");
+        pdchIllumHourDark = newPreDefColumn(pdstIllumHours, "A Bit Dark (<= 100 lux) [hr]");
+        pdchIllumHourDim = newPreDefColumn(pdstIllumHours, "Dim (> 100, <= 300 lux) [hr]");
+        pdchIllumHourAdequate = newPreDefColumn(pdstIllumHours, "Adequate (> 300, <= 500 lux) [hr]");
+        pdchIllumHourBright = newPreDefColumn(pdstIllumHours, "Bright (>500 lux) [hr]");
+
+        pdstIllumOccuHours = newPreDefSubTable(pdrVisualResilience, "Illuminance Level OccupantHours");
+        pdchIllumOccuHourDark = newPreDefColumn(pdstIllumOccuHours, "A Bit Dark (<= 100 lux) [hr]");
+        pdchIllumOccuHourDim = newPreDefColumn(pdstIllumOccuHours, "Dim (> 100, <= 300 lux) [hr]");
+        pdchIllumOccuHourAdequate = newPreDefColumn(pdstIllumOccuHours, "Adequate (> 300, <= 500 lux) [hr]");
+        pdchIllumOccuHourBright = newPreDefColumn(pdstIllumOccuHours, "Bright (>500 lux) [hr]");
+
     }
 
     void PreDefTableEntry(int const columnIndex, std::string const &objName, Real64 const tableEntryReal, Optional_int_const numSigDigits)

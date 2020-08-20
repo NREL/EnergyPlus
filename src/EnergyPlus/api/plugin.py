@@ -62,6 +62,9 @@ class EnergyPlusPlugin(object):
     def on_begin_timestep_before_predictor(self, state) -> int:
         pass
 
+    def on_begin_zone_timestep_before_set_current_weather(self, state) -> int:
+        pass
+
     def on_after_predictor_before_hvac_managers(self, state) -> int:
         pass
 
