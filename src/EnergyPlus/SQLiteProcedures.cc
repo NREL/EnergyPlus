@@ -82,9 +82,9 @@ const int SQLite::UnitsId = 6;
 
 std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase(OutputFiles & outputFiles)
+std::unique_ptr<SQLite> CreateSQLiteDatabase(IOFiles & ioFiles)
 {
-    if (!outputFiles.outputControl.sqlite) {
+    if (!ioFiles.outputControl.sqlite) {
         return nullptr;
     }
     try {

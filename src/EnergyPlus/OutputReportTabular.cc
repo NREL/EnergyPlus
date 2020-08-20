@@ -757,18 +757,12 @@ namespace OutputReportTabular {
         }
 
         if (UpdateTabularReportsGetInput) {
-            GetInputTabularMonthly(state.outputFiles);
+            GetInputTabularMonthly(state.files);
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
-<<<<<<< HEAD
-            GetInputTabularTimeBins(state.outputFiles);
-            GetInputTabularStyle(state.outputFiles);
-            GetInputOutputTableSummaryReports(state.outputFiles);
-=======
-            GetInputTabularTimeBins();
+            GetInputTabularTimeBins(state.files);
             GetInputTabularStyle(state.files);
-            GetInputOutputTableSummaryReports();
->>>>>>> origin/develop
+            GetInputOutputTableSummaryReports(state.files);
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
             if (isInvalidAggregationOrder()) {
@@ -805,7 +799,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly(OutputFiles & outputFiles)
+    void GetInputTabularMonthly(IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -857,7 +851,7 @@ namespace OutputReportTabular {
         int IOStat;               // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
 
-        if (!outputFiles.outputControl.tabular) {
+        if (!ioFiles.outputControl.tabular) {
             WriteTabularFiles = false;
             return;
         }
@@ -1527,7 +1521,7 @@ namespace OutputReportTabular {
         return foundError;
     }
 
-    void GetInputTabularTimeBins(OutputFiles & outputFiles)
+    void GetInputTabularTimeBins(IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1580,7 +1574,7 @@ namespace OutputReportTabular {
         Array1D_string objNames;
         Array1D_int objVarIDs;
 
-        if (!outputFiles.outputControl.tabular) {
+        if (!ioFiles.outputControl.tabular) {
             WriteTabularFiles = false;
             return;
         }
@@ -1934,7 +1928,7 @@ namespace OutputReportTabular {
         return unitsStyleReturn;
     }
 
-    void GetInputOutputTableSummaryReports(OutputFiles & outputFiles)
+    void GetInputOutputTableSummaryReports(IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1994,7 +1988,7 @@ namespace OutputReportTabular {
         bool nameFound;
         bool ErrorsFound;
 
-        if (!outputFiles.outputControl.tabular) {
+        if (!ioFiles.outputControl.tabular) {
             WriteTabularFiles = false;
             return;
         }
@@ -5692,7 +5686,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.outputFiles);
+            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.files);
             WriteTableOfContents(state);
             WriteVeriSumTable(state.dataCostEstimateManager, state.files);
             WriteDemandEndUseSummary(state.dataCostEstimateManager);
@@ -5716,26 +5710,7 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-<<<<<<< HEAD
-        state.outputFiles.audit.ensure_open("WriteTabularReports", state.outputFiles.outputControl.audit);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeMonthlyFieldSetInput", sizeMonthlyFieldSetInput);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyTablesCount", MonthlyTablesCount);
-        print(state.outputFiles.audit, variable_fmt, "MonthlyColumnsCount", MonthlyColumnsCount);
-        print(state.outputFiles.audit, variable_fmt, "sizeReportName", sizeReportName);
-        print(state.outputFiles.audit, variable_fmt, "numReportName", numReportName);
-        print(state.outputFiles.audit, variable_fmt, "sizeSubTable", sizeSubTable);
-        print(state.outputFiles.audit, variable_fmt, "numSubTable", numSubTable);
-        print(state.outputFiles.audit, variable_fmt, "sizeColumnTag", sizeColumnTag);
-        print(state.outputFiles.audit, variable_fmt, "numColumnTag", numColumnTag);
-        print(state.outputFiles.audit, variable_fmt, "sizeTableEntry", sizeTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "numTableEntry", numTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
-        print(state.outputFiles.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
-=======
-        state.files.audit.ensure_open("WriteTabularReports");
+        state.files.audit.ensure_open("WriteTabularReports", state.files.outputControl.audit);
         print(state.files.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
         print(state.files.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
         print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
@@ -5752,7 +5727,6 @@ namespace OutputReportTabular {
         print(state.files.audit, variable_fmt, "numTableEntry", numTableEntry);
         print(state.files.audit, variable_fmt, "sizeCompSizeTableEntry", sizeCompSizeTableEntry);
         print(state.files.audit, variable_fmt, "numCompSizeTableEntry", numCompSizeTableEntry);
->>>>>>> origin/develop
     }
 
     void parseStatLine(const std::string &lineIn,
@@ -7459,7 +7433,7 @@ namespace OutputReportTabular {
 
     void WriteBEPSTable(CostEstimateManagerData &dataCostEstimateManager,
                         ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
-                        OutputFiles &outputFiles)
+                        IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7618,25 +7592,25 @@ namespace OutputReportTabular {
             collapsedTotal(13) = gatherTotalsBEPS(7);                       // water
 
             if (DataGlobals::createPerfLog) {
-                UtilityRoutines::appendPerfLog(outputFiles, "Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Diesel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Coal ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Fuel Oil No 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(6), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Fuel Oil No 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(7), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Propane ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(8), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Other Fuel 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(9), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Other Fuel 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(10), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(11), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(12), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
-                UtilityRoutines::appendPerfLog(outputFiles, "Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
-                UtilityRoutines::appendPerfLog(outputFiles, "Facility Any Zone Oscillating Temperatures Time [hours]",
+                UtilityRoutines::appendPerfLog(ioFiles, "Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Diesel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Coal ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Fuel Oil No 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(6), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Fuel Oil No 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(7), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Propane ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(8), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Other Fuel 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(9), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Other Fuel 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(10), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(11), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(12), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
+                UtilityRoutines::appendPerfLog(ioFiles, "Facility Any Zone Oscillating Temperatures Time [hours]",
                                                General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillate, 2));
-                UtilityRoutines::appendPerfLog(outputFiles, "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                UtilityRoutines::appendPerfLog(ioFiles, "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
                                                General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillateDuringOccupancy, 2));
-                UtilityRoutines::appendPerfLog(outputFiles, "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                UtilityRoutines::appendPerfLog(ioFiles, "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
                                                General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillateInDeadband, 2));
             }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {

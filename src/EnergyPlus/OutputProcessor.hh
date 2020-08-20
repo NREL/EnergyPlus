@@ -1051,7 +1051,7 @@ bool ReportingThisVariable(std::string const &RepVarName);
 
 void InitPollutionMeterReporting(IOFiles &ioFiles, std::string const &ReportFreqName);
 
-void ProduceRDDMDD();
+void ProduceRDDMDD(EnergyPlusData &state);
 
 void AddToOutputVariableList(std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,

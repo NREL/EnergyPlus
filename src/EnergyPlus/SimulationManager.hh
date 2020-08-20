@@ -83,7 +83,7 @@ namespace SimulationManager {
 
     void GetProjectData(EnergyPlusData &state);
 
-    void writeIntialPerfLogValues(OutputFiles &outputFiles, std::string const &currentOverrideModeValue);
+    void writeIntialPerfLogValues(IOFiles &ioFiles, std::string const &currentOverrideModeValue);
 
     std::string bool_to_string(bool logical);
 

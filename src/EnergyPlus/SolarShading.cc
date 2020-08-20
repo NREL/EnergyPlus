@@ -412,8 +412,7 @@ namespace SolarShading {
         ++NumInitSolar_Calls;
 #endif
         if (BeginSimFlag) {
-            auto & outputFiles = OutputFiles::getSingleton();
-            if (outputFiles.outputControl.shd) {
+            if (ioFiles.outputControl.shd) {
                 shd_stream = std::unique_ptr<std::iostream>(new std::fstream(DataStringGlobals::outputShdFileName.c_str(), std::ios_base::out | std::ios_base::trunc));
                 if (!shd_stream) {
                     ShowFatalError("InitSolarCalculations: Could not open file \"" + DataStringGlobals::outputShdFileName + "\" for output (write).");

@@ -260,11 +260,7 @@ void LinesOut(IOFiles &ioFiles, std::string const &option)
     lastoption = option;
     optiondone = true;
 
-<<<<<<< HEAD
-    auto slnfile = OutputFiles::getSingleton().sln.open("LinesOut", OutputFiles::getSingleton().outputControl.sln);
-=======
-    auto slnfile = ioFiles.sln.open("LinesOut");
->>>>>>> origin/develop
+    auto slnfile = ioFiles.sln.open("LinesOut", ioFiles.outputControl.sln);
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
@@ -584,11 +580,7 @@ void DXFOut(IOFiles &ioFiles,
         return;
     }
 
-<<<<<<< HEAD
-    auto dxffile = outputFiles.dxf.open("DXFOut", outputFiles.outputControl.dxf);
-=======
-    auto dxffile = ioFiles.dxf.open("DXFOut");
->>>>>>> origin/develop
+    auto dxffile = ioFiles.dxf.open("DXFOut", ioFiles.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -932,11 +924,7 @@ void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
         return;
     }
 
-<<<<<<< HEAD
-    auto dxffile = OutputFiles::getSingleton().dxf.open("DXFOutLines", OutputFiles::getSingleton().outputControl.dxf);
-=======
-    auto dxffile = ioFiles.dxf.open("DXFOutLines");
->>>>>>> origin/develop
+    auto dxffile = ioFiles.dxf.open("DXFOutLines", ioFiles.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1149,11 +1137,7 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
         return;
     }
 
-<<<<<<< HEAD
-    auto dxffile = outputFiles.dxf.open("DXFOutWireFrame", outputFiles.outputControl.dxf);
-=======
-    auto dxffile = ioFiles.dxf.open("DXFOutWireFrame");
->>>>>>> origin/develop
+    auto dxffile = ioFiles.dxf.open("DXFOutWireFrame", ioFiles.outputControl.dxf);
 
     print(dxffile, Format_702); // Start of Entities section
 
@@ -1810,11 +1794,7 @@ void CostInfoOut(IOFiles &ioFiles)
         }
     }
 
-<<<<<<< HEAD
-    auto scifile = outputFiles.sci.open("CostInfoOut", outputFiles.outputControl.sci);
-=======
-    auto scifile = ioFiles.sci.open("CostInfoOut");
->>>>>>> origin/develop
+    auto scifile = ioFiles.sci.open("CostInfoOut", ioFiles.outputControl.sci);
 
     print(scifile, "{:12}{:12}\n", TotSurfaces, count(uniqueSurf));
     print(scifile, "{}\n", " data for surfaces useful for cost information");
@@ -1917,11 +1897,7 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
         return;
     }
 
-<<<<<<< HEAD
-    auto wrlfile = outputFiles.wrl.open("VRMLOut", outputFiles.outputControl.wrl);
-=======
-    auto wrlfile = ioFiles.wrl.open("VRMLOut");
->>>>>>> origin/develop
+    auto wrlfile = ioFiles.wrl.open("VRMLOut", ioFiles.outputControl.wrl);
 
     print(wrlfile, Format_702);
 

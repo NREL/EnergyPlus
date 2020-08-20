@@ -286,11 +286,7 @@ namespace SizingManager {
                 state.files.zsz.fileName = state.files.outputZszTxtFileName;
             }
 
-<<<<<<< HEAD
-            state.outputFiles.zsz.ensure_open("ManageSizing", state.outputFiles.outputControl.zsz);
-=======
-            state.files.zsz.ensure_open("ManageSizing");
->>>>>>> origin/develop
+            state.files.zsz.ensure_open("ManageSizing", state.files.outputControl.zsz);
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
@@ -489,12 +485,7 @@ namespace SizingManager {
             } else {
                 state.files.ssz.fileName = state.files.outputSszTxtFileName;
             }
-<<<<<<< HEAD
-
-            state.outputFiles.ssz.ensure_open("ManageSizing", state.outputFiles.outputControl.ssz);
-=======
-            state.files.ssz.ensure_open("ManageSizing");
->>>>>>> origin/develop
+            state.files.ssz.ensure_open("ManageSizing", state.files.outputControl.ssz);
 
             SimAir = true;
             SimZoneEquip = true;

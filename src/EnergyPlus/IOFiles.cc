@@ -53,23 +53,16 @@
 #include "InputProcessing/InputProcessor.hh"
 #include "InputProcessing/EmbeddedEpJSONSchema.hh"
 
-<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
 #include "nlohmann/json.hpp"
-#include <ObjexxFCL/gio.hh>
-=======
->>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 #include <fmt/format.h>
 #include <stdexcept>
 
 namespace EnergyPlus {
 
-<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
-OutputFile &OutputFile::ensure_open(const std::string &caller, bool output_to_file)
-=======
-InputFile &InputFile::ensure_open(const std::string &caller)
+InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open();
+        open(output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
@@ -114,7 +107,7 @@ std::ostream::pos_type InputFile::position() const noexcept
     return is->tellg();
 }
 
-void InputFile::open()
+void InputFile::open(bool)
 {
     is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
@@ -181,8 +174,7 @@ void InputFile::backspace() noexcept
     }
 }
 
-InputOutputFile &InputOutputFile::ensure_open(const std::string &caller)
->>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
+InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
         open(output_to_file);
@@ -239,7 +231,7 @@ std::string InputOutputFile::get_output()
     }
 }
 
-InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout) 
+InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout)
   : fileName{std::move(FileName)},
     defaultToStdOut{DefaultToStdout}
 {
@@ -250,11 +242,7 @@ std::ostream::pos_type InputOutputFile::position() const noexcept
     return os->tellg();
 }
 
-<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
-void OutputFile::open(const bool forAppend, bool output_to_file)
-=======
-void InputOutputFile::open(const bool forAppend)
->>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
+void InputOutputFile::open(const bool forAppend, bool output_to_file)
 {
     auto appendMode = [=]() {
         if (forAppend) {
@@ -263,19 +251,15 @@ void InputOutputFile::open(const bool forAppend)
             return std::ios_base::trunc;
         }
     }();
-<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
     if (!output_to_file) {
         os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
+        os->imbue(std::locale("C"));
         print_to_dev_null = true;
     } else {
         os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+        os->imbue(std::locale("C"));
         print_to_dev_null = false;
     }
-=======
-
-    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
-    os->imbue(std::locale("C"));
->>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 }
 
 std::vector<std::string> InputOutputFile::getLines()
@@ -300,8 +284,7 @@ std::vector<std::string> InputOutputFile::getLines()
     return std::vector<std::string>();
 }
 
-<<<<<<< HEAD:src/EnergyPlus/OutputFiles.cc
-void OutputFiles::OutputControl::getInput()
+void IOFiles::OutputControl::getInput()
 {
     auto const instances = inputProcessor->epJSON.find("Output:Control");
     if (instances != inputProcessor->epJSON.end()) {
@@ -429,41 +412,7 @@ void OutputFiles::OutputControl::getInput()
     }
 }
 
-int OutputFiles::open_gio(std::string const& filename, std::string const & header, bool outputControlCheck, bool showFatalError)
-{
-    return open_gio(filename, header, outputControlCheck, "write", showFatalError);
-}
-
-int OutputFiles::open_gio(std::string const& filename, std::string const & header, bool outputControlCheck, std::string const & action, bool showFatalError)
-{
-    auto unit = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION(action);
-        if (outputControlCheck) {
-            ObjexxFCL::gio::open(unit, filename, flags);
-        } else {
-            flags.STATUS("scratch");
-            ObjexxFCL::gio::open(unit, flags);
-            auto * stream = ObjexxFCL::gio::out_stream(unit);
-            stream->setstate(std::ios::badbit);
-        }
-        auto write_stat = flags.ios();
-        if (write_stat != 0) {
-            if (showFatalError) {
-                ShowFatalError(fmt::format("{}: Could not open file {} for output ({}}).", header, filename, action));
-            } else {
-                print(std::cout, "{}: Could not open file {} for output ({}}).", header, filename, action);
-            }
-        }
-    }
-    return unit;
-}
-
-OutputFiles &OutputFiles::getSingleton()
-=======
 IOFiles &IOFiles::getSingleton()
->>>>>>> origin/develop:src/EnergyPlus/IOFiles.cc
 {
     assert(getSingletonInternal() != nullptr);
     if (getSingletonInternal() == nullptr) {

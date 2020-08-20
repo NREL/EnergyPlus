@@ -78,7 +78,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    resultsFramework->setupOutputOptions(state.outputFiles);
+    resultsFramework->setupOutputOptions(state.files);
 
     EXPECT_TRUE(resultsFramework->timeSeriesAndTabularEnabled());
 }
@@ -92,7 +92,7 @@ TEST_F(ResultsFrameworkFixture, ResultsFramework_ParseJsonObject2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    resultsFramework->setupOutputOptions(state.outputFiles);
+    resultsFramework->setupOutputOptions(state.files);
 
     EXPECT_TRUE(resultsFramework->timeSeriesEnabled());
     compare_json_stream("");

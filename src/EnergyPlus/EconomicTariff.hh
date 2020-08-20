@@ -647,7 +647,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff(OutputFiles & outputFiles);
+    void ComputeTariff(IOFiles &ioFiles);
 
     void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer);
 

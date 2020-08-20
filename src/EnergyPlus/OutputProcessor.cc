@@ -1363,11 +1363,7 @@ namespace OutputProcessor {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-<<<<<<< HEAD
-        outputFiles.mtd.ensure_open("InitializeMeters", outputFiles.outputControl.mtd);
-=======
-        ioFiles.mtd.ensure_open("InitializeMeters");
->>>>>>> origin/develop
+        ioFiles.mtd.ensure_open("InitializeMeters", ioFiles.outputControl.mtd);
     }
 
     void GetCustomMeterInput(bool &ErrorsFound)
@@ -3540,14 +3536,10 @@ namespace OutputProcessor {
             if (!EnergyMeters(Loop).RptYR && !EnergyMeters(Loop).RptAccYR) continue;
             if (PrintTimeStamp) {
                 WriteYearlyTimeStamp(
-<<<<<<< HEAD
-                    outputFiles.mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
+                    ioFiles.mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
                 if (ResultsFramework::resultsFramework->YRMeters.rDataFrameEnabled()) {
                     ResultsFramework::resultsFramework->YRMeters.newRow(Month, DayOfMonth, HourOfDay, 0);
                 }
-=======
-                    ioFiles.mtr, YearlyStampReportChr, DataGlobals::CalendarYearChr, PrintTimeStamp && PrintTimeStampToSQL);
->>>>>>> origin/develop
                 PrintTimeStamp = false;
                 PrintTimeStampToSQL = false;
             }
@@ -8764,7 +8756,7 @@ void InitPollutionMeterReporting(IOFiles &ioFiles, std::string const &ReportFreq
     }
 }
 
-void ProduceRDDMDD()
+void ProduceRDDMDD(EnergyPlusData &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -8824,21 +8816,20 @@ void ProduceRDDMDD()
         }
     }
 
-    auto & outputFiles = OutputFiles::getSingleton();
-    outputFiles.rdd.ensure_open("ProduceRDDMDD", outputFiles.outputControl.rdd);
-    outputFiles.mdd.ensure_open("ProduceRDDMDD", outputFiles.outputControl.mdd);
+    state.files.rdd.ensure_open("ProduceRDDMDD", state.files.outputControl.rdd);
+    state.files.mdd.ensure_open("ProduceRDDMDD", state.files.outputControl.mdd);
     if (ProduceReportVDD == ReportVDD_Yes) {
-        print(outputFiles.rdd, "Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(outputFiles.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", DataStringGlobals::NL);
+        print(state.files.rdd, "Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
+        print(state.files.rdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", DataStringGlobals::NL);
 
-        print(outputFiles.mdd, "Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(outputFiles.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", DataStringGlobals::NL);
+        print(state.files.mdd, "Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
+        print(state.files.mdd, "Var Type (reported time step),Var Report Type,Variable Name [Units]{}", DataStringGlobals::NL);
     } else if (ProduceReportVDD == ReportVDD_IDF) {
-        print(outputFiles.rdd, "! Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(outputFiles.rdd, "! Output:Variable Objects (applicable to this run){}", DataStringGlobals::NL);
+        print(state.files.rdd, "! Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
+        print(state.files.rdd, "! Output:Variable Objects (applicable to this run){}", DataStringGlobals::NL);
 
-        print(outputFiles.mdd, "! Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
-        print(outputFiles.mdd, "! Output:Meter Objects (applicable to this run){}", DataStringGlobals::NL);
+        print(state.files.mdd, "! Program Version,{},{}{}", VerString, IDDVerString, DataStringGlobals::NL);
+        print(state.files.mdd, "! Output:Meter Objects (applicable to this run){}", DataStringGlobals::NL);
     }
 
     Array1D_string VariableNames(NumVariablesForOutput);
@@ -8858,7 +8849,7 @@ void ProduceRDDMDD()
         if (ProduceReportVDD == ReportVDD_Yes) {
             ItemPtr = iVariableNames(Item);
             if (!DDVariableTypes(ItemPtr).ReportedOnDDFile) {
-                print(outputFiles.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
                 ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                   standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                   VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8869,7 +8860,7 @@ void ProduceRDDMDD()
                     } else {
                         ItemPtr = DDVariableTypes(ItemPtr).Next;
                     }
-                    print(outputFiles.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                    print(state.files.rdd, "{},{},{}{}{}", StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), VariableNames(Item), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
                     ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                       standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                       VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8879,7 +8870,7 @@ void ProduceRDDMDD()
         } else if (ProduceReportVDD == ReportVDD_IDF) {
             ItemPtr = iVariableNames(Item);
             if (!DDVariableTypes(ItemPtr).ReportedOnDDFile) {
-                print(outputFiles.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
                 ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                   standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                   VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8890,7 +8881,7 @@ void ProduceRDDMDD()
                     } else {
                         ItemPtr = DDVariableTypes(ItemPtr).Next;
                     }
-                    print(outputFiles.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
+                    print(state.files.rdd, "Output:Variable,*,{},hourly; !- {} {}{}{}", VariableNames(Item), StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType), standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType), unitStringFromDDitem(ItemPtr), DataStringGlobals::NL);
                     ResultsFramework::resultsFramework->RDD.push_back(StandardTimeStepTypeKey(DDVariableTypes(ItemPtr).timeStepType) + "," +
                                                                       standardVariableTypeKey(DDVariableTypes(ItemPtr).storeType) + "," +
                                                                       VariableNames(Item) + unitStringFromDDitem(ItemPtr));
@@ -8899,7 +8890,7 @@ void ProduceRDDMDD()
             }
         }
     }
-    outputFiles.rdd.close();
+    state.files.rdd.close();
 
     //  Now EnergyMeter variables
     VariableNames.allocate(NumEnergyMeters);
@@ -8919,19 +8910,19 @@ void ProduceRDDMDD()
     for (Item = 1; Item <= NumEnergyMeters; ++Item) {
         ItemPtr = iVariableNames(Item);
         if (ProduceReportVDD == ReportVDD_Yes) {
-            print(outputFiles.mdd, "Zone,Meter,{}{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
+            print(state.files.mdd, "Zone,Meter,{}{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
             ResultsFramework::resultsFramework->MDD.push_back("Zone,Meter," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
         } else if (ProduceReportVDD == ReportVDD_IDF) {
-            print(outputFiles.mdd, "Output:Meter,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
+            print(state.files.mdd, "Output:Meter,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
             ResultsFramework::resultsFramework->MDD.push_back("Output:Meter," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
-            print(outputFiles.mdd, "Output:Meter:Cumulative,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
+            print(state.files.mdd, "Output:Meter:Cumulative,{},hourly; !-{}{}", EnergyMeters(ItemPtr).Name, unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units), DataStringGlobals::NL);
             ResultsFramework::resultsFramework->MDD.push_back("Output:Meter:Cumulative," + EnergyMeters(ItemPtr).Name +
                                                               unitEnumToStringBrackets(EnergyMeters(ItemPtr).Units));
         }
     }
-    outputFiles.mdd.close();
+    state.files.mdd.close();
 }
 
 void AddToOutputVariableList(std::string const &VarName, // Variable Name

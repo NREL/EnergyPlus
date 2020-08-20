@@ -782,11 +782,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-<<<<<<< HEAD
-            OutputFile &dfs = outputFiles.dfs.ensure_open("CalcDayltgCoefficients", outputFiles.outputControl.dfs);
-=======
-            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients");
->>>>>>> origin/develop
+            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients", ioFiles.outputControl.dfs);
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
@@ -4600,19 +4596,13 @@ namespace DaylightingManager {
             DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
-<<<<<<< HEAD
-                ////  Change to following once delightdfdmp is converted to OutputFiles
-                //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
-                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite", true);
-=======
-                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open();
->>>>>>> origin/develop
+                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open(ioFiles.outputControl.delightdfdmp);
 
                 // Sequentially read lines in DElight Daylight Factors Error File
                 // and process them using standard EPlus warning/error handling calls
                 // Process all error/warning messages first
                 // Then, if any error has occurred, ShowFatalError to terminate processing
-                bEndofErrFile = !iDElightErrorFile.good();
+                // bEndofErrFile = !iDElightErrorFile.good();
                 bRecordsOnErrFile = false;
                 while (!bEndofErrFile) {
                     auto cErrorLine = iDElightErrorFile.readLine();
@@ -4645,20 +4635,8 @@ namespace DaylightingManager {
                     ErrorsFound = true;
                 }
             } else {
-<<<<<<< HEAD
-                // Open, Close, and Delete DElight Daylight Factors Error File for reading
-                ////  Change to following once delightdfdmp is converted to OutputFiles
-                //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
-                iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "ReadWrite", true);
-
-                {
-                    IOFlags flags;
-                    flags.DISPOSE("DELETE");
-                    ObjexxFCL::gio::close(iDElightErrorFile, flags);
-=======
                 if (FileSystem::fileExists(ioFiles.outputDelightDfdmpFileName.fileName)) {
                     FileSystem::removeFile(ioFiles.outputDelightDfdmpFileName.fileName);
->>>>>>> origin/develop
                 }
             }
         }

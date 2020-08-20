@@ -375,48 +375,6 @@ namespace CommandLineInterface {
         }
 
         // EnergyPlus files
-<<<<<<< HEAD
-        state.outputFiles.audit.fileName = outputFilePrefix + normalSuffix + ".audit";
-        state.outputFiles.bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
-        state.outputFiles.dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
-        state.outputFiles.eio.fileName = outputFilePrefix + normalSuffix + ".eio";
-        state.outputFiles.endFile.fileName = outputFilePrefix + normalSuffix + ".end";
-        outputErrFileName = outputFilePrefix + normalSuffix + ".err";
-        state.outputFiles.eso.fileName = outputFilePrefix + normalSuffix + ".eso";
-
-        outputJsonFileName = outputFilePrefix + normalSuffix + ".json";
-        outputTSZoneJsonFileName = outputFilePrefix + normalSuffix + "_detailed_zone.json";
-        outputTSHvacJsonFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.json";
-        outputTSJsonFileName = outputFilePrefix + normalSuffix + "_timestep.json";
-        outputYRJsonFileName = outputFilePrefix + normalSuffix + "_yearly.json";
-        outputMNJsonFileName = outputFilePrefix + normalSuffix + "_monthly.json";
-        outputDYJsonFileName = outputFilePrefix + normalSuffix + "_daily.json";
-        outputHRJsonFileName = outputFilePrefix + normalSuffix + "_hourly.json";
-        outputSMJsonFileName = outputFilePrefix + normalSuffix + "_runperiod.json";
-        outputCborFileName = outputFilePrefix + normalSuffix + ".cbor";
-        outputTSZoneCborFileName = outputFilePrefix + normalSuffix + "_detailed_zone.cbor";
-        outputTSHvacCborFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.cbor";
-        outputTSCborFileName = outputFilePrefix + normalSuffix + "_timestep.cbor";
-        outputYRCborFileName = outputFilePrefix + normalSuffix + "_yearly.cbor";
-        outputMNCborFileName = outputFilePrefix + normalSuffix + "_monthly.cbor";
-        outputDYCborFileName = outputFilePrefix + normalSuffix + "_daily.cbor";
-        outputHRCborFileName = outputFilePrefix + normalSuffix + "_hourly.cbor";
-        outputSMCborFileName = outputFilePrefix + normalSuffix + "_runperiod.cbor";
-        outputMsgPackFileName = outputFilePrefix + normalSuffix + ".msgpack";
-        outputTSZoneMsgPackFileName = outputFilePrefix + normalSuffix + "_detailed_zone.msgpack";
-        outputTSHvacMsgPackFileName = outputFilePrefix + normalSuffix + "_detailed_HVAC.msgpack";
-        outputTSMsgPackFileName = outputFilePrefix + normalSuffix + "_timestep.msgpack";
-        outputYRMsgPackFileName = outputFilePrefix + normalSuffix + "_yearly.msgpack";
-        outputMNMsgPackFileName = outputFilePrefix + normalSuffix + "_monthly.msgpack";
-        outputDYMsgPackFileName = outputFilePrefix + normalSuffix + "_daily.msgpack";
-        outputHRMsgPackFileName = outputFilePrefix + normalSuffix + "_hourly.msgpack";
-        outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
-
-        state.outputFiles.mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
-        state.outputFiles.mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
-        state.outputFiles.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
-        state.outputFiles.rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
-=======
         state.files.audit.fileName = outputFilePrefix + normalSuffix + ".audit";
         state.files.bnd.fileName = outputFilePrefix + normalSuffix + ".bnd";
         state.files.dxf.fileName = outputFilePrefix + normalSuffix + ".dxf";
@@ -454,10 +412,9 @@ namespace CommandLineInterface {
         state.files.json.outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
         state.files.mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
-        outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
+        state.files.mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
         state.files.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
-        outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
->>>>>>> origin/develop
+        state.files.rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         state.files.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
@@ -498,8 +455,8 @@ namespace CommandLineInterface {
         eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
         // Readvars files
-        OutputFiles::getSingleton().csv.fileName = outputFilePrefix + normalSuffix + ".csv";
-        OutputFiles::getSingleton().mtr_csv.fileName = outputFilePrefix + meterSuffix + ".csv";
+        state.files.csv.fileName = outputFilePrefix + normalSuffix + ".csv";
+        state.files.mtr_csv.fileName = outputFilePrefix + meterSuffix + ".csv";
         outputRvauditFileName = outputFilePrefix + normalSuffix + ".rvaudit";
 
         // EPMacro files
@@ -586,11 +543,6 @@ namespace CommandLineInterface {
             }
         }
 
-<<<<<<< HEAD
-=======
-        state.files.debug.ensure_open("OpenOutputFiles");
-
->>>>>>> origin/develop
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
         // Preprocessors (These will likely move to a new file)

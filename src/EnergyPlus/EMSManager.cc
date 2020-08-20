@@ -71,7 +71,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -236,11 +236,7 @@ namespace EMSManager {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-<<<<<<< HEAD
-                outputFiles.edd.ensure_open("CheckIFAnyEMS", outputFiles.outputControl.edd);
-=======
-                ioFiles.edd.ensure_open("CheckIFAnyEMS");
->>>>>>> origin/develop
+                ioFiles.edd.ensure_open("CheckIFAnyEMS", ioFiles.outputControl.edd);
             }
         } else {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);

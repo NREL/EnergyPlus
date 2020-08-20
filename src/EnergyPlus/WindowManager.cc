@@ -7673,11 +7673,7 @@ namespace WindowManager {
         if (PrintTransMap) {
             // Fortran version did not have error handling in case of file open failure. This one does.
             // Which is correct?
-<<<<<<< HEAD
-            auto screenCsvFile = outputFiles.screenCsv.open("CalcWindowScreenComponents", outputFiles.outputControl.screen);
-=======
-            auto screenCsvFile = ioFiles.screenCsv.open("CalcWindowScreenComponents");
->>>>>>> origin/develop
+            auto screenCsvFile = ioFiles.screenCsv.open("CalcWindowScreenComponents", ioFiles.outputControl.screen);
 
             //  WRITE(ScreenTransUnitNo,*)' '
             for (ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum) {

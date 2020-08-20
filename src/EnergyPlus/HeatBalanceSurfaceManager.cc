@@ -384,6 +384,7 @@ namespace HeatBalanceSurfaceManager {
 
         int MapNum;
         bool errFlag;
+        bool elOpened;
         //  LOGICAL :: ShadowingSurf
 
         // FLOW:
@@ -593,41 +594,24 @@ namespace HeatBalanceSurfaceManager {
                 // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
                 if (iErrorFlag != 0) {
                     // Open DElight Electric Lighting Error File for reading
-<<<<<<< HEAD
-                    auto & outputFiles = OutputFiles::getSingleton();
-                    ////  Change to following once delightdfdmp is converted to OutputFiles
-                    //    outputFiles.delightdfdmp.ensure_open(outputFiles.outputControl.delightdfdmp);
-                    iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightDfdmpFileName, "DelightDFdmp", outputFiles.outputControl.delightdfdmp, "readwrite", true);
-=======
-                    auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open();
-                    if (iDElightErrorFile.good()) {
-                        elOpened = true;
-                    } else {
-                        elOpened = false;
-                    }
+                    auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open(state.files.outputControl.delightdfdmp);
+                     if (iDElightErrorFile.good()) {
+                         elOpened = true;
+                     } else {
+                         elOpened = false;
+                     }
                     //            IF (iwriteStatus /= 0) THEN
                     //              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
                     //            ENDIF
                     //            Open(unit=iDElightErrorFile, file='eplusout.delighteldmp', action='READ')
->>>>>>> origin/develop
 
                     // Sequentially read lines in DElight Electric Lighting Error File
                     // and process them using standard EPlus warning/error handling calls
                     bEndofErrFile = false;
                     iReadStatus = 0;
-<<<<<<< HEAD
-                    while (!bEndofErrFile && iReadStatus == 0) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(iDElightErrorFile, fmtA, flags) >> cErrorLine;
-                            iReadStatus = flags.ios();
-                        }
-                        if (iReadStatus < GoodIOStatValue) {
-=======
                     while (!bEndofErrFile && elOpened) {
                         auto cErrorLine = iDElightErrorFile.readLine();
                         if (cErrorLine.eof) {
->>>>>>> origin/develop
                             bEndofErrFile = true;
                             continue;
                         }
@@ -646,19 +630,11 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                     // Close DElight Error File and delete
-<<<<<<< HEAD
-                    {
-                        IOFlags flags;
-                        flags.DISPOSE("DELETE");
-                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
-                    }
-=======
 
                     if (elOpened) {
                         iDElightErrorFile.close();
                         FileSystem::removeFile(iDElightErrorFile.fileName);
                     };
->>>>>>> origin/develop
                     // If any DElight Error occurred then ShowFatalError to terminate
                     if (iErrorFlag > 0) {
                         ShowFatalError("End of DElight Error Messages");
@@ -666,39 +642,22 @@ namespace HeatBalanceSurfaceManager {
                 } else { // RJH 2008-03-07: No errors
                     // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
                     // Open DElight Electric Lighting Dump File for reading
-<<<<<<< HEAD
-                    auto & outputFiles = OutputFiles::getSingleton();
-                    ////  Change to following once delighteldmp is converted to OutputFiles
-                    //    outputFiles.delighteldmp.ensure_open(outputFiles.outputControl.delighteldmp);
-                    iDElightErrorFile = outputFiles.open_gio(DataStringGlobals::outputDelightEldmpFileName, "DelightELdmp", outputFiles.outputControl.delighteldmp, "readwrite", true);
-=======
-                    auto iDElightErrorFile = state.files.outputDelightEldmpFileName.try_open();
-                    if (iDElightErrorFile.is_open()) {
-                        elOpened = true;
-                    } else {
-                        elOpened = false;
-                    }
->>>>>>> origin/develop
+                    auto iDElightErrorFile = state.files.outputDelightEldmpFileName.try_open(state.files.outputControl.delighteldmp);
+                     if (iDElightErrorFile.is_open()) {
+                         elOpened = true;
+                     } else {
+                         elOpened = false;
+                     }
 
                     // Sequentially read lines in DElight Electric Lighting Dump File
                     // and extract refpt illuminances for standard EPlus output handling
                     bEndofErrFile = false;
                     iDElightRefPt = 0;
                     iReadStatus = 0;
-<<<<<<< HEAD
-                    while (!bEndofErrFile && iReadStatus == 0) {
-                        {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(iDElightErrorFile, fmtLD, flags) >> dRefPtIllum;
-                            iReadStatus = flags.ios();
-                        }
-                        if (iReadStatus < GoodIOStatValue) {
-=======
                     while (!bEndofErrFile && elOpened) {
                         auto line = iDElightErrorFile.read<Real64>();
                         dRefPtIllum = line.data;
                         if (line.eof) {
->>>>>>> origin/develop
                             bEndofErrFile = true;
                             continue;
                         }
@@ -711,16 +670,9 @@ namespace HeatBalanceSurfaceManager {
                     }
 
                     // Close DElight Electric Lighting Dump File and delete
-<<<<<<< HEAD
-                    {
-                        IOFlags flags;
-                        flags.DISPOSE("DELETE");
-                        ObjexxFCL::gio::close(iDElightErrorFile, flags);
-=======
                     if (elOpened) {
                         iDElightErrorFile.close();
                         FileSystem::removeFile(iDElightErrorFile.fileName);
->>>>>>> origin/develop
                     };
                 }
                 // Store the calculated total zone Power Reduction Factor due to DElight daylighting

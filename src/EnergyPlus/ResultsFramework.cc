@@ -80,7 +80,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ResultsFramework.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -575,15 +575,9 @@ namespace ResultsFramework {
                 std::vector<uint8_t> v_msgpack = json::to_msgpack(root);
                 std::copy(v_msgpack.begin(), v_msgpack.end(), std::ostream_iterator<uint8_t>(*jsonOutputStreams.msgpack_TSstream_Zone));
             }
-<<<<<<< HEAD:src/EnergyPlus/ResultsFramework.cc
         } else if (ReportFrequency == "TimeStep") {
-            if (outputJSON && DataGlobals::jsonOutputStreams.json_TSstream) {
-                *(DataGlobals::jsonOutputStreams.json_TSstream) << std::setw(4) << root << std::endl;
-=======
-        } else if (ReportFrequency == "Timestep") {
             if (outputJSON && jsonOutputStreams.json_TSstream) {
                 *(jsonOutputStreams.json_TSstream) << std::setw(4) << root << std::endl;
->>>>>>> origin/develop:src/EnergyPlus/ResultsSchema.cc
             }
             if (outputCBOR && jsonOutputStreams.cbor_TSstream) {
                 std::vector<uint8_t> v_cbor = json::to_cbor(root);
@@ -874,7 +868,7 @@ namespace ResultsFramework {
         return datetime;
     }
 
-    void CSVWriter::writeOutput(std::vector<std::string> const & outputVariables, OutputFile & outputFile, bool outputControl)
+    void CSVWriter::writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl)
     {
         outputFile.ensure_open("OpenOutputFiles", outputControl);
 
@@ -909,14 +903,14 @@ namespace ResultsFramework {
         outputFile.close();
     }
 
-    void ResultsFramework::setupOutputOptions(OutputFiles & outputFiles)
+    void ResultsFramework::setupOutputOptions(IOFiles &ioFiles)
     {
-        if (outputFiles.outputControl.csv) {
+        if (ioFiles.outputControl.csv) {
             tsEnabled = true;
             tsAndTabularEnabled = true;
         }
 
-        if (!outputFiles.outputControl.json) {
+        if (!ioFiles.outputControl.json) {
             return;
         }
 
@@ -1279,23 +1273,22 @@ namespace ResultsFramework {
         }
     }
 
-<<<<<<< HEAD:src/EnergyPlus/ResultsFramework.cc
-    void ResultsFramework::writeOutputs()
+    void ResultsFramework::writeOutputs(IOFiles & ioFiles)
     {
-        if (OutputFiles::getSingleton().outputControl.csv) {
-            writeCSVOutput();
+        if (ioFiles.outputControl.csv) {
+            writeCSVOutput(ioFiles);
         }
 
         if (timeSeriesEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeTimeSeriesReports();
+            writeTimeSeriesReports(ioFiles.json);
         }
 
         if (timeSeriesAndTabularEnabled() && (outputJSON || outputCBOR || outputMsgPack)) {
-            writeReport();
+            writeReport(ioFiles.json);
         }
     }
 
-    void ResultsFramework::writeCSVOutput()
+    void ResultsFramework::writeCSVOutput(IOFiles & ioFiles)
     {
         if (!hasOutputData()) {
             return;
@@ -1373,104 +1366,56 @@ namespace ResultsFramework {
             csv.parseTSOutputs(RIDetailedZoneTSData.getJSON(), outputVariables, OutputProcessor::ReportingFrequency::EachCall);
         }
 
-        auto & outputFiles = OutputFiles::getSingleton();
-
-        csv.writeOutput(outputVariables, outputFiles.csv, outputFiles.outputControl.csv);
+        csv.writeOutput(outputVariables, ioFiles.csv, ioFiles.outputControl.csv);
         if (hasMeterData()) {
-            mtr.writeOutput(outputVariables, outputFiles.mtr, outputFiles.outputControl.mtr);
+            mtr.writeOutput(outputVariables, ioFiles.mtr, ioFiles.outputControl.mtr);
         }
     }
 
-    void ResultsFramework::writeTimeSeriesReports()
+    void ResultsFramework::writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams)
     {
         // Output detailed Zone time series data
         if (hasRIDetailedZoneTSData()) {
-            RIDetailedZoneTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RIDetailedZoneTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output detailed HVAC time series data
         if (hasRIDetailedHVACTSData()) {
-            RIDetailedHVACTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RIDetailedHVACTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output timestep time series data
         if (hasRITimestepTSData()) {
-            RITimestepTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RITimestepTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output hourly time series data
         if (hasRIHourlyTSData()) {
-            RIHourlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RIHourlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output daily time series data
         if (hasRIDailyTSData()) {
-            RIDailyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RIDailyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output monthly time series data
         if (hasRIMonthlyTSData()) {
-            RIMonthlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RIMonthlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output run period time series data
         if (hasRIRunPeriodTSData()) {
-            RIRunPeriodTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RIRunPeriodTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
 
         // Output yearly time series data
         if (hasRIYearlyTSData()) {
-            RIYearlyTSData.writeReport(outputJSON, outputCBOR, outputMsgPack);
+            RIYearlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
         }
     }
 
-    void ResultsFramework::writeReport()
-=======
-    void ResultsSchema::writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams)
-    {
-        // Output detailed Zone time series data
-        if (OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() || OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled()) {
-            OutputSchema->RIDetailedZoneTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-
-        // Output detailed HVAC time series data
-        if (OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() || OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled()) {
-            OutputSchema->RIDetailedHVACTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-
-        // Output timestep time series data
-        if (OutputSchema->RITimestepTSData.iDataFrameEnabled() || OutputSchema->RITimestepTSData.rDataFrameEnabled()) {
-            OutputSchema->RITimestepTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-
-        // Output hourly time series data
-        if (OutputSchema->RIHourlyTSData.iDataFrameEnabled() || OutputSchema->RIHourlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIHourlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-
-        // Output daily time series data
-        if (OutputSchema->RIDailyTSData.iDataFrameEnabled() || OutputSchema->RIDailyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIDailyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-
-        // Output monthly time series data
-        if (OutputSchema->RIMonthlyTSData.iDataFrameEnabled() || OutputSchema->RIMonthlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIMonthlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-
-        // Output run period time series data
-        if (OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() || OutputSchema->RIRunPeriodTSData.rDataFrameEnabled()) {
-            OutputSchema->RIRunPeriodTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-
-        // Output yearly time series data
-        if (OutputSchema->RIYearlyTSData.iDataFrameEnabled() || OutputSchema->RIYearlyTSData.rDataFrameEnabled()) {
-            OutputSchema->RIYearlyTSData.writeReport(jsonOutputStreams, outputJSON, outputCBOR, outputMsgPack);
-        }
-    }
-
-    void ResultsSchema::WriteReport(JsonOutputStreams &jsonOutputStreams)
->>>>>>> origin/develop:src/EnergyPlus/ResultsSchema.cc
+    void ResultsFramework::writeReport(JsonOutputStreams &jsonOutputStreams)
     {
         json root, outputVars, rdd, meterVars, meterData;
         json rddvals = json::array();

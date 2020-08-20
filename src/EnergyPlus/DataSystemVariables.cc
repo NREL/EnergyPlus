@@ -244,11 +244,7 @@ namespace DataSystemVariables {
         std::string::size_type pos;
 
         if (firstTime) {
-<<<<<<< HEAD
-            outputFiles.audit.ensure_open("CheckForActualFileName", outputFiles.outputControl.audit);
-=======
-            ioFiles.audit.ensure_open("CheckForActualFileName");
->>>>>>> origin/develop
+            ioFiles.audit.ensure_open("CheckForActualFileName", ioFiles.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
             if (envinputpath1 != blank) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar

@@ -431,7 +431,7 @@ namespace UtilityRoutines {
         return SameString(a, b);
     }
 
-    void appendPerfLog(OutputFiles &outputFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn)
+    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
@@ -450,7 +450,7 @@ namespace UtilityRoutines {
         if (finalColumn) {
             std::fstream fsPerfLog;
             if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
-                if (outputFiles.outputControl.perflog) {
+                if (ioFiles.outputControl.perflog) {
                     fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
                     if (!fsPerfLog) {
                         ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
@@ -459,7 +459,7 @@ namespace UtilityRoutines {
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
-                if (outputFiles.outputControl.perflog) {
+                if (ioFiles.outputControl.perflog) {
                     fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
                     if (!fsPerfLog) {
                         ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
@@ -762,11 +762,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-<<<<<<< HEAD
-            auto tempfl = state.outputFiles.endFile.try_open(state.outputFiles.outputControl.end);
-=======
-            auto tempfl = state.files.endFile.try_open();
->>>>>>> origin/develop
+            auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -781,17 +777,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(state.files.json);
 
-<<<<<<< HEAD
-        ResultsFramework::resultsFramework->writeOutputs();
-=======
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports(state.files.json);
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport(state.files.json);
-        }
->>>>>>> origin/develop
+        ResultsFramework::resultsFramework->writeOutputs(state.files);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
@@ -932,7 +918,7 @@ namespace UtilityRoutines {
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog(outputFiles, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -951,9 +937,9 @@ namespace UtilityRoutines {
         ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog(outputFiles, "Run Time [string]", Elapsed);
-            UtilityRoutines::appendPerfLog(outputFiles, "Number of Warnings", NumWarnings);
-            UtilityRoutines::appendPerfLog(outputFiles, "Number of Severe", NumSevere, true); // last item so write the perfLog file
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Severe", NumSevere, true); // last item so write the perfLog file
         }
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -963,11 +949,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-<<<<<<< HEAD
-            auto tempfl = outputFiles.endFile.try_open(outputFiles.outputControl.end);
-=======
-            auto tempfl = ioFiles.endFile.try_open();
->>>>>>> origin/develop
+            auto tempfl = ioFiles.endFile.try_open(ioFiles.outputControl.end);
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
@@ -977,17 +959,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(ioFiles.json);
 
-<<<<<<< HEAD
-        ResultsFramework::resultsFramework->writeOutputs();
-=======
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports(ioFiles.json);
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport(ioFiles.json);
-        }
->>>>>>> origin/develop
+        ResultsFramework::resultsFramework->writeOutputs(ioFiles);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
@@ -999,185 +971,6 @@ namespace UtilityRoutines {
         return EXIT_SUCCESS;
     }
 
-<<<<<<< HEAD
-    int GetNewUnitNumber()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie, adapted from reference
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number of a unit that can exist and is not connected.  Note
-        // this routine does not magically mark that unit number in use.  In order to
-        // have the unit "used", the source code must OPEN the file.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        //  // Return value
-        //  int UnitNumber; // Result from scanning currently open files
-        //
-        //  // Locals
-        //  // FUNCTION ARGUMENT DEFINITIONS:
-        //
-        //  // FUNCTION PARAMETER DEFINITIONS:
-        //  //  IO Status Values:
-        //
-        //  int const END_OF_RECORD( -2 );
-        //  int const END_OF_FILE( -1 );
-        //
-        //  //  Indicate default input and output units:
-        //
-        //  int const DEFAULT_INPUT_UNIT( 5 );
-        //  int const DEFAULT_OUTPUT_UNIT( 6 );
-        //
-        //  //  Indicate number and value of preconnected units
-        //
-        //  int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-        //  static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
-        //
-        //  //  Largest allowed unit number (or a large number, if none)
-        //  int const MaxUnitNumber( 1000 );
-        //
-        //  // INTERFACE BLOCK SPECIFICATIONS
-        //  // na
-        //
-        //  // DERIVED TYPE DEFINITIONS
-        //  // na
-        //
-        //  // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        //  bool exists; // File exists
-        //  bool opened; // Unit is open
-        //  int ios; // return value from Inquire intrinsic
-        //
-        //  for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-        //      if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
-        //      if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-        //      { IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
-        //flags.ios(); }        if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
-        //  }
-        //
-        //  UnitNumber = -1;
-        //
-        //  return UnitNumber;
-
-        return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units
-                                           // {100,101,102})
-    }
-
-    int FindUnitNumber(std::string const &FileName) // File name to be searched.
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997, adapted from reference
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number for the file name that is either opened or exists.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int UnitNumber; // Unit number that should be used
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  Largest allowed unit number (or a large number, if none)
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string TestFileName; // File name returned from opened file
-        bool exists;              // True if file already exists
-        bool opened;              // True if file is open
-        int ios;                  // Status indicator from INQUIRE intrinsic
-
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(FileName, flags);
-            exists = flags.exists();
-            opened = flags.open();
-            ios = flags.ios();
-        }
-        if (!opened) {
-            UnitNumber = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(UnitNumber, FileName, flags);
-                ios = flags.ios();
-            }
-            if (ios != 0) {
-                DisplayString("FindUnitNumber: Could not open file \"" + FileName + "\" for append.");
-            }
-        } else {
-            std::string::size_type const FileNameLength = len(FileName);
-            std::string::size_type TestFileLength;
-            std::string::size_type Pos; // Position pointer
-            for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-                // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams
-                // constructor
-                if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) ||
-                    (UnitNumber == 102)) {
-                    continue;
-                }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(UnitNumber, flags);
-                    TestFileName = flags.name();
-                    opened = flags.open();
-                }
-                //  Powerstation returns just file name
-                //  DVF (Digital Fortran) returns whole path
-                TestFileLength = len(TestFileName);
-                Pos = index(TestFileName, FileName);
-                if (Pos != std::string::npos) {
-                    //  Must be the last part of the file
-                    if (Pos + FileNameLength == TestFileLength) break;
-                }
-            }
-        }
-
-        return UnitNumber;
-    }
-
-=======
->>>>>>> origin/develop
     void ConvertCaseToUpper(std::string const &InputString, // Input string
                             std::string &OutputString       // Output string (in UpperCase)
     )

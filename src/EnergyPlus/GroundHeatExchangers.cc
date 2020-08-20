@@ -426,7 +426,7 @@ namespace GroundHeatExchangers {
             this->initGLHESimVars(state.dataBranchInputManager);
         } else {
             this->initGLHESimVars(state.dataBranchInputManager);
-            this->calcGroundHeatExchanger();
+            this->calcGroundHeatExchanger(state.files);
             this->updateGHX();
         }
     }
@@ -587,7 +587,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::calcGFunctions()
+    void GLHEVert::calcGFunctions(IOFiles &ioFiles)
     {
 
         // No other choice than to calculate the g-functions here
@@ -600,7 +600,7 @@ namespace GroundHeatExchangers {
             myCacheData["Response Factors"]["time"] = std::vector<Real64>(myRespFactors->time.begin(), myRespFactors->time.end());
             myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(myRespFactors->LNTTS.begin(), myRespFactors->LNTTS.end());
             myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(myRespFactors->GFNC.begin(), myRespFactors->GFNC.end());
-            writeGLHECacheToFile();
+            writeGLHECacheToFile(ioFiles);
         }
     }
 
@@ -1114,7 +1114,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::writeGLHECacheToFile()
+    void GLHEVert::writeGLHECacheToFile(IOFiles &ioFiles)
     {
 
         // For convenience
@@ -1157,8 +1157,7 @@ namespace GroundHeatExchangers {
             std::string case_name = "GHLE " + std::to_string(i + 1);
             json_out[case_name] = myCacheData;
 
-            auto & outputFiles = OutputFiles::getSingleton();
-            if (outputFiles.outputControl.glhe) {
+            if (ioFiles.outputControl.glhe) {
                 // open output file
                 std::ofstream ofs;
                 ofs.open(DataStringGlobals::outputGLHEFileName);
@@ -1178,8 +1177,7 @@ namespace GroundHeatExchangers {
             std::string case_name = "GHLE 1";
             json_out[case_name] = myCacheData;
 
-            auto & outputFiles = OutputFiles::getSingleton();
-            if (outputFiles.outputControl.glhe) {
+            if (ioFiles.outputControl.glhe) {
                 // open output file
                 std::ofstream ofs;
                 ofs.open(DataStringGlobals::outputGLHEFileName);
@@ -1193,7 +1191,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::calcGFunctions()
+    void GLHESlinky::calcGFunctions(IOFiles &)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
@@ -1715,7 +1713,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::calcGroundHeatExchanger()
+    void GLHEBase::calcGroundHeatExchanger(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1785,7 +1783,7 @@ namespace GroundHeatExchangers {
             if (!gFunctionsExist) {
                 makeThisGLHECacheAndCompareWithFileCache();
                 if (!gFunctionsExist) {
-                    calcGFunctions();
+                    calcGFunctions(ioFiles);
                     gFunctionsExist = true;
                 }
             }

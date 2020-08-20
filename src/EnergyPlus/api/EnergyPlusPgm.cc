@@ -311,21 +311,6 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
 #else
         int status = chdir(filepath.c_str());
 #endif
-<<<<<<< HEAD
-
-    DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
-
-    ResultsFramework::resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
-
-    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
-
-    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
-
-    int errStatus = initErrorFile();
-    if (errStatus) {
-        return errStatus;
-=======
         if (status == 0) {
             DisplayString("Directory change successful.");
         } else {
@@ -336,28 +321,14 @@ int initializeEnergyPlus(EnergyPlus::EnergyPlusData &state, std::string const & 
         int dummy_argc = 1;
         const char *dummy_argv[1] = {"energyplus"};
         CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
->>>>>>> origin/develop
     }
 
     return commonRun(state);
 }
 
-<<<<<<< HEAD
-    try {
-        EnergyPlus::inputProcessor = InputProcessor::factory();
-        EnergyPlus::inputProcessor->processInput();
-    } catch (const FatalError &e) {
-        return AbortEnergyPlus(state);
-    } catch (const std::exception &e) {
-        ShowSevereError(e.what());
-        return AbortEnergyPlus(state);
-    }
-    return 0;
-=======
 int initializeAsLibrary(EnergyPlus::EnergyPlusData &state) {
     commonInitialize(state);
     return commonRun(state);
->>>>>>> origin/develop
 }
 
 int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
@@ -381,18 +352,11 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         }
 
         if (DataGlobals::runReadVars) {
-<<<<<<< HEAD
-            state.outputFiles.outputControl.csv = true;
-//            int status = CommandLineInterface::runReadVarsESO(state.outputFiles);
-//            if (status) {
-//                return status;
-//            }
-=======
-            int status = CommandLineInterface::runReadVarsESO(state.files);
-            if (status) {
-                return status;
-            }
->>>>>>> origin/develop
+            state.files.outputControl.csv = true;
+            // int status = CommandLineInterface::runReadVarsESO(state.files, state.files.outputControl.csv);
+            // if (status) {
+            //     return status;
+            // }
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);

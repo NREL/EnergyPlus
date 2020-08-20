@@ -93,11 +93,11 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputFile &ensure_open(const std::string &caller);
+    InputFile &ensure_open(const std::string &caller, bool output_to_file = true);
     std::istream::iostate rdstate() const noexcept;
 
     std::string fileName;
-    void open();
+    void open(bool = true);
     std::fstream::pos_type position() const noexcept;
 
     void rewind() noexcept { if (is) { is->seekg(0); } }
@@ -134,9 +134,9 @@ public:
 
     // opens the file if it is not currently open and returns
     // a reference back to itself
-    InputOutputFile &ensure_open(const std::string &caller);
+    InputOutputFile &ensure_open(const std::string &caller, bool output_to_file = true);
 
-    void open(const bool forAppend = false);
+    void open(const bool forAppend = false, bool output_to_file = true);
     std::fstream::pos_type position() const noexcept;
     std::vector<std::string> getLines();
     void open_as_stringstream();
@@ -146,23 +146,26 @@ public:
 
 private:
     std::unique_ptr<std::iostream> os;
+    bool print_to_dev_null = false;
     template <typename... Args> friend void print(InputOutputFile &of, fmt::string_view format_str, const Args &... args);
+    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim);
+    template <class InputIterator> friend void print(InputIterator first, InputIterator last, InputOutputFile &outputFile);
     friend class IOFiles;
 };
 
 template <typename FileType> struct IOFileName
 {
     std::string fileName;
-    FileType open(const std::string &caller)
+    FileType open(const std::string &caller, bool output_to_file = true)
     {
         FileType file{fileName};
-        file.ensure_open(caller);
+        file.ensure_open(caller, output_to_file);
         return file;
     }
-    FileType try_open()
+    FileType try_open(bool output_to_file = true)
     {
         FileType file{fileName};
-        file.open();
+        file.open(output_to_file);
         return file;
     }
 };
@@ -233,6 +236,46 @@ class IOFiles
 {
 public:
 
+    struct OutputControl
+    {
+        OutputControl() = default;
+
+        void getInput();
+
+        bool csv = true;
+        bool mtr = true;
+        bool eso = true;
+        bool eio = true;
+        bool audit = true;
+        bool zsz = true;
+        bool ssz = true;
+        bool dxf = true;
+        bool bnd = true;
+        bool rdd = true;
+        bool mdd = true;
+        bool mtd = true;
+        bool end = true;
+        bool shd = true;
+        bool dfs = true;
+        bool glhe = true;
+        bool delightin = true;
+        bool delighteldmp = true;
+        bool delightdfdmp = true;
+        bool edd = true;
+        bool dbg = true;
+        bool perflog = true;
+        bool sln = true;
+        bool sci = true;
+        bool wrl = true;
+        bool screen = true;
+        bool tarcog = true;
+        bool extshd = true;
+        bool json = true;
+        bool tabular = true;
+        bool sqlite = true;
+    };
+
+    OutputControl outputControl;
 
     InputOutputFile audit{"eplusout.audit"};
     InputOutputFile eio{"eplusout.eio"};
@@ -255,6 +298,8 @@ public:
 
     InputOutputFile mtr{"eplusout.mtr"};
     InputOutputFile bnd{"eplusout.bnd"};
+    InputOutputFile rdd{"eplusout.rdd"};
+    InputOutputFile mdd{"eplusout.mdd"};
 
     InputOutputFile debug{"eplusout.dbg"};
 
@@ -270,6 +315,9 @@ public:
     InputOutputFile mtd{"eplusout.mtd"};
     InputOutputFile edd{"eplusout.edd", true}; // write to stdout if no file never opened
     InputOutputFile shade{"eplusshading.csv"};
+
+    InputOutputFile csv{"eplusout.csv"};
+    InputOutputFile mtr_csv{"eplusmtr.csv"};
 
     InputOutputFileName screenCsv{"eplusscreen.csv"};
     InputOutputFileName endFile{"eplusout.end"};
@@ -374,6 +422,40 @@ template <typename... Args> void print(InputOutputFile &outputFile, fmt::string_
     }();
 
     EnergyPlus::vprint(*outputStream, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile, const char * delim)
+{
+    auto *outputStream = [&]() -> std::ostream * {
+        if (outputFile.os) {
+            return outputFile.os.get();
+        } else {
+            if (outputFile.defaultToStdOut) {
+                return &std::cout;
+            } else {
+                assert(outputFile.os);
+                return nullptr;
+            }
+        }
+    }();
+    std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputStream, delim));
+}
+
+template <class InputIterator> void print(InputIterator first, InputIterator last, InputOutputFile &outputFile)
+{
+    auto *outputStream = [&]() -> std::ostream * {
+        if (outputFile.os) {
+            return outputFile.os.get();
+        } else {
+            if (outputFile.defaultToStdOut) {
+                return &std::cout;
+            } else {
+                assert(outputFile.os);
+                return nullptr;
+            }
+        }
+    }();
+    std::copy(first, last, std::ostream_iterator<typename std::iterator_traits<InputIterator>::value_type>(*outputStream));
 }
 
 template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)

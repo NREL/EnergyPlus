@@ -321,7 +321,7 @@ namespace ResultsFramework {
             outputVariableIndices = std::vector<bool>(num_output_variables, false);
         }
 
-        void writeOutput(std::vector<std::string> const & outputVariables, OutputFile & outputFile, bool outputControl);
+        void writeOutput(std::vector<std::string> const & outputVariables, InputOutputFile & outputFile, bool outputControl);
         void parseTSOutputs(json const &data, std::vector<std::string> const& outputVariables, OutputProcessor::ReportingFrequency reportingFrequency);
 
     private:
@@ -345,7 +345,7 @@ namespace ResultsFramework {
 
         virtual ~ResultsFramework() = default;
 
-        void setupOutputOptions(OutputFiles & outputFiles);
+        void setupOutputOptions(IOFiles &ioFiles);
 
         bool timeSeriesEnabled() const;
 
@@ -385,8 +385,7 @@ namespace ResultsFramework {
         MeterDataFrame SMMeters = MeterDataFrame("RunPeriod");
         MeterDataFrame YRMeters = MeterDataFrame("Yearly");
 
-<<<<<<< HEAD:src/EnergyPlus/ResultsFramework.hh
-        void writeOutputs();
+        void writeOutputs(IOFiles & ioFiles);
 
         void addReportVariable(std::string const &keyedValue,
                                std::string const &variableName,
@@ -396,10 +395,6 @@ namespace ResultsFramework {
         void addReportMeter(std::string const &meter,
                             std::string const &units,
                             OutputProcessor::ReportingFrequency const reportingInterval);
-=======
-        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
-        void WriteReport(JsonOutputStreams &jsonOutputStreams);
->>>>>>> origin/develop:src/EnergyPlus/ResultsSchema.hh
 
         SimInfo SimulationInformation;
 
@@ -415,11 +410,11 @@ namespace ResultsFramework {
         bool outputMsgPack = false;
         std::vector<std::string> outputVariables;
 
-        void writeTimeSeriesReports();
+        void writeTimeSeriesReports(JsonOutputStreams &jsonOutputStreams);
 
-        void writeReport();
+        void writeReport(JsonOutputStreams &jsonOutputStreams);
 
-        void writeCSVOutput();
+        void writeCSVOutput(IOFiles & ioFiles);
 
     private:
         friend class EnergyPlus::EnergyPlusFixture;
