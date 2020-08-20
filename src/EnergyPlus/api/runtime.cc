@@ -84,16 +84,23 @@ void registerProgressCallback(EnergyPlusState, void (*f)(int const)) {
     EnergyPlus::DataGlobals::progressCallback = f;
 }
 
-void registerStdOutCallback(EnergyPlusState, void (*f)(const char *)) {
+void registerStdOutCallback(EnergyPlusState EP_UNUSED(state), std::function<void (const std::string &)> f) {
     EnergyPlus::DataGlobals::messageCallback = f;
 }
 
-void registerExternalHVACManager(EnergyPlusState, std::function<void (EnergyPlusState)> f) {
-  EnergyPlus::DataGlobals::externalHVACManager = std::move(f);
+void registerStdOutCallback(EnergyPlusState state, void (*f)(const char *)) {
+    const auto stdf = [f](const std::string & message) {
+        f(message.c_str());
+    };
+    registerStdOutCallback(state, std::function<void (const std::string &)>(stdf));
+}
+
+void registerExternalHVACManager(EnergyPlusState EP_UNUSED(state), std::function<void (EnergyPlusState)> f) {
+    EnergyPlus::DataGlobals::externalHVACManager = f;
 }
 
 void registerExternalHVACManager(EnergyPlusState state, void (*f)(EnergyPlusState)) {
-  registerExternalHVACManager(state, std::function<void (EnergyPlusState)>(f));
+    registerExternalHVACManager(state, std::function<void (EnergyPlusState)>(f));
 }
 
 void callbackBeginNewEnvironment(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
