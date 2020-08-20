@@ -471,7 +471,7 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             errorsFound = true;
         }
 
-        if (!this - hardSizeNoDesignRun || this->dataScalableSizingON || this->dataScalableCapSizingON) {
+        if (!this->hardSizeNoDesignRun || this->dataScalableSizingON || this->dataScalableCapSizingON) {
             if (this->wasAutoSized) {
                 // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
                 // determines capacity using physical calculations instead of emperical curves

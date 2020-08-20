@@ -469,6 +469,7 @@ namespace DataSizing {
         DataConstantUsedForSizing = 0.0;
         DataFractionUsedForSizing = 0.0;
         DataNonZoneNonAirloopValue = 0.0;
+        DataSizingFraction = 1.0;
         DataZoneNumber = 0;
         DataFanEnumType = -1;
         DataFanIndex = -1;

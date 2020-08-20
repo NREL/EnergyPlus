@@ -428,11 +428,12 @@ TEST_F(AutoSizingFixture, ZoneCoolingLoadSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(2880.0, sizedValue, 0.0001);
+    EXPECT_EQ(sizer.autoSizedValue, 2880.0);
+    EXPECT_EQ(sizer.originalValue, 2880.0);
     sizer.autoSizedValue = 0.0; // reset for next test
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Zone Cooling Sensible Load [W], 0.00000\n"
-                    " Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Zone Cooling Sensible Load [W], 2880.00000\n");
+        std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, User-Specified Zone Cooling Sensible Load [W], 2880.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 
@@ -560,11 +561,12 @@ TEST_F(AutoSizingFixture, ZoneHeatingLoadSizingGauntlet)
     EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
     EXPECT_FALSE(sizer.wasAutoSized);
     EXPECT_NEAR(2880.0, sizedValue, 0.0001);
+    EXPECT_EQ(sizer.autoSizedValue, 2880.0);
+    EXPECT_EQ(sizer.originalValue, 2880.0);
     sizer.autoSizedValue = 0.0; // reset for next test
     // <Component Sizing Information> header already reported above (and flag set false). Only coil sizing information reported here.
     eiooutput =
-        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, Design Size Zone Heating Sensible Load [W], 0.00000\n"
-                    " Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Zone Heating Sensible Load [W], 2880.00000\n");
+        std::string(" Component Sizing Information, Coil:Heating:Water, MyWaterCoil, User-Specified Zone Heating Sensible Load [W], 2880.00000\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 
@@ -688,9 +690,11 @@ TEST_F(AutoSizingFixture, ASHRAEMinSATCoolingSizingGauntlet)
     sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
     sizedValue = sizer.size(inputValue, errorsFound);
     EXPECT_EQ(AutoSizingResultType::ErrorType1, sizer.errorType);
+    EXPECT_TRUE(errorsFound);
     EXPECT_TRUE(sizer.wasAutoSized);
     EXPECT_NEAR(0.0, sizedValue, 0.001);
     sizer.autoSizedValue = 0.0; // reset for next test
+    errorsFound = false;
 
     // reset eio stream
     has_eio_output(true);
