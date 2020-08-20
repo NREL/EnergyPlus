@@ -1917,14 +1917,14 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
 
     } else if (reportName == "CHILLERREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "CHILLER Electricity Rate");
+        addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "CHILLER EVAPORATOR COOLING ENERGY");      // on meter
         addRecordToOutputVariableStructure("*", "CHILLER CONDENSER HEAT TRANSFER ENERGY"); // on meter
         addRecordToOutputVariableStructure("*", "CHILLER COP");
 
     } else if (reportName == "TOWERREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN Electricity Rate");
+        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER HEAT TRANSFER RATE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER INLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER OUTLET TEMPERATURE");
@@ -1939,7 +1939,7 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "BOILER INLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "BOILER OUTLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "BOILER MASS FLOW RATE");
-        addRecordToOutputVariableStructure("*", "BOILER ANCILLARY Electricity Rate");
+        addRecordToOutputVariableStructure("*", "BOILER ANCILLARY ELECTRICITY RATE");
 
     } else if (reportName == "DXREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING ENERGY"); // on meter
@@ -1951,8 +1951,8 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING RATE");
         addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING RATE");
         addRecordToOutputVariableStructure("*", "COOLING COIL LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL Electricity Rate");
-        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER Electricity Rate");
+        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRICITY RATE");
+        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRICITY RATE");
 
     } else if (reportName == "WINDOWREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE");
@@ -2052,7 +2052,7 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER Electricity Rate");
+        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY RATE");
 
     } else if (reportName == "WATERHEATERREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
@@ -2106,12 +2106,12 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
     } else if (reportName == "FANREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "FAN ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "FAN RISE IN AIR TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "FAN Electricity Rate");
+        addRecordToOutputVariableStructure("*", "FAN ELECTRICITY RATE");
 
     } else if (reportName == "PUMPREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "PUMP Electricity Rate");
+        addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "PUMP SHAFT POWER");
         addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN RATE");
         addRecordToOutputVariableStructure("*", "PUMP OUTLET TEMPERATURE");
