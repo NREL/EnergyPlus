@@ -1175,6 +1175,9 @@ namespace UtilityRoutines {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Fatal, ErrorMessage);
+        }
         throw FatalError(ErrorMessage);
     }
 
@@ -1233,6 +1236,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
     void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1286,6 +1292,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
     void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1325,6 +1334,9 @@ namespace UtilityRoutines {
         ShowErrorMessage(" **   ~~~   ** " + Message, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message);
+        }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Continue, Message);
         }
     }
 
@@ -1382,23 +1394,31 @@ namespace UtilityRoutines {
         }
 
         if (len(Message) < 50) {
-            ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                 CreateSysTimeIntervalString();
+            ShowErrorMessage(" **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
             }
         } else {
-            ShowErrorMessage(" **   ~~~   ** " + Message);
-            ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = " **   ~~~   ** " + Message;
+            const auto postfix = " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                CreateSysTimeIntervalString();
+            ShowErrorMessage(m);
+            ShowErrorMessage(postfix,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
+                DataGlobals::errorCallback(Error::Continue, postfix);
             }
         }
     }
@@ -1443,6 +1463,9 @@ namespace UtilityRoutines {
             ShowErrorMessage(" ************* " + Message, OutUnit1, OutUnit2);
             if (sqlite) {
                 sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Info, Message);
             }
         }
     }
@@ -1499,6 +1522,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        }
     }
 
     void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1528,6 +1554,9 @@ namespace UtilityRoutines {
         ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
+        }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
@@ -1849,8 +1878,8 @@ namespace UtilityRoutines {
         if (present(OutUnit2)) {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
-        std::string tmp = "  " + ErrorMessage + '\n';
-        if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
+        // std::string tmp = "  " + ErrorMessage + '\n';
+        // if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
     void SummarizeErrors()
@@ -1972,18 +2001,32 @@ namespace UtilityRoutines {
                     if (sqlite) {
                         sqlite->updateSQLiteErrorRecord(error.Message);
                     }
+                    if (DataGlobals::errorCallback) {
+                        DataGlobals::errorCallback(Error::Continue, error.Message);
+                    }
                 } else {
+                    const auto warning = has_prefix(error.Message, " ** Warning ** ");
+                    const auto severe = has_prefix(error.Message, " ** Severe  ** ");
+
                     ShowMessage("");
                     ShowMessage(error.Message);
                     ShowMessage(StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
                     ShowMessage(StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
                     ShowMessage(StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
                     if (sqlite) {
-                        if (has_prefix(error.Message, " ** Warning ** ")) {
+                        if (warning) {
                             sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
-                        } else if (has_prefix(error.Message, " ** Severe  ** ")) {
+                        } else if (severe) {
                             sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
                         }
+                    }
+                    if (DataGlobals::errorCallback) {
+                        Error level = Error::Warning;
+                        if (severe) {
+                            level = Error::Severe;
+                        }
+                        DataGlobals::errorCallback(level, error.Message);
+                        DataGlobals::errorCallback(Error::Continue, "");
                     }
                 }
                 StatMessage = "";
