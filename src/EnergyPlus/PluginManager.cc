@@ -1272,6 +1272,9 @@ namespace PluginManagement {
                 if (functionName == this->sHookBeginNewEnvironment) {
                     this->bHasBeginNewEnvironment = true;
                     this->pBeginNewEnvironment = (*EP_PyString_FromString)(functionName.c_str());
+                } else if (functionName == this->sHookBeginZoneTimestepBeforeSetCurrentWeather) {
+                    this->bHasBeginZoneTimestepBeforeSetCurrentWeather = true;
+                    this->pBeginZoneTimestepBeforeSetCurrentWeather = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterNewEnvironmentWarmUpIsComplete) {
                     this->bHasAfterNewEnvironmentWarmUpIsComplete = true;
                     this->pAfterNewEnvironmentWarmUpIsComplete = (*EP_PyString_FromString)(functionName.c_str());
@@ -1367,6 +1370,11 @@ namespace PluginManagement {
             if (this->bHasBeginNewEnvironment) {
                 pFunctionName = this->pBeginNewEnvironment;
                 functionName = this->sHookBeginNewEnvironment;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather) {
+            if (this->bHasBeginZoneTimestepBeforeSetCurrentWeather) {
+                pFunctionName = this->pBeginZoneTimestepBeforeSetCurrentWeather;
+                functionName = this->sHookBeginZoneTimestepBeforeSetCurrentWeather;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromZoneSizing) {
             if (this->bHasEndOfZoneSizing) {

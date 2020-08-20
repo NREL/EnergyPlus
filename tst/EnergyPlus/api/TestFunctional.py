@@ -92,7 +92,7 @@ print("Python API Test: Calculated energy of moisture: %8.4f" % moisture_energy)
 error_count = 0
 
 
-def error_handler(message: bytes) -> None:
+def error_handler(severity: int, message: bytes) -> None:
     global error_count
     error_count += 1
 
