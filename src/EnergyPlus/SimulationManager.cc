@@ -309,9 +309,6 @@ namespace SimulationManager {
 
 
         state.files.outputControl.getInput();
-        if (DataGlobals::runReadVars) {
-            state.files.outputControl.csv = true;
-        }
         ResultsFramework::resultsFramework->setupOutputOptions(state.files);
 
         state.files.debug.ensure_open("OpenOutputFiles", state.files.outputControl.dbg);
