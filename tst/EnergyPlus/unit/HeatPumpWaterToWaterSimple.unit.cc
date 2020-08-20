@@ -786,7 +786,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                         }
                     }
 
-                    WeatherManager::ManageWeather(state.files);
+                    WeatherManager::ManageWeather(state);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 
