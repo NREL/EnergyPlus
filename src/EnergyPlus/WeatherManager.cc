@@ -1841,7 +1841,7 @@ namespace WeatherManager {
                 General::InvOrdinalDay(JDay, SpecialDays(i).ActStMon, SpecialDays(i).ActStDay, LeapYearAdd);
             } else if (SpecialDays(i).DateType == DateType::NthDayInMonth) {
                 int ThisDay = SpecialDays(i).WeekDay - MonWeekDay(SpecialDays(i).Month) + 1;
-                if (SpecialDays(i).WeekDay >= MonWeekDay(SpecialDays(i).Month)) {
+                if (SpecialDays(i).WeekDay < MonWeekDay(SpecialDays(i).Month)) {
                     ThisDay += 7;
                 }
                 ThisDay += 7 * (SpecialDays(i).Day - 1);

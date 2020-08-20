@@ -87,8 +87,9 @@ extern "C" {
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_GetAttrString(PyObject *o, const char *attr_name) {return PyObject_GetAttrString(o, attr_name);}
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction(PyObject *callable, const char *format) {return PyObject_CallFunction(callable, format);}
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallFunction3Args(PyObject *callable, const char *format, PyObject * arg1, PyObject * arg2, PyObject * arg3) {return PyObject_CallFunction(callable, format, arg1, arg2, arg3);}
-
     PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod(PyObject *obj, const char *name, const char *format) {return PyObject_CallMethod(obj, name, format);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod1Arg(PyObject *p, const char *name, const char *format, PyObject *arg1) {return PyObject_CallMethod(p, name, format, arg1);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyObject_CallMethod2ObjArg(PyObject *p, PyObject *name, PyObject *arg1, PyObject *argNull) {return PyObject_CallMethodObjArgs(p, name, arg1, argNull);}
     PYTHONWRAP_API int EP_Wrap_PyList_Check(PyObject *p) {return PyList_Check(p);} // NOLINT(hicpp-signed-bitwise)
     PYTHONWRAP_API unsigned long EP_Wrap_PyList_Size(PyObject *list) {return PyList_Size(list);}
     PYTHONWRAP_API PyObject * EP_Wrap_PyList_GetItem(PyObject *list, Py_ssize_t index) {return PyList_GetItem(list, index);}
@@ -97,4 +98,7 @@ extern "C" {
     PYTHONWRAP_API long EP_Wrap_PyLong_AsLong(PyObject *obj) {return PyLong_AsLong(obj);}
     PYTHONWRAP_API void EP_Wrap_Py_SetPath(const wchar_t *t) {return Py_SetPath(t);}
     PYTHONWRAP_API void EP_Wrap_Py_SetPythonHome(wchar_t *home) {return Py_SetPythonHome(home);}
+    PYTHONWRAP_API PyObject * EP_Wrap_Py_BuildValue(const char *format) {return Py_BuildValue(format);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyLong_FromVoidPtr(void *v) {return PyLong_FromVoidPtr(v);}
+    PYTHONWRAP_API PyObject * EP_Wrap_PyString_FromString(const char *s) {return PyUnicode_FromString(s);}
 }
