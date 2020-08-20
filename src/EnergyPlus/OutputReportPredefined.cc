@@ -1931,13 +1931,13 @@ namespace OutputReportPredefined {
         pdstDXCoolCoil2 = newPreDefSubTable(pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report");
         pdchDXCoolCoilType = newPreDefColumn(pdstDXCoolCoil2, "DX Cooling Coil Type");
         pdchDXCoolCoilNetCapSIA = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test A [W]");
-        pdchDXCoolCoilElecPowerA = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Rate Test A [W]");
+        pdchDXCoolCoilElecPowerA = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test A [W]");
         pdchDXCoolCoilNetCapSIB = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test B [W]");
-        pdchDXCoolCoilElecPowerB = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Rate Test B [W]");
+        pdchDXCoolCoilElecPowerB = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test B [W]");
         pdchDXCoolCoilNetCapSIC = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test C [W]");
-        pdchDXCoolCoilElecPowerC = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Rate Test C [W]");
+        pdchDXCoolCoilElecPowerC = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test C [W]");
         pdchDXCoolCoilNetCapSID = newPreDefColumn(pdstDXCoolCoil2, "Rated Net Cooling Capacity Test D [W]");
-        pdchDXCoolCoilElecPowerD = newPreDefColumn(pdstDXCoolCoil2, "Rated Electricity Rate Test D [W]");
+        pdchDXCoolCoilElecPowerD = newPreDefColumn(pdstDXCoolCoil2, "Rated Electric Power Test D [W]");
 
         pdstDXHeatCoil = newPreDefSubTable(pdrEquip, "DX Heating Coils");
         pdchDXHeatCoilType = newPreDefColumn(pdstDXHeatCoil, "DX Heating Coil Type");
