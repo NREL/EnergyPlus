@@ -486,10 +486,10 @@ namespace UtilityRoutines {
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
 
         } else if (SELECT_CASE_var == "DIESEL") {
             FuelTypeOutput = "Diesel";
@@ -573,11 +573,11 @@ namespace UtilityRoutines {
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
         } else if (SELECT_CASE_var == "DIESEL") {

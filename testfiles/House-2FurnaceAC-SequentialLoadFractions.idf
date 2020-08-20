@@ -1697,17 +1697,17 @@
 
   Output:Variable,*,Zone Air Temperature,detailed;
 
-  Output:Variable,*,Fan Electric Power,detailed;
+  Output:Variable,*,Fan Electricity Rate,detailed;
 
   Output:Variable,*,Heating Coil Heating Rate,detailed;
 
-  Output:Variable,*,Heating Coil Electric Power,detailed;
+  Output:Variable,*,Heating Coil Electricity Rate,detailed;
 
-  Output:Variable,*,Heating Coil Gas Rate,detailed;
+  Output:Variable,*,Heating Coil NaturalGas Rate,detailed;
 
   Output:Variable,*,Heating Coil Runtime Fraction,detailed;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,detailed;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,detailed;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,detailed;
 
@@ -1715,7 +1715,7 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Rate,detailed;
 
-  Output:Variable,*,Cooling Coil Electric Power,detailed;
+  Output:Variable,*,Cooling Coil Electricity Rate,detailed;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,detailed;
 

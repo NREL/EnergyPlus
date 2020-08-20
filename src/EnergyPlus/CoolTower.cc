@@ -441,20 +441,20 @@ namespace CoolTower {
                                 "System",
                                 "Average",
                                 Zone(dataCoolTower.CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Pump Electric Power",
+            SetupOutputVariable("Zone Cooltower Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 dataCoolTower.CoolTowerSys(CoolTowerNum).PumpElecPower,
                                 "System",
                                 "Average",
                                 Zone(dataCoolTower.CoolTowerSys(CoolTowerNum).ZonePtr).Name);
-            SetupOutputVariable("Zone Cooltower Pump Electric Energy",
+            SetupOutputVariable("Zone Cooltower Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 dataCoolTower.CoolTowerSys(CoolTowerNum).PumpElecConsump,
                                 "System",
                                 "Sum",
                                 Zone(dataCoolTower.CoolTowerSys(CoolTowerNum).ZonePtr).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Cooling",
                                 _,
                                 "System");
