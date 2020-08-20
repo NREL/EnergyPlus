@@ -3630,9 +3630,9 @@
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
-  Output:Variable,*,Humidifier NaturalGas Use Rate,hourly;
+  Output:Variable,*,Humidifier NaturalGas Rate,hourly;
 
-  Output:Variable,*,Humidifier NaturalGas Use Energy,hourly;
+  Output:Variable,*,Humidifier NaturalGas Energy,hourly;
 
   Output:Variable,*,Humidifier Auxiliary Electricity Rate,hourly;
 

@@ -553,8 +553,8 @@ namespace Humidifiers {
                                     "Average",
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(
-                    "Humidifier NaturalGas Use Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier NaturalGas Use Energy",
+                    "Humidifier NaturalGas Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).GasUseEnergy,
                                     "System",
