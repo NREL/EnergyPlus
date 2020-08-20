@@ -4602,7 +4602,7 @@ namespace DaylightingManager {
                 // and process them using standard EPlus warning/error handling calls
                 // Process all error/warning messages first
                 // Then, if any error has occurred, ShowFatalError to terminate processing
-                // bEndofErrFile = !iDElightErrorFile.good();
+                bEndofErrFile = !iDElightErrorFile.good();
                 bRecordsOnErrFile = false;
                 while (!bEndofErrFile) {
                     auto cErrorLine = iDElightErrorFile.readLine();
