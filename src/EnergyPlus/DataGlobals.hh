@@ -138,12 +138,13 @@ namespace DataGlobals {
     extern int const emsCallFromEndZoneTimestepAfterZoneReporting;    // Identity where EMS called from
     extern int const emsCallFromSetupSimulation;                      // identify where EMS called from,
     // this is for input processing only
-    extern int const emsCallFromExternalInterface;         // Identity where EMS called from
-    extern int const emsCallFromComponentGetInput;         // EMS called from end of get input for a component
-    extern int const emsCallFromUserDefinedComponentModel; // EMS called from inside a custom user component model
-    extern int const emsCallFromUnitarySystemSizing;       // EMS called from unitary system compound component
-    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance; // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance; // Identity where EMS called from
+    extern int const emsCallFromExternalInterface;                        // Identity where EMS called from
+    extern int const emsCallFromComponentGetInput;                        // EMS called from end of get input for a component
+    extern int const emsCallFromUserDefinedComponentModel;                // EMS called from inside a custom user component model
+    extern int const emsCallFromUnitarySystemSizing;                      // EMS called from unitary system compound component
+    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance;   // Identity where EMS called from
+    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance;    // Identity where EMS called from
+    extern int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather; // Identity where EMS called from
 
     extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
 

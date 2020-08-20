@@ -99,6 +99,7 @@ namespace PluginManagement {
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
+        const char * sHookBeginZoneTimestepBeforeSetCurrentWeather = "on_begin_zone_timestep_before_set_current_weather";
         const char * sHookAfterNewEnvironmentWarmUpIsComplete = "on_after_new_environment_warmup_is_complete";
         const char * sHookBeginZoneTimestepBeforeInitHeatBalance = "on_begin_zone_timestep_before_init_heat_balance";
         const char * sHookBeginZoneTimestepAfterInitHeatBalance = "on_begin_zone_timestep_after_init_heat_balance";
@@ -116,6 +117,7 @@ namespace PluginManagement {
         const char * sHookUserDefinedComponentModel = "on_user_defined_component_model";
         const char * sHookUnitarySystemSizing = "on_unitary_system_sizing";
         bool bHasBeginNewEnvironment = false;
+        bool bHasBeginZoneTimestepBeforeSetCurrentWeather = false;
         bool bHasAfterNewEnvironmentWarmUpIsComplete = false;
         bool bHasBeginZoneTimestepBeforeInitHeatBalance = false;
         bool bHasBeginZoneTimestepAfterInitHeatBalance = false;
@@ -137,6 +139,7 @@ namespace PluginManagement {
         PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
         // precalculated function names as PyObjects
         PyObjectWrap pBeginNewEnvironment = nullptr;
+        PyObjectWrap pBeginZoneTimestepBeforeSetCurrentWeather = nullptr;
         PyObjectWrap pAfterNewEnvironmentWarmUpIsComplete = nullptr;
         PyObjectWrap pBeginZoneTimestepBeforeInitHeatBalance = nullptr;
         PyObjectWrap pBeginZoneTimestepAfterInitHeatBalance = nullptr;
