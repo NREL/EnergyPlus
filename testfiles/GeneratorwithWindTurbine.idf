@@ -622,7 +622,7 @@
     ,                        !- Generator Demand Limit Scheme Purchased Electric Demand Limit {W}
     Always On;               !- Generator Track Schedule Name Scheme Schedule Name
 
-  Output:Variable,*,Generator Produced Electricity Energy,Hourly;
+  Output:Variable,*,Generator Produced AC Electricity Energy,Hourly;
 
   Output:Variable,*,Generator Turbine Local Wind Speed,Hourly;
 
@@ -640,7 +640,7 @@
 
   Output:Variable,*,Generator Turbine Attack Angle,Hourly;
 
-  Output:Variable,*,Generator Produced Electricity Rate,Hourly;
+  Output:Variable,*,Generator Produced AC Electricity Rate,Hourly;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
 

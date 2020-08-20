@@ -817,9 +817,9 @@
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,*,Generator Produced Electricity Rate,timestep;
+  Output:Variable,*,Generator Produced AC Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Produced Electricity Energy,timestep;
+  Output:Variable,*,Generator Produced AC Electricity Energy,timestep;
 
   Output:Variable,*,Facility Total Electricity Demand Rate,timestep;
 

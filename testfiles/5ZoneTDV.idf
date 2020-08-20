@@ -4214,13 +4214,13 @@
   Output:Table:Monthly,
     Generator Report,        !- Name
     ,                        !- Digits After Decimal
-    Generator Produced Electricity Energy,  !- Variable or Meter 1 Name
+    Generator Produced AC Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Generator Diesel Energy, !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Generator NaturalGas Energy,    !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Generator Produced Electricity Energy,  !- Variable or Meter 4 Name
+    Generator Produced AC Electricity Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4
     Generator Total Heat Recovery,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5

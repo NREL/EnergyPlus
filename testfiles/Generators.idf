@@ -2527,7 +2527,7 @@
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,Cat Diesel,Generator Produced Electricity Rate,timestep;
+  Output:Variable,Cat Diesel,Generator Produced AC Electricity Rate,timestep;
 
   Output:Variable,Cat Diesel,Generator Diesel Rate,timestep;
 
@@ -2537,7 +2537,7 @@
 
   Output:Variable,Cat Diesel,Generator Exhaust Air Temperature,timestep;
 
-  Output:Variable,Solar Turbine,Generator Produced Electricity Rate,timestep;
+  Output:Variable,Solar Turbine,Generator Produced AC Electricity Rate,timestep;
 
   Output:Variable,Solar Turbine,Generator NaturalGas Rate,timestep;
 
@@ -2547,7 +2547,7 @@
 
   Output:Variable,Solar Turbine,Generator Exhaust Air Temperature,timestep;
 
-  Output:Variable,Capstone C65,Generator Produced Electricity Rate,timestep;
+  Output:Variable,Capstone C65,Generator Produced AC Electricity Rate,timestep;
 
   Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Rate,timestep;
 

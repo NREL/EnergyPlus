@@ -419,9 +419,9 @@ namespace MicroCHPElectricGenerator {
         SetupOutputVariable("Generator Cool Down Mode Time", OutputProcessor::Unit::s, this->A42Model.CoolDownModeTime, "System", "Sum", this->Name);
 
         SetupOutputVariable(
-            "Generator Produced Electricity Rate", OutputProcessor::Unit::W, this->A42Model.ACPowerGen, "System", "Average", this->Name);
+            "Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->A42Model.ACPowerGen, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electricity Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->A42Model.ACEnergyGen,
                             "System",

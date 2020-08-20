@@ -746,9 +746,9 @@
 !    Water Heater Heating Rate ,  !- Variable_Name
 !    Timestep;                  !- Reporting_Frequency
 
-  Output:Variable,*,Generator Produced Electricity Rate,timestep;
+  Output:Variable,*,Generator Produced AC Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Produced Electricity Energy,timestep;
+  Output:Variable,*,Generator Produced AC Electricity Energy,timestep;
 
   Output:Variable,*,Facility Total Electricity Demand Rate,timestep;
 

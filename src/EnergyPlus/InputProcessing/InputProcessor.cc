@@ -2067,10 +2067,10 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "WATER HEATER SOURCE ENERGY");
 
     } else if (reportName == "GENERATORREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR DIESEL CONSUMPTION");
         addRecordToOutputVariableStructure("*", "GENERATOR NATURALGAS CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR TOTAL HEAT RECOVERY");
         addRecordToOutputVariableStructure("*", "GENERATOR JACKET HEAT RECOVERY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR LUBE HEAT RECOVERY");

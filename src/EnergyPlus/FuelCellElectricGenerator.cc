@@ -1061,9 +1061,9 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electricity Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.ACEnergyGen,
                             "System",

@@ -91,7 +91,7 @@ void progressHandler(EnergyPlusState state, int const progress) {
     }
 }
 
-void errorHandler(EnergyPlusState state, const char * message) {
+void errorHandler(EnergyPlusState state, int level, const char * message) {
     char * warning = strstr(message, "Warning");
     if (warning) {
         numWarnings++;

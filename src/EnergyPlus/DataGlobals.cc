@@ -251,9 +251,9 @@ namespace DataGlobals {
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
-    void (*progressCallback)(int const);
-    void (*messageCallback)(const char * message);
-    void (*errorCallback)(const char * errorMessage);
+    std::function<void(int const)> progressCallback;
+    std::function<void(const std::string &)> messageCallback;
+    std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
 
     bool eplusRunningViaAPI;
 

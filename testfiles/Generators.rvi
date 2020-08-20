@@ -8,15 +8,15 @@ Facility Total Purchased Electricity Energy
 Facility Total Building Electricity Demand Rate
 Facility Total HVAC Electricity Demand Rate
 Facility Total Electricity Demand Rate
-Cat Diesel,Generator Produced Electricity Rate
+Cat Diesel,Generator Produced AC Electricity Rate
 Cat Diesel,Generator Diesel Rate
 Cat Diesel,Generator Diesel Mass Flow Rate
 Cat Diesel,Generator Exhaust Air Temperature
-Solar Turbine,Generator Produced Electricity Rate
+Solar Turbine,Generator Produced AC Electricity Rate
 Solar Turbine,Generator NaturalGas Rate
 Solar Turbine,Generator Gas Mass Flow Rate
 Solar Turbine,Generator Exhaust Air Temperature
-Capstone C65,Generator Produced Electricity Rate
+Capstone C65,Generator Produced AC Electricity Rate
 Capstone C65,Generator Gas HHV Basis Rate
 Capstone C65,Generator Gas Mass Flow Rate
 Capstone C65,Generator LHV Basis Electric Efficiency

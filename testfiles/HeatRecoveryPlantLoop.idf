@@ -3106,7 +3106,7 @@
 
   Output:Variable,Capstone C65,Generator Heat Recovery Water Mass Flow Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Produced Electricity Rate,hourly;
+  Output:Variable,Capstone C65,Generator Produced AC Electricity Rate,hourly;
 
   Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Rate,hourly;
 

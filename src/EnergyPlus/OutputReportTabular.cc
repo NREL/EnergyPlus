@@ -3101,10 +3101,10 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(51).show) {
             curReport = AddMonthlyReport("GeneratorReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Generator Produced Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Generator Produced AC Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Diesel Consumption", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Gas Consumption", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Produced Electricity Energy", "", aggTypeHoursNonZero);
+            AddMonthlyFieldSetInput(curReport, "Generator Produced AC Electricity Energy", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Generator Total Heat Recovery", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Jacket Heat Recovery Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Lube Heat Recovery", "", aggTypeSumOrAvg);

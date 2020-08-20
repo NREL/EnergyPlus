@@ -5087,9 +5087,9 @@
 
   Output:Meter,ElectricityProduced:Facility,hourly;
 
-  Output:Variable,*,Generator Produced Electricity Rate,hourly;
+  Output:Variable,*,Generator Produced AC Electricity Rate,hourly;
 
-  Output:Variable,*,Generator Produced Electricity Energy,hourly;
+  Output:Variable,*,Generator Produced AC Electricity Energy,hourly;
 
   Output:Variable,*,Generator Produced Thermal Rate,hourly;
 
