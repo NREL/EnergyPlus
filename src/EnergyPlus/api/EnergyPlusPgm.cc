@@ -352,11 +352,14 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         }
 
         if (DataGlobals::runReadVars) {
-            state.files.outputControl.csv = true;
-            // int status = CommandLineInterface::runReadVarsESO(state.files, state.files.outputControl.csv);
-            // if (status) {
-            //     return status;
-            // }
+//            state.files.outputControl.csv = true;
+             if (state.files.outputControl.csv) {
+                 ShowWarningMessage("Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
+             }
+             int status = CommandLineInterface::runReadVarsESO(state.files);
+             if (status) {
+                 return status;
+             }
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
