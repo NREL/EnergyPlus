@@ -1,4 +1,4 @@
-from ctypes import cdll, c_char_p, c_void_p, CFUNCTYPE
+from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
 from types import FunctionType
 from pyenergyplus.common import RealEP
 
@@ -534,7 +534,7 @@ class Functional:
         self.api.initializeFunctionalAPI.restype = c_void_p
         self.initialized = False
         self.plugin_mode = running_as_python_plugin
-        self.py_error_callback_type = CFUNCTYPE(c_void_p, c_char_p)
+        self.py_error_callback_type = CFUNCTYPE(c_void_p, c_int, c_char_p)
         self.api.registerErrorCallback.argtypes = [c_void_p, self.py_error_callback_type]
         self.api.registerErrorCallback.restype = c_void_p
 
@@ -590,7 +590,7 @@ class Functional:
         is added to the error file.  The user can then detect specific error messages or whatever.
 
         :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
-        :param f: A python function which takes a string (bytes) argument and returns nothing
+        :param f: A python function which takes an integer severity and a string (bytes) argument and returns nothing
         :return: Nothing
         """
         cb_ptr = self.py_error_callback_type(f)
