@@ -184,8 +184,8 @@ namespace WeatherManager {
     extern Array2D<Real64> TomorrowDifSolarRad;     // Sky diffuse horizontal solar irradiance {W/m2}
     extern Array2D<Real64> TomorrowAlbedo;          // Albedo {dimensionless}
     extern Array2D<Real64> TomorrowLiquidPrecip;    // Liquid Precipitation Depth {mm}
-    extern Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover
-    extern Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover
+    extern Array2D<Real64> TomorrowTotalSkyCover;   // Total Sky Cover {tenth of sky}
+    extern Array2D<Real64> TomorrowOpaqueSkyCover;  // Opaque Sky Cover {tenth of sky}
 
     extern Real64 TimeStepFraction; // Fraction of hour each time step represents
     extern Array1D_int EndDayOfMonth;
