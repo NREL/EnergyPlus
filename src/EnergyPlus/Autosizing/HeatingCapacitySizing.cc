@@ -381,6 +381,8 @@ Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             }
         } else if (this->dataNonZoneNonAirloopValue > 0) {
             this->autoSizedValue = this->dataNonZoneNonAirloopValue;
+        } else if (!this->wasAutoSized) {
+            this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             ShowSevereError(msg);
@@ -392,7 +394,7 @@ Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
         }
     }
     if (!this->hardSizeNoDesignRun || this->dataScalableSizingON || this->dataScalableCapSizingON) {
-        if (this->wasAutoSized) {
+        if (this->wasAutoSized && this->dataFractionUsedForSizing == 0.0) {
             // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
             // determines capacity using physical calculations instead of emperical curves
             bool FlagCheckVolFlowPerRatedTotCap = true;

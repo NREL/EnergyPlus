@@ -11179,8 +11179,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     Real64 locDesignHeatGain4 = Fans::FanDesHeatGain(state, 1, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain4, 50.25, 0.1);
 
-    DataSizing::DataConstantUsedForSizing = 1.0;
-    DataSizing::DataFractionUsedForSizing = 1.0;
     DataSizing::DataTotCapCurveIndex = 0;
     DataSizing::DataDesOutletAirTemp = 0.0;
 
@@ -11238,7 +11236,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_MaxHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
-    DataSizing::DataFractionUsedForSizing = 0.0;
 
     // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in ReportSizingManager)
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;

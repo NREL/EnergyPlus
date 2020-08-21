@@ -462,6 +462,8 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             }
         } else if (this->dataNonZoneNonAirloopValue > 0) {
             this->autoSizedValue = this->dataNonZoneNonAirloopValue;
+        } else if (!this->wasAutoSized) {
+            this->autoSizedValue = this->originalValue;
         } else {
             std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
             ShowSevereError(msg);

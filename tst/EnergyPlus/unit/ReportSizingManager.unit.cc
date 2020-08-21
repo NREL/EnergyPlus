@@ -270,8 +270,6 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     bool PrintWarning;          // true when sizing information is reported in the eio file
     std::string CallingRoutine; // calling routine
 
-    DataConstantUsedForSizing = 1.0;
-    DataFractionUsedForSizing = 0.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -448,8 +446,6 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     bool PrintWarning;          // true when sizing information is reported in the eio file
     std::string CallingRoutine; // calling routine
 
-    DataConstantUsedForSizing = 1.0;
-    DataFractionUsedForSizing = 0.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 
@@ -555,8 +551,6 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
     bool PrintWarning;          // true when sizing information is reported in the eio file
     std::string CallingRoutine; // calling routine
 
-    DataConstantUsedForSizing = 1.0;
-    DataFractionUsedForSizing = 0.0;
     DataTotCapCurveIndex = 0;
     DataDesOutletAirTemp = 0.0;
 

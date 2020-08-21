@@ -349,10 +349,12 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
-        if (this->dataEMSOverrideON) { // EMS overrides value
+        if ( this->dataEMSOverrideON ) { // EMS overrides value
             this->autoSizedValue = this->dataEMSOverride;
             this->reportSizerOutput(
                 this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+        } else if (this->hardSizeNoDesignRun && !this->wasAutoSized && UtilityRoutines::SameString(this->compType, "Fan:ZoneExhaust")) {
+            this->autoSizedValue = this->originalValue;
         } else if (this->wasAutoSized && this->dataFractionUsedForSizing > 0.0 && this->dataConstantUsedForSizing > 0.0) {
             this->autoSizedValue = this->dataFractionUsedForSizing * this->dataConstantUsedForSizing;
             this->reportSizerOutput(

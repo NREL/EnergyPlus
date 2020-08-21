@@ -1441,7 +1441,6 @@ namespace HVACStandAloneERV {
         std::string CompName(StandAloneERV(StandAloneERVNum).Name);
         bool PrintFlag = true;
         bool ErrorsFound = false;
-        DataSizing::DataFractionUsedForSizing = 1.0;
 
         if (StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -1485,6 +1484,7 @@ namespace HVACStandAloneERV {
             std::string SizingString = "Supply Air Flow Rate [m3/s]";
             if (IsAutoSize) {
                 DataSizing::DataConstantUsedForSizing = SupplyAirVolFlowDes;
+                DataSizing::DataFractionUsedForSizing = 1.0;
                 TempSize = SupplyAirVolFlowDes;
                 if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                     OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MaxOA =
@@ -1493,6 +1493,7 @@ namespace HVACStandAloneERV {
                 }
             } else {
                 DataSizing::DataConstantUsedForSizing = StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+                DataSizing::DataFractionUsedForSizing = 1.0;
             }
             if (TempSize > 0.0) {
                 SystemAirFlowSizer sizerSystemAirFlow;
@@ -1530,6 +1531,7 @@ namespace HVACStandAloneERV {
             } else {
                 DataSizing::DataConstantUsedForSizing = StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
             }
+            DataSizing::DataFractionUsedForSizing = 1.0;
             if (TempSize > 0.0) {
                 SystemAirFlowSizer sizerSystemAirFlow;
                 sizerSystemAirFlow.overrideSizingString(SizingString);
