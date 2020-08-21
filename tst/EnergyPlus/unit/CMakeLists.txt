@@ -195,6 +195,7 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SystemReports.unit.cc
   SZVAVModel.unit.cc
   ThermalChimney.unit.cc
   ThermalComfort.unit.cc

@@ -664,14 +664,14 @@ namespace UnitHeater {
                                 "System",
                                 "Sum",
                                 UnitHeat(UnitHeatNum).Name);
-            SetupOutputVariable("Zone Unit Heater Fan Electric Power",
+            SetupOutputVariable("Zone Unit Heater Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 UnitHeat(UnitHeatNum).ElecPower,
                                 "System",
                                 "Average",
                                 UnitHeat(UnitHeatNum).Name);
             // Note that the unit heater fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Unit Heater Fan Electric Energy",
+            SetupOutputVariable("Zone Unit Heater Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 UnitHeat(UnitHeatNum).ElecEnergy,
                                 "System",

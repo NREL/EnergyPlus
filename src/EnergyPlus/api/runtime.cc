@@ -113,6 +113,16 @@ void callbackBeginNewEnvironment(EnergyPlusState state, void (*f)(EnergyPlusStat
     EnergyPlus::PluginManagement::registerNewCallback(*this_state, EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
 }
 
+void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, std::function<void(EnergyPlusState)> const& f) {
+    auto* this_state = reinterpret_cast<EnergyPlus::EnergyPlusData*>(state);
+    EnergyPlus::PluginManagement::registerNewCallback(*this_state, EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, f);
+}
+
+void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, void (*f)(EnergyPlusState)) {
+    auto* this_state = reinterpret_cast<EnergyPlus::EnergyPlusData*>(state);
+    EnergyPlus::PluginManagement::registerNewCallback(*this_state, EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, f);
+}
+
 void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, std::function<void (EnergyPlusState)> const &f) {
     auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
     EnergyPlus::PluginManagement::registerNewCallback(*this_state, EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, f);

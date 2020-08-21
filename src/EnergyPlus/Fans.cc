@@ -929,19 +929,19 @@ namespace Fans {
 
         for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
             // Setup Report variables for the Fans  CurrentModuleObject='Fans'
-            SetupOutputVariable("Fan Electric Power", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
+            SetupOutputVariable("Fan Electricity Rate", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
             SetupOutputVariable(
                 "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, Fan(FanNum).DeltaTemp, "System", "Average", Fan(FanNum).FanName);
             SetupOutputVariable(
                 "Fan Heat Gain to Air", OutputProcessor::Unit::W, Fan(FanNum).PowerLossToAir, "System", "Average", Fan(FanNum).FanName);
-            SetupOutputVariable("Fan Electric Energy",
+            SetupOutputVariable("Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Fan(FanNum).FanEnergy,
                                 "System",
                                 "Sum",
                                 Fan(FanNum).FanName,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Fans",
                                 Fan(FanNum).EndUseSubcategoryName,
                                 "System");

@@ -1160,13 +1160,13 @@ namespace HVACStandAloneERV {
                                 "Sum",
                                 StandAloneERV(StandAloneERVIndex).Name);
 
-            SetupOutputVariable("Zone Ventilator Electric Power",
+            SetupOutputVariable("Zone Ventilator Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 StandAloneERV(StandAloneERVIndex).ElecUseRate,
                                 "System",
                                 "Average",
                                 StandAloneERV(StandAloneERVIndex).Name);
-            SetupOutputVariable("Zone Ventilator Electric Energy",
+            SetupOutputVariable("Zone Ventilator Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 StandAloneERV(StandAloneERVIndex).ElecUseEnergy,
                                 "System",

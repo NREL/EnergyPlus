@@ -301,7 +301,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(1.8, curConversionFactor);
     EXPECT_EQ(32., curConversionOffset);
 
-    varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY[J]";
+    varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY[J]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(20, indexUnitConv);
@@ -410,10 +410,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
     EXPECT_EQ(0, indexUnitConv);
     EXPECT_EQ("ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]", curUnits);
 
-    varNameWithUnits = "Electric Energy Use [GJ]";
+    varNameWithUnits = "Electricity Energy Use [GJ]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
     EXPECT_EQ(86, indexUnitConv);
-    EXPECT_EQ("Electric Energy Use [kWh]", curUnits);
+    EXPECT_EQ("Electricity Energy Use [kWh]", curUnits);
 
     varNameWithUnits = "Electricty [MJ/m2]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
@@ -3462,11 +3462,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",
-        "Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+        "Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
         "SumOrAverage, !- Aggregation Type for Variable or Meter 1",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Maximum, !- Aggregation Type for Variable or Meter 2",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Minimum; !- Aggregation Type for Variable or Meter 2",
     });
 
@@ -3474,7 +3474,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3484,7 +3484,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3494,7 +3494,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3539,7 +3539,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3549,7 +3549,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3559,7 +3559,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6397,11 +6397,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",
-        "Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+        "Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
         "SumOrAverageDuringHoursShown, !- Aggregation Type for Variable or Meter 1",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Maximum, !- Aggregation Type for Variable or Meter 2",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Minimum; !- Aggregation Type for Variable or Meter 2",
 
     });
@@ -6410,7 +6410,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6420,7 +6420,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6430,7 +6430,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7831,7 +7831,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     Real64 GasolineHeating = 3e8;
     Real64 PropaneHeating = 4e8;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7841,7 +7841,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7851,7 +7851,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "AnotherEndUseSubCat");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",

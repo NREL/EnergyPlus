@@ -2670,7 +2670,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Chiller Electric Power,timestep;
+  Output:Variable,*,Chiller Electricity Rate,timestep;
 
   Output:Variable,*,Chiller Source Steam Rate,timestep;
 
@@ -2736,7 +2736,7 @@
 
   Output:Variable,Steam Boiler Plant Steam Pump Outlet Node,System Node Mass Flow Rate,timestep;
 
-  Output:Variable,Steam Boiler Plant Steam Circ Pump,Pump Electric Power,timestep;
+  Output:Variable,Steam Boiler Plant Steam Circ Pump,Pump Electricity Rate,timestep;
 
   Output:Variable,Absorption Chiller Demand Side Bypass Inlet Node,System Node Mass Flow Rate,timestep;
 

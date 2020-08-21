@@ -165,8 +165,8 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
     EXPECT_FALSE(state.dataChillerGasAbsorption.GasAbsorber(1).isWaterCooled);
 
     EXPECT_EQ(2., state.dataChillerGasAbsorption.GasAbsorber(1).CHWLowLimitTemp);
-    EXPECT_EQ("Gas", state.dataChillerGasAbsorption.GasAbsorber(1).FuelType);
+    EXPECT_EQ("NaturalGas", state.dataChillerGasAbsorption.GasAbsorber(1).FuelType);
 
     // Additional tests for fuel type input
-    EXPECT_EQ(state.dataChillerGasAbsorption.GasAbsorber(1).FuelType, "Gas");
+    EXPECT_EQ(state.dataChillerGasAbsorption.GasAbsorber(1).FuelType, "NaturalGas");
 }

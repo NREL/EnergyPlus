@@ -1501,20 +1501,20 @@ namespace LowTempRadiantSystem {
                                 "System",
                                 "Average",
                                 thisCFloSys.Name);
-            SetupOutputVariable("Zone Radiant HVAC Pump Electric Power",
+            SetupOutputVariable("Zone Radiant HVAC Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 thisCFloSys.PumpPower,
                                 "System",
                                 "Average",
                                 thisCFloSys.Name);
-            SetupOutputVariable("Zone Radiant HVAC Pump Electric Energy",
+            SetupOutputVariable("Zone Radiant HVAC Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisCFloSys.PumpEnergy,
                                 "System",
                                 "Sum",
                                 thisCFloSys.Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Pumps",
                                 _,
                                 "Plant");
@@ -1587,8 +1587,8 @@ namespace LowTempRadiantSystem {
             auto &thisElecSys (ElecRadSys(Item));
 
             SetupOutputVariable(
-                "Zone Radiant HVAC Electric Power", OutputProcessor::Unit::W, thisElecSys.ElecPower, "System", "Average", thisElecSys.Name);
-            SetupOutputVariable("Zone Radiant HVAC Electric Energy",
+                "Zone Radiant HVAC Electricity Rate", OutputProcessor::Unit::W, thisElecSys.ElecPower, "System", "Average", thisElecSys.Name);
+            SetupOutputVariable("Zone Radiant HVAC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisElecSys.ElecEnergy,
                                 "System",

@@ -217,7 +217,12 @@ namespace OutputReportTabular {
     extern bool displayEconomicResultSummary;
     extern bool displayHeatEmissionsSummary;
     extern bool displayEioSummary;
-
+    extern bool displayThermalResilienceSummary;
+    extern bool displayCO2ResilienceSummary;
+    extern bool displayVisualResilienceSummary;
+    extern bool displayThermalResilienceSummaryExplicitly;
+    extern bool displayCO2ResilienceSummaryExplicitly;
+    extern bool displayVisualResilienceSummaryExplicitly;
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
@@ -819,6 +824,20 @@ namespace OutputReportTabular {
     void WriteVeriSumTable(CostEstimateManagerData &dataCostEstimateManager, IOFiles &ioFiles);
 
     void WriteAdaptiveComfortTable(CostEstimateManagerData &dataCostEstimateManager);
+
+    void WriteThermalResilienceTables();
+
+    void WriteCO2ResilienceTables();
+
+    void WriteVisualResilienceTables();
+
+    void WriteResilienceBinsTable(int const columnNum,
+                                  std::vector<int> const &columnHead,
+                                  Array1D<std::vector<double>> const &ZoneBins);
+
+    void WriteSETHoursTable(int const columnNum,
+                            std::vector<std::string> const &columnHead,
+                            Array1D<std::vector<double>> const &ZoneBins);
 
     void WriteHeatEmissionTable(CostEstimateManagerData &dataCostEstimateManager);
 

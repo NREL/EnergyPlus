@@ -14,8 +14,8 @@ Zone Radiant HVAC Recirculation Mass Flow Rate
 Zone Radiant HVAC Inlet Temperature
 Zone Radiant HVAC Outlet Temperature
 Zone Radiant HVAC Pump Inlet Temperature
-Zone Radiant HVAC Pump Electric Power
-Zone Radiant HVAC Pump Electric Energy
+Zone Radiant HVAC Pump Electricity Rate
+Zone Radiant HVAC Pump Electricity Energy
 Zone Radiant HVAC Pump Mass Flow Rate
 Zone Radiant HVAC Pump Fluid Heat Gain Rate
 Zone Radiant HVAC Pump Fluid Heat Gain Energy

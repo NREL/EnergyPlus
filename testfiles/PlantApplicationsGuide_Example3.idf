@@ -2573,7 +2573,7 @@
 
   Output:Variable,*,Pump Fluid Heat Gain Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
