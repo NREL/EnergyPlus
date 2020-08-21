@@ -1853,8 +1853,8 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
 
     } else if (reportName == "ZONEELECTRICSUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE LIGHTS ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "ZONE LIGHTS ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY");
 
     } else if (reportName == "SPACEGAINSMONTHLY") {
         addRecordToOutputVariableStructure("*", "ZONE PEOPLE TOTAL HEATING ENERGY");
@@ -1916,15 +1916,15 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "ZONE THERMAL COMFORT FANGER MODEL PPD");
 
     } else if (reportName == "CHILLERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "CHILLER ELECTRIC ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "CHILLER ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY ENERGY"); // on meter
+        addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "CHILLER EVAPORATOR COOLING ENERGY");      // on meter
         addRecordToOutputVariableStructure("*", "CHILLER CONDENSER HEAT TRANSFER ENERGY"); // on meter
         addRecordToOutputVariableStructure("*", "CHILLER COP");
 
     } else if (reportName == "TOWERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRIC ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY ENERGY"); // on meter
+        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER HEAT TRANSFER RATE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER INLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER OUTLET TEMPERATURE");
@@ -1932,27 +1932,27 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
 
     } else if (reportName == "BOILERREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "BOILER HEATING ENERGY");  // on meter
-        addRecordToOutputVariableStructure("*", "BOILER GAS CONSUMPTION"); // on meter
+        addRecordToOutputVariableStructure("*", "BOILER NATURALGAS CONSUMPTION"); // on meter
         addRecordToOutputVariableStructure("*", "BOILER HEATING ENERGY");  // on meter
         addRecordToOutputVariableStructure("*", "BOILER HEATING RATE");
-        addRecordToOutputVariableStructure("*", "BOILER GAS CONSUMPTION RATE");
+        addRecordToOutputVariableStructure("*", "BOILER NATURALGAS CONSUMPTION RATE");
         addRecordToOutputVariableStructure("*", "BOILER INLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "BOILER OUTLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "BOILER MASS FLOW RATE");
-        addRecordToOutputVariableStructure("*", "BOILER ANCILLARY ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "BOILER ANCILLARY ELECTRICITY RATE");
 
     } else if (reportName == "DXREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRIC ENERGY");      // on meter
+        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRICITY ENERGY");      // on meter
         addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "COOLING COIL LATENT COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "COOLING COIL RUNTIME FRACTION");
         addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING RATE");
         addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING RATE");
         addRecordToOutputVariableStructure("*", "COOLING COIL LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRIC POWER");
-        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRICITY RATE");
+        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRICITY RATE");
 
     } else if (reportName == "WINDOWREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE");
@@ -2045,20 +2045,20 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
 
     } else if (reportName == "WINDOWACREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY RATE");
 
     } else if (reportName == "WATERHEATERREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER BURNER HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER GAS CONSUMPTION");
+        addRecordToOutputVariableStructure("*", "WATER HEATER NATURALGAS CONSUMPTION");
         addRecordToOutputVariableStructure("*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER LOSS DEMAND ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER HEAT LOSS ENERGY");
@@ -2067,10 +2067,10 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "WATER HEATER SOURCE ENERGY");
 
     } else if (reportName == "GENERATORREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR DIESEL CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "GENERATOR GAS CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "GENERATOR NATURALGAS CONSUMPTION");
+        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR TOTAL HEAT RECOVERY");
         addRecordToOutputVariableStructure("*", "GENERATOR JACKET HEAT RECOVERY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR LUBE HEAT RECOVERY");
@@ -2104,14 +2104,14 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE HEATING DEMAND RATE");
 
     } else if (reportName == "FANREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "FAN ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "FAN ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "FAN RISE IN AIR TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "FAN ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "FAN ELECTRICITY RATE");
 
     } else if (reportName == "PUMPREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "PUMP ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "PUMP ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "PUMP SHAFT POWER");
         addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN RATE");
         addRecordToOutputVariableStructure("*", "PUMP OUTLET TEMPERATURE");
@@ -2131,8 +2131,8 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "AIR SYSTEM HOT WATER ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM STEAM ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM CHILLED WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM GAS ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM NATURALGAS ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM WATER VOLUME");
 
     } else if (reportName == "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY") {
@@ -2146,17 +2146,17 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY");
 
     } else if (reportName == "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY") {
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM FAN ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM FAN ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX HEATING COIL ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX COOLING COIL ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL GAS ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX HEATING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX COOLING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL NATURALGAS ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL STEAM ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HUMIDIFIER ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM HUMIDIFIER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRICITY ENERGY");
 
     } else if (reportName == "MECHANICALVENTILATIONLOADSMONTHLY") {
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY");

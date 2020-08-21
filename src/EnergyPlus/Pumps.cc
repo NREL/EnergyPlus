@@ -1084,19 +1084,19 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PumpType == Pump_VarSpeed || PumpEquip(PumpNum).PumpType == Pump_ConSpeed ||
                 PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
-                SetupOutputVariable("Pump Electric Energy",
+                SetupOutputVariable("Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquip(PumpNum).Energy,
                                     "System",
                                     "Sum",
                                     PumpEquip(PumpNum).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Pumps",
                                     PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
-                    "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
+                    "Pump Electricity Rate", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable(
                     "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport(PumpNum).ShaftPower, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable("Pump Fluid Heat Gain Rate",
@@ -1127,19 +1127,19 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PumpType == PumpBank_VarSpeed ||
                 PumpEquip(PumpNum).PumpType == PumpBank_ConSpeed) { // CurrentModuleObject='HeaderedPumps'
 
-                SetupOutputVariable("Pump Electric Energy",
+                SetupOutputVariable("Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquip(PumpNum).Energy,
                                     "System",
                                     "Sum",
                                     PumpEquip(PumpNum).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Pumps",
                                     PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
-                    "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
+                    "Pump Electricity Rate", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable(
                     "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport(PumpNum).ShaftPower, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable("Pump Fluid Heat Gain Rate",

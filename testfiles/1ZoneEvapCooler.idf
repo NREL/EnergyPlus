@@ -601,7 +601,7 @@
 
   Output:Variable,*,System Node Temperature,hourly;
 
-  Output:Variable,*,Baseboard Electric Power,hourly;
+  Output:Variable,*,Baseboard Electricity Rate,hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

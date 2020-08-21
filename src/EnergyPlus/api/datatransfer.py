@@ -83,6 +83,10 @@ class DataExchange:
         self.api.daylightSavingsTimeIndicator.restype = c_int
         self.api.hour.argtypes = [c_void_p]
         self.api.hour.restype = c_int
+        self.api.numTimeStepsInHour.argtypes = [c_void_p]
+        self.api.numTimeStepsInHour.restype = c_int
+        self.api.zoneTimeStepNum.argtypes = [c_void_p]
+        self.api.zoneTimeStepNum.restype = c_int
         self.api.currentTime.argtypes = [c_void_p]
         self.api.currentTime.restype = RealEP
         self.api.minutes.argtypes = [c_void_p]
@@ -129,6 +133,62 @@ class DataExchange:
         self.api.actualDateTime.restype = c_int
         self.api.kindOfSim.argtypes = [c_void_p]
         self.api.kindOfSim.restype = c_int
+        self.api.todayWeatherIsRainAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherIsRainAtTime.restype = c_int
+        self.api.todayWeatherIsSnowAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherIsSnowAtTime.restype = c_int
+        self.api.todayWeatherOutDryBulbAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherOutDryBulbAtTime.restype = RealEP
+        self.api.todayWeatherOutDewPointAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherOutDewPointAtTime.restype = RealEP
+        self.api.todayWeatherOutBarometricPressureAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherOutBarometricPressureAtTime.restype = RealEP
+        self.api.todayWeatherOutRelativeHumidityAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherOutRelativeHumidityAtTime.restype = RealEP
+        self.api.todayWeatherWindSpeedAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherWindSpeedAtTime.restype = RealEP
+        self.api.todayWeatherWindDirectionAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherWindDirectionAtTime.restype = RealEP
+        self.api.todayWeatherSkyTemperatureAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherSkyTemperatureAtTime.restype = RealEP
+        self.api.todayWeatherHorizontalIRSkyAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherHorizontalIRSkyAtTime.restype = RealEP
+        self.api.todayWeatherBeamSolarRadiationAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherBeamSolarRadiationAtTime.restype = RealEP
+        self.api.todayWeatherDiffuseSolarRadiationAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherDiffuseSolarRadiationAtTime.restype = RealEP
+        self.api.todayWeatherAlbedoAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherAlbedoAtTime.restype = RealEP
+        self.api.todayWeatherLiquidPrecipitationAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.todayWeatherLiquidPrecipitationAtTime.restype = RealEP
+        self.api.tomorrowWeatherIsRainAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherIsRainAtTime.restype = c_int
+        self.api.tomorrowWeatherIsSnowAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherIsSnowAtTime.restype = c_int
+        self.api.tomorrowWeatherOutDryBulbAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherOutDryBulbAtTime.restype = RealEP
+        self.api.tomorrowWeatherOutDewPointAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherOutDewPointAtTime.restype = RealEP
+        self.api.tomorrowWeatherOutBarometricPressureAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherOutBarometricPressureAtTime.restype = RealEP
+        self.api.tomorrowWeatherOutRelativeHumidityAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherOutRelativeHumidityAtTime.restype = RealEP
+        self.api.tomorrowWeatherWindSpeedAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherWindSpeedAtTime.restype = RealEP
+        self.api.tomorrowWeatherWindDirectionAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherWindDirectionAtTime.restype = RealEP
+        self.api.tomorrowWeatherSkyTemperatureAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherSkyTemperatureAtTime.restype = RealEP
+        self.api.tomorrowWeatherHorizontalIRSkyAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherHorizontalIRSkyAtTime.restype = RealEP
+        self.api.tomorrowWeatherBeamSolarRadiationAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherBeamSolarRadiationAtTime.restype = RealEP
+        self.api.tomorrowWeatherDiffuseSolarRadiationAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherDiffuseSolarRadiationAtTime.restype = RealEP
+        self.api.tomorrowWeatherAlbedoAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherAlbedoAtTime.restype = RealEP
+        self.api.tomorrowWeatherLiquidPrecipitationAtTime.argtypes = [c_void_p, c_int, c_int]
+        self.api.tomorrowWeatherLiquidPrecipitationAtTime.restype = RealEP
 
     def list_available_api_data_csv(self, state: c_void_p) -> bytes:
         """
@@ -825,6 +885,24 @@ class DataExchange:
         """
         return self.api.minutes(state)
 
+    def num_time_steps_in_hour(self, state: c_void_p) -> int:
+        """
+        Returns the number of zone time steps in an hour, which is currently a constant value throughout a simulation.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: An integer representation of the number of time steps in an hour
+        """
+        return self.api.numTimeStepsInHour(state)
+
+    def zone_time_step_number(self, state: c_void_p) -> int:
+        """
+        The current zone time step index, from 1 to the number of zone time steps per hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :return: The integer index of the current time step
+        """
+        return self.api.zoneTimeStepNum(state)
+
     def day_of_week(self, state: c_void_p) -> int:
         """
         Get the current day of the week (1-7)
@@ -950,3 +1028,311 @@ class DataExchange:
         :return: Integer value of current environment.
         """
         return self.api.kindOfSim(state)
+
+    def today_weather_is_raining_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: A true/false for whether the weather condition is active at the specified time
+        """
+        return self.api.todayWeatherIsRainAtTime(state, hour, time_step_number) == 1
+
+    def today_weather_is_snowing_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: A true/false for whether the weather condition is active at the specified time
+        """
+        return self.api.todayWeatherIsSnowAtTime(state, hour, time_step_number) == 1
+
+    def today_weather_outdoor_dry_bulb_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherOutDryBulbAtTime(state, hour, time_step_number)
+
+    def today_weather_outdoor_dew_point_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherOutDewPointAtTime(state, hour, time_step_number)
+
+    def today_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
+
+    def today_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherOutRelativeHumidityAtTime(state, hour, time_step_number)
+
+    def today_weather_wind_speed_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherWindSpeedAtTime(state, hour, time_step_number)
+
+    def today_weather_wind_direction_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherWindDirectionAtTime(state, hour, time_step_number)
+
+    def today_weather_sky_temperature_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherSkyTemperatureAtTime(state, hour, time_step_number)
+
+    def today_weather_horizontal_ir_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherHorizontalIRSkyAtTime(state, hour, time_step_number)
+
+    def today_weather_beam_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherBeamSolarRadiationAtTime(state, hour, time_step_number)
+
+    def today_weather_diffuse_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherDiffuseSolarRadiationAtTime(state, hour, time_step_number)
+
+    def today_weather_albedo_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherAlbedoAtTime(state, hour, time_step_number)
+
+    def today_weather_liquid_precipitation_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.todayWeatherLiquidPrecipitationAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_is_raining_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: A true/false for whether the weather condition is active at the specified time
+        """
+        return self.api.tomorrowWeatherIsRainAtTime(state, hour, time_step_number) == 1
+
+    def tomorrow_weather_is_snowing_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> bool:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: A true/false for whether the weather condition is active at the specified time
+        """
+        return self.api.tomorrowWeatherIsSnowAtTime(state, hour, time_step_number) == 1
+
+    def tomorrow_weather_outdoor_dry_bulb_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherOutDryBulbAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_outdoor_dew_point_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherOutDewPointAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_outdoor_barometric_pressure_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherOutBarometricPressureAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_outdoor_relative_humidity_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherOutRelativeHumidityAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_wind_speed_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherWindSpeedAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_wind_direction_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherWindDirectionAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_sky_temperature_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherSkyTemperatureAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_horizontal_ir_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherHorizontalIRSkyAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_beam_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherBeamSolarRadiationAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_diffuse_solar_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherDiffuseSolarRadiationAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_albedo_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherAlbedoAtTime(state, hour, time_step_number)
+
+    def tomorrow_weather_liquid_precipitation_at_time(self, state: c_void_p, hour: int, time_step_number: int) -> float:
+        """
+        Gets the specified weather data at the specified hour and time step index within that hour
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param hour: Integer hour of day (0 to 23)
+        :param time_step_number: Time step index in hour, from 1 to the number of zone time steps per hour
+        :return: Value of the weather condition at the specified time
+        """
+        return self.api.tomorrowWeatherLiquidPrecipitationAtTime(state, hour, time_step_number)

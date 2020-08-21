@@ -60,6 +60,7 @@ ENERGYPLUSLIB_API void callbackBeginNewEnvironment(EnergyPlusState state, std::f
 ENERGYPLUSLIB_API void callbackAfterNewEnvironmentWarmupComplete(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackBeginZoneTimeStepBeforeInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
+ENERGYPLUSLIB_API void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, std::function<void(EnergyPlusState)> const& f);
 ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackAfterPredictorBeforeHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackAfterPredictorAfterHVACManagers(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
@@ -72,6 +73,7 @@ ENERGYPLUSLIB_API void callbackEndOfZoneSizing(EnergyPlusState state, std::funct
 ENERGYPLUSLIB_API void callbackEndOfSystemSizing(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackEndOfAfterComponentGetInput(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 ENERGYPLUSLIB_API void callbackUnitarySystemSizing(EnergyPlusState state, const std::function<void (EnergyPlusState)>& f);
+ENERGYPLUSLIB_API void registerStdOutCallback(EnergyPlusState state, std::function<void (const std::string &)>);
 ENERGYPLUSLIB_API void registerExternalHVACManager(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 //ENERGYPLUSLIB_API void callbackUserDefinedComponentModel(EnergyPlusState state, std::function<void (EnergyPlusState)> f);
 
@@ -246,6 +248,16 @@ ENERGYPLUSLIB_API void callbackBeginZoneTimeStepAfterInitHeatBalance(EnergyPlusS
 /// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
 ///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
 ENERGYPLUSLIB_API void callbackBeginTimeStepBeforePredictor(EnergyPlusState state, void (*f)(EnergyPlusState));
+/// \brief Register a callback function to be called at each zone time step just before the weather is updated.
+/// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
+///          any registered callback functions are "called back".  This API function allows a client to register a function
+///          with no arguments to be called at this specific calling point.  From inside this function, the client can
+///          leverage other API categories to look up property values or exchange data with the simulation as needed.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] f The function to be called back at this specific calling point in the simulation.  The function expects one EnergyPlusState argument.
+/// \remark This function is only allowed during API simulations.  For Python Plugin applications, the client will
+///         create a custom Python class and override specific functions to be called at equivalent points in the simulation.
+ENERGYPLUSLIB_API void callbackBeginZoneTimestepBeforeSetCurrentWeather(EnergyPlusState state, void (*f)(EnergyPlusState));
 /// \brief Register a callback function to be called at each zone time step before HVAC managers are called.
 /// \details During an EnergyPlus simulation, a number of predetermined calling points have been established at which
 ///          any registered callback functions are "called back".  This API function allows a client to register a function

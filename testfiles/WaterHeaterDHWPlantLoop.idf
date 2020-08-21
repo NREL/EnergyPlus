@@ -529,11 +529,11 @@
 
   Output:Variable,*,Water Heater Heater 2 Runtime Fraction,TIMESTEP;
 
-  Output:Variable,*,Water Heater Electric Power,TIMESTEP;
+  Output:Variable,*,Water Heater Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,TIMESTEP;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,TIMESTEP;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,TIMESTEP;
 
   Output:SQLite,
     Simple;                  !- Option Type

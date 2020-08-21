@@ -873,6 +873,69 @@ namespace OutputReportPredefined {
     extern int pdchLeedSchStPt11pmWednesday;
     extern int pdchLeedSchStPt11pmWedCnt;
 
+    extern int pdrThermalResilience;
+    extern int pdstHIHours;
+    extern int pdchHIHourSafe;
+    extern int pdchHIHourCaution;
+    extern int pdchHIHourExtremeCaution;
+    extern int pdchHIHourDanger;
+    extern int pdchHIHourExtremeDanger;
+
+    extern int pdstHIOccuHours;
+    extern int pdchHIOccuHourSafe;
+    extern int pdchHIOccuHourCaution;
+    extern int pdchHIOccuHourExtremeCaution;
+    extern int pdchHIOccuHourDanger;
+    extern int pdchHIOccuHourExtremeDanger;
+
+    extern int pdstHumidexHours;
+    extern int pdchHumidexHourLittle;
+    extern int pdchHumidexHourSome;
+    extern int pdchHumidexHourGreat;
+    extern int pdchHumidexHourDanger;
+    extern int pdchHumidexHourStroke;
+
+    extern int pdstHumidexOccuHours;
+    extern int pdchHumidexOccuHourLittle;
+    extern int pdchHumidexOccuHourSome;
+    extern int pdchHumidexOccuHourGreat;
+    extern int pdchHumidexOccuHourDanger;
+    extern int pdchHumidexOccuHourStroke;
+
+    extern int pdstHeatingSETHours;
+    extern int pdchHeatingSETHours;
+    extern int pdchHeatingSETOccuHours;
+    extern int pdchHeatingSETUnmetDuration;
+    extern int pdchHeatingSETUnmetTime;
+    extern int pdstCoolingSETHours;
+    extern int pdchCoolingSETHours;
+    extern int pdchCoolingSETOccuHours;
+    extern int pdchCoolingSETUnmetDuration;
+    extern int pdchCoolingSETUnmetTime;
+
+    extern int pdrCO2Resilience;
+    extern int pdstCO2Hours;
+    extern int pdchCO2HourSafe;
+    extern int pdchCO2HourCaution;
+    extern int pdchCO2HourHazard;
+    extern int pdstCO2OccuHours;
+    extern int pdchCO2OccuHourSafe;
+    extern int pdchCO2OccuHourCaution;
+    extern int pdchCO2OccuHourHazard;
+
+    extern int pdrVisualResilience;
+    extern int pdstIllumHours;
+    extern int pdchIllumHourDark;
+    extern int pdchIllumHourDim;
+    extern int pdchIllumHourAdequate;
+    extern int pdchIllumHourBright;
+    extern int pdstIllumOccuHours;
+    extern int pdchIllumOccuHourDark;
+    extern int pdchIllumOccuHourDim;
+    extern int pdchIllumOccuHourAdequate;
+    extern int pdchIllumOccuHourBright;
+
+
     // Internal data structures to store information provided by calls
 
     extern int const sizeIncrement;
