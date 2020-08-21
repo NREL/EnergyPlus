@@ -6,6 +6,12 @@ class HeatingSetPoint(EnergyPlusPlugin):
     def actuate(self, state, x):
         self.api.exchange.set_actuator_value(state, self.data['actuator_heating'], x)
 
+    def on_begin_zone_timestep_before_set_current_weather(self, state) -> int:
+        if self.api.exchange.warmup_flag(state):
+            return 0
+        self.api.exchange.tomorrow_weather_outdoor_dry_bulb_at_time(state, 3, 2)
+        return 0
+
     def on_begin_timestep_before_predictor(self, state) -> int:
         if 'handles_done' not in self.data:
             self.data['actuator_heating'] = self.api.exchange.get_actuator_handle(

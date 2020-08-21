@@ -9060,7 +9060,7 @@
 
 ! ***REPORT METERS/VARIABLES***
 
-  Output:Variable,*,Air System Fan Electric Energy,timestep;
+  Output:Variable,*,Air System Fan Electricity Energy,timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 

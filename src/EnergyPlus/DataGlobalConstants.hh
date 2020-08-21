@@ -88,9 +88,6 @@ namespace DataGlobalConstants {
     extern std::string const cRT_Natural_Gas;
     extern std::string const cRT_Natural_GasUC;
     extern int const iRT_Natural_Gas;
-    extern std::string const cRT_Gas;
-    extern std::string const cRT_GasUC;
-    extern int const iRT_Gas;
     extern std::string const cRT_Gasoline;
     extern std::string const cRT_GasolineUC;
     extern int const iRT_Gasoline;

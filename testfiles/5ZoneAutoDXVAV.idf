@@ -2819,17 +2819,17 @@
 
   Output:Variable,*,Coil System Compressor Speed Ratio,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
   Output:Variable,*,People Occupant Count,hourly;
 
@@ -2877,7 +2877,7 @@
 
   Output:Meter,Cooling:Electricity,monthly;
 
-  Output:Meter,Heating:Gas,monthly;
+  Output:Meter,Heating:NaturalGas,monthly;
 
   Output:Meter,Fans:Electricity,monthly;
 
@@ -2891,7 +2891,7 @@
 
   Output:Meter,Cooling:Electricity,runperiod;
 
-  Output:Meter,Heating:Gas,runperiod;
+  Output:Meter,Heating:NaturalGas,runperiod;
 
   Output:Meter,Fans:Electricity,runperiod;
 
@@ -2913,9 +2913,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2923,9 +2923,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   OutputControl:Table:Style,
     HTML,                    !- Column Separator

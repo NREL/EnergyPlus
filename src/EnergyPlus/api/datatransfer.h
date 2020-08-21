@@ -434,6 +434,18 @@ ENERGYPLUSLIB_API int minutes(EnergyPlusState state);
 /// \see apiDataFullyReady
 ENERGYPLUSLIB_API Real64 zoneTimeStep(EnergyPlusState state);
 
+/// \brief Returns the number of zone time steps in an hour, which is currently a constant value throughout a simulation.
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int numTimeStepsInHour(EnergyPlusState state);
+
+/// \brief The current zone time step index, from 1 to the number of zone time steps per hour
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \see apiDataFullyReady
+ENERGYPLUSLIB_API int zoneTimeStepNum(EnergyPlusState state);
+
 /// \brief Returns the duration of the current HVAC system simulation time step, in fractional hours
 /// \details The HVAC time step will vary throughout the simulation as needed to maintain convergence while being cautious about program runtime.
 ///          This function returns the current value of the time step
@@ -505,7 +517,6 @@ ENERGYPLUSLIB_API int currentEnvironmentNum(EnergyPlusState state);
 /// \param[in] constructionName The name of the construction to be looked up.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \see apiDataFullyReady
-/// \see kindOfSim
 ENERGYPLUSLIB_API int getConstructionHandle(EnergyPlusState state, const char* constructionName);
 
 /// \brief Returns a simple sum of the time part of the date/time function
@@ -513,7 +524,6 @@ ENERGYPLUSLIB_API int getConstructionHandle(EnergyPlusState state, const char* c
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \see apiDataFullyReady
-/// \see kindOfSim
 ENERGYPLUSLIB_API int actualTime(EnergyPlusState state);
 
 /// \brief Returns a simple sum of the date/time function
@@ -521,8 +531,265 @@ ENERGYPLUSLIB_API int actualTime(EnergyPlusState state);
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \see apiDataFullyReady
-/// \see kindOfSim
 ENERGYPLUSLIB_API int actualDateTime(EnergyPlusState state);
+
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \returns 1 if it is raining, 0 if not
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API int todayWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \returns 1 if it is snowing, 0 if not
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API int todayWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 todayWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour, int timeStepNum);
+
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \returns 1 if it is raining, 0 if not
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API int tomorrowWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \returns 1 if it is snowing, 0 if not
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API int tomorrowWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherOutDryBulbAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherOutDewPointAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherOutBarometricPressureAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherOutRelativeHumidityAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherWindSpeedAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherWindDirectionAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherSkyTemperatureAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherHorizontalIRSkyAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherBeamSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherDiffuseSolarRadiationAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherAlbedoAtTime(EnergyPlusState state, int hour, int timeStepNum);
+/// \brief Returns the requested weather data at the specified time
+/// \param[in] state An active EnergyPlusState instance created with `stateNew`.
+/// \param[in] hour The hour of the simulation day, from 0 to 23
+/// \param[in] timeStepNum The time step index, from 1 to the number of zone time steps per hour
+/// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
+/// \remark The API error flag will be set if an issue occurs in the lookup, use `apiErrorFlag` to check
+/// \see apiDataFullyReady
+/// \see apiErrorFlag
+ENERGYPLUSLIB_API Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState state, int hour, int timeStepNum);
 
 #ifdef __cplusplus
 }

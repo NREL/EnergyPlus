@@ -191,13 +191,9 @@ namespace WeatherManager {
 
     Array2D_bool TodayIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
     Array2D_bool TodayIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayRainAmount;      // ficitious indicator of Rain NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodaySnowAmount;      // ficitious indicator of Snow NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutDryBulbTemp;  // Dry bulb temperature of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutWetBulbTemp;  // Wet bulb temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutDewPointTemp; // Dew Point Temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutBaroPress;    // Barometric pressure of outside air NOLINT(cert-err58-cpp)
-    Array2D<Real64> TodayOutHumRat;       // Humidity ratio of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayOutRelHum;       // Relative Humidity of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayWindSpeed;       // Wind speed of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TodayWindDir;         // Wind direction of outside air NOLINT(cert-err58-cpp)
@@ -210,8 +206,6 @@ namespace WeatherManager {
 
     Array2D_bool TomorrowIsRain;             // Rain indicator, true=rain NOLINT(cert-err58-cpp)
     Array2D_bool TomorrowIsSnow;             // Snow indicator, true=snow NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowRainAmount;      // ficitious indicator of Rain NOLINT(cert-err58-cpp)
-    Array2D<Real64> TomorrowSnowAmount;      // ficitious indicator of Snow NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowOutDryBulbTemp;  // Dry bulb temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowOutDewPointTemp; // Dew Point Temperature of outside air NOLINT(cert-err58-cpp)
     Array2D<Real64> TomorrowOutBaroPress;    // Barometric pressure of outside air NOLINT(cert-err58-cpp)
@@ -387,13 +381,9 @@ namespace WeatherManager {
         NumWPSkyTemperatures = 0;             // Number of WeatherProperty:SkyTemperature items in input file
         TodayIsRain.deallocate();             // Rain indicator, true=rain
         TodayIsSnow.deallocate();             // Snow indicator, true=snow
-        TodayRainAmount.deallocate();         // ficitious indicator of Rain
-        TodaySnowAmount.deallocate();         // ficitious indicator of Snow
         TodayOutDryBulbTemp.deallocate();     // Dry bulb temperature of outside air
-        TodayOutWetBulbTemp.deallocate();     // Wet bulb temperature of outside air
         TodayOutDewPointTemp.deallocate();    // Dew Point Temperature of outside air
         TodayOutBaroPress.deallocate();       // Barometric pressure of outside air
-        TodayOutHumRat.deallocate();          // Humidity ratio of outside air
         TodayOutRelHum.deallocate();          // Relative Humidity of outside air
         TodayWindSpeed.deallocate();          // Wind speed of outside air
         TodayWindDir.deallocate();            // Wind direction of outside air
@@ -405,8 +395,6 @@ namespace WeatherManager {
         TodayLiquidPrecip.deallocate();       // Liquid Precipitation Depth (mm)
         TomorrowIsRain.deallocate();          // Rain indicator, true=rain
         TomorrowIsSnow.deallocate();          // Snow indicator, true=snow
-        TomorrowRainAmount.deallocate();      // ficitious indicator of Rain
-        TomorrowSnowAmount.deallocate();      // ficitious indicator of Snow
         TomorrowOutDryBulbTemp.deallocate();  // Dry bulb temperature of outside air
         TomorrowOutDewPointTemp.deallocate(); // Dew Point Temperature of outside air
         TomorrowOutBaroPress.deallocate();    // Barometric pressure of outside air
@@ -517,30 +505,30 @@ namespace WeatherManager {
 
     } // clear_state, for unit tests
 
-    void ManageWeather(IOFiles &ioFiles)
+    void ManageWeather(EnergyPlusData& state)
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
         //       DATE WRITTEN   May 1997
         //       MODIFIED       June 1997 (general clean-up)
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is the main driver of the weather manager module.
         // It controls the assignment of weather related global variables as
         // well as the reads and writes for weather information.
 
-        // METHODOLOGY EMPLOYED:
-        // Standard EnergyPlus "manager" methodology.
+        InitializeWeather(state.files, PrintEnvrnStamp);
 
-        // FLOW:
-
-        InitializeWeather(ioFiles, PrintEnvrnStamp);
-
+        bool anyEMSRan = false;
+        // Cannot call this during sizing, because EMS will not intialize properly until after simulation kickoff
+        if (!DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
+            EMSManager::ManageEMS(
+                state, DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
+        }
         SetCurrentWeather();
 
-        ReportWeatherAndTimeInformation(ioFiles, PrintEnvrnStamp);
+        ReportWeatherAndTimeInformation(state.files, PrintEnvrnStamp);
     }
 
     void ResetEnvironmentCounter()
@@ -1829,7 +1817,7 @@ namespace WeatherManager {
                 General::InvOrdinalDay(JDay, SpecialDays(i).ActStMon, SpecialDays(i).ActStDay, LeapYearAdd);
             } else if (SpecialDays(i).DateType == DateType::NthDayInMonth) {
                 int ThisDay = SpecialDays(i).WeekDay - MonWeekDay(SpecialDays(i).Month) + 1;
-                if (SpecialDays(i).WeekDay >= MonWeekDay(SpecialDays(i).Month)) {
+                if (SpecialDays(i).WeekDay < MonWeekDay(SpecialDays(i).Month)) {
                     ThisDay += 7;
                 }
                 ThisDay += 7 * (SpecialDays(i).Day - 1);
