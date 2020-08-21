@@ -1948,7 +1948,7 @@ namespace OutputProcessor {
                 OutResourceType = "Electricity";
 
             } else if (meterType == "GAS" || meterType == "NATURALGAS") {
-                OutResourceType = "Gas";
+                OutResourceType = "NaturalGas";
 
             } else if (meterType == "GASOLINE") {
                 OutResourceType = "Gasoline";
@@ -5042,7 +5042,7 @@ namespace OutputProcessor {
         // Facility indices are in the 100s
         if (has(meterName, "Electricity:Facility")) {
             indexGroupKey = 100;
-        } else if (has(meterName, "Gas:Facility")) {
+        } else if (has(meterName, "NaturalGas:Facility")) {
             indexGroupKey = 101;
         } else if (has(meterName, "DistricHeating:Facility")) {
             indexGroupKey = 102;
@@ -5054,7 +5054,7 @@ namespace OutputProcessor {
             // Building indices are in the 200s
         } else if (has(meterName, "Electricity:Building")) {
             indexGroupKey = 201;
-        } else if (has(meterName, "Gas:Building")) {
+        } else if (has(meterName, "NaturalGas:Building")) {
             indexGroupKey = 202;
 
             // HVAC indices are in the 300s
@@ -8592,7 +8592,7 @@ void InitPollutionMeterReporting(IOFiles &ioFiles, std::string const &ReportFreq
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
                                                  "DistrictHeating:Facility",
-                                                 "Gas:Facility",
+                                                 "NaturalGas:Facility",
                                                  "GASOLINE:Facility",
                                                  "COAL:Facility",
                                                  "FuelOilNo1:Facility",

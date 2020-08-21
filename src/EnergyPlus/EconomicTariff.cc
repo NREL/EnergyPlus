@@ -4075,7 +4075,7 @@ namespace EconomicTariff {
 
         if (numTariff > 0) {
             elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
-            gasFacilMeter = GetMeterIndex("GAS:FACILITY");
+            gasFacilMeter = GetMeterIndex("NATURALGAS:FACILITY");
             distCoolFacilMeter = GetMeterIndex("DISTRICTCOOLING:FACILITY");
             distHeatFacilMeter = GetMeterIndex("DISTRICTHEATING:FACILITY");
             elecTotalEne = 0.0;
@@ -4250,15 +4250,15 @@ namespace EconomicTariff {
                 //---------------------------------
                 WriteReportHeaders("Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
-                gasFacilMeter = GetMeterIndex("GAS:FACILITY");
+                gasFacilMeter = GetMeterIndex("NATURALGAS:FACILITY");
                 //---- Annual Summary
                 rowHead.allocate(3);
                 columnHead.allocate(4);
                 columnWidth.allocate(4);
                 tableBody.allocate(4, 3);
                 tableBody = "";
-                columnHead(1) = "Electric";
-                columnHead(2) = "Gas";
+                columnHead(1) = "Electricity";
+                columnHead(2) = "Natural Gas";
                 columnHead(3) = "Other";
                 columnHead(4) = "Total";
                 rowHead(1) = "Cost [~~$~~]";

@@ -2250,7 +2250,7 @@
 
   Output:Variable,*,Zone Total Internal Latent Gain Energy,hourly;
 
-  Output:Variable,*,Zone Lights Electric Energy,hourly;
+  Output:Variable,*,Zone Lights Electricity Energy,hourly;
 
   Output:Meter,Electricity:Building,hourly;
 

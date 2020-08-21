@@ -27,7 +27,7 @@
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
 
-  Output:Variable,*,Lights Electric Energy,Monthly;
+  Output:Variable,*,Lights Electricity Energy,Monthly;
 
   Schedule:Compact,
     Office Lighting,         !- Name
