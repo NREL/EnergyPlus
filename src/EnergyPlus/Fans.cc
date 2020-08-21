@@ -1250,6 +1250,7 @@ namespace Fans {
 
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
+        sizerSystemAirFlow.overrideSizingString(SizingString);
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
         Fan(FanNum).MaxAirFlowRate = sizerSystemAirFlow.size(TempFlow, errorsFound);
 

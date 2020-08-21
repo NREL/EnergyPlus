@@ -80,7 +80,8 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
 
     if (this->dataEMSOverrideON) {
         this->autoSizedValue = this->dataEMSOverride;
-    } else if (this->dataConstantUsedForSizing > 0 && this->dataFractionUsedForSizing > 0) {
+    } else if (this->dataConstantUsedForSizing >= 0 && this->dataFractionUsedForSizing > 0) {
+        // back and forth if dataConstantUsedForSizing should be > or >= 0 to make this work for AutoCalculate
         this->autoSizedValue = this->dataConstantUsedForSizing * this->dataFractionUsedForSizing;
     } else {
         if (this->curZoneEqNum > 0) {
