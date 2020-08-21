@@ -57,8 +57,6 @@
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-#include <iostream>
-
 namespace EnergyPlus {
 
 bool oneTimeCompRptHeaderFlag = true;
