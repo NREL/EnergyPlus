@@ -242,8 +242,8 @@ public:
 
         void getInput();
 
-        bool csv = true;
-        bool mtr = true;
+        bool csv = false;
+        bool mtr = false;
         bool eso = true;
         bool eio = true;
         bool audit = true;

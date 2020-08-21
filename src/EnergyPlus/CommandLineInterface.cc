@@ -758,7 +758,7 @@ namespace CommandLineInterface {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << ioFiles.eso.fileName << '\n';
-                ofs << outputCsvFileName << '\n';
+                ofs << ioFiles.csv.fileName << '\n';
             }
         }
 
@@ -769,7 +769,7 @@ namespace CommandLineInterface {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << ioFiles.mtr.fileName << '\n';
-                ofs << outputMtrCsvFileName << '\n';
+                ofs << ioFiles.mtr_csv.fileName << '\n';
             }
         }
 
