@@ -615,6 +615,8 @@ namespace OutputProcessor {
 
     ReportingFrequency determineFrequency(std::string const &FreqString);
 
+    std::string reportingFrequency(ReportingFrequency reportingInterval);
+
     void ProduceMinMaxString(std::string &String,                // Current value
                              int const DateValue,                // Date of min/max
                              ReportingFrequency const ReportFreq // Reporting Frequency
@@ -1049,7 +1051,7 @@ bool ReportingThisVariable(std::string const &RepVarName);
 
 void InitPollutionMeterReporting(IOFiles &ioFiles, std::string const &ReportFreqName);
 
-void ProduceRDDMDD();
+void ProduceRDDMDD(EnergyPlusData &state);
 
 void AddToOutputVariableList(std::string const &VarName, // Variable Name
                              OutputProcessor::TimeStepType const TimeStepType,

@@ -54,7 +54,6 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
-#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -83,12 +82,13 @@ extern "C" {
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -431,7 +431,7 @@ namespace UtilityRoutines {
         return SameString(a, b);
     }
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn)
+    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
@@ -449,27 +449,26 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); // open file normally
-                if (!fsPerfLog.fail()) {
+            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+                if (ioFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                    }
                     fsPerfLog << appendPerfLog_headerRow << std::endl;
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); // append to already existing file
-                if (!fsPerfLog.fail()) {
+                if (ioFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                    }
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             }
             fsPerfLog.close();
         }
-    }
-
-    inline bool exists(const std::string &filename)
-    {
-        // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
-        struct stat buffer;
-        return (stat(filename.c_str(), &buffer) == 0);
     }
 
     bool ValidateFuelType(std::string const &FuelTypeInput,
@@ -749,10 +748,10 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -763,7 +762,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = state.files.endFile.try_open();
+            auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -778,13 +777,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(state.files.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports(state.files.json);
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport(state.files.json);
-        }
+        ResultsFramework::resultsFramework->writeOutputs(state.files);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
@@ -925,7 +918,7 @@ namespace UtilityRoutines {
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -938,15 +931,15 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
-            UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-            UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); // last item so write the perfLog file
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Severe", NumSevere, true); // last item so write the perfLog file
         }
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -956,7 +949,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = ioFiles.endFile.try_open();
+            auto tempfl = ioFiles.endFile.try_open(ioFiles.outputControl.end);
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
@@ -966,13 +959,7 @@ namespace UtilityRoutines {
         // Output detailed ZONE time series data
         SimulationManager::OpenOutputJsonFiles(ioFiles.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports(ioFiles.json);
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport(ioFiles.json);
-        }
+        ResultsFramework::resultsFramework->writeOutputs(ioFiles);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
