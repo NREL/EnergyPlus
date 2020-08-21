@@ -2956,7 +2956,7 @@
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Plant Supply Side Cooling Demand Rate,hourly;
 
@@ -3074,25 +3074,25 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Electric Energy,hourly;
+  Output:Variable,*,Water Heater Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,hourly;
 
   Output:Variable,*,Water Heater Water Volume,hourly;
 
-  Output:Variable,*,Facility Total Produced Electric Power,hourly;
+  Output:Variable,*,Facility Total Produced Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,hourly;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,hourly;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,hourly;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,hourly;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,hourly;
 
-  Output:Variable,*,Facility Total Electric Demand Power,hourly;
+  Output:Variable,*,Facility Total Electricity Demand Rate,hourly;
 
   Output:Variable,*,Generator Produced Thermal Rate,hourly;
 
@@ -3106,13 +3106,13 @@
 
   Output:Variable,Capstone C65,Generator Heat Recovery Water Mass Flow Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Produced Electric Power,hourly;
+  Output:Variable,Capstone C65,Generator Produced AC Electricity Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Rate,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Energy,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Energy,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas Mass Flow Rate,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas Mass Flow Rate,hourly;
 
   Output:Variable,Capstone C65,Generator LHV Basis Electric Efficiency,hourly;
 
@@ -3269,9 +3269,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3283,9 +3283,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

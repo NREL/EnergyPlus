@@ -248,8 +248,8 @@ void CoilCoolingDX::oneTimeInit() {
     SetupOutputVariable("Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name);
     SetupOutputVariable("Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name);
     SetupOutputVariable("Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name);
-    SetupOutputVariable("Cooling Coil Electric Power", OutputProcessor::Unit::W, this->performance.powerUse, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Electric Energy",
+    SetupOutputVariable("Cooling Coil Electricity Rate", OutputProcessor::Unit::W, this->performance.powerUse, "System", "Average", this->name);
+    SetupOutputVariable("Cooling Coil Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->performance.electricityConsumption,
                         "System",
@@ -262,20 +262,20 @@ void CoilCoolingDX::oneTimeInit() {
                         "System");
     SetupOutputVariable(
         "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power",
+    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Rate",
                         OutputProcessor::Unit::W,
                         this->performance.crankcaseHeaterPower,
                         "System",
                         "Average",
                         this->name);
-    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Energy",
+    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Energy",
                         OutputProcessor::Unit::J,
                         this->performance.crankcaseHeaterElectricityConsumption,
                         "System",
                         "Sum",
                         this->name,
                         _,
-                        "Electric",
+                        "Electricity",
                         "DHW",
                         _,
                         "Plant");
@@ -332,20 +332,20 @@ void CoilCoolingDX::oneTimeInit() {
 
 
     if (this->performance.evapCondBasinHeatCap > 0) {
-        SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
+        SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->performance.basinHeaterPower,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("Cooling Coil Basin Heater Electric Energy",
+        SetupOutputVariable("Cooling Coil Basin Heater Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->performance.basinHeaterElectricityConsumption,
                             "System",
                             "Sum",
                             this->name,
                             _,
-                            "Electric",
+                            "Electricity",
                             "COOLING",
                             _,
                             "System");
@@ -366,20 +366,20 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
     if (this->evaporativeCondSupplyTankIndex > 0) {
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->evapCondPumpElecPower,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->evapCondPumpElecConsumption,
                             "System",
                             "Sum",
                             this->name,
                             _,
-                            "Electric",
+                            "Electricity",
                             "COOLING",
                             _,
                             "System");

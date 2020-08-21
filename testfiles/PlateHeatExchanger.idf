@@ -2557,9 +2557,9 @@
 
   Output:Variable,*,Heat Pump Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 
@@ -2577,7 +2577,7 @@
 
   Output:Variable,*,Heat Pump Source Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Pump Electric Power,timestep;
+  Output:Variable,*,Pump Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
@@ -2591,7 +2591,7 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
   Output:Variable,Chilled Water Loop,Plant Supply Side Cooling Demand Rate,timestep;
 
