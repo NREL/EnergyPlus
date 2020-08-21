@@ -117,7 +117,7 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(Real64 _originalValue, bool &
                     this->setHeatCoilInletTempForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                                                               this->zoneEqSizing(this->curZoneEqNum),
                                                               this->finalZoneSizing(this->curZoneEqNum));
-                //Real64 CoilInHumRat =
+                // Real64 CoilInHumRat =
                 //    this->setHeatCoilInletHumRatForZoneEqSizing(setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
                 //                                                this->zoneEqSizing(this->curZoneEqNum),
                 //                                                this->finalZoneSizing(this->curZoneEqNum));
@@ -159,9 +159,9 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(Real64 _originalValue, bool &
                 if (this->dataDesicRegCoil) {
                     this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->dataDesOutletAirTemp - this->dataDesInletAirTemp);
-                } else if ( this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
+                } else if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
                     this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
-                                           (this->airloopDOAS[ this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PreheatTemp - CoilInTemp);
+                                           (this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PreheatTemp - CoilInTemp);
                 } else {
                     this->autoSizedValue = CpAirStd * DataEnvironment::StdRhoAir * this->dataAirFlowUsedForSizing *
                                            (this->finalSysSizing(this->curSysNum).PreheatTemp - CoilInTemp);
@@ -179,7 +179,9 @@ Real64 HeatingWaterDesCoilLoadUsedForUASizer::size(Real64 _originalValue, bool &
     }
     // heating coil can't have negative capacity
     this->autoSizedValue = std::max(0.0, this->autoSizedValue);
-    if (this->isEpJSON) this->sizingString = "water_heating_design_coil_load_for_ua_sizing";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "water_heating_design_coil_load_for_ua_sizing";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject && this->curSysNum <= this->numPrimaryAirSys) {
         coilSelectionReportObj->setCoilHeatingCapacity(this->compName,

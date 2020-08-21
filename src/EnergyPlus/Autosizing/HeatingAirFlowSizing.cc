@@ -50,8 +50,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -251,7 +250,9 @@ Real64 HeatingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
             errorsFound = true;
         }
         // override sizing string
-        if (this->isEpJSON) this->sizingString = "heating_supply_air_flow_rate [m3/s]";
+        if (this->overrideSizeString) {
+            if (this->isEpJSON) this->sizingString = "heating_supply_air_flow_rate [m3/s]";
+        }
         if (this->dataScalableSizingON) {
             if (this->zoneAirFlowSizMethod == DataSizing::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::None) {
                 this->sizingStringScalable = "(scaled by flow / zone) ";

@@ -50,7 +50,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -902,17 +902,19 @@ Real64 SystemAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
     }
 
     // override sizing string
-    if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
-        this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
-        if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-    } else if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:UnitVentilator")) {
-        this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
-        if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
-    } else if (UtilityRoutines::SameString(this->compType, "Fan:SystemModel")) {
-        this->sizingString = "Design Maximum Air Flow Rate [m3/s]";
-        //if (this->isEpJSON) this->sizingString = "design_maximum_air_flow_rate [m3/s]";
-    } else {
-        if (this->isEpJSON) this->sizingString = "supply_air_maximum_flow_rate [m3/s]";
+    if (this->overrideSizeString) {
+        if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
+            this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
+            if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
+        } else if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:UnitVentilator")) {
+            this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
+            if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
+        } else if (UtilityRoutines::SameString(this->compType, "Fan:SystemModel")) {
+            this->sizingString = "Design Maximum Air Flow Rate [m3/s]";
+            // if (this->isEpJSON) this->sizingString = "design_maximum_air_flow_rate [m3/s]";
+        } else {
+            if (this->isEpJSON) this->sizingString = "supply_air_maximum_flow_rate [m3/s]";
+        }
     }
 
     this->selectSizerOutput(errorsFound);

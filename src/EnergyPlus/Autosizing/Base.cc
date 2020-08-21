@@ -57,6 +57,8 @@
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <iostream>
+
 namespace EnergyPlus {
 
 bool oneTimeCompRptHeaderFlag = true;
@@ -316,8 +318,6 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
                                   Optional<Real64 const> UsrValue)
 {
 
-    if (UtilityRoutines::SameString(CompType, "Fan:ZoneExhaust")) return;
-
     static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
     static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
@@ -351,19 +351,29 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
-        if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done or autosizes to 0
+        if (this->dataEMSOverrideON) { // EMS overrides value
+            this->autoSizedValue = this->dataEMSOverride;
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+        } else if (this->wasAutoSized && this->dataFractionUsedForSizing > 0.0 && this->dataConstantUsedForSizing > 0.0) {
+            this->autoSizedValue = this->dataFractionUsedForSizing * this->dataConstantUsedForSizing;
+            this->reportSizerOutput(
+                this->compType, this->compName, "Design Size " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+        } else if (!this->wasAutoSized &&
+                   (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done or autosizes to 0
             this->autoSizedValue = this->originalValue;
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
             this->autoSizedValue = this->originalValue;
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
-        } else if (this->dataEMSOverrideON) { // EMS overrides value
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 &&
                    this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
             // might need more logic here to catch everything correctly
             if (this->dataScalableSizingON && int(this->zoneAirFlowSizMethod) > 0) {
-                this->reportSizerOutput(this->compType, this->compName, "User Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             } else {
                 this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
             }
@@ -376,14 +386,16 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
                                         "User-Specified " + this->sizingStringScalable + this->sizingString,
                                         this->originalValue);
             } else {
-                this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
             }
             if (DataGlobals::DisplayExtraWarnings) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
                     ShowMessage(msg);
-                    msg = "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
+                    msg =
+                        "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
                     this->addErrorMessage(msg);
                     ShowContinueError(msg);
                     msg = "differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5);
@@ -410,7 +422,7 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
     } else if (!this->wasAutoSized && !this->autoCalculate) {
         this->autoSizedValue = this->originalValue;
     }
-
+    this->overrideSizeString = true; // reset for next sizer
     if (this->errorType != AutoSizingResultType::NoError) {
         std::string msg = "Developer Error: sizing of " + this->sizingString + " failed.";
         this->addErrorMessage(msg);
@@ -425,34 +437,44 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
 void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
-        if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue)) { // no sizing run done
-            this->autoSizedValue = this->originalValue;
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+        if (this->dataEMSOverrideON) { // EMS overrides value
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                 this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
-                this->reportSizerOutput(
-                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
+                this->reportSizerOutput(this->compType,
+                                        this->compName,
+                                        "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                        this->autoSizedValue);
+            }
+        } else if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done
+            this->autoSizedValue = this->originalValue;
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
+                this->reportSizerOutput(this->compType,
+                                        this->compName,
+                                        "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                        this->autoSizedValue);
             }
         } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
             this->autoSizedValue = this->originalValue;
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                 this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
-                this->reportSizerOutput(
-                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
-            }
-        } else if (this->dataEMSOverrideON) { // EMS overrides value
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
-            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
-                this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
-                this->reportSizerOutput(
-                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
+                this->reportSizerOutput(this->compType,
+                                        this->compName,
+                                        "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                        this->autoSizedValue);
             }
         } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 &&
                    this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
                                                  // might need more logic here to catch everything correctly
             if (this->dataScalableSizingON && int(this->zoneAirFlowSizMethod) > 0) {
-                this->reportSizerOutput(this->compType, this->compName, "User Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             } else {
                 this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
             }
@@ -483,11 +505,14 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
                 if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                     this->autoSizedValue /= (1 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
                 }
-                this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
                 if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
                     this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
-                    this->reportSizerOutput(
-                        this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
+                    this->reportSizerOutput(this->compType,
+                                            this->compName,
+                                            "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                            this->autoSizedValue);
                 }
             }
             if (DataGlobals::DisplayExtraWarnings) {
@@ -495,7 +520,8 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
                     ShowMessage(msg);
-                    msg = "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
+                    msg =
+                        "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
                     this->addErrorMessage(msg);
                     ShowContinueError(msg);
                     msg = "differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5);
@@ -522,7 +548,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
     } else if (!this->wasAutoSized && !this->autoCalculate) {
         this->autoSizedValue = this->originalValue;
     }
-
+    this->overrideSizeString = true; // reset for next sizer
     if (this->errorType != AutoSizingResultType::NoError) {
         std::string msg = "Developer Error: sizing of " + this->sizingString + " failed.";
         this->addErrorMessage(msg);
@@ -586,6 +612,7 @@ bool BaseSizer::checkInitialized(bool &errorsFound)
 void BaseSizer::overrideSizingString(std::string &string)
 {
     this->sizingString = string;
+    this->overrideSizeString = false;
 }
 
 Real64 BaseSizer::setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
@@ -683,6 +710,7 @@ void BaseSizer::clearState()
     errorType = AutoSizingResultType::NoError;
     sizingString = "";
     sizingStringScalable = "";
+    overrideSizeString = true;
     originalValue = 0.0;
     autoSizedValue = 0.0;
     wasAutoSized = false;

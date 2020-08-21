@@ -170,7 +170,9 @@ Real64 CoolingWaterDesAirOutletTempSizer::size(Real64 _originalValue, bool &erro
         }
     }
     // override sizing string
-    if (this->isEpJSON) this->sizingString = "design_outlet_air_temperature [C]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "design_outlet_air_temperature [C]";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);

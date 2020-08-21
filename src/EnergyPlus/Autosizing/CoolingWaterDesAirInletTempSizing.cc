@@ -65,10 +65,10 @@ Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).ZoneTempAtCoolPeak;
             } else if (this->zoneEqFanCoil) {
                 Real64 DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
-                this->autoSizedValue = this->setCoolCoilInletTempForZoneEqSizing(
-                    this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                    this->zoneEqSizing(this->curZoneEqNum),
-                    this->finalZoneSizing(this->curZoneEqNum));
+                this->autoSizedValue =
+                    this->setCoolCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                                                              this->zoneEqSizing(this->curZoneEqNum),
+                                                              this->finalZoneSizing(this->curZoneEqNum));
             } else {
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInTemp;
             }
@@ -89,7 +89,7 @@ Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
         } else {
             if (this->curOASysNum > 0) { // coil is in OA stream
                 if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue = this->airloopDOAS[ this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOATemp;
+                    this->autoSizedValue = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOATemp;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutTempAtCoolPeak;
                 }
@@ -122,7 +122,9 @@ Real64 CoolingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
         }
     }
     // override sizing string
-    if (this->isEpJSON) this->sizingString = "design_inlet_air_temperature [C]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "design_inlet_air_temperature [C]";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) {
         if (this->curSysNum <= this->numPrimaryAirSys) {

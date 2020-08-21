@@ -121,6 +121,7 @@ struct BaseSizer
     AutoSizingType sizingType = AutoSizingType::Unknown;
     std::string sizingString = "";
     std::string sizingStringScalable = "";
+    bool overrideSizeString = true;
     Real64 originalValue = 0.0;
     Real64 autoSizedValue = 0.0;
     bool wasAutoSized = false;

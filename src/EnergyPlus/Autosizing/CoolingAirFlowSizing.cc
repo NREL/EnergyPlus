@@ -50,7 +50,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
@@ -74,7 +74,7 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
                 this->autoSizedValue = _originalValue;
                 if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
-                    this->originalValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
+                    this->originalValue /= (1.0 - this->dataBypassFrac);  // back out bypass fraction applied in GetInput
                 }
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
                 this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
@@ -611,7 +611,7 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
                 this->autoSizedValue = _originalValue;
                 if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:TwoStageWithHumidityControlMode")) {
                     this->autoSizedValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
-                    this->originalValue /= (1.0 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
+                    this->originalValue /= (1.0 - this->dataBypassFrac);  // back out bypass fraction applied in GetInput
                 }
             } else {
                 if (this->curOASysNum > 0) {
@@ -662,11 +662,28 @@ Real64 CoolingAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
         }
 
         // override sizing string
-        if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
-            this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
-            if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
+        if (this->overrideSizeString) {
+            if (UtilityRoutines::SameString(this->compType, "ZoneHVAC:FourPipeFanCoil")) {
+                this->sizingString = "Maximum Supply Air Flow Rate [m3/s]";
+                if (this->isEpJSON) this->sizingString = "maximum_supply_air_flow_rate [m3/s]";
+            } else if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                if (this->dataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop
+                    if (this->isEpJSON) {
+                        this->sizingString = "high_speed_rated_air_flow_rate [m3/s]";
+                    } else {
+                        this->sizingString = "High Speed Rated Air Flow Rate [m3/s]";
+                    }
+                } else if (this->dataDXSpeedNum == 2) {
+                    if (this->isEpJSON) {
+                        this->sizingString = "low_speed_rated_air_flow_rate [m3/s]";
+                    } else {
+                        this->sizingString = "Low Speed Rated Air Flow Rate [m3/s]";
+                    }
+                }
+            } else if (this->isEpJSON) {
+                this->sizingString = "cooling_supply_air_flow_rate [m3/s]";
+            }
         }
-        if (this->isEpJSON) this->sizingString = "cooling_supply_air_flow_rate [m3/s]";
         if (this->dataScalableSizingON) {
             if (this->zoneAirFlowSizMethod == DataSizing::SupplyAirFlowRate || this->zoneAirFlowSizMethod == DataSizing::None) {
                 this->sizingStringScalable = "(scaled by flow / zone) ";

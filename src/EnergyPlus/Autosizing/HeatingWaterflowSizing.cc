@@ -82,10 +82,10 @@ Real64 HeatingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
                     } else if (this->zoneEqSizing(this->curZoneEqNum).HeatingAirFlow) {
                         DesMassFlow = this->zoneEqSizing(this->curZoneEqNum).HeatingAirVolFlow * DataEnvironment::StdRhoAir;
                     }
-                    Real64 CoilInTemp = this->setHeatCoilInletTempForZoneEqSizing(
-                        this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                        this->zoneEqSizing(this->curZoneEqNum),
-                        this->finalZoneSizing(this->curZoneEqNum));
+                    Real64 CoilInTemp =
+                        this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                                                                  this->zoneEqSizing(this->curZoneEqNum),
+                                                                  this->finalZoneSizing(this->curZoneEqNum));
                     Real64 CoilOutTemp = this->finalZoneSizing(this->curZoneEqNum).HeatDesTemp;
                     Real64 CoilOutHumRat = this->finalZoneSizing(this->curZoneEqNum).HeatDesHumRat;
                     Real64 DesCoilLoad = Psychrometrics::PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
@@ -145,7 +145,9 @@ Real64 HeatingWaterflowSizer::size(Real64 _originalValue, bool &errorsFound)
             }
         }
     }
-    if (this->isEpJSON) this->sizingString = "maximum_water_flow_rate [m3/s]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "maximum_water_flow_rate [m3/s]";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) {
         coilSelectionReportObj->setCoilWaterFlowPltSizNum(

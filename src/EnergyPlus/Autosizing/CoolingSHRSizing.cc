@@ -130,6 +130,7 @@ Real64 CoolingSHRSizer::size(Real64 _originalValue, bool &errorsFound)
 
 void CoolingSHRSizer::updateSizingString()
 {
+    if (!overrideSizeString) return;
     // override sizingString to match existing text
     if (this->coilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
         if (this->dataDXSpeedNum == 1) { // mode 1 is high speed in DXCoils loop

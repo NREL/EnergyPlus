@@ -2667,6 +2667,8 @@ namespace UnitarySystems {
                 sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 this->m_DesignSuppHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
             }
+            // logic here isn't accurate. Replicating temporarily to minimize diffs in AutoSizingLibrary refactor
+            TempSize = this->m_DesignSuppHeatingCapacity;
 
             if (this->m_Humidistat && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat && IsAutoSize) {
                 DataSizing::DataConstantUsedForSizing = max(this->m_DesignSuppHeatingCapacity, this->m_DesignCoolingCapacity);

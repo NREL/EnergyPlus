@@ -108,7 +108,8 @@ namespace EnergyPlus {
                                                Real64 &motInPower,
                                                bool &fanCompModel)
     {
-        if (fanEnumType < 0 || fanIndex < 0) return;
+        // if fan unknown or air flow sizing (recursive call to size fan) then return
+        if (fanEnumType < 0 || fanIndex < 0 || this->sizingType == AutoSizingType::SystemAirFlowSizing) return;
 
         switch (fanEnumType) {
             case DataAirSystems::structArrayLegacyFanModels: {

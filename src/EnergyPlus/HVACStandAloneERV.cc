@@ -1496,6 +1496,7 @@ namespace HVACStandAloneERV {
             }
             if (TempSize > 0.0) {
                 SystemAirFlowSizer sizerSystemAirFlow;
+                sizerSystemAirFlow.overrideSizingString(SizingString);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
             }
@@ -1503,6 +1504,7 @@ namespace HVACStandAloneERV {
         }
 
         // Size ERV exhaust flow rate
+        DataSizing::DataFractionUsedForSizing = 1.0;
         IsAutoSize = false;
         if (StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -1530,6 +1532,7 @@ namespace HVACStandAloneERV {
             }
             if (TempSize > 0.0) {
                 SystemAirFlowSizer sizerSystemAirFlow;
+                sizerSystemAirFlow.overrideSizingString(SizingString);
                 sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                 TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
             }

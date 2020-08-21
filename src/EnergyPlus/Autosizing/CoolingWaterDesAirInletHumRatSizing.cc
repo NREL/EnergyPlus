@@ -64,10 +64,10 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).ZoneHumRatAtCoolPeak;
             } else if (this->zoneEqFanCoil) {
                 Real64 desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesCoolMassFlow;
-                this->autoSizedValue = this->setCoolCoilInletHumRatForZoneEqSizing(
-                    this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                    this->zoneEqSizing(this->curZoneEqNum),
-                    this->finalZoneSizing(this->curZoneEqNum));
+                this->autoSizedValue =
+                    this->setCoolCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                                                                this->zoneEqSizing(this->curZoneEqNum),
+                                                                this->finalZoneSizing(this->curZoneEqNum));
             } else {
                 this->autoSizedValue = this->finalZoneSizing(this->curZoneEqNum).DesCoolCoilInHumRat;
             }
@@ -79,15 +79,14 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
             Real64 OutAirFrac = 1.0;
             if (this->curOASysNum > 0) { // coil is in OA stream
                 if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue =
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
+                    this->autoSizedValue = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].SizingCoolOAHumRat;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).OutHumRatAtCoolPeak;
                 }
             } else if (this->dataDesInletAirHumRat > 0.0) {
                 this->autoSizedValue = this->dataDesInletAirHumRat;
-            } else {                                                                         // coil is in main air loop
-                if ( this->primaryAirSystem(this->curSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
+            } else {                                                               // coil is in main air loop
+                if (this->primaryAirSystem(this->curSysNum).NumOACoolCoils == 0) { // there is no precooling of the OA stream
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).MixHumRatAtCoolPeak;
                 } else { // there is precooling of the OA stream
                     if (this->dataFlowUsedForSizing > 0.0) {
@@ -102,7 +101,9 @@ Real64 CoolingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
             }
         }
     }
-    if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;

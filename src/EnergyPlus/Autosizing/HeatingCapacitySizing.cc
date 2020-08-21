@@ -102,7 +102,8 @@ Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                 } else if (this->dataCoolCoilCap > 0.0 && this->dataFlowUsedForSizing > 0.0) {
                     NominalCapacityDes = this->dataCoolCoilCap;
                     DesVolFlow = this->dataFlowUsedForSizing;
-                } else if (int(this->finalZoneSizing.size()) > 0 && this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow) {
+                } else if (int(this->finalZoneSizing.size()) > 0 &&
+                           this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow >= DataHVACGlobals::SmallMassFlow) {
                     if (this->dataFlowUsedForSizing > 0.0) {
                         DesVolFlow = this->dataFlowUsedForSizing;
                     }
@@ -388,78 +389,78 @@ Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             this->addErrorMessage(msg);
             errorsFound = true;
         }
+    }
+    if (!this->hardSizeNoDesignRun || this->dataScalableSizingON || this->dataScalableCapSizingON) {
+        if (this->wasAutoSized) {
+            // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
+            // determines capacity using physical calculations instead of emperical curves
+            bool FlagCheckVolFlowPerRatedTotCap = true;
+            if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
+                UtilityRoutines::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"))
+                FlagCheckVolFlowPerRatedTotCap = false;
 
-        if (!this->hardSizeNoDesignRun || this->dataScalableSizingON || this->dataScalableCapSizingON) {
-            if (this->wasAutoSized) {
-                // Note: the VolFlowPerRatedTotCap check is not applicable for VRF-FluidTCtrl coil model, which implements variable flow fans and
-                // determines capacity using physical calculations instead of emperical curves
-                bool FlagCheckVolFlowPerRatedTotCap = true;
-                if (UtilityRoutines::SameString(this->compType, "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl") ||
-                    UtilityRoutines::SameString(this->compType, "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"))
-                    FlagCheckVolFlowPerRatedTotCap = false;
-
-                if (this->dataIsDXCoil && FlagCheckVolFlowPerRatedTotCap) {
-                    Real64 RatedVolFlowPerRatedTotCap = 0.0;
-                    if (this->autoSizedValue > 0.0) {
-                        RatedVolFlowPerRatedTotCap = DesVolFlow / this->autoSizedValue;
+            if (this->dataIsDXCoil && FlagCheckVolFlowPerRatedTotCap) {
+                Real64 RatedVolFlowPerRatedTotCap = 0.0;
+                if (this->autoSizedValue > 0.0) {
+                    RatedVolFlowPerRatedTotCap = DesVolFlow / this->autoSizedValue;
+                }
+                if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
+                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                        ShowWarningError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
+                        ShowContinueError("..." + this->sizingString +
+                                          " will be limited by the minimum rated volume flow per rated total capacity ratio.");
+                        ShowContinueError("...DX coil volume flow rate (m3/s ) = " + General::TrimSigDigits(DesVolFlow, 6));
+                        ShowContinueError("...Requested capacity (W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
+                        ShowContinueError("...Requested flow/capacity ratio (m3/s/W ) = " + General::TrimSigDigits(RatedVolFlowPerRatedTotCap, 3));
+                        ShowContinueError("...Minimum flow/capacity ratio (m3/s/W ) = " +
+                                          General::TrimSigDigits(DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT), 3));
                     }
-                    if (RatedVolFlowPerRatedTotCap < DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                        if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
-                            ShowWarningError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
-                            ShowContinueError("..." + this->sizingString +
-                                              " will be limited by the minimum rated volume flow per rated total capacity ratio.");
-                            ShowContinueError("...DX coil volume flow rate (m3/s ) = " + General::TrimSigDigits(DesVolFlow, 6));
-                            ShowContinueError("...Requested capacity (W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
-                            ShowContinueError("...Requested flow/capacity ratio (m3/s/W ) = " +
-                                              General::TrimSigDigits(RatedVolFlowPerRatedTotCap, 3));
-                            ShowContinueError("...Minimum flow/capacity ratio (m3/s/W ) = " +
-                                              General::TrimSigDigits(DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT), 3));
-                        }
 
-                        DXFlowPerCapMinRatio = (DesVolFlow / DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) /
-                                               this->autoSizedValue; // set DX Coil Capacity Increase Ratio from Too Low Flow/Capacity Ratio
-                        this->autoSizedValue = DesVolFlow / DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                    DXFlowPerCapMinRatio = (DesVolFlow / DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) /
+                                           this->autoSizedValue; // set DX Coil Capacity Increase Ratio from Too Low Flow/Capacity Ratio
+                    this->autoSizedValue = DesVolFlow / DataHVACGlobals::MinRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
 
-                        if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
-                            ShowContinueError("...Adjusted capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
-                        }
-                    } else if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
-                        if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
-                            ShowWarningError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
-                            ShowContinueError("..." + this->sizingString +
-                                              " will be limited by the maximum rated volume flow per rated total capacity ratio.");
-                            ShowContinueError("...DX coil volume flow rate ( m3/s ) = " + General::TrimSigDigits(DesVolFlow, 6));
-                            ShowContinueError("...Requested capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
-                            ShowContinueError("...Requested flow/capacity ratio ( m3/s/W ) = " +
-                                              General::TrimSigDigits(RatedVolFlowPerRatedTotCap, 3));
-                            ShowContinueError("...Maximum flow/capacity ratio ( m3/s/W ) = " +
-                                              General::TrimSigDigits(DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT), 3));
-                        }
+                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                        ShowContinueError("...Adjusted capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
+                    }
+                } else if (RatedVolFlowPerRatedTotCap > DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT)) {
+                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                        ShowWarningError(this->callingRoutine + ' ' + this->compType + ' ' + this->compName);
+                        ShowContinueError("..." + this->sizingString +
+                                          " will be limited by the maximum rated volume flow per rated total capacity ratio.");
+                        ShowContinueError("...DX coil volume flow rate ( m3/s ) = " + General::TrimSigDigits(DesVolFlow, 6));
+                        ShowContinueError("...Requested capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
+                        ShowContinueError("...Requested flow/capacity ratio ( m3/s/W ) = " + General::TrimSigDigits(RatedVolFlowPerRatedTotCap, 3));
+                        ShowContinueError("...Maximum flow/capacity ratio ( m3/s/W ) = " +
+                                          General::TrimSigDigits(DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT), 3));
+                    }
 
-                        DXFlowPerCapMaxRatio = DesVolFlow / DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT) /
-                                               this->autoSizedValue; // set DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio
-                        this->autoSizedValue = DesVolFlow / DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
+                    DXFlowPerCapMaxRatio = DesVolFlow / DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT) /
+                                           this->autoSizedValue; // set DX Coil Capacity Decrease Ratio from Too High Flow/Capacity Ratio
+                    this->autoSizedValue = DesVolFlow / DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap(DataHVACGlobals::DXCT);
 
-                        if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
-                            ShowContinueError("...Adjusted capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
-                        }
+                    if (!this->dataEMSOverride && DataGlobals::DisplayExtraWarnings && this->printWarningFlag) {
+                        ShowContinueError("...Adjusted capacity ( W ) = " + General::TrimSigDigits(this->autoSizedValue, 3));
                     }
                 }
             }
         }
+    }
 
-        // override sizing string
-        if (this->isEpJSON) this->sizingString = "cooling_capacity [W]";
-        if (this->dataScalableCapSizingON) {
-            auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::CoolingCapacitySizing));
-            if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
-                this->sizingStringScalable = "(scaled by capacity / area) ";
-            } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||
-                       SELECT_CASE_var == DataSizing::FractionOfAutosizedCoolingCapacity) {
-                this->sizingStringScalable = "(scaled by fractional multiplier) ";
-            }
+    // override sizing string
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "nominal_capacity [W]";
+    }
+    if (this->dataScalableCapSizingON) {
+        auto const SELECT_CASE_var(this->zoneEqSizing(this->curZoneEqNum).SizingMethod(DataHVACGlobals::HeatingCapacitySizing));
+        if (SELECT_CASE_var == DataSizing::CapacityPerFloorArea) {
+            this->sizingStringScalable = "(scaled by capacity / area) ";
+        } else if (SELECT_CASE_var == DataSizing::FractionOfAutosizedHeatingCapacity ||
+                   SELECT_CASE_var == DataSizing::FractionOfAutosizedCoolingCapacity) {
+            this->sizingStringScalable = "(scaled by fractional multiplier) ";
         }
     }
+
     this->selectSizerOutput(errorsFound);
 
     if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {

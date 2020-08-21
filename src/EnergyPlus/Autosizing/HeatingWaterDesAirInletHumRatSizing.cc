@@ -78,10 +78,10 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
                 } else {
                     desMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
-                this->autoSizedValue = this->setHeatCoilInletHumRatForZoneEqSizing(
-                    this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                    this->zoneEqSizing(this->curZoneEqNum),
-                    this->finalZoneSizing(this->curZoneEqNum));
+                this->autoSizedValue =
+                    this->setHeatCoilInletHumRatForZoneEqSizing(this->setOAFracForZoneEqSizing(desMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                                                                this->zoneEqSizing(this->curZoneEqNum),
+                                                                this->finalZoneSizing(this->curZoneEqNum));
             }
         }
     } else if (this->curSysNum > 0) {
@@ -109,7 +109,9 @@ Real64 HeatingWaterDesAirInletHumRatSizer::size(Real64 _originalValue, bool &err
             }
         }
     }
-    if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "design_inlet_air_humidity_ratio [kgWater/kgDryAir]";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;

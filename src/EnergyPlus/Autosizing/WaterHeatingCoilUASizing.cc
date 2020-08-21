@@ -274,7 +274,8 @@ Real64 WaterHeatingCoilUASizer::size(Real64 _originalValue, bool &errorsFound)
                     msg = "  Final UA estimate when iterations exceeded limit = " + General::TrimSigDigits(this->autoSizedValue, 6) + " W/m2-K";
                     this->addErrorMessage(msg);
                     ShowContinueError(msg);
-                    msg = "  AirloopHVAC \"" + this->finalSysSizing(this->curSysNum).AirPriLoopName + "\" coil sizing conditions (may be different than Sizing inputs):";
+                    msg = "  AirloopHVAC \"" + this->finalSysSizing(this->curSysNum).AirPriLoopName +
+                          "\" coil sizing conditions (may be different than Sizing inputs):";
                     this->addErrorMessage(msg);
                     ShowContinueError(msg);
                     msg = "  Coil inlet air temperature     = " + General::TrimSigDigits(this->dataDesInletAirTemp, 3) + " C";
@@ -316,7 +317,8 @@ Real64 WaterHeatingCoilUASizer::size(Real64 _originalValue, bool &errorsFound)
                     msg = "  Upper UA estimate = " + General::TrimSigDigits(UA1, 6) + " W/m2-K (100% of Design Coil Load)";
                     this->addErrorMessage(msg);
                     ShowContinueError(msg);
-                    msg = "  AirloopHVAC \"" + this->finalSysSizing(this->curSysNum).AirPriLoopName + "\" coil sizing conditions (may be different than Sizing inputs):";
+                    msg = "  AirloopHVAC \"" + this->finalSysSizing(this->curSysNum).AirPriLoopName +
+                          "\" coil sizing conditions (may be different than Sizing inputs):";
                     this->addErrorMessage(msg);
                     ShowContinueError(msg);
                     msg = "  Coil inlet air temperature     = " + General::TrimSigDigits(this->dataDesInletAirTemp, 3) + " C";
@@ -353,7 +355,7 @@ Real64 WaterHeatingCoilUASizer::size(Real64 _originalValue, bool &errorsFound)
                         this->addErrorMessage(msg);
                         ShowContinueError(msg);
                         msg = "  Plant design loop exit temperature = " +
-                            General::TrimSigDigits(this->plantSizData(this->dataPltSizHeatNum).ExitTemp, 3) + " C";
+                              General::TrimSigDigits(this->plantSizData(this->dataPltSizHeatNum).ExitTemp, 3) + " C";
                         this->addErrorMessage(msg);
                         ShowContinueError(msg);
                         msg = "  Plant design loop delta T          = " + General::TrimSigDigits(this->dataWaterCoilSizHeatDeltaT, 3) + " C";
@@ -385,7 +387,9 @@ Real64 WaterHeatingCoilUASizer::size(Real64 _originalValue, bool &errorsFound)
         }
     }
     if (this->dataErrorsFound) DataSizing::DataErrorsFound = true;
-    if (this->isEpJSON) this->sizingString = "u-factor_times_area_value [W/K]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "u-factor_times_area_value [W/K]";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         coilSelectionReportObj->setCoilUA(this->compName,

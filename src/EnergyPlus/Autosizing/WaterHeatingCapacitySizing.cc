@@ -150,7 +150,9 @@ Real64 WaterHeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             // not implemented for air loop equipment
         }
     }
-    if (this->isEpJSON) this->sizingString = "rated_capacity";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "rated_capacity";
+    }
     this->selectSizerOutput(errorsFound);
     if (this->isCoilReportObject)
         coilSelectionReportObj->setCoilWaterHeaterCapacityPltSizNum(
