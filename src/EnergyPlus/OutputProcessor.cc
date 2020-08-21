@@ -1368,8 +1368,8 @@ namespace OutputProcessor {
         //         \key Electricity
         //         \key NaturalGas
         //         \key PropaneGas
-        //         \key FuelOil#1
-        //         \key FuelOil#2
+        //         \key FuelOilNo1
+        //         \key FuelOilNo2
         //         \key Coal
         //         \key Diesel
         //         \key Gasoline
@@ -1396,8 +1396,8 @@ namespace OutputProcessor {
         //         \key Electricity
         //         \key NaturalGas
         //         \key PropaneGas
-        //         \key FuelOil#1
-        //         \key FuelOil#2
+        //         \key FuelOilNo1
+        //         \key FuelOilNo2
         //         \key Coal
         //         \key Diesel
         //         \key Gasoline
@@ -1920,7 +1920,7 @@ namespace OutputProcessor {
                 OutResourceType = "Electricity";
 
             } else if (meterType == "GAS" || meterType == "NATURALGAS") {
-                OutResourceType = "Gas";
+                OutResourceType = "NaturalGas";
 
             } else if (meterType == "GASOLINE") {
                 OutResourceType = "Gasoline";
@@ -1931,11 +1931,11 @@ namespace OutputProcessor {
             } else if (meterType == "COAL") {
                 OutResourceType = "Coal";
 
-            } else if (meterType == "FUELOIL#1") {
-                OutResourceType = "FuelOil#1";
+            } else if (meterType == "FUELOILNO1") {
+                OutResourceType = "FuelOilNo1";
 
-            } else if (meterType == "FUELOIL#2") {
-                OutResourceType = "FuelOil#2";
+            } else if (meterType == "FUELOILNO2") {
+                OutResourceType = "FuelOilNo2";
 
             } else if (meterType == "PROPANE" || meterType == "PROPANEGAS") {
                 OutResourceType = "Propane";
@@ -2488,11 +2488,11 @@ namespace OutputProcessor {
             } else if (endUseMeter == "NATURALGASEMISSIONS") {
                 EndUse = "NaturalGasEmissions";
 
-            } else if (endUseMeter == "FUELOIL#1EMISSIONS") {
-                EndUse = "FuelOil#1Emissions";
+            } else if (endUseMeter == "FUELOILNO1EMISSIONS") {
+                EndUse = "FuelOilNo1Emissions";
 
-            } else if (endUseMeter == "FUELOIL#2EMISSIONS") {
-                EndUse = "FuelOil#2Emissions";
+            } else if (endUseMeter == "FUELOILNO2EMISSIONS") {
+                EndUse = "FuelOilNo2Emissions";
 
             } else if (endUseMeter == "COALEMISSIONS") {
                 EndUse = "CoalEmissions";
@@ -4015,7 +4015,6 @@ namespace OutputProcessor {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataStringGlobals::NL;
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -4184,7 +4183,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataStringGlobals::NL;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4294,7 +4292,6 @@ namespace OutputProcessor {
         // na
 
         // Using/Aliasing
-        using DataStringGlobals::NL;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4872,7 +4869,6 @@ namespace OutputProcessor {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataStringGlobals::NL;
         using General::strip_trailing_zeros;
 
         // Locals
@@ -4982,7 +4978,7 @@ namespace OutputProcessor {
         // Facility indices are in the 100s
         if (has(meterName, "Electricity:Facility")) {
             indexGroupKey = 100;
-        } else if (has(meterName, "Gas:Facility")) {
+        } else if (has(meterName, "NaturalGas:Facility")) {
             indexGroupKey = 101;
         } else if (has(meterName, "DistricHeating:Facility")) {
             indexGroupKey = 102;
@@ -4994,7 +4990,7 @@ namespace OutputProcessor {
             // Building indices are in the 200s
         } else if (has(meterName, "Electricity:Building")) {
             indexGroupKey = 201;
-        } else if (has(meterName, "Gas:Building")) {
+        } else if (has(meterName, "NaturalGas:Building")) {
             indexGroupKey = 202;
 
             // HVAC indices are in the 300s
@@ -8491,8 +8487,8 @@ void InitPollutionMeterReporting(IOFiles &ioFiles, std::string const &ReportFreq
     //       Gas:Facility [J]
     //       GASOLINE:Facility [J]
     //       COAL:Facility [J]
-    //       FuelOil#1:Facility [J]
-    //       FuelOil#2:Facility [J]
+    //       FuelOilNo1:Facility [J]
+    //       FuelOilNo2:Facility [J]
     //       Propane:Facility [J]
     //       ElectricityProduced:Facility [J]
     //       Pollutant:CO2
@@ -8523,11 +8519,11 @@ void InitPollutionMeterReporting(IOFiles &ioFiles, std::string const &ReportFreq
                                                  "Diesel:Facility",
                                                  "DistrictCooling:Facility",
                                                  "DistrictHeating:Facility",
-                                                 "Gas:Facility",
+                                                 "NaturalGas:Facility",
                                                  "GASOLINE:Facility",
                                                  "COAL:Facility",
-                                                 "FuelOil#1:Facility",
-                                                 "FuelOil#2:Facility",
+                                                 "FuelOilNo1:Facility",
+                                                 "FuelOilNo2:Facility",
                                                  "Propane:Facility",
                                                  "ElectricityProduced:Facility",
                                                  "Steam:Facility",

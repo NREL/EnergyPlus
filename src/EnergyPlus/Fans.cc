@@ -928,19 +928,19 @@ namespace Fans {
 
         for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
             // Setup Report variables for the Fans  CurrentModuleObject='Fans'
-            SetupOutputVariable("Fan Electric Power", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
+            SetupOutputVariable("Fan Electricity Rate", OutputProcessor::Unit::W, Fan(FanNum).FanPower, "System", "Average", Fan(FanNum).FanName);
             SetupOutputVariable(
                 "Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, Fan(FanNum).DeltaTemp, "System", "Average", Fan(FanNum).FanName);
             SetupOutputVariable(
                 "Fan Heat Gain to Air", OutputProcessor::Unit::W, Fan(FanNum).PowerLossToAir, "System", "Average", Fan(FanNum).FanName);
-            SetupOutputVariable("Fan Electric Energy",
+            SetupOutputVariable("Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 Fan(FanNum).FanEnergy,
                                 "System",
                                 "Sum",
                                 Fan(FanNum).FanName,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Fans",
                                 Fan(FanNum).EndUseSubcategoryName,
                                 "System");
@@ -1504,6 +1504,19 @@ namespace Fans {
         if (NVPerfNum > 0) {
             if (NightVentPerf(NVPerfNum).MaxAirFlowRate == AutoSize) {
                 NightVentPerf(NVPerfNum).MaxAirFlowRate = Fan(FanNum).MaxAirFlowRate;
+            }
+        }
+
+        // Now that sizing is done, do check if the design point of fan is covered in the fault Fan Curve
+        if (Fan(FanNum).FaultyFilterFlag) {
+            int jFault_AirFilter = Fan(FanNum).FaultyFilterIndex;
+
+            // Check fault availability schedules
+            if (!FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
+                ShowSevereError("FaultModel:Fouling:AirFilter = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name  + "\"");
+                ShowContinueError("Invalid Fan Curve Name = \"" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve + "\" does not cover ");
+                ShowContinueError("the operational point of Fan " + Fan(FanNum).FanName);
+                ShowFatalError("SizeFan: Invalid FaultModel:Fouling:AirFilter=" + FaultsManager::FaultsFouledAirFilters(jFault_AirFilter).Name);
             }
         }
 
@@ -3189,7 +3202,7 @@ namespace Fans {
         // Check whether the fan curve covers the design operational point of the fan
         FanCalDeltaPress = CurveValue(FanCurvePtr, FanDesignAirFlowRate);
         if ((FanCalDeltaPress < 0.9 * FanDesignDeltaPress) || (FanCalDeltaPress > 1.1 * FanDesignDeltaPress)) {
-            ShowWarningError("The design operatinal point of the fan " + FanName + " does not fall ");
+            ShowWarningError("The design operational point of the fan " + FanName + " does not fall ");
             ShowContinueError("on the fan curve provided in the FaultModel:Fouling:AirFilter object. ");
             return 0.0;
         }
@@ -3204,8 +3217,8 @@ namespace Fans {
             FanCalDeltaPresstemp = CurveValue(FanCurvePtr, FanFaultyAirFlowRate);
 
             if ((FanCalDeltaPresstemp <= FanCalDeltaPress) || (FanFaultyAirFlowRate <= PerfCurve(FanCurvePtr).Var1Min)) {
-                // The new operatinal point of the fan go beyond the fan selection range
-                ShowWarningError("The operatinal point of the fan " + FanName + " may go beyond the fan selection ");
+                // The new operational point of the fan go beyond the fan selection range
+                ShowWarningError("The operational point of the fan " + FanName + " may go beyond the fan selection ");
                 ShowContinueError("range in the faulty fouling air filter cases");
                 break;
             }

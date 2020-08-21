@@ -2163,7 +2163,7 @@
 
   Output:Variable,*,Zone Window Air Conditioner Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Zone Window Air Conditioner Electric Power,hourly;
+  Output:Variable,*,Zone Window Air Conditioner Electricity Rate,hourly;
 
   Output:Variable,*,Zone Window Air Conditioner Fan Part Load Ratio,hourly;
 

@@ -1442,7 +1442,7 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,hourly;
 
-  Output:Variable,*,Evaporative Cooler Electric Power,hourly;
+  Output:Variable,*,Evaporative Cooler Electricity Rate,hourly;
 
   Output:Variable,*,Evaporative Cooler Water Volume,hourly;
 
@@ -1492,9 +1492,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1504,9 +1504,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

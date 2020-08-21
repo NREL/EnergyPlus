@@ -10776,7 +10776,7 @@
 
   Output:Meter:MeterFileOnly,ElectricityNet:Facility,Hourly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,Hourly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,Hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT ===========
 
@@ -10858,7 +10858,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,             !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -11006,13 +11006,13 @@
   Output:Table:Monthly,
     Building Loads - Electric,  !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -11036,9 +11036,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,            !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,            !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -11076,17 +11076,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -11154,23 +11154,23 @@
   Output:Table:Monthly,
     Peak Gas Demand,         !- Name
     3,                       !- Digits After Decimal
-    Gas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,            !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Gas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,            !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,                !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:Gas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
-    MiscPlugGas:InteriorEquipment:Gas,  !- Variable or Meter 5 Name
+    MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    Gas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,               !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:Gas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
-    Water Heater:WaterSystems:Gas,  !- Variable or Meter 8 Name
+    Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:Gas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,             !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:MECHANICALVENTILATION ===========
@@ -11453,16 +11453,16 @@
 
   Meter:Custom,
     Wired_LTG_Electricity,   !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- FuResourceel Type
     ,                        !- Key Name 1
     Wired_LTG;               !- Output Variable or Meter Name 1
 
   Meter:CustomDecrement,
     Wired_Int_EQUIP,         !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     InteriorEquipment:Electricity,  !- Source Meter Name
     Core_bottom_Elevators_Equip,  !- Key Name 1
-    Electric Equipment Electric Energy;  !- Output Variable or Meter Name 1
+    Electric Equipment Electricity Energy;  !- Output Variable or Meter Name 1
 
   ElectricLoadCenter:Transformer,
     Transformer 1,           !- Name
@@ -11528,7 +11528,7 @@
   EnergyManagementSystem:Sensor,
     Core_bottom_LSr,         !- Name
     Core_bottom,             !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Core_bottom_Occ_Sensor,  !- Name
@@ -11565,7 +11565,7 @@
   EnergyManagementSystem:Sensor,
     Core_mid_LSr,            !- Name
     Core_mid,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Core_mid_Occ_Sensor,     !- Name
@@ -11602,7 +11602,7 @@
   EnergyManagementSystem:Sensor,
     Core_top_LSr,            !- Name
     Core_top,                !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Core_top_Occ_Sensor,     !- Name
@@ -11639,7 +11639,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_3_LSr,  !- Name
     Perimeter_top_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_3_Occ_Sensor,  !- Name
@@ -11676,7 +11676,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_2_LSr,  !- Name
     Perimeter_top_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_2_Occ_Sensor,  !- Name
@@ -11713,7 +11713,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_1_LSr,  !- Name
     Perimeter_top_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_1_Occ_Sensor,  !- Name
@@ -11750,7 +11750,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_4_LSr,  !- Name
     Perimeter_top_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_top_ZN_4_Occ_Sensor,  !- Name
@@ -11787,7 +11787,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_3_LSr,  !- Name
     Perimeter_bot_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_3_Occ_Sensor,  !- Name
@@ -11824,7 +11824,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_2_LSr,  !- Name
     Perimeter_bot_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_2_Occ_Sensor,  !- Name
@@ -11861,7 +11861,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_1_LSr,  !- Name
     Perimeter_bot_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_1_Occ_Sensor,  !- Name
@@ -11898,7 +11898,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_4_LSr,  !- Name
     Perimeter_bot_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_bot_ZN_4_Occ_Sensor,  !- Name
@@ -11935,7 +11935,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_3_LSr,  !- Name
     Perimeter_mid_ZN_3,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_3_Occ_Sensor,  !- Name
@@ -11972,7 +11972,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_2_LSr,  !- Name
     Perimeter_mid_ZN_2,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_2_Occ_Sensor,  !- Name
@@ -12009,7 +12009,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_1_LSr,  !- Name
     Perimeter_mid_ZN_1,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_1_Occ_Sensor,  !- Name
@@ -12046,7 +12046,7 @@
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_4_LSr,  !- Name
     Perimeter_mid_ZN_4,      !- Output:Variable or Output:Meter Index Key Name
-    Zone Lights Electric Power;  !- Output:Variable or Output:Meter Name
+    Zone Lights Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Perimeter_mid_ZN_4_Occ_Sensor,  !- Name

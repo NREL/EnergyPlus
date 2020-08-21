@@ -12,7 +12,7 @@ Zone Air Humidity Ratio
 Plant Supply Side Cooling Demand Rate
 Plant Supply Side Heating Demand Rate
 District Heating Rate
-Chiller Electric Power
+Chiller Electricity Rate
 Chiller Evaporator Cooling Rate
 Chiller Evaporator Inlet Temperature
 Chiller Evaporator Outlet Temperature
@@ -25,8 +25,8 @@ Cooling Tower Inlet Temperature
 Cooling Tower Outlet Temperature
 Cooling Tower Mass Flow Rate
 Cooling Tower Heat Transfer Rate
-Cooling Tower Fan Electric Power
-Cooling Tower Fan Electric Energy
+Cooling Tower Fan Electricity Rate
+Cooling Tower Fan Electricity Energy
 Plant Supply Side Inlet Temperature
 Plant Supply Side Outlet Temperature
 Air System Simulation Maximum Iteration Count

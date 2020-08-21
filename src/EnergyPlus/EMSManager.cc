@@ -228,6 +228,8 @@ namespace EMSManager {
             AnyEnergyManagementSystemInModel = false;
         }
 
+        AnyEnergyManagementSystemInModel = AnyEnergyManagementSystemInModel || DataGlobals::externalHVACManager;
+
         if (AnyEnergyManagementSystemInModel) {
 
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
@@ -959,6 +961,8 @@ namespace EMSManager {
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginNewEvironment;
+                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER") {
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {

@@ -200,7 +200,6 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/InputProcessing/DataStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
@@ -227,6 +226,12 @@ int EnergyPlusPgm(EnergyPlus::EnergyPlusData &state, std::string const &filepath
 
 void commonInitialize(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
+
+    // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton IOFiles" matches
+    // the exe's notion.
+    // TODO: Remove this after we have eliminated all remaining calls to IOFiles::getSingleton
+    EnergyPlus::IOFiles::setSingleton(&state.files);
+
     // Disable C++ i/o synching with C methods for speed
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
@@ -265,6 +270,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
 int commonRun(EnergyPlus::EnergyPlusData &state) {
     using namespace EnergyPlus;
+
     int errStatus = initErrorFile(state.files);
     if (errStatus) {
         return errStatus;

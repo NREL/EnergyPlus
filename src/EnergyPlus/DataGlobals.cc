@@ -97,6 +97,9 @@ namespace DataGlobals {
     bool isUBJSON(false);
     bool isBSON(false);
     bool preserveIDFOrder(true);
+    bool stopSimulation(false);
+    std::function<void (void *)> externalHVACManager;
+    bool externalHVACManagerInitialized(false);
 
     // MODULE PARAMETER DEFINITIONS:
     int const BeginDay(1);
@@ -154,12 +157,13 @@ namespace DataGlobals {
     int const emsCallFromEndZoneTimestepAfterZoneReporting(12);   // Identity where EMS called from
     int const emsCallFromSetupSimulation(13);                     // identify where EMS called from,
     // this is for input processing only
-    int const emsCallFromExternalInterface(14);         // Identity where EMS called from
-    int const emsCallFromComponentGetInput(15);         // EMS called from end of get input for a component
-    int const emsCallFromUserDefinedComponentModel(16); // EMS called from inside a custom user component model
-    int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
-    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
-    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
+    int const emsCallFromExternalInterface(14);                        // Identity where EMS called from
+    int const emsCallFromComponentGetInput(15);                        // EMS called from end of get input for a component
+    int const emsCallFromUserDefinedComponentModel(16);                // EMS called from inside a custom user component model
+    int const emsCallFromUnitarySystemSizing(17);                      // EMS called from unitary system compound component
+    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18);   // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19);    // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather(20); // Identity where EMS called from
 
     int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
 
@@ -248,9 +252,9 @@ namespace DataGlobals {
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
-    void (*progressCallback)(int const);
-    void (*messageCallback)(const char * message);
-    void (*errorCallback)(const char * errorMessage);
+    std::function<void(int const)> progressCallback;
+    std::function<void(const std::string &)> messageCallback;
+    std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
 
     bool eplusRunningViaAPI;
 
@@ -266,6 +270,9 @@ namespace DataGlobals {
         isCBOR = false;
         isMsgPack = false;
         preserveIDFOrder = true;
+        stopSimulation = false;
+        externalHVACManager = nullptr;
+        externalHVACManagerInitialized = false;
         BeginDayFlag = false;
         BeginEnvrnFlag = false;
         BeginHourFlag = false;

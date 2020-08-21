@@ -51,4 +51,18 @@
 typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
 typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
 
+#ifdef __cplusplus
+namespace EnergyPlus {
+
+enum class Error: int {
+  Continue = 0,
+  Info = 1,
+  Warning = 2,
+  Severe = 3,
+  Fatal = 4
+};
+
+} // namespace EnergyPlus
+#endif
+
 #endif
