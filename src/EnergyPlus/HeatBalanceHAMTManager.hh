@@ -55,7 +55,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 namespace HeatBalanceHAMTManager {
 
@@ -156,11 +156,11 @@ namespace HeatBalanceHAMTManager {
 
     // Functions
 
-    void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void ManageHeatBalHAMT(IOFiles &ioFiles, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
     void GetHeatBalHAMTInput();
 
-    void InitHeatBalHAMT(EnergyPlus::OutputFiles &outputFiles);
+    void InitHeatBalHAMT(EnergyPlus::IOFiles &ioFiles);
 
     void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 

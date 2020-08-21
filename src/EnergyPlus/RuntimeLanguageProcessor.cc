@@ -68,12 +68,13 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -150,6 +151,8 @@ namespace RuntimeLanguageProcessor {
     int DayOfWeekVariableNum(0);
     int DayOfYearVariableNum(0);
     int HourVariableNum(0);
+    int TimeStepsPerHourVariableNum(0);
+    int TimeStepNumVariableNum(0);
     int MinuteVariableNum(0);
     int HolidayVariableNum(0);
     int DSTVariableNum(0);
@@ -171,6 +174,7 @@ namespace RuntimeLanguageProcessor {
     std::unordered_map<std::string, std::string> RuntimeReportVarUniqueNames;
 
     // MODULE SUBROUTINES:
+    bool WriteTraceMyOneTimeFlag(false);
 
     // Functions
     void clear_state()
@@ -194,6 +198,8 @@ namespace RuntimeLanguageProcessor {
         DayOfWeekVariableNum = 0;
         DayOfYearVariableNum = 0;
         HourVariableNum = 0;
+        TimeStepsPerHourVariableNum = 0;
+        TimeStepNumVariableNum = 0;
         MinuteVariableNum = 0;
         HolidayVariableNum = 0;
         DSTVariableNum = 0;
@@ -208,9 +214,10 @@ namespace RuntimeLanguageProcessor {
         WarmUpFlagNum = 0;
         ErlStackUniqueNames.clear();
         RuntimeReportVarUniqueNames.clear();
+        WriteTraceMyOneTimeFlag = false;
     }
 
-    void InitializeRuntimeLanguage()
+    void InitializeRuntimeLanguage(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -276,6 +283,7 @@ namespace RuntimeLanguageProcessor {
             OffVariableNum = NewEMSVariable("OFF", 0, False);
             OnVariableNum = NewEMSVariable("ON", 0, True);
             PiVariableNum = NewEMSVariable("PI", 0, SetErlValueNumber(Pi));
+            TimeStepsPerHourVariableNum = NewEMSVariable("TIMESTEPSPERHOUR", 0, SetErlValueNumber(double(DataGlobals::NumOfTimeStepInHour)));
 
             // Create dynamic built-in variables
             YearVariableNum = NewEMSVariable("YEAR", 0);
@@ -284,6 +292,7 @@ namespace RuntimeLanguageProcessor {
             DayOfWeekVariableNum = NewEMSVariable("DAYOFWEEK", 0);
             DayOfYearVariableNum = NewEMSVariable("DAYOFYEAR", 0);
             HourVariableNum = NewEMSVariable("HOUR", 0);
+            TimeStepNumVariableNum = NewEMSVariable("TIMESTEPNUM", 0);
             MinuteVariableNum = NewEMSVariable("MINUTE", 0);
             HolidayVariableNum = NewEMSVariable("HOLIDAY", 0);
             DSTVariableNum = NewEMSVariable("DAYLIGHTSAVINGS", 0);
@@ -298,7 +307,7 @@ namespace RuntimeLanguageProcessor {
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
             WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
 
-            GetRuntimeLanguageUserInput(); // Load and parse all runtime language objects
+            GetRuntimeLanguageUserInput(ioFiles); // Load and parse all runtime language objects
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
@@ -321,6 +330,7 @@ namespace RuntimeLanguageProcessor {
         ErlVariable(DayOfMonthVariableNum).Value = SetErlValueNumber(double(DayOfMonth));
         ErlVariable(DayOfWeekVariableNum).Value = SetErlValueNumber(double(DayOfWeek));
         ErlVariable(DayOfYearVariableNum).Value = SetErlValueNumber(double(DayOfYear));
+        ErlVariable(TimeStepNumVariableNum).Value = SetErlValueNumber(double(DataGlobals::TimeStep));
 
         ErlVariable(DSTVariableNum).Value = SetErlValueNumber(double(DSTIndicator));
         // DSTadjust = REAL(DSTIndicator, r64)
@@ -461,7 +471,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void ParseStack(OutputFiles &outputFiles, int const StackNum)
+    void ParseStack(IOFiles &ioFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -551,16 +561,16 @@ namespace RuntimeLanguageProcessor {
                 auto const SELECT_CASE_var(Keyword);
 
                 if (SELECT_CASE_var == "RETURN") {
-                    if (DeveloperFlag) print(outputFiles.debug, "RETURN \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "RETURN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn);
                     } else {
-                        ParseExpression(outputFiles, Remainder, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Remainder, StackNum, ExpressionNum, Line);
                         InstructionNum = AddInstruction(StackNum, LineNum, KeywordReturn, ExpressionNum);
                     }
 
                 } else if (SELECT_CASE_var == "SET") {
-                    if (DeveloperFlag) print(outputFiles.debug, "SET \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "SET \"{}\"\n", Line);
                     Pos = scan(Remainder, '=');
                     if (Pos == std::string::npos) {
                         AddError(StackNum, LineNum, "Equal sign missing for the SET instruction.");
@@ -579,13 +589,13 @@ namespace RuntimeLanguageProcessor {
                         if (Expression.empty()) {
                             AddError(StackNum, LineNum, "Expression missing for the SET instruction.");
                         } else {
-                            ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                            ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                             InstructionNum = AddInstruction(StackNum, LineNum, KeywordSet, VariableNum, ExpressionNum);
                         }
                     }
 
                 } else if (SELECT_CASE_var == "RUN") {
-                    if (DeveloperFlag) print(outputFiles.debug, "RUN \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "RUN \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction.");
                     } else {
@@ -603,15 +613,15 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "IF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "IF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "IF \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the IF instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedIfDepth;
@@ -627,8 +637,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ELSEIF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ELSEIF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "ELSEIF \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction.");
@@ -650,7 +660,7 @@ namespace RuntimeLanguageProcessor {
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     InstructionNum = AddInstruction(StackNum, LineNum, KeywordIf, ExpressionNum); // Arg2 added at next ELSEIF, ELSE, ENDIF
@@ -659,8 +669,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ELSE") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ELSE \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "ELSE \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction.");
@@ -691,8 +701,8 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == "ENDIF") {
                     if (DeveloperFlag) {
-                        print(outputFiles.debug, "ENDIF \"{}\"\n", Line);
-                        print(outputFiles.debug, "NestedIf={}\n", NestedIfDepth);
+                        print(ioFiles.debug, "ENDIF \"{}\"\n", Line);
+                        print(ioFiles.debug, "NestedIf={}\n", NestedIfDepth);
                     }
                     if (NestedIfDepth == 0) {
                         AddError(StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction.");
@@ -724,13 +734,13 @@ namespace RuntimeLanguageProcessor {
                     --NestedIfDepth;
 
                 } else if (SELECT_CASE_var == "WHILE") {
-                    if (DeveloperFlag) print(outputFiles.debug, "WHILE \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "WHILE \"{}\"\n", Line);
                     if (Remainder.empty()) {
                         AddError(StackNum, LineNum, "Expression missing for the WHILE instruction.");
                         ExpressionNum = 0;
                     } else {
                         Expression = stripped(Remainder);
-                        ParseExpression(outputFiles, Expression, StackNum, ExpressionNum, Line);
+                        ParseExpression(ioFiles, Expression, StackNum, ExpressionNum, Line);
                     }
 
                     ++NestedWhileDepth;
@@ -744,7 +754,7 @@ namespace RuntimeLanguageProcessor {
                     }
 
                 } else if (SELECT_CASE_var == "ENDWHILE") {
-                    if (DeveloperFlag) print(outputFiles.debug, "ENDWHILE \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "ENDWHILE \"{}\"\n", Line);
                     if (NestedWhileDepth == 0) {
                         AddError(StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction.");
                         break;
@@ -763,7 +773,7 @@ namespace RuntimeLanguageProcessor {
                     SavedWhileExpressionNum = 0;
 
                 } else {
-                    if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", Line);
+                    if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", Line);
                     AddError(StackNum, LineNum, "Unknown keyword [" + Keyword + "].");
                 }
             }
@@ -878,7 +888,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    ErlValueType EvaluateStack(OutputFiles &outputFiles, int const StackNum)
+    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -922,7 +932,7 @@ namespace RuntimeLanguageProcessor {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
                         ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
@@ -936,13 +946,13 @@ namespace RuntimeLanguageProcessor {
                         ErlVariable(VariableNum).Value.Error = ReturnValue.Error;
                     }
 
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordRun) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(outputFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    ReturnValue = EvaluateStack(ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
@@ -950,7 +960,7 @@ namespace RuntimeLanguageProcessor {
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
                         ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                             // Eventually should handle strings and arrays too
                             InstructionNum = InstructionNum2;
@@ -960,7 +970,7 @@ namespace RuntimeLanguageProcessor {
                         // KeywordELSE  -- kind of a kludge
                         ReturnValue.Type = ValueNumber;
                         ReturnValue.Number = 1.0;
-                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                        WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     }
 
                 } else if (SELECT_CASE_var == KeywordGoto) {
@@ -976,14 +986,14 @@ namespace RuntimeLanguageProcessor {
                 } else if (SELECT_CASE_var == KeywordEndIf) {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
-                    WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                    WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                         // Eventually should handle strings and arrays too
                         InstructionNum = InstructionNum2;
@@ -997,7 +1007,7 @@ namespace RuntimeLanguageProcessor {
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
-                        WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
+                        WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
                         InstructionNum = InstructionNum2;
                         ++WhileLoopExitCounter;
 
@@ -1007,11 +1017,11 @@ namespace RuntimeLanguageProcessor {
                             WhileLoopExitCounter = 0;
                             ReturnValue.Type = ValueError;
                             ReturnValue.Error = "Maximum WHILE loop iteration limit reached";
-                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         } else {
                             ReturnValue.Type = ValueNumber;
                             ReturnValue.Number = 0.0;
-                            WriteTrace(outputFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
+                            WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                             WhileLoopExitCounter = 0;
                         }
                     }
@@ -1027,7 +1037,7 @@ namespace RuntimeLanguageProcessor {
     }
 
     void
-    WriteTrace(OutputFiles &outputFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
+    WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1052,7 +1062,6 @@ namespace RuntimeLanguageProcessor {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(false);
         int LineNum;
         std::string NameString;
         std::string LineNumString;
@@ -1069,10 +1078,10 @@ namespace RuntimeLanguageProcessor {
             if (ReturnValue.Type != ValueError) return;
         }
 
-        if (!MyOneTimeFlag) {
-            print(outputFiles.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
-            print(outputFiles.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
-            MyOneTimeFlag = true;
+        if (!WriteTraceMyOneTimeFlag) {
+            print(ioFiles.edd, "****  Begin EMS Language Processor Error and Trace Output  *** \n");
+            print(ioFiles.edd, "<Erl program name, line #, line text, result, occurrence timing information ... >\n");
+            WriteTraceMyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
 
@@ -1099,7 +1108,7 @@ namespace RuntimeLanguageProcessor {
         TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
-            print(outputFiles.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
+            print(ioFiles.edd, "{},Line {},{},{},{}\n", NameString, LineNumString, LineString, cValueString, TimeString);
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
@@ -1119,7 +1128,7 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(OutputFiles &outputFiles,
+    void ParseExpression(IOFiles &ioFiles,
                          std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
@@ -1282,9 +1291,9 @@ namespace RuntimeLanguageProcessor {
                 if (!ErrorFlag) {
                     Token(NumTokens).Type = TokenNumber;
                     Token(NumTokens).String = StringToken;
-                    if (DeveloperFlag) print(outputFiles.debug, "Number=\"{}\"\n", StringToken);
+                    if (DeveloperFlag) print(ioFiles.debug, "Number=\"{}\"\n", StringToken);
                     Token(NumTokens).Number = UtilityRoutines::ProcessNumber(StringToken, ErrorFlag);
-                    if (DeveloperFlag && ErrorFlag) print(outputFiles.debug, "{}\n", "Numeric error flagged");
+                    if (DeveloperFlag && ErrorFlag) print(ioFiles.debug, "{}\n", "Numeric error flagged");
                     if (MinusFound) {
                         Token(NumTokens).Number = -Token(NumTokens).Number;
                         MinusFound = false;
@@ -1323,7 +1332,7 @@ namespace RuntimeLanguageProcessor {
                 // Save the variable token
                 Token(NumTokens).Type = TokenVariable;
                 Token(NumTokens).String = StringToken;
-                if (DeveloperFlag) print(outputFiles.debug, "Variable=\"{}\"\n", StringToken);
+                if (DeveloperFlag) print(ioFiles.debug, "Variable=\"{}\"\n", StringToken);
                 Token(NumTokens).Variable = NewEMSVariable(StringToken, StackNum);
 
             } else if (is_any_of(NextChar, "+-*/^=<>@|&")) {
@@ -1370,7 +1379,7 @@ namespace RuntimeLanguageProcessor {
 
                     if ((case_insensitive && UtilityRoutines::SameString(potential_match, string)) ||
                         (!case_insensitive && potential_match == string)) {
-                        if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", potential_match);
+                        if (DeveloperFlag) print(ioFiles.debug, "OPERATOR \"{}\"\n", potential_match);
                         Token(NumTokens).Operator = op;
                         Token(NumTokens).String = potential_match;
                         Pos += (len - 1);
@@ -1394,33 +1403,43 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (String[Pos] == '@') { // next check for builtin functions signaled by "@"
 
-                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) ||
-                        i_parse("@Cos", FuncCos) || i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) ||
-                        i_parse("@DegToRad", FuncDegToRad) || i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) ||
-                        i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) || i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) ||
-                        i_parse("@RANDOMUNIFORM", FuncRandU) || i_parse("@RANDOMNORMAL", FuncRandG) ||
-                        i_parse("@SEEDRANDOM", FuncRandSeed) || i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) ||
-                        i_parse("@CpAirFnW", FuncCpAirFnW) || i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) ||
-                        i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) || i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) ||
-                        i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
+                    if (i_parse("@Round", FuncRound) || i_parse("@Mod", FuncMod) || i_parse("@Sin", FuncSin) || i_parse("@Cos", FuncCos) ||
+                        i_parse("@ArcCos", FuncArcCos) || i_parse("@ArcSin", FuncArcSin) || i_parse("@DegToRad", FuncDegToRad) ||
+                        i_parse("@RadToDeg", FuncRadToDeg) || i_parse("@Exp", FuncExp) || i_parse("@Ln", FuncLn) || i_parse("@Max", FuncMax) ||
+                        i_parse("@Min", FuncMin) || i_parse("@Abs", FuncABS) || i_parse("@RANDOMUNIFORM", FuncRandU) ||
+                        i_parse("@RANDOMNORMAL", FuncRandG) || i_parse("@SEEDRANDOM", FuncRandSeed) ||
+                        i_parse("@RhoAirFnPbTdbW", FuncRhoAirFnPbTdbW) || i_parse("@CpAirFnW", FuncCpAirFnW) ||
+                        i_parse("@HfgAirFnWTdb", FuncHfgAirFnWTdb) || i_parse("@HgAirFnWTdb", FuncHgAirFnWTdb) ||
+                        i_parse("@TdpFnTdbTwbPb", FuncTdpFnTdbTwbPb) || i_parse("@TdpFnWPb", FuncTdpFnWPb) || i_parse("@HFnTdbW", FuncHFnTdbW) ||
                         i_parse("@HFnTdbRhPb", FuncHFnTdbRhPb) || i_parse("@TdbFnHW", FuncTdbFnHW) ||
                         i_parse("@RhovFnTdbRhLBnd0C", FuncRhovFnTdbRhLBnd0C) || i_parse("@RhovFnTdbRh", FuncRhovFnTdbRh) ||
                         i_parse("@RhovFnTdbWPb", FuncRhovFnTdbWPb) || i_parse("@RhFnTdbRhovLBnd0C", FuncRhFnTdbRhovLBnd0C) ||
                         i_parse("@RhFnTdbRhov", FuncRhFnTdbRhov) || i_parse("@RhFnTdbWPb", FuncRhFnTdbWPb) ||
-                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) ||
-                        i_parse("@WFnTdpPb", FuncWFnTdpPb) || i_parse("@WFnTdbH", FuncWFnTdbH) ||
-                        i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
-                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) ||
-                        i_parse("@TsatFnPb", FuncTsatFnPb) || i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) ||
-                        i_parse("@RhoH2O", FuncRhoH2O) || i_parse("@FATALHALTEP", FuncFatalHaltEp) ||
-                        i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
-                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) ||
-                        i_parse("@TRENDMAX", FuncTrendMax) || i_parse("@TRENDMIN", FuncTrendMin) ||
-                        i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
-                        i_parse("@CURVEVALUE", FuncCurveValue)) {
+                        i_parse("@TwbFnTdbWPb", FuncTwbFnTdbWPb) || i_parse("@VFnTdbWPb", FuncVFnTdbWPb) || i_parse("@WFnTdpPb", FuncWFnTdpPb) ||
+                        i_parse("@WFnTdbH", FuncWFnTdbH) || i_parse("@WFnTdbTwbPb", FuncWFnTdbTwbPb) || i_parse("@WFnTdbRhPb", FuncWFnTdbRhPb) ||
+                        i_parse("@PsatFnTemp", FuncPsatFnTemp) || i_parse("@TsatFnHPb", FuncTsatFnHPb) || i_parse("@TsatFnPb", FuncTsatFnPb) ||
+                        i_parse("@CpCW", FuncCpCW) || i_parse("@CpHW", FuncCpHW) || i_parse("@RhoH2O", FuncRhoH2O) ||
+                        i_parse("@FATALHALTEP", FuncFatalHaltEp) || i_parse("@SEVEREWARNEP", FuncSevereWarnEp) || i_parse("@WARNEP", FuncWarnEp) ||
+                        i_parse("@TRENDVALUE", FuncTrendValue) || i_parse("@TRENDAVERAGE", FuncTrendAverage) || i_parse("@TRENDMAX", FuncTrendMax) ||
+                        i_parse("@TRENDMIN", FuncTrendMin) || i_parse("@TRENDDIRECTION", FuncTrendDirection) || i_parse("@TRENDSUM", FuncTrendSum) ||
+                        i_parse("@CURVEVALUE", FuncCurveValue) || i_parse("@TODAYISRAIN", FuncTodayIsRain) ||
+                        i_parse("@TODAYISSNOW", FuncTodayIsSnow) || i_parse("@TODAYOUTDRYBULBTEMP", FuncTodayOutDryBulbTemp) ||
+                        i_parse("@TODAYOUTDEWPOINTTEMP", FuncTodayOutDewPointTemp) || i_parse("@TODAYOUTBAROPRESS", FuncTodayOutBaroPress) ||
+                        i_parse("@TODAYOUTRELHUM", FuncTodayOutRelHum) || i_parse("@TODAYWINDSPEED", FuncTodayWindSpeed) ||
+                        i_parse("@TODAYWINDDIR", FuncTodayWindDir) || i_parse("@TODAYSKYTEMP", FuncTodaySkyTemp) ||
+                        i_parse("@TODAYHORIZIRSKY", FuncTodayHorizIRSky) || i_parse("@TODAYBEAMSOLARRAD", FuncTodayBeamSolarRad) ||
+                        i_parse("@TODAYDIFSOLARRAD", FuncTodayDifSolarRad) || i_parse("@TODAYALBEDO", FuncTodayAlbedo) ||
+                        i_parse("@TODAYLIQUIDPRECIP", FuncTodayLiquidPrecip) || i_parse("@TOMORROWISRAIN", FuncTomorrowIsRain) ||
+                        i_parse("@TOMORROWISSNOW", FuncTomorrowIsSnow) || i_parse("@TOMORROWOUTDRYBULBTEMP", FuncTomorrowOutDryBulbTemp) ||
+                        i_parse("@TOMORROWOUTDEWPOINTTEMP", FuncTomorrowOutDewPointTemp) ||
+                        i_parse("@TOMORROWOUTBAROPRESS", FuncTomorrowOutBaroPress) || i_parse("@TOMORROWOUTRELHUM", FuncTomorrowOutRelHum) ||
+                        i_parse("@TOMORROWWINDSPEED", FuncTomorrowWindSpeed) || i_parse("@TOMORROWWINDDIR", FuncTomorrowWindDir) ||
+                        i_parse("@TOMORROWSKYTEMP", FuncTomorrowSkyTemp) || i_parse("@TOMORROWHORIZIRSKY", FuncTomorrowHorizIRSky) ||
+                        i_parse("@TOMORROWBEAMSOLARRAD", FuncTomorrowBeamSolarRad) || i_parse("@TOMORROWDIFSOLARRAD", FuncTomorrowDifSolarRad) ||
+                        i_parse("@TOMORROWALBEDO", FuncTomorrowAlbedo) || i_parse("@TOMORROWLIQUIDPRECIP", FuncTomorrowLiquidPrecip)) {
                         // was a built in function operator
                     } else { // throw error
-                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", String);
+                        if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", String);
                         ShowFatalError("EMS Runtime Language: did not find valid input for built-in function =" + String);
                     }
                 } else {
@@ -1429,7 +1448,7 @@ namespace RuntimeLanguageProcessor {
                     MultFound = false;
                     DivFound = false;
 
-                    if (DeveloperFlag) print(outputFiles.debug, "OPERATOR \"{}\"\n", StringToken);
+                    if (DeveloperFlag) print(ioFiles.debug, "OPERATOR \"{}\"\n", StringToken);
 
                     if (StringToken == "+") {
                         if (!OperatorProcessing) {
@@ -1470,7 +1489,7 @@ namespace RuntimeLanguageProcessor {
                         Token(NumTokens).String = StringToken;
                     } else {
                         // Uh OH, this should never happen! throw error
-                        if (DeveloperFlag) print(outputFiles.debug, "ERROR \"{}\"\n", StringToken);
+                        if (DeveloperFlag) print(ioFiles.debug, "ERROR \"{}\"\n", StringToken);
                         ShowFatalError("EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String);
                     }
                 }
@@ -1481,7 +1500,7 @@ namespace RuntimeLanguageProcessor {
                 // Parse a parenthesis token
                 ++Pos;
                 StringToken = NextChar;
-                if (DeveloperFlag) print(outputFiles.debug, "PAREN \"{}\"\n", StringToken);
+                if (DeveloperFlag) print(ioFiles.debug, "PAREN \"{}\"\n", StringToken);
                 Token(NumTokens).Type = TokenParenthesis;
                 Token(NumTokens).String = StringToken;
                 if (NextChar == '(') {
@@ -1492,7 +1511,7 @@ namespace RuntimeLanguageProcessor {
 
             } else if (is_any_of(NextChar, "\"")) {
                 // Parse a string literal token
-                if (DeveloperFlag) print(outputFiles.debug, "{}\n", "LITERAL STRING");
+                if (DeveloperFlag) print(ioFiles.debug, "{}\n", "LITERAL STRING");
                 ++Pos;
 
             } else {
@@ -1501,7 +1520,7 @@ namespace RuntimeLanguageProcessor {
         }
 
         if (NumErrors > 0) {
-            if (DeveloperFlag) print(outputFiles.debug, "{}\n", "ERROR OUT");
+            if (DeveloperFlag) print(ioFiles.debug, "{}\n", "ERROR OUT");
             ShowFatalError("EMS, previous errors cause termination.");
         }
 
@@ -2437,6 +2456,90 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent | 5th independent
                         }
 
+                    } else if (SELECT_CASE_var == FuncTodayIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTodayIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TodayIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTodayOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TodayOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTodayWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TodayWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodaySkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTodaySkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TodaySkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTodayHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TodayHorizIRSky, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayBeamSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTodayBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTodayDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TodayDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTodayAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TodayAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTodayLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTodayLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TodayLiquidPrecip, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsRain) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsRain, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsRain, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowIsSnow) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowIsSnow, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowIsSnow, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDryBulbTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDryBulbTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDryBulbTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutDewPointTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutDewPointTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutDewPointTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutBaroPress) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutBaroPress, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutBaroPress, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowOutRelHum) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowOutRelHum, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowOutRelHum, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindSpeed) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindSpeed, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindSpeed, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowWindDir) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowWindDir, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowWindDir, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowSkyTemp) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowSkyTemp, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowSkyTemp, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowHorizIRSky) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowHorizIRSky, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowHorizIRSky, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowBeamSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowBeamSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowBeamSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowDifSolarRad) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowDifSolarRad, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowDifSolarRad, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowAlbedo) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowAlbedo, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowAlbedo, ReturnValue);
+                    } else if (SELECT_CASE_var == FuncTomorrowLiquidPrecip) {
+                        TodayTomorrowWeather(
+                            FuncTomorrowLiquidPrecip, Operand(1).Number, Operand(2).Number, WeatherManager::TomorrowLiquidPrecip, ReturnValue);
                     } else {
                         // throw Error!
                         ShowFatalError("caught unexpected Expression(ExpressionNum)%Operator in EvaluateExpression");
@@ -2449,7 +2552,66 @@ namespace RuntimeLanguageProcessor {
         return ReturnValue;
     }
 
-    void GetRuntimeLanguageUserInput()
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            ReturnVal = SetErlValueNumber(TodayTomorrowWeatherSource(iTimeStep, iHour));
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal)
+    {
+        int iHour = (Operand1 + 1); // Operand 1 is hour from 0:23
+        int iTimeStep = Operand2;
+        if ((iHour > 0) && (iHour <= 24) && (iTimeStep > 0) && (iTimeStep <= DataGlobals::NumOfTimeStepInHour)) {
+            // For logicals return 1 or 0
+            if (TodayTomorrowWeatherSource(iTimeStep, iHour)) {
+                ReturnVal = SetErlValueNumber(1.0);
+            } else {
+                ReturnVal = SetErlValueNumber(0.0);
+            }
+        } else {
+            ReturnVal.Type = DataRuntimeLanguage::ValueError;
+            ReturnVal.Error = DataRuntimeLanguage::PossibleOperators(FunctionCode).Symbol +
+                              " function called with invalid arguments: Hour=" + General::RoundSigDigits(Operand1, 1) +
+                              ", Timestep=" + General::RoundSigDigits(Operand2, 1);
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            value = TodayTomorrowWeatherSource(timestep, iHour);
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value) {
+        int iHour = hour + 1;
+        if ((iHour > 0) && (iHour <= 24) && (timestep > 0) && (timestep <= DataGlobals::NumOfTimeStepInHour)) {
+            if (TodayTomorrowWeatherSource(timestep, iHour)) {
+                value = 1.0;
+            } else {
+                value = 0.0;
+            }
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    void GetRuntimeLanguageUserInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2485,7 +2647,7 @@ namespace RuntimeLanguageProcessor {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int VariableNum(0); // temporary
         int RuntimeReportVarNum;
         // unused0909  INTEGER    :: Pos
@@ -2973,7 +3135,7 @@ namespace RuntimeLanguageProcessor {
 
             // Parse the runtime language code
             for (StackNum = 1; StackNum <= NumErlStacks; ++StackNum) {
-                ParseStack(OutputFiles::getSingleton(), StackNum);
+                ParseStack(ioFiles, StackNum);
 
                 if (ErlStack(StackNum).NumErrors > 0) {
                     ShowSevereError("Errors found parsing EMS Runtime Language program or subroutine = " + ErlStack(StackNum).Name);
@@ -3302,9 +3464,9 @@ namespace RuntimeLanguageProcessor {
                         } else if (SELECT_CASE_var == "COAL") {
                             ResourceTypeString = "Coal";
                         } else if (SELECT_CASE_var == "FUELOILNO1") {
-                            ResourceTypeString = "FuelOil#1";
+                            ResourceTypeString = "FuelOilNo1";
                         } else if (SELECT_CASE_var == "FUELOILNO2") {
-                            ResourceTypeString = "FuelOil#2";
+                            ResourceTypeString = "FuelOilNo2";
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {
                             ResourceTypeString = "OtherFuel1";
                         } else if (SELECT_CASE_var == "OTHERFUEL2") {
@@ -4052,6 +4214,118 @@ namespace RuntimeLanguageProcessor {
         PossibleOperators(FuncCurveValue).Symbol = "@CURVEVALUE";
         PossibleOperators(FuncCurveValue).NumOperands = 6;
         PossibleOperators(FuncCurveValue).Code = FuncCurveValue;
+
+        PossibleOperators(FuncTodayIsRain).Symbol = "@TODAYISRAIN";
+        PossibleOperators(FuncTodayIsRain).NumOperands = 2;
+        PossibleOperators(FuncTodayIsRain).Code = FuncTodayIsRain;
+
+        PossibleOperators(FuncTodayIsSnow).Symbol = "@TODAYISSNOW";
+        PossibleOperators(FuncTodayIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTodayIsSnow).Code = FuncTodayIsSnow;
+
+        PossibleOperators(FuncTodayOutDryBulbTemp).Symbol = "@TODAYOUTDRYBULBTEMP";
+        PossibleOperators(FuncTodayOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDryBulbTemp).Code = FuncTodayOutDryBulbTemp;
+
+        PossibleOperators(FuncTodayOutDewPointTemp).Symbol = "@TODAYOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTodayOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTodayOutDewPointTemp).Code = FuncTodayOutDewPointTemp;
+
+        PossibleOperators(FuncTodayOutBaroPress).Symbol = "@TODAYOUTBAROPRESS";
+        PossibleOperators(FuncTodayOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTodayOutBaroPress).Code = FuncTodayOutBaroPress;
+
+        PossibleOperators(FuncTodayOutRelHum).Symbol = "@TODAYOUTRELHUM";
+        PossibleOperators(FuncTodayOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTodayOutRelHum).Code = FuncTodayOutRelHum;
+
+        PossibleOperators(FuncTodayWindSpeed).Symbol = "@TODAYWINDSPEED";
+        PossibleOperators(FuncTodayWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTodayWindSpeed).Code = FuncTodayWindSpeed;
+
+        PossibleOperators(FuncTodayWindDir).Symbol = "@TODAYWINDDIR";
+        PossibleOperators(FuncTodayWindDir).NumOperands = 2;
+        PossibleOperators(FuncTodayWindDir).Code = FuncTodayWindDir;
+
+        PossibleOperators(FuncTodaySkyTemp).Symbol = "@TODAYSKYTEMP";
+        PossibleOperators(FuncTodaySkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTodaySkyTemp).Code = FuncTodaySkyTemp;
+
+        PossibleOperators(FuncTodayHorizIRSky).Symbol = "@TODAYHORIZIRSKY";
+        PossibleOperators(FuncTodayHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTodayHorizIRSky).Code = FuncTodayHorizIRSky;
+
+        PossibleOperators(FuncTodayBeamSolarRad).Symbol = "@TODAYBEAMSOLARRAD";
+        PossibleOperators(FuncTodayBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayBeamSolarRad).Code = FuncTodayBeamSolarRad;
+
+        PossibleOperators(FuncTodayDifSolarRad).Symbol = "@TODAYDIFSOLARRAD";
+        PossibleOperators(FuncTodayDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTodayDifSolarRad).Code = FuncTodayDifSolarRad;
+
+        PossibleOperators(FuncTodayAlbedo).Symbol = "@TODAYALBEDO";
+        PossibleOperators(FuncTodayAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTodayAlbedo).Code = FuncTodayAlbedo;
+
+        PossibleOperators(FuncTodayLiquidPrecip).Symbol = "@TODAYLIQUIDPRECIP";
+        PossibleOperators(FuncTodayLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTodayLiquidPrecip).Code = FuncTodayLiquidPrecip;
+
+        PossibleOperators(FuncTomorrowIsRain).Symbol = "@TOMORROWISRAIN";
+        PossibleOperators(FuncTomorrowIsRain).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsRain).Code = FuncTomorrowIsRain;
+
+        PossibleOperators(FuncTomorrowIsSnow).Symbol = "@TOMORROWISSNOW";
+        PossibleOperators(FuncTomorrowIsSnow).NumOperands = 2;
+        PossibleOperators(FuncTomorrowIsSnow).Code = FuncTomorrowIsSnow;
+
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Symbol = "@TOMORROWOUTDRYBULBTEMP";
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDryBulbTemp).Code = FuncTomorrowOutDryBulbTemp;
+
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Symbol = "@TOMORROWOUTDEWPOINTTEMP";
+        PossibleOperators(FuncTomorrowOutDewPointTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutDewPointTemp).Code = FuncTomorrowOutDewPointTemp;
+
+        PossibleOperators(FuncTomorrowOutBaroPress).Symbol = "@TOMORROWOUTBAROPRESS";
+        PossibleOperators(FuncTomorrowOutBaroPress).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutBaroPress).Code = FuncTomorrowOutBaroPress;
+
+        PossibleOperators(FuncTomorrowOutRelHum).Symbol = "@TOMORROWOUTRELHUM";
+        PossibleOperators(FuncTomorrowOutRelHum).NumOperands = 2;
+        PossibleOperators(FuncTomorrowOutRelHum).Code = FuncTomorrowOutRelHum;
+
+        PossibleOperators(FuncTomorrowWindSpeed).Symbol = "@TOMORROWWINDSPEED";
+        PossibleOperators(FuncTomorrowWindSpeed).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindSpeed).Code = FuncTomorrowWindSpeed;
+
+        PossibleOperators(FuncTomorrowWindDir).Symbol = "@TOMORROWWINDDIR";
+        PossibleOperators(FuncTomorrowWindDir).NumOperands = 2;
+        PossibleOperators(FuncTomorrowWindDir).Code = FuncTomorrowWindDir;
+
+        PossibleOperators(FuncTomorrowSkyTemp).Symbol = "@TOMORROWSKYTEMP";
+        PossibleOperators(FuncTomorrowSkyTemp).NumOperands = 2;
+        PossibleOperators(FuncTomorrowSkyTemp).Code = FuncTomorrowSkyTemp;
+
+        PossibleOperators(FuncTomorrowHorizIRSky).Symbol = "@TOMORROWHORIZIRSKY";
+        PossibleOperators(FuncTomorrowHorizIRSky).NumOperands = 2;
+        PossibleOperators(FuncTomorrowHorizIRSky).Code = FuncTomorrowHorizIRSky;
+
+        PossibleOperators(FuncTomorrowBeamSolarRad).Symbol = "@TOMORROWBEAMSOLARRAD";
+        PossibleOperators(FuncTomorrowBeamSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowBeamSolarRad).Code = FuncTomorrowBeamSolarRad;
+
+        PossibleOperators(FuncTomorrowDifSolarRad).Symbol = "@TOMORROWDIFSOLARRAD";
+        PossibleOperators(FuncTomorrowDifSolarRad).NumOperands = 2;
+        PossibleOperators(FuncTomorrowDifSolarRad).Code = FuncTomorrowDifSolarRad;
+
+        PossibleOperators(FuncTomorrowAlbedo).Symbol = "@TOMORROWALBEDO";
+        PossibleOperators(FuncTomorrowAlbedo).NumOperands = 2;
+        PossibleOperators(FuncTomorrowAlbedo).Code = FuncTomorrowAlbedo;
+
+        PossibleOperators(FuncTomorrowLiquidPrecip).Symbol = "@TOMORROWLIQUIDPRECIP";
+        PossibleOperators(FuncTomorrowLiquidPrecip).NumOperands = 2;
+        PossibleOperators(FuncTomorrowLiquidPrecip).Code = FuncTomorrowLiquidPrecip;
 
         AlreadyDidOnce = true;
     }

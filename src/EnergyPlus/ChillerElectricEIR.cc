@@ -58,12 +58,12 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -71,13 +71,13 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -736,9 +736,9 @@ namespace ChillerElectricEIR {
 
         SetupOutputVariable("Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Energy,
                             "System",
@@ -852,9 +852,9 @@ namespace ChillerElectricEIR {
 
             if (this->CondenserFanPowerRatio > 0) {
                 SetupOutputVariable(
-                    "Chiller Condenser Fan Electric Power", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
+                    "Chiller Condenser Fan Electricity Rate", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
 
-                SetupOutputVariable("Chiller Condenser Fan Electric Energy",
+                SetupOutputVariable("Chiller Condenser Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->CondenserFanEnergyConsumption,
                                     "System",
@@ -893,16 +893,16 @@ namespace ChillerElectricEIR {
 
                 if (this->BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable(
-                        "Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                        "Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
 
-                    SetupOutputVariable("Chiller Basin Heater Electric Energy",
+                    SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         this->BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         this->Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "CHILLERS",
                                         _,
                                         "Plant");
@@ -1506,7 +1506,7 @@ namespace ChillerElectricEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->IPLVFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(state.outputFiles,
+                StandardRatings::CalcChillerIPLV(state.files,
                                                  this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricEIR,
                                                  this->RefCap,

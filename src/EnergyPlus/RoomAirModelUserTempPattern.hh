@@ -78,6 +78,8 @@ namespace RoomAirModelUserTempPattern {
 
     // Functions
 
+    void clear_state();
+
     void ManageUserDefinedPatterns(int const ZoneNum); // index number for the specified zone
 
     //****************************************************

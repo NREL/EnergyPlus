@@ -2190,6 +2190,7 @@
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     OutdoorDryBulbTemperature,      !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2203,6 +2204,7 @@
     269.09776041774302,      !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     SurfaceFaceTemperature,  !- Temperature Control Type
+    HalfFlowPower,           !- Setpoint Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints 2;  !- Heating Setpoint Temperature Schedule Name
 
@@ -2216,7 +2218,8 @@
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     1.9637972000759794,      !- Fraction of Autosized Heating Design Capacity
     SurfaceInteriorTemperature,    !- Temperature Control Type
-    2.0,                     !- Heating Throttling Range {deltaC}
+    HalfFlowPower,           !- Setpoint Type
+    0.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints 3;  !- Heating Setpoint Temperature Schedule Name
 
   AirLoopHVAC:ZoneSplitter,
@@ -2280,7 +2283,7 @@
 
   Output:Variable,*,Fan Rise in Air Temperature,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
@@ -2292,9 +2295,9 @@
 
   Output:Variable,*,District Heating Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Electric Power,timestep;
+  Output:Variable,*,Zone Radiant HVAC Electricity Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Electric Energy,timestep;
+  Output:Variable,*,Zone Radiant HVAC Electricity Energy,timestep;
 
   Output:Variable,*,Zone Radiant HVAC Heating Rate,timestep;
 

@@ -69,6 +69,8 @@ namespace SurfaceGroundHeatExchanger {
                                       // to avoid static initialization order bug: Keep them in sync
     }                                 // namespace loc
 
+    void clear_state();
+
     struct SurfaceGroundHeatExchangerData : PlantComponent
     {
         ~SurfaceGroundHeatExchangerData() = default;

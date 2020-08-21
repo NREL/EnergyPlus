@@ -149,7 +149,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
@@ -3176,9 +3178,9 @@
 
   Output:Variable,West Zone,AFN Zone Infiltration Sensible Heat Gain Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,Timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,Timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,Timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,Timestep;
 
   Output:Variable,West Zone,Zone Air Temperature,Timestep;
 
@@ -3192,17 +3194,17 @@
 
   Output:Variable,*,AFN Surface Venting Window or Door Opening Factor,Timestep;
 
-  Output:Variable,Supply Fan 1,Fan Electric Power,Timestep;
+  Output:Variable,Supply Fan 1,Fan Electricity Rate,Timestep;
 
   Output:Variable,Zone1FanCoil,Fan Coil Total Cooling Rate,Timestep;
 
   Output:Variable,Zone1FanCoil,Fan Coil Heating Rate,Timestep;
 
-  Output:Variable,Zone1FanCoil,Fan Coil Fan Electric Power,Timestep;
+  Output:Variable,Zone1FanCoil,Fan Coil Fan Electricity Rate,Timestep;
 
   Output:Variable,Zone1FanCoil,Fan Coil Availability Status,Timestep;
 
   Output:Variable,*,Availability Manager Hybrid Ventilation Control Status,Timestep;
 
-  Output:Variable,Zone1FanCoilFan,Fan Electric Power,Timestep;
+  Output:Variable,Zone1FanCoilFan,Fan Electricity Rate,Timestep;
 

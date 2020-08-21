@@ -70,7 +70,7 @@ This is the upper limit on the temperature in degrees C of the air leaving the t
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
@@ -133,7 +133,7 @@ This field specifies the occupancy level to use when calculating the ventilation
   HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
@@ -529,11 +529,20 @@ Schedule:Compact,
 
 \subsubsection{Outputs}\label{outputs-3}
 
-HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Zone Air Terminal VAV Damper Position}\label{zone-air-terminal-vav-damper-position-1}
 
 This output is the variable air volume flow fraction required to meet the zone load. This is the average value over the frequency being reported. The flow fraction is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat}\label{airterminalsingleductvavheatandcoolreheat}
 
@@ -649,11 +658,20 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat,
 
 \subsubsection{Outputs}\label{outputs-4}
 
-HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position-2}
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:VAV:NoReheat}\label{airterminalsingleductvavnoreheat}
 
@@ -773,7 +791,7 @@ An IDF example:
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
 
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s-1}
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
@@ -836,11 +854,20 @@ AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat,
 
 \subsubsection{Outputs}\label{outputs-6}
 
-HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal VAV Damper Position {[]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
 
 \paragraph{Zone Air Terminal VAV Damper Position {[]}}\label{zone-air-terminal-vav-damper-position-4}
 
 This output is the damper position required to meet the zone load. This is the average value over the simulation timestep being reported. The damper position is defined as the terminal unit air mass flow rate divided by the terminal unit's maximum air mass flow rate.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:SeriesPIU:Reheat}\label{airterminalsingleductseriespiureheat}
 
@@ -976,6 +1003,8 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat,
   HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
 \paragraph{Zone Air Terminal Primary Damper Position {[]}}\label{zone-air-terminal-primary-damper-position}
@@ -997,6 +1026,10 @@ This field reports the dry air sensible heat extraction rate of the series PIU t
 \paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j-1}
 
 This field reports the dry air sensible heat extraction of the series PIU terminal unit from the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the terminal unit, and the timestep.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:ParallelPIU:Reheat}\label{airterminalsingleductparallelpiureheat}
 
@@ -1138,6 +1171,8 @@ AirTerminal:SingleDuct:ParallelPIU:Reheat,
   HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
 \paragraph{Zone Air Terminal Primary Damper Position {[]}}\label{zone-air-terminal-primary-damper-position}
@@ -1159,6 +1194,10 @@ This field reports the sensible heat extraction rate of the parallel PIU termina
 \paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j-2}
 
 This field reports the dry air sensible heat extraction of the parallel PIU terminal unit from the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the terminal unit, and the timestep.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction}\label{airterminalsingleductconstantvolumefourpipeinduction}
 
@@ -1323,7 +1362,14 @@ AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction,
 
 \subsubsection{Outputs}\label{outputs-9}
 
-There are no specific outputs for the four pipe induction terminal units.
+\begin{itemize}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
+\end{itemize}
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam}\label{airterminalsingleductconstantvolumefourpipebeam}
 
@@ -1504,6 +1550,10 @@ Heating by the primary air to the zone, exclusive of any cooling or heating done
 
 Air flow rate from the central air handler into the zone in m3/s. Note that this does not include any of the secondary air flow that is induced by the convector and nozzle action (the model does not resolve secondary air flow rate and the result are not available).
 
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
+
 \subsection{AirTerminal:SingleDuct:ConstantVolume:CooledBeam}\label{airterminalsingleductconstantvolumecooledbeam}
 
 The Cooled Beam system is a mixed air-hydronic system. A central, single-duct forced-air system supplies conditioned ventilation air to the zones. Sensible cooling is done by chilled water circulating through ceiling mounted cooled beam units. Chilled water flow rate through the cooled beam units is varied to meet the zone sensible cooling load. Any dehumidification is done by the central ventilation air system. Heating is usually accomplished with hot water radiators. Thermodynamically, the cooled beam system resembles the four-pipe induction unit.
@@ -1671,6 +1721,8 @@ An example input is:
   HVAC,Average,Zone Air Terminal Supply Air Sensible Heating Rate {[}W{]}
 \item
   HVAC,Sum,Zone Air Terminal Beam Chilled Water Energy {[}J{]}
+\item
+  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
 \end{itemize}
 
 \paragraph{Zone Air Terminal Beam Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-beam-sensible-cooling-rate-w-1}
@@ -1700,6 +1752,10 @@ Heating by the supply air to the zone, exclusive of any cooling done by the beam
 \paragraph{Zone Air Terminal Beam Chilled Water Energy {[}J{]}}\label{zone-air-terminal-beam-chilled-water-energy-j}
 
 The heat transfer energy for the chilled water serving the beams, in Joules.
+
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
+
+This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
 
 \subsection{AirTerminal:SingleDuct:Mixer}\label{airterminalsingleductmixer}
 
@@ -1983,7 +2039,7 @@ This output is the damper position of the cold air stream in a dual duct air ter
 
 This output is the damper position of the hot air stream in a dual duct air terminal. This is the average value over the frequency being reported. The damper position is defined as the terminal unit hot air mass flow rate divided by the terminal unit's maximum hot air mass flow rate.
 
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s-2}
+\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}
 
 This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outdoor air system.
 

@@ -57,24 +57,24 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -166,7 +166,7 @@ namespace ChillerReformulatedEIR {
         this->initialize(state.dataBranchInputManager, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->size();
+            this->size(state.files);
         }
     }
 
@@ -614,9 +614,9 @@ namespace ChillerReformulatedEIR {
 
         SetupOutputVariable("Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Energy,
                             "System",
@@ -980,7 +980,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::size()
+    void ReformulatedEIRChillerSpecs::size(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1280,7 +1280,7 @@ namespace ChillerReformulatedEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->MySizeFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(OutputFiles::getSingleton(),
+                StandardRatings::CalcChillerIPLV(ioFiles,
                                                  this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                  this->RefCap,

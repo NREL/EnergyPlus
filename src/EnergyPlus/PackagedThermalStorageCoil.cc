@@ -164,12 +164,19 @@ namespace PackagedThermalStorageCoil {
     int NumTESCoils;
     Array1D_bool CheckEquipName;
     bool GetTESInputFlag(true);
+    bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Object Data
     Array1D<PackagedTESCoolingCoilStruct> TESCoil;
 
-    // Functions
+    void clear_state() {
+        NumTESCoils = 0;
+        CheckEquipName.clear();
+        GetTESInputFlag = true;
+        MyOneTimeFlag = true;
+        TESCoil.clear();
+    }
 
     void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
@@ -1603,33 +1610,33 @@ namespace PackagedThermalStorageCoil {
                                 "Sum",
                                 TESCoil(item).Name);
             SetupOutputVariable(
-                "Cooling Coil Electric Power", OutputProcessor::Unit::W, TESCoil(item).ElecCoolingPower, "System", "Average", TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Electric Energy",
+                "Cooling Coil Electricity Rate", OutputProcessor::Unit::W, TESCoil(item).ElecCoolingPower, "System", "Average", TESCoil(item).Name);
+            SetupOutputVariable("Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).ElecCoolingEnergy,
                                 "System",
                                 "Sum",
                                 TESCoil(item).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "COOLING",
                                 _,
                                 "System");
 
             SetupOutputVariable(
                 "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, TESCoil(item).RuntimeFraction, "System", "Average", TESCoil(item).Name);
-            SetupOutputVariable("Cooling Coil Cold Weather Protection Electric Energy",
+            SetupOutputVariable("Cooling Coil Cold Weather Protection Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 TESCoil(item).ElectColdWeatherEnergy,
                                 "System",
                                 "Sum",
                                 TESCoil(item).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "COOLING",
                                 "Thermal Protection",
                                 "System");
-            SetupOutputVariable("Cooling Coil Cold Weather Protection Electric Power",
+            SetupOutputVariable("Cooling Coil Cold Weather Protection Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 TESCoil(item).ElectColdWeatherPower,
                                 "System",
@@ -1746,38 +1753,38 @@ namespace PackagedThermalStorageCoil {
                                         "System");
                 }
 
-                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     TESCoil(item).EvapCondPumpElecPower,
                                     "System",
                                     "Average",
                                     TESCoil(item).Name);
-                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+                SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     TESCoil(item).EvapCondPumpElecConsumption,
                                     "System",
                                     "Sum",
                                     TESCoil(item).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     _,
                                     "System");
 
-                SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
+                SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     TESCoil(item).ElectEvapCondBasinHeaterPower,
                                     "System",
                                     "Average",
                                     TESCoil(item).Name);
-                SetupOutputVariable("Cooling Coil Basin Heater Electric Energy",
+                SetupOutputVariable("Cooling Coil Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     TESCoil(item).ElectEvapCondBasinHeaterEnergy,
                                     "System",
                                     "Sum",
                                     TESCoil(item).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     "Thermal Protection",
                                     "System");
@@ -1856,7 +1863,6 @@ namespace PackagedThermalStorageCoil {
         static Array1D_bool MySizeFlag;   // One time sizing flag
         static Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
         static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
-        static bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
         bool errFlag;
         int plloopnum;
         int lsnum;

@@ -49,13 +49,13 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/floops.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
@@ -71,16 +70,16 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -238,7 +237,7 @@ namespace WaterThermalTanks {
             if (!this->IsChilledWaterTank) {
                 this->CalcStandardRatings(state);
             } else {
-                this->ReportCWTankInits(state.outputFiles);
+                this->ReportCWTankInits(state.files);
             }
         }
     }
@@ -329,7 +328,7 @@ namespace WaterThermalTanks {
         this->callerLoopNum = calledFromLocation.loopNum;
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state.files);
             this->myOneTimeInitFlag = false;
         }
 
@@ -415,7 +414,7 @@ namespace WaterThermalTanks {
 
         if (this->myOneTimeInitFlag) {
             if (Tank.myOneTimeInitFlag) {
-                Tank.setupOutputVars();
+                Tank.setupOutputVars(state.files);
                 Tank.myOneTimeInitFlag = false;
             }
             this->myOneTimeInitFlag = false;
@@ -698,7 +697,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    bool getDesuperHtrInput()
+    bool getDesuperHtrInput(EnergyPlusData &state)
     {
         bool ErrorsFound = false;
         std::string const RoutineName = "getDesuperHtrInput";
@@ -939,10 +938,12 @@ namespace WaterThermalTanks {
                 } else {
                     WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXMultiSpeed;
                 }
-                DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
+                DXCoils::GetDXCoilIndex(state,
+                                        WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
                                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum,
                                         errFlag,
-                                        DataIPShortCuts::cCurrentModuleObject);
+                                        DataIPShortCuts::cCurrentModuleObject,
+                                        ObjexxFCL::Optional_bool_const());
                 if (allocated(DataHeatBalance::HeatReclaimDXCoil)) {
                     DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                         DataHeatBalance::HeatReclaimDXCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
@@ -1404,7 +1405,7 @@ namespace WaterThermalTanks {
             // check that the DX Coil exists
             bool DXCoilErrFlag = false;
             bool bIsVScoil = false;
-            DXCoils::GetDXCoilIndex(HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
+            DXCoils::GetDXCoilIndex(state, HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
             if (DXCoilErrFlag) {
                 // This could be a variable speed heat pump water heater
                 bool bVSCoilErrFlag = false;
@@ -1576,13 +1577,13 @@ namespace WaterThermalTanks {
             } else {
                 if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
                     HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(HPWH.FanName)); // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
                     HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
                     FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
 
                 } else {
-                    Fans::GetFanType(state.fans, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
-                    Fans::GetFanIndex(state.fans, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                    Fans::GetFanType(state, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
+                    Fans::GetFanIndex(state, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
                     Fans::GetFanVolFlow(HPWH.FanNum, FanVolFlow);
                 }
             }
@@ -2007,7 +2008,7 @@ namespace WaterThermalTanks {
                 FanOutletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->outletNodeNum;
             } else {
                 errFlag = false;
-                FanOutletNodeNum = Fans::GetFanOutletNode(state.fans, HPWH.FanType, HPWH.FanName, errFlag);
+                FanOutletNodeNum = Fans::GetFanOutletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -2029,7 +2030,7 @@ namespace WaterThermalTanks {
                 FanInletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
             } else {
                 errFlag = false;
-                FanInletNodeNum = Fans::GetFanInletNode(state.fans, HPWH.FanType, HPWH.FanName, errFlag);
+                FanInletNodeNum = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -2328,10 +2329,10 @@ namespace WaterThermalTanks {
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(4));
                 if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.FuelType = "Gas";
+                    Tank.FuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.FuelType = "Diesel";
@@ -2343,10 +2344,10 @@ namespace WaterThermalTanks {
                     Tank.FuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.FuelType = "FuelOil#1";
+                    Tank.FuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.FuelType = "FuelOil#2";
+                    Tank.FuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
@@ -2367,7 +2368,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Heater Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(4));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2414,10 +2415,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OffCycParaFuelType = "Gas";
+                    Tank.OffCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OffCycParaFuelType = "Diesel";
@@ -2429,10 +2430,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OffCycParaFuelType = "FuelOil#1";
+                    Tank.OffCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OffCycParaFuelType = "FuelOil#2";
+                    Tank.OffCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
@@ -2453,7 +2454,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(6));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2469,10 +2470,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OnCycParaFuelType = "Gas";
+                    Tank.OnCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OnCycParaFuelType = "Diesel";
@@ -2484,10 +2485,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OnCycParaFuelType = "FuelOil#1";
+                    Tank.OnCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OnCycParaFuelType = "FuelOil#2";
+                    Tank.OnCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OnCycParaFuelType = "Propane";
@@ -2508,7 +2509,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid On-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(7));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2919,10 +2920,10 @@ namespace WaterThermalTanks {
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(7));
                 if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.FuelType = "Gas";
+                    Tank.FuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.FuelType = "Diesel";
@@ -2934,10 +2935,10 @@ namespace WaterThermalTanks {
                     Tank.FuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.FuelType = "FuelOil#1";
+                    Tank.FuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.FuelType = "FuelOil#2";
+                    Tank.FuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
@@ -2958,7 +2959,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Heater Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(7));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2980,10 +2981,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OffCycParaFuelType = "Gas";
+                    Tank.OffCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OffCycParaFuelType = "Diesel";
@@ -2995,10 +2996,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OffCycParaFuelType = "FuelOil#1";
+                    Tank.OffCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OffCycParaFuelType = "FuelOil#2";
+                    Tank.OffCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
@@ -3019,7 +3020,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(8));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -3036,10 +3037,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OnCycParaFuelType = "Gas";
+                    Tank.OnCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OnCycParaFuelType = "Diesel";
@@ -3051,10 +3052,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OnCycParaFuelType = "FuelOil#1";
+                    Tank.OnCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OnCycParaFuelType = "FuelOil#2";
+                    Tank.OnCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OnCycParaFuelType = "Propane";
@@ -3075,7 +3076,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid On-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(9));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -3474,14 +3475,14 @@ namespace WaterThermalTanks {
 
             Tank.MassFlowRateMin = 0.0;
             Tank.IgnitionDelay = 0.0;
-            Tank.FuelType = "Electric";
+            Tank.FuelType = "Electricity";
             Tank.Efficiency = 1.0;
             Tank.PLFCurve = 0;
             Tank.OffCycParaLoad = 0.0;
-            Tank.OffCycParaFuelType = "Electric";
+            Tank.OffCycParaFuelType = "Electricity";
             Tank.OffCycParaFracToTank = 0.0;
             Tank.OnCycParaLoad = 0.0;
-            Tank.OnCycParaFuelType = "Electric";
+            Tank.OnCycParaFuelType = "Electricity";
             Tank.OnCycParaFracToTank = 0.0;
 
             {
@@ -3775,14 +3776,14 @@ namespace WaterThermalTanks {
             Tank.SetPointTempSchedule2 = 0;
             Tank.MaxCapacity2 = 0.0;
             Tank.HeaterHeight2 = 0.0;
-            Tank.FuelType = "Electric";
+            Tank.FuelType = "Electricity";
 
             Tank.OffCycParaLoad = 0.0;
-            Tank.OffCycParaFuelType = "Electric";
+            Tank.OffCycParaFuelType = "Electricity";
             Tank.OffCycParaFracToTank = 0.0;
             Tank.OffCycParaHeight = 0.0;
             Tank.OnCycParaLoad = 0.0;
-            Tank.OnCycParaFuelType = "Electric";
+            Tank.OnCycParaFuelType = "Electricity";
             Tank.OnCycParaFracToTank = 0.0;
             Tank.OnCycParaHeight = 0.0;
 
@@ -4084,11 +4085,11 @@ namespace WaterThermalTanks {
                     "Inlets,Number Of Outlets\n");
 
                 // Write water heater header for EIO
-                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(state.outputFiles.eio, Format_720);
-                if (numHeatPumpWaterHeater > 0) print(state.outputFiles.eio, Format_721);
-                if (numWaterHeaterStratified > 0) print(state.outputFiles.eio, Format_722);
-                if (numChilledWaterMixed > 0) print(state.outputFiles.eio, Format_725);
-                if (numChilledWaterStratified > 0) print(state.outputFiles.eio, Format_726);
+                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(state.files.eio, Format_720);
+                if (numHeatPumpWaterHeater > 0) print(state.files.eio, Format_721);
+                if (numWaterHeaterStratified > 0) print(state.files.eio, Format_722);
+                if (numChilledWaterMixed > 0) print(state.files.eio, Format_725);
+                if (numChilledWaterStratified > 0) print(state.files.eio, Format_726);
             }
 
             if (numWaterThermalTank > 0) {
@@ -4105,7 +4106,7 @@ namespace WaterThermalTanks {
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (numWaterHeaterDesuperheater > 0) {
-                ErrorsFound |= getDesuperHtrInput();
+                ErrorsFound |= getDesuperHtrInput(state);
             }
 
             //  =======   Get HEAT PUMP:WATER HEATER ===============================================================================
@@ -4783,19 +4784,19 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    void WaterThermalTankData::setupOutputVars()
+    void WaterThermalTankData::setupOutputVars(IOFiles &ioFiles)
     {
         if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-            this->setupChilledWaterTankOutputVars(OutputFiles::getSingleton());
+            this->setupChilledWaterTankOutputVars(ioFiles);
         } else {
             // moving setupWaterHeaterOutputVars to here causes big table diffs...
-            this->setupWaterHeaterOutputVars(OutputFiles::getSingleton());
+            this->setupWaterHeaterOutputVars(ioFiles);
         }
         // moving setupZoneInternalGains to here causes math and table diffs...
         // this->setupZoneInternalGains();
     }
 
-    void WaterThermalTankData::setupChilledWaterTankOutputVars(OutputFiles &outputFiles)
+    void WaterThermalTankData::setupChilledWaterTankOutputVars(IOFiles &ioFiles)
     {
 
         // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
@@ -4896,7 +4897,7 @@ namespace WaterThermalTanks {
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_724,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -4944,7 +4945,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::setupWaterHeaterOutputVars(OutputFiles &outputFiles)
+    void WaterThermalTankData::setupWaterHeaterOutputVars(IOFiles &ioFiles)
     {
 
         // Setup report variables for WaterHeater:Mixed
@@ -5041,8 +5042,8 @@ namespace WaterThermalTanks {
         SetupOutputVariable("Water Heater Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction, "System", "Average", this->Name);
         SetupOutputVariable("Water Heater Part Load Ratio", OutputProcessor::Unit::None, this->PartLoadRatio, "System", "Average", this->Name);
 
-        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
-            SetupOutputVariable("Water Heater Electric Power", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
+        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
+            SetupOutputVariable("Water Heater Electricity Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
         } else {
             SetupOutputVariable(
                 "Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
@@ -5058,8 +5059,8 @@ namespace WaterThermalTanks {
                             "DHW",
                             this->EndUseSubcategoryName,
                             "Plant");
-        if (UtilityRoutines::SameString(this->OffCycParaFuelType, "Electric")) {
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electric Power",
+        if (UtilityRoutines::SameString(this->OffCycParaFuelType, "Electricity")) {
+            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->OffCycParaFuelRate,
                                 "System",
@@ -5084,9 +5085,9 @@ namespace WaterThermalTanks {
                             "DHW",
                             this->EndUseSubcategoryName,
                             "Plant");
-        if (UtilityRoutines::SameString(this->OnCycParaFuelType, "Electric")) {
+        if (UtilityRoutines::SameString(this->OnCycParaFuelType, "Electricity")) {
             SetupOutputVariable(
-                "Water Heater On Cycle Parasitic Electric Power", OutputProcessor::Unit::W, this->OnCycParaFuelRate, "System", "Average", this->Name);
+                "Water Heater On Cycle Parasitic Electricity Rate", OutputProcessor::Unit::W, this->OnCycParaFuelRate, "System", "Average", this->Name);
         } else {
             SetupOutputVariable("Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Rate",
                                 OutputProcessor::Unit::W,
@@ -5138,28 +5139,28 @@ namespace WaterThermalTanks {
             SetupOutputVariable(
                 "Water Heater Compressor Part Load Ratio", OutputProcessor::Unit::None, HPWH.HeatingPLR, "System", "Average", HPWH.Name);
             SetupOutputVariable(
-                "Water Heater Off Cycle Ancillary Electric Power", OutputProcessor::Unit::W, HPWH.OffCycParaFuelRate, "System", "Average", HPWH.Name);
-            SetupOutputVariable("Water Heater Off Cycle Ancillary Electric Energy",
+                "Water Heater Off Cycle Ancillary Electricity Rate", OutputProcessor::Unit::W, HPWH.OffCycParaFuelRate, "System", "Average", HPWH.Name);
+            SetupOutputVariable("Water Heater Off Cycle Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HPWH.OffCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 HPWH.Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
             SetupOutputVariable(
-                "Water Heater On Cycle Ancillary Electric Power", OutputProcessor::Unit::W, HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name);
-            SetupOutputVariable("Water Heater On Cycle Ancillary Electric Energy",
+                "Water Heater On Cycle Ancillary Electricity Rate", OutputProcessor::Unit::W, HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name);
+            SetupOutputVariable("Water Heater On Cycle Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HPWH.OnCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 HPWH.Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
@@ -5181,37 +5182,37 @@ namespace WaterThermalTanks {
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater On Cycle Parasitic Electric Power",
+            SetupOutputVariable("Water Heater On Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelRate,
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater On Cycle Parasitic Electric Energy",
+            SetupOutputVariable("Water Heater On Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electric Power",
+            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelRate,
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electric Energy",
+            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
@@ -5221,20 +5222,20 @@ namespace WaterThermalTanks {
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Pump Electric Power",
+            SetupOutputVariable("Water Heater Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).PumpPower,
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Pump Electric Energy",
+            SetupOutputVariable("Water Heater Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).PumpEnergy,
                                 "System",
                                 "Sum",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Desuperheater Pump",
                                 "Plant");
@@ -5300,7 +5301,7 @@ namespace WaterThermalTanks {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_723,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -10478,7 +10479,7 @@ namespace WaterThermalTanks {
 
                 // assume can propagate rules for gas to other fuels.
                 bool FuelTypeIsLikeGas = false;
-                if (UtilityRoutines::SameString(this->FuelType, "Gas")) {
+                if (UtilityRoutines::SameString(this->FuelType, "NaturalGas")) {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Diesel")) {
                     FuelTypeIsLikeGas = true;
@@ -10486,9 +10487,9 @@ namespace WaterThermalTanks {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Coal")) {
                     FuelTypeIsLikeGas = true;
-                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#1")) {
+                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo1")) {
                     FuelTypeIsLikeGas = true;
-                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#2")) {
+                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo2")) {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Propane")) {
                     FuelTypeIsLikeGas = true;
@@ -10503,7 +10504,7 @@ namespace WaterThermalTanks {
                 }
 
                 if (this->Sizing.NumberOfBedrooms == 1) {
-                    if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 20.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 2.5 * 1000.0; // 2.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -10513,7 +10514,7 @@ namespace WaterThermalTanks {
 
                 } else if (this->Sizing.NumberOfBedrooms == 2) {
                     if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 30.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 3.5 * 1000.0; // 3.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10521,7 +10522,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10529,7 +10530,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10539,7 +10540,7 @@ namespace WaterThermalTanks {
                     }
                 } else if (this->Sizing.NumberOfBedrooms == 3) {
                     if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10547,7 +10548,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10555,7 +10556,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10565,7 +10566,7 @@ namespace WaterThermalTanks {
                     }
                 } else if (this->Sizing.NumberOfBedrooms == 4) {
                     if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10573,7 +10574,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10581,7 +10582,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; // 38 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10590,7 +10591,7 @@ namespace WaterThermalTanks {
                         }
                     }
                 } else if (this->Sizing.NumberOfBedrooms == 5) {
-                    if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -10598,7 +10599,7 @@ namespace WaterThermalTanks {
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; // 47 kBtu/hr
                     }
                 } else if (this->Sizing.NumberOfBedrooms >= 6) {
-                    if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11174,7 +11175,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == SizeEnum::ResidentialMin) {
                     // assume can propagate rules for gas to other fuels.
                     bool FuelTypeIsLikeGas = false;
-                    if (UtilityRoutines::SameString(this->FuelType, "Gas")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "NaturalGas")) {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Diesel")) {
                         FuelTypeIsLikeGas = true;
@@ -11182,9 +11183,9 @@ namespace WaterThermalTanks {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Coal")) {
                         FuelTypeIsLikeGas = true;
-                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#1")) {
+                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo1")) {
                         FuelTypeIsLikeGas = true;
-                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#2")) {
+                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo2")) {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Propane")) {
                         FuelTypeIsLikeGas = true;
@@ -11199,7 +11200,7 @@ namespace WaterThermalTanks {
                     }
 
                     if (this->Sizing.NumberOfBedrooms == 1) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 20.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 2.5 * 1000.0; // 2.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -11209,7 +11210,7 @@ namespace WaterThermalTanks {
 
                     } else if (this->Sizing.NumberOfBedrooms == 2) {
                         if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 30.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 3.5 * 1000.0; // 3.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11217,7 +11218,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11225,7 +11226,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11235,7 +11236,7 @@ namespace WaterThermalTanks {
                         }
                     } else if (this->Sizing.NumberOfBedrooms == 3) {
                         if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11243,7 +11244,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11251,7 +11252,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11261,7 +11262,7 @@ namespace WaterThermalTanks {
                         }
                     } else if (this->Sizing.NumberOfBedrooms == 4) {
                         if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11269,7 +11270,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11277,7 +11278,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; // 38 kBtu/hr
                             }
                         } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11286,7 +11287,7 @@ namespace WaterThermalTanks {
                             }
                         }
                     } else if (this->Sizing.NumberOfBedrooms == 5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -11294,7 +11295,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; // 47 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBedrooms >= 6) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -11859,7 +11860,7 @@ namespace WaterThermalTanks {
             }
 
             static constexpr auto Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_720,
                   this->Type,
                   this->Name,
@@ -11869,7 +11870,7 @@ namespace WaterThermalTanks {
                   EnergyFactor);
         } else {
             static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_721,
                   HPWaterHeater(this->HeatPumpNum).Type,
                   HPWaterHeater(this->HeatPumpNum).Name,
@@ -11883,7 +11884,7 @@ namespace WaterThermalTanks {
         this->AlreadyRated = true;
     }
 
-    void WaterThermalTankData::ReportCWTankInits(OutputFiles &outputFiles)
+    void WaterThermalTankData::ReportCWTankInits(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11897,7 +11898,7 @@ namespace WaterThermalTanks {
 
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(ioFiles);
             this->myOneTimeInitFlag = false;
         }
 
@@ -11906,7 +11907,7 @@ namespace WaterThermalTanks {
         }
 
         static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               Format_728,
               this->Type,
               this->Name,

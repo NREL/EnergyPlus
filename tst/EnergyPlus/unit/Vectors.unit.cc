@@ -54,6 +54,8 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 // C++ Headers
 #include <cmath>
 
@@ -61,9 +63,8 @@ using namespace EnergyPlus;
 using namespace EnergyPlus::Vectors;
 using namespace ObjexxFCL;
 
-TEST(VectorsTest, AreaPolygon)
+TEST_F(EnergyPlusFixture, VectorsTest_AreaPolygon)
 {
-    ShowMessage("Begin Test: VectorsTest, AreaPolygon");
     Array1D<Vector> a(4); // 3 x 7 rectangle
     a(1).x = a(1).y = a(1).z = 0.0;
     a(2).x = 3.0;
@@ -77,9 +78,8 @@ TEST(VectorsTest, AreaPolygon)
     EXPECT_EQ(21.0, AreaPolygon(4, a));
 }
 
-TEST(VectorsTest, VecNormalize)
+TEST_F(EnergyPlusFixture, VectorsTest_VecNormalize)
 {
-    ShowMessage("Begin Test: VectorsTest, VecNormalize");
     {
         Vector const v(3.0, 3.0, 3.0);
         Vector const n(VecNormalize(v));
@@ -98,9 +98,8 @@ TEST(VectorsTest, VecNormalize)
     }
 }
 
-TEST(VectorsTest, VecRound)
+TEST_F(EnergyPlusFixture, VectorsTest_VecRound)
 {
-    ShowMessage("Begin Test: VectorsTest, VecRound");
     Vector v(11.567, -33.602, 55.981);
     VecRound(v, 2.0);
     EXPECT_DOUBLE_EQ(11.5, v.x);
@@ -108,7 +107,7 @@ TEST(VectorsTest, VecRound)
     EXPECT_DOUBLE_EQ(56.0, v.z);
 }
 
-TEST(VectorTest, CoplnarPoints) {
+TEST_F(EnergyPlusFixture, VectorsTest_CoplnarPoints) {
     {
         Array1D<Vector> base = {Vector(0, 0, 0), Vector(1, 0, 0), Vector(1, 1, 0), Vector(0, 1, 0)};
         std::vector<int> coplanarPoints;

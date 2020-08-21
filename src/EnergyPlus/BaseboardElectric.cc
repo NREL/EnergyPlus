@@ -102,12 +102,11 @@ namespace BaseboardElectric {
         using General::TrimSigDigits;
 
         int BaseboardNum;               // index of unit in baseboard array
-        static bool GetInputFlag(true); // one time get input flag
         Real64 QZnReq;                  // zone load not yet satisfied
 
-        if (GetInputFlag) {
+        if (state.dataBaseboardElectric.getInputFlag) {
             GetBaseboardInput(state.dataBaseboardElectric);
-            GetInputFlag = false;
+            state.dataBaseboardElectric.getInputFlag = false;
         }
 
         auto &baseboard = state.dataBaseboardElectric;
@@ -189,7 +188,7 @@ namespace BaseboardElectric {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
 
         int CtrlZone;         // index to constrolled zone number
         int ZoneEquipTypeNum; // index to zone equipment in a zone equipment list
@@ -350,19 +349,19 @@ namespace BaseboardElectric {
                                 "Average",
                                 thisBaseboard.EquipName);
 
-            SetupOutputVariable("Baseboard Electric Energy",
+            SetupOutputVariable("Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.ElecUseLoad,
                                 "System",
                                 "Sum",
                                 thisBaseboard.EquipName,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "HEATING",
                                 _,
                                 "System");
 
-            SetupOutputVariable("Baseboard Electric Power",
+            SetupOutputVariable("Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 thisBaseboard.ElecUseRate,
                                 "System",
@@ -390,23 +389,21 @@ namespace BaseboardElectric {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNode;
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         static Array1D_bool MyEnvrnFlag;
 
         // Do the one time initializations
-        if (MyOneTimeFlag) {
+        if (baseboard.MyOneTimeFlag) {
             // initialize the environment and sizing flags
             MyEnvrnFlag.allocate(baseboard.NumBaseboards);
             MyEnvrnFlag = true;
 
-            MyOneTimeFlag = false;
+            baseboard.MyOneTimeFlag = false;
         }
 
         // need to check all units to see if they are on ZoneHVAC:EquipmentList or issue warning
-        if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
-            ZoneEquipmentListChecked = true;
+        if (!baseboard.ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
+            baseboard.ZoneEquipmentListChecked = true;
             for (Loop = 1; Loop <= baseboard.NumBaseboards; ++Loop) {
                 if (CheckZoneEquipmentList(baseboard.Baseboard(Loop).EquipType, baseboard.Baseboard(Loop).EquipName)) continue;
                 ShowSevereError("InitBaseboard: Unit=[" + baseboard.Baseboard(Loop).EquipType + ',' + baseboard.Baseboard(Loop).EquipName +

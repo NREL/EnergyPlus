@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -66,7 +67,6 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -115,7 +115,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &sta
 )
 {
     if (getInputFlag_) {
-        getPowerManagerInput();
+        getPowerManagerInput(state.files);
         getInputFlag_ = false;
     }
 
@@ -195,7 +195,7 @@ void ElectricPowerServiceManager::reinitZoneGainsAtBeginEnvironment()
     }
 }
 
-void ElectricPowerServiceManager::getPowerManagerInput()
+void ElectricPowerServiceManager::getPowerManagerInput(IOFiles &ioFiles)
 {
     std::string const routineName = "ElectricPowerServiceManager  getPowerManagerInput ";
 
@@ -204,7 +204,7 @@ void ElectricPowerServiceManager::getPowerManagerInput()
     if (numLoadCenters_ > 0) {
         for (auto iLoadCenterNum = 1; iLoadCenterNum <= numLoadCenters_; ++iLoadCenterNum) {
             // call Electric Power Load Center constructor, in place
-            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(iLoadCenterNum));
+            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(ioFiles, iLoadCenterNum));
         }
     } else {
         // issue #4639. see if there are any generators, inverters, converters, or storage devcies, that really need a ElectricLoadCenter:Distribution
@@ -247,7 +247,7 @@ void ElectricPowerServiceManager::getPowerManagerInput()
         int anyElectricityPresent = GetMeterIndex("ELECTRICITY:FACILITY");
         int anyPlantLoadProfilePresent = inputProcessor->getNumObjectsFound("LoadProfile:Plant");
         if (anyElectricityPresent > 0 || anyPlantLoadProfilePresent > 0) {
-            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(0));
+            elecLoadCenterObjs.emplace_back(new ElectPowerLoadCenter(ioFiles, 0));
             numLoadCenters_ = 1;
         }
     }
@@ -308,8 +308,8 @@ void ElectricPowerServiceManager::getPowerManagerInput()
     } // if transformers
 
     if (numLoadCenters_ > 0) {
-        SetupOutputVariable("Facility Total Purchased Electric Power", OutputProcessor::Unit::W, electPurchRate_, "System", "Average", name_);
-        SetupOutputVariable("Facility Total Purchased Electric Energy",
+        SetupOutputVariable("Facility Total Purchased Electricity Rate", OutputProcessor::Unit::W, electPurchRate_, "System", "Average", name_);
+        SetupOutputVariable("Facility Total Purchased Electricity Energy",
                             OutputProcessor::Unit::J,
                             electricityPurch_,
                             "System",
@@ -321,8 +321,8 @@ void ElectricPowerServiceManager::getPowerManagerInput()
                             _,
                             "Plant");
 
-        SetupOutputVariable("Facility Total Surplus Electric Power", OutputProcessor::Unit::W, electSurplusRate_, "System", "Average", name_);
-        SetupOutputVariable("Facility Total Surplus Electric Energy",
+        SetupOutputVariable("Facility Total Surplus Electricity Rate", OutputProcessor::Unit::W, electSurplusRate_, "System", "Average", name_);
+        SetupOutputVariable("Facility Total Surplus Electricity Energy",
                             OutputProcessor::Unit::J,
                             electricitySurplus_,
                             "System",
@@ -334,8 +334,8 @@ void ElectricPowerServiceManager::getPowerManagerInput()
                             _,
                             "Plant");
 
-        SetupOutputVariable("Facility Net Purchased Electric Power", OutputProcessor::Unit::W, electricityNetRate_, "System", "Average", name_);
-        SetupOutputVariable("Facility Net Purchased Electric Energy",
+        SetupOutputVariable("Facility Net Purchased Electricity Rate", OutputProcessor::Unit::W, electricityNetRate_, "System", "Average", name_);
+        SetupOutputVariable("Facility Net Purchased Electricity Energy",
                             OutputProcessor::Unit::J,
                             electricityNet_,
                             "System",
@@ -348,12 +348,12 @@ void ElectricPowerServiceManager::getPowerManagerInput()
                             "Plant");
 
         SetupOutputVariable(
-            "Facility Total Building Electric Demand Power", OutputProcessor::Unit::W, totalBldgElecDemand_, "System", "Average", name_);
-        SetupOutputVariable("Facility Total HVAC Electric Demand Power", OutputProcessor::Unit::W, totalHVACElecDemand_, "System", "Average", name_);
-        SetupOutputVariable("Facility Total Electric Demand Power", OutputProcessor::Unit::W, totalElectricDemand_, "System", "Average", name_);
+            "Facility Total Building Electricity Demand Rate", OutputProcessor::Unit::W, totalBldgElecDemand_, "System", "Average", name_);
+        SetupOutputVariable("Facility Total HVAC Electricity Demand Rate", OutputProcessor::Unit::W, totalHVACElecDemand_, "System", "Average", name_);
+        SetupOutputVariable("Facility Total Electricity Demand Rate", OutputProcessor::Unit::W, totalElectricDemand_, "System", "Average", name_);
 
-        SetupOutputVariable("Facility Total Produced Electric Power", OutputProcessor::Unit::W, electProdRate_, "System", "Average", name_);
-        SetupOutputVariable("Facility Total Produced Electric Energy", OutputProcessor::Unit::J, electricityProd_, "System", "Sum", name_);
+        SetupOutputVariable("Facility Total Produced Electricity Rate", OutputProcessor::Unit::W, electProdRate_, "System", "Average", name_);
+        SetupOutputVariable("Facility Total Produced Electricity Energy", OutputProcessor::Unit::J, electricityProd_, "System", "Sum", name_);
 
         reportPVandWindCapacity();
 
@@ -608,8 +608,7 @@ void ElectricPowerServiceManager::checkLoadCenters()
     }
 }
 
-ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
-    int const objectNum)
+ElectPowerLoadCenter::ElectPowerLoadCenter(IOFiles &ioFiles, int const objectNum)
     : numGenerators(0), bussType(ElectricBussType::notYetSet), thermalProd(0.0), thermalProdRate(0.0), inverterPresent(false),
       subpanelFeedInRequest(0.0), subpanelFeedInRate(0.0), subpanelDrawRate(0.0), genElectricProd(0.0), genElectProdRate(0.0), storOpCVDrawRate(0.0),
       storOpCVFeedInRate(0.0), storOpCVChargeRate(0.0), storOpCVDischargeRate(0.0), storOpIsCharging(false), storOpIsDischarging(false),
@@ -902,7 +901,8 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
         for (auto genCount = 1; genCount <= numGenerators; ++genCount) {
             // call constructor in place
             generatorsPresent_ = true;
-            elecGenCntrlObj.emplace_back(new GeneratorController(DataIPShortCuts::cAlphaArgs(alphaCount),
+            elecGenCntrlObj.emplace_back(new GeneratorController(ioFiles,
+                                                                 DataIPShortCuts::cAlphaArgs(alphaCount),
                                                                  DataIPShortCuts::cAlphaArgs(alphaCount + 1),
                                                                  DataIPShortCuts::rNumericArgs(2 * genCount - 1),
                                                                  DataIPShortCuts::cAlphaArgs(alphaCount + 2),
@@ -990,13 +990,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
     }
 
     // Setup general output variables for reporting in the electric load center
-    SetupOutputVariable("Electric Load Center Produced Electric Power", OutputProcessor::Unit::W, genElectProdRate, "System", "Average", name_);
-    SetupOutputVariable("Electric Load Center Produced Electric Energy", OutputProcessor::Unit::J, genElectricProd, "System", "Sum", name_);
-    SetupOutputVariable("Electric Load Center Supplied Electric Power", OutputProcessor::Unit::W, subpanelFeedInRate, "System", "Average", name_);
-    SetupOutputVariable("Electric Load Center Drawn Electric Power", OutputProcessor::Unit::W, subpanelDrawRate, "System", "Average", name_);
+    SetupOutputVariable("Electric Load Center Produced Electricity Rate", OutputProcessor::Unit::W, genElectProdRate, "System", "Average", name_);
+    SetupOutputVariable("Electric Load Center Produced Electricity Energy", OutputProcessor::Unit::J, genElectricProd, "System", "Sum", name_);
+    SetupOutputVariable("Electric Load Center Supplied Electricity Rate", OutputProcessor::Unit::W, subpanelFeedInRate, "System", "Average", name_);
+    SetupOutputVariable("Electric Load Center Drawn Electricity Rate", OutputProcessor::Unit::W, subpanelDrawRate, "System", "Average", name_);
     SetupOutputVariable("Electric Load Center Produced Thermal Rate", OutputProcessor::Unit::W, thermalProdRate, "System", "Average", name_);
     SetupOutputVariable("Electric Load Center Produced Thermal Energy", OutputProcessor::Unit::J, thermalProd, "System", "Sum", name_);
-    SetupOutputVariable("Electric Load Center Requested Electric Power", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_);
+    SetupOutputVariable("Electric Load Center Requested Electricity Rate", OutputProcessor::Unit::W, totalPowerRequest_, "System", "Average", name_);
 
     if (DataGlobals::AnyEnergyManagementSystemInModel && storagePresent_) {
         SetupEMSActuator("Electrical Storage", name_, "Power Draw Rate", "[W]", eMSOverridePelFromStorage_, eMSValuePelFromStorage_);
@@ -1967,7 +1967,8 @@ Real64 ElectPowerLoadCenter::calcLoadCenterThermalLoad(BranchInputManagerData &d
     return thermalLoad;
 }
 
-GeneratorController::GeneratorController(std::string const &objectName,
+GeneratorController::GeneratorController(IOFiles &ioFiles,
+                                         std::string const &objectName,
                                          std::string const &objectType,
                                          Real64 ratedElecPowerOutput,
                                          std::string const &availSchedName,
@@ -2013,7 +2014,7 @@ GeneratorController::GeneratorController(std::string const &objectName,
         // exhaust gas HX is required and it assumed that it has more thermal capacity and is used for control
         compPlantTypeOf_Num = DataPlant::TypeOf_Generator_FCExhaust;
         // and the name of plant component is not the same as the generator because of child object references, so fetch that name
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(ioFiles, name);
         compPlantName = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->ExhaustHX.Name;
     } else if (UtilityRoutines::SameString(objectType, "Generator:MicroCHP")) {
         generatorType = GeneratorType::microCHP;
@@ -2069,7 +2070,7 @@ GeneratorController::GeneratorController(std::string const &objectName,
 
     maxPowerOut = ratedElecPowerOutput, nominalThermElectRatio = thermalToElectRatio;
 
-    SetupOutputVariable("Generator Requested Electric Power", OutputProcessor::Unit::W, powerRequestThisTimestep, "System", "Average", objectName);
+    SetupOutputVariable("Generator Requested Electricity Rate", OutputProcessor::Unit::W, powerRequestThisTimestep, "System", "Average", objectName);
     if (DataGlobals::AnyEnergyManagementSystemInModel) {
         SetupEMSInternalVariable("Generator Nominal Maximum Power", objectName, "[W]", maxPowerOut);
         SetupEMSInternalVariable("Generator Nominal Thermal To Electric Ratio", objectName, "[ratio]", nominalThermElectRatio);
@@ -2088,7 +2089,8 @@ void GeneratorController::reinitAtBeginEnvironment()
     thermProdRate = 0.0;
 }
 
-void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,
+void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state,
+                                                     bool const runFlag,
                                                      Real64 const myElecLoadRequest,
                                                      bool const FirstHVACIteration, // Unused 2010 JANUARY
                                                      Real64 &electricPowerOutput,   // Actual generator electric power output
@@ -2119,7 +2121,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
     }
     case GeneratorType::combTurbine: {
 
-        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(name);
+        auto thisCTE = CTElectricGenerator::CTGeneratorData::factory(state.dataCTElectricGenerator, name);
         // dummy vars
         PlantLocation L(0,0,0,0);
         Real64 tempLoad = myElecLoadRequest;
@@ -2153,7 +2155,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
         break;
     }
     case GeneratorType::fuelCell: {
-        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(name);
+        auto thisFC = FuelCellElectricGenerator::FCDataStruct::factory(state.files, name);
         dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->SimFuelCellGenerator(state.dataBranchInputManager, runFlag, myElecLoadRequest, FirstHVACIteration);
         electProdRate = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACPowerGen;
         electricityProd = dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (thisFC)->Report.ACEnergyGen;
@@ -2164,7 +2166,7 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
         break;
     }
     case GeneratorType::microCHP: {
-        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(name);
+        auto thisMCHP = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state.files, name);
 
         // simulate
         dynamic_cast<MicroCHPElectricGenerator::MicroCHPDataStruct*> (thisMCHP)->InitMicroCHPNoNormalizeGenerators(state.dataBranchInputManager);
@@ -2207,8 +2209,8 @@ void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool
         break;
     }
     case GeneratorType::windTurbine: {
-        WindTurbine::SimWindTurbine(DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
-        WindTurbine::GetWTGeneratorResults(
+        WindTurbine::SimWindTurbine(state, DataGlobalConstants::iGeneratorWindTurbine, name, generatorIndex, runFlag, myElecLoadRequest);
+        WindTurbine::GetWTGeneratorResults(state.dataWindTurbine,
             DataGlobalConstants::iGeneratorWindTurbine, generatorIndex, electProdRate, electricityProd, thermProdRate, thermalProd);
         electricPowerOutput = electProdRate;
         thermalPowerOutput = thermProdRate;
@@ -2386,10 +2388,10 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
         } // end switch modelType
 
         SetupOutputVariable("Inverter DC to AC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_);
-        SetupOutputVariable("Inverter DC Input Electric Power", OutputProcessor::Unit::W, dCPowerIn_, "System", "Average", name_);
-        SetupOutputVariable("Inverter DC Input Electric Energy", OutputProcessor::Unit::J, dCEnergyIn_, "System", "Sum", name_);
-        SetupOutputVariable("Inverter AC Output Electric Power", OutputProcessor::Unit::W, aCPowerOut_, "System", "Average", name_);
-        SetupOutputVariable("Inverter AC Output Electric Energy", OutputProcessor::Unit::J, aCEnergyOut_, "System", "Sum", name_);
+        SetupOutputVariable("Inverter DC Input Electricity Rate", OutputProcessor::Unit::W, dCPowerIn_, "System", "Average", name_);
+        SetupOutputVariable("Inverter DC Input Electricity Energy", OutputProcessor::Unit::J, dCEnergyIn_, "System", "Sum", name_);
+        SetupOutputVariable("Inverter AC Output Electricity Rate", OutputProcessor::Unit::W, aCPowerOut_, "System", "Average", name_);
+        SetupOutputVariable("Inverter AC Output Electricity Energy", OutputProcessor::Unit::J, aCEnergyOut_, "System", "Sum", name_);
         SetupOutputVariable("Inverter Conversion Loss Power", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_);
         SetupOutputVariable("Inverter Conversion Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_);
         SetupOutputVariable("Inverter Conversion Loss Decrement Energy",
@@ -2405,8 +2407,8 @@ DCtoACInverter::DCtoACInverter(std::string const &objectName)
                             "Plant");
         SetupOutputVariable("Inverter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
         SetupOutputVariable("Inverter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
-        SetupOutputVariable("Inverter Ancillary AC Electric Power", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_);
-        SetupOutputVariable("Inverter Ancillary AC Electric Energy",
+        SetupOutputVariable("Inverter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_);
+        SetupOutputVariable("Inverter Ancillary AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             ancillACuseEnergy_,
                             "System",
@@ -2756,13 +2758,13 @@ ACtoDCConverter::ACtoDCConverter(std::string const &objectName)
         zoneRadFract_ = DataIPShortCuts::rNumericArgs(4);
 
         SetupOutputVariable("Converter AC to DC Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_);
-        SetupOutputVariable("Converter AC Input Electric Power", OutputProcessor::Unit::W, aCPowerIn_, "System", "Average", name_);
-        SetupOutputVariable("Converter AC Input Electric Energy", OutputProcessor::Unit::J, aCEnergyIn_, "System", "Sum", name_);
-        SetupOutputVariable("Converter DC Output Electric Power", OutputProcessor::Unit::W, dCPowerOut_, "System", "Average", name_);
-        SetupOutputVariable("Converter DC Output Electric Energy", OutputProcessor::Unit::J, dCEnergyOut_, "System", "Sum", name_);
-        SetupOutputVariable("Converter Electric Loss Power", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_);
-        SetupOutputVariable("Converter Electric Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_);
-        SetupOutputVariable("Converter Electric Loss Decrement Energy",
+        SetupOutputVariable("Converter AC Input Electricity Rate", OutputProcessor::Unit::W, aCPowerIn_, "System", "Average", name_);
+        SetupOutputVariable("Converter AC Input Electricity Energy", OutputProcessor::Unit::J, aCEnergyIn_, "System", "Sum", name_);
+        SetupOutputVariable("Converter DC Output Electricity Rate", OutputProcessor::Unit::W, dCPowerOut_, "System", "Average", name_);
+        SetupOutputVariable("Converter DC Output Electricity Energy", OutputProcessor::Unit::J, dCEnergyOut_, "System", "Sum", name_);
+        SetupOutputVariable("Converter Electricity Loss Rate", OutputProcessor::Unit::W, conversionLossPower_, "System", "Average", name_);
+        SetupOutputVariable("Converter Electricity Loss Energy", OutputProcessor::Unit::J, conversionLossEnergy_, "System", "Sum", name_);
+        SetupOutputVariable("Converter Electricity Loss Decrement Energy",
                             OutputProcessor::Unit::J,
                             conversionLossEnergyDecrement_,
                             "System",
@@ -2775,8 +2777,8 @@ ACtoDCConverter::ACtoDCConverter(std::string const &objectName)
                             "Plant");
         SetupOutputVariable("Converter Thermal Loss Rate", OutputProcessor::Unit::W, thermLossRate_, "System", "Average", name_);
         SetupOutputVariable("Converter Thermal Loss Energy", OutputProcessor::Unit::J, thermLossEnergy_, "System", "Sum", name_);
-        SetupOutputVariable("Converter Ancillary AC Electric Power", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_);
-        SetupOutputVariable("Converter Ancillary AC Electric Energy",
+        SetupOutputVariable("Converter Ancillary AC Electricity Rate", OutputProcessor::Unit::W, ancillACuseRate_, "System", "Average", name_);
+        SetupOutputVariable("Converter Ancillary AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             ancillACuseEnergy_,
                             "System",
@@ -4056,10 +4058,10 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
             }
         }
         SetupOutputVariable("Transformer Efficiency", OutputProcessor::Unit::None, efficiency_, "System", "Average", name_);
-        SetupOutputVariable("Transformer Input Electric Power", OutputProcessor::Unit::W, powerIn_, "System", "Average", name_);
-        SetupOutputVariable("Transformer Input Electric Energy", OutputProcessor::Unit::J, energyIn_, "System", "Sum", name_);
-        SetupOutputVariable("Transformer Output Electric Power", OutputProcessor::Unit::W, powerOut_, "System", "Average", name_);
-        SetupOutputVariable("Transformer Output Electric Energy", OutputProcessor::Unit::J, energyOut_, "System", "Sum", name_);
+        SetupOutputVariable("Transformer Input Electricity Rate", OutputProcessor::Unit::W, powerIn_, "System", "Average", name_);
+        SetupOutputVariable("Transformer Input Electricity Energy", OutputProcessor::Unit::J, energyIn_, "System", "Sum", name_);
+        SetupOutputVariable("Transformer Output Electricity Rate", OutputProcessor::Unit::W, powerOut_, "System", "Average", name_);
+        SetupOutputVariable("Transformer Output Electricity Energy", OutputProcessor::Unit::J, energyOut_, "System", "Sum", name_);
         SetupOutputVariable("Transformer No Load Loss Rate", OutputProcessor::Unit::W, noLoadLossRate_, "System", "Average", name_);
         SetupOutputVariable("Transformer No Load Loss Energy", OutputProcessor::Unit::J, noLoadLossEnergy_, "System", "Sum", name_);
         SetupOutputVariable("Transformer Load Loss Rate", OutputProcessor::Unit::W, loadLossRate_, "System", "Average", name_);
@@ -4067,7 +4069,7 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
         SetupOutputVariable("Transformer Thermal Loss Rate", OutputProcessor::Unit::W, thermalLossRate_, "System", "Average", name_);
         SetupOutputVariable("Transformer Thermal Loss Energy", OutputProcessor::Unit::J, thermalLossEnergy_, "System", "Sum", name_);
         if (usageMode_ == TransformerUse::powerInFromGrid) { // power losses metered as an end use exterior equipment
-            SetupOutputVariable("Transformer Distribution Electric Loss Energy",
+            SetupOutputVariable("Transformer Distribution Electricity Loss Energy",
                                 OutputProcessor::Unit::J,
                                 elecUseMeteredUtilityLosses_,
                                 "System",
@@ -4080,7 +4082,7 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
                                 "System");
         }
         if (usageMode_ == TransformerUse::powerOutFromBldgToGrid) {
-            SetupOutputVariable("Transformer Cogeneration Electric Loss Energy",
+            SetupOutputVariable("Transformer Cogeneration Electricity Loss Energy",
                                 OutputProcessor::Unit::J,
                                 powerConversionMeteredLosses_,
                                 "System",
@@ -4093,7 +4095,7 @@ ElectricTransformer::ElectricTransformer(std::string const &objectName)
                                 "System");
         }
         if (usageMode_ == TransformerUse::powerBetweenLoadCenterAndBldg) {
-            SetupOutputVariable("Transformer Conversion Electric Loss Energy",
+            SetupOutputVariable("Transformer Conversion Electricity Loss Energy",
                                 OutputProcessor::Unit::J,
                                 powerConversionMeteredLosses_,
                                 "System",

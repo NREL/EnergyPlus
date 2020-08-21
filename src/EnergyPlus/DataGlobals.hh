@@ -51,13 +51,16 @@
 // C++ Headers
 #include <iosfwd>
 #include <string>
+#include <functional>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include "OutputFiles.hh"
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
 
 namespace DataGlobals {
 
@@ -75,6 +78,9 @@ namespace DataGlobals {
     extern bool isUBJSON;
     extern bool isBSON;
     extern bool preserveIDFOrder;
+    extern bool stopSimulation;
+    extern std::function<void (void *)> externalHVACManager;
+    extern bool externalHVACManagerInitialized;
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const BeginDay;
@@ -132,12 +138,13 @@ namespace DataGlobals {
     extern int const emsCallFromEndZoneTimestepAfterZoneReporting;    // Identity where EMS called from
     extern int const emsCallFromSetupSimulation;                      // identify where EMS called from,
     // this is for input processing only
-    extern int const emsCallFromExternalInterface;         // Identity where EMS called from
-    extern int const emsCallFromComponentGetInput;         // EMS called from end of get input for a component
-    extern int const emsCallFromUserDefinedComponentModel; // EMS called from inside a custom user component model
-    extern int const emsCallFromUnitarySystemSizing;       // EMS called from unitary system compound component
-    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance; // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance; // Identity where EMS called from
+    extern int const emsCallFromExternalInterface;                        // Identity where EMS called from
+    extern int const emsCallFromComponentGetInput;                        // EMS called from end of get input for a component
+    extern int const emsCallFromUserDefinedComponentModel;                // EMS called from inside a custom user component model
+    extern int const emsCallFromUnitarySystemSizing;                      // EMS called from unitary system compound component
+    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance;   // Identity where EMS called from
+    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance;    // Identity where EMS called from
+    extern int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather; // Identity where EMS called from
 
     extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
 
@@ -149,64 +156,6 @@ namespace DataGlobals {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    struct JsonOutputStreams
-    {
-        std::ostream *json_stream = nullptr; // Internal stream used for json output
-        std::ostream *json_TSstream_Zone = nullptr;
-        std::ostream *json_TSstream_HVAC = nullptr;
-        std::ostream *json_TSstream = nullptr;
-        std::ostream *json_HRstream = nullptr;
-        std::ostream *json_MNstream = nullptr;
-        std::ostream *json_DYstream = nullptr;
-        std::ostream *json_SMstream = nullptr;
-        std::ostream *json_YRstream = nullptr;
-        std::ostream *cbor_stream = nullptr; // Internal stream used for cbor output
-        std::ostream *cbor_TSstream_Zone = nullptr;
-        std::ostream *cbor_TSstream_HVAC = nullptr;
-        std::ostream *cbor_TSstream = nullptr;
-        std::ostream *cbor_HRstream = nullptr;
-        std::ostream *cbor_MNstream = nullptr;
-        std::ostream *cbor_DYstream = nullptr;
-        std::ostream *cbor_SMstream = nullptr;
-        std::ostream *cbor_YRstream = nullptr;
-        std::ostream *msgpack_stream = nullptr; // Internal stream used for messagepack output
-        std::ostream *msgpack_TSstream_Zone = nullptr;
-        std::ostream *msgpack_TSstream_HVAC = nullptr;
-        std::ostream *msgpack_TSstream = nullptr;
-        std::ostream *msgpack_HRstream = nullptr;
-        std::ostream *msgpack_MNstream = nullptr;
-        std::ostream *msgpack_DYstream = nullptr;
-        std::ostream *msgpack_SMstream = nullptr;
-        std::ostream *msgpack_YRstream = nullptr;
-
-        int OutputFileJson = 0; // Unit number for Schema output
-        int OutputFileTSZoneJson = 0;
-        int OutputFileTSHVACJson = 0;
-        int OutputFileTSJson = 0;
-        int OutputFileHRJson = 0;
-        int OutputFileDYJson = 0;
-        int OutputFileMNJson = 0;
-        int OutputFileSMJson = 0;
-        int OutputFileYRJson = 0;
-        int OutputFileCBOR = 0; // Unit number for Schema output
-        int OutputFileTSZoneCBOR = 0;
-        int OutputFileTSHVACCBOR = 0;
-        int OutputFileTSCBOR = 0;
-        int OutputFileHRCBOR = 0;
-        int OutputFileDYCBOR = 0;
-        int OutputFileMNCBOR = 0;
-        int OutputFileSMCBOR = 0;
-        int OutputFileYRCBOR = 0;
-        int OutputFileMsgPack = 0; // Unit number for Schema output
-        int OutputFileTSZoneMsgPack = 0;
-        int OutputFileTSHVACMsgPack = 0;
-        int OutputFileTSMsgPack = 0;
-        int OutputFileHRMsgPack = 0;
-        int OutputFileDYMsgPack = 0;
-        int OutputFileMNMsgPack = 0;
-        int OutputFileSMMsgPack = 0;
-        int OutputFileYRMsgPack = 0;
-    };
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
@@ -233,11 +182,8 @@ namespace DataGlobals {
     extern int TimeStep;                             // Counter for time steps (fractional hours)
     extern Real64 TimeStepZone;                      // Zone time step in fractional hours
     extern bool WarmupFlag;                          // True during the warmup portion of a simulation
-    extern JsonOutputStreams jsonOutputStreams;      // Internal streams used for json outputs
     extern int OutputStandardError;                  // Unit number for the standard error output file
-    extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int StdMeterRecordCount;                  // Count of Meter output records
     extern bool ZoneSizingCalc;                      // TRUE if zone sizing calculation
     extern bool SysSizingCalc;                       // TRUE if system sizing calculation
@@ -290,14 +236,14 @@ namespace DataGlobals {
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
     // these are the new ones
-    extern void (*progressCallback)(int const);
-    extern void (*messageCallback)(const char * message);
-    extern void (*errorCallback)(const char * errorMessage);
+    extern std::function<void(int const)> progressCallback;
+    extern std::function<void(const std::string &)> messageCallback;
+    extern std::function<void(EnergyPlus::Error, const std::string &)> errorCallback;
     extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state(EnergyPlus::OutputFiles &outputFiles);
+    void clear_state(EnergyPlus::IOFiles &ioFiles);
 
 } // namespace DataGlobals
 

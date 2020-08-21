@@ -127,8 +127,14 @@ namespace EcoRoofManager {
     Real64 CurrentIrrigation;    // units of (m) per timestep
 
     Real64 Tfold; // leaf temperature from the previous time step
-    Real64 Tgold; // ground temperature from the previous time step
+    Real64 Tgold; // ground temperature from the previous time step // TODO: These probably need to be re-initialized
     bool EcoRoofbeginFlag(true);
+    bool CalcEcoRoofMyEnvrnFlag(true);
+
+    void clear_state() {
+        EcoRoofbeginFlag = true;
+        CalcEcoRoofMyEnvrnFlag = true;
+    }
 
     // MODULE SUBROUTINES:
 
@@ -136,10 +142,12 @@ namespace EcoRoofManager {
 
     // Functions
 
-    void CalcEcoRoof(int const SurfNum, // Indicator of Surface Number for the current surface
+    void CalcEcoRoof(ConvectionCoefficientsData &dataConvectionCoefficients,
+                     IOFiles &ioFiles,
+                     int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface
-                     int &ConstrNum,    // Indicator for contruction index for the current surface
-                     Real64 &TempExt    // Exterior temperature boundary condidtion
+                     int &ConstrNum,    // Indicator for construction index for the current surface
+                     Real64 &TempExt    // Exterior temperature boundary condition
     )
     {
         // SUBROUTINE INFORMATION
@@ -306,8 +314,7 @@ namespace EcoRoofManager {
         Real64 Qsoilpart2;         // intermediate variable for evaluating Qsoil (part coeff of the ground temperature)
 
         //  INTEGER,EXTERNAL :: GetNewUnitNumber ! external function to return a new (unique) unit for ecoroof writing
-        static int unit(0);
-        static bool MyEnvrnFlag(true);
+        int unit(0); // not actually used in the function it is passed into
 
         Ws = WindSpeedAt(Surface(SurfNum).Centroid.z); // use windspeed at Z of roof
         if (Ws < 2.0) {                                // Later we need to adjust for building roof height...
@@ -321,7 +328,9 @@ namespace EcoRoofManager {
         HMovInsul = 0.0;
 
         if (Surface(SurfNum).ExtWind) {
-            InitExteriorConvectionCoeff(SurfNum,
+            InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                                        ioFiles,
+                                        SurfNum,
                                         HMovInsul,
                                         RoughSurf,
                                         AbsThermSurf,
@@ -412,7 +421,7 @@ namespace EcoRoofManager {
         }
         // DJS July 2007
 
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
+        if (BeginEnvrnFlag && CalcEcoRoofMyEnvrnFlag) {
             Tgold = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             Tfold = OutDryBulbTempAt(Surface(SurfNum).Centroid.z); // OutDryBulbTemp           ! initial guess
             Tg = 10.0;
@@ -427,11 +436,11 @@ namespace EcoRoofManager {
             CurrentET = 0.0;
             CurrentPrecipitation = 0.0;
             CurrentIrrigation = 0.0;
-            MyEnvrnFlag = false;
+            CalcEcoRoofMyEnvrnFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            CalcEcoRoofMyEnvrnFlag = true;
         }
 
         // If current surface is = FirstEcoSurf then for this time step we need to update the soil moisture

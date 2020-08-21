@@ -3,9 +3,9 @@ eplusmtr.csv
 Cooling:Electricity
 DHW:Gas
 Fans:Electricity
-Gas:Facility
-Gas:HVAC
-Gas:Plant
+NaturalGas:Facility
+NaturalGas:HVAC
+NaturalGas:Plant
 Water:Plant
 DHW:Water
 InteriorLights:Electricity
@@ -14,7 +14,7 @@ InteriorLights:Electricity:Zone:NORTHZONE_2NDFLOOR
 InteriorLights:Electricity:Zone:SOUTHZONE_1STFLOOR
 InteriorLights:Electricity:Zone:SOUTHZONE_2NDFLOOR
 Heating:Electricity
-Heating:Gas
+Heating:NaturalGas
 InteriorEquipment:Electricity
 Electricity:HVAC
 Electricity:Building

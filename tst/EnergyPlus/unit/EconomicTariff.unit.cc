@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GetInput_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    UpdateUtilityBills();
+    UpdateUtilityBills(state.dataCostEstimateManager);
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -263,7 +263,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_DefaultConv_Test)
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills();
+    UpdateUtilityBills(state.dataCostEstimateManager);
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -306,7 +306,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Water_CCF_Test)
     EnergyMeters(1).Name = "WATER:FACILITY";
     EnergyMeters(1).ResourceType = "WATER";
 
-    UpdateUtilityBills();
+    UpdateUtilityBills(state.dataCostEstimateManager);;
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     std::string const idf_objects = delimited_string({
         "  UtilityCost:Tariff,                                                       ",
         "    ExampleTariff,           !- Name                                        ",
-        "    Gas:Facility,            !- Output Meter Name                           ",
+        "    NaturalGas:Facility,     !- Output Meter Name                           ",
         "    CCF,                     !- Conversion Factor Choice                    ",
         "    ,                        !- Energy Conversion Factor                    ",
         "    ,                        !- Demand Conversion Factor                    ",
@@ -343,10 +343,10 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     // Create a water meter
     NumEnergyMeters = 1;
     EnergyMeters.allocate(NumEnergyMeters);
-    EnergyMeters(1).Name = "GAS:FACILITY";
-    EnergyMeters(1).ResourceType = "GAS";
+    EnergyMeters(1).Name = "NATURALGAS:FACILITY";
+    EnergyMeters(1).ResourceType = "NATURALGAS";
 
-    UpdateUtilityBills();
+    UpdateUtilityBills(state.dataCostEstimateManager);;
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -387,7 +387,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Electric_CCF_Test)
     EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
     EnergyMeters(1).ResourceType = "ELECTRICITY";
 
-    UpdateUtilityBills();
+    UpdateUtilityBills(state.dataCostEstimateManager);;
 
     // tariff
     EXPECT_EQ(1, numTariff);
@@ -409,7 +409,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     NumEnergyMeters = 4;
     EnergyMeters.allocate(NumEnergyMeters);
     EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
-    EnergyMeters(2).Name = "GAS:FACILITY";
+    EnergyMeters(2).Name = "NATURALGAS:FACILITY";
     EnergyMeters(3).Name = "DISTRICTCOOLING:FACILITY";
     EnergyMeters(4).Name = "DISTRICTHEATING:FACILITY";
 
@@ -588,14 +588,14 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(state.exteriorEnergyUse);
     EXPECT_EQ(1, state.exteriorEnergyUse.NumExteriorLights);
     EXPECT_EQ(1000, state.exteriorEnergyUse.ExteriorLights(1).DesignLevel);
 
 
     // This will only do the get input routines
-    EconomicTariff::UpdateUtilityBills();
+    EconomicTariff::UpdateUtilityBills(state.dataCostEstimateManager);;
 
     // tariff
     EXPECT_EQ(1, EconomicTariff::numTariff);
@@ -649,7 +649,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
 
     // This Should now call GatherForEconomics
     DataGlobals::DoOutputReporting = true;
-    EconomicTariff::UpdateUtilityBills();
+    EconomicTariff::UpdateUtilityBills(state.dataCostEstimateManager);;
     EXPECT_EQ(1, EconomicTariff::tariff(1).seasonForMonth(5));
     EXPECT_EQ(0, EconomicTariff::tariff(1).seasonForMonth(6));
 
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(state.exteriorEnergyUse.ExteriorLights(1).Power * DataGlobals::TimeStepZoneSec, state.exteriorEnergyUse.ExteriorLights(1).CurrentUse);
 
     // This Should now call GatherForEconomics
-    EconomicTariff::UpdateUtilityBills();
+    EconomicTariff::UpdateUtilityBills(state.dataCostEstimateManager);;
     EXPECT_EQ(1, EconomicTariff::tariff(1).seasonForMonth(5));
     EXPECT_EQ(3, EconomicTariff::tariff(1).seasonForMonth(6));
 

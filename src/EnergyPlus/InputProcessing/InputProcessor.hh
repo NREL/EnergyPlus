@@ -79,9 +79,6 @@ class InputProcessor
 public:
     using json = nlohmann::json;
 
-    friend class EnergyPlusFixture;
-    friend class InputProcessorFixture;
-
     json::parser_callback_t callback;
 
     InputProcessor();
@@ -177,6 +174,8 @@ public:
 
     void preScanReportingVariables();
 
+    void reportIDFRecordsStats();
+
     void reportOrphanRecordObjects();
 
     const json &getObjectInstances(std::string const &ObjType);
@@ -184,6 +183,9 @@ public:
     void clear_state();
 
 private:
+    friend class EnergyPlusFixture;
+    friend class InputProcessorFixture;
+
     struct ObjectInfo
     {
         ObjectInfo() = default;

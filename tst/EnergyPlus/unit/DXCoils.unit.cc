@@ -63,9 +63,9 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -1078,9 +1078,9 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
-    GetDXCoils();
+    GetDXCoils(state);
 
     ASSERT_EQ(1, NumDXCoils);
     EXPECT_EQ(DataSizing::AutoSize, DXCoil(1).EvapCondPumpElecNomPower(1));
@@ -1316,7 +1316,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Case 1 test
-    GetDXCoils();
+    GetDXCoils(state);
 
     EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType); // it also covers a test for fuel type input
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
@@ -1460,9 +1460,9 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
-    GetDXCoils();
+    GetDXCoils(state);
     SetPredefinedTables();
     CurZoneEqNum = 1;
 
@@ -1705,7 +1705,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Case 1 test
-    GetDXCoils();
+    GetDXCoils(state);
 
     EnergyPlus::DataAirLoop::AirLoopInputsFilled = true;
 
@@ -1715,8 +1715,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
 
     EXPECT_FALSE(DXCoil(1).ReportCoolingCoilCrankcasePower);
     // These two output variables are listed in rdd for Coil:Cooling:DX:MultiSpeed used for AC only
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electric Power", OutputProcessor::DDVariableTypes(10).VarNameOnly);
-    EXPECT_EQ("Cooling Coil Crankcase Heater Electric Energy", OutputProcessor::DDVariableTypes(11).VarNameOnly);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Rate", OutputProcessor::DDVariableTypes(10).VarNameOnly);
+    EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", OutputProcessor::DDVariableTypes(11).VarNameOnly);
 
     DataGlobals::SysSizingCalc = false;
     EnergyPlus::DataAirLoop::AirLoopInputsFilled = false;
@@ -1790,9 +1790,9 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
-    GetDXCoils();
+    GetDXCoils(state);
 
     ASSERT_EQ(1, NumDXCoils);
     ASSERT_EQ(DXCoil(1).DefrostStrategy, ReverseCycle);
@@ -1857,9 +1857,9 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     GetCurveInput();
-    GetDXCoils();
+    GetDXCoils(state);
 
     // TODO: FIXME: Should this still have cerr output?
     // EXPECT_TRUE( has_cerr_output() ); // capacity as a function of temperature inputs will give output above 1.0 +- 10% and trip warning message
@@ -1962,8 +1962,8 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
-    GetDXCoils();
+    ProcessScheduleInput(state.files);
+    GetDXCoils(state);
 
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
     ASSERT_EQ(-30.0, DXCoil(1).MinOATCompressor);          // removed the minimum limit of -20.0C
@@ -2071,8 +2071,8 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput(state.outputFiles);
-    GetDXCoils();
+    ProcessScheduleInput(state.files);
+    GetDXCoils(state);
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
     ASSERT_EQ(-25.0, DXCoil(1).MinOATCompressor);     // use default value at -25C
@@ -2192,8 +2192,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
-    DXCoils::GetDXCoils();
+    ScheduleManager::ProcessScheduleInput(state.files);
+    DXCoils::GetDXCoils(state);
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
     DataSizing::CurZoneEqNum = 0;
@@ -2417,8 +2417,8 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
-    DXCoils::GetDXCoils();
+    ScheduleManager::ProcessScheduleInput(state.files);
+    DXCoils::GetDXCoils(state);
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
     // All of this is to basically manage to get RatedTotCap to be autosized
@@ -2902,7 +2902,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedHeatingCoilSizingOutput)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get input
-    GetDXCoils();
+    GetDXCoils(state);
     SetPredefinedTables();
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
@@ -3117,7 +3117,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilTabularReporting)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get input
-    GetDXCoils();
+    GetDXCoils(state);
     // Setup the predefined tables
     EnergyPlus::OutputReportPredefined::SetPredefinedTables();
     // check multi-speed DX cooling coil
@@ -3521,7 +3521,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoilsAutoSizingOutput)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get input
-    GetDXCoils();
+    GetDXCoils(state);
     SetPredefinedTables();
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
@@ -3773,7 +3773,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // get input
-    GetDXCoils();
+    GetDXCoils(state);
     SetPredefinedTables();
     // check multi-speed DX cooling coil
     EXPECT_EQ("ASHP CLG COIL", DXCoil(1).Name);
@@ -3941,7 +3941,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     // dx cooling coil
     int CoilIndex = 1;
     EXPECT_EQ(DXCoil(CoilIndex).DXCoilType, "Coil:Cooling:DX:MultiSpeed");
-    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(CoilIndex, ErrorsFound);
+    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, CoilIndex, ErrorsFound);
     EXPECT_EQ(2, DataTotCapCurveIndex);
     // evaluate dx cooling coil curves to show impacts of incorrect curve index
     Real64 TotCapTempModFac_lowestSpeed = CurveValue(1, 19.4, 30.0);
@@ -3958,7 +3958,7 @@ TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
     // dx heating coil
     CoilIndex = 2;
     EXPECT_EQ(DXCoil(CoilIndex).DXCoilType, "Coil:Heating:DX:MultiSpeed");
-    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(CoilIndex, ErrorsFound);
+    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex(state, CoilIndex, ErrorsFound);
     EXPECT_EQ(4, DataTotCapCurveIndex);
     // evaluate dx heating coil curves to show impacts of incorrect curve index
     TotCapTempModFac_lowestSpeed = CurveValue(3, 5.0, 10.0);

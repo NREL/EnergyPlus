@@ -157,7 +157,9 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   Material,
     A1 - 1 IN STUCCO,        !- Name
@@ -2398,7 +2400,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
   Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep;
 

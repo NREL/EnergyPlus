@@ -233,7 +233,7 @@ namespace ChillerAbsorption {
         int NumAlphas;   // Number of elements in the alpha array
         int NumNums;     // Number of elements in the numeric array
         int IOStat;      // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
 
@@ -483,8 +483,8 @@ namespace ChillerAbsorption {
 
     void BLASTAbsorberSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.PumpingEnergy,
                             "System",

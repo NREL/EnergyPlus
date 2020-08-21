@@ -295,5 +295,5 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     GTChillerSpecs::getInput(state.dataPlantChillers);
 
     EXPECT_EQ(1, state.dataPlantChillers.NumGTChillers);
-    EXPECT_EQ(state.dataPlantChillers.GTChiller(1).FuelType, "Gas");
+    EXPECT_EQ(state.dataPlantChillers.GTChiller(1).FuelType, "NaturalGas");
 }

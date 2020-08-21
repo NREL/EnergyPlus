@@ -54,12 +54,12 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
@@ -327,18 +327,18 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(state.outputFiles, errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.outputFiles, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetConstructData(errorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, errorsFound); // read construction data
     EXPECT_FALSE(errorsFound);                         // expect no errors
 
     HeatBalanceManager::GetZoneData(errorsFound);
@@ -356,7 +356,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.outputFiles, errorsFound);
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, errorsFound);
     ASSERT_FALSE(errorsFound);
 
     ZoneSizingInput.allocate(3);

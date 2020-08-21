@@ -101,6 +101,12 @@ namespace MicroturbineElectricGenerator {
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
+    void clear_state() {
+        NumMTGenerators = 0;
+        GetMTInput = true;
+        MTGenerator.clear();
+    }
+
     PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
         // Process the input data for generator if it hasn't been done already
@@ -759,9 +765,9 @@ namespace MicroturbineElectricGenerator {
 
     void MTGeneratorSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->EnergyGen,
                             "System",
@@ -832,9 +838,9 @@ namespace MicroturbineElectricGenerator {
 
         if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
             SetupOutputVariable(
-                "Generator Standby Electric Power", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
+                "Generator Standby Electricity Rate", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Standby Electric Energy",
+            SetupOutputVariable("Generator Standby Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->StandbyEnergy,
                                 "System",
@@ -849,9 +855,9 @@ namespace MicroturbineElectricGenerator {
 
         if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
             SetupOutputVariable(
-                "Generator Ancillary Electric Power", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
+                "Generator Ancillary Electricity Rate", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Ancillary Electric Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable("Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
         }
 
         //   Report combustion air outlet conditions if exhaust air calculations are active

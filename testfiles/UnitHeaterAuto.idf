@@ -1668,7 +1668,7 @@
 
   Output:Variable,*,Zone Unit Heater Heating Rate,hourly;
 
-  Output:Variable,*,Zone Unit Heater Fan Electric Power,hourly;
+  Output:Variable,*,Zone Unit Heater Fan Electricity Rate,hourly;
 
   Output:Variable,Zone1UnitHeatAirOutletNode,System Node Mass Flow Rate,hourly;
 

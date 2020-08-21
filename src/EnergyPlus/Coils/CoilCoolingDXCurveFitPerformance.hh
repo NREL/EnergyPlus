@@ -58,7 +58,7 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
-    class OutputFiles;
+    class IOFiles;
 
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
@@ -102,7 +102,7 @@ struct CoilCoolingDXCurveFitPerformance
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
     void calcStandardRatings(EnergyPlusData &state,
-        int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, EnergyPlus::OutputFiles &outputFiles);
+        int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, EnergyPlus::IOFiles &ioFiles);
     Real64 calcIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
