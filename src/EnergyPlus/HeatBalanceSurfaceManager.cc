@@ -2420,9 +2420,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Always initialize the shortwave quantities
         high_resolution_clock::time_point t1 = high_resolution_clock::now();
-        QRadSWwinAbs = 0.0;
-        InitialDifSolwinAbs = 0.0;
-        QRadSWwinAbsLayer = 0.0;
+
         for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
             InitialZoneDifSolReflW(zoneNum) = 0.0;
             ZoneWinHeatGainRepEnergy(zoneNum) = 0.0;
@@ -2511,6 +2509,18 @@ namespace HeatBalanceSurfaceManager {
                 WinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
                 WinHeatTransferRepEnergy(SurfNum) = 0.0;
                 WinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
+
+            }
+            for (int Lay = 1; Lay <= DataHeatBalance::MaxSolidWinLayers; Lay++) {
+                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                    QRadSWwinAbs(Lay, SurfNum) = 0.0;
+                    QRadSWwinAbsLayer(Lay, SurfNum) = 0.0;
+                }
+            }
+            for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL; Lay++) {
+                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                    InitialDifSolwinAbs(Lay, SurfNum) = 0.0;
+                }
             }
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
