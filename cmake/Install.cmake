@@ -154,6 +154,13 @@ message("-- OS_VERSION variable is set to: " ${_OS_VERSION})
 cmake_host_system_information(RESULT _OS_PLATFORM QUERY OS_PLATFORM)
 message("-- OS_PLATFORM variable is set to: " ${_OS_PLATFORM})
 
+message("CMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}")
+message("CMAKE_SYSTEM_NAME =${CMAKE_SYSTEM_NAME}")
+if(MSVC)
+  message("CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION=${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+  message("MSVC_VERSION =${MSVC_VERSION}")
+endif()
+
 # Mac
 #-- OS_NAME variable is set to: Mac OS X
 #-- OS_RELEASE variable is set to: 10.14.6
@@ -165,9 +172,20 @@ message("-- OS_PLATFORM variable is set to: " ${_OS_PLATFORM})
 #-- OS_RELEASE variable is set to: 5.4.0-42-generic
 #-- OS_VERSION variable is set to: #46~18.04.1-Ubuntu SMP Fri Jul 10 07:21:24 UTC 2020
 #-- OS_PLATFORM variable is set to: x86_64
+# CMAKE_SYSTEM_VERSION=5.3.0-51-generic
+# CMAKE_SYSTEM_NAME =Linux
 
 # Windows
+#-- OS_NAME variable is set to: Windows
+#-- OS_RELEASE variable is set to:  Professional
+#-- OS_VERSION variable is set to:  (Build 19041)
+#-- OS_PLATFORM variable is set to: AMD64
+# CMAKE_SYSTEM_VERSION=10.0.19041
+# CMAKE_SYSTEM_NAME=Windows
+# CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION=10.0.17763.0
+# MSVC_VERSION=1926
 
+#
 # End debug
 
 if(APPLE)
