@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -107,7 +108,7 @@ namespace SizingManager {
 
     void ManageSystemVentilationAdjustments();
 
-    void DetermineSystemPopulationDiversity();
+    void DetermineSystemPopulationDiversity(EnergyPlusData &state);
 
     void GetOARequirements();
 

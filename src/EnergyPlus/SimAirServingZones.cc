@@ -4792,7 +4792,7 @@ namespace SimAirServingZones {
         } // end the primary air system loop
     }
 
-    void SizeSysOutdoorAir()
+    void SizeSysOutdoorAir(EnergyPlusData &state)
     {
 
         using namespace OutputReportPredefined;
@@ -4811,7 +4811,7 @@ namespace SimAirServingZones {
         // begin system OA calcs, this is the first pass, std 62.1 calcs are redone after adjustments and zone units are set up
 
         // call refactored routine for Pz, Ps and D
-        SizingManager::DetermineSystemPopulationDiversity();
+        SizingManager::DetermineSystemPopulationDiversity(state);
 
         // If the system design minimum outside air flow rate is autosized, calculate it from the zone data
         // Note that all TermUnitFinalZoneSizing values have already been scaled by air terminal sizing factors

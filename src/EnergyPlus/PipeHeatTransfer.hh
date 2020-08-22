@@ -57,6 +57,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
@@ -247,10 +248,10 @@ namespace PipeHeatTransfer {
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
+        void InitPipesHeatTransfer(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
         );
 
-        Real64 TBND(Real64 const z,       // Current Depth
+        Real64 TBND(EnergyPlusData &state, Real64 const z,       // Current Depth
                     Real64 const DayOfSim // Current Simulation Day
         );
 

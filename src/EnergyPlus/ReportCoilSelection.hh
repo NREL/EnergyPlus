@@ -57,6 +57,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -326,7 +327,7 @@ public: // methods
                              Real64 const lvgAirHumRat    //
     );
 
-    void setCoilCoolingCapacity(std::string const &coilName,    // user-defined name of the coil
+    void setCoilCoolingCapacity(EnergyPlusData &state, std::string const &coilName,    // user-defined name of the coil
                                 std::string const &coilType,    // idf input object class name of coil
                                 Real64 const totalCoolingCap,   // {W} coil cooling capacity
                                 bool const isAutoSize,          // true if value was autosized
@@ -339,7 +340,7 @@ public: // methods
                                 Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
     );
 
-    void setCoilHeatingCapacity(std::string const &coilName,    // user-defined name of the coil
+    void setCoilHeatingCapacity(EnergyPlusData &state, std::string const &coilName,    // user-defined name of the coil
                                 std::string const &coilType,    // idf input object class name of coil
                                 Real64 const totalHeatingCap,   // {W} coil Heating capacity
                                 bool const isAutoSize,          // true if value was autosized

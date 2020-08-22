@@ -544,7 +544,7 @@ namespace HVACManager {
                     ReportMaxVentilationLoads(state);
                     UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                        if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
+                        if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                     }
                     UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 }
@@ -590,7 +590,7 @@ namespace HVACManager {
                 CalcMoreNodeInfo();
                 UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
-                    if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
+                    if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep(state);
                 }
             } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
                 if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {

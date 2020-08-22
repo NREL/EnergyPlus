@@ -231,7 +231,6 @@
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 #include <EnergyPlus/WaterToAirHeatPump.hh>
-#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
@@ -422,6 +421,5 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     WaterToAirHeatPump::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
-    WeatherManager::clear_state();
     ResultsFramework::clear_state();
 }

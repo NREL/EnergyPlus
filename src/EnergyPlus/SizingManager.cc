@@ -290,7 +290,7 @@ namespace SizingManager {
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
-            ResetEnvironmentCounter();
+            ResetEnvironmentCounter(state);
             KickOffSizing = true;
             SetupZoneSizing(state, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
@@ -307,7 +307,7 @@ namespace SizingManager {
 
                 Available = true;
 
-                ResetEnvironmentCounter();
+                ResetEnvironmentCounter(state);
                 CurOverallSimDay = 0;
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
@@ -325,7 +325,7 @@ namespace SizingManager {
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -493,8 +493,8 @@ namespace SizingManager {
             ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             ManageAirLoops(state, true, SimAir, SimZoneEquip);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
-            SimAirServingZones::SizeSysOutdoorAir();        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
-            ResetEnvironmentCounter();
+            SimAirServingZones::SizeSysOutdoorAir(state);        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
+            ResetEnvironmentCounter(state);
             CurEnvirNumSimDay = 0;
             CurOverallSimDay = 0;
             NumSizingPeriodsPerformed = 0;
@@ -513,7 +513,7 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -1926,7 +1926,7 @@ namespace SizingManager {
         } // loop over air loops for table writing
     }
 
-    void DetermineSystemPopulationDiversity()
+    void DetermineSystemPopulationDiversity(EnergyPlusData &state)
     {
         // determine Pz sum, Ps, and D for each air system for standard 62.1
 
@@ -1970,9 +1970,9 @@ namespace SizingManager {
         // now march through all zone timesteps for entire year to find the concurrent max
         int DaysInYear(366);  // assume leap year
         int dayOfWeekType(1); // assume year starts on Sunday
-        WeatherManager::CalcSpecialDayTypes();
+        WeatherManager::CalcSpecialDayTypes(state);
         for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
-            DataEnvironment::HolidayIndex = WeatherManager::SpecialDayTypes(DayLoop);
+            DataEnvironment::HolidayIndex = state.dataWeatherManager.SpecialDayTypes(DayLoop);
             DataEnvironment::DayOfYear_Schedule = DayLoop;
             DataEnvironment::DayOfWeek = dayOfWeekType;
             ++dayOfWeekType;

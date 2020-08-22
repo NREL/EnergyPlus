@@ -61,6 +61,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -865,7 +866,7 @@ namespace OutputReportTabular {
 
     void GatherComponentLoadsHVAC();
 
-    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteLoadComponentSummaryTables(EnergyPlusData &state, CostEstimateManagerData &dataCostEstimateManager);
 
     void GetDelaySequences(int const &desDaySelected,
                            bool const &isCooling,
@@ -895,7 +896,7 @@ namespace OutputReportTabular {
                                         Array3D<Real64> const &feneCondInstantSeqLoc,
                                         Array2D<Real64> const &surfDelaySeq);
 
-    void CollectPeakZoneConditions(
+    void CollectPeakZoneConditions(EnergyPlusData &state,
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling);
 
     void ComputeEngineeringChecks(CompLoadTablesType &compLoad);

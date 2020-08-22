@@ -324,7 +324,7 @@ namespace EMSManager {
 
                 if (EMSProgramCallManager(ProgramManagerNum).CallingPoint == iCalledFrom) {
                     for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerNum).NumErlPrograms; ++ErlProgramNum) {
-                        EvaluateStack(state.files, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
+                        EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
                         anyProgramRan = true;
                     }
                 }
@@ -332,7 +332,7 @@ namespace EMSManager {
         } else { // call specific program manager
             if (present(ProgramManagerToRun)) {
                 for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerToRun).NumErlPrograms; ++ErlProgramNum) {
-                    EvaluateStack(state.files, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
+                    EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
                     anyProgramRan = true;
                 }
             }

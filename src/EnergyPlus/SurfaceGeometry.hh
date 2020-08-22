@@ -129,7 +129,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -151,7 +151,7 @@ namespace SurfaceGeometry {
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     );
 
-    void GetHTSurfaceData(IOFiles &ioFiles,
+    void GetHTSurfaceData(EnergyPlusData &state, IOFiles &ioFiles,
                           bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
@@ -262,7 +262,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {

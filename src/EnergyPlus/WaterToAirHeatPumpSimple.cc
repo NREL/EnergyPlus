@@ -1767,7 +1767,7 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 }
             }
-            coilSelectionReportObj->setCoilCoolingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilCoolingCapacity(state, SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
                                                            RatedCapCoolTotalAutoSized,
@@ -1968,7 +1968,7 @@ namespace WaterToAirHeatPumpSimple {
                 }
             }
 
-            coilSelectionReportObj->setCoilHeatingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilHeatingCapacity(state, SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapHeat,
                                                            IsAutoSize,

@@ -53,11 +53,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
 
 namespace RuntimeLanguageProcessor {
 
@@ -193,7 +196,7 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum);
+    ErlValueType EvaluateStack(EnergyPlusData &state, IOFiles &ioFiles, int const StackNum);
 
     void
     WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
@@ -215,7 +218,7 @@ namespace RuntimeLanguageProcessor {
 
     int NewExpression();
 
-    ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound);
 
     void TodayTomorrowWeather(
         int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);

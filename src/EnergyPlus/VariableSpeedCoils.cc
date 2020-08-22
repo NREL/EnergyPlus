@@ -4249,7 +4249,7 @@ namespace VariableSpeedCoils {
             coilSelectionReportObj->setCoilEntAirHumRat(VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).VarSpeedCoilType, MixHumRat);
             coilSelectionReportObj->setCoilLvgAirTemp(VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).VarSpeedCoilType, SupTemp);
             coilSelectionReportObj->setCoilLvgAirHumRat(VarSpeedCoil(DXCoilNum).Name, VarSpeedCoil(DXCoilNum).VarSpeedCoilType, SupHumRat);
-            coilSelectionReportObj->setCoilCoolingCapacity(VarSpeedCoil(DXCoilNum).Name,
+            coilSelectionReportObj->setCoilCoolingCapacity(state, VarSpeedCoil(DXCoilNum).Name,
                                                            VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                            RatedCapCoolTotalDes,
                                                            RatedCapCoolTotalAutoSized,
@@ -4293,7 +4293,7 @@ namespace VariableSpeedCoils {
             if (RatedCapHeatDes < SmallLoad) {
                 RatedCapHeatDes = 0.0;
             }
-            coilSelectionReportObj->setCoilHeatingCapacity(VarSpeedCoil(DXCoilNum).Name,
+            coilSelectionReportObj->setCoilHeatingCapacity(state, VarSpeedCoil(DXCoilNum).Name,
                                                            VarSpeedCoil(DXCoilNum).VarSpeedCoilType,
                                                            RatedCapHeatDes,
                                                            RatedCapHeatAutoSized,

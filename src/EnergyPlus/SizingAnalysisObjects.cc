@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "IOFiles.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -303,12 +304,11 @@ void SizingLog::SetupNewEnvironment(int const seedEnvrnNum, int const newEnvrnNu
     newEnvrnToSeedEnvrnMap[newEnvrnNum] = seedEnvrnNum;
 }
 
-int SizingLoggerFramework::SetupVariableSizingLog(Real64 &rVariable, int stepsInAverage)
+int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 &rVariable, int stepsInAverage)
 {
     using DataGlobals::ksDesignDay;
     using DataGlobals::ksRunPeriodDesign;
     using DataGlobals::NumOfTimeStepInHour;
-    using namespace WeatherManager;
     int VectorLength(0);
     int const HoursPerDay(24);
 
@@ -319,25 +319,25 @@ int SizingLoggerFramework::SetupVariableSizingLog(Real64 &rVariable, int stepsIn
 
     // search environment structure for sizing periods
     // this is coded to occur before the additions to Environment structure that will occur to run them as HVAC Sizing sims
-    for (int i = 1; i <= NumOfEnvrn; ++i) {
-        if (Environment(i).KindOfEnvrn == ksDesignDay) {
+    for (int i = 1; i <= state.dataWeatherManager.NumOfEnvrn; ++i) {
+        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksDesignDay) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumOfDesignDaysInLogSet;
         }
-        if (Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumberOfSizingPeriodsInLogSet;
         }
     }
 
     // next fill in the count of steps into map
-    for (int i = 1; i <= NumOfEnvrn; ++i) {
+    for (int i = 1; i <= state.dataWeatherManager.NumOfEnvrn; ++i) {
 
-        if (Environment(i).KindOfEnvrn == ksDesignDay) {
+        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksDesignDay) {
             tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour;
         }
-        if (Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
-            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour * Environment(i).TotalDays;
+        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour * state.dataWeatherManager.Environment(i).TotalDays;
         }
     }
 
@@ -361,16 +361,16 @@ int SizingLoggerFramework::SetupVariableSizingLog(Real64 &rVariable, int stepsIn
     return NumOfLogs - 1;
 }
 
-void SizingLoggerFramework::SetupSizingLogsNewEnvironment()
+void SizingLoggerFramework::SetupSizingLogsNewEnvironment(EnergyPlusData& state)
 {
     using namespace WeatherManager;
 
     for (auto &l : logObjs) {
-        l.SetupNewEnvironment(Environment(Envrn).SeedEnvrnNum, Envrn);
+        l.SetupNewEnvironment(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).SeedEnvrnNum, state.dataWeatherManager.Envrn);
     }
 }
 
-ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
+ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusData& state)
 {
     // prepare current timing data once and then pass into fill routines
     // function used by both zone and system frequency log updates
@@ -385,7 +385,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
 
     ZoneTimestepObject tmpztStepStamp( // call constructor
         DataGlobals::KindOfSim,
-        WeatherManager::Envrn,
+        state.dataWeatherManager.Envrn,
         locDayOfSim,
         DataGlobals::HourOfDay,
         DataGlobals::TimeStep,
@@ -395,24 +395,24 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp()
     return tmpztStepStamp;
 }
 
-void SizingLoggerFramework::UpdateSizingLogValuesZoneStep()
+void SizingLoggerFramework::UpdateSizingLogValuesZoneStep(EnergyPlusData& state)
 {
     ZoneTimestepObject tmpztStepStamp;
 
-    tmpztStepStamp = PrepareZoneTimestepStamp();
+    tmpztStepStamp = PrepareZoneTimestepStamp(state);
 
     for (auto &l : logObjs) {
         l.FillZoneStep(tmpztStepStamp);
     }
 }
 
-void SizingLoggerFramework::UpdateSizingLogValuesSystemStep()
+void SizingLoggerFramework::UpdateSizingLogValuesSystemStep(EnergyPlusData& state)
 {
     Real64 const MinutesPerHour(60.0);
     ZoneTimestepObject tmpztStepStamp;
     SystemTimestepObject tmpSysStepStamp;
 
-    tmpztStepStamp = PrepareZoneTimestepStamp();
+    tmpztStepStamp = PrepareZoneTimestepStamp(state);
 
     // pepare system timestep stamp
     tmpSysStepStamp.CurMinuteEnd = OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute;
@@ -446,7 +446,7 @@ PlantCoinicidentAnalysis::PlantCoinicidentAnalysis(
     plantSizingIndex = sizingIndex;
 }
 
-void PlantCoinicidentAnalysis::ResolveDesignFlowRate(IOFiles &ioFiles, int const HVACSizingIterCount)
+void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFiles &ioFiles, int const HVACSizingIterCount)
 {
     using DataSizing::GlobalCoolingSizingFactorMode;
     using DataSizing::GlobalCoolSizingFactor;
@@ -460,7 +460,6 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(IOFiles &ioFiles, int const
     using namespace DataPlant;
     using namespace OutputReportPredefined;
     using DataHVACGlobals::SmallWaterVolFlow;
-    using WeatherManager::Environment;
     bool setNewSizes;
     Real64 sizingFac;
     Real64 normalizedChange;
@@ -604,7 +603,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(IOFiles &ioFiles, int const
             if (newFoundMassFlowRateTimeStamp.envrnNum > 0) {                            // protect against invalid index
                 PreDefTableEntry(pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                                 Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
+                                 state.dataWeatherManager.Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
             }
             PreDefTableEntry(
                 pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
@@ -618,7 +617,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(IOFiles &ioFiles, int const
             if (NewFoundMaxDemandTimeStamp.envrnNum > 0) {                                  // protect against invalid index
                 PreDefTableEntry(pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                                 Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
+                                 state.dataWeatherManager.Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
             }
             PreDefTableEntry(
                 pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);

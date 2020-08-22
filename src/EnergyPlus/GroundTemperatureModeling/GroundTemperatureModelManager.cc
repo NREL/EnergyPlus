@@ -50,6 +50,7 @@
 #include <vector>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
@@ -148,7 +149,7 @@ namespace GroundTemperatureManager {
         } else if (objectType == objectType_SiteDeepGroundTemp) {
             return SiteDeepGroundTemps::DeepGTMFactory(state.files, objectType, objectName);
         } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state.files, objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(state, state.files, objectType, objectName);
         } else if (objectType == objectType_XingGroundTemp) {
             return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
         } else {

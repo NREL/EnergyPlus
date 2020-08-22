@@ -5738,7 +5738,7 @@ namespace OutputReportTabular {
             WriteCompCostTable(state.dataCostEstimateManager);
             WriteAdaptiveComfortTable(state.dataCostEstimateManager);
             WriteEioTables(state.dataCostEstimateManager, state.files);
-            WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+            WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
             WriteHeatEmissionTable(state.dataCostEstimateManager);
 
             if (displayThermalResilienceSummary) WriteThermalResilienceTables();
@@ -6839,7 +6839,7 @@ namespace OutputReportTabular {
             }
         }
         // fill the LEED setpoint table
-        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state.dataZoneTempPredictorCorrector);
+        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state);
     }
 
     void WriteMonthlyTables(CostEstimateManagerData &dataCostEstimateManager)
@@ -12749,7 +12749,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager)
+    void WriteLoadComponentSummaryTables(EnergyPlusData &state, CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -13002,7 +13002,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqCool,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqCool);
-                    CollectPeakZoneConditions(ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                    CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     // send latent load info to coil summary report
                     coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
@@ -13035,7 +13035,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqHeat,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqHeat);
-                    CollectPeakZoneConditions(ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                    CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
 
                     // send latent load info to coil summary report
                     coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
@@ -13154,7 +13154,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqCool,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqCool);
-                        CollectPeakZoneConditions(AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        CollectPeakZoneConditions(state, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
                     }
                     if (displayZoneComponentLoadSummary &&
@@ -13189,7 +13189,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqHeat,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqHeat);
-                        CollectPeakZoneConditions(AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                        CollectPeakZoneConditions(state, AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
                     }
                 }
@@ -13269,7 +13269,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqCool,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqCool);
-                    CollectPeakZoneConditions(FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                    CollectPeakZoneConditions(state, FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
                 }
                 FacilityZonesCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
@@ -13304,7 +13304,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqHeat,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqHeat);
-                    CollectPeakZoneConditions(FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                    CollectPeakZoneConditions(state, FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
                 }
                 FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
@@ -13706,7 +13706,7 @@ namespace OutputReportTabular {
     }
 
     // for the load summary report add values the peak conditions subtable
-    void CollectPeakZoneConditions(
+    void CollectPeakZoneConditions(EnergyPlusData &state,
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
         using DataHeatBalance::People;
@@ -13726,9 +13726,9 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= state.dataWeatherManager.DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
@@ -13779,9 +13779,9 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= state.dataWeatherManager.DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);

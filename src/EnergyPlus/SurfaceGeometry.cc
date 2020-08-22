@@ -294,7 +294,7 @@ namespace SurfaceGeometry {
             CosZoneRelNorth(ZoneNum) = std::cos(-Zone(ZoneNum).RelNorth * DegToRadians);
             SinZoneRelNorth(ZoneNum) = std::sin(-Zone(ZoneNum).RelNorth * DegToRadians);
         }
-        GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+        GetSurfaceData(state, state.files, ErrorsFound);
 
         if (ErrorsFound) {
             CosZoneRelNorth.deallocate();
@@ -789,7 +789,7 @@ namespace SurfaceGeometry {
         AWinCFOverlap.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
     }
 
-    void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound) // If errors found in input
+    void GetSurfaceData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -1059,7 +1059,7 @@ namespace SurfaceGeometry {
 
         GetRectDetShdSurfaceData(ErrorsFound, NumSurfs, TotRectDetachedFixed, TotRectDetachedBldg);
 
-        GetHTSurfaceData(ioFiles,
+        GetHTSurfaceData(state, ioFiles,
                          ErrorsFound,
                          NumSurfs,
                          TotHTSurfs,
@@ -2172,7 +2172,7 @@ namespace SurfaceGeometry {
 
         exposedFoundationPerimeter.getData(ErrorsFound);
 
-        GetSurfaceHeatTransferAlgorithmOverrides(dataZoneTempPredictorCorrector, ioFiles, ErrorsFound);
+        GetSurfaceHeatTransferAlgorithmOverrides(state, ioFiles, ErrorsFound);
 
         // Set up enclosures, process Air Boundaries if any
         SetupEnclosuresAndAirBoundaries(DataViewFactorInformation::ZoneRadiantInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
@@ -2821,7 +2821,7 @@ namespace SurfaceGeometry {
         } // Item Loop
     }
 
-    void GetHTSurfaceData(IOFiles &ioFiles,
+    void GetHTSurfaceData(EnergyPlusData &state, IOFiles &ioFiles,
                           bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
@@ -3178,7 +3178,7 @@ namespace SurfaceGeometry {
 
                 } else if (UtilityRoutines::SameString(cAlphaArgs(ArgPointer), "Foundation")) {
 
-                    if (!WeatherManager::WeatherFileExists) {
+                    if (!state.dataWeatherManager.WeatherFileExists) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                         "\", using \"Foundation\" type Outside Boundary Condition requires specification of a weather file");
                         ShowContinueError("Either place in.epw in the working directory or specify a weather file on the command line using -w "
@@ -6737,7 +6737,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound)
+    void GetSurfaceHeatTransferAlgorithmOverrides(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7164,7 +7164,7 @@ namespace SurfaceGeometry {
 
         // Setup Kiva instances
         if (DataHeatBalance::AnyKiva) {
-            if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances(dataZoneTempPredictorCorrector, ioFiles);
+            if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances(state, ioFiles);
         }
 
         // test for missing materials for algorithms selected
