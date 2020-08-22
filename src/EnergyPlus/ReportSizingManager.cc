@@ -322,7 +322,6 @@ namespace ReportSizingManager {
 
         // USE STATEMENTS :
         using CurveManager::CurveValue;
-        using DataEnvironment::StdBaroPress;
         using DataGlobals::DisplayExtraWarnings;
         using namespace DataSizing;
         using namespace DataHVACGlobals;

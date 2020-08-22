@@ -1715,7 +1715,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using DataHVACGlobals::DoSetPointTest;
         using DataHVACGlobals::SetPointErrorFlag;
-        // unused  USE DataEnvironment, ONLY: StdBaroPress
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iHumidityRatioMaxSetPoint;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -2166,7 +2165,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        // unused  USE DataEnvironment, ONLY: StdBaroPress
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2584,7 +2582,6 @@ namespace DesiccantDehumidifiers {
         // Using/Aliasing
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
-        // unused  USE DataEnvironment, ONLY: StdBaroPress
         using DXCoils::DXCoilFanOpMode;
         using DXCoils::DXCoilPartLoadRatio;
         using HeatRecovery::SimHeatRecovery;
