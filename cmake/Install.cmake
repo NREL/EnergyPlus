@@ -140,11 +140,75 @@ set(CPACK_IFW_PRODUCT_URL "https://www.energyplus.net")
 include(cmake/TargetArch.cmake)
 target_architecture(TARGET_ARCH)
 
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Release" )
-  set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${TARGET_ARCH}")
-else()
-  set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${TARGET_ARCH}-${CMAKE_BUILD_TYPE}")
+# Debug
+
+cmake_host_system_information(RESULT _OS_NAME QUERY OS_NAME)
+message("-- OS_NAME variable is set to: " ${_OS_NAME})
+
+cmake_host_system_information(RESULT _OS_RELEASE QUERY OS_RELEASE)
+message("-- OS_RELEASE variable is set to: " ${_OS_RELEASE})
+
+cmake_host_system_information(RESULT _OS_VERSION QUERY OS_VERSION)
+message("-- OS_VERSION variable is set to: " ${_OS_VERSION})
+
+cmake_host_system_information(RESULT _OS_PLATFORM QUERY OS_PLATFORM)
+message("-- OS_PLATFORM variable is set to: " ${_OS_PLATFORM})
+
+# Mac
+#-- OS_NAME variable is set to: Mac OS X
+#-- OS_RELEASE variable is set to: 10.14.6
+#-- OS_VERSION variable is set to: 18G2022
+#-- OS_PLATFORM variable is set to: x86_64
+
+# Ubuntu
+#-- OS_NAME variable is set to: Linux
+#-- OS_RELEASE variable is set to: 5.4.0-42-generic
+#-- OS_VERSION variable is set to: #46~18.04.1-Ubuntu SMP Fri Jul 10 07:21:24 UTC 2020
+#-- OS_PLATFORM variable is set to: x86_64
+
+# Windows
+
+# End debug
+
+if(APPLE)
+  # Looking at cmake source code OS_RELEASE is already set to the output of `sw_vers -productVersion` which is what we want
+  cmake_host_system_information(RESULT OSX_VERSION QUERY OS_RELEASE)
+  message("-- OS_RELEASE variable is set to: " ${OSX_VERSION})
+
+  # The output is like 10.12.6, let's strip the end component
+  string(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\..*" "\\1" OSX_VERSION_MAJOR_MINOR ${OSX_VERSION})
+
+  set(SYSTEM_VERSION "-macOS${OSX_VERSION_MAJOR_MINOR}")
+
+elseif(UNIX)
+  # OS_RELEASE is the result of `uname -r` which is unhelpful (eg '5.4.0-42-generic')
+  find_program(LSB_RELEASE lsb_release)
+  # -rs outputs only 16.04, or 18.04
+  execute_process(COMMAND ${LSB_RELEASE} -rs
+    OUTPUT_VARIABLE LSB_RELEASE_VERSION_SHORT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  # -is outputs "Ubuntu" or "Fedora"
+  execute_process(COMMAND ${LSB_RELEASE} -is
+    OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  # eg: `-Ubuntu18.04`
+  set(SYSTEM_VERSION "-${LSB_RELEASE_ID_SHORT}${LSB_RELEASE_VERSION_SHORT}")
+elseif(MSVC)
+  # no-op
+  set(SYSTEM_VERSION "")
 endif()
+
+if ( "${CMAKE_BUILD_TYPE}" STREQUAL "" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Release" )
+  set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}${SYSTEM_VERSION}-${TARGET_ARCH}")
+else()
+  set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}${SYSTEM_VERSION}-${TARGET_ARCH}-${CMAKE_BUILD_TYPE}")
+endif()
+
+message("Installer name is set to '${CPACK_PACKAGE_FILE_NAME}'")
 
 # Installation directory on the target system (common to all CPack Genrators)
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
