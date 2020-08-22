@@ -660,9 +660,9 @@ int actualDateTime(EnergyPlusState) {
     return double(sum(datevalues));
 }
 
-int todayWeatherIsRainAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+int todayWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     int value = 0;
-    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayIsRain, value);
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, state.dataWeatherManager.TodayIsRain, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
