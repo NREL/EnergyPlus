@@ -697,7 +697,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);

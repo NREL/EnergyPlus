@@ -487,7 +487,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // compare_err_stream( "" ); // just for debugging
@@ -938,7 +938,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // For each surface Run the test then Check the result
@@ -3006,7 +3006,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(state, state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     EXPECT_EQ(2, SurfNum);
     std::string const error_string =
@@ -3575,7 +3575,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
@@ -3694,7 +3694,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(state, state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     // We expect one surface, but an error since Surface B cannot be located
     EXPECT_EQ(1, SurfNum);
@@ -6210,7 +6210,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);                                                            // expect no errors
 
     // compare_err_stream( "" ); // just for debugging

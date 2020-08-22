@@ -660,6 +660,7 @@ int actualDateTime(EnergyPlusState) {
     return double(sum(datevalues));
 }
 
+/*
 int todayWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     int value = 0;
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, state.dataWeatherManager.TodayIsRain, value);
@@ -913,3 +914,4 @@ Real64 tomorrowWeatherLiquidPrecipitationAtTime(EnergyPlusState EP_UNUSED(state)
     }
     return value;
 }
+*/

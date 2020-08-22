@@ -2498,7 +2498,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     WindowManager::InitGlassOpticalCalculations(state.dataWindowComplexManager, state.dataWindowManager, state.files);

@@ -529,7 +529,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 12;
     DataGlobals::CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(DataEnvironment::SOLCOS);
+    WeatherManager::DetermineSunUpDown(state, DataEnvironment::SOLCOS);
     // get window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
         if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
@@ -884,7 +884,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 12;
     DataGlobals::CurrentTime = 12.0;
-    WeatherManager::DetermineSunUpDown(DataEnvironment::SOLCOS);
+    WeatherManager::DetermineSunUpDown(state, DataEnvironment::SOLCOS);
     // get equivalent layer window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
         if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {

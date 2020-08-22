@@ -482,7 +482,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     DataSizing::DataFlowUsedForSizing = airFlowRate / DataEnvironment::StdRhoAir;
 
     // setCoilHeatingCapacity will not overwrite previously set temperature data
-    coilSelectionReportObj->setCoilHeatingCapacity(coil1Name,
+    coilSelectionReportObj->setCoilHeatingCapacity(state, coil1Name,
                                                    coil1Type,
                                                    RatedCoilTotCap,
                                                    false,
@@ -509,7 +509,7 @@ TEST_F(EnergyPlusFixture, ReportCoilSelection_ZoneEqCoil)
     c1->coilDesEntHumRat = -999.0;
     c1->coilDesLvgTemp = -999.0;
     c1->coilDesLvgHumRat = -999.0;
-    coilSelectionReportObj->setCoilHeatingCapacity(coil1Name,
+    coilSelectionReportObj->setCoilHeatingCapacity(state, coil1Name,
                                                    coil1Type,
                                                    RatedCoilTotCap,
                                                    false,

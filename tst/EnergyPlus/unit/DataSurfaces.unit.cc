@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt();

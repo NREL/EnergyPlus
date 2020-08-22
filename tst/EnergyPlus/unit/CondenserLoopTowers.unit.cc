@@ -506,7 +506,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
@@ -898,7 +898,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
@@ -1329,7 +1329,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
@@ -1744,7 +1744,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
@@ -2228,7 +2228,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
     CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
 
@@ -2655,7 +2655,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    WeatherManager::ResetEnvironmentCounter();
+    WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
 
     // get inputs of cooling tower object
