@@ -117,7 +117,6 @@ namespace WindowAC {
     using namespace DataSizing;
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutRelHum;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;

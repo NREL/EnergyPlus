@@ -100,7 +100,6 @@ namespace BaseboardRadiator {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
-    using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::SmallLoad;
     using DataPlant::PlantLoop;
     using DataPlant::TypeOf_Baseboard_Conv_Water;

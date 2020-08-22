@@ -139,7 +139,6 @@ namespace HVACMultiSpeedHeatPump {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataHVACGlobals::BlowThru;
     using DataHVACGlobals::Coil_HeatingElectric;

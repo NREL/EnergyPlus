@@ -127,7 +127,6 @@ namespace PurchasedAirManager {
     using DataEnvironment::OutBaroPress;
     using DataEnvironment::OutEnthalpy;
     using DataEnvironment::OutHumRat;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataHeatBalFanSys::ZoneAirHumRat;
     using DataHeatBalFanSys::ZoneThermostatSetPointHi;

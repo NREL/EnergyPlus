@@ -112,7 +112,6 @@ namespace PoweredInductionUnits {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;

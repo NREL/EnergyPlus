@@ -109,7 +109,6 @@ namespace HVACCooledBeam {
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::NumOfZones;

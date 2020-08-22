@@ -123,6 +123,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     // global sizing data
     dataEMSOverrideON = DataSizing::DataEMSOverrideON;
     dataEMSOverride = DataSizing::DataEMSOverride;
+    this->dataAutosizable = DataSizing::DataAutosizable;
     this->minOA = DataSizing::MinOA;
     this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
@@ -349,7 +350,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
-        if ( this->dataEMSOverrideON ) { // EMS overrides value
+        if (this->dataEMSOverrideON) { // EMS overrides value
             this->autoSizedValue = this->dataEMSOverride;
             this->reportSizerOutput(
                 this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
@@ -362,8 +363,9 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
         } else if (!this->wasAutoSized &&
                    (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done or autosizes to 0
             this->autoSizedValue = this->originalValue;
-            this->reportSizerOutput(
-                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            if (this->dataAutosizable)
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
             this->autoSizedValue = this->originalValue;
             this->reportSizerOutput(
@@ -373,23 +375,25 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
             // might need more logic here to catch everything correctly
             if (this->dataScalableSizingON && int(this->zoneAirFlowSizMethod) > 0) {
                 this->reportSizerOutput(
-                    this->compType, this->compName, "User Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             } else {
                 this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
             }
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
             if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
-                this->reportSizerOutput(this->compType,
-                                        this->compName,
-                                        "Design Size " + this->sizingString,
-                                        this->autoSizedValue,
-                                        "User-Specified " + this->sizingStringScalable + this->sizingString,
-                                        this->originalValue);
+                if (this->dataAutosizable)
+                    this->reportSizerOutput(this->compType,
+                                            this->compName,
+                                            "Design Size " + this->sizingString,
+                                            this->autoSizedValue,
+                                            "User-Specified " + this->sizingStringScalable + this->sizingString,
+                                            this->originalValue);
             } else {
-                this->reportSizerOutput(
-                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
+                if (this->dataAutosizable)
+                    this->reportSizerOutput(
+                        this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
             }
-            if (DataGlobals::DisplayExtraWarnings) {
+            if (DataGlobals::DisplayExtraWarnings && this->dataAutosizable) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
@@ -474,7 +478,7 @@ void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
                                                  // might need more logic here to catch everything correctly
             if (this->dataScalableSizingON && int(this->zoneAirFlowSizMethod) > 0) {
                 this->reportSizerOutput(
-                    this->compType, this->compName, "User Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
             } else {
                 this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
             }
@@ -758,6 +762,7 @@ void BaseSizer::clearState()
     // global Data* sizing constants
     dataEMSOverrideON = false;
     dataEMSOverride = 0.0;
+    dataAutosizable = false;
     dataConstantUsedForSizing = 0.0;
     dataFractionUsedForSizing = 0.0;
     dataPltSizHeatNum = 0;

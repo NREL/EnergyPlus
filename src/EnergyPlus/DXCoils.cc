@@ -141,7 +141,6 @@ namespace DXCoils {
     using DataEnvironment::OutDryBulbTemp;
     using DataEnvironment::OutHumRat;
     using DataEnvironment::OutWetBulbTemp;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdPressureSeaLevel;
     using DataHeatBalance::HeatReclaimDXCoil;
 

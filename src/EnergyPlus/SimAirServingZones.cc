@@ -5276,7 +5276,6 @@ namespace SimAirServingZones {
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutHumRat;
-        using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
         using EMSManager::ManageEMS;
         using General::FindNumberInList;

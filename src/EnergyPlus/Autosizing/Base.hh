@@ -169,7 +169,7 @@ struct BaseSizer
     // global Data* sizing constants
     bool dataEMSOverrideON = false;
     Real64 dataEMSOverride = 0.0;
-
+    bool dataAutosizable = false;
     // HeatingWaterflowSizer
     Real64 dataConstantUsedForSizing = 0.0;
     Real64 dataFractionUsedForSizing = 0.0;

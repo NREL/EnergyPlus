@@ -114,7 +114,6 @@ namespace SingleDuct {
     using namespace DataLoopNode;
     using BranchNodeConnections::SetUpCompSets;
     using BranchNodeConnections::TestCompSet;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;

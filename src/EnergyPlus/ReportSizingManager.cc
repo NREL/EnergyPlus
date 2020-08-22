@@ -322,10 +322,7 @@ namespace ReportSizingManager {
 
         // USE STATEMENTS :
         using CurveManager::CurveValue;
-        using DataAirLoop::AirLoopControlInfo;
-        using DataAirSystems::PrimaryAirSystem;
         using DataEnvironment::StdBaroPress;
-        using DataEnvironment::StdRhoAir;
         using DataGlobals::DisplayExtraWarnings;
         using namespace DataSizing;
         using namespace DataHVACGlobals;

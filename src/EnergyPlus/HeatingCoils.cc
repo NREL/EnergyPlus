@@ -117,7 +117,6 @@ namespace HeatingCoils {
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace DataGlobalConstants;
-    using DataEnvironment::StdRhoAir;
     using DataHeatBalance::HeatReclaimDXCoil;
     using DataHeatBalance::HeatReclaimRefrigCondenser;
     using DataHeatBalance::HeatReclaimRefrigeratedRack;
