@@ -716,7 +716,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly();
+    void GetInputTabularMonthly(IOFiles & ioFiles);
 
     int AddMonthlyReport(std::string const &inReportName, int const inNumDigitsShown);
 
@@ -726,7 +726,7 @@ namespace OutputReportTabular {
 
     bool isInvalidAggregationOrder();
 
-    void GetInputTabularTimeBins();
+    void GetInputTabularTimeBins(IOFiles & ioFiles);
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
@@ -734,7 +734,7 @@ namespace OutputReportTabular {
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
-    void GetInputOutputTableSummaryReports();
+    void GetInputOutputTableSummaryReports(IOFiles & ioFiles);
 
     bool isCompLoadRepReq();
 
@@ -809,7 +809,8 @@ namespace OutputReportTabular {
     void WriteTimeBinTables(CostEstimateManagerData &dataCostEstimateManager);
 
     void WriteBEPSTable(CostEstimateManagerData &dataCostEstimateManager,
-                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
+                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                        IOFiles &ioFiles);
 
     std::string ResourceWarningMessage(std::string resource);
 

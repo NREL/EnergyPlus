@@ -628,12 +628,12 @@ namespace HeatBalanceSurfaceManager {
                 // RJH 2008-03-07: If no warnings/errors then read refpt illuminances for standard output reporting
                 if (iErrorFlag != 0) {
                     // Open DElight Electric Lighting Error File for reading
-                    auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open();
-                    if (iDElightErrorFile.good()) {
-                        elOpened = true;
-                    } else {
-                        elOpened = false;
-                    }
+                    auto iDElightErrorFile = state.files.outputDelightDfdmpFileName.try_open(state.files.outputControl.delightdfdmp);
+                     if (iDElightErrorFile.good()) {
+                         elOpened = true;
+                     } else {
+                         elOpened = false;
+                     }
                     //            IF (iwriteStatus /= 0) THEN
                     //              CALL ShowFatalError('InitSurfaceHeatBalance: Could not open file "eplusout.delighteldmp" for output (readwrite).')
                     //            ENDIF
@@ -676,12 +676,12 @@ namespace HeatBalanceSurfaceManager {
                 } else { // RJH 2008-03-07: No errors
                     // extract reference point illuminance values from DElight Electric Lighting dump file for reporting
                     // Open DElight Electric Lighting Dump File for reading
-                    auto iDElightErrorFile = state.files.outputDelightEldmpFileName.try_open();
-                    if (iDElightErrorFile.is_open()) {
-                        elOpened = true;
-                    } else {
-                        elOpened = false;
-                    }
+                    auto iDElightErrorFile = state.files.outputDelightEldmpFileName.try_open(state.files.outputControl.delighteldmp);
+                     if (iDElightErrorFile.is_open()) {
+                         elOpened = true;
+                     } else {
+                         elOpened = false;
+                     }
 
                     // Sequentially read lines in DElight Electric Lighting Dump File
                     // and extract refpt illuminances for standard EPlus output handling
