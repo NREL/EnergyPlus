@@ -288,19 +288,6 @@ namespace SolarShading {
     Array1D<SurfaceErrorTracking> TrackTooManyVertices;
     Array1D<SurfaceErrorTracking> TrackBaseSubSurround;
 
-    static Array1D<Real64> ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade
-    // (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
-    static Array1D<Real64> IntBeamAbsByShadFac; // Like ExtBeamAbsByShadFac, but for interior beam radiation.
-    static Array1D<Real64> WinTransBmSolar;     // Factor for exterior beam solar transmitted through window,
-    // or window plus shade, into zone at current time (m2)
-    static Array1D<Real64> WinTransDifSolar; // Factor for exterior diffuse solar transmitted through window,
-    // or window plus shade, into zone at current time (m2)
-
-    static Array1D<Real64> WinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through
-    // window with horizontally-slatted blind into zone at current time (m2)
-    static Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through
-    // window with horizontally-slatted blind into zone at current time (m2)
-
     bool InitComplexOnce = true;
     bool ShadowOneTimeFlag = true;
     bool CHKSBSOneTimeFlag = true;
@@ -384,13 +371,6 @@ namespace SolarShading {
         TooManyVerticesMessage = false;
         SHDBKSOneTimeFlag = true;
         SHDGSSOneTimeFlag = true;
-
-        ExtBeamAbsByShadFac.deallocate();
-        IntBeamAbsByShadFac.deallocate();
-        WinTransBmSolar.deallocate();
-        WinTransDifSolar.deallocate();
-        WinTransDifSolarGnd.deallocate();
-        WinTransDifSolarSky.deallocate();
     }
 
     void InitSolarCalculations(IOFiles &ioFiles)
@@ -6553,7 +6533,9 @@ namespace SolarShading {
         // or switchable glazing
         Real64 TBmAll;         // Window beam-to-(beam+diffuse) transmittance
         Real64 TBm;            // Window beam-beam transmittance
-
+        Real64 DifSolarInc;    // Exterior diffuse solar incident on window (W/m2)
+        Real64 SkySolarTrans;  // Exterior diffuse sky solar transmitted by TDD (W/m2)
+        Real64 GndSolarTrans;  // Exterior diffuse ground solar transmitted by TDD (W/m2)
         Real64 TDifBare;       // Bare diffuse transmittance of exterior window
         Real64 TGlDif;         // Bare diffuse transmittance of back window
         Real64 TGlBm;          // Glazing system front solar beam transmittance
@@ -6722,7 +6704,18 @@ namespace SolarShading {
         //   reflected from obstruction (W/m2)
         Real64 GndSolarInc; // Incident solar radiation on a window from the ground (W/m2)
 
+        static Array1D<Real64> ExtBeamAbsByShadFac; // Factor for exterior beam radiation absorbed by shade
+        // (1/m2) (absorbed radation = beam incident * ExtBeamAbsByShad
+        static Array1D<Real64> IntBeamAbsByShadFac; // Like ExtBeamAbsByShadFac, but for interior beam radiation.
+        static Array1D<Real64> WinTransBmSolar;     // Factor for exterior beam solar transmitted through window,
+        // or window plus shade, into zone at current time (m2)
+        static Array1D<Real64> WinTransDifSolar; // Factor for exterior diffuse solar transmitted through window,
+        // or window plus shade, into zone at current time (m2)
 
+        static Array1D<Real64> WinTransDifSolarGnd; // Factor for exterior ground diffuse solar transmitted through
+        // window with horizontally-slatted blind into zone at current time (m2)
+        static Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through
+        // window with horizontally-slatted blind into zone at current time (m2)
         /////////// hoisted into namespace renamed to ////////////
         // static bool MustAlloc( true ); // True when local arrays must be allocated
         ////////////////////////
@@ -8675,8 +8668,7 @@ namespace SolarShading {
                 if (SolarDistribution == FullInteriorExterior) {
                     BmIncInsSurfAmountRep(SurfNum) *= BeamSolarRad;
                     BmIncInsSurfAmountRepEnergy(SurfNum) = BmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
-                    BmIncInsSurfIntensRep(SurfNum) =
-                            BmIncInsSurfAmountRep(SurfNum) / (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
+                    BmIncInsSurfIntensRep(SurfNum) = BmIncInsSurfAmountRep(SurfNum) / (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
                 } else { // Simple interior solar distribution. All beam falls on floor.
                     if (ISABSF(SurfNum) > 0.0 && Surface(SurfNum).HeatTransSurf) {
                         if (thisEnclosure.FloorArea > 0.0) {
@@ -8692,10 +8684,106 @@ namespace SolarShading {
                     BmIncInsSurfAmountRep(SurfNum) = Surface(SurfNum).Area * BmIncInsSurfIntensRep(SurfNum);
                     BmIncInsSurfAmountRepEnergy(SurfNum) = BmIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec;
                 }
-            }
-            for (int const SurfNum : thisEnclosure.SurfacePtr) {
                 if (Surface(SurfNum).Class == SurfaceClass_Window || Surface(SurfNum).Class == SurfaceClass_TDD_Dome) {
-                    ReportWinSolarDistributions(SurfNum, enclosureNum, WinTransBmBmSolar, WinTransBmDifSolar, TBmBm + TBmDif);
+
+                    SurfWinIntBeamAbsByShade(SurfNum) = IntBeamAbsByShadFac(SurfNum);
+                    SurfWinExtBeamAbsByShade(SurfNum) = BeamSolarRad * ExtBeamAbsByShadFac(SurfNum);
+
+                    if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
+
+                        ShadeFlag = SurfWinShadingFlag(SurfNum);
+                        BlNum = SurfWinBlindNumber(SurfNum);
+                        ShelfNum = Surface(SurfNum).Shelf;
+                        if (ShelfNum > 0) { // Outside daylighting shelf
+                            OutShelfSurf = Shelf(ShelfNum).OutSurf;
+                        } else {
+                            OutShelfSurf = 0;
+                        }
+
+                        // This lookup may be avoid if this 2nd surf loop can be combined with the 1st
+                        if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
+                            PipeNum = SurfWinTDDPipeNum(SurfNum);
+                            SurfNum2 = TDDPipe(PipeNum).Dome;
+
+                            DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum2) + GndSolarRad * Surface(SurfNum2).ViewFactorGround;
+
+                            SkySolarTrans = DifSolarRad * TransTDD(PipeNum, CosInc, SolarAniso) * AnisoSkyMult(SurfNum2);
+                            GndSolarTrans = GndSolarRad * TDDPipe(PipeNum).TransSolIso * Surface(SurfNum2).ViewFactorGround;
+
+                            WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
+                            WinDifSolar(SurfNum) = SkySolarTrans * Surface(SurfNum).Area + GndSolarTrans * Surface(SurfNum).Area;
+                            WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
+                            WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+
+                            WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
+                            WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+
+                            TDDPipe(PipeNum).TransmittedSolar = WinTransSolar(SurfNum);
+                            // TDDPipe(PipeNum)%TransSolBeam = TBmBm ! Reported above
+                            if (DifSolarInc > 0) {
+                                TDDPipe(PipeNum).TransSolDiff = (SkySolarTrans + GndSolarTrans) / DifSolarInc;
+                            } else {
+                                TDDPipe(PipeNum).TransSolDiff = 0.0;
+                            }
+
+                        } else if (OutShelfSurf > 0) { // Outside daylighting shelf
+                            ShelfSolarRad =
+                                    (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) * CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
+                                     DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
+                                    Shelf(ShelfNum).OutReflectSol;
+
+                            DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum) + GndSolarRad * Surface(SurfNum).ViewFactorGround +
+                                          ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
+
+                            WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
+                            WinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
+                            WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
+                            WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+
+                            WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
+                            WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+
+                        } else { // Regular window
+                            SkySolarInc = SurfWinSkySolarInc(SurfNum);
+                            GndSolarInc = SurfWinGndSolarInc(SurfNum);
+                            DifSolarInc = SkySolarInc + GndSolarInc;
+                            WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
+                            // Note: for complex fenestration, WinTransDifSolar has previously been defined using the effective
+                            // transmittance for sky and ground diffuse radiation (including beam radiation reflected from the ground)
+                            // so these calculations should be correct
+                            WinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
+                            WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
+                            WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+                            if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
+                                if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
+                                    WinDifSolar(SurfNum) = SkySolarInc * WinTransDifSolarSky(SurfNum) + GndSolarInc * WinTransDifSolarGnd(SurfNum);
+                                    WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+                                }
+                            }
+
+                            WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
+                            WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+                        }
+
+                        // added TH 12/9/2009, CR 7907 & 7809
+                        WinBmBmSolar(SurfNum) = BeamSolarRad * WinTransBmBmSolar;
+
+                        WinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar;
+                        WinBmBmSolarEnergy(SurfNum) = WinBmBmSolar(SurfNum) * TimeStepZoneSec;
+                        WinBmDifSolarEnergy(SurfNum) = WinBmDifSolar(SurfNum) * TimeStepZoneSec;
+
+                        WinDirSolTransAtIncAngle(SurfNum) = TBmBm + TBmDif; // For TDD:DIFFUSER this is the TDD transmittance
+
+                        // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
+                        if (Surface(SurfNum).Class != SurfaceClass_TDD_Dome) {
+                            ZoneTransSolar(enclosureNum) += WinTransSolar(SurfNum);                         //[W]
+                            ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * TimeStepZoneSec; //[J]
+                            ZoneBmSolFrExtWinsRep(enclosureNum) += WinBmSolar(SurfNum);
+                            ZoneDifSolFrExtWinsRep(enclosureNum) += WinDifSolar(SurfNum);
+                            ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec;   //[J]
+                            ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec; //[J]
+                        }
+                    }
                 }
             } // End of second loop over surfaces in zone
 
@@ -8713,115 +8801,6 @@ namespace SolarShading {
         //       to all interior surfaces in the zone
         //       Includes subsequent transmittance of diffuse solar to adjacent zones through interior windows
         CalcWinTransDifSolInitialDistribution(dataWindowEquivalentLayer);
-    }
-    void ReportWinSolarDistributions(int SurfNum,
-                                     int enclosureNum,
-                                     Real64 WinTransBmBmSolar,
-                                     Real64 WinTransBmDifSolar,
-                                     Real64 TBmAll)
-    {
-        using DataDaylightingDevices::Shelf;
-        using DataDaylightingDevices::TDDPipe;
-        SurfWinIntBeamAbsByShade(SurfNum) = IntBeamAbsByShadFac(SurfNum);
-        SurfWinExtBeamAbsByShade(SurfNum) = BeamSolarRad * ExtBeamAbsByShadFac(SurfNum);
-
-        if ((Surface(SurfNum).ExtBoundCond == ExternalEnvironment) || (Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt)) {
-
-            int ShadeFlag = SurfWinShadingFlag(SurfNum);
-            int ShelfNum = Surface(SurfNum).Shelf;
-            Real64 OutShelfSurf = 0;
-            if (ShelfNum > 0) { // Outside daylighting shelf
-                OutShelfSurf = Shelf(ShelfNum).OutSurf;
-            } else {
-                OutShelfSurf = 0;
-            }
-            Real64 DifSolarInc;    // Exterior diffuse solar incident on window (W/m2)
-            // This lookup may be avoid if this 2nd surf loop can be combined with the 1st
-            if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
-                int PipeNum = SurfWinTDDPipeNum(SurfNum);
-                int SurfNum2 = TDDPipe(PipeNum).Dome;
-                Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum2);
-
-                DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum2) + GndSolarRad * Surface(SurfNum2).ViewFactorGround;
-                // Exterior diffuse sky solar transmitted by TDD (W/m2)
-                Real64 SkySolarTrans = DifSolarRad * DaylightingDevices::TransTDD(PipeNum, CosInc, DataDaylightingDevices::SolarAniso) * AnisoSkyMult(SurfNum2);
-                // Exterior diffuse ground solar transmitted by TDD (W/m2)
-                Real64 GndSolarTrans = GndSolarRad * TDDPipe(PipeNum).TransSolIso * Surface(SurfNum2).ViewFactorGround;
-
-                WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
-                WinDifSolar(SurfNum) = SkySolarTrans * Surface(SurfNum).Area + GndSolarTrans * Surface(SurfNum).Area;
-                WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
-                WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
-
-                WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
-                WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
-
-                TDDPipe(PipeNum).TransmittedSolar = WinTransSolar(SurfNum);
-                // TDDPipe(PipeNum)%TransSolBeam = TBmBm ! Reported above
-                if (DifSolarInc > 0) {
-                    TDDPipe(PipeNum).TransSolDiff = (SkySolarTrans + GndSolarTrans) / DifSolarInc;
-                } else {
-                    TDDPipe(PipeNum).TransSolDiff = 0.0;
-                }
-
-            } else if (OutShelfSurf > 0) { // Outside daylighting shelf
-                Real64 ShelfSolarRad =
-                        (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) * CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
-                         DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
-                        Shelf(ShelfNum).OutReflectSol;
-
-                DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum) + GndSolarRad * Surface(SurfNum).ViewFactorGround +
-                              ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
-
-                WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
-                WinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
-                WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
-                WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
-
-                WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
-                WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
-
-            } else { // Regular window
-                Real64 SkySolarInc = SurfWinSkySolarInc(SurfNum);
-                Real64 GndSolarInc = SurfWinGndSolarInc(SurfNum);
-                DifSolarInc = SkySolarInc + GndSolarInc;
-                WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
-                // Note: for complex fenestration, WinTransDifSolar has previously been defined using the effective
-                // transmittance for sky and ground diffuse radiation (including beam radiation reflected from the ground)
-                // so these calculations should be correct
-                WinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
-                WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
-                WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
-                if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
-                    if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
-                        WinDifSolar(SurfNum) = SkySolarInc * WinTransDifSolarSky(SurfNum) + GndSolarInc * WinTransDifSolarGnd(SurfNum);
-                        WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
-                    }
-                }
-
-                WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
-                WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
-            }
-
-            // added TH 12/9/2009, CR 7907 & 7809
-            WinBmBmSolar(SurfNum) = BeamSolarRad * WinTransBmBmSolar;
-
-            WinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar;
-            WinBmBmSolarEnergy(SurfNum) = WinBmBmSolar(SurfNum) * TimeStepZoneSec;
-            WinBmDifSolarEnergy(SurfNum) = WinBmDifSolar(SurfNum) * TimeStepZoneSec;
-
-            WinDirSolTransAtIncAngle(SurfNum) = TBmAll; // For TDD:DIFFUSER this is the TDD transmittance
-
-            // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
-            if (Surface(SurfNum).Class != SurfaceClass_TDD_Dome) {
-                ZoneTransSolar(enclosureNum) += WinTransSolar(SurfNum);                         //[W]
-                ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * TimeStepZoneSec; //[J]
-                ZoneBmSolFrExtWinsRep(enclosureNum) += WinBmSolar(SurfNum);
-                ZoneDifSolFrExtWinsRep(enclosureNum) += WinDifSolar(SurfNum);
-                ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec;   //[J]
-                ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec; //[J]
-            }
-        }
     }
     void CalcAborbedOnExteriorOpaqueSurfaces()
     {
