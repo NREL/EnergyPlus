@@ -80,11 +80,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
          "    ,                        !- Basin Heater Capacity {W/K}",
          "    2,                       !- Basin Heater Setpoint Temperature {C}",
          "    ,                        !- Basin Heater Operating Schedule Name",
-		 "	  ,				 		   ! - grid signal schedule
-		 "    ,				     	   ! - Low bound to apply grid responsive control
-	     "    ,                  		 ! - High bound to apply grid responsive control
-	     "    ,                     	 ! - max speed when appy grid responsive control
-	     "    ,				 		 ! - load matched during grid responsive operation
+		 "	  ,				 		   ! - grid signal schedule",
+		 "    ,				     	   ! - Low bound to apply grid responsive control",
+	     "    ,                  		 ! - High bound to apply grid responsive control",
+	     "    ,                     	 ! - max speed when appy grid responsive control",
+	     "    ,				 		 ! - load matched during grid responsive operation",
          "    33861.72,             !- Speed 1 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
          "    0.70,               !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
          "    4.328973,             !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",
@@ -2584,10 +2584,10 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
         "    TIMED,                   !- Defrost Control",
         "    0.166667,                !- Defrost Time Period Fraction",
         "    7200,                    !- Resistive Defrost Heater Capacity {W}",
-	    "	 ,				 		   ! - grid signal schedule
-		"    ,				     	   ! - Low bound to apply grid responsive control
-	    "    ,                  		 ! - High bound to apply grid responsive control
-	    "    ,                     	 ! - max speed when appy grid responsive control
+	    "	 ,				 		   ! - grid signal schedule",
+		"    ,				     	   ! - Low bound to apply grid responsive control",
+	    "    ,                  		 ! - High bound to apply grid responsive control",
+	    "    ,                     	 ! - max speed when appy grid responsive control",
         "    1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {w}",
         "    5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}",
         "    0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}",
@@ -2694,11 +2694,11 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
         "    ,                        !- Basin Heater Capacity {W/K}",
         "    2,                       !- Basin Heater Setpoint Temperature {C}",
         "    ,                        !- Basin Heater Operating Schedule Name",
-		"	 ,				 		   ! - grid signal schedule
-		"    ,				     	   ! - Low bound to apply grid responsive control
-	    "    ,                  		 ! - High bound to apply grid responsive control
-	    "    ,                     	 ! - max speed when appy grid responsive control
-	    "    ,				 		 ! - load matched during grid responsive operation
+		"	 ,				 		   ! - grid signal schedule",
+		"    ,				     	   ! - Low bound to apply grid responsive control",
+	    "    ,                  		 ! - High bound to apply grid responsive control",
+	    "    ,                     	 ! - max speed when appy grid responsive control",
+	    "    ,				 		 ! - load matched during grid responsive operation",
         "    33861.72,                !- Speed 1 Reference Unit Total Cooling Capacity At Rated Conditions {w}",
         "    0.70,                    !- Speed 1 Reference Unit Sensible Heat Ratio At Rated Conditions {dimensionless}",
         "    4.328973,                !- Speed 1 Reference Unit COP At Rated Conditions {dimensionless}",

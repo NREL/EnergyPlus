@@ -1572,11 +1572,11 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High bound to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
-	,				 		 ! - load matched during grid responsive operation
+    ,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
+    ,                          ! - load matched during grid responsive operation
     8914.185229,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.79,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     3.980488789,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}

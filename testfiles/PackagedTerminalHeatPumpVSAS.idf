@@ -231,10 +231,10 @@
     TIMED,                   !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
     7200,                    !- Resistive Defrost Heater Capacity {W}
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High bound to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
+    ,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -325,10 +325,10 @@
     TIMED,                   !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
     4900,                    !- Resistive Defrost Heater Capacity {W}
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High bound to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
+    ,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -419,10 +419,10 @@
     TIMED,                   !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
     7600,                    !- Resistive Defrost Heater Capacity {W}
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High bound to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
+    ,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
     1838.7,                  !- Speed 1 Reference Unit Gross Rated Heating Capacity {W}
     5.0,                     !- Speed 1 Reference Unit Gross Rated Heating COP {dimensionless}
     0.1661088,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
@@ -518,11 +518,11 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High bound to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
-	,				 		 ! - load matched during grid responsive operation
+    ,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
+    ,                          ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
@@ -646,11 +646,11 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High bound to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
-	,				 		 ! - load matched during grid responsive operation
+    ,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
+    ,                          ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
@@ -774,11 +774,11 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High bound to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
-	,				 		 ! - load matched during grid responsive operation
+    ,                          ! - grid signal schedule
+    ,                          ! - Low bound to apply grid responsive control
+    ,                           ! - High bound to apply grid responsive control
+    ,                          ! - max speed when appy grid responsive control
+    ,                          ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
