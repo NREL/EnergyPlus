@@ -71,16 +71,16 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, dataCurveManager.NumCurves);
-    CurveManager::GetCurveInput();
-    dataCurveManager.GetCurvesInputFlag = false;
-    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(state);
+    state.dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
 
-    EXPECT_EQ(1.0, dataCurveManager.PerfCurve(1).CurveMax);
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(1.0, state.dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMaxPresent);
 
-    EXPECT_EQ(0.1, dataCurveManager.PerfCurve(1).CurveMin);
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(0.1, state.dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMinPresent);
 }
 
 TEST_F(EnergyPlusFixture, QuadraticCurve)
@@ -106,16 +106,16 @@ TEST_F(EnergyPlusFixture, QuadraticCurve)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, dataCurveManager.NumCurves);
-    CurveManager::GetCurveInput();
-    dataCurveManager.GetCurvesInputFlag = false;
-    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
+    CurveManager::GetCurveInput(state);
+    state.dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
 
-    EXPECT_EQ(38.0, dataCurveManager.PerfCurve(1).CurveMax);
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(38.0, state.dataCurveManager->PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMaxPresent);
 
-    EXPECT_EQ(0., dataCurveManager.PerfCurve(1).CurveMin);
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(0., state.dataCurveManager->PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMinPresent);
 }
 
 TEST_F(EnergyPlusFixture, TableLookup)
@@ -210,20 +210,20 @@ TEST_F(EnergyPlusFixture, TableLookup)
      });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, dataCurveManager.NumCurves);
+    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput();
-    dataCurveManager.GetCurvesInputFlag = false;
-    ASSERT_EQ(3, dataCurveManager.NumCurves);
+    CurveManager::GetCurveInput(state);
+    state.dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(3, state.dataCurveManager->NumCurves);
 
-    EXPECT_EQ("Table:Lookup", dataCurveManager.PerfCurve(1).ObjectType);
-    EXPECT_EQ("CAPMODFUNCOFWATERFLOW", dataCurveManager.PerfCurve(1).Name);
+    EXPECT_EQ("Table:Lookup", state.dataCurveManager->PerfCurve(1).ObjectType);
+    EXPECT_EQ("CAPMODFUNCOFWATERFLOW", state.dataCurveManager->PerfCurve(1).Name);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(0.0, dataCurveManager.PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(0.0, state.dataCurveManager->PerfCurve(1).CurveMin);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(1.04, dataCurveManager.PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(1.04, state.dataCurveManager->PerfCurve(1).CurveMax);
 }
 
 TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
@@ -309,20 +309,20 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, dataCurveManager.NumCurves);
+    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput();
-    dataCurveManager.GetCurvesInputFlag = false;
-    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    CurveManager::GetCurveInput(state);
+    state.dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, dataCurveManager.PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(expected_curve_min, state.dataCurveManager->PerfCurve(1).CurveMin);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, dataCurveManager.PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(expected_curve_max, state.dataCurveManager->PerfCurve(1).CurveMax);
 
     for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second, CurveManager::CurveValue(1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first*data_point.second, CurveManager::CurveValue(state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -410,20 +410,20 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, dataCurveManager.NumCurves);
+    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput();
-    dataCurveManager.GetCurvesInputFlag = false;
-    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    CurveManager::GetCurveInput(state);
+    state.dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, dataCurveManager.PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(expected_curve_min, state.dataCurveManager->PerfCurve(1).CurveMin);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, dataCurveManager.PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(expected_curve_max, state.dataCurveManager->PerfCurve(1).CurveMax);
 
     for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_divisor, CurveManager::CurveValue(1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_divisor, CurveManager::CurveValue(state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -512,20 +512,20 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, dataCurveManager.NumCurves);
+    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput();
-    dataCurveManager.GetCurvesInputFlag = false;
-    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    CurveManager::GetCurveInput(state);
+    state.dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, dataCurveManager.PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(expected_curve_min, state.dataCurveManager->PerfCurve(1).CurveMin);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, dataCurveManager.PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(expected_curve_max, state.dataCurveManager->PerfCurve(1).CurveMax);
 
     for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_auto_divisor, CurveManager::CurveValue(1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_auto_divisor, CurveManager::CurveValue(state, 1, data_point.first, data_point.second));
     }
 }
 
@@ -615,19 +615,19 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_EQ(0, dataCurveManager.NumCurves);
+    EXPECT_EQ(0, state.dataCurveManager->NumCurves);
 
-    CurveManager::GetCurveInput();
-    dataCurveManager.GetCurvesInputFlag = false;
-    ASSERT_EQ(1, dataCurveManager.NumCurves);
+    CurveManager::GetCurveInput(state);
+    state.dataCurveManager->GetCurvesInputFlag = false;
+    ASSERT_EQ(1, state.dataCurveManager->NumCurves);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMinPresent);
-    EXPECT_EQ(expected_curve_min, dataCurveManager.PerfCurve(1).CurveMin);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMinPresent);
+    EXPECT_EQ(expected_curve_min, state.dataCurveManager->PerfCurve(1).CurveMin);
 
-    EXPECT_TRUE(dataCurveManager.PerfCurve(1).CurveMaxPresent);
-    EXPECT_EQ(expected_curve_max, dataCurveManager.PerfCurve(1).CurveMax);
+    EXPECT_TRUE(state.dataCurveManager->PerfCurve(1).CurveMaxPresent);
+    EXPECT_EQ(expected_curve_max, state.dataCurveManager->PerfCurve(1).CurveMax);
 
     for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_auto_divisor/normalization_divisor, CurveManager::CurveValue(1, data_point.first, data_point.second));
+        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_auto_divisor/normalization_divisor, CurveManager::CurveValue(state, 1, data_point.first, data_point.second));
     }
 }

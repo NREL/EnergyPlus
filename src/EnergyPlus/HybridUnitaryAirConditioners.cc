@@ -45,46 +45,29 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <cassert>
-#include <cmath>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
-// EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HybridEvapCoolingModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/WaterManager.hh>
 
 #define TEMP_CURVE 0
 #define W_CURVE 1
@@ -111,7 +94,8 @@ namespace HybridUnitaryAirConditioners {
     // Begin routines for zone HVAC Hybrid Evaporative cooler unit
     //_______________________________________________________________________________________________________________________
     //***************
-    void SimZoneHybridUnitaryAirConditioners(std::string const &CompName,    // name of the packaged terminal heat pump
+    void SimZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                             std::string const &CompName,    // name of the packaged terminal heat pump
                                              int const ZoneNum,              // number of zone being served
                                              Real64 &SensibleOutputProvided, // sensible capacity delivered to zone cooling is negative
                                              Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
@@ -139,7 +123,7 @@ namespace HybridUnitaryAirConditioners {
         int CompNum;
         bool errorsfound = false;
         if (GetInputZoneHybridEvap) {
-            GetInputZoneHybridUnitaryAirConditioners(errorsfound);
+            GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
             GetInputZoneHybridEvap = false;
         }
 
@@ -171,7 +155,7 @@ namespace HybridUnitaryAirConditioners {
             return;
         }
         try {
-            CalcZoneHybridUnitaryAirConditioners(CompNum, ZoneNum, SensibleOutputProvided, LatentOutputProvided);
+            CalcZoneHybridUnitaryAirConditioners(state, CompNum, ZoneNum, SensibleOutputProvided, LatentOutputProvided);
         } catch (int e) {
             ShowFatalError("An exception occurred in CalcZoneHybridUnitaryAirConditioners" + TrimSigDigits(CompNum) + ", Unit name=" + CompName +
                            ", stored unit name for that index=" + ZoneHybridUnitaryAirConditioner(CompNum).Name + ". Please check idf.");
@@ -213,7 +197,6 @@ namespace HybridUnitaryAirConditioners {
         using DataZoneEquipment::ZoneEquipConfig;
         using DataZoneEquipment::ZoneEquipInputsFilled;
         using DataZoneEquipment::ZoneHybridEvaporativeCooler_Num;
-        using Fans::GetFanVolFlow;
 
         // Locals
         int Loop;
@@ -338,7 +321,8 @@ namespace HybridUnitaryAirConditioners {
                                                                             "InitZoneHybridUnitaryAirConditioners");
     }
 
-    void CalcZoneHybridUnitaryAirConditioners(int const UnitNum,              // unit number
+    void CalcZoneHybridUnitaryAirConditioners(EnergyPlusData &state,
+                                              int const UnitNum,              // unit number
                                               int const ZoneNum,              // number of zone being served
                                               Real64 &SensibleOutputProvided, // sensible capacity delivered to zone cooling negitive
                                               Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
@@ -402,7 +386,7 @@ namespace HybridUnitaryAirConditioners {
         } else {
             DesignMinVRMassFlow = DesignMinVR * 1.225;
         }
-        ZoneHybridUnitaryAirConditioner(UnitNum).doStep(
+        ZoneHybridUnitaryAirConditioner(UnitNum).doStep(state,
             ZoneCoolingLoad, ZoneHeatingLoad, OutputRequiredToHumidify, OutputRequiredToDehumidify, DesignMinVRMassFlow);
         SensibleOutputProvided = -ZoneHybridUnitaryAirConditioner(UnitNum).QSensZoneOut; // cooling negative
 
@@ -457,7 +441,7 @@ namespace HybridUnitaryAirConditioners {
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletMassFlowRate;
     }
 
-    void GetInputZoneHybridUnitaryAirConditioners(bool &Errors)
+    void GetInputZoneHybridUnitaryAirConditioners(EnergyPlusData &state, bool &Errors)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
@@ -677,7 +661,7 @@ namespace HybridUnitaryAirConditioners {
                 }
 
                 for (int modeIter = 0; modeIter <= Numberofoperatingmodes - 1; ++modeIter) {
-                    ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(
+                    ErrorsFound = ZoneHybridUnitaryAirConditioner(UnitLoop).ParseMode(state,
                         Alphas, cAlphaFields, Numbers, cNumericFields, lAlphaBlanks, cCurrentModuleObject);
                     if (ErrorsFound) {
                         ShowFatalError(RoutineName + "Errors found parsing modes");
@@ -1213,11 +1197,11 @@ namespace HybridUnitaryAirConditioners {
             ShowContinueError("... Preceding condition causes termination.");
         }
     }
-    int GetHybridUnitaryACOutAirNode(int const CompNum)
+    int GetHybridUnitaryACOutAirNode(EnergyPlusData &state, int const CompNum)
     {
         bool errorsfound = false;
         if (GetInputZoneHybridEvap) {
-            GetInputZoneHybridUnitaryAirConditioners(errorsfound);
+            GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
             GetInputZoneHybridEvap = false;
         }
 
@@ -1230,11 +1214,11 @@ namespace HybridUnitaryAirConditioners {
         return GetHybridUnitaryACOutAirNode;
     }
 
-    int GetHybridUnitaryACZoneInletNode(int const CompNum)
+    int GetHybridUnitaryACZoneInletNode(EnergyPlusData &state, int const CompNum)
     {
         bool errorsfound = false;
         if (GetInputZoneHybridEvap) {
-            GetInputZoneHybridUnitaryAirConditioners(errorsfound);
+            GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
             GetInputZoneHybridEvap = false;
         }
 
@@ -1247,11 +1231,11 @@ namespace HybridUnitaryAirConditioners {
         return GetHybridUnitaryACZoneInletNode;
     }
 
-    int GetHybridUnitaryACReturnAirNode(int const CompNum)
+    int GetHybridUnitaryACReturnAirNode(EnergyPlusData &state, int const CompNum)
     {
         bool errorsfound = false;
         if (GetInputZoneHybridEvap) {
-            GetInputZoneHybridUnitaryAirConditioners(errorsfound);
+            GetInputZoneHybridUnitaryAirConditioners(state, errorsfound);
             GetInputZoneHybridEvap = false;
         }
 

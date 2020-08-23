@@ -301,7 +301,7 @@ namespace EMSManager {
             PluginManagement::onBeginEnvironment();
         }
 
-        InitEMS(state.files, iCalledFrom);
+        InitEMS(state, state.files, iCalledFrom);
 
         // also call plugins and callbacks here for convenience
         bool anyPluginsOrCallbacksRan = false;
@@ -324,7 +324,7 @@ namespace EMSManager {
 
                 if (EMSProgramCallManager(ProgramManagerNum).CallingPoint == iCalledFrom) {
                     for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerNum).NumErlPrograms; ++ErlProgramNum) {
-                        EvaluateStack(state.files, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
+                        EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
                         anyProgramRan = true;
                     }
                 }
@@ -332,7 +332,7 @@ namespace EMSManager {
         } else { // call specific program manager
             if (present(ProgramManagerToRun)) {
                 for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerToRun).NumErlPrograms; ++ErlProgramNum) {
-                    EvaluateStack(state.files, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
+                    EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
                     anyProgramRan = true;
                 }
             }
@@ -388,7 +388,7 @@ namespace EMSManager {
         ReportEMS();
     }
 
-    void InitEMS(IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
     {
 
         // SUBROUTINE INFORMATION:
@@ -445,7 +445,7 @@ namespace EMSManager {
             SetupSurfaceConstructionActuators();
             SetupSurfaceOutdoorBoundaryConditionActuators();
             SetupZoneOutdoorBoundaryConditionActuators();
-            GetEMSInput(ioFiles);
+            GetEMSInput(state, ioFiles);
             GetEMSUserInput = false;
         }
 
@@ -464,7 +464,7 @@ namespace EMSManager {
             FinishProcessingUserInput = false;
         }
 
-        InitializeRuntimeLanguage(ioFiles);
+        InitializeRuntimeLanguage(state, ioFiles);
 
         if ((BeginEnvrnFlag) || (iCalledFrom == emsCallFromZoneSizing) || (iCalledFrom == emsCallFromSystemSizing) ||
             (iCalledFrom == emsCallFromUserDefinedComponentModel)) {
@@ -541,7 +541,7 @@ namespace EMSManager {
         ReportRuntimeLanguage();
     }
 
-    void GetEMSInput(IOFiles &ioFiles)
+    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -586,16 +586,12 @@ namespace EMSManager {
         int SensorNum;
         int ActuatorNum;
         int ActuatorVariableNum;
-        //  INTEGER                     :: ProgramNum
         int VariableNum; // local do loop index
         int NumAlphas;   // Number of elements in the alpha array
         int NumNums;     // Number of elements in the numeric array
         int AlphaNum;
         int IOStat; // IO Status when calling get input subroutine
-        //  CHARACTER(len=MaxNameLength), DIMENSION(99) :: AlphArray  ! Character string data  ! 99 should really be some kind of constant
-        //  REAL(r64), DIMENSION(1)          :: NumArray  ! Numeric data
         static bool ErrorsFound(false);
-        //  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -933,7 +929,7 @@ namespace EMSManager {
             }
         }
 
-        InitializeRuntimeLanguage(ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
+        InitializeRuntimeLanguage(state, ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
 
         if (NumProgramCallManagers > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";

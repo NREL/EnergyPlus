@@ -92,21 +92,21 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
 
     TimeOpenElapsed = 3.0;
     TimeCloseElapsed = 0.0;
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenStatus);
 
     TimeOpenElapsed = 5.0;
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenStatus);
 
     TimeOpenElapsed = 0.0;
     TimeCloseElapsed = 3.0;
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenStatus);
 
     TimeOpenElapsed = 0.0;
     TimeCloseElapsed = 5.0;
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenStatus);
 
     OutDryBulbTemp = 15.0;
@@ -123,46 +123,46 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).ComfortLowTempCurveNum = 1;
     dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).ComfortHighTempCurveNum = 2;
 
-    dataCurveManager.NumCurves = 2;
-    dataCurveManager.PerfCurve.allocate(dataCurveManager.NumCurves);
+    state.dataCurveManager->NumCurves = 2;
+    state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
     CurveNum = 1;
-    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
-    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 21.2;
-    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 0.09;
-    dataCurveManager.PerfCurve(CurveNum).Coeff3 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Coeff4 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Coeff5 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Coeff6 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Var1Min = -50.0;
-    dataCurveManager.PerfCurve(CurveNum).Var1Max = 10.0;
-    dataCurveManager.PerfCurve(CurveNum).Var2Min = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Var2Max = 2.0;
+    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
+    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 21.2;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.09;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = -50.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 10.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
 
     CurveNum = 2;
-    dataCurveManager.PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
-    dataCurveManager.PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
-    dataCurveManager.PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
-    dataCurveManager.PerfCurve(CurveNum).Coeff1 = 18.8;
-    dataCurveManager.PerfCurve(CurveNum).Coeff2 = 0.33;
-    dataCurveManager.PerfCurve(CurveNum).Coeff3 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Coeff4 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Coeff5 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Coeff6 = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Var1Min = 10.0;
-    dataCurveManager.PerfCurve(CurveNum).Var1Max = 50.0;
-    dataCurveManager.PerfCurve(CurveNum).Var2Min = 0.0;
-    dataCurveManager.PerfCurve(CurveNum).Var2Max = 2.0;
+    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Quadratic;
+    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Quadratic";
+    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 18.8;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = 0.33;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 10.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 50.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Min = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Max = 2.0;
 
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(0, OpenProbStatus);
     EXPECT_EQ(1, CloseProbStatus);
 
     MAT(1) = 26.0;
     MRT(1) = 26.0;
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(2, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
@@ -175,14 +175,14 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_AdvancedTest_Test1)
     ZoneThermostatSetPointLo.allocate(1);
     ZoneThermostatSetPointHi.allocate(1);
 
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 
     TempControlType(1) = 4;
     ZoneThermostatSetPointLo(1) = 22.0;
     ZoneThermostatSetPointHi(1) = 28.0;
-    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
+    dataAirflowNetworkBalanceManager.OccupantVentilationControl(1).calc(state, 1, TimeOpenElapsed, TimeCloseElapsed, OpenStatus, OpenProbStatus, CloseProbStatus);
     EXPECT_EQ(1, OpenProbStatus);
     EXPECT_EQ(0, CloseProbStatus);
 }

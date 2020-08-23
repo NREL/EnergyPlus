@@ -252,7 +252,7 @@ namespace AirflowNetworkBalanceManager {
             TurnFansOn = false; // The FAN should be off when BeginEnvrnFlag = .True.
         }
 
-        dataAirflowNetworkBalanceManager.initialize();
+        dataAirflowNetworkBalanceManager.initialize(state);
 
         NetworkNumOfNodes = NumOfNodesMultiZone;
         NetworkNumOfLinks = NumOfLinksMultiZone;
@@ -341,7 +341,7 @@ namespace AirflowNetworkBalanceManager {
                 dataAirflowNetworkBalanceManager.ValidateDistributionSystemFlag = false;
             }
         }
-        CalcAirflowNetworkAirBalance();
+        CalcAirflowNetworkAirBalance(state);
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
 
@@ -1702,7 +1702,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (!lAlphaBlanks(2)) {
                     dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveName = Alphas(2);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum = GetCurveIndex(Alphas(2)); // convert curve name to number
+                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum = GetCurveIndex(state, Alphas(2)); // convert curve name to number
                     if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum == 0) {
                         dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinTimeControlOnly = true;
                         ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(2) +
@@ -1711,7 +1711,7 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError(
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
                                                                     {1},                                                  // Valid dimensions
                                                                     RoutineName,                                          // Routine name
                                                                     CurrentModuleObject,                                  // Object Type
@@ -1721,9 +1721,10 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (!lAlphaBlanks(3)) {
                     dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(Alphas(3)); // convert curve name to number
+                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(state, Alphas(3)); // convert curve name to number
                     if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
                                                                     {1},                                                   // Valid dimensions
                                                                     RoutineName,                                           // Routine name
                                                                     CurrentModuleObject,                                   // Object Type
@@ -1748,8 +1749,8 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // Check continuity of both curves at boundary point
                 if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum > 0 && dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum) {
-                    if (std::abs(CurveValue(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
-                                 CurveValue(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
+                    if (std::abs(CurveValue(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
+                                 CurveValue(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1");
                         ShowContinueError("Both curve names are = " + cAlphaFields(2) + " and " + cAlphaFields(3));
                         ShowContinueError("The input value of " + cNumericFields(3) + " = " +
@@ -2275,7 +2276,7 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError("The default value is assigned as " + RoundSigDigits(Numbers(1), 1));
                     }
                     MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;          // External node number
-                    MultizoneExternalNodeData(i).curve = CurveManager::GetCurveIndex(Alphas(2)); // Wind pressure curve
+                    MultizoneExternalNodeData(i).curve = CurveManager::GetCurveIndex(state, Alphas(2)); // Wind pressure curve
                     if (MultizoneExternalNodeData(i).curve == 0) {
                         ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + "=" + Alphas(2));
                         ShowContinueError("Entered in " + CurrentModuleObject + '=' + Alphas(1));
@@ -2317,7 +2318,7 @@ namespace AirflowNetworkBalanceManager {
                         // HACK: Need to verify name is unique between "OutdoorAir:Node" and "AirflowNetwork:MultiZone:ExternalNode"
 
                         if (NumAlphas > 5 && !lAlphaBlanks(6)) { // Wind pressure curve
-                            MultizoneExternalNodeData(i).curve = GetCurveIndex(Alphas(6));
+                            MultizoneExternalNodeData(i).curve = GetCurveIndex(state, Alphas(6));
                             if (MultizoneExternalNodeData(i).curve == 0) {
                                 ShowSevereError(RoutineName + "Invalid " + cAlphaFields(6) + "=" + Alphas(6));
                                 ShowContinueError("Entered in " + CurrentModuleObject + '=' + Alphas(1));
@@ -2993,7 +2994,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-            dataAirflowNetworkBalanceManager.calculateWindPressureCoeffs();
+            dataAirflowNetworkBalanceManager.calculateWindPressureCoeffs(state);
             // Ensure automatic generation is OK
             n = 0;
             for (j = 1; j <= 5; ++j) {
@@ -3081,12 +3082,12 @@ namespace AirflowNetworkBalanceManager {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
-            print(state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(index));
+            print(state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(state, index));
 
             for (j = 0; j < numWinDirs; ++j) {
-                print(state.files.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
+                print(state.files.eio, "{:.2R},", CurveManager::CurveValue(state, index, j * angleDelta));
             }
-            print(state.files.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
+            print(state.files.eio, "{:.2R}\n", CurveManager::CurveValue(state, index, numWinDirs * angleDelta));
         }
 
         if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones > 0) {
@@ -4737,7 +4738,7 @@ namespace AirflowNetworkBalanceManager {
 
 }
 
-    void AirflowNetworkBalanceManagerData::initialize()
+    void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -4973,7 +4974,8 @@ namespace AirflowNetworkBalanceManager {
                     }
                     j = AirflowNetworkBalanceManager::MultizoneSurfaceData(i).SurfNum;
                     dataAirflowNetworkBalanceManager.OccupantVentilationControl(AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OccupantVentilationControlNum)
-                        .calc(AirflowNetworkBalanceManager::Surface(j).Zone,
+                        .calc(state,
+                              AirflowNetworkBalanceManager::Surface(j).Zone,
                               AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenElapsedTime,
                               AirflowNetworkBalanceManager::MultizoneSurfaceData(i).CloseElapsedTime,
                               AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpeningStatus,
@@ -5639,7 +5641,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkAirBalance()
+    void CalcAirflowNetworkAirBalance(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -5712,7 +5714,8 @@ namespace AirflowNetworkBalanceManager {
                             LocalWindSpeed = WindSpeedAt(MultizoneExternalNodeData(i).height);
                             LocalDryBulb = OutDryBulbTempAt(AirflowNetworkNodeData(n).NodeHeight);
                             LocalAzimuth = MultizoneExternalNodeData(i).azimuth;
-                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(MultizoneExternalNodeData(i).curve,
+                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(state,
+                                                                            MultizoneExternalNodeData(i).curve,
                                                                             MultizoneExternalNodeData(i).symmetricCurve,
                                                                             MultizoneExternalNodeData(i).useRelativeAngle,
                                                                             LocalAzimuth,
@@ -5729,7 +5732,8 @@ namespace AirflowNetworkBalanceManager {
                             LocalHumRat = Node((NodeNum)).HumRat;
                             LocalDryBulb = Node((NodeNum)).OutAirDryBulb;
                             LocalAzimuth = MultizoneExternalNodeData(i).azimuth;
-                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(MultizoneExternalNodeData(i).curve,
+                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(state,
+                                                                            MultizoneExternalNodeData(i).curve,
                                                                             MultizoneExternalNodeData(i).symmetricCurve,
                                                                             MultizoneExternalNodeData(i).useRelativeAngle,
                                                                             LocalAzimuth,
@@ -6069,36 +6073,36 @@ namespace AirflowNetworkBalanceManager {
         return AFNPressureResidual;
     }
 
-    static int makeTable(const std::string &name, const int gridIndex, const std::vector<Real64> &y)
+    static int makeTable(EnergyPlusData &state, const std::string &name, const int gridIndex, const std::vector<Real64> &y)
     {
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
 
-        int CurveNum = dataCurveManager.PerfCurve.size() + 1;
-        dataCurveManager.PerfCurve.push_back(CurveManager::PerformanceCurveData());
+        int CurveNum = state.dataCurveManager->PerfCurve.size() + 1;
+        state.dataCurveManager->PerfCurve.push_back(CurveManager::PerformanceCurveData());
 
-        dataCurveManager.PerfCurve(CurveNum).Name = name;
-        dataCurveManager.PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-        dataCurveManager.PerfCurve(CurveNum).NumDims = 1;
+        state.dataCurveManager->PerfCurve(CurveNum).Name = name;
+        state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
+        state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
 
-        dataCurveManager.PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
 
-        dataCurveManager.PerfCurve(CurveNum).Var1Min = 0.0;
-        dataCurveManager.PerfCurve(CurveNum).Var1MinPresent = true;
-        dataCurveManager.PerfCurve(CurveNum).Var1Max = 360.0;
-        dataCurveManager.PerfCurve(CurveNum).Var1MaxPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 360.0;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1MaxPresent = true;
 
-        dataCurveManager.PerfCurve(CurveNum).TableIndex = gridIndex;
-        dataCurveManager.PerfCurve(CurveNum).GridValueIndex = dataCurveManager.btwxtManager.addOutputValues(gridIndex, y);
+        state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
+        state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
 
-        EnergyPlus::dataCurveManager.NumCurves += 1;
+        state.dataCurveManager->NumCurves += 1;
         return CurveNum;
     }
 
 }
 
-    void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs()
+    void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6244,7 +6248,7 @@ namespace AirflowNetworkBalanceManager {
         std::vector<Btwxt::GridAxis> dirs30Axes;
         dirs30Axes.emplace_back(dirs30, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-        auto dirs30GridIndex = dataCurveManager.btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
+        auto dirs30GridIndex = state.dataCurveManager->btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
 
         if (AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
             // Create the array of wind directions
@@ -6316,7 +6320,7 @@ namespace AirflowNetworkBalanceManager {
                 } // End of wind direction loop
                 // Add new table
                 vals[12] = vals[0]; // Enforce periodicity
-                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!WPCTABLE" + std::to_string(FacadeNum), dirs30GridIndex, vals);
+                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!WPCTABLE" + std::to_string(FacadeNum), dirs30GridIndex, vals);
             } // End of facade number loop
 
         } else { //-calculate the advanced single sided wind pressure coefficients
@@ -6390,18 +6394,18 @@ namespace AirflowNetworkBalanceManager {
             std::vector<Btwxt::GridAxis> dirs10Axes;
             dirs10Axes.emplace_back(dirs10, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-            auto dirs10GridIndex = dataCurveManager.btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
+            auto dirs10GridIndex = state.dataCurveManager->btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
 
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
+                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
             }
             FacadeNum = 5;
             valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-            curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
+            curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
             for (unsigned facadeNum = 6; facadeNum <= valsByFacade.size(); ++facadeNum) {
                 valsByFacade[facadeNum - 1].push_back(valsByFacade[facadeNum - 1][0]); // Enforce periodicity
-                curveIndex[facadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLE" + std::to_string(facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
+                curveIndex[facadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!SSWPCTABLE" + std::to_string(facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
             }
         }
         // Connect the external nodes to the new curves
@@ -6412,7 +6416,8 @@ namespace AirflowNetworkBalanceManager {
 
 namespace AirflowNetworkBalanceManager {
 
-    Real64 CalcWindPressure(int const curve,           // Curve index, change this to pointer after curve refactor
+    Real64 CalcWindPressure(EnergyPlusData &state,
+                            int const curve,           // Curve index, change this to pointer after curve refactor
                             bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
                             bool const relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                             Real64 const azimuth,      // Azimuthal angle of surface
@@ -6458,7 +6463,7 @@ namespace AirflowNetworkBalanceManager {
                 angle = 360.0 - angle;
             }
         }
-        Cp = CurveManager::CurveValue(curve, angle);
+        Cp = CurveManager::CurveValue(state, curve, angle);
 
         return Cp * 0.5 * rho * windSpeed * windSpeed;
     }
@@ -9567,7 +9572,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= NumOfNodes; ++i) {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
-            if (GetZoneDehumidifierNodeNumber(state.dataZoneDehumidifier, i)) NodeFound(i) = true;
+            if (GetZoneDehumidifierNodeNumber(state, state.dataZoneDehumidifier, i)) NodeFound(i) = true;
 
             for (j = 1; j <= NumOfZones; ++j) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
@@ -11203,7 +11208,8 @@ namespace AirflowNetworkBalanceManager {
         return AirLoopNumber;
     }
 
-    void OccupantVentilationControlProp::calc(int const ZoneNum,
+    void OccupantVentilationControlProp::calc(EnergyPlusData &state,
+                                              int const ZoneNum,
                                               Real64 const TimeOpenDuration,
                                               Real64 const TimeCloseDuration,
                                               int &OpeningStatus,
@@ -11243,9 +11249,9 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (OutDryBulb < ComfortBouPoint) {
-            Tcomfort = CurveValue(ComfortLowTempCurveNum, OutDryBulb);
+            Tcomfort = CurveValue(state, ComfortLowTempCurveNum, OutDryBulb);
         } else {
-            Tcomfort = CurveValue(ComfortHighTempCurveNum, OutDryBulb);
+            Tcomfort = CurveValue(state, ComfortHighTempCurveNum, OutDryBulb);
         }
         ComfortBand = -0.0028 * (100 - MaxPPD) * (100 - MaxPPD) + 0.3419 * (100 - MaxPPD) - 6.6275;
         Toperative = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));

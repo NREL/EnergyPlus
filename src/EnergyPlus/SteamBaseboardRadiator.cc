@@ -1184,7 +1184,7 @@ namespace SteamBaseboardRadiator {
             // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
             DistributeBBSteamRadGains();
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
             HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // Here an assumption is made regarding radiant heat transfer to people.

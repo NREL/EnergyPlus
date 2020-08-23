@@ -285,11 +285,11 @@ protected:
         cbvav.CBVAVBoxOutletNode.allocate(1);
         cbvav.CBVAVBoxOutletNode(1) = 11;
 
-        dataCurveManager.PerfCurve.allocate(1);
-        dataCurveManager.NumCurves = 1;
-        dataCurveManager.PerfCurve(1).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
-        dataCurveManager.PerfCurve(1).CurveType = CurveManager::CurveTypeEnum::Linear;
-        dataCurveManager.PerfCurve(1).Coeff1 = 1.0;
+        state.dataCurveManager->PerfCurve.allocate(1);
+        state.dataCurveManager->NumCurves = 1;
+        state.dataCurveManager->PerfCurve(1).InterpolationType = CurveManager::InterpTypeEnum::EvaluateCurveToLimits;
+        state.dataCurveManager->PerfCurve(1).CurveType = CurveManager::CurveTypeEnum::Linear;
+        state.dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
 
         DataEnvironment::OutDryBulbTemp = 35.0;
         DataEnvironment::OutHumRat = 0.0141066;
@@ -648,7 +648,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

@@ -349,7 +349,7 @@ namespace SimulationManager {
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 
-        ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+        ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
@@ -400,7 +400,7 @@ namespace SimulationManager {
 
         CheckAndReadFaults(state);
 
-        InitCurveReporting();
+        InitCurveReporting(state);
 
         AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         KickOffSimulation = false;
@@ -1285,7 +1285,7 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
-                        overrideMaxAllowedDelTemp = true; 
+                        overrideMaxAllowedDelTemp = true;
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
@@ -1336,7 +1336,7 @@ namespace SimulationManager {
                     if (overrideSystemTimestep) {
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
-                        int MinTimeStepSysOverrideValue = 60.0; 
+                        int MinTimeStepSysOverrideValue = 60.0;
                         if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
                             MinTimeStepSysOverrideValue = MinutesPerTimeStep;
                         }
@@ -1452,7 +1452,7 @@ namespace SimulationManager {
         } else {
             Alphas(7) = "No";
         }
-        Alphas(8) = General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1); 
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1);
         Alphas(9) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 3);
         Alphas(10) = General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
@@ -3164,7 +3164,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation

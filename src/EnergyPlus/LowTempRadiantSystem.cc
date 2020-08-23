@@ -784,7 +784,7 @@ namespace LowTempRadiantSystem {
             }
 
             thisRadSys.CircLength = Numbers(16);
-            
+
             thisRadSys.schedNameChangeoverDelay = Alphas(18);
             if (!lAlphaBlanks(18)) {
                 thisRadSys.schedPtrChangeoverDelay = GetScheduleIndex(Alphas(18));
@@ -1031,7 +1031,7 @@ namespace LowTempRadiantSystem {
             }
 
             thisCFloSys.CircLength = Numbers(12);
-            
+
             thisCFloSys.schedNameChangeoverDelay = Alphas(22);
             if (!lAlphaBlanks(22)) {
                 thisCFloSys.schedPtrChangeoverDelay = GetScheduleIndex(Alphas(22));
@@ -1678,9 +1678,9 @@ namespace LowTempRadiantSystem {
         Real64 zoneMultipliersSurface = 0.0;
         Real64 zoneMultiplersTolerance = 0.001;
         for (int SurfNum = 1; SurfNum <= this->NumOfSurfaces; ++SurfNum) {
-            
+
             if (this->SurfacePtr(SurfNum) == 0) continue; // invalid surface -- detected earlier
-            
+
             if (DataGlobals::DisplayExtraWarnings) {
                 // check zone numbers--ok if they are not the same
                 // group warning issued earlier, show detailed warning here
@@ -1694,7 +1694,7 @@ namespace LowTempRadiantSystem {
                     ShowContinueError("then ignore this warning message.  Otherwise, check the surfaces in this radiant system.");
                 }
             }
-            
+
             // check zone multipliers--these must be the same
             if (SurfNum == 1) zoneMultipliers = double(DataHeatBalance::Zone(this->ZonePtr).Multiplier) *double(DataHeatBalance::Zone(this->ZonePtr).ListMultiplier);
             zoneMultipliersSurface = double(DataHeatBalance::Zone(Surface(this->SurfacePtr(SurfNum)).Zone).Multiplier)
@@ -1705,7 +1705,7 @@ namespace LowTempRadiantSystem {
                 ShowContinueError("Occurs in Low Temperature Radiant System = " + this->Name);
                 errorsFound = true;
             }
-                        
+
             // make sure that this construction is defined with a source/sink--this must be the case or it can't serve as a radiant system surface
             if (!dataConstruction.Construct(Surface(this->SurfacePtr(SurfNum)).Construction).SourceSinkPresent) {
                 ShowSevereError("Construction referenced in Radiant System Surface does not have a source/sink present");
@@ -2070,7 +2070,7 @@ namespace LowTempRadiantSystem {
             MyEnvrnFlagGeneral = false;
         }
         if (!BeginEnvrnFlag) MyEnvrnFlagGeneral = true;
-        
+
         // If we are at the beginning of a new environment OR the warmup period is done and the simulation is starting,
         // then the various changeover variables need to be reset so that we are starting from scratch.
         if ( (BeginEnvrnFlag && FirstHVACIteration) ||
@@ -2089,7 +2089,7 @@ namespace LowTempRadiantSystem {
                 CFloRadSys(RadSysNum).lastTimeStep = 0;
             }
         }
-        
+
         if (SystemType == HydronicSystem) {
             if (BeginEnvrnFlag && MyEnvrnFlagHydr(RadSysNum)) {
                 HydrRadSys(RadSysNum).HeatPower = 0.0;
@@ -2167,7 +2167,7 @@ namespace LowTempRadiantSystem {
                 }
                 MyEnvrnFlagCFlo(RadSysNum) = false;
             }
-            
+
             if (anyRadiantSystemUsingRunningMeanAverage) {
                 if (DataGlobals::BeginDayFlag && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
                     CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature();
@@ -2176,10 +2176,10 @@ namespace LowTempRadiantSystem {
                     CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = true;  // reset so that the next time BeginDayFlag is true this can get set
                 }
             }
-            
+
         } // NumOfCFloLowTempRadSys > 0
         if (!BeginEnvrnFlag && SystemType == ConstantFlowSystem) MyEnvrnFlagCFlo(RadSysNum) = true;
-        
+
         if (SystemType == ElectricSystem) {
             if (BeginEnvrnFlag && MyEnvrnFlagElec(RadSysNum)) {
                 ElecRadSys(RadSysNum).HeatPower = 0.0;
@@ -2342,7 +2342,7 @@ namespace LowTempRadiantSystem {
             } else if (SELECT_CASE_var == ElectricSystem) {
 
                 ElecRadSys(RadSysNum).OperatingMode = NotOperating;
-                
+
             }
         }
 
@@ -2355,7 +2355,7 @@ namespace LowTempRadiantSystem {
         // So, we can update the last status of the system using this information before reseting things
         // to "not operating".
         this->lastOperatingMode = this->OperatingMode;
-        
+
         if (DataGlobals::BeginDayFlag) {
             // The begin day flag is set which mean this is the first time step of the day.
             // This also means that the previous time step was the last time step of yesterday.
@@ -2388,7 +2388,7 @@ namespace LowTempRadiantSystem {
             this->lastHourOfDay = DataGlobals::HourOfDay;
             this->lastTimeStep  = DataGlobals::TimeStep;
         }
-        
+
         // Now go ahead and reset the operating mode (this will be set to something else if the system is running)
         this->OperatingMode = NotOperating;
     }
@@ -2397,27 +2397,27 @@ namespace LowTempRadiantSystem {
     {
         if (this->lastOperatingMode == NotOperating) return; // this should only happen at the beginning of a simulation (at the start of warmup and the actual simulation)
                                                              // so let things proceed with whatever the system wants to do
-        
+
         if (this->OperatingMode == NotOperating) return;  // always let it turn off
-        
+
         if (this->OperatingMode == this->lastOperatingMode) return; // always let it continue to operating in the same mode
-        
+
         if (this->schedPtrChangeoverDelay == 0) return; // user not requesting any delays (no schedule entered) so let it do whatever is requested
-        
+
         Real64 currentChangeoverDelay = ScheduleManager::GetCurrentScheduleValue(this->schedPtrChangeoverDelay);
         if (currentChangeoverDelay <= 0.0) return;  // delay is zero so let it do whatever it requested
-        
+
         // At this point, the radiant system is trying to switch modes from the previous time step, the user is requesting a delay in the changeover,
         // and the requested delay is greater than zero.  Calculate what the current time is in hours from the start of the simulation
         Real64 timeCurrent = 24.0*float(DataGlobals::DayOfSim-1) + float(DataGlobals::HourOfDay-1) + float(DataGlobals::TimeStep-1)/float(DataGlobals::NumOfTimeStepInHour);
         Real64 timeLast = 24.0*float(this->lastDayOfSim-1) + float(this->lastHourOfDay-1) + float(this->lastTimeStep-1)/float(DataGlobals::NumOfTimeStepInHour);
         Real64 actualTimeDifference = timeCurrent - timeLast;
-        
+
         // If the time difference is not longer than the user delay, then the system should not switch modes and needs to be turned off.
         if (actualTimeDifference <= currentChangeoverDelay) this->OperatingMode = NotOperating;
-        
+
         // Note: if the time difference is greater than the user delay request, then go ahead and keep the operating mode needed (don't do anything).
-        
+
     }
 
 
@@ -3292,9 +3292,9 @@ namespace LowTempRadiantSystem {
                 } else if (ControlTemp > OffTempCool && this->CoolingSystem) { // Cooling mode
                     this->OperatingMode = CoolingMode;
                 }
-                
+
                 this->setOperatingModeBasedOnChangeoverDelay();
-                
+
                 if (this->OperatingMode == HeatingMode) {
                     ControlNode = this->HotWaterInNode;
                     MaxWaterFlow = this->WaterFlowMaxHeat;
@@ -3708,7 +3708,7 @@ namespace LowTempRadiantSystem {
                             QRadSysSource(Surface(SurfNum2).ExtBoundCond) = 0.0; // Also zero the other side of an interzone
                     }
                     // Redo the heat balances since we have changed the heat source (set it to zero)
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                     HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
                     // Now check all of the surface temperatures.  If any potentially have condensation, leave the system off.
                     for (RadSurfNum2 = 1; RadSurfNum2 <= this->NumOfSurfaces; ++RadSurfNum2) {
@@ -3767,7 +3767,7 @@ namespace LowTempRadiantSystem {
                         }
 
                         // Redo the heat balances since we have changed the heat source
-                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                         // Check for condensation one more time.  If no condensation, we are done.  If there is
@@ -3833,7 +3833,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
@@ -3942,7 +3942,7 @@ namespace LowTempRadiantSystem {
             } else if (SetPointTemp > OffTempCool && this->CoolingSystem) { // Cooling mode
                 this->OperatingMode = CoolingMode;
             }
-            
+
             this->setOperatingModeBasedOnChangeoverDelay();
 
             // Now actually decide what to do based on the setpoint temperature in relation to the control temperatures
@@ -4888,7 +4888,7 @@ namespace LowTempRadiantSystem {
         // the new SumHATsurf value for the zone.  Note that the difference between the new
         // SumHATsurf and the value originally calculated by the heat balance with a zero
         // source for all radiant systems in the zone is the load met by the system (approximately).
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
         LoadMet = SumHATsurf(this->ZonePtr) - ZeroSourceSumHATsurf(this->ZonePtr);
@@ -4929,7 +4929,7 @@ namespace LowTempRadiantSystem {
         }
         return sum/double(DataGlobals::HoursInDay*DataGlobals::NumOfTimeStepInHour);
     }
-    
+
 
     void ElectricRadiantSystemData::calculateLowTemperatureRadiantSystem(EnergyPlusData &state, Real64 &LoadMet)  // load met by the radiant system, in Watts
     {
@@ -5016,7 +5016,7 @@ namespace LowTempRadiantSystem {
                 }
 
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                 LoadMet = SumHATsurf(ZoneNum) - ZeroSourceSumHATsurf(ZoneNum);
@@ -5466,11 +5466,11 @@ namespace LowTempRadiantSystem {
         }
 
         // Calculate NTU based on the heat transfer model
-        
+
         if (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ISOStandard) {
 
             Real64 U = this->calculateUFromISOStandard(SurfNum, WaterMassFlow*FlowFraction);
-            
+
             // Calculate the NTU parameter
             // NTU = UA/[(Mdot*Cp)min]
             // where: U = h (convection coefficient) and h = (k)(Nu)/D
@@ -5478,7 +5478,7 @@ namespace LowTempRadiantSystem {
             NTU = U * Pi * this->TubeDiameterOuter * this->TubeLength / (WaterMassFlow * CpWater); // FlowFraction cancels out here
 
         } else {    // (this->FluidToSlabHeatTransfer == FluidToSlabHeatTransferTypes::ConvectionOnly)
-            
+
             // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)
             ReD = 4.0 * WaterMassFlow * FlowFraction / (Pi * MUactual * this->TubeDiameterInner * NumCircs);
 
@@ -5522,22 +5522,22 @@ namespace LowTempRadiantSystem {
         // between the fluid and the inner side of the pipe and heat conduction through the pipe.  The remainder
         // of the ISO calculation relates to the slab itself which is modeled using transient heat conduction here
         // in EnergyPlus.
-        
+
         // Return value
         Real64 calculateUFromISOStandard;
 
         int constructionNumber = DataSurfaces::Surface(SurfNum).Construction;
-        
+
         // Fluid resistance to heat transfer, assumes turbulent flow (Equation B5, p. 38 of ISO Standard 11855-2)
         Real64 distanceBetweenPipes = 2.0 * dataConstruction.Construct(constructionNumber).ThicknessPerpend;
         Real64 ratioDiameterToMassFlowLength = this->TubeDiameterInner / WaterMassFlow / this->TubeLength;
         Real64 rFluid = 0.125 / DataGlobals::Pi * std::pow(distanceBetweenPipes, 0.13) * std::pow(ratioDiameterToMassFlowLength,0.87);
-        
+
         // Resistance to heat transfer (conduction through the piping material, Equation B6, p. 38 of ISO Standard 11855-2)
         Real64 rTube = 0.5 * distanceBetweenPipes * std::log(this->TubeDiameterOuter/this->TubeDiameterInner) / DataGlobals::Pi / this->TubeConductivity;
-        
+
         calculateUFromISOStandard = 1.0 / (rFluid + rTube);
-        
+
         return calculateUFromISOStandard;
     }
 
@@ -5693,7 +5693,7 @@ namespace LowTempRadiantSystem {
         } else {
             this->CondCausedTimeOff = 0.0;
         }
-        
+
     }
 
     void ConstantFlowRadiantSystemData::reportLowTemperatureRadiantSystem()
@@ -5792,7 +5792,7 @@ namespace LowTempRadiantSystem {
         this->ElecEnergy = this->ElecPower * TimeStepSys * SecInHour;
         this->HeatPower = this->ElecPower;
         this->HeatEnergy = this->ElecEnergy;
-        
+
     }
 
 } // namespace LowTempRadiantSystem

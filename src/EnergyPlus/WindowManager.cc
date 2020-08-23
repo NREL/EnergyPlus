@@ -134,7 +134,7 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
+    void InitWindowOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -150,11 +150,11 @@ namespace WindowManager {
         if (dataWindowManager.inExtWindowModel->isExternalLibraryModel()) {
             InitWCE_SimplifiedOpticalData(dataWindowManager, ioFiles);
         } else {
-            InitGlassOpticalCalculations(dataWindowComplexManager, dataWindowManager, ioFiles);
+            InitGlassOpticalCalculations(state, dataWindowComplexManager, dataWindowManager, ioFiles);
         }
     }
 
-    void InitGlassOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
+    void InitGlassOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -577,9 +577,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)dataWindowManager.wle.size(); ++ILam) {
                             auto lam = dataWindowManager.wle(ILam);
                             dataWindowManager.wlt(IGlass, ILam) = lam;
-                            dataWindowManager.t(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
-                            dataWindowManager.rff(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
-                            dataWindowManager.rbb(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
+                            dataWindowManager.t(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
+                            dataWindowManager.rff(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
+                            dataWindowManager.rbb(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
                         }
                         SolarSprectrumAverage(dataWindowManager, dataWindowManager.t, tmpTrans);
                         SolarSprectrumAverage(dataWindowManager, dataWindowManager.rff, tmpReflectSolBeamFront);
@@ -642,9 +642,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)dataWindowManager.wle.size(); ++ILam) {
                             auto lam = dataWindowManager.wle(ILam);
                             dataWindowManager.wlt(IGlass, ILam) = lam;
-                            dataWindowManager.tPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
-                            dataWindowManager.rfPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
-                            dataWindowManager.rbPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                            dataWindowManager.tPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            dataWindowManager.rfPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            dataWindowManager.rbPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                     // For use with between-glass shade/blind, save angular properties of isolated glass
@@ -835,9 +835,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)dataWindowManager.wle.size(); ++ILam) {
                             auto lam = dataWindowManager.wle(ILam);
                             dataWindowManager.wlt(IGlass, ILam) = lam;
-                            dataWindowManager.tPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
-                            dataWindowManager.rfPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
-                            dataWindowManager.rbPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                            dataWindowManager.tPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            dataWindowManager.rfPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            dataWindowManager.rbPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                 }
@@ -1512,7 +1512,7 @@ namespace WindowManager {
             }
         } // End of surface loop
 
-        ReportGlass(dataWindowComplexManager, dataWindowManager, ioFiles);
+        ReportGlass(state, dataWindowComplexManager, dataWindowManager, ioFiles);
     }
 
     //*****************************************************************************************
@@ -6832,7 +6832,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
+    void ReportGlass(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7133,9 +7133,9 @@ namespace WindowManager {
                                 }
                                 if (dataMaterial.Material(Layer).GlassSpectralAndAngle) {
                                     OpticalDataType = "SpectralAndAngle";
-                                    SpectralDataName = dataCurveManager.PerfCurve(dataMaterial.Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
-                                                       dataCurveManager.PerfCurve(dataMaterial.Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
-                                                       dataCurveManager.PerfCurve(dataMaterial.Material(Layer).GlassSpecAngBRefleDataPtr).Name;
+                                    SpectralDataName = state.dataCurveManager->PerfCurve(dataMaterial.Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
+                                                       state.dataCurveManager->PerfCurve(dataMaterial.Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
+                                                       state.dataCurveManager->PerfCurve(dataMaterial.Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
                                 static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
                                                                  ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");

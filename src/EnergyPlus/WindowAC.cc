@@ -456,9 +456,9 @@ namespace WindowAC {
                         GetDXHXAsstdCoilOutletNode(state, state.dataWindowAC.WindAC(WindACNum).DXCoilType, state.dataWindowAC.WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
                 } else if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
                     state.dataWindowAC.WindAC(WindACNum).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-                    state.dataWindowAC.WindAC(WindACNum).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
+                    state.dataWindowAC.WindAC(WindACNum).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state,
                     state.dataWindowAC.WindAC(WindACNum).DXCoilType, state.dataWindowAC.WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
-                    state.dataWindowAC.WindAC(WindACNum).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state.dataWindowAC.WindAC(WindACNum).DXCoilName, ErrorsFound);
+                    state.dataWindowAC.WindAC(WindACNum).DXCoilNumOfSpeeds = VariableSpeedCoils::GetVSCoilNumOfSpeeds(state, state.dataWindowAC.WindAC(WindACNum).DXCoilName, ErrorsFound);
                 }
                 if (CoilNodeErrFlag) {
                     ShowContinueError(" that was specified in " + CurrentModuleObject + " = \"" + state.dataWindowAC.WindAC(WindACNum).Name + "\".");

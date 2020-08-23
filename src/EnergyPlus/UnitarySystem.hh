@@ -481,11 +481,13 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInput(EnergyPlusData &state, std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
-        static Real64 DOE2DXCoilResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DOE2DXCoilResidual(EnergyPlusData &state,
+                                         Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 DOE2DXCoilHumRatResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DOE2DXCoilHumRatResidual(EnergyPlusData &state,
+                                               Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
@@ -569,7 +571,8 @@ namespace UnitarySystems {
                                                    std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
         );
 
-        static Real64 DXHeatingCoilResidual(Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 DXHeatingCoilResidual(EnergyPlusData &state,
+                                            Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                             std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
