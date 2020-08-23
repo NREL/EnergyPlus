@@ -846,14 +846,14 @@ namespace VariableSpeedCoils {
             }
 
             // CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"
-            SetupOutputVariable("Cooling Coil Electric Energy",
+            SetupOutputVariable("Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VarSpeedCoil(DXCoilNum).Energy,
                                 "System",
                                 "Summed",
                                 VarSpeedCoil(DXCoilNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Cooling",
                                 _,
                                 "System");
@@ -1254,14 +1254,14 @@ namespace VariableSpeedCoils {
             }
 
             // CurrentModuleObject = "Coil:Cooling:DX:VariableSpeed"
-            SetupOutputVariable("Cooling Coil Electric Energy",
+            SetupOutputVariable("Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VarSpeedCoil(DXCoilNum).Energy,
                                 "System",
                                 "Summed",
                                 VarSpeedCoil(DXCoilNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Cooling",
                                 _,
                                 "System");
@@ -1622,14 +1622,14 @@ namespace VariableSpeedCoils {
             }
 
             // CurrentModuleObject = "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit"
-            SetupOutputVariable("Heating Coil Electric Energy",
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VarSpeedCoil(DXCoilNum).Energy,
                                 "System",
                                 "Summed",
                                 VarSpeedCoil(DXCoilNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
@@ -1958,14 +1958,14 @@ namespace VariableSpeedCoils {
             }
 
             // CurrentModuleObject = "Coil:Heating:DX:Variablespeed "
-            SetupOutputVariable("Heating Coil Electric Energy",
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VarSpeedCoil(DXCoilNum).Energy,
                                 "System",
                                 "Summed",
                                 VarSpeedCoil(DXCoilNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
@@ -2422,14 +2422,14 @@ namespace VariableSpeedCoils {
             }
 
             // CurrentModuleObject = "Coil:Waterheating:Airtowaterheatpump:Variablespeed"
-            SetupOutputVariable("Cooling Coil Electric Energy",
+            SetupOutputVariable("Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VarSpeedCoil(DXCoilNum).Energy,
                                 "System",
                                 "Summed",
                                 VarSpeedCoil(DXCoilNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
@@ -2555,7 +2555,7 @@ namespace VariableSpeedCoils {
                                         "System",
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
-                    SetupOutputVariable("Cooling Coil Electric Power",
+                    SetupOutputVariable("Cooling Coil Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).Power,
                                         "System",
@@ -2635,58 +2635,58 @@ namespace VariableSpeedCoils {
                                             "Cooling",
                                             _,
                                             "System");
-                        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+                        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             VarSpeedCoil(DXCoilNum).EvapCondPumpElecPower,
                                             "System",
                                             "Average",
                                             VarSpeedCoil(DXCoilNum).Name);
-                        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+                        SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption,
                                             "System",
                                             "Sum",
                                             VarSpeedCoil(DXCoilNum).Name,
                                             _,
-                                            "Electric",
+                                            "Electricity",
                                             "COOLING",
                                             _,
                                             "System");
                         if (VarSpeedCoil(DXCoilNum).BasinHeaterPowerFTempDiff > 0.0) {
-                            SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
+                            SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
                                                 OutputProcessor::Unit::W,
                                                 VarSpeedCoil(DXCoilNum).BasinHeaterPower,
                                                 "System",
                                                 "Average",
                                                 VarSpeedCoil(DXCoilNum).Name);
-                            SetupOutputVariable("Cooling Coil Basin Heater Electric Energy",
+                            SetupOutputVariable("Cooling Coil Basin Heater Electricity Energy",
                                                 OutputProcessor::Unit::J,
                                                 VarSpeedCoil(DXCoilNum).BasinHeaterConsumption,
                                                 "System",
                                                 "Sum",
                                                 VarSpeedCoil(DXCoilNum).Name,
                                                 _,
-                                                "Electric",
+                                                "Electricity",
                                                 "COOLING",
                                                 _,
                                                 "System");
                         }
                     }
 
-                    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power",
+                    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower,
                                         "System",
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
-                    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Energy",
+                    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption,
                                         "System",
                                         "Sum",
                                         VarSpeedCoil(DXCoilNum).Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "COOLING",
                                         _,
                                         "System");
@@ -2740,7 +2740,7 @@ namespace VariableSpeedCoils {
                                         "System",
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
-                    SetupOutputVariable("Heating Coil Electric Power",
+                    SetupOutputVariable("Heating Coil Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).Power,
                                         "System",
@@ -2772,37 +2772,37 @@ namespace VariableSpeedCoils {
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
 
-                    SetupOutputVariable("Heating Coil Defrost Electric Power",
+                    SetupOutputVariable("Heating Coil Defrost Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).DefrostPower,
                                         "System",
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
-                    SetupOutputVariable("Heating Coil Defrost Electric Energy",
+                    SetupOutputVariable("Heating Coil Defrost Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         VarSpeedCoil(DXCoilNum).DefrostConsumption,
                                         "System",
                                         "Sum",
                                         VarSpeedCoil(DXCoilNum).Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "HEATING",
                                         _,
                                         "System");
-                    SetupOutputVariable("Heating Coil Crankcase Heater Electric Power",
+                    SetupOutputVariable("Heating Coil Crankcase Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower,
                                         "System",
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
-                    SetupOutputVariable("Heating Coil Crankcase Heater Electric Energy",
+                    SetupOutputVariable("Heating Coil Crankcase Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption,
                                         "System",
                                         "Sum",
                                         VarSpeedCoil(DXCoilNum).Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "HEATING",
                                         _,
                                         "System");
@@ -2812,7 +2812,7 @@ namespace VariableSpeedCoils {
                 if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_CoolingWaterToAirHPVSEquationFit) { // fix coil type
                     // cooling WAHP coil
                     // Setup Report variables for water source Heat Pump
-                    SetupOutputVariable("Cooling Coil Electric Power",
+                    SetupOutputVariable("Cooling Coil Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).Power,
                                         "System",
@@ -2925,7 +2925,7 @@ namespace VariableSpeedCoils {
                 } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingWaterToAirHPVSEquationFit) { // fix coil type
                     // heating WAHP coil
                     // Setup Report variables for water source Heat Pump
-                    SetupOutputVariable("Heating Coil Electric Power",
+                    SetupOutputVariable("Heating Coil Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).Power,
                                         "System",
@@ -3032,7 +3032,7 @@ namespace VariableSpeedCoils {
                                         VarSpeedCoil(DXCoilNum).Name);
                 } else if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == CoilDX_HeatPumpWaterHeaterVariableSpeed) {
                     // air source water heating coil
-                    SetupOutputVariable("Cooling Coil Water Heating Electric Power",
+                    SetupOutputVariable("Cooling Coil Water Heating Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).Power,
                                         "System",
@@ -3124,20 +3124,20 @@ namespace VariableSpeedCoils {
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
 
-                    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power",
+                    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower,
                                         "System",
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
-                    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Energy",
+                    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption,
                                         "System",
                                         "Sum",
                                         VarSpeedCoil(DXCoilNum).Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "HEATING",
                                         _,
                                         "System");
@@ -3155,20 +3155,20 @@ namespace VariableSpeedCoils {
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
 
-                    SetupOutputVariable("Cooling Coil Water Heating Pump Electric Power",
+                    SetupOutputVariable("Cooling Coil Water Heating Pump Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower,
                                         "System",
                                         "Average",
                                         VarSpeedCoil(DXCoilNum).Name);
-                    SetupOutputVariable("Cooling Coil Water Heating Pump Electric Energy",
+                    SetupOutputVariable("Cooling Coil Water Heating Pump Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption,
                                         "System",
                                         "Sum",
                                         VarSpeedCoil(DXCoilNum).Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "HEATING",
                                         _,
                                         "System");

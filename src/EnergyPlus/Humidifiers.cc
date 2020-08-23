@@ -530,13 +530,13 @@ namespace Humidifiers {
                                     "System");
             }
             if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Electric) {
-                SetupOutputVariable("Humidifier Electric Power",
+                SetupOutputVariable("Humidifier Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Humidifier(HumNum).ElecUseRate,
                                     "System",
                                     "Average",
                                     Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Electric Energy",
+                SetupOutputVariable("Humidifier Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).ElecUseEnergy,
                                     "System",
@@ -548,32 +548,32 @@ namespace Humidifiers {
                                     _,
                                     "System");
             } else if (Humidifier(HumNum).HumType_Code == Humidifier_Steam_Gas) {
-                SetupOutputVariable("Humidifier Gas Use Thermal Efficiency",
+                SetupOutputVariable("Humidifier NaturalGas Use Thermal Efficiency",
                                     OutputProcessor::Unit::None,
                                     Humidifier(HumNum).ThermalEff,
                                     "System",
                                     "Average",
                                     Humidifier(HumNum).Name);
                 SetupOutputVariable(
-                    "Humidifier Gas Use Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Gas Use Energy",
+                    "Humidifier NaturalGas Rate", OutputProcessor::Unit::W, Humidifier(HumNum).GasUseRate, "System", "Average", Humidifier(HumNum).Name);
+                SetupOutputVariable("Humidifier NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).GasUseEnergy,
                                     "System",
                                     "Sum",
                                     Humidifier(HumNum).Name,
                                     _,
-                                    "GAS",
+                                    "NATURALGAS",
                                     "HUMIDIFIER",
                                     _,
                                     "System");
-                SetupOutputVariable("Humidifier Auxiliary Electric Power",
+                SetupOutputVariable("Humidifier Auxiliary Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Humidifier(HumNum).AuxElecUseRate,
                                     "System",
                                     "Average",
                                     Humidifier(HumNum).Name);
-                SetupOutputVariable("Humidifier Auxiliary Electric Energy",
+                SetupOutputVariable("Humidifier Auxiliary Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Humidifier(HumNum).AuxElecUseEnergy,
                                     "System",

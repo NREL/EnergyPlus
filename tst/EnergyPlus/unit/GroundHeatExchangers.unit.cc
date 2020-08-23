@@ -235,12 +235,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger
     thisGLHE.SubAGG = 15;
 
     // Horizontal G-Functions
-    thisGLHE.calcGFunctions();
+    thisGLHE.calcGFunctions(state.files);
     EXPECT_NEAR(19.08237, thisGLHE.myRespFactors->GFNC(28), 0.0001);
 
     // Vertical G-Functions
     thisGLHE.verticalConfig = true;
-    thisGLHE.calcGFunctions();
+    thisGLHE.calcGFunctions(state.files);
     EXPECT_NEAR(18.91819, thisGLHE.myRespFactors->GFNC(28), 0.0001);
 }
 
@@ -1198,7 +1198,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     thisGLHE.myRespFactors->maxSimYears = 1;
 
-    thisGLHE.calcGFunctions();
+    thisGLHE.calcGFunctions(state.files);
 
     Real64 const tolerance = 0.1;
 

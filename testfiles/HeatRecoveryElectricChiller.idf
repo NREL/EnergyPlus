@@ -2416,7 +2416,7 @@
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Plant Supply Side Cooling Demand Rate,hourly;
 
@@ -2510,9 +2510,9 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Electric Energy,hourly;
+  Output:Variable,*,Water Heater Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,hourly;
 

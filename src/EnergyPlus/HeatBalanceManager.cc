@@ -6005,7 +6005,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
-        ioFiles.shade.ensure_open("OpenOutputFiles");
+        ioFiles.shade.ensure_open("OpenOutputFiles", ioFiles.outputControl.extshd);
         print(ioFiles.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             print(ioFiles.shade, "{},", Surface(SurfNum).Name);

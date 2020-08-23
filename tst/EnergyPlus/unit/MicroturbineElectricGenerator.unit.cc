@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus::BoilerSteam Unit Tests
+// EnergyPlus::MicroturbineElectricGenerator Unit Tests
 
 // Google Test Headers
 #include <gtest/gtest.h>
@@ -127,7 +127,7 @@ TEST_F(EnergyPlusFixture, MicroturbineElectricGenerator_Fueltype)
     DataIPShortCuts::cCurrentModuleObject = "Generator:MicroTurbine";
     GetMTGeneratorInput(state);
 
-    EXPECT_EQ(MTGenerator(1).FuelType, "Gas");
+    EXPECT_EQ(MTGenerator(1).FuelType, "NaturalGas");
 }
 
 } // namespace EnergyPlus

@@ -3600,7 +3600,7 @@
 
   Output:Variable,*,Zone Cooling Setpoint Not Met While Occupied Time,hourly;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Power,hourly;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Rate,hourly;
 
   Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,hourly;
 
@@ -3608,7 +3608,7 @@
 
   Output:Variable,*,Zone VRF Air Terminal Latent Cooling Rate,hourly;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Power,hourly;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,hourly;
 
   Output:Variable,*,Zone VRF Air Terminal Total Heating Rate,hourly;
 
@@ -3616,9 +3616,9 @@
 
   Output:Variable,*,Zone VRF Air Terminal Latent Heating Rate,hourly;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,hourly;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,hourly;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Power,hourly;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,hourly;
 
   Output:Variable,*,VRF Heat Pump Part Load Ratio,hourly;
 
@@ -3630,15 +3630,15 @@
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
   Output:Variable,*,Heating Coil Runtime Fraction,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,DOAS Outdoor Air Inlet,System Node Standard Density Volume Flow Rate,hourly;
 

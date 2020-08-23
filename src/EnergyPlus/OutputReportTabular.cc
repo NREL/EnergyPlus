@@ -115,7 +115,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ThermalComfort.hh>
@@ -772,12 +772,12 @@ namespace OutputReportTabular {
         }
 
         if (UpdateTabularReportsGetInput) {
-            GetInputTabularMonthly();
+            GetInputTabularMonthly(state.files);
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
-            GetInputTabularTimeBins();
+            GetInputTabularTimeBins(state.files);
             GetInputTabularStyle(state.files);
-            GetInputOutputTableSummaryReports();
+            GetInputOutputTableSummaryReports(state.files);
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
             if (isInvalidAggregationOrder()) {
@@ -814,7 +814,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GetInputTabularMonthly()
+    void GetInputTabularMonthly(IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -865,6 +865,11 @@ namespace OutputReportTabular {
         Array1D<Real64> NumArray; // numeric data
         int IOStat;               // IO Status when calling get input subroutine
         static bool ErrorsFound(false);
+
+        if (!ioFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         MonthlyInputCount = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (MonthlyInputCount > 0) {
@@ -1531,7 +1536,7 @@ namespace OutputReportTabular {
         return foundError;
     }
 
-    void GetInputTabularTimeBins()
+    void GetInputTabularTimeBins(IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1583,6 +1588,11 @@ namespace OutputReportTabular {
 
         Array1D_string objNames;
         Array1D_int objVarIDs;
+
+        if (!ioFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
@@ -1933,7 +1943,7 @@ namespace OutputReportTabular {
         return unitsStyleReturn;
     }
 
-    void GetInputOutputTableSummaryReports()
+    void GetInputOutputTableSummaryReports(IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1992,6 +2002,11 @@ namespace OutputReportTabular {
         int jReport;
         bool nameFound;
         bool ErrorsFound;
+
+        if (!ioFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         ErrorsFound = false;
         NumTabularPredefined = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -2251,7 +2266,7 @@ namespace OutputReportTabular {
         if (displayTabularBEPS || displayDemandEndUse || displaySourceEnergyEndUseSummary || displayLEEDSummary) {
             // initialize the resource type names
             resourceTypeNames(1) = "Electricity";
-            resourceTypeNames(2) = "Gas";
+            resourceTypeNames(2) = "NaturalGas";
             resourceTypeNames(3) = "DistrictCooling";
             resourceTypeNames(4) = "DistrictHeating";
             resourceTypeNames(5) = "Steam";
@@ -2265,7 +2280,7 @@ namespace OutputReportTabular {
             resourceTypeNames(13) = "OtherFuel1";
             resourceTypeNames(14) = "OtherFuel2";
 
-            sourceTypeNames(1) = "Electric";
+            sourceTypeNames(1) = "Electricity";
             sourceTypeNames(2) = "NaturalGas";
             sourceTypeNames(3) = "Gasoline";
             sourceTypeNames(4) = "Diesel";
@@ -2660,10 +2675,10 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(3).show) {
             curReport = AddMonthlyReport("ZoneElectricSummaryMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Zone Lights Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Lights Electric Energy", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Electric Energy", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Zone Lights Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Zone Lights Electricity Energy", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Zone Electric Equipment Electricity Energy", "", aggTypeMaximum);
         }
         if (namedMonthly(4).show) {
             curReport = AddMonthlyReport("SpaceGainsMonthly", 2);
@@ -2706,8 +2721,8 @@ namespace OutputReportTabular {
             curReport = AddMonthlyReport("EnergyConsumptionElectricityNaturalGasMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Electricity:Facility", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Electricity:Facility", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Gas:Facility", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Gas:Facility", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "NaturalGas:Facility", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "NaturalGas:Facility", "", aggTypeMaximum);
         }
         if (namedMonthly(8).show) {
             curReport = AddMonthlyReport("EnergyConsumptionElectricityGeneratedPropaneMonthly", 2);
@@ -2764,13 +2779,13 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(14).show) {
             curReport = AddMonthlyReport("EndUseEnergyConsumptionNaturalGasMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:Gas", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Gas", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Heating:Gas", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Gas", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Gas", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Gas", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Humidifier:Gas", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:NaturalGas", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:NaturalGas", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Heating:NaturalGas", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling:NaturalGas", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:NaturalGas", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:NaturalGas", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Humidifier:NaturalGas", "", aggTypeSumOrAvg);
         }
         if (namedMonthly(15).show) {
             curReport = AddMonthlyReport("EndUseEnergyConsumptionDieselMonthly", 2);
@@ -2863,12 +2878,12 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(24).show) {
             curReport = AddMonthlyReport("PeakEnergyEndUseNaturalGasMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:Gas", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:Gas", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Heating:Gas", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling:Gas", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "WaterSystems:Gas", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cogeneration:Gas", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "InteriorEquipment:NaturalGas", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "ExteriorEquipment:NaturalGas", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Heating:NaturalGas", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling:NaturalGas", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "WaterSystems:NaturalGas", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cogeneration:NaturalGas", "", aggTypeMaximum);
         }
         if (namedMonthly(25).show) {
             curReport = AddMonthlyReport("PeakEnergyEndUseDieselMonthly", 2);
@@ -2966,9 +2981,9 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(35).show) {
             curReport = AddMonthlyReport("ChillerReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Chiller Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Chiller Electric Power", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Chiller Electric Energy", "", aggTypeHoursNonZero);
+            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Rate", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Chiller Electricity Energy", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Chiller Evaporator Cooling Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Chiller Evaporator Cooling Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Chiller Condenser Heat Transfer Energy", "", aggTypeSumOrAvg);
@@ -2979,9 +2994,9 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(36).show) {
             curReport = AddMonthlyReport("TowerReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electric Energy", "", aggTypeHoursNonZero);
-            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electric Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Energy", "", aggTypeHoursNonZero);
+            AddMonthlyFieldSetInput(curReport, "Cooling Tower Fan Electricity Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Heat Transfer Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Inlet Temperature", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Cooling Tower Outlet Temperature", "", aggTypeSumOrAvg);
@@ -2997,25 +3012,25 @@ namespace OutputReportTabular {
             AddMonthlyFieldSetInput(curReport, "Boiler Inlet Temperature", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Outlet Temperature", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Mass Flow Rate", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Boiler Ancillary Electric Power", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Boiler Ancillary Electricity Rate", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Part Load Ratio", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Boiler Part Load Ratio", "", aggTypeMaximum);
         }
         if (namedMonthly(38).show) {
             curReport = AddMonthlyReport("DXReportMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Energy", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Sensible Cooling Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Latent Cooling Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Runtime Fraction", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Runtime Fraction", "", aggTypeMinimum);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Total Cooling Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Sensible Cooling Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Cooling Coil Latent Cooling Rate", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electric Power", "", aggTypeMaximum);
-            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electric Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling Coil Electricity Rate", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Cooling Coil Crankcase Heater Electricity Rate", "", aggTypeMaximum);
         }
         if (namedMonthly(39).show) {
             curReport = AddMonthlyReport("WindowReportMonthly", 2);
@@ -3119,14 +3134,14 @@ namespace OutputReportTabular {
         if (namedMonthly(49).show) {
             curReport = AddMonthlyReport("WindowACReportMonthly", 2);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Total Cooling Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Total Cooling Energy", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Sensible Cooling Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Latent Cooling Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Total Cooling Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Sensible Cooling Rate", "", aggTypeValueWhenMaxMin);
             AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Latent Cooling Rate", "", aggTypeValueWhenMaxMin);
-            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electric Power", "", aggTypeValueWhenMaxMin);
+            AddMonthlyFieldSetInput(curReport, "Zone Window Air Conditioner Electricity Rate", "", aggTypeValueWhenMaxMin);
         }
         if (namedMonthly(50).show) {
             curReport = AddMonthlyReport("WaterHeaterReportMonthly", 2);
@@ -3143,10 +3158,10 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(51).show) {
             curReport = AddMonthlyReport("GeneratorReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Generator Produced Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Generator Produced AC Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Diesel Consumption", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Gas Consumption", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Generator Produced Electric Energy", "", aggTypeHoursNonZero);
+            AddMonthlyFieldSetInput(curReport, "Generator Produced AC Electricity Energy", "", aggTypeHoursNonZero);
             AddMonthlyFieldSetInput(curReport, "Generator Total Heat Recovery", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Jacket Heat Recovery Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Generator Lube Heat Recovery", "", aggTypeSumOrAvg);
@@ -3186,16 +3201,16 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(55).show) {
             curReport = AddMonthlyReport("FanReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Fan Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Fan Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Fan Rise in Air Temperature", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Fan Electric Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Fan Electricity Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Fan Rise in Air Temperature", "", aggTypeValueWhenMaxMin);
         }
         if (namedMonthly(56).show) {
             curReport = AddMonthlyReport("PumpReportMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Pump Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Pump Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Pump Fluid Heat Gain Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Pump Electric Power", "", aggTypeMaximum);
+            AddMonthlyFieldSetInput(curReport, "Pump Electricity Rate", "", aggTypeMaximum);
             AddMonthlyFieldSetInput(curReport, "Pump Shaft Power", "", aggTypeValueWhenMaxMin);
             AddMonthlyFieldSetInput(curReport, "Pump Fluid Heat Gain Rate", "", aggTypeValueWhenMaxMin);
             AddMonthlyFieldSetInput(curReport, "Pump Outlet Temperature", "", aggTypeValueWhenMaxMin);
@@ -3220,8 +3235,8 @@ namespace OutputReportTabular {
             AddMonthlyFieldSetInput(curReport, "Air System Hot Water Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Air System Steam Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Air System Chilled Water Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Gas Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Natural Gas Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Air System Water Volume", "", aggTypeSumOrAvg);
         }
 
@@ -3238,18 +3253,18 @@ namespace OutputReportTabular {
         }
         if (namedMonthly(61).show) {
             curReport = AddMonthlyReport("AirLoopSystemComponentEnergyUseMonthly", 2);
-            AddMonthlyFieldSetInput(curReport, "Air System Fan Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Fan Electricity Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Hot Water Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Air System Cooling Coil Chilled Water Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System DX Heating Coil Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System DX Cooling Coil Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Gas Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System DX Heating Coil Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System DX Cooling Coil Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Natural Gas Energy", "", aggTypeSumOrAvg);
             AddMonthlyFieldSetInput(curReport, "Air System Heating Coil Steam Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Humidifier Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Humidifier Gas Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Evaporative Cooler Electric Energy", "", aggTypeSumOrAvg);
-            AddMonthlyFieldSetInput(curReport, "Air System Desiccant Dehumidifier Electric Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Humidifier Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Humidifier Natural Gas Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Evaporative Cooler Electricity Energy", "", aggTypeSumOrAvg);
+            AddMonthlyFieldSetInput(curReport, "Air System Desiccant Dehumidifier Electricity Energy", "", aggTypeSumOrAvg);
         }
         if (namedMonthly(62).show) {
             curReport = AddMonthlyReport("MechanicalVentilationLoadsMonthly", 2);
@@ -5728,7 +5743,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
+            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.files);
             WriteTableOfContents(state);
             WriteVeriSumTable(state.dataCostEstimateManager, state.files);
             WriteDemandEndUseSummary(state.dataCostEstimateManager);
@@ -5756,7 +5771,7 @@ namespace OutputReportTabular {
         }
 
         constexpr static auto variable_fmt{" {}={:12}\n"};
-        state.files.audit.ensure_open("WriteTabularReports");
+        state.files.audit.ensure_open("WriteTabularReports", state.files.outputControl.audit);
         print(state.files.audit, variable_fmt, "MonthlyInputCount", MonthlyInputCount);
         print(state.files.audit, variable_fmt, "sizeMonthlyInput", sizeMonthlyInput);
         print(state.files.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
@@ -7218,8 +7233,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, MonthlyInput(iInput).name, MonthlyTables(curTable).keyValue, "Custom Monthly Report");
                 }
             } // jTables
@@ -7421,8 +7436,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Time Bin Results");
                 }
                 // create statistics table
@@ -7469,8 +7484,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID(repIndex).namesOfObj, "Statistics");
                 }
             }
@@ -7478,7 +7493,8 @@ namespace OutputReportTabular {
     }
 
     void WriteBEPSTable(CostEstimateManagerData &dataCostEstimateManager,
-                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+                        ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                        IOFiles & ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -7637,25 +7653,25 @@ namespace OutputReportTabular {
             collapsedTotal(13) = gatherTotalsBEPS(7);                       // water
 
             if (DataGlobals::createPerfLog) {
-                UtilityRoutines::appendPerfLog("Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
-                UtilityRoutines::appendPerfLog("Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
-                UtilityRoutines::appendPerfLog("Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
-                UtilityRoutines::appendPerfLog("Diesel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
-                UtilityRoutines::appendPerfLog("Coal ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
-                UtilityRoutines::appendPerfLog("Fuel Oil No 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(6), 3));
-                UtilityRoutines::appendPerfLog("Fuel Oil No 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(7), 3));
-                UtilityRoutines::appendPerfLog("Propane ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(8), 3));
-                UtilityRoutines::appendPerfLog("Other Fuel 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(9), 3));
-                UtilityRoutines::appendPerfLog("Other Fuel 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(10), 3));
-                UtilityRoutines::appendPerfLog("District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(11), 3));
-                UtilityRoutines::appendPerfLog("District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(12), 3));
-                UtilityRoutines::appendPerfLog("Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
-                UtilityRoutines::appendPerfLog("Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
-                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures Time [hours]",
+                UtilityRoutines::appendPerfLog(ioFiles, "Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Gasoline ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Diesel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Coal ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Fuel Oil No 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(6), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Fuel Oil No 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(7), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Propane ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(8), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Other Fuel 1 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(9), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Other Fuel 2 ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(10), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(11), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(12), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(13), 3));
+                UtilityRoutines::appendPerfLog(ioFiles, "Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
+                UtilityRoutines::appendPerfLog(ioFiles, "Facility Any Zone Oscillating Temperatures Time [hours]",
                                                General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillate, 2));
-                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
+                UtilityRoutines::appendPerfLog(ioFiles, "Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]",
                                                General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillateDuringOccupancy, 2));
-                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
+                UtilityRoutines::appendPerfLog(ioFiles, "Facility Any Zone Oscillating Temperatures in Deadband Time [hours]",
                                                General::RoundSigDigits(dataZoneTempPredictorCorrector.AnnualAnyZoneTempOscillateInDeadband, 2));
             }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
@@ -7974,8 +7990,8 @@ namespace OutputReportTabular {
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy");
                 }
 
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Site and Source Energy");
                 }
             }
@@ -8128,13 +8144,13 @@ namespace OutputReportTabular {
                                                            "Site to Source Energy Conversion Factors");
                 }
 
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Site to Source Energy Conversion Factors");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Site to Source Energy Conversion Factors");
                 }
             }
 
@@ -8179,8 +8195,8 @@ namespace OutputReportTabular {
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area");
                 }
 
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Building Area");
                 }
             }
@@ -8434,8 +8450,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses");
                 }
             }
@@ -8605,13 +8621,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "End Uses By Subcategory");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBodyTemp,
-                                                                                            rowHeadTemp,
-                                                                                            columnHeadTemp,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "End Uses By Subcategory");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBodyTemp,
+                                                                                                rowHeadTemp,
+                                                                                                columnHeadTemp,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "End Uses By Subcategory");
                 }
                 rowHeadTemp.deallocate();
                 tableBodyTemp.deallocate();
@@ -8770,13 +8786,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Utility Use Per Conditioned Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Utility Use Per Conditioned Floor Area");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Utility Use Per Conditioned Floor Area");
                 }
             }
             //---- Normalized by Total Area Sub-Table
@@ -8800,13 +8816,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Utility Use Per Total Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Utility Use Per Total Floor Area");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Utility Use Per Total Floor Area");
                 }
             }
 
@@ -8888,8 +8904,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Electric Loads Satisfied");
                 }
             }
@@ -8964,8 +8980,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "On-Site Thermal Sources");
                 }
             }
@@ -9059,8 +9075,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "Water Source Summary");
                 }
             }
@@ -9098,13 +9114,13 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Setpoint Not Met Criteria");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Setpoint Not Met Criteria");
                 }
             }
 
@@ -9141,13 +9157,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Comfort and Setpoint Not Met Summary");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Annual Building Utility Performance Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Comfort and Setpoint Not Met Summary");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Annual Building Utility Performance Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Comfort and Setpoint Not Met Summary");
                 }
             }
 
@@ -9401,13 +9417,13 @@ namespace OutputReportTabular {
                                                        "Entire Facility",
                                                        "Source Energy End Use Components Summary");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Source Energy End Use Components Summary",
-                                                                                        "Entire Facility",
-                                                                                        "Source Energy End Use Components Summary");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Source Energy End Use Components Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Source Energy End Use Components Summary");
             }
 
             // Normalized by Area tables
@@ -9483,8 +9499,8 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Source Energy End Use Component Per Conditioned Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody,
                         rowHead,
                         columnHead,
@@ -9519,13 +9535,13 @@ namespace OutputReportTabular {
                                                            "Entire Facility",
                                                            "Source Energy End Use Components Per Total Floor Area");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                            rowHead,
-                                                                                            columnHead,
-                                                                                            "Source Energy End Use Components Summary",
-                                                                                            "Entire Facility",
-                                                                                            "Source Energy End Use Components Per Total Floor Area");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                                rowHead,
+                                                                                                columnHead,
+                                                                                                "Source Energy End Use Components Summary",
+                                                                                                "Entire Facility",
+                                                                                                "Source Energy End Use Components Per Total Floor Area");
                 }
             } // End of Normalized by Total Area
 
@@ -9849,8 +9865,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses");
             }
 
@@ -9972,8 +9988,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
             }
             rowHeadTemp.deallocate();
@@ -10223,8 +10239,8 @@ namespace OutputReportTabular {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary");
         }
 
@@ -10280,8 +10296,8 @@ namespace OutputReportTabular {
             sqlite->createSQLiteTabularDataRecords(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                 tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details");
         }
     }
@@ -10555,8 +10571,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "General");
             }
 
@@ -10777,8 +10793,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Window-Wall Ratio");
             }
 
@@ -10845,8 +10861,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Conditioned Window-Wall Ratio");
             }
 
@@ -10879,8 +10895,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Skylight-Roof Ratio");
             }
 
@@ -11132,8 +11148,8 @@ namespace OutputReportTabular {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Input Verification and Results Summary", "Entire Facility", "Zone Summary");
             }
         }
@@ -11227,8 +11243,8 @@ namespace OutputReportTabular {
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Adaptive Comfort Report", "Entire Facility", "People Summary");
             }
         }
@@ -11674,8 +11690,8 @@ namespace OutputReportTabular {
                             sqlite->createSQLiteTabularDataRecords(
                                 tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
                         }
-                        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                                 tableBody, rowHead, columnHead, reportName(iReportName).name, "Entire Facility", subTable(jSubTable).name);
                         }
                     }
@@ -11897,8 +11913,8 @@ namespace OutputReportTabular {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry(foundEntry).typeField);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody,
                         rowHead,
                         columnHead,
@@ -12044,8 +12060,8 @@ namespace OutputReportTabular {
                                                                "Entire Facility",
                                                                "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces");
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody,
                             rowHead,
                             columnHead,
@@ -12063,8 +12079,8 @@ namespace OutputReportTabular {
                                                                "Entire Facility",
                                                                "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces");
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody,
                             rowHead,
                             columnHead,
@@ -14285,8 +14301,8 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakLoadCompName);
                 }
 
@@ -14367,8 +14383,8 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, peakCondName);
                 }
 
@@ -14415,8 +14431,8 @@ namespace OutputReportTabular {
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, engineeringCheckName);
                 }
 
@@ -14450,8 +14466,8 @@ namespace OutputReportTabular {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                             tableBody, rowHead, columnHead, reportName, zoneAirLoopFacilityName, zonesIncludedName);
                     }
                 }

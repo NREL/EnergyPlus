@@ -548,13 +548,13 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater Electric Power", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable("Chiller Heater Electricity Rate", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
         // Do not include this on meters, this would duplicate the cool electric and heat electric
-        SetupOutputVariable("Chiller Heater Electric Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
+        SetupOutputVariable("Chiller Heater Electricity Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
 
         SetupOutputVariable(
-            "Chiller Heater Cooling Electric Power", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Cooling Electric Energy",
+            "Chiller Heater Cooling Electricity Rate", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable("Chiller Heater Cooling Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->CoolElectricEnergy,
                             "System",
@@ -567,8 +567,8 @@ namespace ChillerGasAbsorption {
                             "Plant");
 
         SetupOutputVariable(
-            "Chiller Heater Heating Electric Power", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Heating Electric Energy",
+            "Chiller Heater Heating Electricity Rate", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable("Chiller Heater Heating Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->HeatElectricEnergy,
                             "System",

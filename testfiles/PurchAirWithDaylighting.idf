@@ -1479,7 +1479,7 @@
 
   Output:Variable,*,Zone Lights Total Heating Energy,hourly;
 
-  Output:Variable,*,Zone Lights Electric Energy,hourly;
+  Output:Variable,*,Zone Lights Electricity Energy,hourly;
 
   Output:Variable,*,Zone Air System Sensible Heating Energy,hourly;
 

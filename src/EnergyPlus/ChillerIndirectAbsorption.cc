@@ -555,9 +555,9 @@ namespace ChillerIndirectAbsorption {
 
     void IndirectAbsorberSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Report.PumpingPower, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.PumpingEnergy,
                             "System",
