@@ -147,12 +147,12 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
 
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog("RESET", "RESET");
+    UtilityRoutines::appendPerfLog(state.files, "RESET", "RESET");
 
     // add headers and values
-    UtilityRoutines::appendPerfLog("header1", "value1-1");
-    UtilityRoutines::appendPerfLog("header2", "value1-2");
-    UtilityRoutines::appendPerfLog("header3", "value1-3", true);
+    UtilityRoutines::appendPerfLog(state.files, "header1", "value1-1");
+    UtilityRoutines::appendPerfLog(state.files, "header2", "value1-2");
+    UtilityRoutines::appendPerfLog(state.files, "header3", "value1-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;
@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
 {
     // make sure the static variables are cleared
-    UtilityRoutines::appendPerfLog("RESET", "RESET");
+    UtilityRoutines::appendPerfLog(state.files, "RESET", "RESET");
 
     DataStringGlobals::outputPerfLogFileName = "eplusout_2_perflog.csv";
 
@@ -187,9 +187,9 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     initPerfLogFile.close();
 
     // without deleting file add headers and values again
-    UtilityRoutines::appendPerfLog("ignored1", "value2-1");
-    UtilityRoutines::appendPerfLog("ignored2", "value2-2");
-    UtilityRoutines::appendPerfLog("ignored3", "value2-3", true);
+    UtilityRoutines::appendPerfLog(state.files, "ignored1", "value2-1");
+    UtilityRoutines::appendPerfLog(state.files, "ignored2", "value2-2");
+    UtilityRoutines::appendPerfLog(state.files, "ignored3", "value2-3", true);
 
     std::ifstream perfLogFile;
     std::stringstream perfLogStrSteam;

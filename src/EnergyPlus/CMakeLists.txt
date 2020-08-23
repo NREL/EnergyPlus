@@ -491,8 +491,8 @@ SET( SRC
   ReportCoilSelection.hh
   ReportSizingManager.cc
   ReportSizingManager.hh
-  ResultsSchema.cc
-  ResultsSchema.hh
+  ResultsFramework.cc
+  ResultsFramework.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
   RoomAirModelAirflowNetwork.cc

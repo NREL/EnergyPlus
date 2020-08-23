@@ -286,7 +286,7 @@ namespace SizingManager {
                 state.files.zsz.fileName = state.files.outputZszTxtFileName;
             }
 
-            state.files.zsz.ensure_open("ManageSizing");
+            state.files.zsz.ensure_open("ManageSizing", state.files.outputControl.zsz);
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
@@ -485,7 +485,7 @@ namespace SizingManager {
             } else {
                 state.files.ssz.fileName = state.files.outputSszTxtFileName;
             }
-            state.files.ssz.ensure_open("ManageSizing");
+            state.files.ssz.ensure_open("ManageSizing", state.files.outputControl.ssz);
 
             SimAir = true;
             SimZoneEquip = true;
@@ -866,14 +866,14 @@ namespace SizingManager {
 
         int const HourDayToPulse (10);
         int const TimeStepToPulse (1);
-        
+
         if ( (isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
              ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1)) ) {
             return true;
         } else {
             return false;
         }
-        
+
     }
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state)
