@@ -2419,7 +2419,6 @@ namespace HeatBalanceSurfaceManager {
         int SurfSolIncPtr;           // Pointer to schedule surface gain object for interior side of the surface
 
         // Always initialize the shortwave quantities
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
             InitialZoneDifSolReflW(zoneNum) = 0.0;
@@ -2513,10 +2512,15 @@ namespace HeatBalanceSurfaceManager {
             }
             for (int Lay = 1; Lay <= DataHeatBalance::MaxSolidWinLayers; Lay++) {
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                    QRadSWwinAbs(Lay, SurfNum) = 0.0;
                     QRadSWwinAbsLayer(Lay, SurfNum) = 0.0;
                 }
             }
+            for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
+                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                    QRadSWwinAbs(Lay, SurfNum) = 0.0;
+                }
+            }
+
             for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL; Lay++) {
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                     InitialDifSolwinAbs(Lay, SurfNum) = 0.0;
@@ -2579,10 +2583,6 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinGndSolarInc(SurfNum) = 0.0;
             }
         }
-
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        DataGlobals::solar_timer += time_span.count();
 
         if (!SunIsUp || (BeamSolarRad + GndSolarRad + DifSolarRad <= 0.0)) { // Sun is down
 
@@ -2668,12 +2668,16 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
+            high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
-
+            high_resolution_clock::time_point t2 = high_resolution_clock::now();
+            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+            DataGlobals::solar_timer += time_span.count();
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 

@@ -339,6 +339,12 @@ namespace SolarShading {
 
     void CalcInteriorSolarDistribution(WindowEquivalentLayerData &dataWindowEquivalentLayer);
 
+    void ReportWinSolarDistributions(int SurfNum,
+                                     int enclosureNum,
+                                     Real64 WinTransBmBmSolar,
+                                     Real64 WinTransBmDifSolar,
+                                     Real64 TBmAll);
+
     void CalcAborbedOnExteriorOpaqueSurfaces();
 
     void CalcInteriorSolarDistributionWCE(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager);
