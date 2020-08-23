@@ -215,7 +215,7 @@ namespace ZoneTempPredictorCorrector {
             GetZoneAirStatsInputFlag = false;
         }
 
-        InitZoneAirSetPoints(state.dataZoneTempPredictorCorrector);
+        InitZoneAirSetPoints(*state.dataZoneTempPredictorCorrector);
 
         {
             auto const SELECT_CASE_var(UpdateType);
@@ -224,7 +224,7 @@ namespace ZoneTempPredictorCorrector {
                 CalcZoneAirTempSetPoints(state, state.files);
 
             } else if (SELECT_CASE_var == iPredictStep) {
-                PredictSystemLoads(state, state.dataZoneTempPredictorCorrector, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                PredictSystemLoads(state, *state.dataZoneTempPredictorCorrector, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iCorrectStep) {
                 CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -233,7 +233,7 @@ namespace ZoneTempPredictorCorrector {
                 RevertZoneTimestepHistories();
 
             } else if (SELECT_CASE_var == iPushZoneTimestepHistories) {
-                PushZoneTimestepHistories(state.dataZoneTempPredictorCorrector);
+                PushZoneTimestepHistories(*state.dataZoneTempPredictorCorrector);
 
             } else if (SELECT_CASE_var == iPushSystemTimestepHistories) {
                 PushSystemTimestepHistories();
@@ -407,7 +407,7 @@ namespace ZoneTempPredictorCorrector {
             CTSchedMapToControlledZone.dimension(NumTempControlledZones, 0);
 
             TempControlledZoneNum = 0;
-            state.dataZoneTempPredictorCorrector.NumOnOffCtrZone = 0;
+            state.dataZoneTempPredictorCorrector->NumOnOffCtrZone = 0;
             for (Item = 1; Item <= NumTStatStatements; ++Item) {
                 inputProcessor->getObjectItem(cCurrentModuleObject,
                                               Item,
@@ -518,7 +518,7 @@ namespace ZoneTempPredictorCorrector {
                     if (NumNums > 0) {
                         if (rNumericArgs(1) >= 0.0) {
                             TempControlledZone(TempControlledZoneNum).DeltaTCutSet = rNumericArgs(1);
-                            if (rNumericArgs(1) > 0.0) state.dataZoneTempPredictorCorrector.NumOnOffCtrZone++;
+                            if (rNumericArgs(1) > 0.0) state.dataZoneTempPredictorCorrector->NumOnOffCtrZone++;
                         } else {
                             ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " invalid " + cNumericFieldNames(1) + "=[" +
                                             TrimSigDigits(rNumericArgs(1), 0) + "].");
@@ -541,11 +541,11 @@ namespace ZoneTempPredictorCorrector {
         }     // Check on number of TempControlledZones
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglHeatSetPoint));
-        state.dataZoneTempPredictorCorrector.NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumSingleTempHeatingControls > 0) state.dataZoneTempPredictorCorrector.SetPointSingleHeating.allocate(state.dataZoneTempPredictorCorrector.NumSingleTempHeatingControls);
+        if (state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeating.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls);
 
-        for (SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= state.dataZoneTempPredictorCorrector.NumSingleTempHeatingControls; ++SingleTempHeatingControlNum) {
+        for (SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls; ++SingleTempHeatingControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SingleTempHeatingControlNum,
                                           cAlphaArgs,
@@ -559,10 +559,10 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
@@ -571,11 +571,11 @@ namespace ZoneTempPredictorCorrector {
         } // SingleTempHeatingControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglCoolSetPoint));
-        state.dataZoneTempPredictorCorrector.NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumSingleTempCoolingControls > 0) state.dataZoneTempPredictorCorrector.SetPointSingleCooling.allocate(state.dataZoneTempPredictorCorrector.NumSingleTempCoolingControls);
+        if (state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleCooling.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls);
 
-        for (SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= state.dataZoneTempPredictorCorrector.NumSingleTempCoolingControls; ++SingleTempCoolingControlNum) {
+        for (SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls; ++SingleTempCoolingControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SingleTempCoolingControlNum,
                                           cAlphaArgs,
@@ -589,10 +589,10 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
@@ -601,11 +601,11 @@ namespace ZoneTempPredictorCorrector {
         } // SingleTempCoolingControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::SglHCSetPoint));
-        state.dataZoneTempPredictorCorrector.NumSingleTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumSingleTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool.allocate(state.dataZoneTempPredictorCorrector.NumSingleTempHeatCoolControls);
+        if (state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls);
 
-        for (SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector.NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum) {
+        for (SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SingleTempHeatCoolControlNum,
                                           cAlphaArgs,
@@ -617,10 +617,10 @@ namespace ZoneTempPredictorCorrector {
                                           lAlphaFieldBlanks,
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
@@ -629,11 +629,11 @@ namespace ZoneTempPredictorCorrector {
         } // SingleTempHeatCoolControlNum
 
         cCurrentModuleObject = ValidControlTypes(static_cast<int>(ComfortControl::DualSetPoint));
-        state.dataZoneTempPredictorCorrector.NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumDualTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector.SetPointDualHeatCool.allocate(state.dataZoneTempPredictorCorrector.NumDualTempHeatCoolControls);
+        if (state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointDualHeatCool.allocate(state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls);
 
-        for (DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector.NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum) {
+        for (DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           DualTempHeatCoolControlNum,
                                           cAlphaArgs,
@@ -647,17 +647,17 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName = cAlphaArgs(3);
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex = GetScheduleIndex(cAlphaArgs(3));
-            if (state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName = cAlphaArgs(3);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex = GetScheduleIndex(cAlphaArgs(3));
+            if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                 "\" not found.");
                 ErrorsFound = true;
@@ -673,7 +673,7 @@ namespace ZoneTempPredictorCorrector {
             TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatSetPoint = TempIndex;
             if (TempIndex > 0) {
                 TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
-                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector.SetPointSingleHeating);
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector->SetPointSingleHeating);
                 TStatControlTypes(TempControlledZoneNum).MustHave(SingleHeatingSetPoint) = true;
             }
 
@@ -683,7 +683,7 @@ namespace ZoneTempPredictorCorrector {
             TempControlledZone(TempControlledZoneNum).SchIndx_SingleCoolSetPoint = TempIndex;
             if (TempIndex > 0) {
                 TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
-                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector.SetPointSingleCooling);
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector->SetPointSingleCooling);
                 TStatControlTypes(TempControlledZoneNum).MustHave(SingleCoolingSetPoint) = true;
             }
 
@@ -693,7 +693,7 @@ namespace ZoneTempPredictorCorrector {
             TempControlledZone(TempControlledZoneNum).SchIndx_SingleHeatCoolSetPoint = TempIndex;
             if (TempIndex > 0) {
                 TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
-                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool);
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool);
                 TStatControlTypes(TempControlledZoneNum).MustHave(SingleHeatCoolSetPoint) = true;
             }
 
@@ -703,7 +703,7 @@ namespace ZoneTempPredictorCorrector {
             TempControlledZone(TempControlledZoneNum).SchIndx_DualSetPointWDeadBand = TempIndex;
             if (TempIndex > 0) {
                 TempControlledZone(TempControlledZoneNum).ControlTypeSchIndx(TempIndex) =
-                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector.SetPointDualHeatCool);
+                    UtilityRoutines::FindItem(TempControlledZone(TempControlledZoneNum).ControlTypeName(TempIndex), state.dataZoneTempPredictorCorrector->SetPointDualHeatCool);
                 TStatControlTypes(TempControlledZoneNum).MustHave(DualSetPointWithDeadBand) = true;
             }
         }
@@ -888,7 +888,7 @@ namespace ZoneTempPredictorCorrector {
 
         if (NumHumidityControlZones > 0) {
             HumidityControlZone.allocate(NumHumidityControlZones);
-            state.dataZoneTempPredictorCorrector.HumidityControlZoneUniqueNames.reserve(static_cast<unsigned>(NumHumidityControlZones));
+            state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames.reserve(static_cast<unsigned>(NumHumidityControlZones));
         }
 
         for (HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum) {
@@ -907,7 +907,7 @@ namespace ZoneTempPredictorCorrector {
 
             HumidityControlZone(HumidControlledZoneNum).ControlName = cAlphaArgs(1);
             GlobalNames::IntraObjUniquenessCheck(
-                cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataZoneTempPredictorCorrector.HumidityControlZoneUniqueNames, ErrorsFound);
+                cAlphaArgs(2), cCurrentModuleObject, cAlphaFieldNames(2), state.dataZoneTempPredictorCorrector->HumidityControlZoneUniqueNames, ErrorsFound);
 
             HumidityControlZone(HumidControlledZoneNum).ZoneName = cAlphaArgs(2);
             HumidityControlZone(HumidControlledZoneNum).ActualZoneNum = UtilityRoutines::FindItem(cAlphaArgs(2), Zone);
@@ -1232,11 +1232,11 @@ namespace ZoneTempPredictorCorrector {
         // End of Thermal comfort control reading and checking
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHeatSetPointFanger));
-        state.dataZoneTempPredictorCorrector.NumSingleFangerHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumSingleFangerHeatingControls > 0) state.dataZoneTempPredictorCorrector.SetPointSingleHeatingFanger.allocate(state.dataZoneTempPredictorCorrector.NumSingleFangerHeatingControls);
+        if (state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls);
 
-        for (SingleFangerHeatingControlNum = 1; SingleFangerHeatingControlNum <= state.dataZoneTempPredictorCorrector.NumSingleFangerHeatingControls; ++SingleFangerHeatingControlNum) {
+        for (SingleFangerHeatingControlNum = 1; SingleFangerHeatingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatingControls; ++SingleFangerHeatingControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SingleFangerHeatingControlNum,
                                           cAlphaArgs,
@@ -1250,16 +1250,16 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
-                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector.SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
+                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger(SingleFangerHeatingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" entered.");
@@ -1270,13 +1270,13 @@ namespace ZoneTempPredictorCorrector {
         } // SingleFangerHeatingControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglCoolSetPointFanger));
-        state.dataZoneTempPredictorCorrector.NumSingleFangerCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumSingleFangerCoolingControls > 0) {
-            state.dataZoneTempPredictorCorrector.SetPointSingleCoolingFanger.allocate(state.dataZoneTempPredictorCorrector.NumSingleFangerCoolingControls);
+        if (state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls > 0) {
+            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls);
         }
 
-        for (SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= state.dataZoneTempPredictorCorrector.NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum) {
+        for (SingleFangerCoolingControlNum = 1; SingleFangerCoolingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerCoolingControls; ++SingleFangerCoolingControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SingleFangerCoolingControlNum,
                                           cAlphaArgs,
@@ -1290,16 +1290,16 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector.SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
-                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector.SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
+                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger(SingleFangerCoolingControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" entered.");
@@ -1311,11 +1311,11 @@ namespace ZoneTempPredictorCorrector {
         } // SingleFangerCoolingControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::SglHCSetPointFanger));
-        state.dataZoneTempPredictorCorrector.NumSingleFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumSingleFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector.SetPointSingleHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector.NumSingleFangerHeatCoolControls);
+        if (state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls);
 
-        for (SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector.NumSingleFangerHeatCoolControls;
+        for (SingleFangerHeatCoolControlNum = 1; SingleFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumSingleFangerHeatCoolControls;
              ++SingleFangerHeatCoolControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           SingleFangerHeatCoolControlNum,
@@ -1330,16 +1330,16 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
-                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector.SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
+                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger(SingleFangerHeatCoolControlNum).PMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" entered.");
@@ -1351,11 +1351,11 @@ namespace ZoneTempPredictorCorrector {
         } // SingleFangerHeatCoolControlNum
 
         cCurrentModuleObject = ValidComfortControlTypes(static_cast<int>(ComfortControl::DualSetPointFanger));
-        state.dataZoneTempPredictorCorrector.NumDualFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
-        if (state.dataZoneTempPredictorCorrector.NumDualFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector.NumDualFangerHeatCoolControls);
+        if (state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls > 0) state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger.allocate(state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls);
 
-        for (DualFangerHeatCoolControlNum = 1; DualFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector.NumDualFangerHeatCoolControls; ++DualFangerHeatCoolControlNum) {
+        for (DualFangerHeatCoolControlNum = 1; DualFangerHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumDualFangerHeatCoolControls; ++DualFangerHeatCoolControlNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           DualFangerHeatCoolControlNum,
                                           cAlphaArgs,
@@ -1369,23 +1369,23 @@ namespace ZoneTempPredictorCorrector {
                                           cNumericFieldNames);
             UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound);
 
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).Name = cAlphaArgs(1);
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSetptSchedName = cAlphaArgs(2);
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
-            if (state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).Name = cAlphaArgs(1);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSetptSchedName = cAlphaArgs(2);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex = GetScheduleIndex(cAlphaArgs(2));
+            if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(2) + "=\"" + cAlphaArgs(2) +
                                 "\" not found.");
                 ErrorsFound = true;
             }
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSetptSchedName = cAlphaArgs(3);
-            state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex = GetScheduleIndex(cAlphaArgs(3));
-            if (state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex == 0) {
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSetptSchedName = cAlphaArgs(3);
+            state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex = GetScheduleIndex(cAlphaArgs(3));
+            if (state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex == 0) {
                 ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(3) + "=\"" + cAlphaArgs(3) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 ValidScheduleControlType =
-                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex, ">=", -3.0, "<=", 3.0);
+                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).HeatPMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(2) + "=\"" +
                                     cAlphaArgs(2) + "\" entered.");
@@ -1393,7 +1393,7 @@ namespace ZoneTempPredictorCorrector {
                     ErrorsFound = true;
                 }
                 ValidScheduleControlType =
-                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0);
+                    CheckScheduleValueMinMax(state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger(DualFangerHeatCoolControlNum).CoolPMVSchedIndex, ">=", -3.0, "<=", 3.0);
                 if (!ValidScheduleControlType) {
                     ShowSevereError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid PMV values " + cAlphaFieldNames(3) + "=\"" +
                                     cAlphaArgs(3) + "\" entered.");
@@ -1412,7 +1412,7 @@ namespace ZoneTempPredictorCorrector {
             ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglHeatSetPointFanger = ComfortIndex;
             if (ComfortIndex > 0) {
                 ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
-                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector.SetPointSingleHeatingFanger);
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector->SetPointSingleHeatingFanger);
                 TComfortControlTypes(ComfortControlledZoneNum).MustHave(static_cast<int>(ComfortControl::SglHeatSetPointFanger)) = true;
             }
 
@@ -1422,7 +1422,7 @@ namespace ZoneTempPredictorCorrector {
             ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglCoolSetPointFanger = ComfortIndex;
             if (ComfortIndex > 0) {
                 ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
-                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector.SetPointSingleCoolingFanger);
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector->SetPointSingleCoolingFanger);
                 TComfortControlTypes(ComfortControlledZoneNum).MustHave(static_cast<int>(ComfortControl::SglCoolSetPointFanger)) = true;
             }
 
@@ -1432,7 +1432,7 @@ namespace ZoneTempPredictorCorrector {
             ComfortControlledZone(ComfortControlledZoneNum).SchIndx_SglHCSetPointFanger = ComfortIndex;
             if (ComfortIndex > 0) {
                 ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
-                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector.SetPointSingleHeatCoolFanger);
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector->SetPointSingleHeatCoolFanger);
                 TComfortControlTypes(ComfortControlledZoneNum).MustHave(static_cast<int>(ComfortControl::SglHCSetPointFanger)) = true;
             }
 
@@ -1442,7 +1442,7 @@ namespace ZoneTempPredictorCorrector {
             ComfortControlledZone(ComfortControlledZoneNum).SchIndx_DualSetPointFanger = ComfortIndex;
             if (ComfortIndex > 0) {
                 ComfortControlledZone(ComfortControlledZoneNum).ControlTypeSchIndx(ComfortIndex) = UtilityRoutines::FindItem(
-                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector.SetPointDualHeatCoolFanger);
+                    ComfortControlledZone(ComfortControlledZoneNum).ControlTypeName(ComfortIndex), state.dataZoneTempPredictorCorrector->SetPointDualHeatCoolFanger);
                 TComfortControlTypes(ComfortControlledZoneNum).MustHave(static_cast<int>(ComfortControl::DualSetPointFanger)) = true;
             }
         }
@@ -1832,9 +1832,9 @@ namespace ZoneTempPredictorCorrector {
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortTempControl = true;
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                         UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
-                                    if (!state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
-                                        Array1D<Real64> runningAverageASH(state.dataWeatherManager.NumDaysInYear, 0.0);
-                                        Array1D<Real64> runningAverageCEN(state.dataWeatherManager.NumDaysInYear, 0.0);
+                                    if (!state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized) {
+                                        Array1D<Real64> runningAverageASH(state.dataWeatherManager->NumDaysInYear, 0.0);
+                                        Array1D<Real64> runningAverageCEN(state.dataWeatherManager->NumDaysInYear, 0.0);
                                         CalculateMonthlyRunningAverageDryBulb(state, ioFiles, runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(state, runningAverageASH, runningAverageCEN);
                                     }
@@ -1924,9 +1924,9 @@ namespace ZoneTempPredictorCorrector {
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortTempControl = true;
                                     TempControlledZone(TempControlledZoneNum).AdaptiveComfortModelTypeIndex =
                                         UtilityRoutines::FindItem(cAlphaArgs(4), AdaptiveComfortModelTypes, AdaptiveComfortModelTypes.isize());
-                                    if (!state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
-                                        Array1D<Real64> runningAverageASH(state.dataWeatherManager.NumDaysInYear, 0.0);
-                                        Array1D<Real64> runningAverageCEN(state.dataWeatherManager.NumDaysInYear, 0.0);
+                                    if (!state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized) {
+                                        Array1D<Real64> runningAverageASH(state.dataWeatherManager->NumDaysInYear, 0.0);
+                                        Array1D<Real64> runningAverageCEN(state.dataWeatherManager->NumDaysInYear, 0.0);
                                         CalculateMonthlyRunningAverageDryBulb(state, ioFiles, runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(state, runningAverageASH, runningAverageCEN);
                                     }
@@ -2125,7 +2125,7 @@ namespace ZoneTempPredictorCorrector {
         if (NumStageControlledZones > 0) StagedTStatObjects.allocate(NumStageControlledZones);
 
         // Pre-scan for use of Zone lists in TStat statements (i.e. Global application of TStat)
-        state.dataZoneTempPredictorCorrector.NumStageCtrZone = 0;
+        state.dataZoneTempPredictorCorrector->NumStageCtrZone = 0;
         for (Item = 1; Item <= NumStageControlledZones; ++Item) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
                                           Item,
@@ -2145,14 +2145,14 @@ namespace ZoneTempPredictorCorrector {
             ZLItem = 0;
             if (Item1 == 0 && NumOfZoneLists > 0) ZLItem = UtilityRoutines::FindItemInList(cAlphaArgs(2), ZoneList);
             if (Item1 > 0) {
-                StagedTStatObjects(Item).StageControlledZoneStartPtr = state.dataZoneTempPredictorCorrector.NumStageCtrZone + 1;
-                ++state.dataZoneTempPredictorCorrector.NumStageCtrZone;
+                StagedTStatObjects(Item).StageControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
+                ++state.dataZoneTempPredictorCorrector->NumStageCtrZone;
                 StagedTStatObjects(Item).NumOfZones = 1;
                 StagedTStatObjects(Item).ZoneListActive = false;
                 StagedTStatObjects(Item).ZoneOrZoneListPtr = Item1;
             } else if (ZLItem > 0) {
-                StagedTStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneTempPredictorCorrector.NumStageCtrZone + 1;
-                state.dataZoneTempPredictorCorrector.NumStageCtrZone += ZoneList(ZLItem).NumOfZones;
+                StagedTStatObjects(Item).TempControlledZoneStartPtr = state.dataZoneTempPredictorCorrector->NumStageCtrZone + 1;
+                state.dataZoneTempPredictorCorrector->NumStageCtrZone += ZoneList(ZLItem).NumOfZones;
                 StagedTStatObjects(Item).NumOfZones = ZoneList(ZLItem).NumOfZones;
                 StagedTStatObjects(Item).ZoneListActive = true;
                 StagedTStatObjects(Item).ZoneOrZoneListPtr = ZLItem;
@@ -2166,11 +2166,11 @@ namespace ZoneTempPredictorCorrector {
         if (ErrorsFound) {
             ShowSevereError("GetStagedDualSetpoint: Errors with invalid names in " + cCurrentModuleObject + " objects.");
             ShowContinueError("...These will not be read in.  Other errors may occur.");
-            state.dataZoneTempPredictorCorrector.NumStageCtrZone = 0;
+            state.dataZoneTempPredictorCorrector->NumStageCtrZone = 0;
         }
 
-        if (state.dataZoneTempPredictorCorrector.NumStageCtrZone > 0) {
-            StageControlledZone.allocate(state.dataZoneTempPredictorCorrector.NumStageCtrZone);
+        if (state.dataZoneTempPredictorCorrector->NumStageCtrZone > 0) {
+            StageControlledZone.allocate(state.dataZoneTempPredictorCorrector->NumStageCtrZone);
             StageZoneLogic.dimension(NumOfZones, false);
 
             StageControlledZoneNum = 0;
@@ -2386,8 +2386,8 @@ namespace ZoneTempPredictorCorrector {
         std::string::size_type pos;
         int ind, i, j;
 
-        Array1D<Real64> adaptiveTemp(state.dataWeatherManager.NumDaysInYear, 0.0);
-        Array1D<Real64> dailyDryTemp(state.dataWeatherManager.NumDaysInYear, 0.0);
+        Array1D<Real64> adaptiveTemp(state.dataWeatherManager->NumDaysInYear, 0.0);
+        Array1D<Real64> dailyDryTemp(state.dataWeatherManager->NumDaysInYear, 0.0);
 
         readStat = 0;
         if (FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName)) {
@@ -2396,7 +2396,7 @@ namespace ZoneTempPredictorCorrector {
             for (i = 1; i <= 9; ++i) { // Headers
                 epwFile.readLine();
             }
-            for (i = 1; i <= state.dataWeatherManager.NumDaysInYear; ++i) {
+            for (i = 1; i <= state.dataWeatherManager->NumDaysInYear; ++i) {
                 avgDryBulb = 0.0;
                 for (j = 1; j <= 24; ++j) {
                     epwLine = epwFile.readLine().data;
@@ -2414,7 +2414,7 @@ namespace ZoneTempPredictorCorrector {
 
             // Calculate monthly running average dry bulb temperature.
             int dayOfYear = 0;
-            while (dayOfYear < state.dataWeatherManager.NumDaysInYear) {
+            while (dayOfYear < state.dataWeatherManager->NumDaysInYear) {
                 dayOfYear++;
                 calcEndDay = dayOfYear - 1;
                 calcStartDayASH = calcEndDay - 30;
@@ -2427,12 +2427,12 @@ namespace ZoneTempPredictorCorrector {
                     }
                     runningAverageASH(dayOfYear) /= 30;
                 } else { // Do special things for wrapping the epw
-                    calcStartDayASH += state.dataWeatherManager.NumDaysInYear;
+                    calcStartDayASH += state.dataWeatherManager->NumDaysInYear;
                     for (i = 1; i <= calcEndDay; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                     }
-                    for (i = calcStartDayASH; i < state.dataWeatherManager.NumDaysInYear; i++) {
+                    for (i = calcStartDayASH; i < state.dataWeatherManager->NumDaysInYear; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageASH(dayOfYear) = runningAverageASH(dayOfYear) + avgDryBulb;
                     }
@@ -2446,12 +2446,12 @@ namespace ZoneTempPredictorCorrector {
                     }
                     runningAverageCEN(dayOfYear) /= 7;
                 } else { // Do special things for wrapping the epw
-                    calcStartDayCEN += state.dataWeatherManager.NumDaysInYear;
+                    calcStartDayCEN += state.dataWeatherManager->NumDaysInYear;
                     for (i = 1; i <= calcEndDay; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                     }
-                    for (i = calcStartDayCEN; i < state.dataWeatherManager.NumDaysInYear; i++) {
+                    for (i = calcStartDayCEN; i < state.dataWeatherManager->NumDaysInYear; i++) {
                         avgDryBulb = dailyDryTemp(i);
                         runningAverageCEN(dayOfYear) = runningAverageCEN(dayOfYear) + avgDryBulb;
                     }
@@ -2477,59 +2477,59 @@ namespace ZoneTempPredictorCorrector {
         int const summerDesignDayTypeIndex(9);
         Real64 GrossApproxAvgDryBulbDesignDay(0.0);
 
-        for (size_t i = 1; i <= state.dataWeatherManager.DesDayInput.size(); i++) {
+        for (size_t i = 1; i <= state.dataWeatherManager->DesDayInput.size(); i++) {
             // Summer design day
-            if (state.dataWeatherManager.DesDayInput(i).DayType == summerDesignDayTypeIndex) {
-                GrossApproxAvgDryBulbDesignDay = (state.dataWeatherManager.DesDayInput(i).MaxDryBulb + (state.dataWeatherManager.DesDayInput(i).MaxDryBulb - state.dataWeatherManager.DesDayInput(i).DailyDBRange)) / 2.0;
+            if (state.dataWeatherManager->DesDayInput(i).DayType == summerDesignDayTypeIndex) {
+                GrossApproxAvgDryBulbDesignDay = (state.dataWeatherManager->DesDayInput(i).MaxDryBulb + (state.dataWeatherManager->DesDayInput(i).MaxDryBulb - state.dataWeatherManager->DesDayInput(i).DailyDBRange)) / 2.0;
                 if (GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 33.5) {
-                    state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(1) = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
-                    state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(2) = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
-                    state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(3) = 0.31 * GrossApproxAvgDryBulbDesignDay + 21.3;
+                    state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(1) = 0.31 * GrossApproxAvgDryBulbDesignDay + 17.8;
+                    state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(2) = 0.31 * GrossApproxAvgDryBulbDesignDay + 20.3;
+                    state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(3) = 0.31 * GrossApproxAvgDryBulbDesignDay + 21.3;
                 }
                 if (GrossApproxAvgDryBulbDesignDay > 10 && GrossApproxAvgDryBulbDesignDay < 30) {
-                    state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(4) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
-                    state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(5) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;
+                    state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(4) = 0.33 * GrossApproxAvgDryBulbDesignDay + 18.8;
+                    state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(5) = 0.33 * GrossApproxAvgDryBulbDesignDay + 20.8;
                     ;
-                    state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(6) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;
+                    state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(6) = 0.33 * GrossApproxAvgDryBulbDesignDay + 21.8;
                     ;
-                    state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(7) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;
+                    state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(7) = 0.33 * GrossApproxAvgDryBulbDesignDay + 22.8;
                     ;
                 }
             }
         }
 
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.allocate(state.dataWeatherManager.NumDaysInYear);
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.allocate(state.dataWeatherManager.NumDaysInYear);
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.allocate(state.dataWeatherManager.NumDaysInYear);
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.allocate(state.dataWeatherManager.NumDaysInYear);
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.allocate(state.dataWeatherManager.NumDaysInYear);
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate(state.dataWeatherManager.NumDaysInYear);
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate(state.dataWeatherManager.NumDaysInYear);
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central.allocate(state.dataWeatherManager->NumDaysInYear);
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90.allocate(state.dataWeatherManager->NumDaysInYear);
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80.allocate(state.dataWeatherManager->NumDaysInYear);
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central.allocate(state.dataWeatherManager->NumDaysInYear);
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I.allocate(state.dataWeatherManager->NumDaysInYear);
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II.allocate(state.dataWeatherManager->NumDaysInYear);
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III.allocate(state.dataWeatherManager->NumDaysInYear);
 
         // Calculate the set points based on different models, set flag as -1 when running average temperature is not in the range.
-        for (int day = 1; day <= state.dataWeatherManager.NumDaysInYear; day++) {
+        for (int day = 1; day <= state.dataWeatherManager->NumDaysInYear; day++) {
             if (runningAverageASH(day) > 10 && runningAverageASH(day) < 33.5) {
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(day) = 0.31 * runningAverageASH(day) + 17.8;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(day) = 0.31 * runningAverageASH(day) + 20.3;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(day) = 0.31 * runningAverageASH(day) + 21.3;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(day) = 0.31 * runningAverageASH(day) + 17.8;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(day) = 0.31 * runningAverageASH(day) + 20.3;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(day) = 0.31 * runningAverageASH(day) + 21.3;
             } else {
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(day) = -1;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(day) = -1;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(day) = -1;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(day) = -1;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(day) = -1;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(day) = -1;
             }
             if (runningAverageCEN(day) > 10 && runningAverageCEN(day) < 30) {
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(day) = 0.33 * runningAverageCEN(day) + 18.8;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(day) = 0.33 * runningAverageCEN(day) + 20.8;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(day) = 0.33 * runningAverageCEN(day) + 21.8;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(day) = 0.33 * runningAverageCEN(day) + 22.8;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(day) = 0.33 * runningAverageCEN(day) + 18.8;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(day) = 0.33 * runningAverageCEN(day) + 20.8;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(day) = 0.33 * runningAverageCEN(day) + 21.8;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(day) = 0.33 * runningAverageCEN(day) + 22.8;
             } else {
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(day) = -1;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(day) = -1;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(day) = -1;
-                state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(day) = -1;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(day) = -1;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(day) = -1;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(day) = -1;
+                state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(day) = -1;
             }
         }
-        state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized = true;
+        state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.initialized = true;
     }
 
     void InitZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
@@ -3557,7 +3557,7 @@ namespace ZoneTempPredictorCorrector {
             // Calculate the various heat balance sums
 
             // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(*state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -3744,7 +3744,7 @@ namespace ZoneTempPredictorCorrector {
 
                     SchedTypeIndex = TempControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
 
-                    SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SchedTypeIndex).TempSchedIndex;
+                    SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SchedTypeIndex).TempSchedIndex;
                     TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(SetPointTempSchedIndex);
                     TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointLo = TempZoneThermostatSetPoint(ActualZoneNum);
 
@@ -3758,7 +3758,7 @@ namespace ZoneTempPredictorCorrector {
 
                     SchedTypeIndex = TempControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
 
-                    SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SchedTypeIndex).TempSchedIndex;
+                    SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SchedTypeIndex).TempSchedIndex;
                     TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(SetPointTempSchedIndex);
                     TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = TempZoneThermostatSetPoint(ActualZoneNum);
 
@@ -3773,7 +3773,7 @@ namespace ZoneTempPredictorCorrector {
                     ZoneThermostatSetPointHi(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum);
                     //        ZoneThermostatSetPointLo(ActualZoneNum) = TempZoneThermostatSetPoint(ActualZoneNum)
 
-                    AdjustCoolingSetPointforTempAndHumidityControl(state.dataZoneTempPredictorCorrector, RelativeZoneNum, ActualZoneNum);
+                    AdjustCoolingSetPointforTempAndHumidityControl(*state.dataZoneTempPredictorCorrector, RelativeZoneNum, ActualZoneNum);
 
                 } else if (SELECT_CASE_var == SingleHeatCoolSetPoint) {
 
@@ -3781,7 +3781,7 @@ namespace ZoneTempPredictorCorrector {
 
                     SchedTypeIndex = TempControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
 
-                    SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SchedTypeIndex).TempSchedIndex;
+                    SetPointTempSchedIndex = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SchedTypeIndex).TempSchedIndex;
                     TempZoneThermostatSetPoint(ActualZoneNum) = GetCurrentScheduleValue(SetPointTempSchedIndex);
 
                     // Added Jan 17 (X. Luo)
@@ -3821,8 +3821,8 @@ namespace ZoneTempPredictorCorrector {
 
                     SchedTypeIndex = TempControlledZone(RelativeZoneNum).ControlTypeSchIndx(SchedNameIndex);
 
-                    SetPointTempSchedIndexHot = state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(SchedTypeIndex).HeatTempSchedIndex;
-                    SetPointTempSchedIndexCold = state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(SchedTypeIndex).CoolTempSchedIndex;
+                    SetPointTempSchedIndexHot = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(SchedTypeIndex).HeatTempSchedIndex;
+                    SetPointTempSchedIndexCold = state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(SchedTypeIndex).CoolTempSchedIndex;
                     ZoneThermostatSetPointHi(ActualZoneNum) = GetCurrentScheduleValue(SetPointTempSchedIndexCold);
                     TempControlledZone(RelativeZoneNum).ZoneThermostatSetPointHi = ZoneThermostatSetPointHi(ActualZoneNum);
 
@@ -3860,7 +3860,7 @@ namespace ZoneTempPredictorCorrector {
                     }
                     //--------------------------------------------------------------------------------------------
 
-                    AdjustCoolingSetPointforTempAndHumidityControl(state.dataZoneTempPredictorCorrector, RelativeZoneNum, ActualZoneNum);
+                    AdjustCoolingSetPointforTempAndHumidityControl(*state.dataZoneTempPredictorCorrector, RelativeZoneNum, ActualZoneNum);
 
                 } else {
                     ShowSevereError("CalcZoneAirTempSetpoints: Illegal control type for Zone=" + Zone(ActualZoneNum).Name +
@@ -3901,7 +3901,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(state.dataZoneTempPredictorCorrector, ioFiles);
+        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(*state.dataZoneTempPredictorCorrector, ioFiles);
         OverrideAirSetPointsforEMSCntrl();
     }
 
@@ -4870,7 +4870,7 @@ namespace ZoneTempPredictorCorrector {
             ManageAirModel(state, ZoneNum);
 
             // Calculate the various heat balance sums
-            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(*state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -5032,10 +5032,10 @@ namespace ZoneTempPredictorCorrector {
             SNLoadCoolEnergy(ZoneNum) = std::abs(min(SNLoad, 0.0) * TimeStepSys * SecInHour);
 
             // Final humidity calcs
-            CorrectZoneHumRat(state.dataZonePlenum, ZoneNum);
+            CorrectZoneHumRat(*state.dataZonePlenum, ZoneNum);
 
             ZoneAirHumRat(ZoneNum) = ZoneAirHumRatTemp(ZoneNum);
-            state.dataZoneTempPredictorCorrector.ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, RoutineName);
+            state.dataZoneTempPredictorCorrector->ZoneAirRelHum(ZoneNum) = 100.0 * PsyRhFnTdbWPb(ZT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress, RoutineName);
 
             // ZoneTempChange is used by HVACManager to determine if the timestep needs to be shortened.
             {
@@ -5079,7 +5079,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
 
-            CalcZoneComponentLoadSums(state.dataZonePlenum, ZoneNum,
+            CalcZoneComponentLoadSums(*state.dataZonePlenum, ZoneNum,
                                       TempDepCoef,
                                       TempIndCoef,
                                       ZnAirRpt(ZoneNum).SumIntGains,
@@ -6947,38 +6947,38 @@ namespace ZoneTempPredictorCorrector {
         // FLOW:
         // adjust zone operative setpoint
         if (!(TempControlledZone(TempControlledZoneID).AdaptiveComfortTempControl)) return; // do nothing to setpoint
-        if ((state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).KindOfEnvrn != ksDesignDay) && (state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
+        if ((state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != ksDesignDay) && (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
             // Adjust run period cooling set point
             switch (AdaptiveComfortModelTypeIndex) {
             case static_cast<int>(AdaptiveComfortModel::ASH55_CENTRAL):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Central(DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::ASH55_UPPER_90):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_90(DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::ASH55_UPPER_80):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveASH55_Upper_80(DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_CENTRAL):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Central(DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_UPPER_I):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_I(DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_UPPER_II):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_II(DayOfYear);
                 break;
             case static_cast<int>(AdaptiveComfortModel::CEN15251_UPPER_III):
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(DayOfYear);
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortDailySetPointSchedule.ThermalComfortAdaptiveCEN15251_Upper_III(DayOfYear);
                 break;
             default:;
             }
         } else {
-            int const envrnDayNum(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum);
+            int const envrnDayNum(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum);
             int const summerDesignDayTypeIndex(9);
             // Adjust summer design day set point
-            if (state.dataWeatherManager.DesDayInput(envrnDayNum).DayType == summerDesignDayTypeIndex) {
-                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector.AdapComfortSetPointSummerDesDay(AdaptiveComfortModelTypeIndex - 1);
+            if (state.dataWeatherManager->DesDayInput(envrnDayNum).DayType == summerDesignDayTypeIndex) {
+                ZoneAirSetPoint = state.dataZoneTempPredictorCorrector->AdapComfortSetPointSummerDesDay(AdaptiveComfortModelTypeIndex - 1);
             }
         }
         // If adaptive operative temperature not applicable, set back
@@ -7636,8 +7636,8 @@ namespace ZoneTempPredictorCorrector {
         // J.Glazer - Aug 2017
         using namespace OutputReportPredefined;
         std::vector<int> uniqSch;
-        uniqSch.reserve(state.dataZoneTempPredictorCorrector.NumSingleTempHeatingControls + state.dataZoneTempPredictorCorrector.NumSingleTempCoolingControls + state.dataZoneTempPredictorCorrector.NumSingleTempHeatCoolControls +
-                        state.dataZoneTempPredictorCorrector.NumDualTempHeatCoolControls * 2);
+        uniqSch.reserve(state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls + state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls + state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls +
+                        state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls * 2);
         Real64 setPointAt11;
         Real64 setPointAt23;
         int numDays;
@@ -7645,116 +7645,116 @@ namespace ZoneTempPredictorCorrector {
         std::string monthAssumed2;
         const int wednesday = 4;
 
-        for (int SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= state.dataZoneTempPredictorCorrector.NumSingleTempHeatingControls; ++SingleTempHeatingControlNum) {
-            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex) == uniqSch.end()) {
-                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex);
+        for (int SingleTempHeatingControlNum = 1; SingleTempHeatingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatingControls; ++SingleTempHeatingControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex);
                 PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
-                                 state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName,
-                                 state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).Name);
+                                 state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName,
+                                 state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedIndex, false, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector.SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, monthAssumed);
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointSingleHeating(SingleTempHeatingControlNum).TempSchedName, monthAssumed);
             }
         }
-        for (int SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= state.dataZoneTempPredictorCorrector.NumSingleTempCoolingControls; ++SingleTempCoolingControlNum) {
-            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex) == uniqSch.end()) {
-                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex);
+        for (int SingleTempCoolingControlNum = 1; SingleTempCoolingControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempCoolingControls; ++SingleTempCoolingControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex);
                 PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
-                                 state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName,
-                                 state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).Name);
+                                 state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName,
+                                 state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedIndex, true, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector.SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, monthAssumed);
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointSingleCooling(SingleTempCoolingControlNum).TempSchedName, monthAssumed);
             }
         }
-        for (int SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector.NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum) {
-            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex) == uniqSch.end()) {
-                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex);
+        for (int SingleTempHeatCoolControlNum = 1; SingleTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumSingleTempHeatCoolControls; ++SingleTempHeatCoolControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex);
                 PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
-                                 state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
-                                 state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name);
+                                 state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
+                                 state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).Name);
 
-                std::string schNm = state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (summer)";
+                std::string schNm = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (summer)";
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 11);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 23);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, true, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
 
-                schNm = state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (winter)";
+                schNm = state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName + " (winter)";
                 std::tie(setPointAt11, numDays, monthAssumed2) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 11);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 11);
                 PreDefTableEntry(pdchLeedSchStPt11amWednesday, schNm, setPointAt11);
                 PreDefTableEntry(pdchLeedSchStPt11amWedCnt, schNm, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed2) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 23);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedIndex, false, wednesday, 23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWednesday, schNm, setPointAt23);
                 PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, schNm, numDays);
 
                 PreDefTableEntry(pdChLeedSchStPtMonthUsed,
-                                 state.dataZoneTempPredictorCorrector.SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
+                                 state.dataZoneTempPredictorCorrector->SetPointSingleHeatCool(SingleTempHeatCoolControlNum).TempSchedName,
                                  monthAssumed + " and " + monthAssumed2);
             }
         }
-        for (int DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector.NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum) {
-            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex) == uniqSch.end()) {
-                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex);
+        for (int DualTempHeatCoolControlNum = 1; DualTempHeatCoolControlNum <= state.dataZoneTempPredictorCorrector->NumDualTempHeatCoolControls; ++DualTempHeatCoolControlNum) {
+            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex);
                 PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
-                                 state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName,
-                                 state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
+                                 state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName,
+                                 state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSchedIndex, false, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, monthAssumed);
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).HeatTempSetptSchedName, monthAssumed);
             }
-            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex) == uniqSch.end()) {
-                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex);
+            if (std::find(uniqSch.begin(), uniqSch.end(), state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex) == uniqSch.end()) {
+                uniqSch.emplace_back(state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex);
                 PreDefTableEntry(pdChLeedSchStPtFirstObjUsed,
-                                 state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName,
-                                 state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
+                                 state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName,
+                                 state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).Name);
 
                 std::tie(setPointAt11, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 11);
-                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt11);
-                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 11);
+                PreDefTableEntry(pdchLeedSchStPt11amWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt11);
+                PreDefTableEntry(pdchLeedSchStPt11amWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
 
                 std::tie(setPointAt23, numDays, monthAssumed) =
-                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt23);
-                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
+                    temperatureAndCountInSch(state, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSchedIndex, true, wednesday, 23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWednesday, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, setPointAt23);
+                PreDefTableEntry(pdchLeedSchStPt11pmWedCnt, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, numDays);
 
-                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector.SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, monthAssumed);
+                PreDefTableEntry(pdChLeedSchStPtMonthUsed, state.dataZoneTempPredictorCorrector->SetPointDualHeatCool(DualTempHeatCoolControlNum).CoolTempSetptSchedName, monthAssumed);
             }
         }
     }
@@ -7800,7 +7800,7 @@ namespace ZoneTempPredictorCorrector {
         // should adjust date if lands on a holiday but for now assume that it does not
 
         // adjust time of day for daylight savings time
-        int hourSelect = hourOfDay + state.dataWeatherManager.DSTIndex(jdateSelect);
+        int hourSelect = hourOfDay + state.dataWeatherManager->DSTIndex(jdateSelect);
 
         // get the value at the selected time
         int const firstTimeStep = 1;

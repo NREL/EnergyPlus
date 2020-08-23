@@ -124,10 +124,10 @@ SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(EnergyPlusData &state, IOFiles
         ShowSevereError(cCurrentModuleObject + ": Too many objects entered. Only one allowed.");
         thisModel->errorsFound = true;
 
-    } else if (state.dataWeatherManager.wthFCGroundTemps) {
+    } else if (state.dataWeatherManager->wthFCGroundTemps) {
 
         for (int i = 1; i <= 12; ++i) {
-            thisModel->fcFactorGroundTemps(i) = state.dataWeatherManager.GroundTempsFCFromEPWHeader(i);
+            thisModel->fcFactorGroundTemps(i) = state.dataWeatherManager->GroundTempsFCFromEPWHeader(i);
         }
 
         FCGroundTemps = true;
@@ -185,7 +185,7 @@ Real64 SiteFCFactorMethodGroundTemps::getGroundTempAtTimeInSeconds(EnergyPlusDat
     using DataGlobals::SecsInDay;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 secPerMonth = state.dataWeatherManager.NumDaysInYear * SecsInDay / 12;
+    Real64 secPerMonth = state.dataWeatherManager->NumDaysInYear * SecsInDay / 12;
 
     // Convert secs to months
     int month = ceil(_seconds / secPerMonth);

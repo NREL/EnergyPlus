@@ -325,7 +325,7 @@ namespace SizingManager {
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
-                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                         // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
                         // more easily converge fewer warmup days are allowed
                         DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -513,7 +513,7 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
-                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
+                if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                     // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                     // easily converge fewer warmup days are allowed
                     DisplayString("Suppressing Initialization of New Environment Parameters");
@@ -1972,7 +1972,7 @@ namespace SizingManager {
         int dayOfWeekType(1); // assume year starts on Sunday
         WeatherManager::CalcSpecialDayTypes(state);
         for (int DayLoop = 1; DayLoop <= DaysInYear; ++DayLoop) { // loop over all days in year
-            DataEnvironment::HolidayIndex = state.dataWeatherManager.SpecialDayTypes(DayLoop);
+            DataEnvironment::HolidayIndex = state.dataWeatherManager->SpecialDayTypes(DayLoop);
             DataEnvironment::DayOfYear_Schedule = DayLoop;
             DataEnvironment::DayOfWeek = dayOfWeekType;
             ++dayOfWeekType;

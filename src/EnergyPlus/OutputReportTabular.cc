@@ -5728,7 +5728,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
+            WriteBEPSTable(state.dataCostEstimateManager, *state.dataZoneTempPredictorCorrector);
             WriteTableOfContents(state);
             WriteVeriSumTable(state.dataCostEstimateManager, state.files);
             WriteDemandEndUseSummary(state.dataCostEstimateManager);
@@ -6637,8 +6637,8 @@ namespace OutputReportTabular {
         PreDefTableEntry(pdchHVACcntVal, "Conditioned Zones", numCondZones);
         PreDefTableEntry(pdchHVACcntVal, "Unconditioned Zones", numUncondZones);
         // add the number of plenums to the count report
-        PreDefTableEntry(pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum.NumZoneSupplyPlenums);
-        PreDefTableEntry(pdchHVACcntVal, "Return Plenums", state.dataZonePlenum.NumZoneReturnPlenums);
+        PreDefTableEntry(pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum->NumZoneSupplyPlenums);
+        PreDefTableEntry(pdchHVACcntVal, "Return Plenums", state.dataZonePlenum->NumZoneReturnPlenums);
 
         // Started to create a total row but did not fully implement
         // CALL PreDefTableEntry(pdchOaoZoneVol1,'Total OA Avg', totalVolume)
@@ -13726,9 +13726,9 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= state.dataWeatherManager.DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
@@ -13779,9 +13779,9 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= state.dataWeatherManager.DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(state.dataWeatherManager.DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);

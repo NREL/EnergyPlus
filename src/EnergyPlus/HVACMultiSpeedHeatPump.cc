@@ -754,7 +754,7 @@ namespace HVACMultiSpeedHeatPump {
                                 if (ComfortControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }
-                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneTempPredictorCorrector.NumStageCtrZone; ++TstatZoneNum) {
+                            for (TstatZoneNum = 1; TstatZoneNum <= state.dataZoneTempPredictorCorrector->NumStageCtrZone; ++TstatZoneNum) {
                                 if (StageControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
                                 AirNodeFound = true;
                             }

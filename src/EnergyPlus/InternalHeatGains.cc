@@ -5345,7 +5345,7 @@ namespace InternalHeatGains {
                     int retNum = Lights(Loop).ZoneReturnNum;
                     int ReturnZonePlenumCondNum = ZoneEquipConfig(NZ).ReturnNodePlenumNum(retNum);
                     if (ReturnZonePlenumCondNum > 0) {
-                        ReturnPlenumTemp = state.dataZonePlenum.ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
+                        ReturnPlenumTemp = state.dataZonePlenum->ZoneRetPlenCond(ReturnZonePlenumCondNum).ZoneTemp;
                         FractionReturnAir =
                             Lights(Loop).FractionReturnAirPlenTempCoeff1 - Lights(Loop).FractionReturnAirPlenTempCoeff2 * ReturnPlenumTemp;
                         FractionReturnAir = max(0.0, min(1.0, FractionReturnAir));
@@ -5524,7 +5524,7 @@ namespace InternalHeatGains {
 
         CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
-        CalcWaterUseZoneGains(state.dataWaterUse);
+        CalcWaterUseZoneGains(*state.dataWaterUse);
         FigureFuelCellZoneGains();
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();

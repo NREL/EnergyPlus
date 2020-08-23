@@ -370,7 +370,7 @@ namespace HeatBalanceManager {
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files); // Initialize all heat balance related parameters
+        InitHeatBalance(*state.dataWindowComplexManager, *state.dataWindowEquivalentLayer, *state.dataWindowManager, state.files); // Initialize all heat balance related parameters
         ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -462,7 +462,7 @@ namespace HeatBalanceManager {
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(*state.dataWindowEquivalentLayer, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -1220,7 +1220,7 @@ namespace HeatBalanceManager {
             AlphaName(3) = "NO";
         }
 
-        WindowManager::initWindowModel(state.dataWindowManager);
+        WindowManager::initWindowModel(*state.dataWindowManager);
 
         static constexpr auto Format_728(
             "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");

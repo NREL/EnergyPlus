@@ -4924,7 +4924,7 @@ namespace LowTempRadiantSystem {
         Real64 sum = 0.0;
         for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
             for (int timeStepNumber = 1; timeStepNumber <= DataGlobals::NumOfTimeStepInHour; ++timeStepNumber) {
-                sum += state.dataWeatherManager.TodayOutDryBulbTemp(timeStepNumber,hourNumber);
+                sum += state.dataWeatherManager->TodayOutDryBulbTemp(timeStepNumber,hourNumber);
             }
         }
         return sum/double(DataGlobals::HoursInDay*DataGlobals::NumOfTimeStepInHour);

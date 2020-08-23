@@ -1200,7 +1200,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
     DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
     SingleDuct::GetSysInput(state);
 
     MixedAir::GetOutsideAirSysInputs(state);

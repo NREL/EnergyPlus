@@ -57,5 +57,18 @@
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/WindowAC.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindTurbine.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #endif

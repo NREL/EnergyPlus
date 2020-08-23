@@ -3178,7 +3178,7 @@ namespace SurfaceGeometry {
 
                 } else if (UtilityRoutines::SameString(cAlphaArgs(ArgPointer), "Foundation")) {
 
-                    if (!state.dataWeatherManager.WeatherFileExists) {
+                    if (!state.dataWeatherManager->WeatherFileExists) {
                         ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name +
                                         "\", using \"Foundation\" type Outside Boundary Condition requires specification of a weather file");
                         ShowContinueError("Either place in.epw in the working directory or specify a weather file on the command line using -w "

@@ -771,7 +771,7 @@ namespace FanCoilUnits {
             }
 
             // check for inlet side air mixer
-            GetATMixer(state.dataZoneAirLoopEquipmentManager, FanCoil(FanCoilNum).Name,
+            GetATMixer(*state.dataZoneAirLoopEquipmentManager, FanCoil(FanCoilNum).Name,
                        ATMixerName,
                        ATMixerNum,
                        ATMixerType,

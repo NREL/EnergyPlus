@@ -906,11 +906,11 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak)
     DataSizing::FinalZoneSizing(CurZoneEqNum).TimeStepNumAtCoolMax = 72;
 
     // Fake a design day
-    state.dataWeatherManager.DesDayInput.allocate(1);
+    state.dataWeatherManager->DesDayInput.allocate(1);
     std::string DDTitle = "CHICAGO ANN CLG 1% CONDNS DB=>MWB";
-    state.dataWeatherManager.DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title = DDTitle;
-    state.dataWeatherManager.DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month = 7;
-    state.dataWeatherManager.DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
+    state.dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Title = DDTitle;
+    state.dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).Month = 7;
+    state.dataWeatherManager->DesDayInput(FinalZoneSizing(CurZoneEqNum).CoolDDNum).DayOfMonth = 15;
     // Also need to set this, it's used to check if DDNum <= TotDesDays
     DataEnvironment::TotDesDays = 1;
 

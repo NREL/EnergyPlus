@@ -222,19 +222,19 @@ namespace WaterUse {
         Real64 const Tolerance(0.1); // Make input?
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
-            if (state.dataWaterUse.numWaterEquipment > 0) {
-                for (int i = state.dataWaterUse.WaterEquipment.l(), e = state.dataWaterUse.WaterEquipment.u(); i <= e; ++i) {
-                    state.dataWaterUse.WaterEquipment(i).reset();
+            if (state.dataWaterUse->numWaterEquipment > 0) {
+                for (int i = state.dataWaterUse->WaterEquipment.l(), e = state.dataWaterUse->WaterEquipment.u(); i <= e; ++i) {
+                    state.dataWaterUse->WaterEquipment(i).reset();
 
-                    if (state.dataWaterUse.WaterEquipment(i).setupMyOutputVars) {
-                        state.dataWaterUse.WaterEquipment(i).setupOutputVars(state.dataWaterUse);
-                        state.dataWaterUse.WaterEquipment(i).setupMyOutputVars = false;
+                    if (state.dataWaterUse->WaterEquipment(i).setupMyOutputVars) {
+                        state.dataWaterUse->WaterEquipment(i).setupOutputVars(*state.dataWaterUse);
+                        state.dataWaterUse->WaterEquipment(i).setupMyOutputVars = false;
                     }
                 }
             }
 
-            if (state.dataWaterUse.numWaterConnections > 0) {
-                for (auto &e : state.dataWaterUse.WaterConnections)
+            if (state.dataWaterUse->numWaterConnections > 0) {
+                for (auto &e : state.dataWaterUse->WaterConnections)
                     e.TotalMassFlowRate = 0.0;
             }
 
@@ -243,15 +243,15 @@ namespace WaterUse {
 
         if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
-        this->InitConnections(state.dataBranchInputManager, state.dataWaterUse);
+        this->InitConnections(state.dataBranchInputManager, *state.dataWaterUse);
 
         int NumIteration = 0;
 
         while (true) {
             ++NumIteration;
 
-            this->CalcConnectionsFlowRates(state.dataWaterUse, FirstHVACIteration);
-            this->CalcConnectionsDrainTemp(state.dataWaterUse);
+            this->CalcConnectionsFlowRates(*state.dataWaterUse, FirstHVACIteration);
+            this->CalcConnectionsDrainTemp(*state.dataWaterUse);
             this->CalcConnectionsHeatRecovery();
 
             if (this->TempError < Tolerance) {
@@ -270,7 +270,7 @@ namespace WaterUse {
         } // WHILE
 
         this->UpdateWaterConnections();
-        this->ReportWaterUse(state.dataWaterUse);
+        this->ReportWaterUse(*state.dataWaterUse);
     }
 
     void GetWaterUseInput(WaterUseData &dataWaterUse)

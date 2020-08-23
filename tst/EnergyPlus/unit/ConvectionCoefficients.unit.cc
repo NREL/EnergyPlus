@@ -440,7 +440,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -915,7 +915,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -972,7 +972,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1029,7 +1029,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1086,7 +1086,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1143,7 +1143,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1200,7 +1200,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;

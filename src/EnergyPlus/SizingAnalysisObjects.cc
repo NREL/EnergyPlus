@@ -319,25 +319,25 @@ int SizingLoggerFramework::SetupVariableSizingLog(EnergyPlusData& state, Real64 
 
     // search environment structure for sizing periods
     // this is coded to occur before the additions to Environment structure that will occur to run them as HVAC Sizing sims
-    for (int i = 1; i <= state.dataWeatherManager.NumOfEnvrn; ++i) {
-        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksDesignDay) {
+    for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksDesignDay) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumOfDesignDaysInLogSet;
         }
-        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
             ++tmpLog.NumOfEnvironmentsInLogSet;
             ++tmpLog.NumberOfSizingPeriodsInLogSet;
         }
     }
 
     // next fill in the count of steps into map
-    for (int i = 1; i <= state.dataWeatherManager.NumOfEnvrn; ++i) {
+    for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) {
 
-        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksDesignDay) {
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksDesignDay) {
             tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour;
         }
-        if (state.dataWeatherManager.Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
-            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour * state.dataWeatherManager.Environment(i).TotalDays;
+        if (state.dataWeatherManager->Environment(i).KindOfEnvrn == ksRunPeriodDesign) {
+            tmpLog.ztStepCountByEnvrnMap[i] = HoursPerDay * NumOfTimeStepInHour * state.dataWeatherManager->Environment(i).TotalDays;
         }
     }
 
@@ -366,7 +366,7 @@ void SizingLoggerFramework::SetupSizingLogsNewEnvironment(EnergyPlusData& state)
     using namespace WeatherManager;
 
     for (auto &l : logObjs) {
-        l.SetupNewEnvironment(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).SeedEnvrnNum, state.dataWeatherManager.Envrn);
+        l.SetupNewEnvironment(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).SeedEnvrnNum, state.dataWeatherManager->Envrn);
     }
 }
 
@@ -385,7 +385,7 @@ ZoneTimestepObject SizingLoggerFramework::PrepareZoneTimestepStamp(EnergyPlusDat
 
     ZoneTimestepObject tmpztStepStamp( // call constructor
         DataGlobals::KindOfSim,
-        state.dataWeatherManager.Envrn,
+        state.dataWeatherManager->Envrn,
         locDayOfSim,
         DataGlobals::HourOfDay,
         DataGlobals::TimeStep,
@@ -603,7 +603,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFi
             if (newFoundMassFlowRateTimeStamp.envrnNum > 0) {                            // protect against invalid index
                 PreDefTableEntry(pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                                 state.dataWeatherManager.Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
+                                 state.dataWeatherManager->Environment(newFoundMassFlowRateTimeStamp.envrnNum).Title);
             }
             PreDefTableEntry(
                 pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, newFoundMassFlowRateTimeStamp.dayOfSim);
@@ -617,7 +617,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(EnergyPlusData& state, IOFi
             if (NewFoundMaxDemandTimeStamp.envrnNum > 0) {                                  // protect against invalid index
                 PreDefTableEntry(pdchPlantSizDesDay,
                                  PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration,
-                                 state.dataWeatherManager.Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
+                                 state.dataWeatherManager->Environment(NewFoundMaxDemandTimeStamp.envrnNum).Title);
             }
             PreDefTableEntry(
                 pdchPlantSizPkTimeDayOfSim, PlantLoop(plantLoopIndex).Name + " Sizing Pass " + chIteration, NewFoundMaxDemandTimeStamp.dayOfSim);

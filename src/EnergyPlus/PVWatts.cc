@@ -390,7 +390,7 @@ namespace PVWatts {
         // initialize_cell_temp
         m_tccalc->set_last_values(m_lastCellTemperature, m_lastPlaneOfArrayIrradiance);
 
-        Real64 albedo = state.dataWeatherManager.TodayAlbedo(TimeStep, HourOfDay);
+        Real64 albedo = state.dataWeatherManager->TodayAlbedo(TimeStep, HourOfDay);
         if (!(std::isfinite(albedo) && albedo > 0.0 && albedo < 1)) {
             albedo = 0.2;
         }
@@ -402,9 +402,9 @@ namespace PVWatts {
                                                     HourOfDay - 1,
                                                     (TimeStep - 0.5) * DataGlobals::MinutesPerTimeStep,
                                                     TimeStepZone,
-                                                    state.dataWeatherManager.WeatherFileLatitude,
-                                                    state.dataWeatherManager.WeatherFileLongitude,
-                                                    state.dataWeatherManager.WeatherFileTimeZone,
+                                                    state.dataWeatherManager->WeatherFileLatitude,
+                                                    state.dataWeatherManager->WeatherFileLongitude,
+                                                    state.dataWeatherManager->WeatherFileTimeZone,
                                                     DataEnvironment::BeamSolarRad,
                                                     DataEnvironment::DifSolarRad,
                                                     albedo);

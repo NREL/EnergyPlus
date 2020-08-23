@@ -152,11 +152,11 @@ TEST_F(EnergyPlusFixture, SkyTempTest)
 TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 {
     // setup environment state
-    state.dataWeatherManager.Environment.allocate(4);
-    state.dataWeatherManager.Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
-    state.dataWeatherManager.Environment(2).SkyTempModel = EmissivityCalcType::BruntModel;
-    state.dataWeatherManager.Environment(3).SkyTempModel = EmissivityCalcType::IdsoModel;
-    state.dataWeatherManager.Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
+    state.dataWeatherManager->Environment.allocate(4);
+    state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state.dataWeatherManager->Environment(2).SkyTempModel = EmissivityCalcType::BruntModel;
+    state.dataWeatherManager->Environment(3).SkyTempModel = EmissivityCalcType::IdsoModel;
+    state.dataWeatherManager->Environment(4).SkyTempModel = EmissivityCalcType::BerdahlMartinModel;
 
     // init local variables
     Real64 OpagueSkyCover(0.0);
@@ -164,17 +164,17 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
     Real64 DewPoint(16.7);
     Real64 RelHum(0.6);
 
-    EXPECT_NEAR(0.832, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.867, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.832, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.867, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 
     DryBulb = 5.0;
     DewPoint = -2.13;
-    EXPECT_NEAR(0.781, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.746, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.760, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.747, CalcSkyEmissivity(state, state.dataWeatherManager.Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.781, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.746, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.760, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.747, CalcSkyEmissivity(state, state.dataWeatherManager->Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
@@ -183,9 +183,9 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)
     using DataEnvironment::Latitude;
     using DataEnvironment::WaterMainsTemp;
 
-    state.dataWeatherManager.WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
-    state.dataWeatherManager.WaterMainsTempsAnnualAvgAirTemp = 9.69;
-    state.dataWeatherManager.WaterMainsTempsMaxDiffAirTemp = 28.1;
+    state.dataWeatherManager->WaterMainsTempsMethod = WeatherManager::WaterMainsTempCalcMethod::Correlation;
+    state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp = 9.69;
+    state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp = 28.1;
     DayOfYear = 50;
 
     Latitude = 40.0;
@@ -324,11 +324,11 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
     // then process the input for this underwater surface
     bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries(state);
     EXPECT_TRUE(shouldBeTrue);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
-    EXPECT_NEAR(state.dataWeatherManager.underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].OSCMIndex, 1);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].VelocityScheduleIndex, 2);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
+    EXPECT_NEAR(state.dataWeatherManager->underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].OSCMIndex, 1);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].WaterTempScheduleIndex, 1);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].VelocityScheduleIndex, 2);
 }
 
 TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
@@ -348,11 +348,11 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
     // then process the input for this underwater surface
     bool shouldBeTrue = WeatherManager::CheckIfAnyUnderwaterBoundaries(state);
     EXPECT_TRUE(shouldBeTrue);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
-    EXPECT_NEAR(state.dataWeatherManager.underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].OSCMIndex, 1);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].WaterTempScheduleIndex, 1);
-    EXPECT_EQ(state.dataWeatherManager.underwaterBoundaries[0].VelocityScheduleIndex, 0);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].Name, "UNDERWATERSURFACENAME");
+    EXPECT_NEAR(state.dataWeatherManager->underwaterBoundaries[0].distanceFromLeadingEdge, 31.4159, 0.0001);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].OSCMIndex, 1);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].WaterTempScheduleIndex, 1);
+    EXPECT_EQ(state.dataWeatherManager->underwaterBoundaries[0].VelocityScheduleIndex, 0);
 }
 
 TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionConvectionCoefficients)
@@ -383,15 +383,15 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromWeatherFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsAnnualAvgAirTemp, 0.0);
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsMaxDiffAirTemp, 0.0);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
 
     // set water mains parameters for CorrelationFromWeatherFile method
-    state.dataWeatherManager.OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
-    state.dataWeatherManager.OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
-    state.dataWeatherManager.OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+    state.dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
+    state.dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
+    state.dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
     DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 15th water mains temperature test
@@ -429,30 +429,30 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these parameters are ignored
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsAnnualAvgAirTemp, 0.0);
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsMaxDiffAirTemp, 0.0);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
 
     Array1D<Real64> MonthlyDryBulbTempFromStatFile(12, {-4.60, -2.50, 3.80, 10.00, 15.30, 21.10, 24.10, 21.80, 18.10, 11.00, 4.70, -3.70});
-    state.dataWeatherManager.OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDryBulbTempFromStatFile;
+    state.dataWeatherManager->OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDryBulbTempFromStatFile;
 
     // calc water mains parameters for CorrelationFromWeatherFile method
     for (int i = 1; i <= 12; ++i) {
-        AnnualDailyAverageDryBulbTempSum += state.dataWeatherManager.OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i) * state.dataWeatherManager.EndDayOfMonth(i);
-        MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, state.dataWeatherManager.OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
-        MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, state.dataWeatherManager.OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
-        AnnualNumberOfDays += state.dataWeatherManager.EndDayOfMonth(i);
+        AnnualDailyAverageDryBulbTempSum += state.dataWeatherManager->OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i) * state.dataWeatherManager->EndDayOfMonth(i);
+        MonthlyDailyDryBulbMin = min(MonthlyDailyDryBulbMin, state.dataWeatherManager->OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
+        MonthlyDailyDryBulbMax = max(MonthlyDailyDryBulbMax, state.dataWeatherManager->OADryBulbAverage.MonthlyDailyAverageDryBulbTemp(i));
+        AnnualNumberOfDays += state.dataWeatherManager->EndDayOfMonth(i);
     }
-    state.dataWeatherManager.OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
-    state.dataWeatherManager.OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
+    state.dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp = AnnualDailyAverageDryBulbTempSum / AnnualNumberOfDays;
+    state.dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = MonthlyDailyDryBulbMax - MonthlyDailyDryBulbMin;
     // check results
-    EXPECT_NEAR(state.dataWeatherManager.OADryBulbAverage.AnnualAvgOADryBulbTemp, 9.9882, 0.0001);
-    EXPECT_NEAR(state.dataWeatherManager.OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 28.7000, 0.0001);
+    EXPECT_NEAR(state.dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp, 9.9882, 0.0001);
+    EXPECT_NEAR(state.dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 28.7000, 0.0001);
 
     // test water mains temperature
     // WeatherManager::WaterMainsTempsMethod = WeatherManager::CorrelationFromWeatherFileMethod;
-    state.dataWeatherManager.OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+    state.dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
     DataEnvironment::Latitude = 42.00; // CHICAGO_IL_USA_WMO_725300
 
     // January 21st water mains temperature test
@@ -483,15 +483,15 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     bool foundErrors(false);
     WeatherManager::GetWaterMainsTemperatures(state, foundErrors);
     EXPECT_FALSE(foundErrors); // expect no errors
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsMethod, WeatherManager::WaterMainsTempCalcMethod::CorrelationFromWeatherFile);
     // for calculation method CorrelationFromWeatherFile these two parameters are ignored
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsAnnualAvgAirTemp, 0.0);
-    EXPECT_EQ(state.dataWeatherManager.WaterMainsTempsMaxDiffAirTemp, 0.0);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsAnnualAvgAirTemp, 0.0);
+    EXPECT_EQ(state.dataWeatherManager->WaterMainsTempsMaxDiffAirTemp, 0.0);
 
     // set water mains temp parameters for CorrelationFromWeatherFile method
-    state.dataWeatherManager.OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
-    state.dataWeatherManager.OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
-    state.dataWeatherManager.OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
+    state.dataWeatherManager->OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
+    state.dataWeatherManager->OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
+    state.dataWeatherManager->OADryBulbAverage.OADryBulbWeatherDataProcessed = true;
 
     // report water mains parameters to eio file
     WeatherManager::ReportWaterMainsTempParameters(state, state.files);
@@ -570,10 +570,10 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     bool ErrorsFound(false);
     DataEnvironment::TotDesDays = 2;
     // setup environment state
-    state.dataWeatherManager.Environment.allocate(DataEnvironment::TotDesDays);
-    state.dataWeatherManager.DesignDay.allocate(DataEnvironment::TotDesDays);
-    state.dataWeatherManager.Environment(1).DesignDayNum = 1;
-    state.dataWeatherManager.Environment(2).DesignDayNum = 2;
+    state.dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
+    state.dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state.dataWeatherManager->Environment(1).DesignDayNum = 1;
+    state.dataWeatherManager->Environment(2).DesignDayNum = 2;
     GetDesignDayData(state, DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
@@ -586,10 +586,10 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     // EnvrnNum = 1 uses Tau values of January
     int EnvrnNum = 1;
     Real64 CosZenith = 1.0; // assumed zero zenith angle
-    Real64 TauB = state.dataWeatherManager.DesDayInput(EnvrnNum).TauB;
-    Real64 TauD = state.dataWeatherManager.DesDayInput(EnvrnNum).TauD;
+    Real64 TauB = state.dataWeatherManager->DesDayInput(EnvrnNum).TauB;
+    Real64 TauD = state.dataWeatherManager->DesDayInput(EnvrnNum).TauD;
     // check tau values
-    EXPECT_EQ(DesignDaySolarModel::ASHRAE_Tau2017, state.dataWeatherManager.DesDayInput(EnvrnNum).SolarModel);
+    EXPECT_EQ(DesignDaySolarModel::ASHRAE_Tau2017, state.dataWeatherManager->DesDayInput(EnvrnNum).SolarModel);
     EXPECT_EQ(0.325, TauB);
     EXPECT_EQ(2.461, TauD);
     // calc expected values for environment 1
@@ -600,7 +600,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     Real64 expectedIDifH = ETR * std::exp(-TauD * std::pow(M, AD));
     Real64 expectedIGlbH = expectedIDirN * CosZenith + expectedIDifH;
     // calc TauModel
-    ASHRAETauModel(state, state.dataWeatherManager.DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    ASHRAETauModel(state, state.dataWeatherManager->DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
     // check the coefficients are correctly applied
     EXPECT_EQ(expectedIDirN, BeamRad);
     EXPECT_EQ(expectedIDifH, DiffRad);
@@ -609,8 +609,8 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     // EnvrnNum = 2 uses Tau values of July
     EnvrnNum = 2;
     CosZenith = 1.0; // assumed zero zenith angle
-    TauB = state.dataWeatherManager.DesDayInput(EnvrnNum).TauB;
-    TauD = state.dataWeatherManager.DesDayInput(EnvrnNum).TauD;
+    TauB = state.dataWeatherManager->DesDayInput(EnvrnNum).TauB;
+    TauD = state.dataWeatherManager->DesDayInput(EnvrnNum).TauD;
     // check tau values
     EXPECT_EQ(0.556, TauB);
     EXPECT_EQ(1.779, TauD);
@@ -626,7 +626,7 @@ TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
     DiffRad = 0.0;
     GloHorzRad = 0.0;
     // calc TauModel
-    ASHRAETauModel(state, state.dataWeatherManager.DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
+    ASHRAETauModel(state, state.dataWeatherManager->DesDayInput(EnvrnNum).SolarModel, ETR, CosZenith, TauB, TauD, BeamRad, DiffRad, GloHorzRad);
     // check the coefficients are correctly applied
     EXPECT_EQ(expectedIDirN, BeamRad);
     EXPECT_EQ(expectedIDifH, DiffRad);
@@ -671,7 +671,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     DataGlobals::BeginSimFlag = false;
     DataGlobals::NumOfTimeStepInHour = 4;
-    state.dataWeatherManager.LocationGathered = false;
+    state.dataWeatherManager->LocationGathered = false;
 
     bool Available{false};
     bool ErrorsFound{false};
@@ -689,8 +689,8 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
-    EXPECT_EQ(1, state.dataWeatherManager.NumOfEnvrn);
-    EXPECT_EQ(state.dataWeatherManager.Environment(1).KindOfEnvrn, DataGlobals::ksDesignDay);
+    EXPECT_EQ(1, state.dataWeatherManager->NumOfEnvrn);
+    EXPECT_EQ(state.dataWeatherManager->Environment(1).KindOfEnvrn, DataGlobals::ksDesignDay);
 }
 
 // Test for https://github.com/NREL/EnergyPlus/issues/7550
@@ -748,11 +748,11 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     bool ErrorsFound(false);
     DataEnvironment::TotDesDays = 1;
     // setup environment state
-    state.dataWeatherManager.Environment.allocate(DataEnvironment::TotDesDays);
-    state.dataWeatherManager.DesignDay.allocate(DataEnvironment::TotDesDays);
+    state.dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
+    state.dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
 
-    state.dataWeatherManager.Environment(1).DesignDayNum = 1;
-    state.dataWeatherManager.Environment(1).WP_Type1 = 0;
+    state.dataWeatherManager->Environment(1).DesignDayNum = 1;
+    state.dataWeatherManager->Environment(1).WP_Type1 = 0;
     DataGlobals::MinutesPerTimeStep = 60;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::BeginSimFlag = true;
@@ -765,15 +765,15 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     ASSERT_FALSE(ErrorsFound);
 
     WeatherManager::SetUpDesignDay(state, state.files, 1);
-    EXPECT_EQ(state.dataWeatherManager.DesDayInput(1).HumIndType, DDHumIndType::Enthalpy);
-    EXPECT_EQ(state.dataWeatherManager.DesDayInput(1).HumIndValue, 90500.0);
+    EXPECT_EQ(state.dataWeatherManager->DesDayInput(1).HumIndType, DDHumIndType::Enthalpy);
+    EXPECT_EQ(state.dataWeatherManager->DesDayInput(1).HumIndValue, 90500.0);
 
     unsigned n_RH_not100 = 0;
     for (int Hour = 1; Hour <= 24; ++Hour) {
         for (int TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
-            EXPECT_GE(state.dataWeatherManager.TomorrowOutRelHum(TS, Hour), 0.);
-            EXPECT_LE(state.dataWeatherManager.TomorrowOutRelHum(TS, Hour), 100.);
-            if (state.dataWeatherManager.TomorrowOutRelHum(TS, Hour) < 100.) {
+            EXPECT_GE(state.dataWeatherManager->TomorrowOutRelHum(TS, Hour), 0.);
+            EXPECT_LE(state.dataWeatherManager->TomorrowOutRelHum(TS, Hour), 100.);
+            if (state.dataWeatherManager->TomorrowOutRelHum(TS, Hour) < 100.) {
                 ++n_RH_not100;
             }
         }
@@ -1003,23 +1003,23 @@ TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
     DataEnvironment::TotDesDays = 2;
 
     // setup environment state
-    state.dataWeatherManager.Environment.allocate(DataEnvironment::TotDesDays);
-    state.dataWeatherManager.DesignDay.allocate(DataEnvironment::TotDesDays);
-    state.dataWeatherManager.Environment(1).DesignDayNum = 1;
-    state.dataWeatherManager.Environment(2).DesignDayNum = 2;
+    state.dataWeatherManager->Environment.allocate(DataEnvironment::TotDesDays);
+    state.dataWeatherManager->DesignDay.allocate(DataEnvironment::TotDesDays);
+    state.dataWeatherManager->Environment(1).DesignDayNum = 1;
+    state.dataWeatherManager->Environment(2).DesignDayNum = 2;
     GetDesignDayData(state, DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    state.dataWeatherManager.Envrn =1;
+    state.dataWeatherManager->Envrn =1;
 
     DataGlobals::NumOfTimeStepInHour = 1;
-    state.dataWeatherManager.Environment.allocate(1);
-    state.dataWeatherManager.Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
+    state.dataWeatherManager->Environment.allocate(1);
+    state.dataWeatherManager->Environment(1).SkyTempModel = EmissivityCalcType::ClarkAllenModel;
 
     AllocateWeatherData(state);
     OpenWeatherFile(state, ErrorsFound);
     ReadWeatherForDay(state, state.files, 0, 1, false);
 
     Real64 expected_IRHorizSky = 345.73838855245953;
-    EXPECT_NEAR(state.dataWeatherManager.TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);
+    EXPECT_NEAR(state.dataWeatherManager->TomorrowHorizIRSky(1, 1), expected_IRHorizSky, 0.001);
 }

@@ -166,26 +166,26 @@ namespace HeatBalanceKivaManager {
         int accDate =
             DataEnvironment::DayOfYear - 1 - acceleratedTimestep * (numAccelaratedTimesteps + 1); // date time = last timestep from the day before
         while (accDate < 0) {
-            accDate = accDate + 365 + state.dataWeatherManager.LeapYearAdd;
+            accDate = accDate + 365 + state.dataWeatherManager->LeapYearAdd;
         }
 
         // Initialize with steady state before accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_STEADY_STATE;
-        setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+        setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
         instance.calculate();
         accDate += acceleratedTimestep;
-        while (accDate > 365 + state.dataWeatherManager.LeapYearAdd) {
-            accDate = accDate - (365 + state.dataWeatherManager.LeapYearAdd);
+        while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
+            accDate = accDate - (365 + state.dataWeatherManager->LeapYearAdd);
         }
 
         // Accelerated timestepping
         instance.ground->foundation.numericalScheme = Kiva::Foundation::NS_IMPLICIT;
         for (int i = 0; i < numAccelaratedTimesteps; ++i) {
-            setInitialBoundaryConditions(state.dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
+            setInitialBoundaryConditions(*state.dataZoneTempPredictorCorrector, kivaWeather, accDate, 24, DataGlobals::NumOfTimeStepInHour);
             instance.calculate(acceleratedTimestep * 24 * 60 * 60);
             accDate += acceleratedTimestep;
-            while (accDate > 365 + state.dataWeatherManager.LeapYearAdd) {
-                accDate = accDate - (365 + state.dataWeatherManager.LeapYearAdd);
+            while (accDate > 365 + state.dataWeatherManager->LeapYearAdd) {
+                accDate = accDate - (365 + state.dataWeatherManager->LeapYearAdd);
             }
         }
 

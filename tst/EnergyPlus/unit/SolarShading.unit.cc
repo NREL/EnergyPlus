@@ -118,7 +118,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
     }
 
     DetailedSolarTimestepIntegration = false;
-    CalcPerSolarBeam(state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+    CalcPerSolarBeam(*state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -138,7 +138,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CalcPerSolarBeamTest)
 
     DetailedSolarTimestepIntegration = true;
     HourOfDay = 23;
-    CalcPerSolarBeam(state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
+    CalcPerSolarBeam(*state.dataWindowComplexManager, AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin);
 
     for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
         for (int Hour = 1; Hour <= 24; ++Hour) {
@@ -622,7 +622,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1022,7 +1022,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1433,7 +1433,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1803,7 +1803,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
+    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);

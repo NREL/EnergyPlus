@@ -65,9 +65,10 @@
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 using namespace EnergyPlus;
-using namespace WeatherManager;
+//using namespace WeatherManager;
 using namespace OutputProcessor;
 using namespace DataGlobals;
 using namespace DataPlant;
@@ -100,27 +101,27 @@ public:
         TimeStepZone = 0.25;
 
         // setup weather manager state needed
-        state.dataWeatherManager.NumOfEnvrn = 2;
-        state.dataWeatherManager.Environment.allocate(state.dataWeatherManager.NumOfEnvrn);
-        state.dataWeatherManager.Environment(1).KindOfEnvrn = ksDesignDay;
-        state.dataWeatherManager.Environment(1).DesignDayNum = 1;
+        state.dataWeatherManager->NumOfEnvrn = 2;
+        state.dataWeatherManager->Environment.allocate(state.dataWeatherManager->NumOfEnvrn);
+        state.dataWeatherManager->Environment(1).KindOfEnvrn = ksDesignDay;
+        state.dataWeatherManager->Environment(1).DesignDayNum = 1;
 
-        state.dataWeatherManager.Environment(2).KindOfEnvrn = ksDesignDay;
-        state.dataWeatherManager.Environment(2).DesignDayNum = 2;
+        state.dataWeatherManager->Environment(2).KindOfEnvrn = ksDesignDay;
+        state.dataWeatherManager->Environment(2).DesignDayNum = 2;
 
         averagingWindow = 1;
         logIndex = sizingLoggerFrameObj.SetupVariableSizingLog(state, LogVal, averagingWindow);
 
-        state.dataWeatherManager.NumOfEnvrn = 4;
-        state.dataWeatherManager.Environment.redimension(state.dataWeatherManager.NumOfEnvrn);
+        state.dataWeatherManager->NumOfEnvrn = 4;
+        state.dataWeatherManager->Environment.redimension(state.dataWeatherManager->NumOfEnvrn);
 
-        state.dataWeatherManager.Environment(3).KindOfEnvrn = ksHVACSizeDesignDay;
-        state.dataWeatherManager.Environment(3).DesignDayNum = 1;
-        state.dataWeatherManager.Environment(3).SeedEnvrnNum = 1;
+        state.dataWeatherManager->Environment(3).KindOfEnvrn = ksHVACSizeDesignDay;
+        state.dataWeatherManager->Environment(3).DesignDayNum = 1;
+        state.dataWeatherManager->Environment(3).SeedEnvrnNum = 1;
 
-        state.dataWeatherManager.Environment(4).KindOfEnvrn = ksHVACSizeDesignDay;
-        state.dataWeatherManager.Environment(4).DesignDayNum = 2;
-        state.dataWeatherManager.Environment(4).SeedEnvrnNum = 2;
+        state.dataWeatherManager->Environment(4).KindOfEnvrn = ksHVACSizeDesignDay;
+        state.dataWeatherManager->Environment(4).DesignDayNum = 2;
+        state.dataWeatherManager->Environment(4).SeedEnvrnNum = 2;
 
         OutputProcessor::SetupTimePointers("ZONE", TimeStepZone);
         OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
@@ -152,7 +153,7 @@ public:
         TotNumLoops = 0;
         PlantLoop(1).LoopSide.deallocate();
         PlantLoop.deallocate();
-        state.dataWeatherManager.Environment.deallocate();
+        state.dataWeatherManager->Environment.deallocate();
         PlantSizData.deallocate();
         TimeValue.clear();
     }
@@ -169,8 +170,8 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     KindOfSim = 4;
     DayOfSim = 1;
     HourOfDay = 1;
-    state.dataWeatherManager.Envrn = 3;
-    state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum = 1;
+    state.dataWeatherManager->Envrn = 3;
+    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 1;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state);
     DataGlobals::TimeStep = 1;
 
@@ -190,8 +191,8 @@ TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
     // first step of second design day
     HourOfDay = 1;
     DataGlobals::TimeStep = 1;
-    state.dataWeatherManager.Envrn = 4;
-    state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum = 2;
+    state.dataWeatherManager->Envrn = 4;
+    state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum = 2;
     sizingLoggerFrameObj.SetupSizingLogsNewEnvironment(state);
     LogVal = midLogVal;
     sizingLoggerFrameObj.UpdateSizingLogValuesZoneStep(state);

@@ -201,7 +201,7 @@ namespace RoomAirModelAirflowNetwork {
             thisRAFN.CalcRoomAirModelAirflowNetwork(ThisRoomAirNode);
         }
 
-        thisRAFN.UpdateRoomAirModelAirflowNetwork(state.dataZoneDehumidifier);
+        thisRAFN.UpdateRoomAirModelAirflowNetwork(*state.dataZoneDehumidifier);
 
     } // SimRoomAirModelAirflowNetwork
 
@@ -574,7 +574,7 @@ namespace RoomAirModelAirflowNetwork {
         }
 
         // reuse code in ZoneTempPredictorCorrector for sensible components.
-        CalcNodeSums(state.dataZonePlenum, RoomAirNode);
+        CalcNodeSums(*state.dataZonePlenum, RoomAirNode);
 
         SumNonAirSystemResponseForNode(state, RoomAirNode);
 

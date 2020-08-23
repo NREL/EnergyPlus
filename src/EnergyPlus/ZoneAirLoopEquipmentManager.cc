@@ -122,7 +122,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Beginning of Code
 
-        GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+        GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
 
         // Find the correct Zone Air Distribution Unit Equipment
         if (CompIndex == 0) {
@@ -143,7 +143,7 @@ namespace ZoneAirLoopEquipmentManager {
             }
         }
         DataSizing::CurTermUnitSizingNum = AirDistUnit(AirDistUnitNum).TermUnitSizingNum;
-        InitZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
         InitZoneAirLoopEquipmentTimeStep(AirDistUnitNum);
 
         SimZoneAirLoopEquipment(state,
@@ -151,7 +151,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
         // matched to zone euqip config nodes
-        InitZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
+        InitZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
     }
 
     void GetZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
@@ -745,7 +745,7 @@ namespace ZoneAirLoopEquipmentManager {
                                               AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctATMixer) {
-                    GetATMixers(state.dataZoneAirLoopEquipmentManager); // Needed here if mixer used only with unitarysystem which gets its input late
+                    GetATMixers(*state.dataZoneAirLoopEquipmentManager); // Needed here if mixer used only with unitarysystem which gets its input late
                     ProvideSysOutput = false;
 
                 } else {

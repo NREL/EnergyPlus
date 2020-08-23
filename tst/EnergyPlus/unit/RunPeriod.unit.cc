@@ -202,45 +202,45 @@ TEST_F(EnergyPlusFixture, RunPeriod_YearTests)
     WeatherManager::GetRunPeriodData(state, totalrps, errors_in_input);
     EXPECT_FALSE(errors_in_input);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Monday, state.dataWeatherManager.RunPeriodInput[0].startWeekDay);
-    EXPECT_EQ(2016, state.dataWeatherManager.RunPeriodInput[0].startYear);
-    EXPECT_EQ(2457448, state.dataWeatherManager.RunPeriodInput[0].startJulianDate);
-    EXPECT_EQ(2457451, state.dataWeatherManager.RunPeriodInput[0].endJulianDate);
+    EXPECT_EQ(WeatherManager::WeekDay::Monday, state.dataWeatherManager->RunPeriodInput[0].startWeekDay);
+    EXPECT_EQ(2016, state.dataWeatherManager->RunPeriodInput[0].startYear);
+    EXPECT_EQ(2457448, state.dataWeatherManager->RunPeriodInput[0].startJulianDate);
+    EXPECT_EQ(2457451, state.dataWeatherManager->RunPeriodInput[0].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, state.dataWeatherManager.RunPeriodInput[1].startWeekDay);
-    EXPECT_EQ(2012, state.dataWeatherManager.RunPeriodInput[1].startYear);
-    EXPECT_EQ(2455987, state.dataWeatherManager.RunPeriodInput[1].startJulianDate);
-    EXPECT_EQ(2455990, state.dataWeatherManager.RunPeriodInput[1].endJulianDate);
+    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, state.dataWeatherManager->RunPeriodInput[1].startWeekDay);
+    EXPECT_EQ(2012, state.dataWeatherManager->RunPeriodInput[1].startYear);
+    EXPECT_EQ(2455987, state.dataWeatherManager->RunPeriodInput[1].startJulianDate);
+    EXPECT_EQ(2455990, state.dataWeatherManager->RunPeriodInput[1].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Thursday, state.dataWeatherManager.RunPeriodInput[2].startWeekDay);
-    EXPECT_EQ(2015, state.dataWeatherManager.RunPeriodInput[2].startYear);
-    EXPECT_EQ(2457024, state.dataWeatherManager.RunPeriodInput[2].startJulianDate);
-    EXPECT_EQ(2457388, state.dataWeatherManager.RunPeriodInput[2].endJulianDate);
+    EXPECT_EQ(WeatherManager::WeekDay::Thursday, state.dataWeatherManager->RunPeriodInput[2].startWeekDay);
+    EXPECT_EQ(2015, state.dataWeatherManager->RunPeriodInput[2].startYear);
+    EXPECT_EQ(2457024, state.dataWeatherManager->RunPeriodInput[2].startJulianDate);
+    EXPECT_EQ(2457388, state.dataWeatherManager->RunPeriodInput[2].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Sunday, state.dataWeatherManager.RunPeriodInput[3].startWeekDay);
-    EXPECT_EQ(2017, state.dataWeatherManager.RunPeriodInput[3].startYear);
-    EXPECT_EQ(2457755, state.dataWeatherManager.RunPeriodInput[3].startJulianDate);
-    EXPECT_EQ(2458119, state.dataWeatherManager.RunPeriodInput[3].endJulianDate);
+    EXPECT_EQ(WeatherManager::WeekDay::Sunday, state.dataWeatherManager->RunPeriodInput[3].startWeekDay);
+    EXPECT_EQ(2017, state.dataWeatherManager->RunPeriodInput[3].startYear);
+    EXPECT_EQ(2457755, state.dataWeatherManager->RunPeriodInput[3].startJulianDate);
+    EXPECT_EQ(2458119, state.dataWeatherManager->RunPeriodInput[3].endJulianDate);
     // This is the default, check that it works properly
     std::array<Real64, 12> startDays{ {1, 4, 4, 7, 2, 5, 7, 3, 6, 1, 4, 6} };
     for (size_t i = 0; i < 12; ++i) {
-        EXPECT_EQ(startDays[i], state.dataWeatherManager.RunPeriodInput[3].monWeekDay[i]);
+        EXPECT_EQ(startDays[i], state.dataWeatherManager->RunPeriodInput[3].monWeekDay[i]);
     }
 
-    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, state.dataWeatherManager.RunPeriodInput[4].startWeekDay);
-    EXPECT_EQ(2010, state.dataWeatherManager.RunPeriodInput[4].startYear);
-    EXPECT_EQ(2455427, state.dataWeatherManager.RunPeriodInput[4].startJulianDate);
-    EXPECT_EQ(2455562, state.dataWeatherManager.RunPeriodInput[4].endJulianDate);
+    EXPECT_EQ(WeatherManager::WeekDay::Wednesday, state.dataWeatherManager->RunPeriodInput[4].startWeekDay);
+    EXPECT_EQ(2010, state.dataWeatherManager->RunPeriodInput[4].startYear);
+    EXPECT_EQ(2455427, state.dataWeatherManager->RunPeriodInput[4].startJulianDate);
+    EXPECT_EQ(2455562, state.dataWeatherManager->RunPeriodInput[4].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Saturday, state.dataWeatherManager.RunPeriodInput[5].startWeekDay);
-    EXPECT_EQ(1992, state.dataWeatherManager.RunPeriodInput[5].startYear);
-    EXPECT_EQ(2448682, state.dataWeatherManager.RunPeriodInput[5].startJulianDate);
-    EXPECT_EQ(2448988, state.dataWeatherManager.RunPeriodInput[5].endJulianDate);
+    EXPECT_EQ(WeatherManager::WeekDay::Saturday, state.dataWeatherManager->RunPeriodInput[5].startWeekDay);
+    EXPECT_EQ(1992, state.dataWeatherManager->RunPeriodInput[5].startYear);
+    EXPECT_EQ(2448682, state.dataWeatherManager->RunPeriodInput[5].startJulianDate);
+    EXPECT_EQ(2448988, state.dataWeatherManager->RunPeriodInput[5].endJulianDate);
 
-    EXPECT_EQ(WeatherManager::WeekDay::Friday, state.dataWeatherManager.RunPeriodInput[6].startWeekDay);
-    EXPECT_EQ(2016, state.dataWeatherManager.RunPeriodInput[6].startYear);
-    EXPECT_EQ(2457389, state.dataWeatherManager.RunPeriodInput[6].startJulianDate);
-    EXPECT_EQ(2458940, state.dataWeatherManager.RunPeriodInput[6].endJulianDate);
+    EXPECT_EQ(WeatherManager::WeekDay::Friday, state.dataWeatherManager->RunPeriodInput[6].startWeekDay);
+    EXPECT_EQ(2016, state.dataWeatherManager->RunPeriodInput[6].startYear);
+    EXPECT_EQ(2457389, state.dataWeatherManager->RunPeriodInput[6].startJulianDate);
+    EXPECT_EQ(2458940, state.dataWeatherManager->RunPeriodInput[6].endJulianDate);
 }
 
 TEST_F(EnergyPlusFixture, RunPeriod_EndYearOnly)
@@ -447,17 +447,17 @@ TEST_F(EnergyPlusFixture, RunPeriod_BadLeapDayFlagLogic)
 
     EXPECT_FALSE(errors_in_input);
 
-    state.dataWeatherManager.Environment.allocate(1);
+    state.dataWeatherManager->Environment.allocate(1);
     // These may already be set, but do it anyway
     DataEnvironment::TotDesDays = 0;
-    state.dataWeatherManager.TotRunPers = 1;
-    state.dataWeatherManager.TotRunDesPers = 0;
+    state.dataWeatherManager->TotRunPers = 1;
+    state.dataWeatherManager->TotRunDesPers = 0;
 
-    state.dataWeatherManager.WFAllowsLeapYears = true; // This was hitting a bad bit of logic
+    state.dataWeatherManager->WFAllowsLeapYears = true; // This was hitting a bad bit of logic
     WeatherManager::SetupEnvironmentTypes(state);
 
-    EXPECT_FALSE(state.dataWeatherManager.Environment[0].IsLeapYear);
-    EXPECT_EQ(365, state.dataWeatherManager.Environment[0].TotalDays);
+    EXPECT_FALSE(state.dataWeatherManager->Environment[0].IsLeapYear);
+    EXPECT_EQ(365, state.dataWeatherManager->Environment[0].TotalDays);
 
-    state.dataWeatherManager.Environment.deallocate();
+    state.dataWeatherManager->Environment.deallocate();
 }

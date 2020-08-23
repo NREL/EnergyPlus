@@ -65,6 +65,7 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDElight.hh>
 #include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/DataDaylightingDevices.hh>
@@ -303,7 +304,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(state.dataZoneTempPredictorCorrector, state.files, false); // "Record keeping" for the zone
+        ManageThermalComfort(*state.dataZoneTempPredictorCorrector, state.files, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -536,7 +537,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Need to be called each timestep in order to check if surface points to new construction (EMS) and if does then
         // complex fenestration needs to be initialized for additional states
-        TimestepInitComplexFenestration(state.dataWindowComplexManager);
+        TimestepInitComplexFenestration(*state.dataWindowComplexManager);
 
         // Calculate exterior-surface multipliers that account for anisotropy of
         // sky radiance
@@ -549,7 +550,7 @@ namespace HeatBalanceSurfaceManager {
         // Set shading flag for exterior windows (except flags related to daylighting) and
         // window construction (unshaded or shaded) to be used in heat balance calculation
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Window Shading");
-        WindowShadingManager(state.dataWindowEquivalentLayer);
+        WindowShadingManager(*state.dataWindowEquivalentLayer);
 
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
@@ -736,7 +737,7 @@ namespace HeatBalanceSurfaceManager {
         // The order of these initializations is important currently.  Over time we hope to
         //  take the appropriate parts of these inits to the other heat balance managers
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
-        InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
+        InitSolarHeatGains(*state.dataWindowComplexManager, *state.dataWindowEquivalentLayer, *state.dataWindowManager);
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (NZ = 1; NZ <= NumOfZones; ++NZ) {
                 if (ZoneDaylight(NZ).TotalDaylRefPoints > 0) {
@@ -766,7 +767,7 @@ namespace HeatBalanceSurfaceManager {
             //    if (firstTime) CALL DisplayString('Reporting Surfaces')
             //    CALL ReportSurfaces
             if (InitSurfaceHeatBalancefirstTime) DisplayString("Gathering Information for Predefined Reporting");
-            GatherForPredefinedReport(state.dataWindowManager);
+            GatherForPredefinedReport(*state.dataWindowManager);
         }
 
         // Initialize the temperature history terms for conduction through the surfaces
@@ -6231,12 +6232,12 @@ namespace HeatBalanceSurfaceManager {
             ZoneWinHeatLossRepEnergy = 0.0;
 
             if (AllCTF) {
-                CalcHeatBalanceInsideSurf2CTFOnly(state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
+                CalcHeatBalanceInsideSurf2CTFOnly(state.dataConvectionCoefficients, *state.dataWindowComplexManager, *state.dataWindowEquivalentLayer, *state.dataWindowManager, state.files, 1, NumOfZones, DataSurfaces::AllIZSurfaceList);
             } else {
                 CalcHeatBalanceInsideSurf2(state.dataConvectionCoefficients,
-                                           state.dataWindowComplexManager,
-                                           state.dataWindowEquivalentLayer,
-                                           state.dataWindowManager,
+                                           *state.dataWindowComplexManager,
+                                           *state.dataWindowEquivalentLayer,
+                                           *state.dataWindowManager,
                                            state.files,
                                            DataSurfaces::AllHTSurfaceList,
                                            DataSurfaces::AllIZSurfaceList,
@@ -6267,7 +6268,7 @@ namespace HeatBalanceSurfaceManager {
             auto const &zoneHTWindowSurfList(Zone(ZoneToResimulate).ZoneHTWindowSurfaceList);
             // Cannot use CalcHeatBalanceInsideSurf2CTFOnly because resimulated zone includes adjacent interzone surfaces
             CalcHeatBalanceInsideSurf2(
-                state.dataConvectionCoefficients, state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, state.files, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
+                state.dataConvectionCoefficients, *state.dataWindowComplexManager, *state.dataWindowEquivalentLayer, *state.dataWindowManager, state.files, zoneHTSurfList, zoneIZSurfList, zoneHTNonWindowSurfList, zoneHTWindowSurfList, ZoneToResimulate);
             // Sort window heat gain/loss
             if (ZoneWinHeatGain(ZoneToResimulate) >= 0.0) {
                 ZoneWinHeatGainRep(ZoneToResimulate) = ZoneWinHeatGain(ZoneToResimulate);

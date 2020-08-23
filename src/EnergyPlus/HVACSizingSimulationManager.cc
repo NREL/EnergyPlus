@@ -260,7 +260,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
         WarmupFlag = true;
         Available = true;
-        for (int i = 1; i <= state.dataWeatherManager.NumOfEnvrn; ++i) { // loop over environments
+        for (int i = 1; i <= state.dataWeatherManager->NumOfEnvrn; ++i) { // loop over environments
 
             GetNextEnvironment(state, Available, ErrorsFound);
             if (ErrorsFound) break;
@@ -273,7 +273,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             if (KindOfSim == ksDesignDay) continue;
             if (KindOfSim == ksRunPeriodDesign) continue;
 
-            if (state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
+            if (state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
 
             if (ReportDuringHVACSizingSimulation) {
                 if (sqlite) {
@@ -288,7 +288,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
             DisplayString("Initializing New Environment Parameters, HVAC Sizing Simulation");
 
             BeginEnvrnFlag = true;
-            if ((KindOfSim == ksHVACSizeDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((KindOfSim == ksHVACSizeDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Suppressing Initialization of New Environment Parameters");

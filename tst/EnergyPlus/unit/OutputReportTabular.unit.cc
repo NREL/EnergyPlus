@@ -6466,9 +6466,9 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_CollectPeakZoneConditions_test
     Zone(1).ListMultiplier = 1;
     Zone(1).FloorArea = 12.;
 
-    state.dataWeatherManager.DesDayInput.allocate(1);
-    state.dataWeatherManager.DesDayInput(1).Month = 5;
-    state.dataWeatherManager.DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput.allocate(1);
+    state.dataWeatherManager->DesDayInput(1).Month = 5;
+    state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
 
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 15;
@@ -6938,11 +6938,11 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     int numDesDays = 2;
     DataEnvironment::TotDesDays = numDesDays;
     DataEnvironment::TotRunDesPersDays = 0;
-    state.dataWeatherManager.DesDayInput.allocate(2);
-    state.dataWeatherManager.DesDayInput(1).Month = 7;
-    state.dataWeatherManager.DesDayInput(1).DayOfMonth = 21;
-    state.dataWeatherManager.DesDayInput(2).Month = 1;
-    state.dataWeatherManager.DesDayInput(2).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput.allocate(2);
+    state.dataWeatherManager->DesDayInput(1).Month = 7;
+    state.dataWeatherManager->DesDayInput(1).DayOfMonth = 21;
+    state.dataWeatherManager->DesDayInput(2).Month = 1;
+    state.dataWeatherManager->DesDayInput(2).DayOfMonth = 21;
 
 
     DataGlobals::NumOfTimeStepInHour = 4;
@@ -7427,7 +7427,7 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7549,7 +7549,7 @@ TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
     OutputReportPredefined::SetPredefinedTables();
 
     // Call the routine that fills up the table we care about
-    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(*state.dataWindowManager);
 
 
     // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
@@ -7934,7 +7934,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
-    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
+    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, *state.dataZoneTempPredictorCorrector);
     OutputReportTabular::WriteDemandEndUseSummary(state.dataCostEstimateManager);
 
     EnergyPlus::sqlite->sqliteCommit();

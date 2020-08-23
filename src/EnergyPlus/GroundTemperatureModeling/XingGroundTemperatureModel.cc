@@ -140,7 +140,7 @@ Real64 XingGroundTempsModel::getGroundTemp(EnergyPlusData &state)
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int n;
-    Real64 static tp(state.dataWeatherManager.NumDaysInYear); // Period of soil temperature cycle
+    Real64 static tp(state.dataWeatherManager->NumDaysInYear); // Period of soil temperature cycle
     Real64 Ts_1;                     // Amplitude of surface temperature
     Real64 Ts_2;                     // Amplitude of surface temperature
     Real64 PL_1;                     // Phase shift of surface temperature
@@ -191,7 +191,7 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInMonths(EnergyPlusData &state, 
     // USE STATEMENTS:
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Real64 const aveDaysInMonth = state.dataWeatherManager.NumDaysInYear / 12;
+    Real64 const aveDaysInMonth = state.dataWeatherManager->NumDaysInYear / 12;
 
     depth = _depth;
 
@@ -229,8 +229,8 @@ Real64 XingGroundTempsModel::getGroundTempAtTimeInSeconds(EnergyPlusData &state,
 
     simTimeInDays = seconds / SecsInDay;
 
-    if (simTimeInDays > state.dataWeatherManager.NumDaysInYear) {
-        simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager.NumDaysInYear);
+    if (simTimeInDays > state.dataWeatherManager->NumDaysInYear) {
+        simTimeInDays = remainder(simTimeInDays, state.dataWeatherManager->NumDaysInYear);
     }
 
     return getGroundTemp(state);

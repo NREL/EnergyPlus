@@ -1118,7 +1118,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(*state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(state.files, ErrorsFound);
@@ -2394,10 +2394,10 @@ TEST_F(LowTempRadiantSystemTest, calculateRunningMeanAverageTemperatureTest)
     auto &thisCFloSys (CFloRadSys(1));
     
     NumOfTimeStepInHour = 1;
-    state.dataWeatherManager.TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
-    state.dataWeatherManager.TodayOutDryBulbTemp = 0.0;
+    state.dataWeatherManager->TodayOutDryBulbTemp.allocate(NumOfTimeStepInHour, DataGlobals::HoursInDay);
+    state.dataWeatherManager->TodayOutDryBulbTemp = 0.0;
     for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
-        state.dataWeatherManager.TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
+        state.dataWeatherManager->TodayOutDryBulbTemp(NumOfTimeStepInHour,hourNumber) = double(hourNumber);
     }
     
     // Test 1: First day of the simulation and it's in warmup-->everything set to the same temperature

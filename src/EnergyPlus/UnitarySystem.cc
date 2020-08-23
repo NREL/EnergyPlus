@@ -3183,7 +3183,7 @@ namespace UnitarySystems {
                 bool ZoneInletNodeFound = false;
 
                 // Get AirTerminal mixer data
-                SingleDuct::GetATMixer(state.dataZoneAirLoopEquipmentManager, thisObjectName,
+                SingleDuct::GetATMixer(*state.dataZoneAirLoopEquipmentManager, thisObjectName,
                                        thisSys.m_ATMixerName,
                                        thisSys.m_ATMixerIndex,
                                        thisSys.ATMixerType,

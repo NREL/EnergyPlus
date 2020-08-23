@@ -4131,7 +4131,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state.dataWeatherManager.EndDayOfMonth(DataEnvironment::Month)) {
+        if (DataEnvironment::DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -4375,7 +4375,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state.dataWeatherManager.EndDayOfMonth(DataEnvironment::Month)) {
+        if (DataEnvironment::DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -4632,7 +4632,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state.dataWeatherManager.EndDayOfMonth(DataEnvironment::Month)) {
+        if (DataEnvironment::DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -4837,7 +4837,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state.dataWeatherManager.EndDayOfMonth(DataEnvironment::Month)) {
+        if (DataEnvironment::DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
         // OutputProcessor::TimeValue.allocate(2);
@@ -4977,7 +4977,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state.dataWeatherManager.EndDayOfMonth(DataEnvironment::Month)) {
+        if (DataEnvironment::DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 
@@ -5055,7 +5055,7 @@ namespace OutputProcessor {
             }
         }
 
-        if (DataEnvironment::DayOfMonth == state.dataWeatherManager.EndDayOfMonth(DataEnvironment::Month)) {
+        if (DataEnvironment::DayOfMonth == state.dataWeatherManager->EndDayOfMonth(DataEnvironment::Month)) {
             DataEnvironment::EndMonthFlag = true;
         }
 

@@ -513,7 +513,7 @@ namespace SimulationManager {
             DisplayString("Initializing New Environment Parameters");
 
             BeginEnvrnFlag = true;
-            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager.DesDayInput(state.dataWeatherManager.Environment(state.dataWeatherManager.Envrn).DesignDayNum).suppressBegEnvReset)) {
+            if ((KindOfSim == ksDesignDay) && (state.dataWeatherManager->DesDayInput(state.dataWeatherManager->Environment(state.dataWeatherManager->Envrn).DesignDayNum).suppressBegEnvReset)) {
                 // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
                 // easily converge fewer warmup days are allowed
                 DisplayString("Design Day Fast Warmup Mode: Suppressing Initialization of New Environment Parameters");
@@ -1238,7 +1238,7 @@ namespace SimulationManager {
                 bool overrideMaxAllowedDelTemp(false);
                 // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
                 // dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
-                state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
+                state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
