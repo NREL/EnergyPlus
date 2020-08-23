@@ -1146,16 +1146,6 @@ namespace HVACFan {
         }
     }
 
-    void FanSystem::getFanInputsForDesignHeatGain(Real64 &deltaP, Real64 &motEff, Real64 &totEff, Real64 &motInAirFrac)
-    {
-        deltaP = deltaPress;
-        motEff = m_motorEff;
-        totEff = m_fanTotalEff;
-        motInAirFrac = m_motorInAirFrac;
-        return;
-    }
-    
-
     // void
     // FanSystem::fanIsSecondaryDriver()
     //{

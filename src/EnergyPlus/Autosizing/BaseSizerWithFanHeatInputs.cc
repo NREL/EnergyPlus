@@ -109,7 +109,7 @@ namespace EnergyPlus {
                                                bool &fanCompModel)
     {
         // if fan unknown or air flow sizing (recursive call to size fan) then return
-        if (fanEnumType < 0 || fanIndex < 0 || this->sizingType == AutoSizingType::SystemAirFlowSizing) return;
+        if (fanEnumType < 0 || fanIndex < 0 || this->isFanReportObject) return;
 
         switch (fanEnumType) {
             case DataAirSystems::structArrayLegacyFanModels: {
@@ -117,7 +117,7 @@ namespace EnergyPlus {
                 break;
             }
             case DataAirSystems::objectVectorOOFanSystemModel: {
-                HVACFan::fanObjs[fanIndex]->getFanInputsForDesignHeatGain(deltaP, motEff, totEff, motInAirFrac);
+                HVACFan::fanObjs[fanIndex]->FanInputsForDesignHeatGain(state, deltaP, motEff, totEff, motInAirFrac);
                 break;
             }
             case DataAirSystems::fanModelTypeNotYetSet: {
