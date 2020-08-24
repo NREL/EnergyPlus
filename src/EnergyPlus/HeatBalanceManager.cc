@@ -370,7 +370,7 @@ namespace HeatBalanceManager {
                   ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // These Inits will still have to be looked at as the routines are re-engineered further
-        InitHeatBalance(*state.dataWindowComplexManager, *state.dataWindowEquivalentLayer, *state.dataWindowManager, state.files); // Initialize all heat balance related parameters
+        InitHeatBalance(state, state.files); // Initialize all heat balance related parameters
         ManageEMS(state, DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, anyRan, ObjexxFCL::Optional_int_const()); // EMS calling point
 
         // Solve the zone heat balance by first calling the Surface Heat Balance Manager
@@ -5156,7 +5156,7 @@ namespace HeatBalanceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatBalance(WindowComplexManagerData &dataWindowComplexManager, WindowEquivalentLayerData &dataWindowEquivalentLayer, WindowManagerData &dataWindowManager, IOFiles &ioFiles)
+    void InitHeatBalance(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5200,9 +5200,9 @@ namespace HeatBalanceManager {
             }
 
             DisplayString("Initializing Window Optical Properties");
-            InitEquivalentLayerWindowCalculations(dataWindowEquivalentLayer); // Initialize the EQL window optical properties
+            InitEquivalentLayerWindowCalculations(*state.dataWindowEquivalentLayer); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
-            InitWindowOpticalCalculations(dataWindowComplexManager, dataWindowManager, ioFiles);
+            InitWindowOpticalCalculations(state, ioFiles);
             InitDaylightingDevices(ioFiles); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(ioFiles); // Initialize the shadowing calculations
@@ -5270,12 +5270,12 @@ namespace HeatBalanceManager {
                 }
             }
             if (!DetailedSolarTimestepIntegration) {
-                PerformSolarCalculations(dataWindowComplexManager, ioFiles);
+                PerformSolarCalculations(*state.dataWindowComplexManager, ioFiles);
             }
         }
 
         if (DetailedSolarTimestepIntegration) { // always redo solar calcs
-            PerformSolarCalculations(dataWindowComplexManager, ioFiles);
+            PerformSolarCalculations(*state.dataWindowComplexManager, ioFiles);
         }
 
         if (BeginDayFlag && !WarmupFlag && KindOfSim == ksRunPeriodWeather && ReportExtShadingSunlitFrac) {
