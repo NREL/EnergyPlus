@@ -53,6 +53,7 @@
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -660,25 +661,27 @@ int actualDateTime(EnergyPlusState) {
     return double(sum(datevalues));
 }
 
-/*
 int todayWeatherIsRainAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     int value = 0;
-    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, state.dataWeatherManager.TodayIsRain, value);
+    auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, this_state->dataWeatherManager->TodayIsRain, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
     }
     return value;
 }
-int todayWeatherIsSnowAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
+int todayWeatherIsSnowAtTime(EnergyPlusState state, int hour, int timeStepNum) {
     int value = 0;
-    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayIsSnow, value);
+    auto *this_state = reinterpret_cast<EnergyPlus::EnergyPlusData *>(state);
+    int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, this_state->dataWeatherManager->TodayIsSnow, value);
     if (returnStatus != 0) {
         EnergyPlus::ShowSevereError("Invalid return from weather lookup, check hour and time step argument values are in range.");
         EnergyPlus::PluginManagement::apiErrorFlag = true;
     }
     return value;
 }
+/*
 Real64 todayWeatherOutDryBulbAtTime(EnergyPlusState EP_UNUSED(state), int hour, int timeStepNum) {
     Real64 value = 0;
     int returnStatus = EnergyPlus::RuntimeLanguageProcessor::TodayTomorrowWeather(hour, timeStepNum, EnergyPlus::WeatherManager::TodayOutDryBulbTemp, value);
