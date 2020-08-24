@@ -2139,7 +2139,7 @@
 
   Output:Variable,*,Fan Rise in Air Temperature,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 

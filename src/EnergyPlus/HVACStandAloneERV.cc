@@ -886,14 +886,14 @@ namespace HVACStandAloneERV {
             thisOAController.RetNode = NodeNumber;
 
             if (!lAlphaBlanks(2)) {
-                thisOAController.EnthalpyCurvePtr = GetCurveIndex(Alphas(2));
-                if (GetCurveIndex(Alphas(2)) == 0) {
+                thisOAController.EnthalpyCurvePtr = GetCurveIndex(state, Alphas(2));
+                if (GetCurveIndex(state, Alphas(2)) == 0) {
                     ShowSevereError(CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError("..." + cAlphaFields(2) + " not found:" + Alphas(2));
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(thisOAController.EnthalpyCurvePtr, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, thisOAController.EnthalpyCurvePtr, // Curve index
                                                                 {1},                               // Valid dimensions
                                                                 "GetStandAloneERV: ",              // Routine name
                                                                 CurrentModuleObject,               // Object Type
@@ -1159,13 +1159,13 @@ namespace HVACStandAloneERV {
                                 "Sum",
                                 StandAloneERV(StandAloneERVIndex).Name);
 
-            SetupOutputVariable("Zone Ventilator Electric Power",
+            SetupOutputVariable("Zone Ventilator Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 StandAloneERV(StandAloneERVIndex).ElecUseRate,
                                 "System",
                                 "Average",
                                 StandAloneERV(StandAloneERVIndex).Name);
-            SetupOutputVariable("Zone Ventilator Electric Energy",
+            SetupOutputVariable("Zone Ventilator Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 StandAloneERV(StandAloneERVIndex).ElecUseEnergy,
                                 "System",

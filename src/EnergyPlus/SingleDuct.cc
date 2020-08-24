@@ -5394,7 +5394,7 @@ namespace SingleDuct {
         UpdateATMixer(SysNum);
     }
 
-    void GetATMixers(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
+    void GetATMixers(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5448,7 +5448,7 @@ namespace SingleDuct {
         SysATMixer.allocate(NumATMixers);
 
         // Need air distribution units first
-        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(dataZoneAirLoopEquipmentManager);
+        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, dataZoneAirLoopEquipmentManager);
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -5916,7 +5916,8 @@ namespace SingleDuct {
         DataDefineEquip::AirDistUnit(aduNum).MassFlowRateSup = Node(PriInNode).MassFlowRate;
     }
 
-    void GetATMixer(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(EnergyPlusData &state,
+                    ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type
@@ -5942,7 +5943,7 @@ namespace SingleDuct {
 
         if (GetATMixerFlag) {
             // CALL GetZoneAirLoopEquipment
-            GetATMixers(dataZoneAirLoopEquipmentManager);
+            GetATMixers(state, dataZoneAirLoopEquipmentManager);
             GetATMixerFlag = false;
         }
 

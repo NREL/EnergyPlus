@@ -119,7 +119,8 @@ namespace ZoneDehumidifier {
     using General::TrimSigDigits;
     using namespace ScheduleManager;
 
-    void SimZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, std::string const &CompName,              // Name of the zone dehumidifier
+    void SimZoneDehumidifier(EnergyPlusData &state,
+                             ZoneDehumidifierData &dataZoneDehumidifier, std::string const &CompName,              // Name of the zone dehumidifier
                              int const ZoneNum,                        // Number of zone being served
                              bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
                              Real64 &QSensOut,                         // Sensible capacity delivered to zone (W)
@@ -161,7 +162,7 @@ namespace ZoneDehumidifier {
         Real64 QZnDehumidReq; // Zone dehumidification load required (kg moisture/sec)
 
         if (dataZoneDehumidifier.GetInputFlag) {
-            GetZoneDehumidifierInput(dataZoneDehumidifier);
+            GetZoneDehumidifierInput(state, dataZoneDehumidifier);
             dataZoneDehumidifier.GetInputFlag = false;
         }
 
@@ -191,14 +192,14 @@ namespace ZoneDehumidifier {
 
         InitZoneDehumidifier(dataZoneDehumidifier, ZoneDehumidNum);
 
-        CalcZoneDehumidifier(dataZoneDehumidifier, ZoneDehumidNum, QZnDehumidReq, QSensOut, QLatOut);
+        CalcZoneDehumidifier(state, dataZoneDehumidifier, ZoneDehumidNum, QZnDehumidReq, QSensOut, QLatOut);
 
         UpdateZoneDehumidifier(dataZoneDehumidifier, ZoneDehumidNum);
 
         ReportZoneDehumidifier(dataZoneDehumidifier, ZoneDehumidNum);
     }
 
-    void GetZoneDehumidifierInput(ZoneDehumidifierData &dataZoneDehumidifier)
+    void GetZoneDehumidifierInput(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier)
     {
 
         // SUBROUTINE INFORMATION:
@@ -335,7 +336,7 @@ namespace ZoneDehumidifier {
             }
 
             // A5,  \field Water Removal Curve Name
-            dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex = GetCurveIndex(Alphas(5)); // Convert curve name to index number
+            dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex = GetCurveIndex(state, Alphas(5)); // Convert curve name to index number
             if (dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex == 0) {
                 if (lAlphaBlanks(5)) {
                     ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(5) + "\" is required, missing for " +
@@ -347,7 +348,7 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, // Curve index
                                                             {2},                                                  // Valid dimensions
                                                             RoutineName,                                          // Routine name
                                                             CurrentModuleObject,                                  // Object Type
@@ -355,7 +356,7 @@ namespace ZoneDehumidifier {
                                                             cAlphaFields(5));                                     // Field Name
 
                 if (!ErrorsFound) {
-                    CurveVal = CurveValue(dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH);
+                    CurveVal = CurveValue(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH);
                     if (CurveVal > 1.10 || CurveVal < 0.90) {
                         ShowWarningError(cAlphaFields(5) + " output is not equal to 1.0");
                         ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
@@ -365,7 +366,7 @@ namespace ZoneDehumidifier {
             }
 
             // A6,  \field Energy Factor Curve Name
-            dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex = GetCurveIndex(Alphas(6)); // convert curve name to number
+            dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex = GetCurveIndex(state, Alphas(6)); // convert curve name to number
             if (dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(6) + "\" is required, missing for " +
@@ -377,7 +378,7 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, // Curve index
                                                             {2},                                                  // Valid dimensions
                                                             RoutineName,                                          // Routine name
                                                             CurrentModuleObject,                                  // Object Type
@@ -385,7 +386,7 @@ namespace ZoneDehumidifier {
                                                             cAlphaFields(6));                                     // Field Name
 
                 if (!ErrorsFound) {
-                    CurveVal = CurveValue(dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH);
+                    CurveVal = CurveValue(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH);
                     if (CurveVal > 1.10 || CurveVal < 0.90) {
                         ShowWarningError(cAlphaFields(6) + " output is not equal to 1.0");
                         ShowContinueError("(+ or -10%) at rated conditions for " + CurrentModuleObject + " = " + Alphas(1));
@@ -395,7 +396,7 @@ namespace ZoneDehumidifier {
             }
 
             // A7,  \field Part Load Fraction Correlation Curve Name
-            dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex = GetCurveIndex(Alphas(7)); // convert curve name to number
+            dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex = GetCurveIndex(state, Alphas(7)); // convert curve name to number
             if (dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex == 0) {
                 if (lAlphaBlanks(7)) {
                     ShowSevereError(RoutineName + ':' + CurrentModuleObject + "=\"" + cAlphaFields(7) + "\" is required, missing for " +
@@ -407,7 +408,7 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex, // Curve index
                                                             {1},                                              // Valid dimensions
                                                             RoutineName,                                      // Routine name
                                                             CurrentModuleObject,                              // Object Type
@@ -491,30 +492,30 @@ namespace ZoneDehumidifier {
                                 "System",
                                 "Sum",
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electric Power",
+            SetupOutputVariable("Zone Dehumidifier Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).ElecPower,
                                 "System",
                                 "Average",
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Electric Energy",
+            SetupOutputVariable("Zone Dehumidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).ElecConsumption,
                                 "System",
                                 "Sum",
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "COOLING",
                                 _,
                                 "System");
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Power",
+            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecPower,
                                 "System",
                                 "Average",
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).Name);
-            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electric Energy",
+            SetupOutputVariable("Zone Dehumidifier Off Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).OffCycleParasiticElecCons,
                                 "System",
@@ -706,7 +707,8 @@ namespace ZoneDehumidifier {
         // na
     }
 
-    void CalcZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum,     // Index number of the current zone dehumidifier being simulated
+    void CalcZoneDehumidifier(EnergyPlusData &state,
+                              ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum,     // Index number of the current zone dehumidifier being simulated
                               Real64 const QZnDehumidReq, // Dehumidification load to be met (kg/s), negative value means dehumidification load
                               Real64 &SensibleOutput,     // Sensible (heating) output (W), sent to load predictor for next simulation time step
                               Real64 &LatentOutput        // Latent (dehumidification) output provided (kg/s)
@@ -796,7 +798,7 @@ namespace ZoneDehumidifier {
             // A dehumidification load is being requested and dehumidifier is available (schedule value > 0)
             //  and the inlet air temperature is within the min/max values specified by user input
 
-            WaterRemovalRateFactor = CurveValue(dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).WaterRemovalCurveIndex, InletAirTemp, InletAirRH);
+            WaterRemovalRateFactor = CurveValue(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).WaterRemovalCurveIndex, InletAirTemp, InletAirRH);
             // Warn user if curve output goes negative
             if (WaterRemovalRateFactor <= 0.0) {
                 if (dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).WaterRemovalCurveErrorCount < 1) {
@@ -829,7 +831,7 @@ namespace ZoneDehumidifier {
                 RunTimeFraction = 0.0;
             }
 
-            EnergyFactorAdjFactor = CurveValue(dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).EnergyFactorCurveIndex, InletAirTemp, InletAirRH);
+            EnergyFactorAdjFactor = CurveValue(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).EnergyFactorCurveIndex, InletAirTemp, InletAirRH);
 
             // Warn user if curve output goes negative
             if (EnergyFactorAdjFactor <= 0.0) {
@@ -855,7 +857,7 @@ namespace ZoneDehumidifier {
                 EnergyFactor = EnergyFactorAdjFactor * dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).RatedEnergyFactor;
 
                 if (dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).PartLoadCurveIndex > 0) {
-                    PLF = CurveValue(dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).PartLoadCurveIndex, PLR); // Calculate part load fraction
+                    PLF = CurveValue(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumNum).PartLoadCurveIndex, PLR); // Calculate part load fraction
                 } else {
                     PLF = 1.0;
                 }
@@ -1126,7 +1128,7 @@ namespace ZoneDehumidifier {
         }
     }
 
-    bool GetZoneDehumidifierNodeNumber(ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber) // Node being tested
+    bool GetZoneDehumidifierNodeNumber(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber) // Node being tested
     {
 
         // FUNCTION INFORMATION:
@@ -1168,7 +1170,7 @@ namespace ZoneDehumidifier {
         // na
 
         if (dataZoneDehumidifier.GetInputFlag) {
-            GetZoneDehumidifierInput(dataZoneDehumidifier);
+            GetZoneDehumidifierInput(state, dataZoneDehumidifier);
             dataZoneDehumidifier.GetInputFlag = false;
         }
 

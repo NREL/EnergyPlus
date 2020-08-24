@@ -4080,7 +4080,7 @@ namespace SystemAvailabilityManager {
         int SysAvailNum;
 
         if (GetHybridInputFlag) {
-            GetHybridVentilationInputs();
+            GetHybridVentilationInputs(state);
             GetHybridInputFlag = false;
         }
 
@@ -4102,7 +4102,7 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    void GetHybridVentilationInputs()
+    void GetHybridVentilationInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4358,13 +4358,13 @@ namespace SystemAvailabilityManager {
             }
 
             if (!lAlphaFieldBlanks(7)) {
-                HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS = GetCurveIndex(cAlphaArgs(7));
+                HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS = GetCurveIndex(state, cAlphaArgs(7));
                 if (HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS <= 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                     ShowContinueError(" not found: " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) + "\".");
                     ErrorsFound = true;
                 } else {
-                    GetCurveMinMaxValues(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMin, CurveMax);
+                    GetCurveMinMaxValues(state, HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMin, CurveMax);
                     if (CurveMin < 0.0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError("The minimum wind speed used in " + cAlphaFieldNames(7) + "=\"" + cAlphaArgs(7) +
@@ -4372,7 +4372,7 @@ namespace SystemAvailabilityManager {
                         ShowContinueError("Curve minimum value appears to be less than 0.");
                         ErrorsFound = true;
                     }
-                    CurveVal = CurveValue(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMin);
+                    CurveVal = CurveValue(state, HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMin);
                     if (CurveVal < 0.0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError("The minimum value of " + cAlphaFieldNames(7) +
@@ -4381,7 +4381,7 @@ namespace SystemAvailabilityManager {
                         ShowContinueError("Curve output at the minimum wind speed = " + TrimSigDigits(CurveVal, 3));
                         ErrorsFound = true;
                     }
-                    CurveVal = CurveValue(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMax);
+                    CurveVal = CurveValue(state, HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, CurveMax);
                     if (CurveVal > 1.0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\"");
                         ShowContinueError("The maximum value of " + cAlphaFieldNames(7) +
@@ -4391,7 +4391,7 @@ namespace SystemAvailabilityManager {
                         ErrorsFound = true;
                     }
                     // Check curve type
-                    ErrorsFound |= CurveManager::CheckCurveDims(
+                    ErrorsFound |= CurveManager::CheckCurveDims(state,
                         HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS,   // Curve index
                         {1},                            // Valid dimensions
                         RoutineName,                    // Routine name
@@ -5228,7 +5228,7 @@ namespace SystemAvailabilityManager {
 
         if (HybridVentSysAvailMgrData(SysAvailNum).VentilationCtrl == HybridVentCtrl_Open &&
             HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0 && HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS > 0) {
-            HybridVentSysAvailWindModifier(SysAvailNum) = CurveValue(HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, WindExt);
+            HybridVentSysAvailWindModifier(SysAvailNum) = CurveValue(state, HybridVentSysAvailMgrData(SysAvailNum).OpeningFactorFWS, WindExt);
         }
 
         // Set up flags to control simple airflow objects
@@ -5302,7 +5302,7 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    bool GetHybridVentilationControlStatus(EnergyPlusData &EP_UNUSED(state), int const ZoneNum) // Index of zone
+    bool GetHybridVentilationControlStatus(EnergyPlusData &state, int const ZoneNum) // Index of zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -5344,7 +5344,7 @@ namespace SystemAvailabilityManager {
 
         // Obtains inputs of hybrid ventilation objects
         if (GetHybridInputFlag) { // First time subroutine has been entered
-            GetHybridVentilationInputs();
+            GetHybridVentilationInputs(state);
             GetHybridInputFlag = false;
         }
 

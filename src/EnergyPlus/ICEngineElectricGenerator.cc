@@ -104,11 +104,11 @@ namespace ICEngineElectricGenerator {
         ICEngineGenerator.deallocate();
     }
 
-    PlantComponent *ICEngineGeneratorSpecs::factory(std::string const &objectName)
+    PlantComponent *ICEngineGeneratorSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for ICEGen if it hasn't been done already
         if (getICEInput) {
-            GetICEngineGeneratorInput();
+            GetICEngineGeneratorInput(state);
             getICEInput = false;
         }
 
@@ -125,7 +125,7 @@ namespace ICEngineElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetICEngineGeneratorInput()
+    void GetICEngineGeneratorInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -194,41 +194,41 @@ namespace ICEngineElectricGenerator {
             ICEngineGenerator(genNum).OptPartLoadRat = NumArray(4);
 
             // Load Special IC ENGINE Generator Curve Fit Inputs
-            ICEngineGenerator(genNum).ElecOutputFuelCurve = CurveManager::GetCurveIndex(AlphArray(3)); // convert curve name to number
+            ICEngineGenerator(genNum).ElecOutputFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(3)); // convert curve name to number
             if (ICEngineGenerator(genNum).ElecOutputFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + AlphArray(3));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).RecJacHeattoFuelCurve = CurveManager::GetCurveIndex(AlphArray(4)); // convert curve name to number
+            ICEngineGenerator(genNum).RecJacHeattoFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(4)); // convert curve name to number
             if (ICEngineGenerator(genNum).RecJacHeattoFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + AlphArray(4));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).RecLubeHeattoFuelCurve = CurveManager::GetCurveIndex(AlphArray(5)); // convert curve name to number
+            ICEngineGenerator(genNum).RecLubeHeattoFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(5)); // convert curve name to number
             if (ICEngineGenerator(genNum).RecLubeHeattoFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + AlphArray(5));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).TotExhausttoFuelCurve = CurveManager::GetCurveIndex(AlphArray(6)); // convert curve name to number
+            ICEngineGenerator(genNum).TotExhausttoFuelCurve = CurveManager::GetCurveIndex(state, AlphArray(6)); // convert curve name to number
             if (ICEngineGenerator(genNum).TotExhausttoFuelCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + AlphArray(6));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             }
 
-            ICEngineGenerator(genNum).ExhaustTempCurve = CurveManager::GetCurveIndex(AlphArray(7)); // convert curve name to number
+            ICEngineGenerator(genNum).ExhaustTempCurve = CurveManager::GetCurveIndex(state, AlphArray(7)); // convert curve name to number
             if (ICEngineGenerator(genNum).ExhaustTempCurve == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + AlphArray(7));
                 ShowContinueError("Entered in " + DataIPShortCuts::cCurrentModuleObject + '=' + AlphArray(1));
                 ErrorsFound = true;
             } else {
-                Real64 xValue = CurveManager::CurveValue(ICEngineGenerator(genNum).ExhaustTempCurve, 1.0);
+                Real64 xValue = CurveManager::CurveValue(state, ICEngineGenerator(genNum).ExhaustTempCurve, 1.0);
                 if (xValue < ReferenceTemp) {
                     ShowSevereError("GetICEngineGeneratorInput: " + DataIPShortCuts::cAlphaFieldNames(7) + " output has very low value.");
                     ShowContinueError("...curve generates [" + General::RoundSigDigits(xValue, 3) + " C] at PLR=1.0");
@@ -307,9 +307,9 @@ namespace ICEngineElectricGenerator {
 
     void ICEngineGeneratorSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ElecEnergyGenerated,
                             "System",
@@ -436,7 +436,7 @@ namespace ICEngineElectricGenerator {
                                                         FirstHVACIteration);
     }
 
-    void ICEngineGeneratorSpecs::CalcICEngineGeneratorModel(bool const RunFlag, Real64 const MyLoad)
+    void ICEngineGeneratorSpecs::CalcICEngineGeneratorModel(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -509,7 +509,7 @@ namespace ICEngineElectricGenerator {
         Real64 fuelEnergyUseRate; // IC ENGINE fuel use rate (W)
         if (PLR > 0.0) {
             // (RELDC) Ratio of generator output to Fuel Energy Input
-            Real64 elecOutputFuelRat = CurveManager::CurveValue(this->ElecOutputFuelCurve, PLR);
+            Real64 elecOutputFuelRat = CurveManager::CurveValue(state, this->ElecOutputFuelCurve, PLR);
             fuelEnergyUseRate = elecPowerGenerated / elecOutputFuelRat;
         } else {
             fuelEnergyUseRate = 0.0;
@@ -520,7 +520,7 @@ namespace ICEngineElectricGenerator {
         // particular part load.
 
         // (RJACDC) Ratio of Recoverable Jacket Heat to Fuel Energy Input
-        Real64 recJacHeattoFuelRat = CurveManager::CurveValue(this->RecJacHeattoFuelCurve, PLR);
+        Real64 recJacHeattoFuelRat = CurveManager::CurveValue(state, this->RecJacHeattoFuelCurve, PLR);
 
         // water jacket heat recovered (W)
         Real64 QJacketRec = fuelEnergyUseRate * recJacHeattoFuelRat;
@@ -529,7 +529,7 @@ namespace ICEngineElectricGenerator {
         // multiplying the total fuel input (J/s) by the fraction of that power that could be recovered in the lube oil at that
         // particular part load.
         // (RLUBDC) Ratio of Recoverable Lube Oil Heat to Fuel Energy Input
-        Real64 recLubeHeattoFuelRat = CurveManager::CurveValue(this->RecLubeHeattoFuelCurve, PLR);
+        Real64 recLubeHeattoFuelRat = CurveManager::CurveValue(state, this->RecLubeHeattoFuelCurve, PLR);
 
         // lube oil cooler heat recovered (W)
         Real64 QLubeOilRec = fuelEnergyUseRate * recLubeHeattoFuelRat;
@@ -539,7 +539,7 @@ namespace ICEngineElectricGenerator {
         // particular part load.
 
         // (REXDC) Total Exhaust Energy Input to Fuel Energy Input
-        Real64 totExhausttoFuelRat = CurveManager::CurveValue(this->TotExhausttoFuelCurve, PLR);
+        Real64 totExhausttoFuelRat = CurveManager::CurveValue(state, this->TotExhausttoFuelCurve, PLR);
 
         // total engine exhaust heat (W)
         Real64 QExhaustTotal = fuelEnergyUseRate * totExhausttoFuelRat;
@@ -554,7 +554,7 @@ namespace ICEngineElectricGenerator {
         // of the exhaust temperature in C to the part load ratio.
         if (PLR > 0.0) {
             // (TEX) Exhaust Gas Temp
-            Real64 exhaustTemp = CurveManager::CurveValue(this->ExhaustTempCurve, PLR);
+            Real64 exhaustTemp = CurveManager::CurveValue(state, this->ExhaustTempCurve, PLR);
 
             if (exhaustTemp > ReferenceTemp) {
 

@@ -300,7 +300,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetUnitConversion)
     EXPECT_EQ(1.8, curConversionFactor);
     EXPECT_EQ(32., curConversionOffset);
 
-    varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY[J]";
+    varNameWithUnits = "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY[J]";
     LookupSItoIP(varNameWithUnits, indexUnitConv, curUnits);
     GetUnitConversion(indexUnitConv, curConversionFactor, curConversionOffset, curUnits);
     EXPECT_EQ(20, indexUnitConv);
@@ -409,10 +409,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_LookupJtokWH)
     EXPECT_EQ(0, indexUnitConv);
     EXPECT_EQ("ZONE AIR SYSTEM SENSIBLE COOLING RATE[W]", curUnits);
 
-    varNameWithUnits = "Electric Energy Use [GJ]";
+    varNameWithUnits = "Electricity Energy Use [GJ]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
     EXPECT_EQ(86, indexUnitConv);
-    EXPECT_EQ("Electric Energy Use [kWh]", curUnits);
+    EXPECT_EQ("Electricity Energy Use [kWh]", curUnits);
 
     varNameWithUnits = "Electricty [MJ/m2]";
     LookupJtokWH(varNameWithUnits, indexUnitConv, curUnits);
@@ -3461,11 +3461,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",
-        "Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+        "Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
         "SumOrAverage, !- Aggregation Type for Variable or Meter 1",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Maximum, !- Aggregation Type for Variable or Meter 2",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Minimum; !- Aggregation Type for Variable or Meter 2",
     });
 
@@ -3473,7 +3473,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3483,7 +3483,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3493,7 +3493,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3508,7 +3508,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_ResetMonthlyGathering)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
-    GetInputTabularMonthly();
+    GetInputTabularMonthly(state.files);
     EXPECT_EQ(MonthlyInputCount, 1);
     InitializeTabularMonthly();
 
@@ -3538,7 +3538,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3548,7 +3548,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3558,7 +3558,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -3583,7 +3583,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
-    GetInputOutputTableSummaryReports();
+    GetInputOutputTableSummaryReports(state.files);
 
     extLitUse = 1.01;
 
@@ -3785,7 +3785,7 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 
     DataGlobals::DoWeathSim = true;
 
-    GetInputTabularTimeBins();
+    GetInputTabularTimeBins(state.files);
 
     EXPECT_EQ(OutputReportTabular::OutputTableBinned.size(), 1u);
     EXPECT_EQ(OutputTableBinned(1).keyValue, "SYSTEM1");
@@ -6396,11 +6396,11 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
         "Output:Table:Monthly,",
         "Space Gains Annual Report, !- Name",
         "2, !-  Digits After Decimal",
-        "Exterior Lights Electric Energy, !- Variable or Meter 1 Name",
+        "Exterior Lights Electricity Energy, !- Variable or Meter 1 Name",
         "SumOrAverageDuringHoursShown, !- Aggregation Type for Variable or Meter 1",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Maximum, !- Aggregation Type for Variable or Meter 2",
-        "Exterior Lights Electric Power, !- Variable or Meter 2 Name",
+        "Exterior Lights Electricity Rate, !- Variable or Meter 2 Name",
         "Minimum; !- Aggregation Type for Variable or Meter 2",
 
     });
@@ -6409,7 +6409,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
 
     Real64 extLitUse;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6419,7 +6419,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6429,7 +6429,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -6444,7 +6444,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthly_invalidAggregationOrder)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * 60.0;
 
-    GetInputTabularMonthly();
+    GetInputTabularMonthly(state.files);
     EXPECT_EQ(MonthlyInputCount, 1);
     InitializeTabularMonthly();
 
@@ -7215,7 +7215,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 
     OutputProcessor::GetReportVariableInput(state.files);
-    OutputReportTabular::GetInputOutputTableSummaryReports();
+    OutputReportTabular::GetInputOutputTableSummaryReports(state.files);
     OutputReportTabular::InitializeTabularMonthly();
 
     // We check that the Predefined Table is actually set to show
@@ -7493,6 +7493,134 @@ TEST_F(EnergyPlusFixture, AzimuthToCardinal)
 }
 
 
+// Test for interior surface report
+TEST_F(EnergyPlusFixture, InteriorSurfaceEnvelopeSummaryReport)
+{
+    // Allocate some needed arrays
+    DataHeatBalance::Zone.allocate(2);
+    DataHeatBalance::Zone(1).ListMultiplier = 1;
+    DataHeatBalance::Zone(2).ListMultiplier = 1;
+    dataConstruction.Construct.allocate(1);
+    dataConstruction.Construct(1).Name = "A Construction";
+    dataConstruction.Construct(1).OutsideAbsorpSolar = 0.4;
+
+    DataHeatBalance::NominalU.allocate(1);
+    DataHeatBalance::NominalU(1) = 0.2;
+
+    DataSurfaces::TotSurfaces = 4 ;
+    DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
+
+    // first surface, interzonal walls and doors
+    for (int i = 1; i <= TotSurfaces; i++){
+        DataSurfaces::Surface(i).HeatTransSurf = true;
+        DataSurfaces::Surface(i).Azimuth = 180.;
+        DataSurfaces::Surface(i).Tilt = 90.;
+        DataSurfaces::Surface(i).Construction = 1;
+        // odd number - wall, even number - door
+        if (i % 2 == 1) {
+            DataSurfaces::Surface(i).Name = "Interzonal_Wall_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).GrossArea = 200.;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Wall;
+            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        }else{
+            DataSurfaces::Surface(i).Name = "Interzonal_Door_" + std::to_string((i + 1) / 2);
+            DataSurfaces::Surface(i).BaseSurfName = DataSurfaces::Surface(i - 1).Name;
+            DataSurfaces::Surface(i).BaseSurf = i - 1;
+            DataSurfaces::Surface(i).GrossArea = 50.;
+            DataSurfaces::Surface(i).Class = DataSurfaces::SurfaceClass_Door;
+            DataSurfaces::AllSurfaceListReportOrder.push_back(i);
+        }
+        if ((i + 1) / 2 == 1) {
+            // first pair of wall and door
+            DataSurfaces::Surface(i).Zone = 1;
+            DataSurfaces::Surface(i).ExtBoundCond = i + 2;
+        }else{
+            // second pair of wall and door
+            DataSurfaces::Surface(i).Zone = 2;
+            DataSurfaces::Surface(i).ExtBoundCond = i - 2;
+        }
+    }
+    DataSurfaces::Surface(1).ExtBoundCondName = "Interzonal_Wall_2";
+    DataSurfaces::Surface(2).ExtBoundCondName = "Interzonal_Door_2";
+    DataSurfaces::Surface(3).ExtBoundCondName = "Interzonal_Wall_1";
+    DataSurfaces::Surface(4).ExtBoundCondName = "Interzonal_Door_1";
+
+    // Setup pre def tables
+    OutputReportPredefined::SetPredefinedTables();
+
+    // Call the routine that fills up the table we care about
+    HeatBalanceSurfaceManager::GatherForPredefinedReport(state.dataWindowManager);
+
+
+    // Looking for Report 'EnvelopeSummary' (pdrEnvelope)
+    // SubTable 'Opaque Interior' (pdstIntOpaque)
+
+    for (int i = 1; i <= TotSurfaces; i++){
+        if (i % 2 == 1){
+
+            /****************************************************************************
+            *                            Wall (odd entries)                             *
+            *****************************************************************************/
+
+            // Check the wall gross area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpGrArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "200.00");
+            // Check the wall net area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpNetArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "150.00");
+            // Check the wall u value
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpUfactNoFilm,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.200");
+            // Check the wall construction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpCons,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "A Construction");
+            // Check the wall reflectance
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpRefl,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.60");
+            // Check the tilt
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpTilt,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "90.00");
+            // Check the azimuth
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpAzimuth,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "180.00");
+            // Check cardinal direction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntOpDir,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "S");
+        }else{
+
+            /****************************************************************************
+            *                           door (even entries)                           *
+            *****************************************************************************/
+
+            // Check the door gross area
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrGrArea,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "50.00");
+            // Check the wall u value
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrUfactNoFilm,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "0.200");
+            // Check the door construction
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrCons,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       "A Construction");
+            // Check the door parant surface name
+            EXPECT_EQ(OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchIntDrParent,
+                                                                       DataSurfaces::Surface(i).Name),
+                                                                       DataSurfaces::Surface(i-1).Name);
+        }
+    }
+}
+
+
 TEST_F(SQLiteFixture, WriteSourceEnergyEndUseSummary_TestPerArea) {
 
     EnergyPlus::sqlite->sqliteBegin();
@@ -7698,7 +7826,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     Real64 GasolineHeating = 3e8;
     Real64 PropaneHeating = 4e8;
 
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7708,7 +7836,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "General");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7718,7 +7846,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                         "Electricity",
                         "Exterior Lights",
                         "AnotherEndUseSubCat");
-    SetupOutputVariable("Exterior Lights Electric Energy",
+    SetupOutputVariable("Exterior Lights Electricity Energy",
                         OutputProcessor::Unit::J,
                         extLitUse,
                         "Zone",
@@ -7772,7 +7900,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
     *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
-    GetInputOutputTableSummaryReports();
+    GetInputOutputTableSummaryReports(state.files);
 
     DataEnvironment::Month = 12;
 
@@ -7806,7 +7934,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     // AnotherEndUseSubCat
     EXPECT_NEAR(extLitUse * 3, gatherEndUseSubBEPS(2, DataGlobalConstants::endUseExteriorLights, 1), 1.);
 
-    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector);
+    OutputReportTabular::WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.files);
     OutputReportTabular::WriteDemandEndUseSummary(state.dataCostEstimateManager);
 
     EnergyPlus::sqlite->sqliteCommit();

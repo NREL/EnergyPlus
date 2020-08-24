@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
@@ -400,7 +400,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
@@ -673,7 +673,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);

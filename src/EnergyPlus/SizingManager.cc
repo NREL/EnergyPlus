@@ -286,7 +286,7 @@ namespace SizingManager {
                 state.files.zsz.fileName = state.files.outputZszTxtFileName;
             }
 
-            state.files.zsz.ensure_open("ManageSizing");
+            state.files.zsz.ensure_open("ManageSizing", state.files.outputControl.zsz);
 
             ShowMessage("Beginning Zone Sizing Calculations");
 
@@ -396,7 +396,7 @@ namespace SizingManager {
                                 // set flag for pulse used in load component reporting
                                 doLoadComponentPulseNow = CalcdoLoadComponentPulseNow(isPulseZoneSizing,WarmupFlag,HourOfDay,TimeStep,KindOfSim,DayOfSim);
 
-                                ManageWeather(state.files);
+                                ManageWeather(state);
 
                                 if (!WarmupFlag) {
                                     TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
@@ -485,7 +485,7 @@ namespace SizingManager {
             } else {
                 state.files.ssz.fileName = state.files.outputSszTxtFileName;
             }
-            state.files.ssz.ensure_open("ManageSizing");
+            state.files.ssz.ensure_open("ManageSizing", state.files.outputControl.ssz);
 
             SimAir = true;
             SimZoneEquip = true;
@@ -572,7 +572,7 @@ namespace SizingManager {
                                 }
                             }
 
-                            ManageWeather(state.files);
+                            ManageWeather(state);
 
                             UpdateSysSizing(state, DuringDay);
 
@@ -3949,7 +3949,7 @@ namespace SizingManager {
 
             BeginTimeStepFlag = true;
 
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageHeatBalance(state);
 
@@ -3960,7 +3960,7 @@ namespace SizingManager {
             BeginFullSimFlag = false;
 
             //          ! do another timestep=1
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageHeatBalance(state);
 
@@ -3970,7 +3970,7 @@ namespace SizingManager {
             TimeStep = NumOfTimeStepInHour;
             EndEnvrnFlag = true;
 
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageHeatBalance(state);
 

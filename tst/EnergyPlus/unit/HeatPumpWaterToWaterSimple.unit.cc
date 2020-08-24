@@ -721,7 +721,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
@@ -786,7 +786,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                         }
                     }
 
-                    WeatherManager::ManageWeather(state.files);
+                    WeatherManager::ManageWeather(state);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 
@@ -1471,7 +1471,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;

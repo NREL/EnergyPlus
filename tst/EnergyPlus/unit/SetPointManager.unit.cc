@@ -380,9 +380,9 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     DataLoopNode::Node(condInletNodeNum).Temp = 10;
 
     SetPointManager::DefineCondEntSetPointManager thisSPM;
-    thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex("MINDSNWBCURVENAME");
-    thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex("MINACTWBCURVENAME");
-    thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex("OPTCONDENTCURVENAME");
+    thisSPM.MinTwrWbCurve = CurveManager::GetCurveIndex(state, "MINDSNWBCURVENAME");
+    thisSPM.MinOaWbCurve = CurveManager::GetCurveIndex(state, "MINACTWBCURVENAME");
+    thisSPM.OptCondEntCurve = CurveManager::GetCurveIndex(state, "OPTCONDENTCURVENAME");
     thisSPM.CondEntTempSchedPtr = ScheduleManager::GetScheduleIndex("CONDENSER LOOP TEMP SCHEDULE");
     thisSPM.LoopIndexPlantSide = chwLoopIndex;
     thisSPM.ChillerIndexPlantSide = chillerBranchChW;
@@ -396,7 +396,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     DataPlant::PlantLoop(1).CoolingDemand = 4700;
 
     // Now call and check
-    thisSPM.calculate();
+    thisSPM.calculate(state);
     EXPECT_NEAR(designCondenserEnteringTemp + 1.0, thisSPM.SetPt, 0.001);
 
     // switch: Weighted ratio < 9 || etc...
@@ -408,7 +408,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     thisSPM.MinimumLiftTD = 2;
 
     // Now call and check
-    thisSPM.calculate();
+    thisSPM.calculate(state);
     EXPECT_NEAR(32, thisSPM.SetPt, 0.001);
 
     // switch: ELSE
@@ -417,7 +417,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     thisSPM.MinimumLiftTD = 5;
 
     // Now call and check
-    thisSPM.calculate();
+    thisSPM.calculate(state);
     EXPECT_NEAR(30, thisSPM.SetPt, 0.001);
 }
 
@@ -738,7 +738,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     DataLoopNode::Node(3).Temp = 16.0;
     DataLoopNode::Node(3).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(3).Temp, DataLoopNode::Node(3).HumRat);
 
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
 
     // node number table
@@ -755,7 +755,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     dataAirLoop.AirLoopFlow(1).OAFrac = 0.8;
     dataAirLoop.AirLoopFlow(1).OAMinFrac = 0.8;
 
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
 
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 18.20035, 0.001);
@@ -771,7 +771,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     DataLoopNode::Node(1).Temp = 26.0;
     DataLoopNode::Node(4).Temp = 27.0; // fan rise
 
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
 
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 27.0, 0.001);
@@ -779,7 +779,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     dataAirLoop.AirLoopFlow(1).OAFrac = 0.8;
     dataAirLoop.AirLoopFlow(1).OAMinFrac = 0.8;
 
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
 
     EXPECT_NEAR(DataLoopNode::Node(7).TempSetPoint, 26.19976, 0.001);
@@ -1200,13 +1200,13 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
     DataZoneEquipment::GetZoneEquipmentData(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     SingleDuct::GetSysInput(state);
 
     MixedAir::GetOutsideAirSysInputs(state);
     SplitterComponent::GetSplitterInput();
-    BranchInputManager::GetMixerInput(state.dataBranchInputManager);
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
+    BranchInputManager::GetMixerInput(state, state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager);
 
     DataGlobals::SysSizingCalc = true;
     SimAirServingZones::GetAirPathData(state);
@@ -1231,7 +1231,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
     DataLoopNode::Node(2).Temp = 40.0;           // zone inlet node air temperature, deg C
     DataLoopNode::Node(5).Temp = 21.0;           // zone air node temperature set to 21.0 deg C
 
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
 
     EXPECT_EQ(DataLoopNode::NodeID(13), "VAV SYS 1 OUTLET NODE");
@@ -1282,14 +1282,14 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     // do init
     SetPointManager::InitSetPointManagers();
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
     // check OA Reset Set Point Manager sim
     EXPECT_EQ(80.0, DataLoopNode::Node(1).TempSetPointHi);
     // change the low outdoor air setpoint reset value to 60.0C
     SetPointManager::OutAirSetPtMgr(1).OutLowSetPt1 = 60.0;
     // re simulate OA Reset Set Point Manager
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
     // check the new reset value is set
     EXPECT_EQ(60.0, DataLoopNode::Node(1).TempSetPointHi);
@@ -1297,7 +1297,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     // set out door dry bukb temp
     DataEnvironment::OutDryBulbTemp = 2.0;
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
     // SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
     Real64 SetPt = 60.0 - ((2.0 - -17.778) / (21.11 - -17.778)) * (60.0 - 40.0);
@@ -1338,14 +1338,14 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     // do init
     SetPointManager::InitSetPointManagers();
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
     // check OA Reset Set Point Manager sim
     EXPECT_EQ(40.0, DataLoopNode::Node(1).TempSetPointLo);
     // change the low outdoor air setpoint reset value to 60.0C
     SetPointManager::OutAirSetPtMgr(1).OutHighSetPt1 = 35.0;
     // re simulate OA Reset Set Point Manager
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
     // check the new reset value is set
     EXPECT_EQ(35.0, DataLoopNode::Node(1).TempSetPointLo);
@@ -1353,7 +1353,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     // set out door dry bulb temp
     DataEnvironment::OutDryBulbTemp = 2.0;
     // check OA Reset Set Point Manager run
-    SetPointManager::SimSetPointManagers();
+    SetPointManager::SimSetPointManagers(state);
     SetPointManager::UpdateSetPointManagers();
     // SetPt = SetTempAtOutLow - ((OutDryBulbTemp - OutLowTemp)/(OutHighTemp - OutLowTemp)) * (SetTempAtOutLow - SetTempAtOutHigh);
     Real64 SetPt = 80.0 - ((2.0 - -17.778) / (21.11 - -17.778)) * (80.0 - 35.0);

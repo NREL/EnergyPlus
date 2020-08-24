@@ -47,8 +47,8 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/api/state.h>
 
 #ifdef _WIN32
 #define __PRETTY_FUNCTION__ __FUNCSIG__
@@ -57,11 +57,11 @@
 int numWarnings = 0;
 int oneTimeHalfway = 0;
 
-void BeginNewEnvironmentHandler() {
+void BeginNewEnvironmentHandler(EnergyPlusState state) {
     printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
-    issueWarning("Fake Warning at new environment");
-    issueSevere("Fake Severe at new environment");
-    issueText("Just some text at the new environment");
+    issueWarning(state, "Fake Warning at new environment");
+    issueSevere(state, "Fake Severe at new environment");
+    issueText(state, "Just some text at the new environment");
 }
 void AfterNewEnvironmentWarmupCompleteHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
 void BeginZoneTimeStepBeforeInitHeatBalanceHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
@@ -91,7 +91,7 @@ void progressHandler(EnergyPlusState state, int const progress) {
     }
 }
 
-void errorHandler(EnergyPlusState state, const char * message) {
+void errorHandler(EnergyPlusState state, int level, const char * message) {
     char * warning = strstr(message, "Warning");
     if (warning) {
         numWarnings++;
@@ -105,8 +105,8 @@ void externalHVAC(EnergyPlusState state) {
 int main(int argc, const char * argv[]) {
 //    callbackBeginNewEnvironment(BeginNewEnvironmentHandler);
 //    callbackAfterNewEnvironmentWarmupComplete(AfterNewEnvironmentWarmupCompleteHandler);
-//    callbackBeginZoneTimeStepBeforeInitHeatBalance(BeginZoneTimeStepBeforeInitHeatBalanceHandler);
-//    callbackBeginZoneTimeStepAfterInitHeatBalance(BeginZoneTimeStepAfterInitHeatBalanceHandler);
+//    callbackBeginZoneTimeStepBeforeInitHeatBalance(state, BeginZoneTimeStepBeforeInitHeatBalanceHandler);
+//    callbackBeginZoneTimeStepAfterInitHeatBalance(state, BeginZoneTimeStepAfterInitHeatBalanceHandler);
 //    callbackBeginTimeStepBeforePredictor(BeginTimeStepBeforePredictorHandler);
 //    callbackAfterPredictorBeforeHVACManagers(AfterPredictorBeforeHVACManagersHandler);
 //    callbackAfterPredictorAfterHVACManagers(AfterPredictorAfterHVACManagersHandler);

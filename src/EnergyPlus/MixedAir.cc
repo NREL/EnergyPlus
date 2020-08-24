@@ -842,13 +842,13 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == Humidifier) { // 'Humidifier:Steam:Electric'
                 // 'Humidifier:Steam:Gas'
                 if (Sim) {
-                    SimHumidifier(CompName, FirstHVACIteration, CompIndex);
+                    SimHumidifier(state, CompName, FirstHVACIteration, CompIndex);
                 }
 
                 // Unglazed Transpired Solar Collector
             } else if (SELECT_CASE_var == Unglazed_SolarCollector) { // 'SolarCollector:UnglazedTranspired'
                 if (Sim) {
-                    SimTranspiredCollector(state.dataConvectionCoefficients, state.files, CompName, CompIndex);
+                    SimTranspiredCollector(state, state.dataConvectionCoefficients, state.files, CompName, CompIndex);
                 }
 
                 // Air-based Photovoltaic-thermal flat plate collector
@@ -864,7 +864,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
                 // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
                 if (Sim) {
-                    SimEvapCooler(CompName, CompIndex);
+                    SimEvapCooler(state, CompName, CompIndex);
                 }
 
             } else if (SELECT_CASE_var == VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
@@ -2389,14 +2389,15 @@ namespace MixedAir {
         }
 
         if (!lAlphaBlanks(8)) {
-            OAController(OutAirNum).EnthalpyCurvePtr = GetCurveIndex(AlphArray(8)); // convert curve name to number
+            OAController(OutAirNum).EnthalpyCurvePtr = GetCurveIndex(state, AlphArray(8)); // convert curve name to number
             if (OAController(OutAirNum).EnthalpyCurvePtr == 0) {
                 ShowSevereError(CurrentModuleObject + "=\"" + AlphArray(1) + "\" invalid " + cAlphaFields(8) + "=\"" + AlphArray(8) +
                                 "\" not found.");
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(OAController(OutAirNum).EnthalpyCurvePtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            OAController(OutAirNum).EnthalpyCurvePtr, // Curve index
                                                             {1},                                      // Valid dimensions
                                                             RoutineName,                              // Routine name
                                                             CurrentModuleObject,                      // Object Type
@@ -4569,7 +4570,7 @@ namespace MixedAir {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
                 }
-                this->Checksetpoints(OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
+                this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Return air enthalpy limit
             if (this->Econo == DifferentialEnthalpy) {
@@ -4577,23 +4578,23 @@ namespace MixedAir {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
                 }
-                this->Checksetpoints(OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
+                this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Outside air temperature limit
             if (this->Econo == FixedDryBulb) {
-                this->Checksetpoints(OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
+                this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Fixed Enthalpy limit
             if (this->Econo == FixedEnthalpy) {
-                this->Checksetpoints(OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
+                this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // FIXED DEW POINT AND DRY BULB TEMPERATURE STRATEGY
             if (this->Econo == FixedDewPointAndDryBulb) {
-                this->Checksetpoints(OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
+                this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // ELECRONIC ENTHALPY, HUMIDITY RATIO CURVE
             if (this->Econo == ElectronicEnthalpy) {
-                this->Checksetpoints(OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
+                this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
             // Differential dry bulb and enthalpy strategy
             if (this->Econo == DifferentialDryBulbAndEnthalpy) {
@@ -4605,7 +4606,7 @@ namespace MixedAir {
                     OutAirSignal = OutAirMinFrac;
                     EconomizerOperationFlag = false;
                 }
-                this->Checksetpoints(OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
+                this->Checksetpoints(state, OutAirMinFrac, OutAirSignal, EconomizerOperationFlag);
             }
 
             if (this->TempLowLim != BlankNumeric && this->OATemp < this->TempLowLim) {
@@ -6263,7 +6264,8 @@ namespace MixedAir {
         GlobalNames::VerifyUniqueInterObjectName(OAControllerUniqueNames, OAControllerName, ObjectType, FieldName, ErrorsFound);
     }
 
-    void OAControllerProps::Checksetpoints(Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
+    void OAControllerProps::Checksetpoints(EnergyPlusData &state,
+                                           Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
                                            Real64 &OutAirSignal,         // Used to set OA mass flow rate
                                            bool &EconomizerOperationFlag // logical used to show economizer status
     )
@@ -6323,7 +6325,7 @@ namespace MixedAir {
         }
 
         if (this->EnthalpyCurvePtr > 0) {
-            if (this->OAHumRat > CurveValue(this->EnthalpyCurvePtr, this->OATemp)) {
+            if (this->OAHumRat > CurveValue(state, this->EnthalpyCurvePtr, this->OATemp)) {
                 OutAirSignal = OutAirMinFrac;
                 EconomizerOperationFlag = false;
             }

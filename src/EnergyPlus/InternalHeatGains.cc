@@ -1400,7 +1400,7 @@ namespace InternalHeatGains {
                     if (Lights(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Lights Electric Power", OutputProcessor::Unit::W, Lights(Loop).Power, "Zone", "Average", Lights(Loop).Name);
+                    SetupOutputVariable("Lights Electricity Rate", OutputProcessor::Unit::W, Lights(Loop).Power, "Zone", "Average", Lights(Loop).Name);
 
                     SetupOutputVariable(
                         "Lights Radiant Heating Energy", OutputProcessor::Unit::J, Lights(Loop).RadGainEnergy, "Zone", "Sum", Lights(Loop).Name);
@@ -1439,7 +1439,7 @@ namespace InternalHeatGains {
                         "Lights Total Heating Energy", OutputProcessor::Unit::J, Lights(Loop).TotGainEnergy, "Zone", "Sum", Lights(Loop).Name);
                     SetupOutputVariable(
                         "Lights Total Heating Rate", OutputProcessor::Unit::W, Lights(Loop).TotGainRate, "Zone", "Average", Lights(Loop).Name);
-                    SetupOutputVariable("Lights Electric Energy",
+                    SetupOutputVariable("Lights Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Lights(Loop).Consumption,
                                         "Zone",
@@ -1457,13 +1457,13 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(Lights(Loop).ZonePtr)) {
                         RepVarSet(Lights(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Lights Electric Power",
+                        SetupOutputVariable("Zone Lights Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsPower,
                                             "Zone",
                                             "Average",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Electric Energy",
+                        SetupOutputVariable("Zone Lights Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsElecConsump,
                                             "Zone",
@@ -1794,13 +1794,13 @@ namespace InternalHeatGains {
                     if (ZoneElectric(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Electric Equipment Electric Power",
+                    SetupOutputVariable("Electric Equipment Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).Power,
                                         "Zone",
                                         "Average",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Electric Energy",
+                    SetupOutputVariable("Electric Equipment Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).Consumption,
                                         "Zone",
@@ -1879,13 +1879,13 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(ZoneElectric(Loop).ZonePtr)) {
                         RepVarSet(ZoneElectric(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Electric Equipment Electric Power",
+                        SetupOutputVariable("Zone Electric Equipment Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Electric Energy",
+                        SetupOutputVariable("Zone Electric Equipment Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecConsump,
                                             "Zone",
@@ -2210,15 +2210,15 @@ namespace InternalHeatGains {
 
                     // Object report variables
                     SetupOutputVariable(
-                        "Gas Equipment Gas Rate", OutputProcessor::Unit::W, ZoneGas(Loop).Power, "Zone", "Average", ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment Gas Energy",
+                        "Gas Equipment NaturalGas Rate", OutputProcessor::Unit::W, ZoneGas(Loop).Power, "Zone", "Average", ZoneGas(Loop).Name);
+                    SetupOutputVariable("Gas Equipment NaturalGas Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneGas(Loop).Consumption,
                                         "Zone",
                                         "Sum",
                                         ZoneGas(Loop).Name,
                                         _,
-                                        "Gas",
+                                        "NaturalGas",
                                         "InteriorEquipment",
                                         ZoneGas(Loop).EndUseSubcategory,
                                         "Building",
@@ -2275,13 +2275,13 @@ namespace InternalHeatGains {
                     if (RepVarSet(ZoneGas(Loop).ZonePtr)) {
                         RepVarSet(ZoneGas(Loop).ZonePtr) = false;
 
-                        SetupOutputVariable("Zone Gas Equipment Gas Rate",
+                        SetupOutputVariable("Zone Gas Equipment NaturalGas Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Gas Energy",
+                        SetupOutputVariable("Zone Gas Equipment NaturalGas Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasConsump,
                                             "Zone",
@@ -3748,21 +3748,21 @@ namespace InternalHeatGains {
                 bool hasReturnApproachTemp = !lNumericFieldBlanks(11);
 
                 // Performance curves
-                ZoneITEq(Loop).CPUPowerFLTCurve = GetCurveIndex(AlphaName(7));
+                ZoneITEq(Loop).CPUPowerFLTCurve = GetCurveIndex(state, AlphaName(7));
                 if (ZoneITEq(Loop).CPUPowerFLTCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + AlphaName(7));
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).AirFlowFLTCurve = GetCurveIndex(AlphaName(8));
+                ZoneITEq(Loop).AirFlowFLTCurve = GetCurveIndex(state, AlphaName(8));
                 if (ZoneITEq(Loop).AirFlowFLTCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(8) + '=' + AlphaName(8));
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).FanPowerFFCurve = GetCurveIndex(AlphaName(9));
+                ZoneITEq(Loop).FanPowerFFCurve = GetCurveIndex(state, AlphaName(9));
                 if (ZoneITEq(Loop).FanPowerFFCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(9) + '=' + AlphaName(9));
@@ -3771,7 +3771,7 @@ namespace InternalHeatGains {
 
                 if (!lAlphaFieldBlanks(15)) {
                     // If this field isn't blank, it must point to a valid curve
-                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
+                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(state, AlphaName(15));
                     if (ZoneITEq(Loop).RecircFLTCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                         ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
@@ -3784,7 +3784,7 @@ namespace InternalHeatGains {
 
                 if (!lAlphaFieldBlanks(16)) {
                     // If this field isn't blank, it must point to a valid curve
-                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(state, AlphaName(16));
                     if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                         ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
@@ -3943,18 +3943,18 @@ namespace InternalHeatGains {
 
                 // Object report variables
                 SetupOutputVariable(
-                    "ITE CPU Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).CPUPower, "Zone", "Average", ZoneITEq(Loop).Name);
+                    "ITE CPU Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).CPUPower, "Zone", "Average", ZoneITEq(Loop).Name);
                 SetupOutputVariable(
-                    "ITE Fan Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).FanPower, "Zone", "Average", ZoneITEq(Loop).Name);
+                    "ITE Fan Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).FanPower, "Zone", "Average", ZoneITEq(Loop).Name);
                 SetupOutputVariable(
-                    "ITE UPS Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).UPSPower, "Zone", "Average", ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE CPU Electric Power at Design Inlet Conditions",
+                    "ITE UPS Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).UPSPower, "Zone", "Average", ZoneITEq(Loop).Name);
+                SetupOutputVariable("ITE CPU Electricity Rate at Design Inlet Conditions",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).CPUPowerAtDesign,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Fan Electric Power at Design Inlet Conditions",
+                SetupOutputVariable("ITE Fan Electricity Rate at Design Inlet Conditions",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).FanPowerAtDesign,
                                     "Zone",
@@ -3973,7 +3973,7 @@ namespace InternalHeatGains {
                                     "Average",
                                     ZoneITEq(Loop).Name);
 
-                SetupOutputVariable("ITE CPU Electric Energy",
+                SetupOutputVariable("ITE CPU Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).CPUConsumption,
                                     "Zone",
@@ -3987,7 +3987,7 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE Fan Electric Energy",
+                SetupOutputVariable("ITE Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).FanConsumption,
                                     "Zone",
@@ -4001,7 +4001,7 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE UPS Electric Energy",
+                SetupOutputVariable("ITE UPS Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).UPSConsumption,
                                     "Zone",
@@ -4015,13 +4015,13 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE CPU Electric Energy at Design Inlet Conditions",
+                SetupOutputVariable("ITE CPU Electricity Energy at Design Inlet Conditions",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).CPUEnergyAtDesign,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Fan Electric Energy at Design Inlet Conditions",
+                SetupOutputVariable("ITE Fan Electricity Energy at Design Inlet Conditions",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).FanEnergyAtDesign,
                                     "Zone",
@@ -4164,31 +4164,31 @@ namespace InternalHeatGains {
                 // Zone total report variables
                 if (RepVarSet(ZoneITEq(Loop).ZonePtr)) {
                     RepVarSet(ZoneITEq(Loop).ZonePtr) = false;
-                    SetupOutputVariable("Zone ITE CPU Electric Power",
+                    SetupOutputVariable("Zone ITE CPU Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Power",
+                    SetupOutputVariable("Zone ITE Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Electric Power",
+                    SetupOutputVariable("Zone ITE UPS Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE CPU Electric Power at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE CPU Electricity Rate at Design Inlet Conditions",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUPowerAtDesign,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Power at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE Fan Electricity Rate at Design Inlet Conditions",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanPowerAtDesign,
                                         "Zone",
@@ -4213,31 +4213,31 @@ namespace InternalHeatGains {
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
 
-                    SetupOutputVariable("Zone ITE CPU Electric Energy",
+                    SetupOutputVariable("Zone ITE CPU Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Energy",
+                    SetupOutputVariable("Zone ITE Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Electric Energy",
+                    SetupOutputVariable("Zone ITE UPS Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE CPU Electric Energy at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE CPU Electricity Energy at Design Inlet Conditions",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUEnergyAtDesign,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Energy at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE Fan Electricity Energy at Design Inlet Conditions",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanEnergyAtDesign,
                                         "Zone",
@@ -4423,8 +4423,8 @@ namespace InternalHeatGains {
 
             // Object report variables
             SetupOutputVariable(
-                "Baseboard Electric Power", OutputProcessor::Unit::W, ZoneBBHeat(Loop).Power, "Zone", "Average", ZoneBBHeat(Loop).Name);
-            SetupOutputVariable("Baseboard Electric Energy",
+                "Baseboard Electricity Rate", OutputProcessor::Unit::W, ZoneBBHeat(Loop).Power, "Zone", "Average", ZoneBBHeat(Loop).Name);
+            SetupOutputVariable("Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 ZoneBBHeat(Loop).Consumption,
                                 "Zone",
@@ -4463,13 +4463,13 @@ namespace InternalHeatGains {
             // Zone total report variables
             if (RepVarSet(ZoneBBHeat(Loop).ZonePtr)) {
                 RepVarSet(ZoneBBHeat(Loop).ZonePtr) = false;
-                SetupOutputVariable("Zone Baseboard Electric Power",
+                SetupOutputVariable("Zone Baseboard Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatPower,
                                     "Zone",
                                     "Average",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Electric Energy",
+                SetupOutputVariable("Zone Baseboard Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatElecCons,
                                     "Zone",
@@ -5520,7 +5520,7 @@ namespace InternalHeatGains {
             ZnRpt(NZ).CO2Rate += ZoneCO2Gen(Loop).CO2GainRate;
         }
 
-        if (NumZoneITEqStatements > 0) CalcZoneITEq();
+        if (NumZoneITEqStatements > 0) CalcZoneITEq(state);
 
         CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
@@ -5608,7 +5608,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void CalcZoneITEq()
+    void CalcZoneITEq(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5775,7 +5775,7 @@ namespace InternalHeatGains {
                     TSupply = Node(SupplyNodeNum).Temp;
                     WSupply = Node(SupplyNodeNum).HumRat;
                     if (ZoneITEq(Loop).RecircFLTCurve != 0) {
-                        RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
+                        RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(state, ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
                     } else {
                         RecircFrac = ZoneITEq(Loop).DesignRecircFrac;
                     }
@@ -5816,20 +5816,20 @@ namespace InternalHeatGains {
             }
 
             CPUPower =
-                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
+                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
             ZoneITEq(Loop).CPUPowerAtDesign =
-                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
 
-            AirVolFlowFrac = max(CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
+            AirVolFlowFrac = max(CurveValue(state, ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
             AirVolFlowRate = ZoneITEq(Loop).DesignAirVolFlowRate * OperSchedFrac * AirVolFlowFrac;
             if (AirVolFlowRate < SmallAirVolFlow) {
                 AirVolFlowRate = 0.0;
             }
-            AirVolFlowFracDesignT = max(CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+            AirVolFlowFracDesignT = max(CurveValue(state, ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
 
-            FanPower = max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac), 0.0);
+            FanPower = max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac), 0.0);
             ZoneITEq(Loop).FanPowerAtDesign =
-                max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
+                max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
 
             // Calculate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
             if (ZoneITEq(Loop).DesignTotalPower > 0.0) {
@@ -5839,7 +5839,7 @@ namespace InternalHeatGains {
             }
             if (ZoneITEq(Loop).UPSEfficFPLRCurve != 0) {
                 UPSPower = (CPUPower + FanPower) *
-                           max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
+                           max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(state, ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
             } else {
                 UPSPower = (CPUPower + FanPower) * max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency), 0.0);
             }

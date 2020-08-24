@@ -400,7 +400,7 @@
 
   Output:Variable,*,Plant Loop Pressure Difference,Hourly;
 
-  Output:Variable,*,Pump Electric Power,Hourly;
+  Output:Variable,*,Pump Electricity Rate,Hourly;
 
   Output:Meter,Heating:DistrictHeating,Daily;
 

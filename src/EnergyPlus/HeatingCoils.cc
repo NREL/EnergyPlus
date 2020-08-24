@@ -292,9 +292,10 @@ namespace HeatingCoils {
                                               StageNum,
                                               OpMode); // Autodesk:OPTIONAL SpeedRatio, PartLoadRatio, StageNum used without PRESENT check
         } else if (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingGasOrOtherFuel) {
-            CalcFuelHeatingCoil(CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
+            CalcFuelHeatingCoil(state, CoilNum, QCoilRequired, QCoilActual2, OpMode, PartLoadFrac);
         } else if (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingGas_MultiStage) {
-            CalcMultiStageGasHeatingCoil(CoilNum,
+            CalcMultiStageGasHeatingCoil(state,
+                                         CoilNum,
                                          SpeedRatio,
                                          PartLoadRatio,
                                          StageNum,
@@ -488,18 +489,18 @@ namespace HeatingCoils {
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electric Energy",
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electric Power",
+            SetupOutputVariable("Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
@@ -597,18 +598,18 @@ namespace HeatingCoils {
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electric Energy",
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electric Power",
+            SetupOutputVariable("Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
@@ -692,7 +693,7 @@ namespace HeatingCoils {
             // parasitic electric load associated with the fuel heating coil
             coil.ParasiticElecLoad = Numbers(3);
 
-            coil.PLFCurveIndex = GetCurveIndex(Alphas(7)); // convert curve name to number
+            coil.PLFCurveIndex = GetCurveIndex(state, Alphas(7)); // convert curve name to number
 
             // parasitic fuel load associated with the gas heating coil (standing pilot light)
             coil.ParasiticFuelCapacity = Numbers(4);
@@ -724,7 +725,7 @@ namespace HeatingCoils {
                                 _,
                                 "System");
             SetupOutputVariable("Heating Coil " + FuelType + " Rate", OutputProcessor::Unit::W, coil.FuelUseRate, "System", "Average", coil.Name);
-            SetupOutputVariable("Heating Coil Electric Energy",
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 coil.ElecUseLoad,
                                 "System",
@@ -735,7 +736,7 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electric Power", OutputProcessor::Unit::W, coil.ElecUseRate, "System", "Average", coil.Name);
+            SetupOutputVariable("Heating Coil Electricity Rate", OutputProcessor::Unit::W, coil.ElecUseRate, "System", "Average", coil.Name);
             SetupOutputVariable("Heating Coil Runtime Fraction", OutputProcessor::Unit::None, coil.RTF, "System", "Average", coil.Name);
             SetupOutputVariable(
                 "Heating Coil Ancillary " + FuelType + " Rate", OutputProcessor::Unit::W, coil.ParasiticFuelRate, "System", "Average", coil.Name);
@@ -830,7 +831,7 @@ namespace HeatingCoils {
             // parasitic electric load associated with the gas heating coil
             HeatingCoil(CoilNum).ParasiticElecLoad = Numbers(10);
 
-            HeatingCoil(CoilNum).PLFCurveIndex = GetCurveIndex(Alphas(6)); // convert curve name to number
+            HeatingCoil(CoilNum).PLFCurveIndex = GetCurveIndex(state, Alphas(6)); // convert curve name to number
 
             // parasitic gas load associated with the gas heating coil (standing pilot light)
 
@@ -853,20 +854,20 @@ namespace HeatingCoils {
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Gas Energy",
+            SetupOutputVariable("Heating Coil NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).FuelUseLoad,
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
                                 _,
-                                "Gas",
+                                "NaturalGas",
                                 "Heating",
                                 _,
                                 "System");
             SetupOutputVariable(
-                "Heating Coil Gas Rate", OutputProcessor::Unit::W, HeatingCoil(CoilNum).FuelUseRate, "System", "Average", HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electric Energy",
+                "Heating Coil NaturalGas Rate", OutputProcessor::Unit::W, HeatingCoil(CoilNum).FuelUseRate, "System", "Average", HeatingCoil(CoilNum).Name);
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "System",
@@ -877,7 +878,7 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electric Power",
+            SetupOutputVariable("Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "System",
@@ -889,20 +890,20 @@ namespace HeatingCoils {
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Ancillary Gas Rate",
+            SetupOutputVariable("Heating Coil Ancillary NaturalGas Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ParasiticFuelRate,
                                 "System",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Ancillary Gas Energy",
+            SetupOutputVariable("Heating Coil Ancillary NaturalGas Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ParasiticFuelLoad,
                                 "System",
                                 "Sum",
                                 HeatingCoil(CoilNum).Name,
                                 _,
-                                "Gas",
+                                "NaturalGas",
                                 "Heating",
                                 _,
                                 "System");
@@ -1081,7 +1082,7 @@ namespace HeatingCoils {
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:VariableSpeed")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
                 HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum =
-                    VariableSpeedCoils::GetCoilIndexVariableSpeed(Alphas(5), Alphas(6), DXCoilErrFlag);
+                    VariableSpeedCoils::GetCoilIndexVariableSpeed(state, Alphas(5), Alphas(6), DXCoilErrFlag);
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -1194,7 +1195,7 @@ namespace HeatingCoils {
                                 "HVAC",
                                 "Average",
                                 HeatingCoil(CoilNum).Name);
-            SetupOutputVariable("Heating Coil Electric Energy",
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HeatingCoil(CoilNum).ElecUseLoad,
                                 "HVAC",
@@ -1205,7 +1206,7 @@ namespace HeatingCoils {
                                 "Heating",
                                 _,
                                 "System");
-            SetupOutputVariable("Heating Coil Electric Power",
+            SetupOutputVariable("Heating Coil Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 HeatingCoil(CoilNum).ElecUseRate,
                                 "HVAC",
@@ -2074,7 +2075,8 @@ namespace HeatingCoils {
         Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
-    void CalcFuelHeatingCoil(int const CoilNum, // index to heating coil
+    void CalcFuelHeatingCoil(EnergyPlusData &state,
+                             int const CoilNum, // index to heating coil
                              Real64 const QCoilReq,
                              Real64 &QCoilActual,                  // coil load actually delivered (W)
                              int const FanOpMode,                  // fan operating mode
@@ -2218,7 +2220,7 @@ namespace HeatingCoils {
             if (PartLoadRat == 0) {
                 HeatingCoil(CoilNum).FuelUseLoad = 0.0;
             } else {
-                PLF = CurveValue(HeatingCoil(CoilNum).PLFCurveIndex, PartLoadRat);
+                PLF = CurveValue(state, HeatingCoil(CoilNum).PLFCurveIndex, PartLoadRat);
                 if (PLF < 0.7) {
                     if (HeatingCoil(CoilNum).PLFErrorCount < 1) {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
@@ -2288,7 +2290,8 @@ namespace HeatingCoils {
         Node(HeatingCoil(CoilNum).AirOutletNodeNum).Temp = HeatingCoil(CoilNum).OutletAirTemp;
     }
 
-    void CalcMultiStageGasHeatingCoil(int &CoilNum,            // the number of the Gas heating coil to be simulated
+    void CalcMultiStageGasHeatingCoil(EnergyPlusData &state,
+                                      int &CoilNum,            // the number of the Gas heating coil to be simulated
                                       Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (maximum speed) and 0.0 (minimum speed)
                                       Real64 const CycRatio,   // cycling part load ratio
                                       int const StageNum,      // Speed number
@@ -2513,7 +2516,7 @@ namespace HeatingCoils {
         // The PLF curve is only used when the coil cycles.
         if (HeatingCoil(CoilNum).PLFCurveIndex > 0) {
             if (PartLoadRat > 0.0 && StageNum < 2) {
-                PLF = CurveValue(HeatingCoil(CoilNum).PLFCurveIndex, PartLoadRat);
+                PLF = CurveValue(state, HeatingCoil(CoilNum).PLFCurveIndex, PartLoadRat);
                 if (PLF < 0.7) {
                     if (HeatingCoil(CoilNum).PLFErrorCount < 1) {
                         ++HeatingCoil(CoilNum).PLFErrorCount;
@@ -3278,7 +3281,7 @@ namespace HeatingCoils {
                 break;
             }
         } else if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED")) {
-            CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(CoilType, CoilName, GetCoilErrFlag);
+            CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(state, CoilType, CoilName, GetCoilErrFlag);
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
                 if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil(NumCoil).ReclaimHeatingCoilName != CoilName)
                     continue;

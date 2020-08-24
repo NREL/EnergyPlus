@@ -480,7 +480,8 @@ namespace UnitVentilator {
                 GetOnlySingleNode(Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             // Get AirTerminal mixer data
-            GetATMixer(state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
+            GetATMixer(state,
+                       state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
                        UnitVent(UnitVentNum).ATMixerName,
                        UnitVent(UnitVentNum).ATMixerIndex,
                        UnitVent(UnitVentNum).ATMixerType,
@@ -1142,14 +1143,14 @@ namespace UnitVentilator {
                                 "System",
                                 "Sum",
                                 UnitVent(UnitVentNum).Name);
-            SetupOutputVariable("Zone Unit Ventilator Fan Electric Power",
+            SetupOutputVariable("Zone Unit Ventilator Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 UnitVent(UnitVentNum).ElecPower,
                                 "System",
                                 "Average",
                                 UnitVent(UnitVentNum).Name);
             // Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Unit Ventilator Fan Electric Energy",
+            SetupOutputVariable("Zone Unit Ventilator Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 UnitVent(UnitVentNum).ElecEnergy,
                                 "System",

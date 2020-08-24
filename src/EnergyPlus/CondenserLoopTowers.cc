@@ -111,15 +111,15 @@ namespace CondenserLoopTowers {
     std::string const cCoolingTower_VariableSpeed("CoolingTower:VariableSpeed");
     std::string const cCoolingTower_VariableSpeedMerkel("CoolingTower:VariableSpeed:Merkel");
 
-    PlantComponent *CoolingTower::factory(CondenserLoopTowersData &dataCondenserLoopTowers, std::string const &objectName)
+    PlantComponent *CoolingTower::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for towers if it hasn't been done already
-        if (dataCondenserLoopTowers.GetInput) {
-            GetTowerInput(dataCondenserLoopTowers);
-            dataCondenserLoopTowers.GetInput = false;
+        if (state.dataCondenserLoopTowers.GetInput) {
+            GetTowerInput(state, state.dataCondenserLoopTowers);
+            state.dataCondenserLoopTowers.GetInput = false;
         }
         // Now look for this particular tower in the list
-        for (auto &tower : dataCondenserLoopTowers.towers) {
+        for (auto &tower : state.dataCondenserLoopTowers.towers) {
             if (tower.Name == objectName) {
                 return &tower;
             }
@@ -172,7 +172,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void GetTowerInput(CondenserLoopTowersData &dataCondenserLoopTowers)
+    void GetTowerInput(EnergyPlusData &state, CondenserLoopTowersData &dataCondenserLoopTowers)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1067,7 +1067,7 @@ namespace CondenserLoopTowers {
             }
 
             if (!lAlphaFieldBlanks(6)) {
-                dataCondenserLoopTowers.towers(TowerNum).FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(AlphArray(6));
+                dataCondenserLoopTowers.towers(TowerNum).FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(state, AlphArray(6));
                 if (dataCondenserLoopTowers.towers(TowerNum).FanPowerfAirFlowCurve == 0) {
                     ShowWarningError(cCurrentModuleObject + ", \"" + dataCondenserLoopTowers.towers(TowerNum).Name +
                                      "\" the Fan Power Ratio as a function of Air Flow Rate Ratio Curve Name specified as " + AlphArray(6) +
@@ -1567,7 +1567,7 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            dataCondenserLoopTowers.towers(TowerNum).FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(AlphArray(5));
+            dataCondenserLoopTowers.towers(TowerNum).FanPowerfAirFlowCurve = CurveManager::GetCurveIndex(state, AlphArray(5));
             if (dataCondenserLoopTowers.towers(TowerNum).FanPowerfAirFlowCurve == 0) {
                 ShowSevereError(cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError("Invalid " + cAlphaFieldNames(5) + '=' + AlphArray(5));
@@ -1617,7 +1617,7 @@ namespace CondenserLoopTowers {
             }
             dataCondenserLoopTowers.towers(TowerNum).FreeConvTowerUASizingFactor = NumArray(16);
 
-            dataCondenserLoopTowers.towers(TowerNum).UAModFuncAirFlowRatioCurvePtr = CurveManager::GetCurveIndex(AlphArray(6));
+            dataCondenserLoopTowers.towers(TowerNum).UAModFuncAirFlowRatioCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(6));
             if (dataCondenserLoopTowers.towers(TowerNum).UAModFuncAirFlowRatioCurvePtr == 0) {
                 ShowSevereError(cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError("Invalid " + cAlphaFieldNames(6) + '=' + AlphArray(6));
@@ -1625,7 +1625,7 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            dataCondenserLoopTowers.towers(TowerNum).UAModFuncWetBulbDiffCurvePtr = CurveManager::GetCurveIndex(AlphArray(7));
+            dataCondenserLoopTowers.towers(TowerNum).UAModFuncWetBulbDiffCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(7));
             if (dataCondenserLoopTowers.towers(TowerNum).UAModFuncWetBulbDiffCurvePtr == 0) {
                 ShowSevereError(cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + AlphArray(7));
@@ -1633,7 +1633,7 @@ namespace CondenserLoopTowers {
                 ErrorsFound = true;
             }
 
-            dataCondenserLoopTowers.towers(TowerNum).UAModFuncWaterFlowRatioCurvePtr = CurveManager::GetCurveIndex(AlphArray(8));
+            dataCondenserLoopTowers.towers(TowerNum).UAModFuncWaterFlowRatioCurvePtr = CurveManager::GetCurveIndex(state, AlphArray(8));
             if (dataCondenserLoopTowers.towers(TowerNum).UAModFuncWaterFlowRatioCurvePtr == 0) {
                 ShowSevereError(cCurrentModuleObject + '=' + AlphArray(1));
                 ShowContinueError("Invalid " + cAlphaFieldNames(8) + '=' + AlphArray(8));
@@ -1928,15 +1928,15 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
                                 "System",
                                 "Sum",
                                 this->Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
@@ -1947,15 +1947,15 @@ namespace CondenserLoopTowers {
                 "Cooling Tower Fan Cycling Ratio", OutputProcessor::Unit::None, this->FanCyclingRatio, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
                                     "Plant");
@@ -1969,15 +1969,15 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
                                 "System",
                                 "Sum",
                                 this->Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
@@ -1987,15 +1987,15 @@ namespace CondenserLoopTowers {
             SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
                                     "Plant");
@@ -2009,15 +2009,15 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
                                 "System",
                                 "Sum",
                                 this->Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
@@ -2028,15 +2028,15 @@ namespace CondenserLoopTowers {
             SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
                                     "Plant");
@@ -2050,15 +2050,15 @@ namespace CondenserLoopTowers {
             SetupOutputVariable(
                 "Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
             SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
-            SetupOutputVariable("Cooling Tower Fan Electric Energy",
+            SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+            SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->FanEnergy,
                                 "System",
                                 "Sum",
                                 this->Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "HeatRejection",
                                 this->EndUseSubcategory,
                                 "Plant");
@@ -2067,15 +2067,15 @@ namespace CondenserLoopTowers {
             SetupOutputVariable("Cooling Tower Operating Cells Count", OutputProcessor::Unit::None, this->NumCellOn, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable(
-                    "Cooling Tower Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Cooling Tower Basin Heater Electric Energy",
+                    "Cooling Tower Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Cooling Tower Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HeatRejection",
                                     "BasinHeater",
                                     "Plant");
@@ -4668,7 +4668,7 @@ namespace CondenserLoopTowers {
                     if (this->FanPowerfAirFlowCurve == 0) {
                         this->FanPower = pow_3(this->airFlowRateRatio) * this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
                     } else {
-                        Real64 const FanCurveValue = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+                        Real64 const FanCurveValue = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
                         this->FanPower = max(0.0, (this->HighSpeedFanPower * FanCurveValue)) * this->NumCellOn / this->NumCell;
                     }
                     //       fan is cycling ON and OFF at the minimum fan speed. Adjust fan power and air flow rate ratio according to cycling rate
@@ -4725,7 +4725,7 @@ namespace CondenserLoopTowers {
                     if (this->FanPowerfAirFlowCurve == 0) {
                         this->FanPower = pow_3(this->airFlowRateRatio) * this->HighSpeedFanPower * this->NumCellOn / this->NumCell;
                     } else {
-                        Real64 const FanCurveValue = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+                        Real64 const FanCurveValue = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
                         this->FanPower = max(0.0, (this->HighSpeedFanPower * FanCurveValue)) * this->NumCellOn / this->NumCell;
                     }
                     //           outlet water temperature is calculated as the inlet air wet-bulb temperature plus tower approach temperature
@@ -4926,9 +4926,9 @@ namespace CondenserLoopTowers {
         AirFlowRatePerCell = this->HighSpeedAirFlowRate / this->NumCell;
         this->airFlowRateRatio = 1.0;
         Real64 WaterFlowRateRatio = WaterMassFlowRatePerCell / this->DesWaterMassFlowRatePerCell;
-        Real64 UAwetbulbAdjFac = CurveManager::CurveValue(this->UAModFuncWetBulbDiffCurvePtr, (DesignWetBulb - this->AirWetBulb));
-        Real64 UAairflowAdjFac = CurveManager::CurveValue(this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
-        Real64 UAwaterflowAdjFac = CurveManager::CurveValue(this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
+        Real64 UAwetbulbAdjFac = CurveManager::CurveValue(state, this->UAModFuncWetBulbDiffCurvePtr, (DesignWetBulb - this->AirWetBulb));
+        Real64 UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
+        Real64 UAwaterflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
         Real64 UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
         this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
         Real64 FullSpeedFanQdot = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
@@ -4943,7 +4943,7 @@ namespace CondenserLoopTowers {
                     ++this->NumCellOn;
                     WaterMassFlowRatePerCell = this->WaterMassFlowRate / this->NumCellOn;
                     WaterFlowRateRatio = WaterMassFlowRatePerCell / this->DesWaterMassFlowRatePerCell;
-                    UAwaterflowAdjFac = CurveManager::CurveValue(this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
+                    UAwaterflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncWaterFlowRatioCurvePtr, WaterFlowRateRatio);
                     UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
                     this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
                     IncrNumCellFlag = (FullSpeedFanQdot + DataHVACGlobals::SmallLoad) < std::abs(MyLoad) && (this->NumCellOn < this->NumCell) &&
@@ -4955,7 +4955,7 @@ namespace CondenserLoopTowers {
             CalcBasinHeaterPower(
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
-            FanPowerAdjustFac = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+            FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
 
             return;
@@ -4964,7 +4964,7 @@ namespace CondenserLoopTowers {
         // next find minimum air flow ratio cooling rate
         this->airFlowRateRatio = this->MinimumVSAirFlowFrac;
         AirFlowRatePerCell = this->airFlowRateRatio * this->HighSpeedAirFlowRate / this->NumCell;
-        UAairflowAdjFac = CurveManager::CurveValue(this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
+        UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
         UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
         this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
         Real64 MinSpeedFanQdot = this->WaterMassFlowRate * CpWater * (DataLoopNode::Node(this->WaterInletNodeNum).Temp - this->OutletWaterTemp);
@@ -4974,7 +4974,7 @@ namespace CondenserLoopTowers {
             CalcBasinHeaterPower(
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
             // now calculate fan power
-            FanPowerAdjustFac = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+            FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
             return;
         }
@@ -5034,7 +5034,7 @@ namespace CondenserLoopTowers {
             // now rerun to get peformance with AirFlowRateRatio
             AirFlowRatePerCell = this->airFlowRateRatio * this->HighSpeedAirFlowRate / this->NumCell;
 
-            UAairflowAdjFac = CurveManager::CurveValue(this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
+            UAairflowAdjFac = CurveManager::CurveValue(state, this->UAModFuncAirFlowRatioCurvePtr, this->airFlowRateRatio);
             UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
 
             this->OutletWaterTemp = this->calculateSimpleTowerOutletTemp(WaterMassFlowRatePerCell, AirFlowRatePerCell, UAadjustedPerCell);
@@ -5043,7 +5043,7 @@ namespace CondenserLoopTowers {
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
 
             // now calculate fan power
-            FanPowerAdjustFac = CurveManager::CurveValue(this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
+            FanPowerAdjustFac = CurveManager::CurveValue(state, this->FanPowerfAirFlowCurve, this->airFlowRateRatio);
             this->FanPower = this->HighSpeedFanPower * FanPowerAdjustFac * this->NumCellOn / this->NumCell;
         }
     }
@@ -5082,7 +5082,7 @@ namespace CondenserLoopTowers {
         auto const &TotalWaterMassFlowRate = Par(8);
 
         Real64 const AirFlowRatePerCell = airFlowRateRatioLocal * state.dataCondenserLoopTowers.towers(TowerNum).HighSpeedAirFlowRate / state.dataCondenserLoopTowers.towers(TowerNum).NumCell;
-        Real64 const UAairflowAdjFac = CurveManager::CurveValue(state.dataCondenserLoopTowers.towers(TowerNum).UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
+        Real64 const UAairflowAdjFac = CurveManager::CurveValue(state, state.dataCondenserLoopTowers.towers(TowerNum).UAModFuncAirFlowRatioCurvePtr, airFlowRateRatioLocal);
         Real64 const UAadjustedPerCell = UAdesignPerCell * UAwetbulbAdjFac * UAairflowAdjFac * UAwaterflowAdjFac;
 
         Real64 OutletWaterTempTrial;

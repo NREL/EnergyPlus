@@ -1353,7 +1353,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
@@ -1571,7 +1571,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
@@ -1888,7 +1888,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
@@ -2119,7 +2119,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;

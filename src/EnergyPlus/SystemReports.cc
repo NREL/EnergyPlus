@@ -171,12 +171,14 @@ namespace SystemReports {
     Array1D<Real64> SysTotH2OHOT;
     Array1D<Real64> SysTotH2OCOLD;
     Array1D<Real64> SysTotElec;
-    Array1D<Real64> SysTotGas;
+    Array1D<Real64> SysTotNaturalGas;
+    Array1D<Real64> SysTotPropane;
     Array1D<Real64> SysTotSteam;
 
     Array1D<Real64> SysHumidHTNG;
     Array1D<Real64> SysHumidElec;
-    Array1D<Real64> SysHumidGas;
+    Array1D<Real64> SysHumidNaturalGas;
+    Array1D<Real64> SysHumidPropane;
     Array1D<Real64> SysEvapCLNG;
     Array1D<Real64> SysEvapElec;
     Array1D<Real64> SysHeatExHTNG;
@@ -197,7 +199,8 @@ namespace SystemReports {
     Array1D<Real64> SysHCCompElec;
     Array1D<Real64> SysHCCompElecRes;
     Array1D<Real64> SysHCCompHTNG;
-    Array1D<Real64> SysHCCompGas;
+    Array1D<Real64> SysHCCompNaturalGas;
+    Array1D<Real64> SysHCCompPropane;
     Array1D<Real64> SysHCCompSteam;
     Array1D<Real64> SysDomesticH2O;
 
@@ -1953,14 +1956,16 @@ namespace SystemReports {
         SysTotCLNG.allocate(NumPrimaryAirSys);
 
         SysTotElec.allocate(NumPrimaryAirSys);
-        SysTotGas.allocate(NumPrimaryAirSys);
+        SysTotNaturalGas.allocate(NumPrimaryAirSys);
+        SysTotPropane.allocate(NumPrimaryAirSys);
         SysTotSteam.allocate(NumPrimaryAirSys);
         SysTotH2OCOLD.allocate(NumPrimaryAirSys);
         SysTotH2OHOT.allocate(NumPrimaryAirSys);
 
         SysHumidHTNG.allocate(NumPrimaryAirSys);
         SysHumidElec.allocate(NumPrimaryAirSys);
-        SysHumidGas.allocate(NumPrimaryAirSys);
+        SysHumidNaturalGas.allocate(NumPrimaryAirSys);
+        SysHumidPropane.allocate(NumPrimaryAirSys);
         DesDehumidCLNG.allocate(NumPrimaryAirSys);
         DesDehumidElec.allocate(NumPrimaryAirSys);
         SysEvapCLNG.allocate(NumPrimaryAirSys);
@@ -1980,7 +1985,8 @@ namespace SystemReports {
         SysHCCompElec.allocate(NumPrimaryAirSys);
         SysHCCompElecRes.allocate(NumPrimaryAirSys);
         SysHCCompHTNG.allocate(NumPrimaryAirSys);
-        SysHCCompGas.allocate(NumPrimaryAirSys);
+        SysHCCompNaturalGas.allocate(NumPrimaryAirSys);
+        SysHCCompPropane.allocate(NumPrimaryAirSys);
         SysHCCompSteam.allocate(NumPrimaryAirSys);
         SysDomesticH2O.allocate(NumPrimaryAirSys);
 
@@ -2029,7 +2035,8 @@ namespace SystemReports {
 
         // SYSTEM ENERGY USE REPORT
         SysTotElec = 0.0;
-        SysTotGas = 0.0;
+        SysTotNaturalGas = 0.0;
+        SysTotPropane = 0.0;
         SysTotSteam = 0.0;
         SysTotH2OCOLD = 0.0;
         SysTotH2OHOT = 0.0;
@@ -2056,10 +2063,12 @@ namespace SystemReports {
         SysHCCompElec = 0.0;
         SysCCCompElec = 0.0;
         SysHCCompElecRes = 0.0;
-        SysHCCompGas = 0.0;
+        SysHCCompNaturalGas = 0.0;
+        SysHCCompPropane = 0.0;
         SysHCCompSteam = 0.0;
         SysHumidElec = 0.0;
-        SysHumidGas = 0.0;
+        SysHumidNaturalGas = 0.0;
+        SysHumidPropane = 0.0;
         DesDehumidElec = 0.0;
         SysEvapElec = 0.0;
 
@@ -2097,10 +2106,13 @@ namespace SystemReports {
                                     PrimaryAirSystem(SysIndex).Name);
 
                 SetupOutputVariable(
-                    "Air System Electric Energy", OutputProcessor::Unit::J, SysTotElec(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
+                    "Air System Electricity Energy", OutputProcessor::Unit::J, SysTotElec(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
 
                 SetupOutputVariable(
-                    "Air System Gas Energy", OutputProcessor::Unit::J, SysTotGas(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
+                    "Air System NaturalGas Energy", OutputProcessor::Unit::J, SysTotNaturalGas(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable(
+                    "Air System Propane Energy", OutputProcessor::Unit::J, SysTotPropane(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
 
                 SetupOutputVariable(
                     "Air System Water Volume", OutputProcessor::Unit::m3, SysDomesticH2O(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
@@ -2191,7 +2203,7 @@ namespace SystemReports {
                                     PrimaryAirSystem(SysIndex).Name);
 
                 // SYSTEM COMPONENT ENERGY REPORT
-                SetupOutputVariable("Air System Fan Electric Energy",
+                SetupOutputVariable("Air System Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     SysFANCompElec(SysIndex),
                                     "HVAC",
@@ -2212,30 +2224,37 @@ namespace SystemReports {
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System DX Heating Coil Electric Energy",
+                SetupOutputVariable("Air System DX Heating Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     SysHCCompElec(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System DX Cooling Coil Electric Energy",
+                SetupOutputVariable("Air System DX Cooling Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     SysCCCompElec(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heating Coil Electric Energy",
+                SetupOutputVariable("Air System Heating Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     SysHCCompElecRes(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Heating Coil Gas Energy",
+                SetupOutputVariable("Air System Heating Coil NaturalGas Energy",
                                     OutputProcessor::Unit::J,
-                                    SysHCCompGas(SysIndex),
+                                    SysHCCompNaturalGas(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Heating Coil Propane Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHCCompPropane(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
@@ -2247,28 +2266,35 @@ namespace SystemReports {
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Humidifier Electric Energy",
+                SetupOutputVariable("Air System Humidifier Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     SysHumidElec(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Humidifier Gas Energy",
+                SetupOutputVariable("Air System Humidifier NaturalGas Energy",
                                     OutputProcessor::Unit::J,
-                                    SysHumidGas(SysIndex),
+                                    SysHumidNaturalGas(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Evaporative Cooler Electric Energy",
+                SetupOutputVariable("Air System Humidifier Propane Energy",
+                                    OutputProcessor::Unit::J,
+                                    SysHumidPropane(SysIndex),
+                                    "HVAC",
+                                    "Sum",
+                                    PrimaryAirSystem(SysIndex).Name);
+
+                SetupOutputVariable("Air System Evaporative Cooler Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     SysEvapElec(SysIndex),
                                     "HVAC",
                                     "Sum",
                                     PrimaryAirSystem(SysIndex).Name);
 
-                SetupOutputVariable("Air System Desiccant Dehumidifier Electric Energy",
+                SetupOutputVariable("Air System Desiccant Dehumidifier Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     DesDehumidElec(SysIndex),
                                     "HVAC",
@@ -3532,7 +3558,8 @@ namespace SystemReports {
 
         // SYSTEM ENERGY USE REPORT
         SysTotElec = 0.0;
-        SysTotGas = 0.0;
+        SysTotNaturalGas = 0.0;
+        SysTotPropane = 0.0;
         SysTotSteam = 0.0;
         SysTotH2OCOLD = 0.0;
         SysTotH2OHOT = 0.0;
@@ -3559,10 +3586,12 @@ namespace SystemReports {
         SysHCCompElec = 0.0;
         SysCCCompElec = 0.0;
         SysHCCompElecRes = 0.0;
-        SysHCCompGas = 0.0;
+        SysHCCompNaturalGas = 0.0;
+        SysHCCompPropane = 0.0;
         SysHCCompSteam = 0.0;
         SysHumidElec = 0.0;
-        SysHumidGas = 0.0;
+        SysHumidNaturalGas = 0.0;
+        SysHumidPropane = 0.0;
         DesDehumidElec = 0.0;
         SysEvapElec = 0.0;
 
@@ -3769,7 +3798,8 @@ namespace SystemReports {
                                      SysSolarCollectCooling(AirLoopNum) + SysUserDefinedTerminalCooling(AirLoopNum);
             SysTotElec(AirLoopNum) = SysFANCompElec(AirLoopNum) + SysHCCompElec(AirLoopNum) + SysCCCompElec(AirLoopNum) +
                                      SysHCCompElecRes(AirLoopNum) + SysHumidElec(AirLoopNum) + DesDehumidElec(AirLoopNum) + SysEvapElec(AirLoopNum);
-            SysTotGas(AirLoopNum) = SysHCCompGas(AirLoopNum) + SysHumidGas(AirLoopNum);
+            SysTotNaturalGas(AirLoopNum) = SysHCCompNaturalGas(AirLoopNum) + SysHumidNaturalGas(AirLoopNum);
+            SysTotPropane(AirLoopNum) = SysHCCompPropane(AirLoopNum) + SysHumidPropane(AirLoopNum);
             SysTotSteam(AirLoopNum) = SysHCCompSteam(AirLoopNum);
             SysTotH2OCOLD(AirLoopNum) = SysCCCompH2OCOLD(AirLoopNum);
             SysTotH2OHOT(AirLoopNum) = SysHCCompH2OHOT(AirLoopNum);
@@ -4110,8 +4140,10 @@ namespace SystemReports {
                 SysHCCompSteam(AirLoopNum) += CompEnergy;
             } else if (EnergyType == iRT_Electricity) {
                 SysHCCompElec(AirLoopNum) += CompEnergy;
-            } else if ((EnergyType == iRT_Natural_Gas) || (EnergyType == iRT_Propane)) {
-                SysHCCompGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Natural_Gas) {
+                SysHCCompNaturalGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Propane) {
+                SysHCCompPropane(AirLoopNum) += CompEnergy;
             }
 
             break;
@@ -4145,8 +4177,10 @@ namespace SystemReports {
                 } else {
                     SysHCCompElec(AirLoopNum) += CompEnergy;
                 }
-            } else if ((EnergyType == iRT_Natural_Gas) || (EnergyType == iRT_Propane)) {
-                SysHCCompGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Natural_Gas) {
+                SysHCCompNaturalGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Propane) {
+                SysHCCompPropane(AirLoopNum) += CompEnergy;
             }
 
             // DX Systems
@@ -4197,8 +4231,10 @@ namespace SystemReports {
                 SysDomesticH2O(AirLoopNum) += std::abs(CompEnergy);
             } else if (EnergyType == iRT_Electricity) {
                 SysHumidElec(AirLoopNum) += CompEnergy;
-            } else if ((EnergyType == iRT_Natural_Gas) || (EnergyType == iRT_Propane)) {
-                SysHumidGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Natural_Gas) {
+                SysHumidNaturalGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Propane) {
+                SysHumidPropane(AirLoopNum) += CompEnergy;
             }
 
             // Evap Cooler Types for the air system simulation
@@ -4306,8 +4342,10 @@ namespace SystemReports {
                 } else {
                     SysHCCompElec(AirLoopNum) += CompEnergy;
                 }
-            } else if ((EnergyType == iRT_Natural_Gas) || (EnergyType == iRT_Propane)) {
-                SysHCCompGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Natural_Gas) {
+                SysHCCompNaturalGas(AirLoopNum) += CompEnergy;
+            } else if (EnergyType == iRT_Propane) {
+                SysHCCompPropane(AirLoopNum) += CompEnergy;
             }
             // Recurring warning for unaccounted equipment types
             // (should never happen, when this does happen enter appropriate equipment CASE statement above)
@@ -4650,15 +4688,15 @@ namespace SystemReports {
 
                     } else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
                         OutAirNode =
-                            GetHybridUnitaryACOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetHybridUnitaryACZoneInletNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACZoneInletNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
 
                         ReturnAirNode =
-                            GetHybridUnitaryACReturnAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
                             //						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode
                             //).HumRat

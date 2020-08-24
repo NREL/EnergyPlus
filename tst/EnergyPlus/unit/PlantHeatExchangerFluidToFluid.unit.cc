@@ -1071,7 +1071,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
@@ -1135,7 +1135,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         }
                     }
 
-                    WeatherManager::ManageWeather(state.files);
+                    WeatherManager::ManageWeather(state);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 
@@ -2162,7 +2162,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
@@ -2226,7 +2226,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         }
                     }
 
-                    WeatherManager::ManageWeather(state.files);
+                    WeatherManager::ManageWeather(state);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 

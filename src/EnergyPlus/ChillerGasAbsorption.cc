@@ -113,15 +113,15 @@ namespace ChillerGasAbsorption {
 
 
 
-    PlantComponent *GasAbsorberSpecs::factory(ChillerGasAbsorptionData &chillers, std::string const &objectName)
+    PlantComponent *GasAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (chillers.getGasAbsorberInputs) {
-            GetGasAbsorberInput(chillers);
-            chillers.getGasAbsorberInputs = false;
+        if (state.dataChillerGasAbsorption.getGasAbsorberInputs) {
+            GetGasAbsorberInput(state, state.dataChillerGasAbsorption);
+            state.dataChillerGasAbsorption.getGasAbsorberInputs = false;
         }
         // Now look for this particular pipe in the list
-        for (auto &comp : chillers.GasAbsorber) {
+        for (auto &comp : state.dataChillerGasAbsorption.GasAbsorber) {
             if (comp.Name == objectName) {
                 return &comp;
             }
@@ -145,14 +145,14 @@ namespace ChillerGasAbsorption {
             // Calculate Equipment and Update Variables
             this->InCoolingMode = RunFlag != 0;
             this->initialize(state.dataBranchInputManager);
-            this->calculateChiller(CurLoad);
+            this->calculateChiller(state, CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             // Calculate Node Values
             // Calculate Equipment and Update Variables
             this->InHeatingMode = RunFlag != 0;
             this->initialize(state.dataBranchInputManager);
-            this->calculateHeater(CurLoad, RunFlag);
+            this->calculateHeater(state, CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
             if (this->CDLoopNum > 0) {
@@ -232,7 +232,7 @@ namespace ChillerGasAbsorption {
         TempCondInDesign = this->TempDesCondReturn;
     }
 
-    void GetGasAbsorberInput(ChillerGasAbsorptionData &chillers)
+    void GetGasAbsorberInput(EnergyPlusData &state, ChillerGasAbsorptionData &chillers)
     {
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
@@ -370,13 +370,13 @@ namespace ChillerGasAbsorption {
                 thisChiller.HeatVolFlowRateWasAutoSized = true;
             }
             // Assign Curve Numbers
-            thisChiller.CoolCapFTCurve = GetCurveCheck(cAlphaArgs(8), Get_ErrorsFound, ChillerName);
-            thisChiller.FuelCoolFTCurve = GetCurveCheck(cAlphaArgs(9), Get_ErrorsFound, ChillerName);
-            thisChiller.FuelCoolFPLRCurve = GetCurveCheck(cAlphaArgs(10), Get_ErrorsFound, ChillerName);
-            thisChiller.ElecCoolFTCurve = GetCurveCheck(cAlphaArgs(11), Get_ErrorsFound, ChillerName);
-            thisChiller.ElecCoolFPLRCurve = GetCurveCheck(cAlphaArgs(12), Get_ErrorsFound, ChillerName);
-            thisChiller.HeatCapFCoolCurve = GetCurveCheck(cAlphaArgs(13), Get_ErrorsFound, ChillerName);
-            thisChiller.FuelHeatFHPLRCurve = GetCurveCheck(cAlphaArgs(14), Get_ErrorsFound, ChillerName);
+            thisChiller.CoolCapFTCurve = GetCurveCheck(state, cAlphaArgs(8), Get_ErrorsFound, ChillerName);
+            thisChiller.FuelCoolFTCurve = GetCurveCheck(state, cAlphaArgs(9), Get_ErrorsFound, ChillerName);
+            thisChiller.FuelCoolFPLRCurve = GetCurveCheck(state, cAlphaArgs(10), Get_ErrorsFound, ChillerName);
+            thisChiller.ElecCoolFTCurve = GetCurveCheck(state, cAlphaArgs(11), Get_ErrorsFound, ChillerName);
+            thisChiller.ElecCoolFPLRCurve = GetCurveCheck(state, cAlphaArgs(12), Get_ErrorsFound, ChillerName);
+            thisChiller.HeatCapFCoolCurve = GetCurveCheck(state, cAlphaArgs(13), Get_ErrorsFound, ChillerName);
+            thisChiller.FuelHeatFHPLRCurve = GetCurveCheck(state, cAlphaArgs(14), Get_ErrorsFound, ChillerName);
             if (Get_ErrorsFound) {
                 ShowFatalError("Errors found in processing curve input for " + cCurrentModuleObject + '=' + cAlphaArgs(1));
                 Get_ErrorsFound = false;
@@ -548,13 +548,13 @@ namespace ChillerGasAbsorption {
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater Electric Power", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable("Chiller Heater Electricity Rate", OutputProcessor::Unit::W, this->ElectricPower, "System", "Average", ChillerName);
         // Do not include this on meters, this would duplicate the cool electric and heat electric
-        SetupOutputVariable("Chiller Heater Electric Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
+        SetupOutputVariable("Chiller Heater Electricity Energy", OutputProcessor::Unit::J, this->ElectricEnergy, "System", "Sum", ChillerName);
 
         SetupOutputVariable(
-            "Chiller Heater Cooling Electric Power", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Cooling Electric Energy",
+            "Chiller Heater Cooling Electricity Rate", OutputProcessor::Unit::W, this->CoolElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable("Chiller Heater Cooling Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->CoolElectricEnergy,
                             "System",
@@ -567,8 +567,8 @@ namespace ChillerGasAbsorption {
                             "Plant");
 
         SetupOutputVariable(
-            "Chiller Heater Heating Electric Power", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
-        SetupOutputVariable("Chiller Heater Heating Electric Energy",
+            "Chiller Heater Heating Electricity Rate", OutputProcessor::Unit::W, this->HeatElectricPower, "System", "Average", ChillerName);
+        SetupOutputVariable("Chiller Heater Heating Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->HeatElectricEnergy,
                             "System",
@@ -1231,7 +1231,7 @@ namespace ChillerGasAbsorption {
         }
     }
 
-    void GasAbsorberSpecs::calculateChiller(Real64 &MyLoad)
+    void GasAbsorberSpecs::calculateChiller(EnergyPlusData &state, Real64 &MyLoad)
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   March 2001
@@ -1418,7 +1418,7 @@ namespace ChillerGasAbsorption {
             }
 
             // Determine available cooling capacity using the setpoint temperature
-            lAvailableCoolingCapacity = lNomCoolingCap * CurveManager::CurveValue(lCoolCapFTCurve, ChillSupplySetPointTemp, calcCondTemp);
+            lAvailableCoolingCapacity = lNomCoolingCap * CurveManager::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, calcCondTemp);
 
             // Calculate current load for cooling
             MyLoad = sign(max(std::abs(MyLoad), lAvailableCoolingCapacity * lMinPartLoadRat), MyLoad);
@@ -1535,15 +1535,15 @@ namespace ChillerGasAbsorption {
             // Calculate fuel consumption for cooling
             // fuel used for cooling availCap * HIR * HIR-FT * HIR-FPLR
             lCoolFuelUseRate = lAvailableCoolingCapacity * lFuelCoolRatio *
-                               CurveManager::CurveValue(lFuelCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
-                               CurveManager::CurveValue(lFuelCoolFPLRCurve, lCoolPartLoadRatio) * lFractionOfPeriodRunning;
+                               CurveManager::CurveValue(state, lFuelCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
+                               CurveManager::CurveValue(state, lFuelCoolFPLRCurve, lCoolPartLoadRatio) * lFractionOfPeriodRunning;
 
             // Calculate electric parasitics used
             // based on nominal capacity, not available capacity,
             // electric used for cooling nomCap * %OP * EIR * EIR-FT * EIR-FPLR
             lCoolElectricPower = lNomCoolingCap * lElecCoolRatio * lFractionOfPeriodRunning *
-                                 CurveManager::CurveValue(lElecCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
-                                 CurveManager::CurveValue(lElecCoolFPLRCurve, lCoolPartLoadRatio);
+                                 CurveManager::CurveValue(state, lElecCoolFTCurve, lChillSupplyTemp, calcCondTemp) *
+                                 CurveManager::CurveValue(state, lElecCoolFPLRCurve, lCoolPartLoadRatio);
 
             // determine conderser load which is cooling load plus the
             // fuel used for cooling times the burner efficiency plus
@@ -1572,7 +1572,7 @@ namespace ChillerGasAbsorption {
                 // iteration's value of condenser supply temperature and the actual calculated condenser supply
                 // temperature.  If this becomes too common then may need to iterate a solution instead of
                 // relying on previous iteration method.
-                revisedEstimateAvailCap = lNomCoolingCap * CurveManager::CurveValue(lCoolCapFTCurve, ChillSupplySetPointTemp, lCondSupplyTemp);
+                revisedEstimateAvailCap = lNomCoolingCap * CurveManager::CurveValue(state, lCoolCapFTCurve, ChillSupplySetPointTemp, lCondSupplyTemp);
                 if (revisedEstimateAvailCap > 0.0) {
                     errorAvailCap = std::abs((revisedEstimateAvailCap - lAvailableCoolingCapacity) / revisedEstimateAvailCap);
                     if (errorAvailCap > 0.05) { // if more than 5% error in estimate
@@ -1604,7 +1604,7 @@ namespace ChillerGasAbsorption {
         this->ElectricPower = lCoolElectricPower + lHeatElectricPower;
     }
 
-    void GasAbsorberSpecs::calculateHeater(Real64 &MyLoad, bool const RunFlag)
+    void GasAbsorberSpecs::calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag)
     {
         //       AUTHOR         Jason Glazer and Michael J. Witte
         //       DATE WRITTEN   March 2001
@@ -1710,7 +1710,7 @@ namespace ChillerGasAbsorption {
 
             // Determine available heating capacity using the current cooling load
             lAvailableHeatingCapacity = this->NomHeatCoolRatio * this->NomCoolingCap *
-                                        CurveManager::CurveValue(lHeatCapFCoolCurve, (this->CoolingLoad / this->NomCoolingCap));
+                                        CurveManager::CurveValue(state, lHeatCapFCoolCurve, (this->CoolingLoad / this->NomCoolingCap));
 
             // Calculate current load for heating
             MyLoad = sign(max(std::abs(MyLoad), this->HeatingCapacity * lMinPartLoadRat), MyLoad);
@@ -1792,7 +1792,7 @@ namespace ChillerGasAbsorption {
             // Calculate fuel consumption for cooling
             // fuel used for cooling availCap * HIR * HIR-FT * HIR-FPLR
 
-            lHeatFuelUseRate = lAvailableHeatingCapacity * lFuelHeatRatio * CurveManager::CurveValue(lFuelHeatFHPLRCurve, lHeatPartLoadRatio);
+            lHeatFuelUseRate = lAvailableHeatingCapacity * lFuelHeatRatio * CurveManager::CurveValue(state, lFuelHeatFHPLRCurve, lHeatPartLoadRatio);
 
             // calculate the fraction of the time period that the chiller would be running
             // use maximum from heating and cooling sides

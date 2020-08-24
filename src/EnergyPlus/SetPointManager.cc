@@ -510,7 +510,7 @@ namespace SetPointManager {
         InitSetPointManagers();
 
         if (ManagerOn) {
-            SimSetPointManagers();
+            SimSetPointManagers(state);
             UpdateSetPointManagers();
             // The Mixed Air Setpoint Managers (since they depend on other setpoints, they must be calculated
             // and updated next to last).
@@ -3118,9 +3118,9 @@ namespace SetPointManager {
             }
             CondEntSetPtMgr(SetPtMgrNum).CondEntTempSched = cAlphaArgs(3);
             CondEntSetPtMgr(SetPtMgrNum).CondEntTempSchedPtr = GetScheduleIndex(cAlphaArgs(3));
-            CondEntSetPtMgr(SetPtMgrNum).MinTwrWbCurve = GetCurveIndex(cAlphaArgs(4));
-            CondEntSetPtMgr(SetPtMgrNum).MinOaWbCurve = GetCurveIndex(cAlphaArgs(5));
-            CondEntSetPtMgr(SetPtMgrNum).OptCondEntCurve = GetCurveIndex(cAlphaArgs(6));
+            CondEntSetPtMgr(SetPtMgrNum).MinTwrWbCurve = GetCurveIndex(state, cAlphaArgs(4));
+            CondEntSetPtMgr(SetPtMgrNum).MinOaWbCurve = GetCurveIndex(state, cAlphaArgs(5));
+            CondEntSetPtMgr(SetPtMgrNum).OptCondEntCurve = GetCurveIndex(state, cAlphaArgs(6));
             CondEntSetPtMgr(SetPtMgrNum).MinimumLiftTD = rNumericArgs(1);
             CondEntSetPtMgr(SetPtMgrNum).MaxCondEntTemp = rNumericArgs(2);
             CondEntSetPtMgr(SetPtMgrNum).TowerDsnInletAirWetBulb = rNumericArgs(3);
@@ -5037,7 +5037,7 @@ namespace SetPointManager {
         }
     }
 
-    void SimSetPointManagers()
+    void SimSetPointManagers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5242,7 +5242,7 @@ namespace SetPointManager {
         // The Condenser Entering Water Temperature Set Point Managers
         for (SetPtMgrNum = 1; SetPtMgrNum <= NumCondEntSetPtMgrs; ++SetPtMgrNum) {
 
-            CondEntSetPtMgr(SetPtMgrNum).calculate();
+            CondEntSetPtMgr(SetPtMgrNum).calculate(state);
         }
 
         // The Ideal Condenser Entering Water Temperature Set Point Managers
@@ -7200,7 +7200,7 @@ namespace SetPointManager {
         this->SetPt = min(this->SetPt, MaxSetPoint);
     }
 
-    void DefineCondEntSetPointManager::calculate()
+    void DefineCondEntSetPointManager::calculate(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7367,13 +7367,13 @@ namespace SetPointManager {
             // In this section the optimal temperature is computed along with the minimum
             // design wet bulb temp and the minimum actual wet bulb temp.
             // Min_DesignWB = ACoef1 + ACoef2*OaWb + ACoef3*WPLR + ACoef4*TwrDsnWB + ACoef5*NF
-            DCESPMMin_DesignWB = CurveValue(this->MinTwrWbCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow);
+            DCESPMMin_DesignWB = CurveValue(state, this->MinTwrWbCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow);
 
             // Min_ActualWb = BCoef1 + BCoef2*MinDsnWB + BCoef3*WPLR + BCoef4*TwrDsnWB + BCoef5*NF
-            DCESPMMin_ActualWb = CurveValue(this->MinOaWbCurve, DCESPMMin_DesignWB, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow);
+            DCESPMMin_ActualWb = CurveValue(state, this->MinOaWbCurve, DCESPMMin_DesignWB, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow);
 
             // Opt_CondEntTemp = CCoef1 + CCoef2*OaWb + CCoef3*WPLR + CCoef4*TwrDsnWB + CCoef5*NF
-            DCESPMOpt_CondEntTemp = CurveValue(this->OptCondEntCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow);
+            DCESPMOpt_CondEntTemp = CurveValue(state, this->OptCondEntCurve, OutWetBulbTemp, DCESPMWeighted_Ratio, Twr_DesignWB, NormDsnCondFlow);
 
             // ***** Calculate (Cond ent - Evap lvg) Section *****
             // In this section we find the worst case of (Cond ent - Evap lvg) for the

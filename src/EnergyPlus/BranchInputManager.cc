@@ -94,7 +94,7 @@ namespace BranchInputManager {
     const char * cMIXER("Connector:Mixer");
     const char * cSPLITTER("Connector:Splitter");
 
-    void ManageBranchInput(BranchInputManagerData &dataBranchInputManager)
+    void ManageBranchInput(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -108,10 +108,10 @@ namespace BranchInputManager {
         // gathered prior to need.
 
         if (dataBranchInputManager.GetBranchInputFlag) {
-            GetBranchInput(dataBranchInputManager);
+            GetBranchInput(state, dataBranchInputManager);
             if (dataBranchInputManager.GetBranchListInputFlag) {
                 dataBranchInputManager.GetBranchListInputFlag = false;
-                GetBranchListInput(dataBranchInputManager);
+                GetBranchListInput(state, dataBranchInputManager);
             }
             AuditBranches(dataBranchInputManager, false);
             dataBranchInputManager.GetBranchInputFlag = false;
@@ -122,7 +122,8 @@ namespace BranchInputManager {
     //   Routines that "get" data from internal branch management structure
     //==================================================================================
 
-    void GetBranchList(BranchInputManagerData &dataBranchInputManager,
+    void GetBranchList(EnergyPlusData &state,
+                       BranchInputManagerData &dataBranchInputManager,
                        std::string const &LoopName,       // Name of Loop Branch List is on
                        std::string const &BranchListName, // Branch List Name from Input
                        int &NumBranchNames,               // Number of Branches for this Branch List
@@ -151,7 +152,7 @@ namespace BranchInputManager {
 
         if (dataBranchInputManager.GetBranchListInputFlag) {
             dataBranchInputManager.GetBranchListInputFlag = false;
-            GetBranchListInput(dataBranchInputManager);
+            GetBranchListInput(state, dataBranchInputManager);
         }
 
         //  Find this BranchList in the master BranchList Names
@@ -188,7 +189,7 @@ namespace BranchInputManager {
         }
     }
 
-    int NumBranchesInBranchList(BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName)
+    int NumBranchesInBranchList(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName)
     {
 
         // FUNCTION INFORMATION:
@@ -209,7 +210,7 @@ namespace BranchInputManager {
 
         if (dataBranchInputManager.GetBranchListInputFlag) {
             dataBranchInputManager.GetBranchListInputFlag = false;
-            GetBranchListInput(dataBranchInputManager);
+            GetBranchListInput(state, dataBranchInputManager);
         }
 
         //  Find this BranchList in the master BranchList Names
@@ -223,7 +224,8 @@ namespace BranchInputManager {
         return NumBranchesInBranchList;
     }
 
-    void GetBranchData(BranchInputManagerData &dataBranchInputManager,
+    void GetBranchData(EnergyPlusData &state,
+                       BranchInputManagerData &dataBranchInputManager,
                        std::string const &LoopName,         // Loop Name of this Branch
                        std::string const &BranchName,       // Requested Branch Name
                        int &PressCurveType,                 // Index of a pressure curve object
@@ -263,7 +265,7 @@ namespace BranchInputManager {
 
         BComponents.allocate(NumComps);
 
-        GetInternalBranchData(dataBranchInputManager, LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound);
+        GetInternalBranchData(state, dataBranchInputManager, LoopName, BranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound);
 
         MinCompsAllowed = min(
             size(CompType), size(CompName), size(CompInletNodeNames), size(CompInletNodeNums), size(CompOutletNodeNames), size(CompOutletNodeNums));
@@ -285,7 +287,7 @@ namespace BranchInputManager {
         BComponents.deallocate();
     }
 
-    int NumCompsInBranch(BranchInputManagerData &dataBranchInputManager, std::string const &BranchName)
+    int NumCompsInBranch(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, std::string const &BranchName)
     {
 
         // FUNCTION INFORMATION:
@@ -306,7 +308,7 @@ namespace BranchInputManager {
 
         if (dataBranchInputManager.GetBranchInputFlag) {
             dataBranchInputManager.GetBranchInputFlag = false;
-            GetBranchInput(dataBranchInputManager);
+            GetBranchInput(state, dataBranchInputManager);
         }
 
         Found = UtilityRoutines::FindItemInList(BranchName, dataBranchInputManager.Branch);
@@ -320,7 +322,7 @@ namespace BranchInputManager {
         return NumCompsInBranch;
     }
 
-    int GetAirBranchIndex(BranchInputManagerData &dataBranchInputManager, std::string const &CompType, std::string const &CompName)
+    int GetAirBranchIndex(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, std::string const &CompType, std::string const &CompName)
     {
 
         // FUNCTION INFORMATION:
@@ -343,7 +345,7 @@ namespace BranchInputManager {
 
         if (dataBranchInputManager.GetBranchInputFlag) {
             dataBranchInputManager.GetBranchInputFlag = false;
-            GetBranchInput(dataBranchInputManager);
+            GetBranchInput(state, dataBranchInputManager);
         }
 
         NumBranches = size(dataBranchInputManager.Branch);
@@ -366,7 +368,7 @@ namespace BranchInputManager {
         return GetAirBranchIndex;
     }
 
-    void GetBranchFanTypeName(BranchInputManagerData &dataBranchInputManager,
+    void GetBranchFanTypeName(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager,
                               int const BranchNum,
                               std::string &FanType,
                               std::string &FanName,
@@ -393,7 +395,7 @@ namespace BranchInputManager {
 
         if (dataBranchInputManager.GetBranchInputFlag) {
             dataBranchInputManager.GetBranchInputFlag = false;
-            GetBranchInput(dataBranchInputManager);
+            GetBranchInput(state, dataBranchInputManager);
         }
 
         ErrFound = false;
@@ -425,7 +427,8 @@ namespace BranchInputManager {
         }
     }
 
-    void GetInternalBranchData(BranchInputManagerData &dataBranchInputManager,
+    void GetInternalBranchData(EnergyPlusData &state,
+                               BranchInputManagerData &dataBranchInputManager,
                                std::string const &LoopName,         // Loop Name for Branch
                                std::string const &BranchName,       // Requested Branch Name
                                int &PressCurveType,                 // Index of pressure curve object
@@ -451,7 +454,7 @@ namespace BranchInputManager {
         int Found; // Pointer to requested Branch Name
 
         if (dataBranchInputManager.GetBranchInputFlag) {
-            GetBranchInput(dataBranchInputManager);
+            GetBranchInput(state, dataBranchInputManager);
             dataBranchInputManager.GetBranchInputFlag = false;
         }
 
@@ -482,7 +485,8 @@ namespace BranchInputManager {
         }
     }
 
-    void GetNumSplitterMixerInConntrList(BranchInputManagerData &dataBranchInputManager,
+    void GetNumSplitterMixerInConntrList(EnergyPlusData &state,
+                                         BranchInputManagerData &dataBranchInputManager,
                                          std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
                                          std::string const &ConnectorListName, // Requested Connector List Name
                                          int &numSplitters,                    // Number of splitters in the loop
@@ -505,7 +509,7 @@ namespace BranchInputManager {
         int ConnNum;
 
         if (dataBranchInputManager.GetConnectorListInputFlag) {
-            GetConnectorListInput(dataBranchInputManager);
+            GetConnectorListInput(state, dataBranchInputManager);
             dataBranchInputManager.GetConnectorListInputFlag = false;
         }
 
@@ -522,7 +526,8 @@ namespace BranchInputManager {
         }
     }
 
-    void GetConnectorList(BranchInputManagerData &dataBranchInputManager,
+    void GetConnectorList(EnergyPlusData &state,
+                          BranchInputManagerData &dataBranchInputManager,
                           std::string const &ConnectorListName, // Requested Connector List
                           ConnectorData &Connectoid,            // Returned Connector Data
                           Optional_int_const NumInList          // Number of the current connector in the list of connectors
@@ -559,7 +564,7 @@ namespace BranchInputManager {
         int Count; // Loop Counter
 
         if (dataBranchInputManager.GetConnectorListInputFlag) {
-            GetConnectorListInput(dataBranchInputManager);
+            GetConnectorListInput(state,dataBranchInputManager);
             dataBranchInputManager.GetConnectorListInputFlag = false;
         }
 
@@ -585,7 +590,8 @@ namespace BranchInputManager {
         }
     }
 
-    void GetLoopMixer(BranchInputManagerData &dataBranchInputManager,
+    void GetLoopMixer(EnergyPlusData &state,
+                      BranchInputManagerData &dataBranchInputManager,
                       std::string const &LoopName,          // Loop Name for Mixer
                       std::string const &ConnectorListName, // Requested Connector List Name
                       std::string &MixerName,               // Name of Mixer
@@ -630,11 +636,11 @@ namespace BranchInputManager {
         Array1D<ComponentData> BComponents; // Branch Component Data
 
         if (dataBranchInputManager.GetMixerInputFlag) {
-            GetMixerInput(dataBranchInputManager);
+            GetMixerInput(state, dataBranchInputManager);
             dataBranchInputManager.GetMixerInputFlag = false;
         }
 
-        GetConnectorList(dataBranchInputManager, ConnectorListName, Connectoid, ConnectorNumber);
+        GetConnectorList(state, dataBranchInputManager, ConnectorListName, Connectoid, ConnectorNumber);
         if (UtilityRoutines::SameString(Connectoid.ConnectorType(1), cMIXER)) {
             Count = UtilityRoutines::FindItemInList(Connectoid.ConnectorName(1), dataBranchInputManager.Mixers);
             if (present(MixerNumber)) ++MixerNumber;
@@ -671,7 +677,7 @@ namespace BranchInputManager {
             inputProcessor->getObjectDefMaxArgs("Branch", NumParams, NumAlphas, NumNumbers);
             BComponents.allocate(NumAlphas - 1);
             errFlag = false;
-            GetInternalBranchData(dataBranchInputManager, LoopName, dataBranchInputManager.Mixers(Count).OutletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag);
+            GetInternalBranchData(state, dataBranchInputManager, LoopName, dataBranchInputManager.Mixers(Count).OutletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag);
             if (errFlag) {
                 ShowContinueError("..occurs for Connector:Mixer Name=" + dataBranchInputManager.Mixers(Count).Name);
                 ErrorsFound = true;
@@ -701,7 +707,7 @@ namespace BranchInputManager {
                 InletNodeNames = "";
 
                 for (Loop = 1; Loop <= dataBranchInputManager.Mixers(Count).NumInletBranches; ++Loop) {
-                    GetInternalBranchData(dataBranchInputManager,
+                    GetInternalBranchData(state, dataBranchInputManager,
                         LoopName, dataBranchInputManager.Mixers(Count).InletBranchNames(Loop), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound);
                     if (NumComps > 0) {
                         InletNodeNames(Loop) = BComponents(NumComps).OutletNodeName;
@@ -726,7 +732,8 @@ namespace BranchInputManager {
         }
     }
 
-    void GetLoopSplitter(BranchInputManagerData &dataBranchInputManager,
+    void GetLoopSplitter(EnergyPlusData &state,
+                         BranchInputManagerData &dataBranchInputManager,
                          std::string const &LoopName,          // Loop Name for this Splitter
                          std::string const &ConnectorListName, // Requested Connector List Name
                          std::string &SplitterName,            // Name of Splitter
@@ -771,7 +778,7 @@ namespace BranchInputManager {
         Array1D<ComponentData> BComponents; // Branch Component Data
 
         if (dataBranchInputManager.GetSplitterInputFlag) {
-            GetSplitterInput(dataBranchInputManager);
+            GetSplitterInput(state, dataBranchInputManager);
             dataBranchInputManager.GetSplitterInputFlag = false;
         }
 
@@ -779,7 +786,7 @@ namespace BranchInputManager {
             ShowSevereError("GetLoopSplitter: ConnectorListName is blank.  LoopName=" + LoopName);
             ShowFatalError("Program terminates due to previous condition.");
         }
-        GetConnectorList(dataBranchInputManager, ConnectorListName, Connectoid, ConnectorNumber);
+        GetConnectorList(state, dataBranchInputManager, ConnectorListName, Connectoid, ConnectorNumber);
         if (UtilityRoutines::SameString(Connectoid.ConnectorType(1), cSPLITTER)) {
             Count = UtilityRoutines::FindItemInList(Connectoid.ConnectorName(1), dataBranchInputManager.Splitters);
             if (present(SplitterNumber)) ++SplitterNumber;
@@ -816,7 +823,7 @@ namespace BranchInputManager {
             inputProcessor->getObjectDefMaxArgs("Branch", NumParams, NumAlphas, NumNumbers);
             BComponents.allocate(NumAlphas - 1);
             errFlag = false;
-            GetInternalBranchData(dataBranchInputManager, LoopName, dataBranchInputManager.Splitters(Count).InletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag);
+            GetInternalBranchData(state, dataBranchInputManager, LoopName, dataBranchInputManager.Splitters(Count).InletBranchName, PressCurveType, PressCurveIndex, NumComps, BComponents, errFlag);
             if (errFlag) {
                 ShowContinueError("..occurs for Splitter Name=" + dataBranchInputManager.Splitters(Count).Name);
                 ErrorsFound = true;
@@ -846,7 +853,7 @@ namespace BranchInputManager {
                 OutletNodeNames = "";
 
                 for (Loop = 1; Loop <= dataBranchInputManager.Splitters(Count).NumOutletBranches; ++Loop) {
-                    GetInternalBranchData(dataBranchInputManager,
+                    GetInternalBranchData(state, dataBranchInputManager,
                         LoopName, dataBranchInputManager.Splitters(Count).OutletBranchNames(Loop), PressCurveType, PressCurveIndex, NumComps, BComponents, ErrorsFound);
                     if (NumComps > 0) {
                         OutletNodeNames(Loop) = BComponents(1).InletNodeName;
@@ -871,7 +878,7 @@ namespace BranchInputManager {
         }
     }
 
-    std::string GetFirstBranchInletNodeName(BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName) // Branch List name to search
+    std::string GetFirstBranchInletNodeName(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName) // Branch List name to search
     {
 
         // FUNCTION INFORMATION:
@@ -893,7 +900,7 @@ namespace BranchInputManager {
 
         if (dataBranchInputManager.GetBranchListInputFlag) {
             dataBranchInputManager.GetBranchListInputFlag = false;
-            GetBranchListInput(dataBranchInputManager);
+            GetBranchListInput(state, dataBranchInputManager);
         }
 
         Found1 = UtilityRoutines::FindItemInList(BranchListName, dataBranchInputManager.BranchList);
@@ -914,7 +921,7 @@ namespace BranchInputManager {
         return InletNodeName;
     }
 
-    std::string GetLastBranchOutletNodeName(BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName) // Branch List name to search
+    std::string GetLastBranchOutletNodeName(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName) // Branch List name to search
     {
 
         // FUNCTION INFORMATION:
@@ -936,7 +943,7 @@ namespace BranchInputManager {
 
         if (dataBranchInputManager.GetBranchListInputFlag) {
             dataBranchInputManager.GetBranchListInputFlag = false;
-            GetBranchListInput(dataBranchInputManager);
+            GetBranchListInput(state, dataBranchInputManager);
         }
 
         Found1 = UtilityRoutines::FindItemInList(BranchListName, dataBranchInputManager.BranchList);
@@ -961,7 +968,7 @@ namespace BranchInputManager {
     //   Routines that get the input for the internal branch management structure
     //==================================================================================
 
-    void GetBranchInput(BranchInputManagerData &dataBranchInputManager)
+    void GetBranchInput(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1049,7 +1056,7 @@ namespace BranchInputManager {
                                                   cNumericFields);
                     if (UtilityRoutines::IsNameEmpty(Alphas(1), CurrentModuleObject, ErrFound)) continue;
                     ++BCount;
-                    GetSingleBranchInput(dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
+                    GetSingleBranchInput(state, dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
                 }
 
                 dataBranchInputManager.NumOfBranches = BCount;
@@ -1071,7 +1078,8 @@ namespace BranchInputManager {
         }
     }
 
-    void GetSingleBranchInput(BranchInputManagerData &dataBranchInputManager,
+    void GetSingleBranchInput(EnergyPlusData &state,
+                              BranchInputManagerData &dataBranchInputManager,
                               std::string const &RoutineName,
                               int const BCount,
                               Array1D_string &Alphas,
@@ -1097,7 +1105,7 @@ namespace BranchInputManager {
         std::string CurrentModuleObject = "Branch";
 
         dataBranchInputManager.Branch(BCount).Name = Alphas(1);
-        GetPressureCurveTypeAndIndex(Alphas(2), PressureCurveType, PressureCurveIndex);
+        GetPressureCurveTypeAndIndex(state, Alphas(2), PressureCurveType, PressureCurveIndex);
         if (PressureCurveType == PressureCurve_Error) {
             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\", invalid data.");
             ShowContinueError("..Invalid " + cAlphaFields(2) + "=\"" + Alphas(2) + "\".");
@@ -1222,7 +1230,7 @@ namespace BranchInputManager {
         dataBranchInputManager.Branch(BCount).NumOfComponents = NumInComps;
     }
 
-    void GetBranchListInput(BranchInputManagerData &dataBranchInputManager)
+    void GetBranchListInput(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1325,7 +1333,7 @@ namespace BranchInputManager {
                 for (Loop = 1; Loop <= dataBranchInputManager.BranchList(BCount).NumOfBranchNames; ++Loop) {
                     // If NumOfBranches = 0 then Branches havent been read yet.
                     if (dataBranchInputManager.NumOfBranches == 0) {
-                        GetBranchInput(dataBranchInputManager);
+                        GetBranchInput(state, dataBranchInputManager);
                     }
                     if (!dataBranchInputManager.BranchList(BCount).BranchNames(Loop).empty()) {
                         Found = UtilityRoutines::FindItemInList(dataBranchInputManager.BranchList(BCount).BranchNames(Loop), dataBranchInputManager.Branch);
@@ -1365,7 +1373,7 @@ namespace BranchInputManager {
         lNumericBlanks.deallocate();
     }
 
-    void GetConnectorListInput(BranchInputManagerData &dataBranchInputManager)
+    void GetConnectorListInput(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1510,11 +1518,11 @@ namespace BranchInputManager {
 
         // Validity checks on Connector Lists
         if (dataBranchInputManager.GetSplitterInputFlag) {
-            GetSplitterInput(dataBranchInputManager);
+            GetSplitterInput(state, dataBranchInputManager);
             dataBranchInputManager.GetSplitterInputFlag = false;
         }
         if (dataBranchInputManager.GetMixerInputFlag) {
-            GetMixerInput(dataBranchInputManager);
+            GetMixerInput(state, dataBranchInputManager);
             dataBranchInputManager.GetMixerInputFlag = false;
         }
 
@@ -1626,7 +1634,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetSplitterInput(BranchInputManagerData &dataBranchInputManager)
+    void GetSplitterInput(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1725,7 +1733,7 @@ namespace BranchInputManager {
 
         // More validity -- check splitter "names" against branches.
         if (!dataBranchInputManager.GetBranchInputFlag) {
-            GetBranchInput(dataBranchInputManager);
+            GetBranchInput(state, dataBranchInputManager);
             dataBranchInputManager.GetBranchInputFlag = false;
         }
         for (Count = 1; Count <= dataBranchInputManager.NumSplitters; ++Count) {
@@ -1852,7 +1860,7 @@ namespace BranchInputManager {
         }
     }
 
-    void GetMixerInput(BranchInputManagerData &dataBranchInputManager)
+    void GetMixerInput(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1953,7 +1961,7 @@ namespace BranchInputManager {
 
         // More validity -- check mixer "names" against branches.
         if (!dataBranchInputManager.GetBranchInputFlag) {
-            GetBranchInput(dataBranchInputManager);
+            GetBranchInput(state, dataBranchInputManager);
             dataBranchInputManager.GetBranchInputFlag = false;
         }
         for (Count = 1; Count <= dataBranchInputManager.NumMixers; ++Count) {
