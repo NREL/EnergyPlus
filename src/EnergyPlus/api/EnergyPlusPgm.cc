@@ -200,13 +200,12 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/InputProcessing/DataStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -260,8 +259,8 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     DataStringGlobals::CurrentDateTime = CreateCurrentDateTimeString();
 
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+    ResultsFramework::resultsFramework->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    ResultsFramework::resultsFramework->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
@@ -289,7 +288,6 @@ int commonRun(EnergyPlus::EnergyPlusData &state) {
             DisplayString("Converted input file format. Exiting.");
             return EndEnergyPlus(state.files);
         }
-        ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
@@ -354,10 +352,14 @@ int wrapUpEnergyPlus(EnergyPlus::EnergyPlusData &state) {
         }
 
         if (DataGlobals::runReadVars) {
-            int status = CommandLineInterface::runReadVarsESO(state.files);
-            if (status) {
-                return status;
-            }
+//            state.files.outputControl.csv = true;
+             if (state.files.outputControl.csv) {
+                 ShowWarningMessage("Native CSV output requested in input file, but running ReadVarsESO due to command line argument.");
+             }
+             int status = CommandLineInterface::runReadVarsESO(state.files);
+             if (status) {
+                 return status;
+             }
         }
     } catch (const FatalError &e) {
         return AbortEnergyPlus(state);

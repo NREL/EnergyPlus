@@ -1009,14 +1009,14 @@ namespace FanCoilUnits {
                                 "System",
                                 "Sum",
                                 FanCoil(FanCoilNum).Name);
-            SetupOutputVariable("Fan Coil Fan Electric Power",
+            SetupOutputVariable("Fan Coil Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 FanCoil(FanCoilNum).ElecPower,
                                 "System",
                                 "Average",
                                 FanCoil(FanCoilNum).Name);
             SetupOutputVariable(
-                "Fan Coil Fan Electric Energy", OutputProcessor::Unit::J, FanCoil(FanCoilNum).ElecEnergy, "System", "Sum", FanCoil(FanCoilNum).Name);
+                "Fan Coil Fan Electricity Energy", OutputProcessor::Unit::J, FanCoil(FanCoilNum).ElecEnergy, "System", "Sum", FanCoil(FanCoilNum).Name);
             if (FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_CycFan || FanCoil(FanCoilNum).CapCtrlMeth_Num == CCM_MultiSpeedFan) {
                 SetupOutputVariable(
                     "Fan Coil Runtime Fraction", OutputProcessor::Unit::None, FanCoil(FanCoilNum).PLR, "System", "Average", FanCoil(FanCoilNum).Name);
