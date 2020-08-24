@@ -2631,9 +2631,9 @@ namespace SolarShading {
         Real64 DOTP;          // Dot product of C and D
 
         // Object Data
-        Vector AVec; // Vector from vertex 2 to vertex 1, both same surface
-        Vector BVec; // Vector from vertex 2 to vertex 3, both same surface
-        Vector CVec; // Vector perpendicular to surface at vertex 2
+        Vector AVec; // Vector from vertex 1 to vertex NVRS, both same surface
+        Vector BVec; // Vector from vertex 1 to vertex 2, both same surface
+        Vector CVec; // Vector perpendicular to surface at vertex 1
         Vector DVec; // Vector from vertex 2 of first surface to vertex 'n' of second surface
 
         NVRS = Surface(NRS).Sides;
@@ -2641,13 +2641,13 @@ namespace SolarShading {
 
         // SEE IF ANY VERTICES OF THE back surface ARE IN FRONT OF THE receiving surface
 
-        AVec = Surface(NRS).Vertex(1) - Surface(NRS).Vertex(2);
-        BVec = Surface(NRS).Vertex(3) - Surface(NRS).Vertex(2);
+        AVec = Surface(NRS).Vertex(NVRS) - Surface(NRS).Vertex(1);
+        BVec = Surface(NRS).Vertex(2) - Surface(NRS).Vertex(1);
 
         CVec = cross(BVec, AVec);
 
         for (N = 1; N <= NVBS; ++N) {
-            DVec = Surface(NBS).Vertex(N) - Surface(NRS).Vertex(2);
+            DVec = Surface(NBS).Vertex(N) - Surface(NRS).Vertex(1);
             DOTP = dot(CVec, DVec);
             if (DOTP > 0.0009) {
                 ShowSevereError("Problem in interior solar distribution calculation (CHKBKS)");
