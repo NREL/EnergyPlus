@@ -68,6 +68,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -161,7 +162,7 @@ namespace DualDuct {
         GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
     }
 
-    void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
+    void SimulateDualDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -228,7 +229,7 @@ namespace DualDuct {
 
                 } else if (SELECT_CASE_var == DualDuct_VariableVolume) { // 'AirTerminal:DualDuct:VAV'
 
-                    thisDualDuct.SimDualDuctVarVol(ZoneNum, ZoneNodeNum);
+                    thisDualDuct.SimDualDuctVarVol(state, ZoneNum, ZoneNodeNum);
 
                 } else if (SELECT_CASE_var == DualDuct_OutdoorAir) {
 
@@ -237,7 +238,7 @@ namespace DualDuct {
             }
 
             // Update the current Damper to the outlet nodes
-            thisDualDuct.UpdateDualDuct();
+            thisDualDuct.UpdateDualDuct(state);
 
             // Report the current Damper
             thisDualDuct.ReportDualDuct();
@@ -1333,7 +1334,7 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::SimDualDuctVarVol(int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctVarVol(EnergyPlusData &state, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1395,7 +1396,7 @@ namespace DualDuct {
         CpAirSysCold = CpAirZn;
 
         // calculate supply air flow rate based on user specified OA requirement
-        this->CalcOAMassFlow(MassFlowBasedOnOA, AirLoopOAFrac);
+        this->CalcOAMassFlow(state, MassFlowBasedOnOA, AirLoopOAFrac);
 
         // Then depending on if the Load is for heating or cooling it is handled differently.  First
         // the massflow rate of either heating or cooling is determined to meet the entire load.  Then
@@ -1822,8 +1823,9 @@ namespace DualDuct {
     }
 
 
-    void DualDuctAirTerminal::CalcOAMassFlow(Real64 &SAMassFlow,   // outside air based on optional user input
-                        Real64 &AirLoopOAFrac // outside air based on optional user input
+    void DualDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
+                                             Real64 &SAMassFlow,   // outside air based on optional user input
+                                             Real64 &AirLoopOAFrac // outside air based on optional user input
     )
     {
 
@@ -1856,14 +1858,14 @@ namespace DualDuct {
 
         // Calculate the amount of OA based on optional user inputs
         if (AirLoopNum > 0) {
-            AirLoopOAFrac = dataAirLoop.AirLoopFlow(AirLoopNum).OAFrac;
+            AirLoopOAFrac = state.dataAirLoop->AirLoopFlow(AirLoopNum).OAFrac;
             // If no additional input from user, RETURN from subroutine
             if ( this->NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
                 OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( this->OARequirementsPtr,
                                                                      this->ActualZoneNum,
-                                                                     dataAirLoop.AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
+                                                                     state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag,
                                                                      UseMinOASchFlag);
                 OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
@@ -1955,7 +1957,7 @@ namespace DualDuct {
     // Beginning of Update subroutines for the Damper Module
     // *****************************************************************************
 
-    void DualDuctAirTerminal::UpdateDualDuct()
+    void DualDuctAirTerminal::UpdateDualDuct(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2034,7 +2036,7 @@ namespace DualDuct {
                 }
             }
 
-            this->CalcOutdoorAirVolumeFlowRate();
+            this->CalcOutdoorAirVolumeFlowRate(state);
 
         } else if ( this->DamperType == DualDuct_OutdoorAir) {
 
@@ -2133,7 +2135,7 @@ namespace DualDuct {
         // Still needs to report the Damper power from this component
     }
 
-    void ReportDualDuctConnections(IOFiles &ioFiles)
+    void ReportDualDuctConnections(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2206,16 +2208,16 @@ namespace DualDuct {
             Found = 0;
             std::string ChrName;
             for (int Count2 = 1; Count2 <= NumPrimaryAirSys; ++Count2) {
-                ChrName = dataAirLoop.AirToZoneNodeInfo(Count2).AirLoopName;
+                ChrName = state.dataAirLoop->AirToZoneNodeInfo(Count2).AirLoopName;
                 Found = 0;
-                for (int Count3 = 1; Count3 <= dataAirLoop.AirToZoneNodeInfo(Count2).NumSupplyNodes; ++Count3) {
+                for (int Count3 = 1; Count3 <= state.dataAirLoop->AirToZoneNodeInfo(Count2).NumSupplyNodes; ++Count3) {
                     if (SupplyAirPathNum != 0) {
-                        if (SupplyAirPath(SupplyAirPathNum).InletNodeNum == dataAirLoop.AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (SupplyAirPath(SupplyAirPathNum).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
                     } else {
-                        if (dd_airterminal(Count1).HotAirInletNodeNum == dataAirLoop.AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).ColdAirInletNodeNum == dataAirLoop.AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).OAInletNodeNum == dataAirLoop.AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
-                        if (dd_airterminal(Count1).RecircAirInletNodeNum == dataAirLoop.AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (dd_airterminal(Count1).HotAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (dd_airterminal(Count1).ColdAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (dd_airterminal(Count1).OAInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
+                        if (dd_airterminal(Count1).RecircAirInletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipSupplyNodeNum(Count3)) Found = Count3;
                     }
                 }
                 if (Found != 0) break;
@@ -2345,11 +2347,11 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
+    void DualDuctAirTerminal::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * dataAirLoop.AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             // do nothing for now
         }

@@ -136,9 +136,9 @@ namespace FourPipeBeam {
 
         void update() const;
 
-        void report();
+        void report(EnergyPlusData &state);
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
     private:                      // data
         int coolingAvailSchedNum; // index to schedule for cooling availability

@@ -866,7 +866,7 @@ namespace OutputReportTabular {
 
     void GatherComponentLoadsHVAC();
 
-    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager);
+    void WriteLoadComponentSummaryTables(EnergyPlusData &state, CostEstimateManagerData &dataCostEstimateManager);
 
     void GetDelaySequences(int const &desDaySelected,
                            bool const &isCooling,

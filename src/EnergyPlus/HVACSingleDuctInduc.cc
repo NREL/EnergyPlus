@@ -254,7 +254,7 @@ namespace HVACSingleDuctInduc {
         // CALL UpdateIndUnit(IUNum);
 
         // Fill the report variables. There are no report variables
-        IndUnit(IUNum).ReportIndUnit();
+        IndUnit(IUNum).ReportIndUnit(state);
     }
 
     void GetIndUnits()
@@ -1602,19 +1602,19 @@ namespace HVACSingleDuctInduc {
         return YesNo;
     }
 
-    void IndUnitData::ReportIndUnit()
+    void IndUnitData::ReportIndUnit(EnergyPlusData &state)
     {
         // Purpose: this subroutine for reporting
 
         // set zone OA volume flow rate
-        this->CalcOutdoorAirVolumeFlowRate();
+        this->CalcOutdoorAirVolumeFlowRate(state);
     }
 
-    void IndUnitData::CalcOutdoorAirVolumeFlowRate()
+    void IndUnitData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * dataAirLoop.AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

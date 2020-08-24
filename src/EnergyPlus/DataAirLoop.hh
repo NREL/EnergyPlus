@@ -308,8 +308,6 @@ struct DataAirLoopData : BaseGlobalStruct {
     }
 };
 
-extern DataAirLoopData dataAirLoop;
-
 } // namespace EnergyPlus
 
 #endif

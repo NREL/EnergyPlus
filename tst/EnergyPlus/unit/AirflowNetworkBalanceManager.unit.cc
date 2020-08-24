@@ -2313,10 +2313,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     AirflowNetwork::AirflowNetworkNodeData(3).AirLoopNum = 1;
     AirflowNetwork::AirflowNetworkLinkageData(46).AirLoopNum = 1;
 
-    dataAirLoop.AirLoopAFNInfo.allocate(1);
-    //    dataAirLoop.LoopOnOffFanPartLoadRatio.allocate(1);
-    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
+    //    state.dataAirLoop->LoopOnOffFanPartLoadRatio.allocate(1);
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
     // Calculate mass flow rate based on pressure setpoint
     AirflowNetwork::PressureControllerData(1).OANodeNum = AirflowNetwork::DisSysCompReliefAirData(1).OutletNode;
     CalcAirflowNetworkAirBalance(state);
@@ -2330,7 +2330,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
 
     dataAirflowNetworkBalanceManager.exchangeData.allocate(NumOfZones);
 
-    UpdateAirflowNetwork();
+    UpdateAirflowNetwork(state);
 
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(10).PZ, 0.0001);
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkNodeSimu(20).PZ, 0.0001);
@@ -13167,12 +13167,12 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_MultiAirLoopTest)
     AirflowNetwork::AirflowNetworkLinkageData(42).AirLoopNum = 1;
     AirflowNetwork::AirflowNetworkLinkageData(67).AirLoopNum = 2;
 
-    dataAirLoop.AirLoopAFNInfo.allocate(2);
-    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    dataAirLoop.AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
-    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
-    dataAirLoop.AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
-    dataAirLoop.AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
+    state.dataAirLoop->AirLoopAFNInfo.allocate(2);
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state.dataAirLoop->AirLoopAFNInfo(2).LoopFanOperationMode = 1.0;
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state.dataAirLoop->AirLoopAFNInfo(2).LoopOnOffFanPartLoadRatio = 1.0;
+    state.dataAirLoop->AirLoopAFNInfo(2).LoopSystemOnMassFlowrate = 0.52;
 
     CalcAirflowNetworkAirBalance(state);
 
@@ -15621,10 +15621,10 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
             AirflowNetwork::AirflowNetworkNodeSimu(i).WZ = DataEnvironment::OutHumRat;
         }
     }
-    dataAirLoop.AirLoopAFNInfo.allocate(1);
-    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 1;
-    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
-    dataAirLoop.AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
+    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 1;
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate = 1.23;
     AirflowNetwork::AirflowNetworkLinkageData(17).AirLoopNum = 1;
     Node(4).MassFlowRate = 1.23;
 
@@ -15647,7 +15647,7 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestFanModel)
     CalcAirflowNetworkAirBalance(state);
     EXPECT_NEAR(1.23, AirflowNetwork::AirflowNetworkLinkSimu(20).FLOW, 0.0001);
 
-    dataAirLoop.AirLoopAFNInfo.deallocate();
+    state.dataAirLoop->AirLoopAFNInfo.deallocate();
 }
 
 // Missing an AirflowNetwork:Distribution:Node for the Zone Air Node
@@ -19976,9 +19976,9 @@ std::string const idf_objects = delimited_string({
         AirflowNetwork::DisSysCompReliefAirData(1).OutletNode = 1;
     }
 
-    dataAirLoop.AirLoopAFNInfo.allocate(1);
-    dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
-    dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
+    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode = 0.0;
+    state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio = 0.0;
 
     AirflowNetwork::AirflowNetworkFanActivated = false;
 

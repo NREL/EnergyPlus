@@ -1209,7 +1209,7 @@ namespace HVACUnitaryBypassVAV {
             }
 
             if (CBVAV(CBVAVNum).AirLoopNumber > 0) {
-                CBVAV(CBVAVNum).NumControlledZones = dataAirLoop.AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
+                CBVAV(CBVAVNum).NumControlledZones = state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
                 CBVAV(CBVAVNum).ControlledZoneNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
                 CBVAV(CBVAVNum).ActualZoneNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
                 CBVAV(CBVAVNum).ActualZoneNodeNum.allocate(CBVAV(CBVAVNum).NumControlledZones);
@@ -1219,17 +1219,17 @@ namespace HVACUnitaryBypassVAV {
 
                 CBVAV(CBVAVNum).ControlledZoneNum = 0;
                 CBVAV(CBVAVNum).ActualZoneNum = 0;
-                for (int AirLoopZoneNum = 1; AirLoopZoneNum <= dataAirLoop.AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
+                for (int AirLoopZoneNum = 1; AirLoopZoneNum <= state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).NumZonesCooled;
                      ++AirLoopZoneNum) {
                     CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum) =
-                        dataAirLoop.AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolCtrlZoneNums(AirLoopZoneNum);
+                        state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolCtrlZoneNums(AirLoopZoneNum);
                     if (CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum) > 0) {
                         CBVAV(CBVAVNum).ActualZoneNodeNum(AirLoopZoneNum) =
                             DataZoneEquipment::ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ZoneNode;
                         CBVAV(CBVAVNum).ActualZoneNum(AirLoopZoneNum) =
                             DataZoneEquipment::ZoneEquipConfig(CBVAV(CBVAVNum).ControlledZoneNum(AirLoopZoneNum)).ActualZoneNum;
                         CBVAV(CBVAVNum).CBVAVBoxOutletNode(AirLoopZoneNum) =
-                            dataAirLoop.AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolZoneInletNodes(AirLoopZoneNum);
+                            state.dataAirLoop->AirToZoneNodeInfo(CBVAV(CBVAVNum).AirLoopNumber).CoolZoneInletNodes(AirLoopZoneNum);
                         // check for thermostat in controlled zone
                         bool FoundTstatZone = false;
                         for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
@@ -1446,7 +1446,7 @@ namespace HVACUnitaryBypassVAV {
             // speed up test based on code from 16 years ago to correct cycling fan economizer defect
             // see https://github.com/NREL/EnergyPlusArchive/commit/a2202f8a168fd0330bf3a45392833405e8bd08f2
             // This test sets simple flag so air loop doesn't iterate twice each pass (reverts above change)
-            // dataAirLoop.AirLoopControlInfo(AirLoopNum).Simple = true;
+            // state.dataAirLoop->AirLoopControlInfo(AirLoopNum).Simple = true;
         }
 
         if (MyPlantScanFlag(CBVAVNum) && allocated(DataPlant::PlantLoop)) {
@@ -1533,10 +1533,10 @@ namespace HVACUnitaryBypassVAV {
         if (!DataGlobals::SysSizingCalc && MySizeFlag(CBVAVNum)) {
             SizeCBVAV(CBVAVNum);
             // Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
-            dataAirLoop.AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = CBVAV(CBVAVNum).FanOpModeSchedPtr;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = CBVAV(CBVAVNum).FanOpModeSchedPtr;
             //   Set UnitarySys flag to FALSE and let the heating coil autosize independently of the cooling coil
-            dataAirLoop.AirLoopControlInfo(AirLoopNum).UnitarySys = false;
-            dataAirLoop.AirLoopControlInfo(AirLoopNum).FanOpMode = CBVAV(CBVAVNum).OpMode;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = false;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = CBVAV(CBVAVNum).OpMode;
             // check for set point manager on outlet node of CBVAV
             CBVAV(CBVAVNum).OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(state,
                 OutNode, SetPointManager::iCtrlVarType_Temp, SetPointManager::iSPMType_MixedAir, SetPointManager::CtrlNodeType::reference);
@@ -3392,7 +3392,7 @@ namespace HVACUnitaryBypassVAV {
             DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRate =
                 BypassDuctFlowFraction * DataLoopNode::Node(CBVAV(CBVAVNum).MixerInletAirNode).MassFlowRate;
             DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRateMaxAvail = DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRate;
-            dataAirLoop.AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).BypassMassFlow = DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRate;
+            state.dataAirLoop->AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).BypassMassFlow = DataLoopNode::Node(plenumOrMixerInletNode).MassFlowRate;
         }
 
         // calculate sensible load met using delta enthalpy at a constant (minimum) humidity ratio)
@@ -3401,9 +3401,9 @@ namespace HVACUnitaryBypassVAV {
                                                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinHumRat));
 
         // calculate OA fraction used for zone OA volume flow rate calc
-        dataAirLoop.AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
+        state.dataAirLoop->AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
         if (DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
-            dataAirLoop.AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac =
+            state.dataAirLoop->AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac =
                 DataLoopNode::Node(CBVAV(CBVAVNum).MixerOutsideAirNode).MassFlowRate / DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate;
         }
     }

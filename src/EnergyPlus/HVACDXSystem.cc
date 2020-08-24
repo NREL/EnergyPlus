@@ -342,10 +342,10 @@ namespace HVACDXSystem {
             if (AirLoopNum > 0) { // Real airloopNum called from MixedAir and SimAirServingZones
                 if ((DXCoolingSystem(DXSystemNum).PartLoadFrac > 0.0 || DXCoolingSystem(DXSystemNum).SpeedRatio > 0.0 ||
                      DXCoolingSystem(DXSystemNum).CycRatio > 0.0) &&
-                    dataAirLoop.AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
-                    dataAirLoop.AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
+                    state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
+                    state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
                 } else { // used for AirLoopHVACDOAS only
-                    dataAirLoop.AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
+                    state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
                 }
             }
         }
@@ -933,7 +933,7 @@ namespace HVACDXSystem {
             if (AirLoopNum == 0) {
                 EconomizerFlag = false;
             } else {
-                EconomizerFlag = dataAirLoop.AirLoopControlInfo(AirLoopNum).EconoActive;
+                EconomizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
             }
             if (ControlNode == 0) {
                 DXCoolingSystem(DXSystemNum).DesiredOutletTemp = 0.0;

@@ -245,7 +245,7 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports(IOFiles &ioFiles)
+    void InitEnergyReports(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -342,8 +342,8 @@ namespace SystemReports {
                                             if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).InNode ==
                                                 SupplyAirPath(SAPNum).OutletNode(SAPOutNode)) {
                                                 ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyAirPathIndex = SAPNum;
-                                                for (OutNum = 1; OutNum <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
-                                                    if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
+                                                for (OutNum = 1; OutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
+                                                    if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) ==
                                                         SupplyAirPath(SAPNum).InletNodeNum) {
                                                         ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex =
                                                             PrimaryAirSystem(AirLoopNum).OutletBranchNum(OutNum);
@@ -367,12 +367,12 @@ namespace SystemReports {
                                     }
                                 } else { // no supply air path
                                     if (AirLoopNum > 0) {
-                                        for (NodeIndex = 1; NodeIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
-                                            if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
+                                        for (NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
+                                            if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
                                                 ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).InNode) {
                                                 for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
                                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).NodeNumOut ==
-                                                        dataAirLoop.AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                        state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
                                                         ZoneEquipConfig(CtrlZoneNum).AirDistUnitCool(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                         if (PrimaryAirSystem(AirLoopNum).Splitter.Exists) {
                                                             for (MainBranchNum = 1; MainBranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches;
@@ -398,12 +398,12 @@ namespace SystemReports {
                                 ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).AirDistUnitIndex = CompNum;
                                 if (ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyAirPathExists) {
                                     for (SAPNum = 1; SAPNum <= NumSupplyAirPaths; ++SAPNum) {
-                                        for (NodeIndex = 1; NodeIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
-                                            if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
+                                        for (NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
+                                            if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
                                                 SupplyAirPath(SAPNum).InletNodeNum) {
                                                 for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
                                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).NodeNumOut ==
-                                                        dataAirLoop.AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                        state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
                                                         ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                         if (PrimaryAirSystem(AirLoopNum).Splitter.Exists) {
                                                             for (MainBranchNum = 1; MainBranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches;
@@ -431,12 +431,12 @@ namespace SystemReports {
                                     }
                                 } else { // no supply air path
                                     if (AirLoopNum > 0) {
-                                        for (NodeIndex = 1; NodeIndex <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
-                                            if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
+                                        for (NodeIndex = 1; NodeIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++NodeIndex) {
+                                            if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(NodeIndex) ==
                                                 ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).InNode) {
                                                 for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
                                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).NodeNumOut ==
-                                                        dataAirLoop.AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
+                                                        state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(NodeIndex)) {
                                                         ZoneEquipConfig(CtrlZoneNum).AirDistUnitHeat(ZoneInletNodeNum).SupplyBranchIndex = BranchNum;
                                                         if (PrimaryAirSystem(AirLoopNum).Splitter.Exists) {
                                                             for (MainBranchNum = 1; MainBranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches;
@@ -5096,7 +5096,7 @@ namespace SystemReports {
         }
     }
 
-    void ReportAirLoopConnections(IOFiles &ioFiles)
+    void ReportAirLoopConnections(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5168,7 +5168,7 @@ namespace SystemReports {
               "Type>");
         for (int Count = 1; Count <= NumPrimaryAirSys; ++Count) {
             const auto oaSysExists = [&]() {
-                if (dataAirLoop.AirToOANodeInfo(Count).OASysExists) {
+                if (state.dataAirLoop->AirToOANodeInfo(Count).OASysExists) {
                     return "Yes";
                 } else {
                     return "No";
@@ -5177,96 +5177,96 @@ namespace SystemReports {
 
             print(ioFiles.bnd,
                   " AirLoopHVAC,{},{},{},{},{},{}\n",
-                  dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName,
-                  dataAirLoop.AirToZoneNodeInfo(Count).NumReturnNodes,
-                  dataAirLoop.AirToZoneNodeInfo(Count).NumSupplyNodes,
-                  dataAirLoop.AirToZoneNodeInfo(Count).NumZonesCooled,
-                  dataAirLoop.AirToZoneNodeInfo(Count).NumZonesHeated,
+                  state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName,
+                  state.dataAirLoop->AirToZoneNodeInfo(Count).NumReturnNodes,
+                  state.dataAirLoop->AirToZoneNodeInfo(Count).NumSupplyNodes,
+                  state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesCooled,
+                  state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesHeated,
                   oaSysExists);
-            for (int Count1 = 1; Count1 <= dataAirLoop.AirToZoneNodeInfo(Count).NumReturnNodes; ++Count1) {
-                print(ioFiles.bnd, "   AirLoop Return Connections,{},{},", Count1, dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
-                if (dataAirLoop.AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1) > 0) {
+            for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumReturnNodes; ++Count1) {
+                print(ioFiles.bnd, "   AirLoop Return Connections,{},{},", Count1, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
+                if (state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1) > 0) {
                     print(ioFiles.bnd,
                           "{},{},",
-                          dataAirLoop.AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1),
-                          NodeID(dataAirLoop.AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1)));
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1),
+                          NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1)));
                 } else {
                     print(ioFiles.bnd, "{},{},", errstring, errstring);
                 }
-                if (dataAirLoop.AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1) > 0) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1) > 0) {
                     print(ioFiles.bnd,
                           "{},{}\n",
-                          dataAirLoop.AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1),
-                          NodeID(dataAirLoop.AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1)));
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1),
+                          NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1)));
                 } else {
                     print(ioFiles.bnd, "{},{}\n", errstring, errstring);
                 }
             }
-            for (int Count1 = 1; Count1 <= dataAirLoop.AirToZoneNodeInfo(Count).NumSupplyNodes; ++Count1) {
-                print(ioFiles.bnd, "   AirLoop Supply Connections,{},{},", Count1, dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
-                if (dataAirLoop.AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1) > 0) {
+            for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumSupplyNodes; ++Count1) {
+                print(ioFiles.bnd, "   AirLoop Supply Connections,{},{},", Count1, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
+                if (state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1) > 0) {
                     print(ioFiles.bnd,
                           "{},{},",
-                          dataAirLoop.AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1),
-                          NodeID(dataAirLoop.AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1)));
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1),
+                          NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).ZoneEquipSupplyNodeNum(Count1)));
                 } else {
                     print(ioFiles.bnd, "{},{},", errstring, errstring);
                 }
-                if (dataAirLoop.AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1) > 0) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1) > 0) {
                     print(ioFiles.bnd,
                           "{},{}\n",
-                          dataAirLoop.AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1),
-                          NodeID(dataAirLoop.AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1)));
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1),
+                          NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1)));
                 } else {
                     print(ioFiles.bnd, "{},{}\n", errstring, errstring);
                 }
             }
 
-            for (int Count1 = 1; Count1 <= dataAirLoop.AirToZoneNodeInfo(Count).NumZonesCooled; ++Count1) {
-                const auto CtrldZoneNum = dataAirLoop.AirToZoneNodeInfo(Count).CoolCtrlZoneNums(Count1);
+            for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesCooled; ++Count1) {
+                const auto CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(Count).CoolCtrlZoneNums(Count1);
                 const auto ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
                 print(ioFiles.bnd, "   Cooled Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
-                if (dataAirLoop.AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1) > 0) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1) > 0) {
                     print(ioFiles.bnd,
                           "{},{},{}\n",
-                          dataAirLoop.AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1),
-                          NodeID(dataAirLoop.AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1)),
-                          dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1),
+                          NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1)),
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
                 } else {
-                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
+                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
                 }
             }
-            for (int Count1 = 1; Count1 <= dataAirLoop.AirToZoneNodeInfo(Count).NumZonesHeated; ++Count1) {
-                const auto CtrldZoneNum = dataAirLoop.AirToZoneNodeInfo(Count).HeatCtrlZoneNums(Count1);
+            for (int Count1 = 1; Count1 <= state.dataAirLoop->AirToZoneNodeInfo(Count).NumZonesHeated; ++Count1) {
+                const auto CtrldZoneNum = state.dataAirLoop->AirToZoneNodeInfo(Count).HeatCtrlZoneNums(Count1);
                 const auto ZoneNum = ZoneEquipConfig(CtrldZoneNum).ActualZoneNum;
                 print(ioFiles.bnd, "   Heated Zone Info,{},{},", Count1, Zone(ZoneNum).Name);
-                if (dataAirLoop.AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1) > 0) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1) > 0) {
                     print(ioFiles.bnd,
                           "{},{},{}\n",
-                          dataAirLoop.AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1),
-                          NodeID(dataAirLoop.AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1)),
-                          dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1),
+                          NodeID(state.dataAirLoop->AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1)),
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
                 } else {
-                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
+                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
                 }
             }
-            if (dataAirLoop.AirToOANodeInfo(Count).OASysExists) {
+            if (state.dataAirLoop->AirToOANodeInfo(Count).OASysExists) {
                 std::string ChrOut;
                 std::string ChrOut2;
-                if (dataAirLoop.AirToOANodeInfo(Count).OASysInletNodeNum > 0) {
-                    ChrOut = std::to_string(dataAirLoop.AirToOANodeInfo(Count).OASysInletNodeNum);
+                if (state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum > 0) {
+                    ChrOut = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum);
                 } else {
                     ChrOut = errstring;
                 }
-                if (dataAirLoop.AirToOANodeInfo(Count).OASysOutletNodeNum > 0) {
-                    ChrOut2 = std::to_string(dataAirLoop.AirToOANodeInfo(Count).OASysOutletNodeNum);
+                if (state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum > 0) {
+                    ChrOut2 = std::to_string(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum);
                 } else {
                     ChrOut2 = errstring;
                 }
 
                 print(ioFiles.bnd, "   Outdoor Air Connections,{},", ChrOut);
                 if (ChrOut != errstring) {
-                    print(ioFiles.bnd, "{},", NodeID(dataAirLoop.AirToOANodeInfo(Count).OASysInletNodeNum));
+                    print(ioFiles.bnd, "{},", NodeID(state.dataAirLoop->AirToOANodeInfo(Count).OASysInletNodeNum));
                 } else {
                     print(ioFiles.bnd, "{},", errstring);
                 }
@@ -5274,10 +5274,10 @@ namespace SystemReports {
                     print(ioFiles.bnd,
                           "{},{},{}\n",
                           ChrOut2,
-                          NodeID(dataAirLoop.AirToOANodeInfo(Count).OASysOutletNodeNum),
-                          dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
+                          NodeID(state.dataAirLoop->AirToOANodeInfo(Count).OASysOutletNodeNum),
+                          state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
                 } else {
-                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, dataAirLoop.AirToZoneNodeInfo(Count).AirLoopName);
+                    print(ioFiles.bnd, "{},{},{}\n", errstring, errstring, state.dataAirLoop->AirToZoneNodeInfo(Count).AirLoopName);
                 }
             }
             //  Report HVAC Air Loop Splitter to BND file

@@ -341,7 +341,7 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
 {
     // Test passing variables between Furnace and AirflowNetwork #5134
 
-    dataAirLoop.AirLoopAFNInfo.allocate(1);
+    state.dataAirLoop->AirLoopAFNInfo.allocate(1);
 
     int FurnaceNum;
 
@@ -358,12 +358,12 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
 
     AirflowNetwork::SimulateAirflowNetwork = AirflowNetwork::AirflowNetworkControlMultiADS;
-    ReportFurnace(FurnaceNum, 1);
+    ReportFurnace(state, FurnaceNum, 1);
 
-    EXPECT_EQ(2.0, dataAirLoop.AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
-    EXPECT_EQ(0.0, dataAirLoop.AirLoopAFNInfo(1).LoopSystemOffMassFlowrate);
-    EXPECT_EQ(1.0, dataAirLoop.AirLoopAFNInfo(1).LoopFanOperationMode);
-    EXPECT_EQ(1.0, dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
+    EXPECT_EQ(2.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopSystemOnMassFlowrate);
+    EXPECT_EQ(0.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopSystemOffMassFlowrate);
+    EXPECT_EQ(1.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopFanOperationMode);
+    EXPECT_EQ(1.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
     Furnace(FurnaceNum).FurnaceType_Num = UnitarySys_HeatCool;
     Furnace(FurnaceNum).HeatPartLoadRatio = 0.0;
@@ -371,9 +371,9 @@ TEST_F(EnergyPlusFixture, FurnaceTest_PartLoadRatioTest)
     Furnace(FurnaceNum).MaxCoolAirMassFlow = 2.2;
     Furnace(FurnaceNum).MaxHeatAirMassFlow = 2.0;
 
-    ReportFurnace(FurnaceNum, 1);
+    ReportFurnace(state, FurnaceNum, 1);
 
-    EXPECT_EQ(1.0, dataAirLoop.AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
+    EXPECT_EQ(1.0, state.dataAirLoop->AirLoopAFNInfo(1).LoopOnOffFanPartLoadRatio);
 
     AirflowNetwork::SimulateAirflowNetwork = 0;
     Furnace.deallocate();

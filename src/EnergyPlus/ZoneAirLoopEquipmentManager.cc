@@ -55,11 +55,8 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DualDuct.hh>
@@ -87,7 +84,6 @@ namespace ZoneAirLoopEquipmentManager {
     //       AUTHOR         Russ Taylor
     //       DATE WRITTEN   May 1997
 
-    using namespace DataPrecisionGlobals;
     using DataGlobals::BeginDayFlag;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::BeginHourFlag;
@@ -612,7 +608,7 @@ namespace ZoneAirLoopEquipmentManager {
                     MassFlowRateMinAvail = Node(InNodeNum).MassFlowRateMinAvail;
                     AirLoopNum = AirDistUnit(AirDistUnitNum).AirLoopNum;
                     if (AirLoopNum > 0) {
-                        DesFlowRatio = dataAirLoop.AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio;
+                        DesFlowRatio = state.dataAirLoop->AirLoopFlow(AirLoopNum).SysToZoneDesFlowRatio;
                     } else {
                         DesFlowRatio = 1.0;
                     }
@@ -633,21 +629,21 @@ namespace ZoneAirLoopEquipmentManager {
                 auto const SELECT_CASE_var(AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum));
 
                 if (SELECT_CASE_var == DualDuctConstVolume) {
-                    SimulateDualDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateDualDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                      FirstHVACIteration,
                                      ActualZoneNum,
                                      ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                      AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == DualDuctVAV) {
-                    SimulateDualDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateDualDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                      FirstHVACIteration,
                                      ActualZoneNum,
                                      ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                      AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == DualDuctVAVOutdoorAir) {
-                    SimulateDualDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateDualDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                      FirstHVACIteration,
                                      ActualZoneNum,
                                      ZoneEquipConfig(ControlledZoneNum).ZoneNode,
@@ -724,7 +720,7 @@ namespace ZoneAirLoopEquipmentManager {
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctConstVolCooledBeam) {
-                    SimCoolBeam(state.dataBranchInputManager,
+                    SimCoolBeam(state, state.dataBranchInputManager,
                                 AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                 FirstHVACIteration,
                                 ActualZoneNum,

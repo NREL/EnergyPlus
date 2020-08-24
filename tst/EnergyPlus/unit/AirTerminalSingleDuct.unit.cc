@@ -1771,8 +1771,8 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     // Needs an airloop, assume 20% outdoor air
     Real64 const AirLoopOAFraction = 0.20;
     thisHeatCoolAT.AirLoopNum = 1;
-    dataAirLoop.AirLoopFlow.allocate(1);
-    dataAirLoop.AirLoopFlow(thisHeatCoolAT.AirLoopNum).OAFrac = AirLoopOAFraction;
+    state.dataAirLoop->AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow(thisHeatCoolAT.AirLoopNum).OAFrac = AirLoopOAFraction;
 
     // test 1: heating load at minimum supply air flow rate
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
@@ -1785,7 +1785,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     FirstHVACIteration = false;
     thisHeatCoolAT.InitSys(state, FirstHVACIteration);
     thisHeatCoolAT.SimCBVAV(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    thisHeatCoolAT.ReportSys();
+    thisHeatCoolAT.ReportSys(state);
     Real64 expect_OutdoorAirFlowRate = (SysMinMassFlowRes / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMinMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRate);
@@ -1811,7 +1811,7 @@ TEST_F(EnergyPlusFixture, VAVHeatCoolReheatAirTerminal_ZoneOAVolumeFlowRateTest)
     FirstHVACIteration = false;
     thisHeatCoolAT.InitSys(state, FirstHVACIteration);
     thisHeatCoolAT.SimCBVAV(state, FirstHVACIteration, ZoneNum, ZoneNodeNum);
-    thisHeatCoolAT.ReportSys();
+    thisHeatCoolAT.ReportSys(state);
     expect_OutdoorAirFlowRate = (SysMaxMassFlowRes / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRateMaxAvail);
     EXPECT_EQ(SysMaxMassFlowRes, thisHeatCoolAT.sd_airterminalOutlet.AirMassFlowRate);

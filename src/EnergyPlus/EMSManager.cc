@@ -458,7 +458,7 @@ namespace EMSManager {
         // need to delay setup of HVAC actuator until after the systems input has been processed (if present)
         if (FinishProcessingUserInput && !DoingSizing && !KickOffSimulation) {
             SetupNodeSetPointsAsActuators();
-            SetupPrimaryAirSystemAvailMgrAsActuators();
+            SetupPrimaryAirSystemAvailMgrAsActuators(state);
             //    CALL SetupWindowShadingControlActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupThermostatActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupSurfaceConvectionActuators !this is too late for including in sizing, moved to GetEMSUserInput
@@ -1728,7 +1728,7 @@ namespace EMSManager {
         return returnValue;
     }
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators()
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1769,11 +1769,11 @@ namespace EMSManager {
 
         lDummy = false;
 
-        if (allocated(dataAirLoop.PriAirSysAvailMgr)) {
-            numAirLoops = isize(dataAirLoop.PriAirSysAvailMgr);
+        if (allocated(state.dataAirLoop->PriAirSysAvailMgr)) {
+            numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, dataAirLoop.PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {

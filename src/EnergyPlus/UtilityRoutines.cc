@@ -707,8 +707,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.files);
-                ReportLoopConnections(state.files);
+                ReportAirLoopConnections(state, state.files);
+                ReportLoopConnections(state, state.files);
             }
 
         } else if (!ExitDuringSimulations) {

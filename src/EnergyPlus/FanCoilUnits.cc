@@ -3576,7 +3576,7 @@ namespace FanCoilUnits {
                     min(Node(FanCoil(FanCoilNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(InletNode).MassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
-                SimATMixer(FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
+                SimATMixer(state, FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
             }
             AirMassFlow = Node(InletNode).MassFlowRate;
         } else {
@@ -3746,7 +3746,7 @@ namespace FanCoilUnits {
         if (FanCoil(FanCoilNum).ATMixerExists) {
             if (FanCoil(FanCoilNum).ATMixerType == ATMixer_SupplySide) {
                 // Now calculate the ATM mixer if it is on the supply side of the zone unit
-                SimATMixer(FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
+                SimATMixer(state, FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
             }
         }
 

@@ -301,7 +301,7 @@ namespace HVACMultiSpeedHeatPump {
         SimMSHP(state, MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnLoad, OnOffAirFlowRatio);
 
         // Update the unit outlet nodes
-        UpdateMSHeatPump(MSHeatPumpNum);
+        UpdateMSHeatPump(state, MSHeatPumpNum);
 
         // Report the result of the simulation
         ReportMSHeatPump(MSHeatPumpNum);
@@ -398,7 +398,7 @@ namespace HVACMultiSpeedHeatPump {
         OnOffFanPartLoadFraction = 1.0;
 
         SaveMassFlowRate = Node(InletNode).MassFlowRate;
-        if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 && dataAirLoop.AirLoopControlInfo(AirLoopNum).EconoActive) {
+        if (!FirstHVACIteration && MSHeatPump(MSHeatPumpNum).OpMode == CycFanCycCoil && QZnReq < 0.0 && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive) {
             // for cycling fan, cooling load, check whether furnace can meet load with compressor off
             CompOp = Off;
             ControlMSHPOutput(state, MSHeatPumpNum,
@@ -2022,11 +2022,11 @@ namespace HVACMultiSpeedHeatPump {
             MSHeatPump(MSHeatPumpNum).FlowFraction = 1.0;
             MSHeatPump(MSHeatPumpNum).MySizeFlag = false;
             // Pass the fan cycling schedule index up to the air loop. Set the air loop unitary system flag.
-            dataAirLoop.AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = MSHeatPump(MSHeatPumpNum).FanSchedPtr;
-            dataAirLoop.AirLoopControlInfo(AirLoopNum).UnitarySys = true;
-            dataAirLoop.AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr = MSHeatPump(MSHeatPumpNum).FanSchedPtr;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys = true;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySysSimulating =
                 false; // affects child coil sizing by allowing coil to size itself instead of parent telling coil what size to use
-            dataAirLoop.AirLoopControlInfo(AirLoopNum).FanOpMode = MSHeatPump(MSHeatPumpNum).OpMode;
+            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = MSHeatPump(MSHeatPumpNum).OpMode;
         }
 
         if (allocated(ZoneEquipConfig) && MSHeatPump(MSHeatPumpNum).MyCheckFlag) {
@@ -2051,32 +2051,32 @@ namespace HVACMultiSpeedHeatPump {
         }
 
         // Find the number of zones (zone Inlet Nodes) attached to an air loop from the air loop number
-        NumAirLoopZones = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
-        if (allocated(dataAirLoop.AirToZoneNodeInfo) && MSHeatPump(MSHeatPumpNum).MyFlowFracFlag) {
+        NumAirLoopZones = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled + state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+        if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && MSHeatPump(MSHeatPumpNum).MyFlowFracFlag) {
             FlowFracFlagReady = true;
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
                 // zone inlet nodes for cooling
-                if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesCooled > 0) {
-                    if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesCooled > 0) {
+                    if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
                         // the data structure for the zones inlet nodes has not been filled
                         FlowFracFlagReady = false;
                     }
                 }
                 // zone inlet nodes for heating
-                if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
-                    if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) == -999) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumZonesHeated > 0) {
+                    if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) == -999) {
                         // the data structure for the zones inlet nodes has not been filled
                         FlowFracFlagReady = false;
                     }
                 }
             }
         }
-        if (allocated(dataAirLoop.AirToZoneNodeInfo) && FlowFracFlagReady) {
+        if (allocated(state.dataAirLoop->AirToZoneNodeInfo) && FlowFracFlagReady) {
             SumOfMassFlowRateMax = 0.0; // initialize the sum of the maximum flows
             for (ZoneInSysIndex = 1; ZoneInSysIndex <= NumAirLoopZones; ++ZoneInSysIndex) {
-                ZoneInletNodeNum = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
+                ZoneInletNodeNum = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
                 SumOfMassFlowRateMax += Node(ZoneInletNodeNum).MassFlowRateMax;
-                if (dataAirLoop.AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) == MSHeatPump(MSHeatPumpNum).ControlZoneNum) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).CoolCtrlZoneNums(ZoneInSysIndex) == MSHeatPump(MSHeatPumpNum).ControlZoneNum) {
                     CntrlZoneTerminalUnitMassFlowRateMax = Node(ZoneInletNodeNum).MassFlowRateMax;
                 }
             }
@@ -3836,7 +3836,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void UpdateMSHeatPump(int const MSHeatPumpNum) // Engine driven heat pump number
+    void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum) // Engine driven heat pump number
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
@@ -3860,11 +3860,11 @@ namespace HVACMultiSpeedHeatPump {
 
         if (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlMultiADS ||
             AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS) {
-            dataAirLoop.AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
-            dataAirLoop.AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
-            dataAirLoop.AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
-            dataAirLoop.AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
-            dataAirLoop.AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOnMassFlowrate = CompOnMassFlow;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopSystemOffMassFlowrate = CompOffMassFlow;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopFanOperationMode = MSHeatPump(MSHeatPumpNum).OpMode;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopOnOffFanPartLoadRatio = MSHeatPump(MSHeatPumpNum).FanPartLoadRatio;
+            state.dataAirLoop->AirLoopAFNInfo(MSHeatPump(MSHeatPumpNum).AirLoopNumber).LoopCompCycRatio = MSHeatPumpReport(MSHeatPumpNum).CycRatio;
         }
     }
 

@@ -713,8 +713,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     // Needs an airloop, assume 20% outdoor air
     Real64 const AirLoopOAFraction = 0.20;
     thisSeriesAT.AirLoopNum = 1;
-    dataAirLoop.AirLoopFlow.allocate(1);
-    dataAirLoop.AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
+    state.dataAirLoop->AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
 
     DataZoneEquipment::ZoneEquipConfig(thisSeriesAT.CtrlZoneNum).InletNodeAirLoopNum(thisSeriesAT.ctrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions
@@ -732,7 +732,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     Real64 expect_OutdoorAirFlowRate = (0.0 / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(0.0, DataLoopNode::Node(PriNodeNum).MassFlowRate);
@@ -744,7 +744,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRateMinAvail = PriMinMassFlow;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     expect_OutdoorAirFlowRate = (PriMinMassFlow / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMassFlowAtPrimMin, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(PriMinMassFlow, DataLoopNode::Node(PriNodeNum).MassFlowRate);
@@ -766,7 +766,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRateMaxAvail = PriMaxMassFlow;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -3000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     expect_OutdoorAirFlowRate = (PriMaxMassFlow / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMassFlowAtPrimMax, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(PriMaxMassFlow, DataLoopNode::Node(PriNodeNum).MassFlowRate);

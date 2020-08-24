@@ -5753,7 +5753,7 @@ namespace OutputReportTabular {
             WriteCompCostTable(state.dataCostEstimateManager);
             WriteAdaptiveComfortTable(state.dataCostEstimateManager);
             WriteEioTables(state.dataCostEstimateManager, state.files);
-            WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+            WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
             WriteHeatEmissionTable(state.dataCostEstimateManager);
 
             if (displayThermalResilienceSummary) WriteThermalResilienceTables();
@@ -12765,7 +12765,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager)
+    void WriteLoadComponentSummaryTables(EnergyPlusData &state, CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -13111,9 +13111,9 @@ namespace OutputReportTabular {
                     timeHeatMax = 0;
                 }
 
-                int NumZonesCooled = dataAirLoop.AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
+                int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                    int CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
                     zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
@@ -13121,9 +13121,9 @@ namespace OutputReportTabular {
                     AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
                     AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
                 }
-                int NumZonesHeated = dataAirLoop.AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
+                int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
-                    int CtrlZoneNum = dataAirLoop.AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
                     zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;

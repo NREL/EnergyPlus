@@ -4056,9 +4056,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     // get OA System
     MixedAir::GetOutsideAirSysInputs(state);
     int OASysNum = 1;
-    auto &thisOASys = dataAirLoop.OutsideAirSys(OASysNum);
+    auto &thisOASys = state.dataAirLoop->OutsideAirSys(OASysNum);
     thisOASys.OAControllerIndex = MixedAir::GetOAController(thisOAController.Name);
-    EXPECT_EQ(1, dataAirLoop.NumOASystems);
+    EXPECT_EQ(1, state.dataAirLoop->NumOASystems);
     EXPECT_EQ("VAV WITH REHEAT_OA", thisOASys.Name);
     // get HR HX generic
     GetHeatRecoveryInput();
@@ -4186,8 +4186,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     thisOAController.ControllerType_Num = MixedAir::ControllerOutsideAir;
 
     int OASysNum = 1;
-    dataAirLoop.OutsideAirSys.allocate(OASysNum);
-    auto &thisOASys = dataAirLoop.OutsideAirSys(OASysNum);
+    state.dataAirLoop->OutsideAirSys.allocate(OASysNum);
+    auto &thisOASys = state.dataAirLoop->OutsideAirSys(OASysNum);
     thisOASys.OAControllerIndex = 1;
 
     DataSizing::CurSysNum = 1;

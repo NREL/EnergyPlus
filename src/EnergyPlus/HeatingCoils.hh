@@ -236,7 +236,8 @@ namespace HeatingCoils {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcElectricHeatingCoil(int const CoilNum, // index to heating coil
+    void CalcElectricHeatingCoil(EnergyPlusData &state,
+                                 int const CoilNum, // index to heating coil
                                  Real64 &QCoilReq,
                                  Real64 &QCoilActual,       // coil load actually delivered (W)
                                  int const FanOpMode,       // fan operating mode

@@ -515,7 +515,7 @@ namespace FourPipeBeam {
             this->update();
 
             // Fill the report variables.
-            this->report();
+            this->report(state);
         }
     }
 
@@ -1474,7 +1474,7 @@ namespace FourPipeBeam {
 
     }
 
-    void HVACFourPipeBeam::report() // fill out local output variables for reporting
+    void HVACFourPipeBeam::report(EnergyPlusData &state) // fill out local output variables for reporting
     {
 
         Real64 ReportingConstant;
@@ -1501,14 +1501,14 @@ namespace FourPipeBeam {
 
         this->primAirFlow = this->mDotSystemAir / DataEnvironment::StdRhoAir;
 
-        this->CalcOutdoorAirVolumeFlowRate();
+        this->CalcOutdoorAirVolumeFlowRate(state);
     }
 
-    void HVACFourPipeBeam::CalcOutdoorAirVolumeFlowRate()
+    void HVACFourPipeBeam::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->airLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * dataAirLoop.AirLoopFlow(this->airLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->airLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

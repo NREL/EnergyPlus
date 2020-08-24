@@ -267,7 +267,7 @@ namespace Fans {
         UpdateFan(FanNum);
 
         // Report the current fan
-        ReportFan(FanNum);
+        ReportFan(state, FanNum);
     }
 
     // Get Input Section of the Module
@@ -1072,7 +1072,7 @@ namespace Fans {
             // Set the loop cycling flag
             if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
                 if (CurSysNum > 0) {
-                    dataAirLoop.AirLoopControlInfo(CurSysNum).CyclingFan = true;
+                    state.dataAirLoop->AirLoopControlInfo(CurSysNum).CyclingFan = true;
                 }
             }
 
@@ -2571,7 +2571,7 @@ namespace Fans {
     // Beginning of Reporting subroutines for the Fan Module
     // *****************************************************************************
 
-    void ReportFan(int const FanNum)
+    void ReportFan(EnergyPlusData &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2613,7 +2613,7 @@ namespace Fans {
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
             if (Fan(FanNum).AirLoopNum > 0) {
-                dataAirLoop.AirLoopAFNInfo(Fan(FanNum).AirLoopNum).AFNLoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
+                state.dataAirLoop->AirLoopAFNInfo(Fan(FanNum).AirLoopNum).AFNLoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
             }
         }
     }

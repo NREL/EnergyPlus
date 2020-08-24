@@ -59,8 +59,8 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -94,9 +94,6 @@ namespace HVACInterfaceManager {
     // OTHER NOTES:
     // na
 
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
     // Data
     // MODULE PARAMETER DEFINITIONS:
     // Common Pipe Recirc Flow Directions
@@ -123,7 +120,8 @@ namespace HVACInterfaceManager {
 
     // Functions
 
-    void UpdateHVACInterface(int const AirLoopNum, // airloop number for which air loop this is
+    void UpdateHVACInterface(EnergyPlusData &state,
+                             int const AirLoopNum, // airloop number for which air loop this is
                              int const CalledFrom,
                              int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
                              int const InletNode,     // Node number for the inlet of the side that needs the outlet node data
@@ -162,8 +160,8 @@ namespace HVACInterfaceManager {
             Real64 totDemandSideMassFlow = 0.0;
             Real64 totDemandSideMinAvail = 0.0;
             Real64 totDemandSideMaxAvail = 0.0;
-            for (int demIn = 1; demIn <= dataAirLoop.AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++demIn) {
-                int demInNode = dataAirLoop.AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(demIn);
+            for (int demIn = 1; demIn <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++demIn) {
+                int demInNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(demIn);
                 totDemandSideMassFlow += Node(demInNode).MassFlowRate;
                 totDemandSideMinAvail += Node(demInNode).MassFlowRateMinAvail;
                 totDemandSideMaxAvail += Node(demInNode).MassFlowRateMaxAvail;
