@@ -92,9 +92,10 @@ void BaseSizerWithScalableInputs::initializeWithinEP(EnergyPlusData &state,
     this->zoneHVACSizing = DataSizing::ZoneHVACSizing;
 
     // set supply air fan properties
-    if (this->isCoilReportObject && this->curSysNum > 0 && this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
+    if (this->isCoilReportObject && this->curSysNum > 0 && int(this->primaryAirSystem.size()) > 0 &&
+        this->curSysNum <= DataHVACGlobals::NumPrimaryAirSys) {
         int SupFanNum = this->primaryAirSystem(this->curSysNum).SupFanNum;
-        //int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
+        // int RetFanNum = this->primaryAirSystem(this->curSysNum).RetFanNum;
         switch (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
             if (SupFanNum > 0) {

@@ -207,6 +207,8 @@ void BaseSizer::preSize(Real64 const _originalValue)
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->initialized = false; // force use of Init then Size in subsequent calls
     this->hardSizeNoDesignRun = !(this->sysSizingRunDone || this->zoneSizingRunDone);
+    this->sizingDesRunThisZone = false;
+    this->sizingDesRunThisAirSys = false;
 
     if (this->dataFractionUsedForSizing == 0.0 && this->dataConstantUsedForSizing > 0.0) {
         this->errorType = AutoSizingResultType::ErrorType1;
