@@ -55,6 +55,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -549,18 +550,18 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
 
     double expected_auto_divisor{6.0};
     double normalization_divisor{4.0};
-    double expected_curve_max{21.0/expected_auto_divisor/normalization_divisor};
-    double expected_curve_min{2.0/expected_auto_divisor/normalization_divisor};
+    double expected_curve_max{21.0 / expected_auto_divisor / normalization_divisor};
+    double expected_curve_min{2.0 / expected_auto_divisor / normalization_divisor};
 
     std::vector<std::pair<double, double>> table_data{
-            { 2.0, 1.0 }, // 2.0
-            { 2.0, 2.0 }, // 4.0
-            { 2.0, 3.0 }, // 6.0
-            { 7.0, 1.0 }, // 7.0
-            { 7.0, 2.0 }, // 14.0
-            { 7.0, 3.0 }, // 21.0
-            { 3.0, 3.0 }, // 9.0
-            { 5.0, 2.0 }, // 10.0
+        {2.0, 1.0}, // 2.0
+        {2.0, 2.0}, // 4.0
+        {2.0, 3.0}, // 6.0
+        {7.0, 1.0}, // 7.0
+        {7.0, 2.0}, // 14.0
+        {7.0, 3.0}, // 21.0
+        {3.0, 3.0}, // 9.0
+        {5.0, 2.0}, // 10.0
     };
 
     std::string const idf_objects = delimited_string({
@@ -617,7 +618,7 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
         "1.0,                                   !- Value 1",
         "2.0,                                   !- Value 2",
         "3.0;                                   !- Value 3",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, CurveManager::NumCurves);
@@ -632,7 +633,22 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
     EXPECT_TRUE(CurveManager::PerfCurve(1).CurveMaxPresent);
     EXPECT_EQ(expected_curve_max, CurveManager::PerfCurve(1).CurveMax);
 
-    for (auto data_point : table_data ){
-        EXPECT_DOUBLE_EQ(data_point.first*data_point.second/expected_auto_divisor/normalization_divisor, CurveManager::CurveValue(1, data_point.first, data_point.second));
+    for (auto data_point : table_data) {
+        EXPECT_DOUBLE_EQ(data_point.first * data_point.second / expected_auto_divisor / normalization_divisor,
+                         CurveManager::CurveValue(1, data_point.first, data_point.second));
+    }
+}
+
+TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
+{
+    CurveManager::TableFile testTableFile = CurveManager::TableFile();
+    std::string testCSV = configured_source_directory() + "/tst/EnergyPlus/unit/Resources/TestCarriageReturn.csv";
+    testTableFile.filePath = testCSV;
+    testTableFile.load(IOFiles::getSingleton(), testCSV);
+    std::vector<double> TestArray;
+    std::pair<std::size_t, std::size_t> testPoint = std::make_pair(0,1);
+    TestArray = testTableFile.getArray(testPoint);
+    for (int i = 0; i < 7; i++){
+        EXPECT_EQ(TestArray[i], -5 );
     }
 }
