@@ -2728,9 +2728,10 @@ namespace SolarShading {
 
         auto const &surface_R(Surface(NRS));
         auto const &vertex_R(surface_R.Vertex);
-        auto const vertex_R_2(vertex_R(2));
-        Vector const AVec(vertex_R(1) - vertex_R_2); // Vector from vertex 2 to vertex 1 of receiving surface
-        Vector const BVec(vertex_R(3) - vertex_R_2); // Vector from vertex 2 to vertex 3 of receiving surface
+        int NVRS_temp = Surface(NRS).Sides;
+        auto const vertex_R_2(vertex_R(1));
+        Vector const AVec(vertex_R(NVRS_temp) - vertex_R_2); // Vector from vertex 2 to vertex 1 of receiving surface
+        Vector const BVec(vertex_R(2) - vertex_R_2); // Vector from vertex 2 to vertex 3 of receiving surface
 
         Vector const CVec(cross(BVec, AVec)); // Vector perpendicular to surface at vertex 2
 
@@ -2745,9 +2746,9 @@ namespace SolarShading {
 
         if (DOTP > TolValue) {
 
-            auto const vertex_C_2(vertex_C(2));
-            Vector const AVec(vertex_C(1) - vertex_C_2);
-            Vector const BVec(vertex_C(3) - vertex_C_2);
+            auto const vertex_C_2(vertex_C(1));
+            Vector const AVec(vertex_C(NVSS) - vertex_C_2);
+            Vector const BVec(vertex_C(2) - vertex_C_2);
 
             Vector const CVec(cross(BVec, AVec));
 
