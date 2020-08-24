@@ -160,8 +160,9 @@ namespace LowTempRadiantSystem {
         Array1D_string SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFrac;     // Fraction of flow/pipe length or electric power for a particular surface
         Real64 TotalSurfaceArea;         // Total surface area for all surfaces that are part of this radiant system
-        LowTempRadiantControlTypes ControlType; // Control type for the system (MAT, MRT, Op temp, ODB, OWB)
+        LowTempRadiantControlTypes ControlType; // Control type for the system (MAT, MRT, Op temp, ODB, OWB, Surface Face Temp, Surface Interior Temp, Running Mean Temp for Constant Flow systems only)
         LowTempRadiantSetpointTypes SetpointType;   // Setpoint type for the syste, (HalfFlowPower or ZeroFlowPower)
+        int OperatingMode;               // Operating mode currently being used (NotOperating, Heating, Cooling)
         Real64 HeatPower;             // heating sent to panel in Watts
         Real64 HeatEnergy;            // heating sent to panel in Joules
         Real64 runningMeanOutdoorAirTemperatureWeightingFactor; // Weighting factor for running mean outdoor air temperature equation (user input)
@@ -169,13 +170,14 @@ namespace LowTempRadiantSystem {
         Real64 yesterdayRunningMeanOutdoorDryBulbTemperature;    // Running mean outdoor air dry-bulb temperature from yesterday
         Real64 todayAverageOutdoorDryBulbTemperature;            // Average outdoor dry-bulb temperature for today
         Real64 yesterdayAverageOutdoorDryBulbTemperature;        // Average outdoor dry-bulb temperature for yesterday
- 
+
         // Default Constructor
         RadiantSystemBaseData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), ControlType(LowTempRadiantControlTypes::MATControl),
-              SetpointType(LowTempRadiantSetpointTypes::halfFlowPower), runningMeanOutdoorAirTemperatureWeightingFactor(0.8),
-              todayRunningMeanOutdoorDryBulbTemperature(0.0), yesterdayRunningMeanOutdoorDryBulbTemperature(0.0),
-              todayAverageOutdoorDryBulbTemperature(0.0), yesterdayAverageOutdoorDryBulbTemperature(0.0)
+            SetpointType(LowTempRadiantSetpointTypes::halfFlowPower), OperatingMode(NotOperating),
+            runningMeanOutdoorAirTemperatureWeightingFactor(0.8), todayRunningMeanOutdoorDryBulbTemperature(0.0),
+            yesterdayRunningMeanOutdoorDryBulbTemperature(0.0), todayAverageOutdoorDryBulbTemperature(0.0),
+            yesterdayAverageOutdoorDryBulbTemperature(0.0)
         {
         }
 
@@ -203,7 +205,7 @@ namespace LowTempRadiantSystem {
         virtual void updateLowTemperatureRadiantSystem() = 0;
 
         virtual void reportLowTemperatureRadiantSystem() = 0;
-
+        
     };
 
     struct HydronicSystemBaseData : RadiantSystemBaseData
@@ -237,6 +239,12 @@ namespace LowTempRadiantSystem {
         bool CondCausedShutDown;  // .TRUE. when condensation predicted at surface
         int NumCircCalcMethod;    // Calculation method for number of circuits per surface; 1=1 per surface, 2=use cicuit length
         Real64 CircLength;        // Circuit length {m}
+        std::string schedNameChangeoverDelay;   // changeover delay schedule
+        int schedPtrChangeoverDelay;    // Pointer to the schedule for the changeover delay in hours
+        int lastOperatingMode; // Last mode of operation (heating or cooling)
+        int lastDayOfSim;   // Last day of simulation radiant system operated in lastOperatingMode
+        int lastHourOfDay;  // Last hour of the day radiant system operated in lastOperatingMode
+        int lastTimeStep;   // Last time step radiant system operated in lastOperatingMode
         // Other parameters
         bool EMSOverrideOnWaterMdot;
         Real64 EMSWaterMdotOverrideValue;
@@ -254,13 +262,18 @@ namespace LowTempRadiantSystem {
               HeatingSystem(false), HotWaterInNode(0), HotWaterOutNode(0), HWLoopNum(0), HWLoopSide(0),
               HWBranchNum(0), HWCompNum(0),CoolingSystem(false), ColdWaterInNode(0), ColdWaterOutNode(0), CWLoopNum(0), CWLoopSide(0),
               CWBranchNum(0), CWCompNum(0), GlycolIndex(0), CondErrIndex(0), CondCtrlType(1), CondDewPtDeltaT(1.0), CondCausedTimeOff(0.0),
-              CondCausedShutDown(false), NumCircCalcMethod(0), CircLength(0.0), EMSOverrideOnWaterMdot(false), EMSWaterMdotOverrideValue(0.0),
+              CondCausedShutDown(false), NumCircCalcMethod(0), CircLength(0.0), schedPtrChangeoverDelay(0), lastOperatingMode(NotOperating),
+              lastDayOfSim(1), lastHourOfDay(1),lastTimeStep(1), EMSOverrideOnWaterMdot(false), EMSWaterMdotOverrideValue(0.0),
               WaterInletTemp(0.0), WaterOutletTemp(0.0), CoolPower(0.0), CoolEnergy(0.0), OutRangeHiErrorCount(0), OutRangeLoErrorCount(0)
         {
         }
 
-        FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(std::string const userInput);
+        void updateOperatingModeHistory();
         
+        void setOperatingModeBasedOnChangeoverDelay();
+
+        FluidToSlabHeatTransferTypes getFluidToSlabHeatTransferInput(std::string const userInput);
+                
         Real64 calculateHXEffectivenessTerm(int const SurfNum,          // Surface Number
                                             Real64 const Temperature,   // Temperature of water entering the radiant system, in C
                                             Real64 const WaterMassFlow, // Mass flow rate of water in the radiant system, in kg/s
