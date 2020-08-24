@@ -2971,7 +2971,7 @@ namespace WeatherManager {
     }
 
     Real64
-    CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType const ESkyCalcType, Real64 const OSky, Real64 const DryBulb, Real64 const DewPoint, Real64 const RelHum)
+    CalcSkyEmissivity(EnergyPlusData &EP_UNUSED(state), EmissivityCalcType const ESkyCalcType, Real64 const OSky, Real64 const DryBulb, Real64 const DewPoint, Real64 const RelHum)
     {
         // Calculate Sky Emissivity
         // References:
@@ -3878,7 +3878,7 @@ namespace WeatherManager {
 
     //------------------------------------------------------------------------------
 
-    void ASHRAETauModel(EnergyPlusData &state, DesignDaySolarModel const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+    void ASHRAETauModel(EnergyPlusData &EP_UNUSED(state), DesignDaySolarModel const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 const ETR,                       // extraterrestrial normal irradiance, W/m2
                         Real64 const CosZen,                    // COS( solar zenith angle), 0 - 1
                         Real64 const TauB,                      // beam tau factor
@@ -7943,7 +7943,7 @@ namespace WeatherManager {
         }
     }
 
-    void SkipEPlusWFHeader(EnergyPlusData &state, IOFiles &ioFiles)
+    void SkipEPlusWFHeader(EnergyPlusData &EP_UNUSED(state), IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:

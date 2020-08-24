@@ -620,9 +620,9 @@ namespace WeatherManager {
     Real64 AirMass(Real64 CosZen); // COS( solar zenith), 0 - 1
 
     // Calculate sky temperature from weather data
-    Real64 CalcSkyEmissivity(EnergyPlusData &state, EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
+    Real64 CalcSkyEmissivity(EnergyPlusData &EP_UNUSED(state), EmissivityCalcType ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum);
 
-    void ASHRAETauModel(EnergyPlusData &state, DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
+    void ASHRAETauModel(EnergyPlusData &EP_UNUSED(state), DesignDaySolarModel TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 ETR,                       // extraterrestrial normal irradiance, W/m2
                         Real64 CosZen,                    // COS( solar zenith angle), 0 - 1
                         Real64 TauB,                      // beam tau factor
@@ -718,7 +718,7 @@ namespace WeatherManager {
 
     void ProcessEPWHeader(EnergyPlusData &state, IOFiles &ioFiles, std::string const &HeaderString, std::string &Line, bool &ErrorsFound);
 
-    void SkipEPlusWFHeader(EnergyPlusData &state, IOFiles &ioFiles);
+    void SkipEPlusWFHeader(EnergyPlusData &EP_UNUSED(state), IOFiles &ioFiles);
 
     void ReportMissing_RangeData(EnergyPlusData &state);
 
@@ -1153,7 +1153,8 @@ namespace WeatherManager {
 
         // Default Constructor
         WeatherManagerData()
-            : Sigma(5.6697e-8),
+            : GetBranchInputOneTimeFlag(true), GetEnvironmentFirstCall(true), PrntEnvHeaders(true), FirstCall(true), 
+              WaterMainsParameterReport(true), PrintEnvrnStamp(false), Sigma(5.6697e-8),
               YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""), 
               WeatherFileExists(false),
               LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0), 
@@ -1166,12 +1167,10 @@ namespace WeatherManager {
               NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), 
               UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false),
               DaylightSavingIsActive(false), WFAllowsLeapYears(false), 
-              curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0), 
-              NumWPSkyTemperatures(0), GetBranchInputOneTimeFlag(true), GetEnvironmentFirstCall(true), FirstCall(true),
-              PrntEnvHeaders(true), RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), 
-              SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0),
-              NumSPSiteScheduleNamePtrs(0), WaterMainsParameterReport(true),
-              EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), PrintEnvrnStamp(false),
+              curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0), NumWPSkyTemperatures(0),
+              RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), 
+              SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0), 
+              NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), 
               LeapYearAdd(0), DatesShouldBeReset(false), 
               StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
         {
