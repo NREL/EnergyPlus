@@ -2434,7 +2434,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     Tank.Mode = 0;
     Tank.SetPointTemp = 50;
     EXPECT_TRUE(Desuperheater.FirstTimeThroughFlag);
-    Tank.CalcDesuperheaterWaterHeater(FirstHVAC);
+    Tank.CalcDesuperheaterWaterHeater(state, FirstHVAC);
     // FirsttimeThroughFlag attribute supposed to set as false after first run
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     // Advanced to next time step (0 => 1)
@@ -2447,7 +2447,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
     Tank.TankTemp = 20.0; // Assumed Tank temperature from previous iteration
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
-    Tank.CalcDesuperheaterWaterHeater(FirstHVAC);
+    Tank.CalcDesuperheaterWaterHeater(state, FirstHVAC);
     EXPECT_FALSE(Desuperheater.FirstTimeThroughFlag);
     EXPECT_EQ(Node(Desuperheater.WaterInletNode).Temp, 50);
     // Saved temperature not supposed to change
@@ -2461,7 +2461,7 @@ TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
     FirstHVAC = false;
     Tank.TankTemp = 20.0;
     DataHeatBalance::HeatReclaimDXCoil(DXNum).AvailCapacity = 500;
-    Tank.CalcDesuperheaterWaterHeater(FirstHVAC);
+    Tank.CalcDesuperheaterWaterHeater(state, FirstHVAC);
     // Flag changed from false to true
     EXPECT_TRUE(Desuperheater.FirstTimeThroughFlag);
     // Saved temperature not supposed to change
@@ -2482,7 +2482,6 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     using DataPlant::PlantLoop;
     using WaterThermalTanks::WaterHeaterDesuperheater;
     using WaterThermalTanks::WaterThermalTank;
-    using WaterToAirHeatPumpSimple::SimpleWatertoAirHP;
 
     std::string const idf_objects = delimited_string({
         "Schedule:Constant, Hot Water Demand Schedule, , 1.0;",
@@ -2660,9 +2659,9 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Node(3).Temp = 15.0;
     Node(3).MassFlowRate = 0.05;
     // Plant loop must be initialized
-    SimpleWatertoAirHP(HPNum).LoopNum = 1;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum = 1;
     PlantLoop.allocate(LoopNum);
-    PlantLoop(SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
+    PlantLoop(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(HPNum).LoopNum).FluidIndex = 1;
     PlantLoop(LoopNum).LoopSide.allocate(DemandSide);
     PlantLoop(LoopNum).LoopSide.allocate(SupplySide);
     auto &SupplySideloop(PlantLoop(LoopNum).LoopSide(SupplySide));
@@ -2676,13 +2675,13 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 
     DataGlobals::BeginEnvrnFlag = true;
     WaterToAirHeatPumpSimple::InitSimpleWatertoAirHP(state, HPNum, 10.0, 1.0, 0.0, 10.0, 10.0, CyclingScheme, 1.0, 1);
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
     // Coil source side heat successfully passed to HeatReclaimSimple_WAHPCoil(1).AvailCapacity
-    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity, SimpleWatertoAirHP(1).QSource);
+    EXPECT_EQ(DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity, state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource);
     // Reclaimed heat successfully returned to reflect the plant impact
     DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).WaterHeatingDesuperheaterReclaimedHeat(1) = 100.0;
-    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
-    EXPECT_EQ(SimpleWatertoAirHP(1).QSource, DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
+    WaterToAirHeatPumpSimple::CalcHPCoolingSimple(state, HPNum, CyclingScheme, 1.0, 10.0, 10.0, 1, PLR, 1.0);
+    EXPECT_EQ(state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).QSource, DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity - 100.0);
 
     WaterThermalTanks::WaterThermalTankData &Tank = WaterThermalTank(TankNum);
     WaterThermalTanks::WaterHeaterDesuperheaterData &Desuperheater = WaterHeaterDesuperheater(Tank.DesuperheaterNum);
@@ -2710,11 +2709,11 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     TimeStepSys = TimeStepZone;
     SysTimeElapsed = 0.0;
     DataHeatBalance::HeatReclaimSimple_WAHPCoil(1).AvailCapacity = 1000;
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.0;
     Tank.initialize(state, true);
     Tank.SetPointTemp = 45;
     Tank.SetPointTemp2 = 45;
-    Tank.CalcDesuperheaterWaterHeater(true);
+    Tank.CalcDesuperheaterWaterHeater(state, true);
     // If there's no demand in water thermal tank, no heat is reclaimed
     EXPECT_EQ(Desuperheater.HeaterRate, 0);
 
@@ -2729,10 +2728,10 @@ TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     Tank.SourceMassFlowRate = 0.003;
     Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
 
-    WaterToAirHeatPumpSimple::SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
+    state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(1).PartLoadRatio = 0.8;
     Tank.initialize(state, false);
     Desuperheater.SaveMode = 1;
-    Tank.CalcDesuperheaterWaterHeater(false);
+    Tank.CalcDesuperheaterWaterHeater(state, false);
     // The HVAC part load ratio is successfully passed to waterthermaltank desuperheater data struct
     EXPECT_EQ(Desuperheater.DXSysPLR, 0.8);
     // The heater rate is correctly calculated
@@ -3096,7 +3095,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Tank.Mode = 0;
     Tank.SetPointTemp = 40.0;
     Desuperheater.FirstTimeThroughFlag = true;
-    Tank.CalcDesuperheaterWaterHeater(true);
+    Tank.CalcDesuperheaterWaterHeater(state, true);
 
     EXPECT_EQ(Desuperheater.DXSysPLR, DXCoil(DXNum).PartLoadRatio);
     // if desuperheater was not on through all the timestep, part load ratio is searched to meet load demand
@@ -3114,7 +3113,7 @@ TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
     Node(Desuperheater.WaterInletNode).Temp = Tank.SavedSourceOutletTemp;
     Tank.SourceMassFlowRate = 0.003;
     DXCoils::CalcMultiSpeedDXCoilCooling(DXNum, 1, 1, 2, 1, 1, 1);
-    Tank.CalcDesuperheaterWaterHeater(false);
+    Tank.CalcDesuperheaterWaterHeater(state, false);
     EXPECT_EQ(Desuperheater.Mode, 0);
     EXPECT_EQ(Desuperheater.HeaterRate, 0.0);
     EXPECT_EQ(Tank.SourceRate, 0.0);
@@ -3742,7 +3741,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     // first tank heat reclaim
     // Call desuperheater calculation function
-    Tank1.CalcDesuperheaterWaterHeater(FirstHVAC);
+    Tank1.CalcDesuperheaterWaterHeater(state, FirstHVAC);
     // Reclaim efficiency applied correctly
     EXPECT_EQ(Desuperheater1.HeaterRate, 500 * 0.1);
     // Results stored in ata structs
@@ -3753,7 +3752,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     EXPECT_NEAR(Tank1.SourceRate, Desuperheater1.HeaterRate, Tank1.SourceRate * 0.05);
 
     // Call desuperheater calculation function
-    Tank2.CalcDesuperheaterWaterHeater(FirstHVAC);
+    Tank2.CalcDesuperheaterWaterHeater(state, FirstHVAC);
     // Reclaim efficiency applied correctly
     EXPECT_EQ(Desuperheater2.HeaterRate, 500 * 0.15);
     // Results stored in ata structs

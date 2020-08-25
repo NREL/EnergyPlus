@@ -4150,7 +4150,7 @@ namespace UnitarySystems {
                             errFlag = false;
                         }
 
-                        thisSys.m_HeatingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                        thisSys.m_HeatingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                         if (thisSys.m_HeatingCoilIndex == 0) {
                             ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                             ShowContinueError("Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
@@ -4169,7 +4169,7 @@ namespace UnitarySystems {
                         // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
                         errFlag = false;
                         thisSys.m_MaxHeatAirVolFlow =
-                            WaterToAirHeatPumpSimple::GetCoilAirFlowRate(loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                            WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                         if (thisSys.m_MaxHeatAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -5115,7 +5115,7 @@ namespace UnitarySystems {
                                 errFlag = false;
                             }
 
-                            thisSys.m_CoolingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                            thisSys.m_CoolingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (thisSys.m_CoolingCoilIndex == 0) {
                                 ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                                 ShowContinueError("Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
@@ -5134,7 +5134,7 @@ namespace UnitarySystems {
                             // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
                             errFlag = false;
                             thisSys.m_MaxCoolAirVolFlow =
-                                WaterToAirHeatPumpSimple::GetCoilAirFlowRate(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                                WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -5373,7 +5373,7 @@ namespace UnitarySystems {
                 if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple &&
                     thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
                     thisSys.m_WaterCyclingMode = DataHVACGlobals::WaterCycling;
-                    WaterToAirHeatPumpSimple::SetSimpleWSHPData(
+                    WaterToAirHeatPumpSimple::SetSimpleWSHPData(state, 
                         thisSys.m_CoolingCoilIndex, errorsFound, thisSys.m_WaterCyclingMode, _, thisSys.m_HeatingCoilIndex);
                 }
 

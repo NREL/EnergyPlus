@@ -614,7 +614,6 @@ namespace PackagedTerminalHeatPump {
         using VariableSpeedCoils::GetCoilOutletNodeVariableSpeed;
         using VariableSpeedCoils::GetVSCoilCondenserInletNode;
         using VariableSpeedCoils::SetVarSpeedCoilData;
-        using WaterToAirHeatPumpSimple::SetSimpleWSHPData;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetPTUnit: "); // include trailing blank space
@@ -2559,7 +2558,7 @@ namespace PackagedTerminalHeatPump {
                 } else {
                     errFlag = false;
                     PTUnit(PTUnitNum).DXHeatCoilIndexNum =
-                        GetWtoAHPSimpleCoilIndex(PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, errFlag);
+                        GetWtoAHPSimpleCoilIndex(state, PTUnit(PTUnitNum).DXHeatCoilType, PTUnit(PTUnitNum).DXHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                         ErrorsFound = true;
@@ -2606,7 +2605,7 @@ namespace PackagedTerminalHeatPump {
                 } else {
                     errFlag = false;
                     PTUnit(PTUnitNum).DXCoolCoilIndexNum =
-                        GetWtoAHPSimpleCoilIndex(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
+                        GetWtoAHPSimpleCoilIndex(state, PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                         ErrorsFound = true;
@@ -2660,7 +2659,7 @@ namespace PackagedTerminalHeatPump {
             // end get water flow mode info
             if (Alphas(9) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" && Alphas(11) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
                 if (PTUnit(PTUnitNum).DXHeatCoilIndexNum > 0 && PTUnit(PTUnitNum).DXCoolCoilIndexNum > 0) {
-                    SetSimpleWSHPData(PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                    WaterToAirHeatPumpSimple::SetSimpleWSHPData(state, PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                       ErrorsFound,
                                       PTUnit(PTUnitNum).WaterCyclingMode,
                                       _,

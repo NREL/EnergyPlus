@@ -419,7 +419,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     WaterManager::clear_state();
     WaterThermalTanks::clear_state();
     WaterToAirHeatPump::clear_state();
-    WaterToAirHeatPumpSimple::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

@@ -355,7 +355,7 @@ namespace WaterThermalTanks {
                 this->CalcWaterThermalTankStratified();
             }
         } else if (this->DesuperheaterNum > 0) {
-            this->CalcDesuperheaterWaterHeater(FirstHVACIteration);
+            this->CalcDesuperheaterWaterHeater(state, FirstHVACIteration);
         }
         this->UpdateWaterThermalTank();
         this->ReportWaterThermalTank();
@@ -987,7 +987,7 @@ namespace WaterThermalTanks {
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
                 WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::AirWaterHeatPumpEQ;
                 WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum =
-                    WaterToAirHeatPumpSimple::GetCoilIndex(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
+                    WaterToAirHeatPumpSimple::GetCoilIndex(state, DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
                 if (allocated(DataHeatBalance::HeatReclaimSimple_WAHPCoil)) {
                     DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                         DataHeatBalance::HeatReclaimSimple_WAHPCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
@@ -8010,7 +8010,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::CalcDesuperheaterWaterHeater(bool const FirstHVACIteration)
+    void WaterThermalTankData::CalcDesuperheaterWaterHeater(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8170,7 +8170,7 @@ namespace WaterThermalTanks {
             } else if (DesupHtr.ReclaimHeatingSource == CoilObjEnum::AirWaterHeatPumpEQ) {
                 AverageWasteHeat = DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).AvailCapacity -
                                    DataHeatBalance::HeatReclaimSimple_WAHPCoil(SourceID).HVACDesuperheaterReclaimedHeatTotal;
-                DesupHtr.DXSysPLR = WaterToAirHeatPumpSimple::SimpleWatertoAirHP(SourceID).PartLoadRatio;
+                DesupHtr.DXSysPLR = state.dataWaterToAirHeatPumpSimple->SimpleWatertoAirHP(SourceID).PartLoadRatio;
             }
         } else {
             AverageWasteHeat = 0.0;

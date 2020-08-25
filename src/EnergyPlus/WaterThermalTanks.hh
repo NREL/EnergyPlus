@@ -764,7 +764,7 @@ namespace WaterThermalTanks {
                                                             Real64 &Qsource // steady state heat transfer rate from a constant source side flow
         );
 
-        void CalcDesuperheaterWaterHeater(bool FirstHVACIteration);
+        void CalcDesuperheaterWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
         Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                            Array1D<Real64> const &Par // par(1) = HP set point temperature [C]

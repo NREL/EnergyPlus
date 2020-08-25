@@ -3869,7 +3869,7 @@ namespace Furnaces {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else {
-                    Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPSimpleCoilIndex(HeatingCoilType, HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPSimpleCoilIndex(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilInletNode = GetWtoAHPSimpleCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                     HeatingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
@@ -3915,7 +3915,7 @@ namespace Furnaces {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 } else {
-                    Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPSimpleCoilIndex(CoolingCoilType, CoolingCoilName, errFlag);
+                    Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPSimpleCoilIndex(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilInletNode = GetWtoAHPSimpleCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     CoolingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                 }
@@ -3957,7 +3957,7 @@ namespace Furnaces {
             // end get water flow mode info
             if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" && Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
                 Furnace(FurnaceNum).WatertoAirHPType = WatertoAir_Simple;
-                SetSimpleWSHPData(
+                SetSimpleWSHPData(state,
                     Furnace(FurnaceNum).CoolingCoilIndex, ErrorsFound, Furnace(FurnaceNum).WaterCyclingMode, _, Furnace(FurnaceNum).HeatingCoilIndex);
             } else if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" &&
                        Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION") {
@@ -4347,8 +4347,8 @@ namespace Furnaces {
                 // simple HP model air flow rate input will not be used.
             } else if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple) {
                 errFlag = false;
-                Furnace(FurnaceNum).MaxHeatAirVolFlow = GetWtoAHPSimpleCoilAirFlow(HeatingCoilType, HeatingCoilName, errFlag);
-                Furnace(FurnaceNum).MaxCoolAirVolFlow = GetWtoAHPSimpleCoilAirFlow(CoolingCoilType, CoolingCoilName, errFlag);
+                Furnace(FurnaceNum).MaxHeatAirVolFlow = GetWtoAHPSimpleCoilAirFlow(state, HeatingCoilType, HeatingCoilName, errFlag);
+                Furnace(FurnaceNum).MaxCoolAirVolFlow = GetWtoAHPSimpleCoilAirFlow(state, CoolingCoilType, CoolingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
