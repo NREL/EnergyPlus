@@ -5042,12 +5042,7 @@ namespace WaterThermalTanks {
         SetupOutputVariable("Water Heater Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction, "System", "Average", this->Name);
         SetupOutputVariable("Water Heater Part Load Ratio", OutputProcessor::Unit::None, this->PartLoadRatio, "System", "Average", this->Name);
 
-        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
-            SetupOutputVariable("Water Heater Electricity Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
-        } else {
-            SetupOutputVariable(
-                "Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
-        }
+        SetupOutputVariable("Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
         SetupOutputVariable("Water Heater " + this->FuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelEnergy,
@@ -5059,21 +5054,13 @@ namespace WaterThermalTanks {
                             "DHW",
                             this->EndUseSubcategoryName,
                             "Plant");
-        if (UtilityRoutines::SameString(this->OffCycParaFuelType, "Electricity")) {
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Rate",
-                                OutputProcessor::Unit::W,
-                                this->OffCycParaFuelRate,
-                                "System",
-                                "Average",
-                                this->Name);
-        } else {
-            SetupOutputVariable("Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Rate",
-                                OutputProcessor::Unit::W,
-                                this->OffCycParaFuelRate,
-                                "System",
-                                "Average",
-                                this->Name);
-        }
+        
+        SetupOutputVariable("Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->OffCycParaFuelRate,
+                            "System",
+                            "Average",
+                            this->Name);
         SetupOutputVariable("Water Heater Off Cycle Parasitic " + this->OffCycParaFuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->OffCycParaFuelEnergy,
@@ -5085,18 +5072,13 @@ namespace WaterThermalTanks {
                             "DHW",
                             this->EndUseSubcategoryName,
                             "Plant");
-        if (UtilityRoutines::SameString(this->OnCycParaFuelType, "Electricity")) {
-            SetupOutputVariable(
-                "Water Heater On Cycle Parasitic Electricity Rate", OutputProcessor::Unit::W, this->OnCycParaFuelRate, "System", "Average", this->Name);
-        } else {
-            SetupOutputVariable("Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Rate",
-                                OutputProcessor::Unit::W,
-                                this->OnCycParaFuelRate,
-                                "System",
-                                "Average",
-                                this->Name);
-        }
 
+        SetupOutputVariable("Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->OnCycParaFuelRate,
+                            "System",
+                            "Average",
+                            this->Name);
         SetupOutputVariable("Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Energy",
                             OutputProcessor::Unit::J,
                             this->OnCycParaFuelEnergy,

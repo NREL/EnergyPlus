@@ -4715,80 +4715,40 @@ namespace HVACVariableRefrigerantFlow {
                                 "System",
                                 "Average",
                                 VRF(NumCond).Name);
-            if (VRF(NumCond).FuelType == FuelTypeElectric) {
-                SetupOutputVariable("VRF Heat Pump Cooling Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    VRF(NumCond).ElecCoolingPower,
-                                    "System",
-                                    "Average",
-                                    VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Cooling Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    VRF(NumCond).CoolElecConsumption,
-                                    "System",
-                                    "Sum",
-                                    VRF(NumCond).Name,
-                                    _,
-                                    cValidFuelTypes(VRF(NumCond).FuelType),
-                                    "COOLING",
-                                    _,
-                                    "System");
-            } else {
-                SetupOutputVariable("VRF Heat Pump Cooling " + cValidFuelTypes(VRF(NumCond).FuelType) + " Rate",
-                                    OutputProcessor::Unit::W,
-                                    VRF(NumCond).ElecCoolingPower,
-                                    "System",
-                                    "Average",
-                                    VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Cooling " + cValidFuelTypes(VRF(NumCond).FuelType) + " Energy",
-                                    OutputProcessor::Unit::J,
-                                    VRF(NumCond).CoolElecConsumption,
-                                    "System",
-                                    "Sum",
-                                    VRF(NumCond).Name,
-                                    _,
-                                    cValidFuelTypes(VRF(NumCond).FuelType),
-                                    "COOLING",
-                                    _,
-                                    "System");
-            }
-            if (VRF(NumCond).FuelType == FuelTypeElectric) {
-                SetupOutputVariable("VRF Heat Pump Heating Electricity Rate",
-                                    OutputProcessor::Unit::W,
-                                    VRF(NumCond).ElecHeatingPower,
-                                    "System",
-                                    "Average",
-                                    VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Heating Electricity Energy",
-                                    OutputProcessor::Unit::J,
-                                    VRF(NumCond).HeatElecConsumption,
-                                    "System",
-                                    "Sum",
-                                    VRF(NumCond).Name,
-                                    _,
-                                    cValidFuelTypes(VRF(NumCond).FuelType),
-                                    "HEATING",
-                                    _,
-                                    "System");
-            } else {
-                SetupOutputVariable("VRF Heat Pump Heating " + cValidFuelTypes(VRF(NumCond).FuelType) + " Rate",
-                                    OutputProcessor::Unit::W,
-                                    VRF(NumCond).ElecHeatingPower,
-                                    "System",
-                                    "Average",
-                                    VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Heating " + cValidFuelTypes(VRF(NumCond).FuelType) + " Energy",
-                                    OutputProcessor::Unit::J,
-                                    VRF(NumCond).HeatElecConsumption,
-                                    "System",
-                                    "Sum",
-                                    VRF(NumCond).Name,
-                                    _,
-                                    cValidFuelTypes(VRF(NumCond).FuelType),
-                                    "HEATING",
-                                    _,
-                                    "System");
-            }
+            SetupOutputVariable("VRF Heat Pump Cooling " + cValidFuelTypes(VRF(NumCond).FuelType) + " Rate",
+                                OutputProcessor::Unit::W,
+                                VRF(NumCond).ElecCoolingPower,
+                                "System",
+                                "Average",
+                                VRF(NumCond).Name);
+            SetupOutputVariable("VRF Heat Pump Cooling " + cValidFuelTypes(VRF(NumCond).FuelType) + " Energy",
+                                OutputProcessor::Unit::J,
+                                VRF(NumCond).CoolElecConsumption,
+                                "System",
+                                "Sum",
+                                VRF(NumCond).Name,
+                                _,
+                                cValidFuelTypes(VRF(NumCond).FuelType),
+                                "COOLING",
+                                _,
+                                "System");
+            SetupOutputVariable("VRF Heat Pump Heating " + cValidFuelTypes(VRF(NumCond).FuelType) + " Rate",
+                                OutputProcessor::Unit::W,
+                                VRF(NumCond).ElecHeatingPower,
+                                "System",
+                                "Average",
+                                VRF(NumCond).Name);
+            SetupOutputVariable("VRF Heat Pump Heating " + cValidFuelTypes(VRF(NumCond).FuelType) + " Energy",
+                                OutputProcessor::Unit::J,
+                                VRF(NumCond).HeatElecConsumption,
+                                "System",
+                                "Sum",
+                                VRF(NumCond).Name,
+                                _,
+                                cValidFuelTypes(VRF(NumCond).FuelType),
+                                "HEATING",
+                                _,
+                                "System");
 
             SetupOutputVariable(
                 "VRF Heat Pump Cooling COP", OutputProcessor::Unit::None, VRF(NumCond).OperatingCoolingCOP, "System", "Average", VRF(NumCond).Name);
