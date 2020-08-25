@@ -467,7 +467,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = FuelTypeElectricity;
+    Coil.FuelType = "Electricity";
     Coil.RegionNum = 4;
     Coil.MSRatedTotCap(1) = 2202.5268975202675;
     Coil.MSRatedCOP(1) = 4.200635910578916;
@@ -825,7 +825,7 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = FuelTypeElectricity;
+    Coil.FuelType = "Electricity";
     Coil.RegionNum = 4;
 
     NumCurves = 5;
@@ -1318,7 +1318,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 1 test
     GetDXCoils(state);
 
-    EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType); // it also covers a test for fuel type input
+    EXPECT_EQ("Electricity", DXCoil(1).FuelType); // it also covers a test for fuel type input
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
     
     // Test calculations of the waste heat function #5162
