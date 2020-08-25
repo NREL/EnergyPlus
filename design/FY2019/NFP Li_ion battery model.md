@@ -2,7 +2,6 @@
 **Rohit Chintala**
 **Ben Polly**
 **Noel Merket**
-**Xin Jin**
 - Original Date: July 2019
 
 # Introduction
@@ -84,7 +83,25 @@ The System Advisor Model (SAM) already has a battery module based on the models 
 
 https://github.com/nrel/ssc
 
-The electrical storage model in EnergyPlus is present in the file ElectricPowerServiceManager.cc. The storage model in this file currently has just two cases corresponding to the simple battery model (simpleBucketStorage) and the Kinetic Battery Model (kiBaMBattery). A third case needs to be added to model Li-ion batteries (LiIonBattery) by importing the relevant libraries from the 'third\_party' folder. 
+The following liabraries from the SAM repository would be imported into EnergyPlus. 
+1.	cmod_battery.h
+2.	common.h 
+3.	core.h
+4.	lib_battery.h
+5.	lib_battery_dispatch.h
+6.	lib_battery_powerflow.h
+7.	lib_power_electronics.h
+8.	lib_resilience.h
+9.	lib_shared_inverter.h
+10.	lib_time.h
+11.	lib_util.h
+12.	lib_utility_rate.h
+13.	lib_weatherfile.h
+14.	6par_newton.h
+
+A new class lifetime_calendar_t::runLithiumIonLifetimeModel has been programmed in the lib_battery module of SAM to model the capacity degradation of a lithium-ion battery based on the model described above by Smith et.al. [4]. The model outputs the updated capacity of the battery at every timestep taking into consideration the cycling history, state of charge, depth of discharge, and the ambient temperature to which the battery is exposed.  
+
+The electrical storage model in EnergyPlus is present in the file ElectricPowerServiceManager.cc. The storage model in this file currently has just two cases corresponding to the simple battery model (simpleBucketStorage) and the Kinetic Battery Model (kiBaMBattery). By importing the aforementioned liabraries from SAM, a more detailed and accurate capacity degaradation model for Lithium ion can be incorporated into EnergyPlus.  
 
 # Inputs and Outputs
 The inputs and outputs that would be required to incorporate the Li-ion battery performance and lifetime degradation models are shown below. 
