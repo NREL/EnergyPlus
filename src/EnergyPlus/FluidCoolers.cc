@@ -407,15 +407,15 @@ namespace FluidCoolers {
         SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
         SetupOutputVariable("Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
         SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-        SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
-        SetupOutputVariable("Cooling Tower Fan Electric Energy",
+        SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->FanEnergy,
                             "System",
                             "Sum",
                             this->Name,
                             _,
-                            "Electric",
+                            "Electricity",
                             "HeatRejection",
                             _,
                             "Plant");

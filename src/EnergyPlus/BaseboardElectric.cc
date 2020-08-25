@@ -349,19 +349,19 @@ namespace BaseboardElectric {
                                 "Average",
                                 thisBaseboard.EquipName);
 
-            SetupOutputVariable("Baseboard Electric Energy",
+            SetupOutputVariable("Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 thisBaseboard.ElecUseLoad,
                                 "System",
                                 "Sum",
                                 thisBaseboard.EquipName,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "HEATING",
                                 _,
                                 "System");
 
-            SetupOutputVariable("Baseboard Electric Power",
+            SetupOutputVariable("Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 thisBaseboard.ElecUseRate,
                                 "System",

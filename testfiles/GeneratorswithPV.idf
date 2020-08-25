@@ -1108,13 +1108,13 @@
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
-  Output:Variable,*,Generator Produced DC Electric Power,hourly;
+  Output:Variable,*,Generator Produced DC Electricity Rate,hourly;
 
-  Output:Variable,*,Generator Produced DC Electric Energy,hourly;
+  Output:Variable,*,Generator Produced DC Electricity Energy,hourly;
 
-  Output:Variable,*,Inverter AC Output Electric Energy,hourly;
+  Output:Variable,*,Inverter AC Output Electricity Energy,hourly;
 
-  Output:Variable,*,Inverter AC Output Electric Power,hourly;
+  Output:Variable,*,Inverter AC Output Electricity Rate,hourly;
 
   Output:Variable,*,Generator PV Array Efficiency,hourly;
 

@@ -5052,7 +5052,7 @@
 !    Report Variable, *, Tower Water Inlet Temp, hourly;
 !    Report Variable, *, Tower Water Outlet Temp, hourly;
 !    Report Variable, *, Tower Heat Transfer, hourly;
-!    Report Variable, *, Tower Fan Electric Power, hourly;
+!    Report Variable, *, Tower Fan Electricity Rate, hourly;
 
   Sizing:Plant,
     Boiler Plant,            !- Plant or Condenser Loop Name
@@ -7160,7 +7160,7 @@
 
   UtilityCost:Tariff,
     FL_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -7785,7 +7785,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
@@ -7805,9 +7805,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -7830,10 +7830,10 @@
     3,                       !- Digits After Decimal
     Cooling:Electricity,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,             !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
-  Output:Variable,*,Pump Electric Power,hourly;
+  Output:Variable,*,Pump Electricity Rate,hourly;
 
   Output:Variable,*,Pump Outlet Temperature,hourly;
 

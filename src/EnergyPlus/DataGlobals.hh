@@ -138,12 +138,13 @@ namespace DataGlobals {
     extern int const emsCallFromEndZoneTimestepAfterZoneReporting;    // Identity where EMS called from
     extern int const emsCallFromSetupSimulation;                      // identify where EMS called from,
     // this is for input processing only
-    extern int const emsCallFromExternalInterface;         // Identity where EMS called from
-    extern int const emsCallFromComponentGetInput;         // EMS called from end of get input for a component
-    extern int const emsCallFromUserDefinedComponentModel; // EMS called from inside a custom user component model
-    extern int const emsCallFromUnitarySystemSizing;       // EMS called from unitary system compound component
-    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance; // Identity where EMS called from
-    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance; // Identity where EMS called from
+    extern int const emsCallFromExternalInterface;                        // Identity where EMS called from
+    extern int const emsCallFromComponentGetInput;                        // EMS called from end of get input for a component
+    extern int const emsCallFromUserDefinedComponentModel;                // EMS called from inside a custom user component model
+    extern int const emsCallFromUnitarySystemSizing;                      // EMS called from unitary system compound component
+    extern int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance;   // Identity where EMS called from
+    extern int const emsCallFromBeginZoneTimestepAfterInitHeatBalance;    // Identity where EMS called from
+    extern int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather; // Identity where EMS called from
 
     extern int const ScheduleAlwaysOn; // Value when passed to schedule routines gives back 1.0 (on)
 
@@ -235,9 +236,9 @@ namespace DataGlobals {
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
     // these are the new ones
-    extern void (*progressCallback)(int const);
-    extern void (*messageCallback)(const char * message);
-    extern void (*errorCallback)(const char * errorMessage);
+    extern std::function<void(int const)> progressCallback;
+    extern std::function<void(const std::string &)> messageCallback;
+    extern std::function<void(EnergyPlus::Error, const std::string &)> errorCallback;
     extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
 
     // Clears the global data in DataGlobals.

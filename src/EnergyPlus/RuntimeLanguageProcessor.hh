@@ -119,6 +119,8 @@ namespace RuntimeLanguageProcessor {
     extern int DayOfWeekVariableNum;
     extern int DayOfYearVariableNum;
     extern int HourVariableNum;
+    extern int TimeStepsPerHourVariableNum;
+    extern int TimeStepNumVariableNum;
     extern int MinuteVariableNum;
     extern int HolidayVariableNum;
     extern int DSTVariableNum;
@@ -214,6 +216,16 @@ namespace RuntimeLanguageProcessor {
     int NewExpression();
 
     ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
 
     void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
 
