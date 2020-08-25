@@ -156,11 +156,6 @@ namespace HVACVariableRefrigerantFlow {
     int const VRF_HeatPump(1);
     Array1D_string const cVRFTypes(NumVRFSystemTypes, std::string("AirConditioner:VariableRefrigerantFlow"));
 
-    int const NumValidFuelTypes(9);
-    Array1D_string const
-        cValidFuelTypes(NumValidFuelTypes,
-                        {"Electricity", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
-
     static std::string const fluidNameSteam("STEAM");
 
     // VRF Algorithm Type
@@ -175,17 +170,6 @@ namespace HVACVariableRefrigerantFlow {
     int const ModeCoolingOnly(1);       // Flag for Cooling Only Mode [-]
     int const ModeHeatingOnly(2);       // Flag for Heating Only Mode [-]
     int const ModeCoolingAndHeating(3); // Flag for Simultaneous Cooling and Heating Only Mode [-]
-
-    // Fuel Types
-    int const FuelTypeElectric(1);   // Fuel type for electricity
-    int const FuelTypeNaturalGas(2); // Fuel type for natural gas
-    int const FuelTypePropaneGas(3); // Fuel type for propane gas
-    int const FuelTypeDiesel(4);     // Fuel type for diesel
-    int const FuelTypeGasoline(5);   // Fuel type for gasoline
-    int const FuelTypeFuelOil1(6);   // Fuel type for fuel oil #1
-    int const FuelTypeFuelOil2(7);   // Fuel type for fuel oil #2
-    int const FuelTypeOtherFuel1(8); // Fuel type for other fuel #1
-    int const FuelTypeOtherFuel2(9); // Fuel type for other fuel #2
 
     static std::string const BlankString;
 
@@ -2335,11 +2319,11 @@ namespace HVACVariableRefrigerantFlow {
                 }
             }
 
-            VRF(VRFNum).FuelType = FuelTypeElectric;
+            VRF(VRFNum).FuelType = "Electricity";
             if (!lAlphaFieldBlanks(39)) {
                 // A39; \field Fuel type, Validate fuel type input
                 bool FuelTypeError(false);
-                UtilityRoutines::ValidateFuelTypeWithFuelTypeNum(cAlphaArgs(39), VRF(VRFNum).FuelType, FuelTypeError);
+                UtilityRoutines::ValidateFuelType(cAlphaArgs(39), VRF(VRFNum).FuelType, FuelTypeError);
                 if (FuelTypeError) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
@@ -2466,7 +2450,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).Name = cAlphaArgs(1);
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
-            VRF(VRFNum).FuelType = FuelTypeElectric;
+            VRF(VRFNum).FuelType = "Electricity";
 
             if (lAlphaFieldBlanks(2)) {
                 VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
@@ -2828,7 +2812,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).HeatRecoveryUsed = true;
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
-            VRF(VRFNum).FuelType = FuelTypeElectric;
+            VRF(VRFNum).FuelType = "Electricity";
 
             if (lAlphaFieldBlanks(2)) {
                 VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
@@ -4715,37 +4699,37 @@ namespace HVACVariableRefrigerantFlow {
                                 "System",
                                 "Average",
                                 VRF(NumCond).Name);
-            SetupOutputVariable("VRF Heat Pump Cooling " + cValidFuelTypes(VRF(NumCond).FuelType) + " Rate",
+            SetupOutputVariable("VRF Heat Pump Cooling " + VRF(NumCond).FuelType + " Rate",
                                 OutputProcessor::Unit::W,
                                 VRF(NumCond).ElecCoolingPower,
                                 "System",
                                 "Average",
                                 VRF(NumCond).Name);
-            SetupOutputVariable("VRF Heat Pump Cooling " + cValidFuelTypes(VRF(NumCond).FuelType) + " Energy",
+            SetupOutputVariable("VRF Heat Pump Cooling " + VRF(NumCond).FuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 VRF(NumCond).CoolElecConsumption,
                                 "System",
                                 "Sum",
                                 VRF(NumCond).Name,
                                 _,
-                                cValidFuelTypes(VRF(NumCond).FuelType),
+                                VRF(NumCond).FuelType,
                                 "COOLING",
                                 _,
                                 "System");
-            SetupOutputVariable("VRF Heat Pump Heating " + cValidFuelTypes(VRF(NumCond).FuelType) + " Rate",
+            SetupOutputVariable("VRF Heat Pump Heating " + VRF(NumCond).FuelType + " Rate",
                                 OutputProcessor::Unit::W,
                                 VRF(NumCond).ElecHeatingPower,
                                 "System",
                                 "Average",
                                 VRF(NumCond).Name);
-            SetupOutputVariable("VRF Heat Pump Heating " + cValidFuelTypes(VRF(NumCond).FuelType) + " Energy",
+            SetupOutputVariable("VRF Heat Pump Heating " + VRF(NumCond).FuelType + " Energy",
                                 OutputProcessor::Unit::J,
                                 VRF(NumCond).HeatElecConsumption,
                                 "System",
                                 "Sum",
                                 VRF(NumCond).Name,
                                 _,
-                                cValidFuelTypes(VRF(NumCond).FuelType),
+                                VRF(NumCond).FuelType,
                                 "HEATING",
                                 _,
                                 "System");
@@ -4850,7 +4834,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             if (VRF(NumCond).DefrostStrategy == Resistive ||
-                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelType == FuelTypeElectric)) {
+                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelType == "Electricity")) {
                 SetupOutputVariable("VRF Heat Pump Defrost Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).DefrostPower,
@@ -4869,20 +4853,20 @@ namespace HVACVariableRefrigerantFlow {
                                     _,
                                     "System");
             } else { // defrost energy applied to fuel type
-                SetupOutputVariable("VRF Heat Pump Defrost " + cValidFuelTypes(VRF(NumCond).FuelType) + " Rate",
+                SetupOutputVariable("VRF Heat Pump Defrost " + VRF(NumCond).FuelType + " Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).DefrostPower,
                                     "System",
                                     "Average",
                                     VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Defrost " + cValidFuelTypes(VRF(NumCond).FuelType) + " Energy",
+                SetupOutputVariable("VRF Heat Pump Defrost " + VRF(NumCond).FuelType + " Energy",
                                     OutputProcessor::Unit::J,
                                     VRF(NumCond).DefrostConsumption,
                                     "System",
                                     "Sum",
                                     VRF(NumCond).Name,
                                     _,
-                                    cValidFuelTypes(VRF(NumCond).FuelType),
+                                    VRF(NumCond).FuelType,
                                     "HEATING",
                                     _,
                                     "System");
