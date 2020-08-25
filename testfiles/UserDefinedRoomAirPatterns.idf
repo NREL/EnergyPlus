@@ -719,7 +719,7 @@
 
   UtilityCost:Tariff,
     IA_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -10685,7 +10685,7 @@
 !    Report Variable, *, Tower Water Inlet Temp, hourly;
 !    Report Variable, *, Tower Water Outlet Temp, hourly;
 !    Report Variable, *, Tower Heat Transfer, hourly;
-!    Report Variable, *, Tower Fan Electric Power, hourly;
+!    Report Variable, *, Tower Fan Electricity Rate, hourly;
 
   Sizing:Plant,
     Boiler Plant,            !- Plant or Condenser Loop Name

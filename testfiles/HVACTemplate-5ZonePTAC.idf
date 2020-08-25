@@ -1996,7 +1996,7 @@
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Total Heating Rate,hourly;
 
@@ -2010,7 +2010,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Latent Cooling Rate,hourly;
 
-  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electric Power,hourly;
+  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electricity Rate,hourly;
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio,hourly;
 
@@ -2018,15 +2018,15 @@
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
   Output:Variable,*,Heating Coil Runtime Fraction,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:VariableDictionary,Regular;
 
@@ -2044,9 +2044,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2058,9 +2058,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

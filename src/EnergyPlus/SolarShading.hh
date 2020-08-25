@@ -50,6 +50,7 @@
 
 // C++ Headers
 #include <fstream>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array2D.hh>
@@ -136,7 +137,7 @@ namespace SolarShading {
     extern int ShadowingCalcFrequency; // Frequency for Shadowing Calculations
     extern int ShadowingDaysLeft;      // Days left in current shadowing period
     extern bool debugging;
-    extern std::ofstream shd_stream; // Shading file stream
+    extern std::unique_ptr<std::iostream> os; // Shading file stream
     extern Array1D_int HCNS;         // Surface number of back surface HC figures
     extern Array1D_int HCNV;         // Number of vertices of each HC figure
     extern Array2D<Int64> HCA;       // 'A' homogeneous coordinates of sides

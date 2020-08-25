@@ -6,7 +6,7 @@ Zone Air Humidity Ratio
 Zone Air System Sensible Cooling Rate
 Zone Air System Sensible Heating Rate
 Heating Coil Heating Rate
-Cooling Coil Electric Power
+Cooling Coil Electricity Rate
 Coil System Part Load Ratio
 Air Loop Outlet Node,System Node Mass Flow Rate
 Air Loop Inlet Node,System Node Temperature

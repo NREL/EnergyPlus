@@ -2358,7 +2358,7 @@
 
   Output:Variable,*,Humidifier Water Volume Flow Rate,hourly;
 
-  Output:Variable,*,Humidifier Electric Power,hourly;
+  Output:Variable,*,Humidifier Electricity Rate,hourly;
 
   Output:Variable,Zone 1 Node,System Node Mass Flow Rate,hourly;
 
