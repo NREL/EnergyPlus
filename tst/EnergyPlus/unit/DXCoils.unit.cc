@@ -1324,7 +1324,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
-    DXCoil(1).FuelType = FuelTypeNaturalGas;
+    DXCoil(1).FuelType = "NaturalGas";
     DXCoil(1).MSHPHeatRecActive = false;
 
     OutDryBulbTemp = 35;

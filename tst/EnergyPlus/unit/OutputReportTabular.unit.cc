@@ -3751,7 +3751,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatEmissionReport)
     DXCoils::DXCoil.allocate(2);
     DXCoils::DXCoil(1).DXCoilType_Num = DataHVACGlobals::CoilDX_MultiSpeedCooling;
     DXCoils::DXCoil(1).CondenserType(1) = DataHVACGlobals::AirCooled;
-    DXCoils::DXCoil(1).FuelType = DXCoils::FuelTypeNaturalGas;
+    DXCoils::DXCoil(1).FuelType = "NaturalGas";
     DXCoils::DXCoil(1).ElecCoolingConsumption = 100.0;
     DXCoils::DXCoil(1).TotalCoolingEnergy = 100.0;
     DXCoils::DXCoil(1).MSFuelWasteHeat = 1.0;

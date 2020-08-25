@@ -482,7 +482,7 @@ namespace UtilityRoutines {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
 
-        auto const SELECT_CASE_var(FuelTypeInput);
+        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelTypeInput));
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             FuelTypeOutput = "Electricity";
