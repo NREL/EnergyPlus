@@ -180,7 +180,8 @@ namespace UnitVentilator {
     Array1D<UnitVentilatorData> UnitVent;
     Array1D<UnitVentNumericFieldData> UnitVentNumericFields;
 
-    // Functions
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     void clear_state()
     {
@@ -193,6 +194,9 @@ namespace UnitVentilator {
         CheckEquipName.deallocate();
         UnitVent.deallocate();
         UnitVentNumericFields.deallocate();
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+
     }
 
     void SimUnitVentilator(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
@@ -508,7 +512,7 @@ namespace UnitVentilator {
                 ErrorsFound = true;
             } else {
                 if (!UtilityRoutines::SameString(UnitVent(UnitVentNum).FanType, "Fan:SystemModel")) {
-                    GetFanType(state.fans,
+                    GetFanType(state,
                         UnitVent(UnitVentNum).FanName, UnitVent(UnitVentNum).FanType_Num, errFlag, CurrentModuleObject, UnitVent(UnitVentNum).Name);
 
                     {
@@ -518,12 +522,12 @@ namespace UnitVentilator {
 
                             // Get fan outlet node
                             UnitVent(UnitVentNum).FanOutletNode =
-                                GetFanOutletNode(state.fans, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
+                                GetFanOutletNode(state, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + UnitVent(UnitVentNum).Name + "\".");
                                 ErrorsFound = true;
                             } else {
-                                GetFanIndex(state.fans, UnitVent(UnitVentNum).FanName, FanIndex, errFlag, CurrentModuleObject);
+                                GetFanIndex(state, UnitVent(UnitVentNum).FanName, FanIndex, errFlag, CurrentModuleObject);
                                 // Other error checks should trap before it gets to this point in the code, but including just in case.
 
                                 GetFanVolFlow(FanIndex, FanVolFlow);
@@ -549,7 +553,7 @@ namespace UnitVentilator {
                                 // Get the fan's availability schedule
                                 errFlag = false;
                                 UnitVent(UnitVentNum).FanAvailSchedPtr =
-                                    GetFanAvailSchPtr(state.fans, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
+                                    GetFanAvailSchPtr(state, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
                                 if (errFlag) {
                                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                                     ErrorsFound = true;
@@ -563,7 +567,7 @@ namespace UnitVentilator {
                     }
                 } else if (UtilityRoutines::SameString(UnitVent(UnitVentNum).FanType, "Fan:SystemModel")) {
                     UnitVent(UnitVentNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(UnitVent(UnitVentNum).FanName));              // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, UnitVent(UnitVentNum).FanName));              // call constructor
                     UnitVent(UnitVentNum).Fan_Index = HVACFan::getFanObjectVectorIndex(UnitVent(UnitVentNum).FanName); // zero-based
                     UnitVent(UnitVentNum).FanOutletNode = HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->designAirVolFlowRate;
@@ -1138,14 +1142,14 @@ namespace UnitVentilator {
                                 "System",
                                 "Sum",
                                 UnitVent(UnitVentNum).Name);
-            SetupOutputVariable("Zone Unit Ventilator Fan Electric Power",
+            SetupOutputVariable("Zone Unit Ventilator Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 UnitVent(UnitVentNum).ElecPower,
                                 "System",
                                 "Average",
                                 UnitVent(UnitVentNum).Name);
             // Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Unit Ventilator Fan Electric Energy",
+            SetupOutputVariable("Zone Unit Ventilator Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 UnitVent(UnitVentNum).ElecEnergy,
                                 "System",
@@ -1292,8 +1296,6 @@ namespace UnitVentilator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirRelNode;  // relief air node number in unit ventilator loop
         int ColdConNode; // cold water control node number in unit ventilator loop
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;

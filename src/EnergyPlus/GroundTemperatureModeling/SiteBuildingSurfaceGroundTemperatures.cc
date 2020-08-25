@@ -54,8 +54,8 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -65,7 +65,7 @@ namespace EnergyPlus {
 
 // Site:GroundTemperature:BuildingSurface factory
 std::shared_ptr<SiteBuildingSurfaceGroundTemps>
-SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName)
+SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -128,7 +128,7 @@ SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(OutputFiles &outputFil
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    write_ground_temps(outputFiles.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
+    write_ground_temps(ioFiles.eio, "BuildingSurface", thisModel->buildingSurfaceGroundTemps);
 
     if (!thisModel->errorsFound) {
         groundTempModels.push_back(thisModel);

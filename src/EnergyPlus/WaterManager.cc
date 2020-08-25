@@ -103,6 +103,10 @@ namespace WaterManager {
     // Data
     // MODULE PARAMETER DEFINITIONS:
     bool MyOneTimeFlag(true);
+    bool GetInputFlag(true); // First time, input is "gotten"
+    bool MyEnvrnFlag(true);   // flag for init once at start of environment
+    bool MyWarmupFlag(false); // flag for init after warmup complete
+    bool MyTankDemandCheckFlag(true);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -119,6 +123,10 @@ namespace WaterManager {
     void clear_state()
     {
         MyOneTimeFlag = true;
+        GetInputFlag = true;
+        MyEnvrnFlag = true;
+        MyWarmupFlag = false;
+        MyTankDemandCheckFlag = true;
     }
 
     void ManageWater()
@@ -167,10 +175,9 @@ namespace WaterManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
-        static int RainColNum(0);
-        static int TankNum(0);
-        static int WellNum(0);
+        int RainColNum(0);
+        int TankNum(0);
+        int WellNum(0);
 
         if (GetInputFlag) {
             GetWaterManagerInput();
@@ -938,13 +945,13 @@ namespace WaterManager {
                                     "Wellwater",
                                     _,
                                     "System");
-                SetupOutputVariable("Water System Groundwater Well Pump Electric Power",
+                SetupOutputVariable("Water System Groundwater Well Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     GroundwaterWell(Item).PumpPower,
                                     "System",
                                     "Average",
                                     GroundwaterWell(Item).Name);
-                SetupOutputVariable("Water System Groundwater Well Pump Electric Energy",
+                SetupOutputVariable("Water System Groundwater Well Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     GroundwaterWell(Item).PumpEnergy,
                                     "System",
@@ -1769,9 +1776,6 @@ namespace WaterManager {
         int TankNum;
         int RainColNum;
         int WellNum;
-        static bool MyEnvrnFlag(true);   // flag for init once at start of environment
-        static bool MyWarmupFlag(false); // flag for init after warmup complete
-        static bool MyTankDemandCheckFlag(true);
 
         if (BeginEnvrnFlag && MyEnvrnFlag) {
             for (TankNum = 1; TankNum <= NumWaterStorageTanks; ++TankNum) {

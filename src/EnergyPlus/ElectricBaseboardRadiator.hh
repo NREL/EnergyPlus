@@ -149,6 +149,7 @@ namespace ElectricBaseboardRadiator {
     extern Array1D<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
 
     // Functions
+    void clear_state();
 
     void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
                           int const ActualZoneNum,

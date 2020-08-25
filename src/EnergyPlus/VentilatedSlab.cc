@@ -195,6 +195,8 @@ namespace VentilatedSlab {
     Array1D_bool CheckEquipName;
 
     // Autosizing variables
+    bool GetInputFlag(true);
+    bool MyOneTimeFlag(true);
     Array1D_bool MySizeFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
@@ -208,6 +210,8 @@ namespace VentilatedSlab {
 
     void clear_state()
     {
+        MyOneTimeFlag = true;
+        GetInputFlag = true;
         HCoilOn = false;
         NumOfVentSlabs = 0;
         OAMassFlowRate = 0.0;
@@ -251,7 +255,6 @@ namespace VentilatedSlab {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // index of ventilated slab being simulated
-        static bool GetInputFlag(true); // First time, input is "gotten"
 
         // FLOW:
         if (GetInputFlag) {
@@ -903,7 +906,7 @@ namespace VentilatedSlab {
 
             if (HVACFan::checkIfFanNameIsAFanSystem(VentSlab(Item).FanName)) {
                 VentSlab(Item).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(VentSlab(Item).FanName));
+                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, VentSlab(Item).FanName));
                 VentSlab(Item).Fan_Index = HVACFan::getFanObjectVectorIndex(VentSlab(Item).FanName);
             } else {
                 bool isNotOkay(false);
@@ -1296,14 +1299,14 @@ namespace VentilatedSlab {
                                 "System",
                                 "Average",
                                 VentSlab(Item).Name);
-            SetupOutputVariable("Zone Ventilated Slab Fan Electric Power",
+            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 VentSlab(Item).ElecFanPower,
                                 "System",
                                 "Average",
                                 VentSlab(Item).Name);
             //! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Ventilated Slab Fan Electric Energy",
+            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VentSlab(Item).ElecFanEnergy,
                                 "System",
@@ -1415,7 +1418,6 @@ namespace VentilatedSlab {
 
         int AirRelNode;  // relief air node number in Ventilated Slab loop
         int ColdConNode; // cold water control node number in Ventilated Slab loop
-        static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
@@ -3895,7 +3897,7 @@ namespace VentilatedSlab {
                 // the new SumHATsurf value for the zone.  Note that the difference between the new
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             } // SYSCONFIG. SLABONLY&SLABANDZONE
@@ -4135,7 +4137,7 @@ namespace VentilatedSlab {
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
             } // SeriesSlabs

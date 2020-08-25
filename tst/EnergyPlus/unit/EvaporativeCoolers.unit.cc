@@ -414,9 +414,6 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp
 
 TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
 {
-
-    ShowMessage("Begin Test: EvaporativeCoolers, IndEvapCoolerPower");
-
     using CurveManager::Quadratic;
 
     int CurveNum;

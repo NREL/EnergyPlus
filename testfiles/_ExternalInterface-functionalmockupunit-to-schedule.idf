@@ -1279,7 +1279,7 @@
 
   Output:Variable,*,Site Outdoor Air Relative Humidity,Timestep;
 
-  Output:Variable,*,Lights Electric Energy,Timestep;
+  Output:Variable,*,Lights Electricity Energy,Timestep;
 
   Output:VariableDictionary,Regular;
 

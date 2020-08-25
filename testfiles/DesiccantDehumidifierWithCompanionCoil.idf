@@ -3117,7 +3117,7 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,timestep;
 
@@ -3125,9 +3125,9 @@
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Heat Exchanger Sensible Heating Rate,timestep;
 
@@ -3153,9 +3153,9 @@
 
   Output:Variable,*,Heat Exchanger Total Cooling Energy,timestep;
 
-  Output:Variable,*,Heat Exchanger Electric Power,timestep;
+  Output:Variable,*,Heat Exchanger Electricity Rate,timestep;
 
-  Output:Variable,*,Heat Exchanger Electric Energy,timestep;
+  Output:Variable,*,Heat Exchanger Electricity Energy,timestep;
 
   Output:Variable,*,Dehumidifier Removed Water Mass Flow Rate,timestep;
 
@@ -3163,9 +3163,9 @@
 
   Output:Variable,*,Dehumidifier Part Load Ratio,timestep;
 
-  Output:Variable,*,Dehumidifier Exhaust Fan Electric Power,timestep;
+  Output:Variable,*,Dehumidifier Exhaust Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Dehumidifier Exhaust Fan Electric Energy,timestep;
+  Output:Variable,*,Dehumidifier Exhaust Fan Electricity Energy,timestep;
 
   Output:Variable,HX Process Outlet Node,System Node Setpoint Temperature,timestep;
 
@@ -3215,7 +3215,7 @@
 
   Output:Meter,Cooling:Electricity,timestep;
 
-  Output:Meter,Heating:Gas,timestep;
+  Output:Meter,Heating:NaturalGas,timestep;
 
   Output:Meter,Fans:Electricity,timestep;
 
@@ -3225,9 +3225,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3235,9 +3235,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

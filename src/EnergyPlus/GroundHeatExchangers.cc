@@ -69,6 +69,7 @@
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -425,7 +426,7 @@ namespace GroundHeatExchangers {
             this->initGLHESimVars(state.dataBranchInputManager);
         } else {
             this->initGLHESimVars(state.dataBranchInputManager);
-            this->calcGroundHeatExchanger();
+            this->calcGroundHeatExchanger(state.files);
             this->updateGHX();
         }
     }
@@ -586,7 +587,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::calcGFunctions()
+    void GLHEVert::calcGFunctions(IOFiles &ioFiles)
     {
 
         // No other choice than to calculate the g-functions here
@@ -599,7 +600,7 @@ namespace GroundHeatExchangers {
             myCacheData["Response Factors"]["time"] = std::vector<Real64>(myRespFactors->time.begin(), myRespFactors->time.end());
             myCacheData["Response Factors"]["LNTTS"] = std::vector<Real64>(myRespFactors->LNTTS.begin(), myRespFactors->LNTTS.end());
             myCacheData["Response Factors"]["GFNC"] = std::vector<Real64>(myRespFactors->GFNC.begin(), myRespFactors->GFNC.end());
-            writeGLHECacheToFile();
+            writeGLHECacheToFile(ioFiles);
         }
     }
 
@@ -1042,7 +1043,7 @@ namespace GroundHeatExchangers {
         // For convenience
         using json = nlohmann::json;
 
-        if (!ObjexxFCL::gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
+        if (!FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
             // if the file doesn't exist, there are no data to read
             return;
         } else {
@@ -1113,13 +1114,13 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::writeGLHECacheToFile()
+    void GLHEVert::writeGLHECacheToFile(IOFiles &ioFiles)
     {
 
         // For convenience
         using json = nlohmann::json;
 
-        if (ObjexxFCL::gio::file_exists(DataStringGlobals::outputGLHEFileName)) {
+        if (FileSystem::fileExists(DataStringGlobals::outputGLHEFileName)) {
             // file exists -- add data
 
             // open file
@@ -1156,14 +1157,15 @@ namespace GroundHeatExchangers {
             std::string case_name = "GHLE " + std::to_string(i + 1);
             json_out[case_name] = myCacheData;
 
-            // open output file
-            std::ofstream ofs(DataStringGlobals::outputGLHEFileName);
-
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-
-            // don't forget to close
-            ofs.close();
+            if (ioFiles.outputControl.glhe) {
+                // open output file
+                std::ofstream ofs;
+                ofs.open(DataStringGlobals::outputGLHEFileName);
+                // write data to file, set spacing at 2
+                ofs << std::setw(2) << json_out;
+                // don't forget to close
+                ofs.close();
+            }
 
         } else {
             // file doesn't exist -- add data
@@ -1175,20 +1177,21 @@ namespace GroundHeatExchangers {
             std::string case_name = "GHLE 1";
             json_out[case_name] = myCacheData;
 
-            // open output file
-            std::ofstream ofs(DataStringGlobals::outputGLHEFileName);
-
-            // write data to file, set spacing at 2
-            ofs << std::setw(2) << json_out;
-
-            // don't forget to close
-            ofs.close();
+            if (ioFiles.outputControl.glhe) {
+                // open output file
+                std::ofstream ofs;
+                ofs.open(DataStringGlobals::outputGLHEFileName);
+                // write data to file, set spacing at 2
+                ofs << std::setw(2) << json_out;
+                // don't forget to close
+                ofs.close();
+            }
         }
     }
 
     //******************************************************************************
 
-    void GLHESlinky::calcGFunctions()
+    void GLHESlinky::calcGFunctions(IOFiles &)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Matt Mitchell
@@ -1710,7 +1713,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::calcGroundHeatExchanger()
+    void GLHEBase::calcGroundHeatExchanger(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -1780,7 +1783,7 @@ namespace GroundHeatExchangers {
             if (!gFunctionsExist) {
                 makeThisGLHECacheAndCompareWithFileCache();
                 if (!gFunctionsExist) {
-                    calcGFunctions();
+                    calcGFunctions(ioFiles);
                     gFunctionsExist = true;
                 }
             }

@@ -2336,9 +2336,9 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Chiller Electric Power,timestep;
+  Output:Variable,*,Chiller Electricity Rate,timestep;
 
-  Output:Variable,*,Chiller Electric Energy,timestep;
+  Output:Variable,*,Chiller Electricity Energy,timestep;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,timestep;
 

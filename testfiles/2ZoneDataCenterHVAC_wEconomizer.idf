@@ -3155,27 +3155,27 @@
     Verbose,                 !- Internal Variable Availability Dictionary Reporting
     Verbose;                 !- EMS Runtime Language Debug Output Level
 
-  ! The variable "Facility Total Building Electric Demand Power" includes: lighting and IT Equipment.
+  ! The variable "Facility Total Building Electricity Demand Rate" includes: lighting and IT Equipment.
   ! Other internal electric loads, electric equipment other than IT is set to zero.
 
   EnergyManagementSystem:Sensor,
     IT_Equip_Power,          !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Building Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total Building Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
-  ! "Facility Total Electric Demand Power" is the total of the whole Building and HVAC electric demands.
+  ! "Facility Total Electricity Demand Rate" is the total of the whole Building and HVAC electric demands.
 
   EnergyManagementSystem:Sensor,
     Whole_Building_Power,    !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
-  ! "Facility Total HVAC Electric Demand Power" is the total of the whole Building HVAC electric demands.
+  ! "Facility Total HVAC Electricity Demand Rate" is the total of the whole Building HVAC electric demands.
 
   EnergyManagementSystem:Sensor,
     Whole_HVAC_Power,        !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total HVAC Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total HVAC Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:OutputVariable,
     Power Utilization Effectiveness,  !- Name
@@ -3282,19 +3282,19 @@
 
   Output:Variable,*,Evaporative Cooler Operating Mode Status,timestep;
 
-  Output:Variable,*,Evaporative Cooler Electric Power,timestep;
+  Output:Variable,*,Evaporative Cooler Electricity Rate,timestep;
 
   Output:Variable,*,Evaporative Cooler Water Volume,timestep;
 
-  Output:Variable,*,ITE CPU Electric Power,hourly;
+  Output:Variable,*,ITE CPU Electricity Rate,hourly;
 
-  Output:Variable,*,ITE Fan Electric Power,hourly;
+  Output:Variable,*,ITE Fan Electricity Rate,hourly;
 
-  Output:Variable,*,ITE UPS Electric Power,hourly;
+  Output:Variable,*,ITE UPS Electricity Rate,hourly;
 
-  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,hourly;
+  Output:Variable,*,ITE CPU Electricity Rate at Design Inlet Conditions,hourly;
 
-  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,hourly;
+  Output:Variable,*,ITE Fan Electricity Rate at Design Inlet Conditions,hourly;
 
   Output:Variable,*,ITE UPS Heat Gain to Zone Rate,hourly;
 
@@ -3338,15 +3338,15 @@
 
   Output:Variable,*,ITE Air Inlet Relative Humidity Difference Below Operating Range,hourly;
 
-  Output:Variable,*,Zone ITE CPU Electric Power,hourly;
+  Output:Variable,*,Zone ITE CPU Electricity Rate,hourly;
 
-  Output:Variable,*,Zone ITE Fan Electric Power,hourly;
+  Output:Variable,*,Zone ITE Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Zone ITE UPS Electric Power,hourly;
+  Output:Variable,*,Zone ITE UPS Electricity Rate,hourly;
 
-  Output:Variable,*,Zone ITE CPU Electric Power at Design Inlet Conditions,hourly;
+  Output:Variable,*,Zone ITE CPU Electricity Rate at Design Inlet Conditions,hourly;
 
-  Output:Variable,*,Zone ITE Fan Electric Power at Design Inlet Conditions,hourly;
+  Output:Variable,*,Zone ITE Fan Electricity Rate at Design Inlet Conditions,hourly;
 
   Output:Variable,*,Zone ITE UPS Heat Gain to Zone Rate,hourly;
 
