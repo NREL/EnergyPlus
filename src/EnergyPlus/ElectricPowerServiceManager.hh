@@ -62,9 +62,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 enum class ThermalLossDestination : int
 {
     heatLossNotDetermined = 0,

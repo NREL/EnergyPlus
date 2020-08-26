@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetBoilerInput(state, state.dataBoilers);
+    GetBoilerInput(state);
 
     EXPECT_EQ(1, state.dataBoilers.numBoilers);
     EXPECT_EQ(AutoSize, state.dataBoilers.Boiler(1).VolFlowRate);
@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetBoilerInput(state, state.dataBoilers);
+    GetBoilerInput(state);
     auto &thisBoiler = state.dataBoilers.Boiler(1);
 
     DataPlant::PlantLoop(1).Name = "HotWaterLoop";

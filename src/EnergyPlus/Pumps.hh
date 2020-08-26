@@ -57,9 +57,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace Pumps {
 
     // Using/Aliasing

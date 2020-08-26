@@ -56,9 +56,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace PlantUtilities {
 
     // Functions

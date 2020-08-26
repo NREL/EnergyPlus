@@ -58,9 +58,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct BranchInputManagerData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace DataPlant {
 

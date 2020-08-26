@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EneryPlusData;
-struct BranchInputManagerData;
 
 namespace RefrigeratedCase {
 

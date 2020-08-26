@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 struct ChillerGasAbsorptionData;
 
 namespace ChillerGasAbsorption {

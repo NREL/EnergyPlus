@@ -64,7 +64,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 struct CondenserLoopTowersData;
 
 namespace CondenserLoopTowers {

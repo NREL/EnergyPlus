@@ -788,7 +788,7 @@ namespace FaultsManager {
             // Boiler check and link
             {
                 if (state.dataBoilers.getBoilerInputFlag) {
-                    Boilers::GetBoilerInput(state, state.dataBoilers);
+                    Boilers::GetBoilerInput(state);
                     state.dataBoilers.getBoilerInputFlag = false;
                 }
                 // Check the boiler name and boiler type
@@ -1402,7 +1402,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerAbsorbers.getInput) {
-                        ChillerAbsorption::GetBLASTAbsorberInput(state.dataChillerAbsorbers);
+                        ChillerAbsorption::GetBLASTAbsorberInput(state);
                         state.dataChillerAbsorbers.getInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other

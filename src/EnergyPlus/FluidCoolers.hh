@@ -58,9 +58,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace FluidCoolers {
 
     // MODULE PARAMETER DEFINITIONS:

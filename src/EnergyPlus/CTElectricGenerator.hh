@@ -61,7 +61,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct BranchInputManagerData;
 struct CTElectricGeneratorData;
 struct EnergyPlusData;
 
