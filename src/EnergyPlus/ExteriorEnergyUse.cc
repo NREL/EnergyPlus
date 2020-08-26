@@ -216,16 +216,16 @@ namespace ExteriorEnergyUse {
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ExteriorLights",
                                  exteriorEnergyUse.ExteriorLights(Item).Name,
-                                 "Electric Power",
+                                 "Electricity Rate",
                                  "W",
                                  exteriorEnergyUse.ExteriorLights(Item).PowerActuatorOn,
                                  exteriorEnergyUse.ExteriorLights(Item).PowerActuatorValue);
             }
 
             SetupOutputVariable(
-                "Exterior Lights Electric Power", OutputProcessor::Unit::W, exteriorEnergyUse.ExteriorLights(Item).Power, "Zone", "Average", exteriorEnergyUse.ExteriorLights(Item).Name);
+                "Exterior Lights Electricity Rate", OutputProcessor::Unit::W, exteriorEnergyUse.ExteriorLights(Item).Power, "Zone", "Average", exteriorEnergyUse.ExteriorLights(Item).Name);
 
-            SetupOutputVariable("Exterior Lights Electric Energy",
+            SetupOutputVariable("Exterior Lights Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 exteriorEnergyUse.ExteriorLights(Item).CurrentUse,
                                 "Zone",
@@ -476,16 +476,16 @@ namespace ExteriorEnergyUse {
         // Select the correct Number for the associated ascii name for the fuel type
         if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity")) {
             FuelTypeNumber = ExteriorFuelUsage::ElecUse;
-            FuelTypeString = "Electric";
+            FuelTypeString = "Electricity";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "NaturalGas")) {
             FuelTypeNumber = ExteriorFuelUsage::GasUse;
-            FuelTypeString = "Gas";
+            FuelTypeString = "NaturalGas";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Coal")) {
             FuelTypeNumber = ExteriorFuelUsage::CoalUse;
             FuelTypeString = "Coal";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo1")) {
             FuelTypeNumber = ExteriorFuelUsage::FuelOil1Use;
-            FuelTypeString = "FuelOil#1";
+            FuelTypeString = "FuelOilNo1";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
             FuelTypeNumber = ExteriorFuelUsage::PropaneUse;
             FuelTypeString = "Propane";
@@ -497,7 +497,7 @@ namespace ExteriorEnergyUse {
             FuelTypeString = "Diesel";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo2")) {
             FuelTypeNumber = ExteriorFuelUsage::FuelOil2Use;
-            FuelTypeString = "FuelOil#2";
+            FuelTypeString = "FuelOilNo2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {
             FuelTypeNumber = ExteriorFuelUsage::OtherFuel1Use;
             FuelTypeString = "OtherFuel1";

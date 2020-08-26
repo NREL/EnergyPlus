@@ -48,9 +48,11 @@
 
 #include <utility>
 
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
+#include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
-#include <EnergyPlus/Autosizing/CoolingSHRSizing.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -335,16 +337,22 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
         Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 
     bool PrintFlag = true;
+    bool errorsFound = false;
     std::string CompType = this->object_name;
     std::string CompName = this->name;
 
-    int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-    std::string SizingString = "Rated Air Flow Rate [m3/s]";
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->evap_air_flow_rate, PrintFlag, RoutineName);
+    CoolingAirFlowSizer sizingCoolingAirFlow;
+    std::string stringOverride = "Rated Air Flow Rate [m3/s]";
+    if (DataGlobals::isEpJSON) stringOverride = "rated_air_flow_rate [m3/s]";
+    sizingCoolingAirFlow.overrideSizingString(stringOverride);
+    sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->evap_air_flow_rate = sizingCoolingAirFlow.size(this->evap_air_flow_rate, errorsFound);
 
-    SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-    SizingString = "Gross Cooling Capacity [W]";
-    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->rated_total_capacity, PrintFlag, RoutineName);
+    std::string SizingString = "Gross Cooling Capacity [W]";
+    CoolingCapacitySizer sizerCoolingCapacity;
+    sizerCoolingCapacity.overrideSizingString(SizingString);
+    sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+    this->rated_total_capacity = sizerCoolingCapacity.size(this->rated_total_capacity, errorsFound);
 
      //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );

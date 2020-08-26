@@ -56,7 +56,7 @@ struct CoolingWaterflowSizer : BaseSizerWithFanHeatInputs
 {
     CoolingWaterflowSizer()
     {
-        this->sizingType = AutoSizingType::HeatingWaterflowSizing;
+        this->sizingType = AutoSizingType::CoolingWaterflowSizing;
         this->sizingString = "Design Water Flow Rate [m3/s]";
     }
     ~CoolingWaterflowSizer() = default;

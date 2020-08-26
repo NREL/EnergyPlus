@@ -131,7 +131,7 @@ extern "C" {
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -307,13 +307,14 @@ namespace SimulationManager {
         bool AnyUnderwaterBoundaries = false;
         int EnvCount;
 
-        // Windows: ensure that EnergyPlusAPI.dll's notion of the "static singleton IOFiles" matches
-        // the exe's notion.
-        // TODO: Remove this after we have eliminated all remaining calls to IOFiles::getSingleton
-        IOFiles::setSingleton(&state.files);
+
+        state.files.outputControl.getInput();
+        ResultsFramework::resultsFramework->setupOutputOptions(state.files);
+
+        state.files.debug.ensure_open("OpenOutputFiles", state.files.outputControl.dbg);
 
         // CreateSQLiteDatabase();
-        sqlite = EnergyPlus::CreateSQLiteDatabase();
+        sqlite = EnergyPlus::CreateSQLiteDatabase(state.files);
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -458,7 +459,7 @@ namespace SimulationManager {
                       anyEMSRan,
                       ObjexxFCL::Optional_int_const()); // point to finish setup processing EMS, sensor ready now
 
-            ProduceRDDMDD();
+            ProduceRDDMDD(state);
 
             if (TerminalError) {
                 ShowFatalError("Previous Conditions cause program termination.");
@@ -493,6 +494,7 @@ namespace SimulationManager {
         WarmupFlag = true;
 
         while (Available) {
+            if (stopSimulation) break;
 
             GetNextEnvironment(state, Available, ErrorsFound);
 
@@ -547,6 +549,7 @@ namespace SimulationManager {
             ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                if (stopSimulation) break;
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
@@ -589,11 +592,14 @@ namespace SimulationManager {
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+                    if (stopSimulation) break;
 
                     BeginHourFlag = true;
                     EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+                        if (stopSimulation) break;
+
                         if (AnySlabsInModel || AnyBasementsInModel) {
                             SimulateGroundDomains(state, false);
                         }
@@ -627,7 +633,7 @@ namespace SimulationManager {
                             }
                         }
 
-                        ManageWeather(state.files);
+                        ManageWeather(state);
 
                         ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -680,7 +686,7 @@ namespace SimulationManager {
 #endif
         SimCostEstimate(state);
 
-        ComputeTariff(); //     Compute the utility bills
+        ComputeTariff(state.files); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
 
@@ -1284,7 +1290,7 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                         overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
-                        overrideMaxAllowedDelTemp = true; 
+                        overrideMaxAllowedDelTemp = true;
                     } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
@@ -1335,7 +1341,7 @@ namespace SimulationManager {
                     if (overrideSystemTimestep) {
                         ShowWarningError(
                             "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
-                        int MinTimeStepSysOverrideValue = 60.0; 
+                        int MinTimeStepSysOverrideValue = 60.0;
                         if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
                             MinTimeStepSysOverrideValue = MinutesPerTimeStep;
                         }
@@ -1451,7 +1457,7 @@ namespace SimulationManager {
         } else {
             Alphas(7) = "No";
         }
-        Alphas(8) = General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1); 
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1);
         Alphas(9) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 3);
         Alphas(10) = General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
@@ -1490,29 +1496,29 @@ namespace SimulationManager {
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
         if (DataGlobals::createPerfLog) {
-            writeIntialPerfLogValues(overrideModeValue);
+            writeIntialPerfLogValues(state.files, overrideModeValue);
         }
     }
 
-    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue)
+    void writeIntialPerfLogValues(IOFiles &ioFiles, std::string const &currentOverrideModeValue)
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
-        UtilityRoutines::appendPerfLog("Program, Version, TimeStamp",
+        UtilityRoutines::appendPerfLog(ioFiles, "Program, Version, TimeStamp",
                                        DataStringGlobals::VerString); // this string already includes three portions and has commas
-        UtilityRoutines::appendPerfLog("Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
+        UtilityRoutines::appendPerfLog(ioFiles, "Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
         if (HeatBalanceIntRadExchange::CarrollMethod) {
-            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "CarrollMRT");
+            UtilityRoutines::appendPerfLog(ioFiles, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
-            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "ScriptF");
+            UtilityRoutines::appendPerfLog(ioFiles, "Zone Radiant Exchange Algorithm", "ScriptF");
         }
-        UtilityRoutines::appendPerfLog("Override Mode", currentOverrideModeValue);
-        UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
-        UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
-        UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog("Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1));
-        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
-        UtilityRoutines::appendPerfLog("MaxAllowedDelTemp", General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
+        UtilityRoutines::appendPerfLog(ioFiles, "Override Mode", currentOverrideModeValue);
+        UtilityRoutines::appendPerfLog(ioFiles, "Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
+        UtilityRoutines::appendPerfLog(ioFiles, "Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog(ioFiles, "SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog(ioFiles, "Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1));
+        UtilityRoutines::appendPerfLog(ioFiles, "MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
+        UtilityRoutines::appendPerfLog(ioFiles, "MaxAllowedDelTemp", General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
     }
 
     std::string bool_to_string(bool logical)
@@ -1691,113 +1697,113 @@ namespace SimulationManager {
     {
 
         //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            if (ResultsFramework::OutputSchema->JSONEnabled()) {
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            if (ResultsFramework::resultsFramework->JSONEnabled()) {
                 jsonOutputStreams.json_stream = OpenStreamFile(jsonOutputStreams.outputJsonFileName);
             }
-            if (ResultsFramework::OutputSchema->CBOREnabled()) {
+            if (ResultsFramework::resultsFramework->CBOREnabled()) {
                 jsonOutputStreams.cbor_stream = OpenStreamFile(jsonOutputStreams.outputCborFileName);
             }
-            if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+            if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                 jsonOutputStreams.msgpack_stream = OpenStreamFile(jsonOutputStreams.outputMsgPackFileName);
             }
         }
         //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
             // Output detailed Zone time series file
-            if (ResultsFramework::OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+            if (ResultsFramework::resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneMsgPackFileName);
                 }
             }
 
             // Output detailed HVAC time series file
-            if (ResultsFramework::OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+            if (ResultsFramework::resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacMsgPackFileName);
                 }
             }
 
             // Output timestep time series file
-            if (ResultsFramework::OutputSchema->RITimestepTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RITimestepTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+            if (ResultsFramework::resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_TSstream = OpenStreamFile(jsonOutputStreams.outputTSJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_TSstream = OpenStreamFile(jsonOutputStreams.outputTSCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_TSstream = OpenStreamFile(jsonOutputStreams.outputTSMsgPackFileName);
                 }
             }
 
             // Output hourly time series file
-            if (ResultsFramework::OutputSchema->RIHourlyTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIHourlyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+            if (ResultsFramework::resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_HRstream = OpenStreamFile(jsonOutputStreams.outputHRJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_HRstream = OpenStreamFile(jsonOutputStreams.outputHRCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_HRstream = OpenStreamFile(jsonOutputStreams.outputHRMsgPackFileName);
                 }
             }
 
             // Output daily time series file
-            if (ResultsFramework::OutputSchema->RIDailyTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIDailyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+            if (ResultsFramework::resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_DYstream = OpenStreamFile(jsonOutputStreams.outputDYJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_DYstream = OpenStreamFile(jsonOutputStreams.outputDYCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_DYstream = OpenStreamFile(jsonOutputStreams.outputDYMsgPackFileName);
                 }
             }
 
             // Output monthly time series file
-            if (ResultsFramework::OutputSchema->RIMonthlyTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIMonthlyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+            if (ResultsFramework::resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_MNstream = OpenStreamFile(jsonOutputStreams.outputMNJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_MNstream = OpenStreamFile(jsonOutputStreams.outputMNCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_MNstream = OpenStreamFile(jsonOutputStreams.outputMNMsgPackFileName);
                 }
             }
 
             // Output run period time series file
-            if (ResultsFramework::OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIRunPeriodTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
+            if (ResultsFramework::resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
                     jsonOutputStreams.json_SMstream = OpenStreamFile(jsonOutputStreams.outputSMJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
                     jsonOutputStreams.cbor_SMstream = OpenStreamFile(jsonOutputStreams.outputSMCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
                     jsonOutputStreams.msgpack_SMstream = OpenStreamFile(jsonOutputStreams.outputSMMsgPackFileName);
                 }
             }
@@ -1841,19 +1847,19 @@ namespace SimulationManager {
 
         // FLOW:
         StdOutputRecordCount = 0;
-        ioFiles.eso.ensure_open("OpenOutputFiles");
+        ioFiles.eso.ensure_open("OpenOutputFiles", ioFiles.outputControl.eso);
         print(ioFiles.eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        ioFiles.eio.ensure_open("OpenOutputFiles");
+        ioFiles.eio.ensure_open("OpenOutputFiles", ioFiles.outputControl.eio);
         print(ioFiles.eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        ioFiles.mtr.ensure_open("OpenOutputFiles");
+        ioFiles.mtr.ensure_open("OpenOutputFiles", ioFiles.outputControl.mtr);
         print(ioFiles.mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        ioFiles.bnd.ensure_open("OpenOutputFiles");
+        ioFiles.bnd.ensure_open("OpenOutputFiles", ioFiles.outputControl.bnd);
         print(ioFiles.bnd, "Program Version,{}\n", VerString);
     }
 
@@ -1926,7 +1932,7 @@ namespace SimulationManager {
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        ioFiles.audit.ensure_open("CloseOutputFiles");
+        ioFiles.audit.ensure_open("CloseOutputFiles", ioFiles.outputControl.audit);
         constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
         print(ioFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
@@ -2132,7 +2138,7 @@ namespace SimulationManager {
 
             BeginTimeStepFlag = true;
 
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -2147,7 +2153,7 @@ namespace SimulationManager {
             //          ! do another timestep=1
             if (DeveloperFlag) DisplayString("Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
 
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
@@ -2160,7 +2166,7 @@ namespace SimulationManager {
             EndEnvrnFlag = true;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
-            ManageWeather(state.files);
+            ManageWeather(state);
 
             ManageExteriorEnergyUse(state.exteriorEnergyUse);
 

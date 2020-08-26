@@ -59,32 +59,44 @@ namespace EnergyPlus {
 
 enum class AutoSizingType
 {
-    ASHRAEMinSATCoolingSizing,
-    ASHRAEMaxSATHeatingSizing,
-    AutoCalculateSizing,
-    CoolingSHRSizing,
-    CoolingWaterDesAirInletHumRatSizing,
-    CoolingWaterDesAirInletTempSizing,
-    CoolingWaterDesAirOutletHumRatSizing,
-    CoolingWaterDesAirOutletTempSizing,
-    CoolingWaterDesWaterInletTempSizing,
-    CoolingWaterNumofTubesPerRowSizing,
-    DesiccantDehumidifierBFPerfDataFaceVelocitySizing,
-    HeatingAirflowUASizing,
-    HeatingCoilDesAirInletHumRatSizing,
-    HeatingCoilDesAirInletTempSizing,
-    HeatingCoilDesAirOutletTempSizing,
-    HeatingWaterDesAirInletHumRatSizing,
-    HeatingWaterDesAirInletTempSizing,
-    HeatingWaterDesCoilLoadUsedForUASizing,
-    HeatingWaterDesCoilWaterVolFlowUsedForUASizing,
-    HeatingWaterflowSizing,
-    MaxHeaterOutletTempSizing,
-    WaterHeatingCapacitySizing,
-    WaterHeatingCoilUASizing,
-    ZoneCoolingLoadSizing,
-    ZoneHeatingLoadSizing,
-    Unknown
+    // align with DataHVACGlobals so scalable sizing strings can be applied
+    // this will not be necessary when scalable sizing is moved to BaseSizerWithScalableInputs
+    ASHRAEMinSATCoolingSizing = 30,
+    ASHRAEMaxSATHeatingSizing = 31,
+    AutoCalculateSizing = 25,
+    CoolingAirFlowSizing = 1,
+    CoolingCapacitySizing = 17,
+    CoolingSHRSizing = 22,
+    CoolingWaterDesAirInletHumRatSizing = 5,
+    CoolingWaterDesAirInletTempSizing = 4,
+    CoolingWaterDesAirOutletHumRatSizing = 8,
+    CoolingWaterDesAirOutletTempSizing = 7,
+    CoolingWaterDesWaterInletTempSizing = 6,
+    CoolingWaterflowSizing = 2,
+    CoolingWaterNumofTubesPerRowSizing = 9,
+    DesiccantDehumidifierBFPerfDataFaceVelocitySizing = 35,
+    HeatingAirFlowSizing = 14,
+    HeatingAirflowUASizing = 15,
+    HeatingCapacitySizing = 18,
+    HeatingCoilDesAirInletHumRatSizing = 34,
+    HeatingCoilDesAirInletTempSizing = 32,
+    HeatingCoilDesAirOutletTempSizing = 33,
+    HeatingDefrostSizing = 23, // not used
+    HeatingWaterDesAirInletHumRatSizing = 11,
+    HeatingWaterDesAirInletTempSizing = 10,
+    HeatingWaterDesCoilLoadUsedForUASizing = 12,
+    HeatingWaterDesCoilWaterVolFlowUsedForUASizing = 13,
+    HeatingWaterflowSizing = 3,
+    MinSATempCoolingSizing = 28, // not used
+    MaxHeaterOutletTempSizing = 24,
+    MaxSATempHeatingSizing = 29, // not used
+    SystemAirFlowSizing = 16,
+    SystemCapacitySizing = 21, // not used
+    WaterHeatingCapacitySizing = 19,
+    WaterHeatingCoilUASizing = 20,
+    ZoneCoolingLoadSizing = 26,
+    ZoneHeatingLoadSizing = 27,
+    Unknown = 0
 };
 
 enum class AutoSizingResultType
@@ -99,11 +111,17 @@ struct BaseSizer
 
     Real64 stdRhoAir = 0.0;
 
-    bool getCoilReportObject = false; // provides access to coil reporting
+    int zoneAirFlowSizMethod = 0;
+    bool dataScalableSizingON = false;
+    bool dataScalableCapSizingON = false;
+    bool isCoilReportObject = false; // provides access to coil reporting
+    bool isFanReportObject = false;  // provides access to fan reporting
     bool initialized = false;     // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
     AutoSizingType sizingType = AutoSizingType::Unknown;
     std::string sizingString = "";
+    std::string sizingStringScalable = "";
+    bool overrideSizeString = true;
     Real64 originalValue = 0.0;
     Real64 autoSizedValue = 0.0;
     bool wasAutoSized = false;
@@ -148,7 +166,7 @@ struct BaseSizer
     // global Data* sizing constants
     bool dataEMSOverrideON = false;
     Real64 dataEMSOverride = 0.0;
-
+    bool dataAutosizable = false;
     // HeatingWaterflowSizer
     Real64 dataConstantUsedForSizing = 0.0;
     Real64 dataFractionUsedForSizing = 0.0;
@@ -212,6 +230,13 @@ struct BaseSizer
     Real64 dataDesignCoilCapacity = 0.0;
     bool dataErrorsFound = false;
 
+    // CoolingAirFlowSizing
+    Real64 dataBypassFrac = 0.0;
+
+    Real64 dataIsDXCoil = false;
+
+    Real64 dataNonZoneNonAirloopValue = 0.0;
+
     bool printWarningFlag = false;
     std::string callingRoutine = "";
     Array1D<DataSizing::SystemSizingInputData> sysSizingInputData;
@@ -261,7 +286,11 @@ protected:
 
     void selectSizerOutput(bool &errorsFound);
 
+    void select2StgDXHumCtrlSizerOutput(bool& errorsFound);
+
     bool isValidCoilType(std::string const &compType);
+
+    bool isValidFanType(std::string const &compType);
 
     bool checkInitialized(bool &errorsFound);
 

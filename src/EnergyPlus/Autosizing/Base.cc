@@ -113,13 +113,17 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->primaryAirSystem = DataAirSystems::PrimaryAirSystem;
 
     this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
-    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if coilType is not one of DataHVACGlobals::cAllCoilTypes
-        this->getCoilReportObject = true;
+    if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if compType is not one of DataHVACGlobals::cAllCoilTypes
+        this->isCoilReportObject = true;
+    }
+    if (EnergyPlus::BaseSizer::isValidFanType(this->compType)) { // fan reports fail if compType is not a valid fan type
+        this->isFanReportObject = true;
     }
 
     // global sizing data
     dataEMSOverrideON = DataSizing::DataEMSOverrideON;
     dataEMSOverride = DataSizing::DataEMSOverride;
+    this->dataAutosizable = DataSizing::DataAutosizable;
     this->minOA = DataSizing::MinOA;
     this->dataConstantUsedForSizing = DataSizing::DataConstantUsedForSizing;
     this->dataFractionUsedForSizing = DataSizing::DataFractionUsedForSizing;
@@ -160,6 +164,9 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->dataFanOpMode = DataSizing::DataFanOpMode;
     this->dataDesignCoilCapacity = DataSizing::DataDesignCoilCapacity;
     this->dataErrorsFound = DataSizing::DataErrorsFound;
+    this->dataBypassFrac = DataSizing::DataBypassFrac;
+    this->dataIsDXCoil = DataSizing::DataIsDXCoil;
+    this->dataNonZoneNonAirloopValue = DataSizing::DataNonZoneNonAirloopValue;
 }
 
 void BaseSizer::initializeFromAPI(Real64 const elevation)
@@ -172,7 +179,7 @@ void BaseSizer::initializeFromAPI(Real64 const elevation)
     this->callingRoutine = "called_from_API";
     Real64 barometricPressure = DataEnvironment::StdPressureSeaLevel * std::pow(1.0 - 2.25577e-05 * elevation, 5.2559);
     this->stdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(barometricPressure, 20.0, 0.0);
-    this->getCoilReportObject = false;
+    this->isCoilReportObject = false;
 }
 
 void BaseSizer::addErrorMessage(std::string const &s)
@@ -200,6 +207,8 @@ void BaseSizer::preSize(Real64 const _originalValue)
     this->errorType = EnergyPlus::AutoSizingResultType::NoError;
     this->initialized = false; // force use of Init then Size in subsequent calls
     this->hardSizeNoDesignRun = !(this->sysSizingRunDone || this->zoneSizingRunDone);
+    this->sizingDesRunThisZone = false;
+    this->sizingDesRunThisAirSys = false;
 
     if (this->dataFractionUsedForSizing == 0.0 && this->dataConstantUsedForSizing > 0.0) {
         this->errorType = AutoSizingResultType::ErrorType1;
@@ -207,8 +216,8 @@ void BaseSizer::preSize(Real64 const _originalValue)
         this->hardSizeNoDesignRun = false;
         if (this->wasAutoSized) {
             this->autoSizedValue = 0.0;
-            std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + this->sizingString +
-                " must both be greater than 0.";
+            std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " +
+                              this->sizingString + " must both be greater than 0.";
             this->addErrorMessage(msg);
             ShowSevereError(msg);
         }
@@ -219,8 +228,8 @@ void BaseSizer::preSize(Real64 const _originalValue)
         this->autoCalculate = true;
         if (this->originalValue == DataSizing::AutoSize && !this->dataEMSOverrideON) {
             this->errorType = AutoSizingResultType::ErrorType1;
-            std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " + this->sizingString +
-                " must both be greater than 0.";
+            std::string msg = "Sizing Library: DataConstantUsedForSizing and DataFractionUsedForSizing used for autocalculating " +
+                              this->sizingString + " must both be greater than 0.";
             this->addErrorMessage(msg);
             ShowSevereError(msg);
         }
@@ -343,35 +352,57 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
 void BaseSizer::selectSizerOutput(bool &errorsFound)
 {
     if (this->printWarningFlag) {
-        if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue)) { // no sizing run done
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
+        if (this->dataEMSOverrideON) { // EMS overrides value
+            this->autoSizedValue = this->dataEMSOverride;
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+        } else if (this->hardSizeNoDesignRun && !this->wasAutoSized && UtilityRoutines::SameString(this->compType, "Fan:ZoneExhaust")) {
             this->autoSizedValue = this->originalValue;
+        } else if (this->wasAutoSized && this->dataFractionUsedForSizing > 0.0 && this->dataConstantUsedForSizing > 0.0) {
+            this->autoSizedValue = this->dataFractionUsedForSizing * this->dataConstantUsedForSizing;
+            this->reportSizerOutput(
+                this->compType, this->compName, "Design Size " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+        } else if (!this->wasAutoSized &&
+                   (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done or autosizes to 0
+            this->autoSizedValue = this->originalValue;
+            if (this->dataAutosizable || (!this->sizingDesRunThisZone && UtilityRoutines::SameString(this->compType, "Fan:ZoneExhaust"))) {
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            }
         } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
             this->autoSizedValue = this->originalValue;
-        } else if (this->dataEMSOverrideON) { // EMS overrides value
-            this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->autoSizedValue);
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
         } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 &&
                    this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
             // might need more logic here to catch everything correctly
-            this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
+            if (this->dataScalableSizingON && int(this->zoneAirFlowSizMethod) > 0) {
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            } else {
+                this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
+            }
         } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
             if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
-                this->reportSizerOutput(this->compType,
-                                        this->compName,
-                                        "Design Size " + this->sizingString,
-                                        this->autoSizedValue,
-                                        "User-Specified " + this->sizingString,
-                                        this->originalValue);
+                if (this->dataAutosizable)
+                    this->reportSizerOutput(this->compType,
+                                            this->compName,
+                                            "Design Size " + this->sizingString,
+                                            this->autoSizedValue,
+                                            "User-Specified " + this->sizingStringScalable + this->sizingString,
+                                            this->originalValue);
             } else {
-                this->reportSizerOutput(this->compType, this->compName, "User-Specified " + this->sizingString, this->originalValue);
+                if (this->dataAutosizable)
+                    this->reportSizerOutput(
+                        this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
             }
-            if (DataGlobals::DisplayExtraWarnings) {
+            if (DataGlobals::DisplayExtraWarnings && this->dataAutosizable) {
                 if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
                     std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
                     this->addErrorMessage(msg);
                     ShowMessage(msg);
-                    msg = "User-Specified " + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
+                    msg =
+                        "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
                     this->addErrorMessage(msg);
                     ShowContinueError(msg);
                     msg = "differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5);
@@ -398,7 +429,7 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
     } else if (!this->wasAutoSized && !this->autoCalculate) {
         this->autoSizedValue = this->originalValue;
     }
-
+    this->overrideSizeString = true; // reset for next sizer
     if (this->errorType != AutoSizingResultType::NoError) {
         std::string msg = "Developer Error: sizing of " + this->sizingString + " failed.";
         this->addErrorMessage(msg);
@@ -409,6 +440,133 @@ void BaseSizer::selectSizerOutput(bool &errorsFound)
         errorsFound = true;
     }
 }
+
+void BaseSizer::select2StgDXHumCtrlSizerOutput(bool &errorsFound)
+{
+    if (this->printWarningFlag) {
+        if (this->dataEMSOverrideON) { // EMS overrides value
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
+                this->reportSizerOutput(this->compType,
+                                        this->compName,
+                                        "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                        this->autoSizedValue);
+            }
+        } else if (!this->wasAutoSized && (this->autoSizedValue == this->originalValue || this->autoSizedValue == 0.0)) { // no sizing run done
+            this->autoSizedValue = this->originalValue;
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
+                this->reportSizerOutput(this->compType,
+                                        this->compName,
+                                        "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                        this->autoSizedValue);
+            }
+        } else if (!this->wasAutoSized && this->autoSizedValue >= 0.0 && this->originalValue == 0.0) { // input was blank or zero
+            this->autoSizedValue = this->originalValue;
+            this->reportSizerOutput(
+                this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
+                this->reportSizerOutput(this->compType,
+                                        this->compName,
+                                        "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                        this->autoSizedValue);
+            }
+        } else if (this->wasAutoSized && this->autoSizedValue >= 0.0 &&
+                   this->originalValue <= 0.0) { // autosized to 0 or greater and input is 0 or autosize
+                                                 // might need more logic here to catch everything correctly
+            if (this->dataScalableSizingON && int(this->zoneAirFlowSizMethod) > 0) {
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->autoSizedValue);
+            } else {
+                this->reportSizerOutput(this->compType, this->compName, "Design Size " + this->sizingString, this->autoSizedValue);
+            }
+            if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
+                this->reportSizerOutput(
+                    this->compType, this->compName, "Design Size " + this->sizingString + " ( non-bypassed )", this->autoSizedValue);
+            }
+        } else if (this->autoSizedValue >= 0.0 && this->originalValue > 0.0) {
+            if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+                this->reportSizerOutput(this->compType,
+                                        this->compName,
+                                        "Design Size " + this->sizingString,
+                                        this->autoSizedValue,
+                                        "User-Specified " + this->sizingStringScalable + this->sizingString,
+                                        this->originalValue);
+                if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                    this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
+                    this->originalValue *= (1 - this->dataBypassFrac);  // now reapply for second message and remianing simulation calcs
+                    this->reportSizerOutput(this->compType,
+                                            this->compName,
+                                            "Design Size " + this->sizingString + " ( non-bypassed )",
+                                            this->autoSizedValue,
+                                            "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                            this->originalValue);
+                }
+            } else {
+                if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                    this->autoSizedValue /= (1 - this->dataBypassFrac); // back out bypass fraction applied in GetInput
+                }
+                this->reportSizerOutput(
+                    this->compType, this->compName, "User-Specified " + this->sizingStringScalable + this->sizingString, this->originalValue);
+                if (UtilityRoutines::SameString(this->compType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
+                    this->autoSizedValue *= (1 - this->dataBypassFrac); // now reapply for second message and remianing simulation calcs
+                    this->reportSizerOutput(this->compType,
+                                            this->compName,
+                                            "User-Specified " + this->sizingStringScalable + this->sizingString + " ( non-bypassed )",
+                                            this->autoSizedValue);
+                }
+            }
+            if (DataGlobals::DisplayExtraWarnings) {
+                if ((std::abs(this->autoSizedValue - this->originalValue) / this->originalValue) > DataSizing::AutoVsHardSizingThreshold) {
+                    std::string msg = this->callingRoutine + ": Potential issue with equipment sizing for " + this->compType + ' ' + this->compName;
+                    this->addErrorMessage(msg);
+                    ShowMessage(msg);
+                    msg =
+                        "User-Specified " + this->sizingStringScalable + this->sizingString + " = " + General::RoundSigDigits(this->originalValue, 5);
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "differs from Design Size " + this->sizingString + " = " + General::RoundSigDigits(this->autoSizedValue, 5);
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "This may, or may not, indicate mismatched component sizes.";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                    msg = "Verify that the value entered is intended and is consistent with other components.";
+                    this->addErrorMessage(msg);
+                    ShowContinueError(msg);
+                }
+            }
+            if (!this->wasAutoSized) this->autoSizedValue = this->originalValue;
+        } else {
+            std::string msg = this->callingRoutine + ' ' + this->compType + ' ' + this->compName + ", Developer Error: Component sizing incomplete.";
+            this->addErrorMessage(msg);
+            ShowSevereError(msg);
+            msg = "SizingString = " + this->sizingString + ", SizingResult = " + General::TrimSigDigits(this->originalValue, 1);
+            this->addErrorMessage(msg);
+            ShowContinueError(msg);
+            this->errorType = AutoSizingResultType::ErrorType1;
+        }
+    } else if (!this->wasAutoSized && !this->autoCalculate) {
+        this->autoSizedValue = this->originalValue;
+    }
+    this->overrideSizeString = true; // reset for next sizer
+    if (this->errorType != AutoSizingResultType::NoError) {
+        std::string msg = "Developer Error: sizing of " + this->sizingString + " failed.";
+        this->addErrorMessage(msg);
+        ShowSevereError(msg);
+        msg = "Occurs in " + this->compType + " " + this->compName;
+        this->addErrorMessage(msg);
+        ShowContinueError(msg);
+        errorsFound = true;
+    }
+}
+
 bool BaseSizer::isValidCoilType(std::string const &_compType)
 {
     int coilNum = 0;
@@ -421,6 +579,24 @@ bool BaseSizer::isValidCoilType(std::string const &_compType)
     }
     this->coilType_Num = 0;
     return false;
+}
+
+bool BaseSizer::isValidFanType(std::string const &_compType)
+{
+    // if compType name is one of the fan objects, then return true
+    if (UtilityRoutines::SameString(_compType, "Fan:SystemModel")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:ComponentModel")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:OnOff")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:ConstantVolume")) {
+        return true;
+    } else if (UtilityRoutines::SameString(_compType, "Fan:VariableVolume")) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool BaseSizer::checkInitialized(bool &errorsFound)
@@ -443,6 +619,7 @@ bool BaseSizer::checkInitialized(bool &errorsFound)
 void BaseSizer::overrideSizingString(std::string &string)
 {
     this->sizingString = string;
+    this->overrideSizeString = false;
 }
 
 Real64 BaseSizer::setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing)
@@ -531,10 +708,16 @@ void BaseSizer::clearState()
 {
     stdRhoAir = 0.0;
 
-    getCoilReportObject = false; // provides access to coil reporting
-    initialized = false;         // indicates initializeWithinEP was called
+    zoneAirFlowSizMethod = 0;
+    dataScalableSizingON = false;
+    dataScalableCapSizingON = false;
+    isCoilReportObject = false; // provides access to coil reporting
+    isFanReportObject = false;  // provides access to fan reporting
+    initialized = false;        // indicates initializeWithinEP was called
     errorType = AutoSizingResultType::NoError;
     sizingString = "";
+    sizingStringScalable = "";
+    overrideSizeString = true;
     originalValue = 0.0;
     autoSizedValue = 0.0;
     wasAutoSized = false;
@@ -582,6 +765,7 @@ void BaseSizer::clearState()
     // global Data* sizing constants
     dataEMSOverrideON = false;
     dataEMSOverride = 0.0;
+    dataAutosizable = false;
     dataConstantUsedForSizing = 0.0;
     dataFractionUsedForSizing = 0.0;
     dataPltSizHeatNum = 0;
@@ -613,6 +797,10 @@ void BaseSizer::clearState()
     dataFanOpMode = 0;
     dataDesignCoilCapacity = 0.0;
     dataErrorsFound = false;
+    dataBypassFrac = 0.0;
+    dataIsDXCoil = false;
+
+    dataNonZoneNonAirloopValue = 0.0;
 
     printWarningFlag = false;
     callingRoutine = "";

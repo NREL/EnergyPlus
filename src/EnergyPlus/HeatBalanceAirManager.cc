@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
@@ -761,7 +762,7 @@ namespace HeatBalanceAirManager {
                                     "System",
                                     "Average",
                                     Zone(ZoneAirBalance(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Combined Outdoor Air Fan Electric Energy",
+                SetupOutputVariable("Zone Combined Outdoor Air Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZnAirRpt(ZoneAirBalance(Loop).ZonePtr).OABalanceFanElec,
                                     "System",
@@ -1868,7 +1869,7 @@ namespace HeatBalanceAirManager {
                                                 "System",
                                                 "Average",
                                                 Zone(Ventilation(Loop).ZonePtr).Name);
-                            SetupOutputVariable("Zone Ventilation Fan Electric Energy",
+                            SetupOutputVariable("Zone Ventilation Fan Electricity Energy",
                                                 OutputProcessor::Unit::J,
                                                 ZnAirRpt(Ventilation(Loop).ZonePtr).VentilFanElec,
                                                 "System",
@@ -2271,7 +2272,7 @@ namespace HeatBalanceAirManager {
                                         "System",
                                         "Average",
                                         Zone(Ventilation(VentiCount).ZonePtr).Name);
-                    SetupOutputVariable("Zone Ventilation Fan Electric Energy",
+                    SetupOutputVariable("Zone Ventilation Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnAirRpt(Ventilation(VentiCount).ZonePtr).VentilFanElec,
                                         "System",
@@ -4213,7 +4214,14 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ManageHVAC(state);
+        if(DataGlobals::externalHVACManager) {
+          if (!DataGlobals::externalHVACManagerInitialized) {
+              initializeForExternalHVACManager(state);
+          }
+          DataGlobals::externalHVACManager(&state);
+        } else {
+          ManageHVAC(state);
+        }
 
         // Do Final Temperature Calculations for Heat Balance before next Time step
         SumHmAW = 0.0;
@@ -4222,6 +4230,16 @@ namespace HeatBalanceAirManager {
     }
 
     // END Algorithm Section of the Module
+
+    void initializeForExternalHVACManager(EnergyPlusData &state) {
+        // this function will ultimately provide a nice series of calls that initialize all the hvac stuff needed
+        // to allow an external hvac manager to play nice with E+
+        EnergyPlus::ZoneTempPredictorCorrector::InitZoneAirSetPoints(state.dataZoneTempPredictorCorrector);
+        if (!EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled) {
+            EnergyPlus::DataZoneEquipment::GetZoneEquipmentData(state);
+            EnergyPlus::DataZoneEquipment::ZoneEquipInputsFilled = true;
+        }
+    }
 
     void ReportZoneMeanAirTemp()
     {

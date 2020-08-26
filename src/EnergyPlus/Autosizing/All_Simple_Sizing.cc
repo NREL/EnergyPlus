@@ -320,7 +320,7 @@ Real64 HeatingCoilDesAirInletTempSizer::size(Real64 _originalValue, bool &errors
         }
     }
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     return this->autoSizedValue;
 }
 
@@ -352,7 +352,7 @@ Real64 HeatingCoilDesAirOutletTempSizer::size(Real64 _originalValue, bool &error
         }
     }
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirTemp(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 
@@ -388,7 +388,7 @@ Real64 HeatingCoilDesAirInletHumRatSizer::size(Real64 _originalValue, bool &erro
         }
     }
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

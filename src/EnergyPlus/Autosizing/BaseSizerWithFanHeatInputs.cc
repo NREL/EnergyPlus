@@ -58,8 +58,9 @@ namespace EnergyPlus {
                                                         const std::string &_compName, const bool &_printWarningFlag,
                                                         const std::string &_callingRoutine) {
         BaseSizer::initializeWithinEP(state, _compType, _compName, _printWarningFlag, _callingRoutine);
+        this->dataDesAccountForFanHeat = DataSizing::DataDesAccountForFanHeat;
         // water coils on main branch have no parent object to set DataFan* variables
-        if (this->curSysNum > 0 && this->curOASysNum == 0) {
+        if (int(this->primaryAirSystem.size() > 0) && this->curSysNum > 0 && this->curOASysNum == 0) {
             if (this->primaryAirSystem(this->curSysNum).supFanModelTypeEnum == DataAirSystems::structArrayLegacyFanModels) {
                 this->dataFanEnumType = DataAirSystems::structArrayLegacyFanModels;
                 this->dataFanIndex = this->primaryAirSystem(this->curSysNum).SupFanNum;
@@ -107,7 +108,8 @@ namespace EnergyPlus {
                                                Real64 &motInPower,
                                                bool &fanCompModel)
     {
-        if (fanEnumType < 0 || fanIndex < 0) return;
+        // if fan unknown or air flow sizing (recursive call to size fan) then return
+        if (fanEnumType < 0 || fanIndex < 0 || this->isFanReportObject) return;
 
         switch (fanEnumType) {
             case DataAirSystems::structArrayLegacyFanModels: {

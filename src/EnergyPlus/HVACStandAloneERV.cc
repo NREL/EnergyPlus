@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -113,7 +114,6 @@ namespace HVACStandAloneERV {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DisplayExtraWarnings;
@@ -1159,13 +1159,13 @@ namespace HVACStandAloneERV {
                                 "Sum",
                                 StandAloneERV(StandAloneERVIndex).Name);
 
-            SetupOutputVariable("Zone Ventilator Electric Power",
+            SetupOutputVariable("Zone Ventilator Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 StandAloneERV(StandAloneERVIndex).ElecUseRate,
                                 "System",
                                 "Average",
                                 StandAloneERV(StandAloneERVIndex).Name);
-            SetupOutputVariable("Zone Ventilator Electric Energy",
+            SetupOutputVariable("Zone Ventilator Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 StandAloneERV(StandAloneERVIndex).ElecUseEnergy,
                                 "System",
@@ -1407,7 +1407,6 @@ namespace HVACStandAloneERV {
         using General::RoundSigDigits;
         using HeatRecovery::SetHeatExchangerData;
         using MixedAir::OAController;
-        using ReportSizingManager::ReportSizingOutput;
         using ScheduleManager::GetScheduleMaxValue;
 
         static std::string const RoutineName("SizeStandAloneERV: ");
@@ -1440,8 +1439,7 @@ namespace HVACStandAloneERV {
         std::string CompType("ZoneHVAC:EnergyRecoveryVentilator");
         std::string CompName(StandAloneERV(StandAloneERVNum).Name);
         bool PrintFlag = true;
-        int SizingMethod = AutoCalculateSizing;
-        DataSizing::DataFractionUsedForSizing = 1.0;
+        bool ErrorsFound = false;
 
         if (StandAloneERV(StandAloneERVNum).SupplyAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -1485,6 +1483,7 @@ namespace HVACStandAloneERV {
             std::string SizingString = "Supply Air Flow Rate [m3/s]";
             if (IsAutoSize) {
                 DataSizing::DataConstantUsedForSizing = SupplyAirVolFlowDes;
+                DataSizing::DataFractionUsedForSizing = 1.0;
                 TempSize = SupplyAirVolFlowDes;
                 if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                     OAController(StandAloneERV(StandAloneERVNum).ControllerIndex).MaxOA =
@@ -1493,12 +1492,19 @@ namespace HVACStandAloneERV {
                 }
             } else {
                 DataSizing::DataConstantUsedForSizing = StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
+                DataSizing::DataFractionUsedForSizing = 1.0;
             }
-            if (TempSize > 0.0) ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            if (TempSize > 0.0) {
+                SystemAirFlowSizer sizerSystemAirFlow;
+                sizerSystemAirFlow.overrideSizingString(SizingString);
+                sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+            }
             StandAloneERV(StandAloneERVNum).SupplyAirVolFlow = TempSize;
         }
 
         // Size ERV exhaust flow rate
+        DataSizing::DataFractionUsedForSizing = 1.0;
         IsAutoSize = false;
         if (StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow == AutoSize) {
             IsAutoSize = true;
@@ -1524,7 +1530,13 @@ namespace HVACStandAloneERV {
             } else {
                 DataSizing::DataConstantUsedForSizing = StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow;
             }
-            if (TempSize > 0.0) ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+            DataSizing::DataFractionUsedForSizing = 1.0;
+            if (TempSize > 0.0) {
+                SystemAirFlowSizer sizerSystemAirFlow;
+                sizerSystemAirFlow.overrideSizingString(SizingString);
+                sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                TempSize = sizerSystemAirFlow.size(TempSize, ErrorsFound);
+            }
             StandAloneERV(StandAloneERVNum).ExhaustAirVolFlow = TempSize;
             StandAloneERV(StandAloneERVNum).DesignEAFanVolFlowRate = TempSize * StandAloneERV(StandAloneERVNum).HighRHOAFlowRatio;
         }

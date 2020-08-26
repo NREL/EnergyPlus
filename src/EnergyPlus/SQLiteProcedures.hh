@@ -994,7 +994,7 @@ private:
 
 extern std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase();
+std::unique_ptr<SQLite> CreateSQLiteDatabase(IOFiles & ioFiles);
 
 void CreateSQLiteZoneExtendedOutput();
 

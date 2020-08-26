@@ -5276,7 +5276,6 @@ namespace SimAirServingZones {
         // Using/Aliasing
         using DataEnvironment::OutDryBulbTemp;
         using DataEnvironment::OutHumRat;
-        using DataEnvironment::StdBaroPress;
         using DataEnvironment::StdRhoAir;
         using EMSManager::ManageEMS;
         using General::FindNumberInList;
@@ -7254,7 +7253,6 @@ namespace SimAirServingZones {
         using DataSizing::FinalSysSizing;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
-        using ReportSizingManager::RequestSizing;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space

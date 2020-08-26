@@ -5,6 +5,7 @@ set( test_src
   Fixtures/EnergyPlusFixture.hh
   Fixtures/IdfParserFixture.hh
   Fixtures/InputProcessorFixture.hh
+  Fixtures/ResultsFrameworkFixture.hh
   Fixtures/SQLiteFixture.hh
   PhaseChangeModeling/HysteresisModel.unit.cc
   AdvancedAFN.unit.cc
@@ -18,6 +19,8 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   Autosizing/AutosizingFixture.hh
   Autosizing/All_Simple_Sizing.unit.cc
+  Autosizing/CoolingAirFlowSizing.unit.cc
+  Autosizing/CoolingCapacitySizing.unit.cc
   Autosizing/CoolingSHRSizing.unit.cc
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesAirInletTempSizing.unit.cc
@@ -26,12 +29,15 @@ set( test_src
   Autosizing/CoolingWaterDesWaterInletTempSizing.unit.cc
   Autosizing/CoolingWaterflowSizing.unit.cc
   Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
+  Autosizing/HeatingAirFlowSizing.unit.cc
   Autosizing/HeatingAirflowUASizing.unit.cc
+  Autosizing/HeatingCapacitySizing.unit.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
   Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.unit.cc
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.unit.cc
   Autosizing/HeatingWaterflowSizing.unit.cc
+  Autosizing/SystemAirFlowSizing.unit.cc
   Autosizing/WaterHeatingCapacitySizing.unit.cc
   Autosizing/WaterHeatingCoilUASizing.unit.cc
   BaseboardRadiator.unit.cc
@@ -128,7 +134,6 @@ set( test_src
   InputProcessor.unit.cc
   IntegratedHeatPump.unit.cc
   InternalHeatGains.unit.cc
-  JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
   MicroCHPElectricGenerator.unit.cc
@@ -168,6 +173,7 @@ set( test_src
   PVWatts.unit.cc
   ReportCoilSelection.unit.cc
   ReportSizingManager.unit.cc
+  ResultsFramework.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc
   RootFinder.unit.cc
@@ -195,6 +201,7 @@ set( test_src
   SurfaceOctree.unit.cc
   SwimmingPool.unit.cc
   SystemAvailabilityManager.unit.cc
+  SystemReports.unit.cc
   SZVAVModel.unit.cc
   ThermalChimney.unit.cc
   ThermalComfort.unit.cc

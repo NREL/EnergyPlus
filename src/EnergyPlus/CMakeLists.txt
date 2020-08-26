@@ -31,6 +31,12 @@ SET( SRC
   Autosizing/Base.hh
   Autosizing/BaseSizerWithFanHeatInputs.cc
   Autosizing/BaseSizerWithFanHeatInputs.hh
+  Autosizing/BaseSizerWithScalableInputs.cc
+  Autosizing/BaseSizerWithScalableInputs.hh
+  Autosizing/CoolingAirFlowSizing.cc
+  Autosizing/CoolingAirFlowSizing.hh
+  Autosizing/CoolingCapacitySizing.cc
+  Autosizing/CoolingCapacitySizing.hh
   Autosizing/CoolingSHRSizing.cc
   Autosizing/CoolingSHRSizing.hh
   Autosizing/CoolingWaterDesAirInletHumRatSizing.cc
@@ -47,8 +53,12 @@ SET( SRC
   Autosizing/CoolingWaterflowSizing.hh
   Autosizing/CoolingWaterNumofTubesPerRowSizing.cc
   Autosizing/CoolingWaterNumofTubesPerRowSizing.hh
+  Autosizing/HeatingAirFlowSizing.cc
+  Autosizing/HeatingAirFlowSizing.hh
   Autosizing/HeatingAirflowUASizing.cc
   Autosizing/HeatingAirflowUASizing.hh
+  Autosizing/HeatingCapacitySizing.cc
+  Autosizing/HeatingCapacitySizing.hh
   Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.cc
   Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.hh
   Autosizing/HeatingWaterDesAirInletHumRatSizing.cc
@@ -59,6 +69,8 @@ SET( SRC
   Autosizing/HeatingWaterDesCoilWaterVolFlowUsedForUASizing.hh
   Autosizing/HeatingWaterflowSizing.cc
   Autosizing/HeatingWaterflowSizing.hh
+  Autosizing/SystemAirFlowSizing.cc
+  Autosizing/SystemAirFlowSizing.hh
   Autosizing/WaterHeatingCapacitySizing.cc
   Autosizing/WaterHeatingCapacitySizing.hh
   Autosizing/WaterHeatingCoilUASizing.cc
@@ -527,8 +539,8 @@ SET( SRC
   ReportCoilSelection.hh
   ReportSizingManager.cc
   ReportSizingManager.hh
-  ResultsSchema.cc
-  ResultsSchema.hh
+  ResultsFramework.cc
+  ResultsFramework.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
   RoomAirModelAirflowNetwork.cc
@@ -774,6 +786,7 @@ SET( API_HEADERS
   api/func.h
   api/runtime.h
   api/datatransfer.h
+  api/state.h
   api/autosizing.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
@@ -782,14 +795,24 @@ SET( API_HEADERS
 SET( API_CORE_SRC
   api/func.cc
   api/runtime.cc
+  api/state.cc
   api/datatransfer.cc
   api/autosizing.cc
   api/EnergyPlusPgm.cc)
 
+option( BUILD_STATIC_ENERGYPLUS_API "Build a static library instead of a shared library for the EnergyPlus API" OFF )
+mark_as_advanced( BUILD_STATIC_ENERGYPLUS_API )
+if( BUILD_STATIC_ENERGYPLUS_API )
+	set(API_LIBRARY_TYPE STATIC)
+	ADD_DEFINITIONS(-DENERGYPLUS_STATIC_API)
+else()
+	set(API_LIBRARY_TYPE SHARED)
+endif()
+
 if(APPLE OR UNIX)
-  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} ${API_HEADERS})
+  add_library( energyplusapi ${API_LIBRARY_TYPE} CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} ${API_HEADERS})
 else()  # windows
-  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
+  add_library( energyplusapi ${API_LIBRARY_TYPE} CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 target_link_libraries( energyplusapi energypluslib )
 
@@ -845,6 +868,9 @@ add_custom_command(
         -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
         -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
         -P "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
+        # TODO: temporary "hack" to depend on a specific file that doesn't exist to force this to run
+        # ideally the whole process would be revamped
+        DEPENDS __ALWAYSRUNME
 )
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
@@ -987,6 +1013,12 @@ if( BUILD_TESTING )
     add_test(NAME "API.PluginTesterTester"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
+    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/test_DataTransferTypes.py" "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py" COPYONLY)
+    add_test(NAME "API.test_DataTransferTypes"
+            COMMAND "${PYTHON_EXECUTABLE}" -m unittest "${API_TEST_TARGET_DIR}/test_DataTransferTypes.py"
+            WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
+
   endif()
 endif()
 

@@ -412,9 +412,9 @@ namespace CommandLineInterface {
         state.files.json.outputSMMsgPackFileName = outputFilePrefix + normalSuffix + "_runperiod.msgpack";
 
         state.files.mtd.fileName = outputFilePrefix + normalSuffix + ".mtd";
-        outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
+        state.files.mdd.fileName = outputFilePrefix + normalSuffix + ".mdd";
         state.files.mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
-        outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
+        state.files.rdd.fileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         state.files.dfs.fileName = outputFilePrefix + normalSuffix + ".dfs";
         outputGLHEFileName = outputFilePrefix + normalSuffix + ".glhe";
@@ -455,8 +455,8 @@ namespace CommandLineInterface {
         eplusADSFileName = inputDirPathName + "eplusADS.inp";
 
         // Readvars files
-        outputCsvFileName = outputFilePrefix + normalSuffix + ".csv";
-        outputMtrCsvFileName = outputFilePrefix + meterSuffix + ".csv";
+        state.files.csv.fileName = outputFilePrefix + normalSuffix + ".csv";
+        state.files.mtr_csv.fileName = outputFilePrefix + meterSuffix + ".csv";
         outputRvauditFileName = outputFilePrefix + normalSuffix + ".rvaudit";
 
         // EPMacro files
@@ -542,8 +542,6 @@ namespace CommandLineInterface {
                 exit(EXIT_FAILURE);
             }
         }
-
-        state.files.debug.ensure_open("OpenOutputFiles");
 
         // TODO: might be able to convert epJSON->IDF, run preprocessors, then go back IDF->epJSON
 
@@ -760,7 +758,7 @@ namespace CommandLineInterface {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << ioFiles.eso.fileName << '\n';
-                ofs << outputCsvFileName << '\n';
+                ofs << ioFiles.csv.fileName << '\n';
             }
         }
 
@@ -771,7 +769,7 @@ namespace CommandLineInterface {
                 ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
             } else {
                 ofs << ioFiles.mtr.fileName << '\n';
-                ofs << outputMtrCsvFileName << '\n';
+                ofs << ioFiles.mtr_csv.fileName << '\n';
             }
         }
 

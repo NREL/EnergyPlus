@@ -82,8 +82,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
         } else {
             if (this->curOASysNum > 0) { // coil is in OA stream
                 if (this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                    this->autoSizedValue =
-                        this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolHumRat;
+                    this->autoSizedValue = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].PrecoolHumRat;
                 } else {
                     this->autoSizedValue = this->finalSysSizing(this->curSysNum).PrecoolHumRat;
                 }
@@ -99,8 +98,8 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
         if (this->autoSizedValue > this->dataDesInletAirHumRat &&
             (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
              UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
-            std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
-                "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.";
+            std::string msg =
+                this->callingRoutine + ":" + " Coil=\"" + this->compName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio.";
             this->addErrorMessage(msg);
             ShowWarningError(msg);
             msg = "    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]";
@@ -130,8 +129,8 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
                 (UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER") ||
                  UtilityRoutines::SameString(this->compType, "COIL:COOLING:WATER:DETAILEDGEOMETRY"))) {
                 std::string msg = this->callingRoutine + ":" + " Coil=\"" + this->compName +
-                    "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
-                    "temperature > design air entering humidity ratio.";
+                                  "\", Cooling Coil is running dry for sizing and has minimum humidity ratio at saturation for inlet chilled water "
+                                  "temperature > design air entering humidity ratio.";
                 this->addErrorMessage(msg);
                 ShowWarningError(msg);
                 msg = "    Wair,in =  " + General::RoundSigDigits(this->dataDesInletAirHumRat, 6) + " [kgWater/kgDryAir]";
@@ -144,7 +143,7 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
                 this->addErrorMessage(msg);
                 ShowContinueError(msg);
                 msg = "    Minimum humidity ratio at saturation for inlet chilled water temperature = " +
-                    General::RoundSigDigits(desHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]";
+                      General::RoundSigDigits(desHumRatAtWaterInTemp, 6) + " [kgWater/kgDryAir]";
                 this->addErrorMessage(msg);
                 ShowContinueError(msg);
                 this->autoSizedValue = this->dataDesInletAirHumRat;
@@ -157,9 +156,11 @@ Real64 CoolingWaterDesAirOutletHumRatSizer::size(Real64 _originalValue, bool &er
             }
         }
     }
-    if (this->isEpJSON) this->sizingString = "design_outlet_air_humidity_ratio [kgWater/kgDryAir]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "design_outlet_air_humidity_ratio [kgWater/kgDryAir]";
+    }
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilLvgAirHumRat(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 

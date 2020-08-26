@@ -237,8 +237,6 @@ namespace DaylightingManager {
     Array2D_int MapErrIndex;
     Array2D_int RefErrIndex;
 
-    Array1D_bool CheckTDDZone;
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE DaylightingModule
 
     // MODULE SUBROUTINES:
@@ -250,7 +248,6 @@ namespace DaylightingManager {
         // this will need a lot more, but it is a start
         ZoneDaylight.deallocate();
         CalcDayltghCoefficients_firstTime = true;
-        CheckTDDZone.deallocate();
         TDDTransVisBeam.deallocate();
         TDDFluxInc.deallocate();
         TDDFluxTrans.deallocate();
@@ -282,7 +279,6 @@ namespace DaylightingManager {
         TDDFluxTrans.deallocate();
         MapErrIndex.deallocate();
         RefErrIndex.deallocate();
-        CheckTDDZone.deallocate();
         doSkyReporting = true;
         CreateDFSReportFile = true;
     }
@@ -566,7 +562,6 @@ namespace DaylightingManager {
             CheckTDDsAndLightShelvesInDaylitZones();
             AssociateWindowShadingControlWithDaylighting();
             CalcDayltghCoefficients_firstTime = false;
-            if (allocated(CheckTDDZone)) CheckTDDZone.deallocate();
         } // End of check if firstTime
 
         // Find the total number of exterior windows associated with all Daylighting:Detailed zones.
@@ -787,7 +782,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients");
+            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients", ioFiles.outputControl.dfs);
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
@@ -4601,7 +4596,7 @@ namespace DaylightingManager {
             DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
-                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open();
+                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open(ioFiles.outputControl.delightdfdmp);
 
                 // Sequentially read lines in DElight Daylight Factors Error File
                 // and process them using standard EPlus warning/error handling calls
@@ -5531,11 +5526,6 @@ namespace DaylightingManager {
         int SurfNum;  // daylight device surface number
         bool ErrorsFound;
 
-        if (CheckTDDs_firstTime) {
-            CheckTDDZone.dimension(NumOfZones, true);
-            CheckTDDs_firstTime = false;
-        }
-
         ErrorsFound = false;
 
         for (PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
@@ -5549,13 +5539,7 @@ namespace DaylightingManager {
                     }
                 }
                 if (!daylightControlFound) {
-                    ShowSevereError("DaylightingDevice:Tubular = " + TDDPipe(PipeNum).Name + ":  is not connected to a Zone that has Daylighting.  ");
-                    ShowContinueError("Add Daylighting:Controls one of the following zones in the same enclosure:  ");
-                    for (int const zoneNum2 : DataViewFactorInformation::ZoneSolarInfo(Surface(SurfNum).SolarEnclSurfIndex).ZoneNums) {
-                        ShowContinueError(Zone(zoneNum2).Name);
-                    }
-                    ErrorsFound = true;
-                    CheckTDDZone(Surface(SurfNum).Zone) = false;
+                    ShowWarningError("DaylightingDevice:Tubular = " + TDDPipe(PipeNum).Name + ":  is not connected to a Zone that has Daylighting, no visible transmittance will be modeled through the daylighting device.");
                 }
 
             } else { // SurfNum == 0

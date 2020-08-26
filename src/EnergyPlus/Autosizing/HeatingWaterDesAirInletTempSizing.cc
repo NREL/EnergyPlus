@@ -83,10 +83,10 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
                 } else {
                     DesMassFlow = this->finalZoneSizing(this->curZoneEqNum).DesHeatMassFlow;
                 }
-                this->autoSizedValue = this->setHeatCoilInletTempForZoneEqSizing(
-                    this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
-                    this->zoneEqSizing(this->curZoneEqNum),
-                    this->finalZoneSizing(this->curZoneEqNum));
+                this->autoSizedValue =
+                    this->setHeatCoilInletTempForZoneEqSizing(this->setOAFracForZoneEqSizing(DesMassFlow, this->zoneEqSizing(this->curZoneEqNum)),
+                                                              this->zoneEqSizing(this->curZoneEqNum),
+                                                              this->finalZoneSizing(this->curZoneEqNum));
             }
         }
     } else if (this->curSysNum > 0) {
@@ -109,19 +109,20 @@ Real64 HeatingWaterDesAirInletTempSizer::size(Real64 _originalValue, bool &error
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).PreheatTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
             } else if (this->curOASysNum > 0 && this->outsideAirSys(this->curOASysNum).AirLoopDOASNum > -1) {
-                this->autoSizedValue =
-                    this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
+                this->autoSizedValue = this->airloopDOAS[this->outsideAirSys(this->curOASysNum).AirLoopDOASNum].HeatOutTemp;
             } else {
                 this->autoSizedValue = OutAirFrac * this->finalSysSizing(this->curSysNum).HeatOutTemp +
                                        (1.0 - OutAirFrac) * this->finalSysSizing(this->curSysNum).HeatRetTemp;
             }
         }
     }
-    if (this->isEpJSON) this->sizingString = "rated_inlet_air_temperature";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "rated_inlet_air_temperature";
+    }
     this->selectSizerOutput(errorsFound);
     // report not written for OA coils and needs to be corrected
     if (this->curSysNum <= this->numPrimaryAirSys) {
-        if (this->getCoilReportObject)
+        if (this->isCoilReportObject)
             coilSelectionReportObj->setCoilEntAirTemp(this->compName, this->compType, this->autoSizedValue, this->curSysNum, this->curZoneEqNum);
     }
     return this->autoSizedValue;

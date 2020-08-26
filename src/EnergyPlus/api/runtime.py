@@ -1,4 +1,5 @@
 from ctypes import cdll, c_int, c_char_p, c_void_p, CFUNCTYPE
+from inspect import signature
 from typing import Union, List
 from types import FunctionType
 
@@ -21,15 +22,22 @@ class Runtime:
     """
 
     def __init__(self, api: cdll):
+        """
+        Create a new Runtime class instance.
+
+        :param api: An active CTYPES CDLL instance.
+        """
         self.api = api
         # self.api.energyplus.argtypes = [c_int, POINTER(c_char_p)]  # DEFERRED UNTIL run_energyplus call
         self.api.energyplus.restype = c_int
-        self.api.issueWarning.argtypes = [c_char_p]
+        self.api.issueWarning.argtypes = [c_void_p, c_char_p]
         self.api.issueWarning.restype = c_void_p
-        self.api.issueSevere.argtypes = [c_char_p]
+        self.api.issueSevere.argtypes = [c_void_p, c_char_p]
         self.api.issueSevere.restype = c_void_p
-        self.api.issueText.argtypes = [c_char_p]
+        self.api.issueText.argtypes = [c_void_p, c_char_p]
         self.api.issueText.restype = c_void_p
+        self.api.stopSimulation.argtypes = [c_void_p]
+        self.api.stopSimulation.restype = c_void_p
         self.py_progress_callback_type = CFUNCTYPE(c_void_p, c_int)
         self.api.registerProgressCallback.argtypes = [c_void_p, self.py_progress_callback_type]
         self.api.registerProgressCallback.restype = c_void_p
@@ -47,6 +55,8 @@ class Runtime:
         self.api.callbackBeginZoneTimeStepAfterInitHeatBalance.restype = c_void_p
         self.api.callbackBeginTimeStepBeforePredictor.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackBeginTimeStepBeforePredictor.restype = c_void_p
+        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather.argtypes = [c_void_p, self.py_state_callback_type]
+        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather.restype = c_void_p
         self.api.callbackAfterPredictorBeforeHVACManagers.argtypes = [c_void_p, self.py_state_callback_type]
         self.api.callbackAfterPredictorBeforeHVACManagers.restype = c_void_p
         self.api.callbackAfterPredictorAfterHVACManagers.argtypes = [c_void_p, self.py_state_callback_type]
@@ -71,12 +81,15 @@ class Runtime:
         # self.api.callbackUserDefinedComponentModel.restype = c_void_p
         self.api.callbackUnitarySystemSizing.argtypes = [self.py_state_callback_type]
         self.api.callbackUnitarySystemSizing.restype = c_void_p
-        self.api.stateNew.argtypes = []
-        self.api.stateNew.restype = c_void_p
-        self.api.stateReset.argtypes = [c_void_p]
-        self.api.stateReset.restype = c_void_p
-        self.api.stateDelete.argtypes = [c_void_p]
-        self.api.stateDelete.restype = c_void_p
+        self.api.registerExternalHVACManager.argtypes = [self.py_state_callback_type]
+        self.api.registerExternalHVACManager.restype = c_void_p
+
+    @staticmethod
+    def _check_callback_args(function_to_check, expected_num_args, calling_point_name):
+        sig = signature(function_to_check)
+        num_args = len(sig.parameters)
+        if num_args != expected_num_args:
+            raise TypeError(f"Registering function with incorrect arguments, calling point = {calling_point_name} needs {expected_num_args} arguments")
 
     def run_energyplus(self, state: c_void_p, command_line_args: List[Union[str, bytes]]) -> int:
         """
@@ -86,8 +99,10 @@ class Runtime:
         program name is not passed in as an argument, rather only the command line options.
 
         An example call:
-        run_energyplus(['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
+        state = api.state_manager.new_state()
+        run_energyplus(state, ['-d', '/path/to/output/directory', '-w', '/path/to/weather.epw', '/path/to/input.idf'])
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param command_line_args: The command line arguments that would be passed into EnergyPlus if executing directly
                                   from the EnergyPlus executable.
         :return: An integer exit code from the simulation, zero is success, non-zero is failure
@@ -116,7 +131,10 @@ class Runtime:
         cli_args = cli_arg_type(*args_with_program_name)
         return self.api.energyplus(state, len(args_with_program_name), cli_args)
 
-    def issue_warning(self, message: Union[str, bytes]) -> None:
+    # def stop_simulation(self, state: c_void_p) -> None:
+    #     pass
+
+    def issue_warning(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
         This function allows a script to issue a warning through normal EnergyPlus methods.  The message will be listed
         in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness
@@ -127,14 +145,15 @@ class Runtime:
         Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
         conversion as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param message: The warning message to be listed in the error file.
         :return: Nothing
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueWarning(message)
+        self.api.issueWarning(state, message)
 
-    def issue_severe(self, message: Union[str, bytes]) -> None:
+    def issue_severe(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
         This function allows a script to issue an error through normal EnergyPlus methods.  The message will be listed
         in the standard EnergyPlus error file once the simulation is complete.  This function has limited usefulness
@@ -149,14 +168,15 @@ class Runtime:
         Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
         conversion as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param message: The error message to be listed in the error file.
         :return: Nothing
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueSevere(message)
+        self.api.issueSevere(state, message)
 
-    def issue_text(self, message: Union[str, bytes]) -> None:
+    def issue_text(self, state: c_void_p, message: Union[str, bytes]) -> None:
         """
         This function allows a script to issue a message through normal EnergyPlus methods.  The message will be listed
         in the standard EnergyPlus error file once the simulation is complete.  This function can be used alongside the
@@ -168,21 +188,24 @@ class Runtime:
         Note that the argument passed in here can be either a string or a bytes object, as this wrapper handles
         conversion as needed.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param message: The message to be listed in the error file.
         :return: Nothing
         """
         if isinstance(message, str):
             message = message.encode('utf-8')
-        self.api.issueText(message)
+        self.api.issueText(state, message)
 
     def callback_progress(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of each
         day with a progress (percentage) indicator
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param f: A python function which takes an integer argument and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_progress')
         cb_ptr = self.py_progress_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.registerProgressCallback(state, cb_ptr)
@@ -194,9 +217,11 @@ class Runtime:
         conjunction with the progress callback, a progress bar and status text label can provide a nice EnergyPlus
         experience on a GUI.
 
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
         :param f: A python function which takes a string (bytes) argument and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_message')
         cb_ptr = self.py_message_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.registerStdOutCallback(state, cb_ptr)
@@ -206,9 +231,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of
         each environment.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_begin_new_environment')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackBeginNewEnvironment(state, cb_ptr)
@@ -218,9 +245,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the warmup of
         each environment.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_after_new_environment_warmup_complete')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackAfterNewEnvironmentWarmupComplete(state, cb_ptr)
@@ -230,9 +259,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of the
         zone time step before init heat balance.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_begin_zone_timestep_before_init_heat_balance')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackBeginZoneTimeStepBeforeInitHeatBalance(state, cb_ptr)
@@ -242,9 +273,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of the
         zone time step after init heat balance.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_begin_zone_timestep_after_init_heat_balance')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackBeginZoneTimeStepAfterInitHeatBalance(state, cb_ptr)
@@ -254,21 +287,39 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the beginning of
         system time step .
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_begin_system_timestep_before_predictor')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackBeginTimeStepBeforePredictor(state, cb_ptr)
+
+    def callback_begin_zone_timestep_before_set_current_weather(self, state: c_void_p, f: FunctionType) -> None:
+        """
+        This function allows a client to register a function to be called back by EnergyPlus at the beginning of
+        zone time step, before weather is updated.
+
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
+        :return: Nothing
+        """
+        self._check_callback_args(f, 1, 'callback_begin_zone_timestep_before_set_current_weather')
+        cb_ptr = self.py_state_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        self.api.callbackBeginZoneTimestepBeforeSetCurrentWeather(state, cb_ptr)
 
     def callback_after_predictor_before_hvac_managers(self, state: c_void_p, f: FunctionType) -> None:
         """
         This function allows a client to register a function to be called back by EnergyPlus at the end of the
         predictor step but before HVAC managers.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_after_predictor_before_hvac_managers')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackAfterPredictorBeforeHVACManagers(state, cb_ptr)
@@ -278,9 +329,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of the
         predictor step after HVAC managers.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_after_predictor_after_hvac_managers')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackAfterPredictorAfterHVACManagers(state, cb_ptr)
@@ -290,9 +343,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus inside the system
         iteration loop.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_inside_system_iteration_loop')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackInsideSystemIterationLoop(state, cb_ptr)
@@ -302,9 +357,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a zone
         time step but before zone reporting has been completed.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_end_zone_timestep_before_zone_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfZoneTimeStepBeforeZoneReporting(state, cb_ptr)
@@ -314,9 +371,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a zone
         time step and after zone reporting.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_end_zone_timestep_after_zone_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfZoneTimeStepAfterZoneReporting(state, cb_ptr)
@@ -326,9 +385,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a system
         time step, but before HVAC reporting.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_end_system_timestep_before_hvac_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfSystemTimeStepBeforeHVACReporting(state, cb_ptr)
@@ -338,9 +399,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of a system
         time step and after HVAC reporting.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_end_system_timestep_after_hvac_reporting')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfSystemTimeStepAfterHVACReporting(state, cb_ptr)
@@ -350,9 +413,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of the zone
         sizing process.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_end_zone_sizing')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfZoneSizing(state, cb_ptr)
@@ -362,9 +427,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of the system
         sizing process.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_end_system_sizing')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfSystemSizing(state, cb_ptr)
@@ -374,9 +441,11 @@ class Runtime:
         This function allows a client to register a function to be called back by EnergyPlus at the end of
         component get input processes.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_after_component_get_input')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackEndOfAfterComponentGetInput(state, cb_ptr)
@@ -388,36 +457,30 @@ class Runtime:
         """
         This function allows a client to register a function to be called back by EnergyPlus in unitary system sizing.
 
-        :param f: A python function which takes no arguments and returns nothing
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
+        self._check_callback_args(f, 1, 'callback_unitary_system_sizing')
         cb_ptr = self.py_state_callback_type(f)
         all_callbacks.append(cb_ptr)
         self.api.callbackUnitarySystemSizing(state, cb_ptr)
 
-    def new_state(self) -> c_void_p:
+    def callback_register_external_hvac_manager(self, state: c_void_p, f: FunctionType) -> None:
         """
-        This function creates a new state object that is required to pass into EnergyPlus Runtime API function calls
+        This function allows a client to register an external HVAC manager function to be called back in EnergyPlus.
+        By registering this function, EnergyPlus will bypass all HVAC calculations and expect that this function will
+        manage all HVAC through sensors and actuators. Right now this function is not well-supported, and this callback
+        should be considered purely as a placeholder until a future release refines the use case.
 
-        :return: A pointer to a new state object in memory
-        """
-        return self.api.stateNew()
-
-    def reset_state(self, state: c_void_p) -> None:
-        """
-        This function resets an existing state instance
-
+        :param state: An active EnergyPlus "state" that is returned from a call to `api.state_manager.new_state()`.
+        :param f: A python function which takes one argument, the current state instance, and returns nothing
         :return: Nothing
         """
-        self.api.stateReset(state)
-
-    def delete_state(self, state: c_void_p) -> None:
-        """
-        This function deletes an existing state instance
-
-        :return: Nothing
-        """
-        self.api.stateDelete(state)
+        self._check_callback_args(f, 1, 'callback_register_external_hvac_manager')
+        cb_ptr = self.py_state_callback_type(f)
+        all_callbacks.append(cb_ptr)
+        self.api.registerExternalHVACManager(state, cb_ptr)
 
     @staticmethod
     def clear_callbacks() -> None:

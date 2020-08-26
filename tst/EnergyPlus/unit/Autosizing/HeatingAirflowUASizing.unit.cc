@@ -56,6 +56,30 @@
 
 namespace EnergyPlus {
 
+TEST_F(AutoSizingFixture, HeatingAirflowUA_APIExampleUnitTest)
+{
+    // simple example unit test for API calls
+    // C and Python files will exercise the API by making function calls into each library
+    // see energyplusapi/Source Files/autosizing.c
+    bool errorsFound = false;
+    HeatingAirflowUASizer sizer;
+    // initializeForSingleDuctZoneTerminal(Real64 const elevation, Real64 mainFlowRate)
+    sizer.initializeForSingleDuctZoneTerminal(1650.0, 0.3); // Denver
+    EXPECT_TRUE(sizer.zoneSizingRunDone);
+    EXPECT_EQ(sizer.curZoneEqNum, 1);
+    EXPECT_TRUE(sizer.termUnitSingDuct);
+    EXPECT_EQ(sizer.curTermUnitSizingNum, 1);
+    EXPECT_GT(int(sizer.termUnitSizing.size()), 0);
+    EXPECT_EQ(sizer.termUnitSizing(1).AirVolFlow, 0.3);
+    Real64 sizedValue = sizer.size(DataSizing::AutoSize, errorsFound);
+    EXPECT_NEAR(sizedValue, 0.29599, 0.00001); // converts volume input to mass flow rate at elevation
+    EXPECT_FALSE(errorsFound);
+
+    sizer.initializeForSingleDuctZoneTerminal(0.0, 0.3);
+    sizedValue = sizer.size(DataSizing::AutoSize, errorsFound);
+    EXPECT_NEAR(sizedValue, 0.36129, 0.00001); // converts volume input to mass flow rate at elevation
+}
+
 TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
 {
     // this global state is what would be set up by E+ currently

@@ -22,4 +22,5 @@ configure_file( "${API_SOURCE_DIR}/autosizing.py" "${API_TARGET_DIR}/autosizing.
 configure_file( "${API_SOURCE_DIR}/func.py" "${API_TARGET_DIR}/func.py" )
 configure_file( "${API_SOURCE_DIR}/runtime.py" "${API_TARGET_DIR}/runtime.py" )
 configure_file( "${API_SOURCE_DIR}/plugin.py" "${API_TARGET_DIR}/plugin.py" )
+configure_file( "${API_SOURCE_DIR}/state.py" "${API_TARGET_DIR}/state.py" )
 configure_file( "${API_SOURCE_DIR}/__init__.py" "${API_TARGET_DIR}/__init__.py" )

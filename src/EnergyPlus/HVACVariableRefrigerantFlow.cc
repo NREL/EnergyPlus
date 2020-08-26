@@ -56,6 +56,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
+#include <EnergyPlus/Autosizing/CoolingCapacitySizing.hh>
+#include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/WaterHeatingCapacitySizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
@@ -161,7 +166,7 @@ namespace HVACVariableRefrigerantFlow {
     int const NumValidFuelTypes(9);
     Array1D_string const
         cValidFuelTypes(NumValidFuelTypes,
-                        {"Electric", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
+                        {"Electricity", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
 
     static std::string const fluidNameSteam("STEAM");
 
@@ -4579,20 +4584,20 @@ namespace HVACVariableRefrigerantFlow {
         // Set up output variables
         for (VRFNum = 1; VRFNum <= NumVRFTU; ++VRFNum) {
             if (VRFTU(VRFNum).CoolingCoilPresent) {
-                SetupOutputVariable("Zone VRF Air Terminal Cooling Electric Power",
+                SetupOutputVariable("Zone VRF Air Terminal Cooling Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRFTU(VRFNum).ParasiticCoolElecPower,
                                     "System",
                                     "Average",
                                     VRFTU(VRFNum).Name);
-                SetupOutputVariable("Zone VRF Air Terminal Cooling Electric Energy",
+                SetupOutputVariable("Zone VRF Air Terminal Cooling Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     VRFTU(VRFNum).ParasiticElecCoolConsumption,
                                     "System",
                                     "Sum",
                                     VRFTU(VRFNum).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     _,
                                     "System");
@@ -4634,20 +4639,20 @@ namespace HVACVariableRefrigerantFlow {
                                     VRFTU(VRFNum).Name);
             }
             if (VRFTU(VRFNum).HeatingCoilPresent) {
-                SetupOutputVariable("Zone VRF Air Terminal Heating Electric Power",
+                SetupOutputVariable("Zone VRF Air Terminal Heating Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRFTU(VRFNum).ParasiticHeatElecPower,
                                     "System",
                                     "Average",
                                     VRFTU(VRFNum).Name);
-                SetupOutputVariable("Zone VRF Air Terminal Heating Electric Energy",
+                SetupOutputVariable("Zone VRF Air Terminal Heating Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     VRFTU(VRFNum).ParasiticElecHeatConsumption,
                                     "System",
                                     "Sum",
                                     VRFTU(VRFNum).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HEATING",
                                     _,
                                     "System");
@@ -4718,13 +4723,13 @@ namespace HVACVariableRefrigerantFlow {
                                 "Average",
                                 VRF(NumCond).Name);
             if (VRF(NumCond).FuelType == FuelTypeElectric) {
-                SetupOutputVariable("VRF Heat Pump Cooling Electric Power",
+                SetupOutputVariable("VRF Heat Pump Cooling Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).ElecCoolingPower,
                                     "System",
                                     "Average",
                                     VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Cooling Electric Energy",
+                SetupOutputVariable("VRF Heat Pump Cooling Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     VRF(NumCond).CoolElecConsumption,
                                     "System",
@@ -4755,13 +4760,13 @@ namespace HVACVariableRefrigerantFlow {
                                     "System");
             }
             if (VRF(NumCond).FuelType == FuelTypeElectric) {
-                SetupOutputVariable("VRF Heat Pump Heating Electric Power",
+                SetupOutputVariable("VRF Heat Pump Heating Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).ElecHeatingPower,
                                     "System",
                                     "Average",
                                     VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Heating Electric Energy",
+                SetupOutputVariable("VRF Heat Pump Heating Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     VRF(NumCond).HeatElecConsumption,
                                     "System",
@@ -4801,7 +4806,7 @@ namespace HVACVariableRefrigerantFlow {
             if (VRF(NumCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
                 // For VRF_FluidTCtrl Model
                 SetupOutputVariable(
-                    "VRF Heat Pump Compressor Electric Power", OutputProcessor::Unit::W, VRF(NumCond).Ncomp, "System", "Average", VRF(NumCond).Name);
+                    "VRF Heat Pump Compressor Electricity Rate", OutputProcessor::Unit::W, VRF(NumCond).Ncomp, "System", "Average", VRF(NumCond).Name);
                 SetupOutputVariable("VRF Heat Pump Outdoor Unit Fan Power",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).OUFanPower,
@@ -4893,20 +4898,20 @@ namespace HVACVariableRefrigerantFlow {
 
             if (VRF(NumCond).DefrostStrategy == Resistive ||
                 (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelType == FuelTypeElectric)) {
-                SetupOutputVariable("VRF Heat Pump Defrost Electric Power",
+                SetupOutputVariable("VRF Heat Pump Defrost Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).DefrostPower,
                                     "System",
                                     "Average",
                                     VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Defrost Electric Energy",
+                SetupOutputVariable("VRF Heat Pump Defrost Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     VRF(NumCond).DefrostConsumption,
                                     "System",
                                     "Sum",
                                     VRF(NumCond).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HEATING",
                                     _,
                                     "System");
@@ -4946,20 +4951,20 @@ namespace HVACVariableRefrigerantFlow {
                                 "Average",
                                 VRF(NumCond).Name);
 
-            SetupOutputVariable("VRF Heat Pump Crankcase Heater Electric Power",
+            SetupOutputVariable("VRF Heat Pump Crankcase Heater Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 VRF(NumCond).CrankCaseHeaterPower,
                                 "System",
                                 "Average",
                                 VRF(NumCond).Name);
-            SetupOutputVariable("VRF Heat Pump Crankcase Heater Electric Energy",
+            SetupOutputVariable("VRF Heat Pump Crankcase Heater Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VRF(NumCond).CrankCaseHeaterElecConsumption,
                                 "System",
                                 "Sum",
                                 VRF(NumCond).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "COOLING",
                                 _,
                                 "System");
@@ -5015,39 +5020,39 @@ namespace HVACVariableRefrigerantFlow {
                                     "Cooling",
                                     _,
                                     "System");
-                SetupOutputVariable("VRF Heat Pump Evaporative Condenser Pump Electric Power",
+                SetupOutputVariable("VRF Heat Pump Evaporative Condenser Pump Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).EvapCondPumpElecPower,
                                     "System",
                                     "Average",
                                     VRF(NumCond).Name);
-                SetupOutputVariable("VRF Heat Pump Evaporative Condenser Pump Electric Energy",
+                SetupOutputVariable("VRF Heat Pump Evaporative Condenser Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     VRF(NumCond).EvapCondPumpElecConsumption,
                                     "System",
                                     "Sum",
                                     VRF(NumCond).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     _,
                                     "System");
 
                 if (VRF(NumCond).BasinHeaterPowerFTempDiff > 0.0) {
-                    SetupOutputVariable("VRF Heat Pump Basin Heater Electric Power",
+                    SetupOutputVariable("VRF Heat Pump Basin Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         VRF(NumCond).BasinHeaterPower,
                                         "System",
                                         "Average",
                                         VRF(NumCond).Name);
-                    SetupOutputVariable("VRF Heat Pump Basin Heater Electric Energy",
+                    SetupOutputVariable("VRF Heat Pump Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         VRF(NumCond).BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         VRF(NumCond).Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "COOLING",
                                         _,
                                         "System");
@@ -7018,11 +7023,9 @@ namespace HVACVariableRefrigerantFlow {
         using DataHVACGlobals::CoolingCapacitySizing;
         using DataHVACGlobals::HeatingAirflowSizing;
         using DataHVACGlobals::HeatingCapacitySizing;
-        using DataHVACGlobals::SystemAirflowSizing;
         using General::RoundSigDigits;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         static std::string const RoutineName("SizeVRF: "); // include trailing blank space
 
@@ -7216,9 +7219,8 @@ namespace HVACVariableRefrigerantFlow {
             zoneHVACIndex = VRFTU(VRFTUNum).HVACSizingIndex;
 
             SizingMethod = CoolingAirflowSizing;
-            FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
             PrintFlag = true;
-            SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
+            bool errorsFound = false;
             SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
             EqSizing.SizingMethod(SizingMethod) = SAFMethod;
             if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
@@ -7240,8 +7242,15 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).MaxCoolAirVolFlow = TempSize;
+
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                std::string stringOverride = "Cooling Supply Air Flow Rate [m3/s]";
+                if (DataGlobals::isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
+
             } else if (SAFMethod == FlowPerCoolingCapacity) {
                 SizingMethod = CoolingCapacitySizing;
                 TempSize = AutoSize;
@@ -7251,14 +7260,20 @@ namespace HVACVariableRefrigerantFlow {
                 if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                     DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                DataAutosizedCoolingCapacity = TempSize;
+                CoolingCapacitySizer sizerCoolingCapacity;
+                sizerCoolingCapacity.overrideSizingString(SizingString);
+                sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                DataAutosizedCoolingCapacity = sizerCoolingCapacity.size(TempSize, errorsFound);
                 DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-                SizingMethod = CoolingAirflowSizing;
                 PrintFlag = true;
                 TempSize = AutoSize;
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).MaxCoolAirVolFlow = TempSize;
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                std::string stringOverride = "Cooling Supply Air Flow Rate [m3/s]";
+                if (DataGlobals::isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
             }
 
             SizingMethod = HeatingAirflowSizing;
@@ -7286,8 +7301,12 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).MaxHeatAirVolFlow = TempSize;
+                bool errorsFound = false;
+                HeatingAirFlowSizer sizingHeatingAirFlow;
+                sizingHeatingAirFlow.overrideSizingString(SizingString);
+                // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                VRFTU(VRFTUNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
             } else if (SAFMethod == FlowPerHeatingCapacity) {
                 SizingMethod = HeatingCapacitySizing;
                 TempSize = AutoSize;
@@ -7297,20 +7316,24 @@ namespace HVACVariableRefrigerantFlow {
                 if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                     DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                DataAutosizedHeatingCapacity = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                DataAutosizedHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
                 DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                 SizingMethod = HeatingAirflowSizing;
                 PrintFlag = true;
                 TempSize = AutoSize;
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).MaxHeatAirVolFlow = TempSize;
+                errorsFound = false;
+                HeatingAirFlowSizer sizingHeatingAirFlow;
+                sizingHeatingAirFlow.overrideSizingString(SizingString);
+                // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                VRFTU(VRFTUNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
             }
 
-            SizingMethod = CoolingAirflowSizing;
-            FieldNum = 2; // N2, \field Supply Air Flow Rate When No Cooling is Needed
             PrintFlag = true;
-            SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
             SAFMethod = ZoneHVACSizing(zoneHVACIndex).NoCoolHeatSAFMethod;
             EqSizing.SizingMethod(SizingMethod) = SAFMethod;
             if ((SAFMethod == SupplyAirFlowRate) || (SAFMethod == FlowPerFloorArea) || (SAFMethod == FractionOfAutosizedHeatingAirflow) ||
@@ -7339,8 +7362,13 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = TempSize;
+                CoolingAirFlowSizer sizingCoolingAirFlow;
+                std::string stringOverride = "No Cooling Supply Air Flow Rate [m3/s]";
+                if (DataGlobals::isEpJSON) stringOverride = "no_cooling_supply_air_flow_rate [m3/s]";
+                sizingCoolingAirFlow.overrideSizingString(stringOverride);
+                //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
             }
 
             SizingMethod = HeatingAirflowSizing;
@@ -7375,8 +7403,12 @@ namespace HVACVariableRefrigerantFlow {
                 } else {
                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = TempSize;
+                bool errorsFound = false;
+                HeatingAirFlowSizer sizingNoHeatingAirFlow;
+                sizingNoHeatingAirFlow.overrideSizingString(SizingString);
+                // sizingNoHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                sizingNoHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = sizingNoHeatingAirFlow.size(TempSize, errorsFound);
             }
 
             // initialize capacity sizing variables: cooling
@@ -7426,33 +7458,39 @@ namespace HVACVariableRefrigerantFlow {
 
             PrintFlag = true;
 
-            SizingMethod = CoolingAirflowSizing;
-            FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
-            SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = VRFTU(VRFTUNum).MaxCoolAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxCoolAirVolFlow = TempSize;
+            bool errorsFound = false;
+            CoolingAirFlowSizer sizingCoolingAirFlow;
+            std::string stringOverride = "Cooling Supply Air Flow Rate [m3/s]";
+            if (DataGlobals::isEpJSON) stringOverride = "cooling_supply_air_flow_rate [m3/s]";
+            sizingCoolingAirFlow.overrideSizingString(stringOverride);
+            //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            VRFTU(VRFTUNum).MaxCoolAirVolFlow = sizingCoolingAirFlow.size(TempSize, errorsFound);
 
             FieldNum = 3; // N3, \field Supply Air Flow Rate During Heating Operation
             SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
             SizingMethod = HeatingAirflowSizing;
             TempSize = VRFTU(VRFTUNum).MaxHeatAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxHeatAirVolFlow = TempSize;
+            errorsFound = false;
+            HeatingAirFlowSizer sizingHeatingAirFlow;
+            sizingHeatingAirFlow.overrideSizingString(SizingString);
+            // sizingHeatingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            sizingHeatingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            VRFTU(VRFTUNum).MaxHeatAirVolFlow = sizingHeatingAirFlow.size(TempSize, errorsFound);
 
-            FieldNum = 2; // N2, \field Supply Air Flow Rate When No Cooling is Needed
-            SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-            SizingMethod = SystemAirflowSizing;
-            TempSize = VRFTU(VRFTUNum).MaxNoCoolAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = TempSize;
+            errorsFound = false;
+            SystemAirFlowSizer sizerSystemAirFlow;
+            std::string sizingString = "No Cooling Supply Air Flow Rate [m3/s]";
+            sizerSystemAirFlow.overrideSizingString(sizingString);
+            sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = sizerSystemAirFlow.size(VRFTU(VRFTUNum).MaxNoCoolAirVolFlow, errorsFound);
 
-            FieldNum = 4; // N4, \field Supply Air Flow Rate When No Heating is Needed
-            SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-            SizingMethod = SystemAirflowSizing;
-            TempSize = VRFTU(VRFTUNum).MaxNoHeatAirVolFlow;
-            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-            VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = TempSize;
+            SystemAirFlowSizer sizerSystemAirFlow2;
+            sizingString = "No Heating Supply Air Flow Rate [m3/s]";
+            sizerSystemAirFlow2.overrideSizingString(sizingString);
+            sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+            VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = sizerSystemAirFlow2.size(VRFTU(VRFTUNum).MaxNoHeatAirVolFlow, errorsFound);
         }
         IsAutoSize = false;
         if (VRFTU(VRFTUNum).CoolOutAirVolFlow == AutoSize) {
@@ -7689,8 +7727,11 @@ namespace HVACVariableRefrigerantFlow {
                 SizingString = "Supplemental Heating Coil Nominal Capacity [W]";
                 if (TempSize == DataSizing::AutoSize) {
                     IsAutoSize = true;
-                    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = TempSize;
+                    bool errorsFound = false;
+                    HeatingCapacitySizer sizerHeatingCapacity;
+                    sizerHeatingCapacity.overrideSizingString(SizingString);
+                    sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                    VRFTU(VRFTUNum).DesignSuppHeatingCapacity = sizerHeatingCapacity.size(TempSize, errorsFound);
                 }
             }
         }

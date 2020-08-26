@@ -175,7 +175,6 @@ namespace Furnaces {
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using DataEnvironment::OutDryBulbTemp;
-    using DataEnvironment::StdBaroPress;
     using DataEnvironment::StdRhoAir;
     using namespace DataZoneEquipment;
     using Psychrometrics::PsyCpAirFnW;

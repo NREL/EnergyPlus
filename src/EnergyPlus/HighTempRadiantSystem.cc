@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
@@ -642,31 +643,31 @@ namespace HighTempRadiantSystem {
                                 _,
                                 "System");
             if (HighTempRadSys(Item).HeaterType == Gas) {
-                SetupOutputVariable("Zone Radiant HVAC Gas Rate",
+                SetupOutputVariable("Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).GasPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Gas Energy",
+                SetupOutputVariable("Zone Radiant HVAC NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).GasEnergy,
                                     "System",
                                     "Sum",
                                     HighTempRadSys(Item).Name,
                                     _,
-                                    "Gas",
+                                    "NaturalGas",
                                     "Heating",
                                     _,
                                     "System");
             } else if (HighTempRadSys(Item).HeaterType == Electric) {
-                SetupOutputVariable("Zone Radiant HVAC Electric Power",
+                SetupOutputVariable("Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).ElecPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Electric Energy",
+                SetupOutputVariable("Zone Radiant HVAC Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).ElecEnergy,
                                     "System",
@@ -800,8 +801,6 @@ namespace HighTempRadiantSystem {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
-        using ReportSizingManager::RequestSizing;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -877,8 +876,11 @@ namespace HighTempRadiantSystem {
                 } else {
                     TempSize = HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-                HighTempRadSys(RadSysNum).MaxPowerCapac = TempSize;
+                bool errorsFound = false;
+                HeatingCapacitySizer sizerHeatingCapacity;
+                sizerHeatingCapacity.overrideSizingString(SizingString);
+                sizerHeatingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
+                HighTempRadSys(RadSysNum).MaxPowerCapac = sizerHeatingCapacity.size(TempSize, errorsFound);
                 DataScalableCapSizingON = false;
             }
         }

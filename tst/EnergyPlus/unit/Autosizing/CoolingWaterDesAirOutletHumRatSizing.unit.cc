@@ -366,6 +366,25 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirOutletHumRatSizingGauntlet)
     eiooutput =
         std::string(" Component Sizing Information, Coil:Cooling:Water, MyWaterCoil, Design Size Design Outlet Air Humidity Ratio [kgWater/kgDryAir], 3.00000E-003\n");
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+
+    // Test 17 - Repeat w/ dry coil and high water temp, Outdoor Air System Equipment with DOAS system, autosized humidity ratio
+    // start with an auto-sized value as the user input
+    inputValue = EnergyPlus::DataSizing::AutoSize;
+    DataSizing::DataDesInletAirHumRat = 0.010;
+    DataSizing::DataDesInletWaterTemp = 12.0;
+    DataSizing::DataDesInletAirHumRat = 0.008;
+
+    // do sizing
+    sizer.wasAutoSized = false;
+    printFlag = true;
+    sizer.initializeWithinEP(this->state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::Coil_CoolingWater), "MyWaterCoil", printFlag, routineName);
+    sizedValue = sizer.size(inputValue, errorsFound);
+    EXPECT_EQ(AutoSizingResultType::NoError, sizer.errorType);
+    EXPECT_TRUE(sizer.wasAutoSized);
+    EXPECT_NEAR(DataSizing::DataDesInletAirHumRat, sizedValue, 0.0001); // hard-sized value
+    EXPECT_NEAR(0.008, sizedValue, 0.0001);                             // hum rat set to inlet hum rat
+    sizer.autoSizedValue = 0.0;                                         // reset for next test
+
 }
 
 } // namespace EnergyPlus

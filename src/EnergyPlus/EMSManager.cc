@@ -71,6 +71,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -228,12 +229,14 @@ namespace EMSManager {
             AnyEnergyManagementSystemInModel = false;
         }
 
+        AnyEnergyManagementSystemInModel = AnyEnergyManagementSystemInModel || DataGlobals::externalHVACManager;
+
         if (AnyEnergyManagementSystemInModel) {
 
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-                ioFiles.edd.ensure_open("CheckIFAnyEMS");
+                ioFiles.edd.ensure_open("CheckIFAnyEMS", ioFiles.outputControl.edd);
             }
         } else {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
@@ -959,6 +962,8 @@ namespace EMSManager {
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginNewEvironment;
+                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER") {
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {

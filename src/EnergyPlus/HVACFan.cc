@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -238,10 +239,13 @@ namespace HVACFan {
         DataSizing::DataAutosizable = true;
         DataSizing::DataEMSOverrideON = m_maxAirFlowRateEMSOverrideOn;
         DataSizing::DataEMSOverride = m_maxAirFlowRateEMSOverrideValue;
-        ReportSizingManager::RequestSizing(state,
-            m_fanType, name, DataHVACGlobals::SystemAirflowSizing, "Design Maximum Air Flow Rate [m3/s]", tempFlow, bPRINT, routineName);
-        designAirVolFlowRate = tempFlow;
-        DataSizing::DataAutosizable = true;
+
+        bool errorsFound = false;
+        SystemAirFlowSizer sizerSystemAirFlow;
+        sizerSystemAirFlow.initializeWithinEP(state, m_fanType, name, bPRINT, routineName);
+        designAirVolFlowRate = sizerSystemAirFlow.size(tempFlow, errorsFound);
+
+        DataSizing::DataAutosizable = true; // should be false?
         DataSizing::DataEMSOverrideON = false;
         DataSizing::DataEMSOverride = 0.0;
 
@@ -601,17 +605,17 @@ namespace HVACFan {
             ShowFatalError(routineName + "Errors found in input for fan name = " + name + ".  Program terminates.");
         }
 
-        SetupOutputVariable("Fan Electric Power", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
+        SetupOutputVariable("Fan Electricity Rate", OutputProcessor::Unit::W, m_fanPower, "System", "Average", name);
         SetupOutputVariable("Fan Rise in Air Temperature", OutputProcessor::Unit::deltaC, m_deltaTemp, "System", "Average", name);
         SetupOutputVariable("Fan Heat Gain to Air", OutputProcessor::Unit::W, m_powerLossToAir, "System", "Average", name);
-        SetupOutputVariable("Fan Electric Energy",
+        SetupOutputVariable("Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             m_fanEnergy,
                             "System",
                             "Sum",
                             name,
                             _,
-                            "Electric",
+                            "Electricity",
                             "Fans",
                             m_endUseSubcategoryName,
                             "System");

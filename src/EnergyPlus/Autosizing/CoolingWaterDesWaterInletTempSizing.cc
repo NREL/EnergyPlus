@@ -64,9 +64,11 @@ Real64 CoolingWaterDesWaterInletTempSizer::size(Real64 _originalValue, bool &err
     } else {
         this->errorType = AutoSizingResultType::ErrorType1;
     }
-    if (this->isEpJSON) this->sizingString = "design_inlet_water_temperature [C]";
+    if (this->overrideSizeString) {
+        if (this->isEpJSON) this->sizingString = "design_inlet_water_temperature [C]";
+    }
     this->selectSizerOutput(errorsFound);
-    if (this->getCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
+    if (this->isCoilReportObject) coilSelectionReportObj->setCoilEntWaterTemp(this->compName, this->compType, this->autoSizedValue);
     return this->autoSizedValue;
 }
 
