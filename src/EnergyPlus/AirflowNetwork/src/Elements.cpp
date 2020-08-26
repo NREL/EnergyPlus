@@ -234,7 +234,7 @@ namespace AirflowNetwork {
         return x * x;
     }
 
-    int Duct::calculate(EnergyPlusData &state,
+    int Duct::calculate(EnergyPlusData & EP_UNUSED(state),
                         bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                         Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                         int const EP_UNUSED(i),     // Linkage number
@@ -528,7 +528,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int SurfaceCrack::calculate(EnergyPlusData &state,
+    int SurfaceCrack::calculate(EnergyPlusData & EP_UNUSED(state),
                                 bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                 Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                 int const i,                // Linkage number
@@ -752,7 +752,7 @@ namespace AirflowNetwork {
     }
 
 
-    int DuctLeak::calculate(EnergyPlusData &state,
+    int DuctLeak::calculate(EnergyPlusData & EP_UNUSED(state),
                             bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                             Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                             int const EP_UNUSED(i),     // Linkage number
@@ -1042,7 +1042,7 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int DetailedFan::calculate(EnergyPlusData &state,
+    int DetailedFan::calculate(EnergyPlusData & EP_UNUSED(state),
                                bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                int const i,                // Linkage number
@@ -1302,7 +1302,7 @@ namespace AirflowNetwork {
     }
 
 
-    int Damper::calculate(EnergyPlusData &state,
+    int Damper::calculate(EnergyPlusData & EP_UNUSED(state),
                           bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                           Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                           int const i,                // Linkage number
@@ -1429,7 +1429,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int EffectiveLeakageRatio::calculate(EnergyPlusData &state,
+    int EffectiveLeakageRatio::calculate(EnergyPlusData & EP_UNUSED(state),
                                          bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                          Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                          int const EP_UNUSED(i),     // Linkage number
@@ -1594,7 +1594,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DetailedOpening::calculate(EnergyPlusData &state,
+    int DetailedOpening::calculate(EnergyPlusData & EP_UNUSED(state),
                                    bool const EP_UNUSED(LFLAG),           // Initialization flag.If = 1, use laminar relationship
                                    Real64 const PDROP,                    // Total pressure drop across a component (P1 - P2) [Pa]
                                    int const IL,                          // Linkage number
@@ -2059,7 +2059,7 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int SimpleOpening::calculate(EnergyPlusData &state,
+    int SimpleOpening::calculate(EnergyPlusData & EP_UNUSED(state),
                                  bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                  Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                  int const i,                // Linkage number
@@ -2204,7 +2204,7 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    int ConstantPressureDrop::calculate(EnergyPlusData &state,
+    int ConstantPressureDrop::calculate(EnergyPlusData & EP_UNUSED(state),
                                         bool const EP_UNUSED(LFLAG),           // Initialization flag.If = 1, use laminar relationship
                                         const Real64 PDROP,                    // Total pressure drop across a component (P1 - P2) [Pa]
                                         int const i,                           // Linkage number
@@ -2263,7 +2263,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int EffectiveLeakageArea::calculate(EnergyPlusData &state,
+    int EffectiveLeakageArea::calculate(EnergyPlusData & EP_UNUSED(state),
                                         bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                         Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                         int const EP_UNUSED(i),     // Linkage number
@@ -2435,7 +2435,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompCoilProp::calculate(EnergyPlusData &state,
+    int DisSysCompCoilProp::calculate(EnergyPlusData & EP_UNUSED(state),
                                       bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                       Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                       int const EP_UNUSED(i),     // Linkage number
@@ -2744,7 +2744,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompTermUnitProp::calculate(EnergyPlusData &state,
+    int DisSysCompTermUnitProp::calculate(EnergyPlusData & EP_UNUSED(state),
                                           bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                           Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                           int const i,                // Linkage number
@@ -2915,7 +2915,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int DisSysCompHXProp::calculate(EnergyPlusData &state,
+    int DisSysCompHXProp::calculate(EnergyPlusData & EP_UNUSED(state),
                                     bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                     Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                     int const EP_UNUSED(i),     // Linkage number
@@ -3201,7 +3201,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int ZoneExhaustFan::calculate(EnergyPlusData &state,
+    int ZoneExhaustFan::calculate(EnergyPlusData & EP_UNUSED(state),
                                   bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                   Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                   int const i,                // Linkage number
@@ -3444,7 +3444,7 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    int HorizontalOpening::calculate(EnergyPlusData &state,
+    int HorizontalOpening::calculate(EnergyPlusData & EP_UNUSED(state),
                                      bool const LFLAG,           // Initialization flag.If = 1, use laminar relationship
                                      Real64 const PDROP,         // Total pressure drop across a component (P1 - P2) [Pa]
                                      int const i,                // Linkage number
