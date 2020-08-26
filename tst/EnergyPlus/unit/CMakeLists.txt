@@ -19,6 +19,7 @@ set( test_src
   AirTerminalSingleDuctPIUReheat.unit.cc
   Autosizing/AutosizingFixture.hh
   Autosizing/All_Simple_Sizing.unit.cc
+  Autosizing/BaseClassSizing.unit.cc
   Autosizing/CoolingAirFlowSizing.unit.cc
   Autosizing/CoolingCapacitySizing.unit.cc
   Autosizing/CoolingSHRSizing.unit.cc
@@ -172,7 +173,6 @@ set( test_src
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
   ReportCoilSelection.unit.cc
-  ReportSizingManager.unit.cc
   ResultsFramework.unit.cc
   RoomAirflowNetwork.unit.cc
   RoomAirModelUserTempPattern.unit.cc

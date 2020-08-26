@@ -53,25 +53,25 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -171,10 +171,8 @@ namespace PlantHeatExchangerFluidToFluid {
         }
     }
 
-    void HeatExchangerStruct::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
-                                       bool const FirstHVACIteration,
-                                       Real64 &CurLoad,
-                                       bool const EP_UNUSED(RunFlag))
+    void HeatExchangerStruct::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const EP_UNUSED(RunFlag))
     {
 
         // SUBROUTINE INFORMATION:
@@ -863,16 +861,16 @@ namespace PlantHeatExchangerFluidToFluid {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->SupplySideLoop.DesignVolumeFlowRate = tmpSupSideDesignVolFlowRate;
                 }
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput("HeatExchanger:FluidToFluid",
-                                                            this->Name,
-                                                            "Loop Supply Side Design Fluid Flow Rate [m3/s]",
-                                                            this->SupplySideLoop.DesignVolumeFlowRate);
+                    BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                                                 this->Name,
+                                                 "Loop Supply Side Design Fluid Flow Rate [m3/s]",
+                                                 this->SupplySideLoop.DesignVolumeFlowRate);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput("HeatExchanger:FluidToFluid",
-                                                            this->Name,
-                                                            "Initial Loop Supply Side Design Fluid Flow Rate [m3/s]",
-                                                            this->SupplySideLoop.DesignVolumeFlowRate);
+                    BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                                                 this->Name,
+                                                 "Initial Loop Supply Side Design Fluid Flow Rate [m3/s]",
+                                                 this->SupplySideLoop.DesignVolumeFlowRate);
                 }
             } else {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) {
@@ -894,16 +892,16 @@ namespace PlantHeatExchangerFluidToFluid {
                 if (DataPlant::PlantFirstSizesOkayToFinalize) this->DemandSideLoop.DesignVolumeFlowRate = tmpDmdSideDesignVolFlowRate;
             }
             if (DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput("HeatExchanger:FluidToFluid",
-                                                        this->Name,
-                                                        "Loop Demand Side Design Fluid Flow Rate [m3/s]",
-                                                        this->DemandSideLoop.DesignVolumeFlowRate);
+                BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                                             this->Name,
+                                             "Loop Demand Side Design Fluid Flow Rate [m3/s]",
+                                             this->DemandSideLoop.DesignVolumeFlowRate);
             }
             if (DataPlant::PlantFirstSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput("HeatExchanger:FluidToFluid",
-                                                        this->Name,
-                                                        "Initial Loop Demand Side Design Fluid Flow Rate [m3/s]",
-                                                        this->DemandSideLoop.DesignVolumeFlowRate);
+                BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                                             this->Name,
+                                             "Initial Loop Demand Side Design Fluid Flow Rate [m3/s]",
+                                             this->DemandSideLoop.DesignVolumeFlowRate);
             }
         }
         PlantUtilities::RegisterPlantCompDesignFlow(this->DemandSideLoop.inletNodeNum, tmpDmdSideDesignVolFlowRate);
@@ -951,18 +949,17 @@ namespace PlantHeatExchangerFluidToFluid {
                     if (DataPlant::PlantFirstSizesOkayToFinalize) this->UA = 0.0;
                 }
                 if (DataPlant::PlantFinalSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "HeatExchanger:FluidToFluid", this->Name, "Heat Exchanger U-Factor Times Area Value [W/C]", this->UA);
-                    ReportSizingManager::ReportSizingOutput(
-                        "HeatExchanger:FluidToFluid",
-                        this->Name,
-                        "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]",
-                        tmpDeltaTloopToLoop);
+                    BaseSizer::reportSizerOutput("HeatExchanger:FluidToFluid",
+                                                 this->Name,
+                                                 "Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]",
+                                                 tmpDeltaTloopToLoop);
                 }
                 if (DataPlant::PlantFirstSizesOkayToReport) {
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "HeatExchanger:FluidToFluid", this->Name, "Initial Heat Exchanger U-Factor Times Area Value [W/C]", this->UA);
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "HeatExchanger:FluidToFluid",
                         this->Name,
                         "Initial Loop-to-loop Temperature Difference Used to Size Heat Exchanger U-Factor Times Area Value [C]",

@@ -88,7 +88,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -233,7 +232,8 @@ namespace VentilatedSlab {
         VentSlabNumericFields.deallocate();
     }
 
-    void SimVentilatedSlab(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
+    void SimVentilatedSlab(EnergyPlusData &state,
+                           std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -259,7 +259,7 @@ namespace VentilatedSlab {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Item;                       // index of ventilated slab being simulated
+        int Item; // index of ventilated slab being simulated
 
         // FLOW:
         if (GetInputFlag) {
@@ -1077,8 +1077,8 @@ namespace VentilatedSlab {
                             VentSlab(Item).CCoilPlantName = cAlphaArgs(31);
                         } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
                             VentSlab(Item).CCoilType = Cooling_CoilHXAssisted;
-                            GetHXCoilTypeAndName(state,
-                                cAlphaArgs(30), cAlphaArgs(31), ErrorsFound, VentSlab(Item).CCoilPlantType, VentSlab(Item).CCoilPlantName);
+                            GetHXCoilTypeAndName(
+                                state, cAlphaArgs(30), cAlphaArgs(31), ErrorsFound, VentSlab(Item).CCoilPlantType, VentSlab(Item).CCoilPlantName);
                             if (UtilityRoutines::SameString(VentSlab(Item).CCoilPlantType, "Coil:Cooling:Water")) {
                                 VentSlab(Item).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
                             } else if (UtilityRoutines::SameString(VentSlab(Item).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry")) {
@@ -1356,7 +1356,8 @@ namespace VentilatedSlab {
         }
     }
 
-    void InitVentilatedSlab(EnergyPlusData &state, int const Item,               // index for the current ventilated slab
+    void InitVentilatedSlab(EnergyPlusData &state,
+                            int const Item,               // index for the current ventilated slab
                             int const VentSlabZoneNum,    // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
@@ -1421,8 +1422,8 @@ namespace VentilatedSlab {
         int SurfNum;    // Intermediate variable for keeping track of the surface number
         int ZoneNum;    // Intermediate variable for keeping track of the zone number
 
-        int AirRelNode;  // relief air node number in Ventilated Slab loop
-        int ColdConNode; // cold water control node number in Ventilated Slab loop
+        int AirRelNode;                              // relief air node number in Ventilated Slab loop
+        int ColdConNode;                             // cold water control node number in Ventilated Slab loop
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
@@ -1750,7 +1751,6 @@ namespace VentilatedSlab {
         using HVACHXAssistedCoolingCoil::GetHXCoilType;
         using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
         using PlantUtilities::MyPlantSizingIndex;
-        using ReportSizingManager::ReportSizingOutput;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetCoilSteamOutletNode;
         using WaterCoils::GetCoilWaterInletNode;
@@ -1882,7 +1882,7 @@ namespace VentilatedSlab {
                     std::string stringOverride = "Maximum Air Flow Rate [m3/s]";
                     if (DataGlobals::isEpJSON) stringOverride = "maximum_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
-                    //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
 
@@ -1903,7 +1903,7 @@ namespace VentilatedSlab {
                     std::string stringOverride = "Maximum Air Flow Rate [m3/s]";
                     if (DataGlobals::isEpJSON) stringOverride = "maximum_air_flow_rate [m3/s]";
                     sizingCoolingAirFlow.overrideSizingString(stringOverride);
-                    //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                    // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                     sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
                     CoolingAirVolFlowScalable = sizingCoolingAirFlow.size(TempSize, ErrorsFound);
                 }
@@ -1970,7 +1970,7 @@ namespace VentilatedSlab {
             TempSize = VentSlab(Item).MaxAirVolFlow;
             SystemAirFlowSizer sizerSystemAirFlow;
             sizerSystemAirFlow.overrideSizingString(SizingString);
-            //sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             VentSlab(Item).MaxAirVolFlow = sizerSystemAirFlow.size(TempSize, ErrorsFound);
         }
@@ -1982,7 +1982,7 @@ namespace VentilatedSlab {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (VentSlab(Item).OutAirVolFlow > 0.0) {
-                    ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         cMO_VentilatedSlab, VentSlab(Item).Name, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", VentSlab(Item).OutAirVolFlow);
                 }
             } else { // Autosize or hard-size with sizing run
@@ -1990,16 +1990,17 @@ namespace VentilatedSlab {
                 OutAirVolFlowDes = VentSlab(Item).MaxAirVolFlow;
                 if (IsAutoSize) {
                     VentSlab(Item).OutAirVolFlow = OutAirVolFlowDes;
-                    ReportSizingOutput(cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes);
+                    BaseSizer::reportSizerOutput(
+                        cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes);
                 } else {
                     if (VentSlab(Item).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0) {
                         OutAirVolFlowUser = VentSlab(Item).OutAirVolFlow;
-                        ReportSizingOutput(cMO_VentilatedSlab,
-                                           VentSlab(Item).Name,
-                                           "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
-                                           OutAirVolFlowDes,
-                                           "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
-                                           OutAirVolFlowUser);
+                        BaseSizer::reportSizerOutput(cMO_VentilatedSlab,
+                                                     VentSlab(Item).Name,
+                                                     "Design Size Maximum Outdoor Air Flow Rate [m3/s]",
+                                                     OutAirVolFlowDes,
+                                                     "User-Specified Maximum Outdoor Air Flow Rate [m3/s]",
+                                                     OutAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(OutAirVolFlowDes - OutAirVolFlowUser) / OutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
@@ -2024,10 +2025,10 @@ namespace VentilatedSlab {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (VentSlab(Item).MinOutAirVolFlow > 0.0) {
-                    ReportSizingOutput(cMO_VentilatedSlab,
-                                       VentSlab(Item).Name,
-                                       "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
-                                       VentSlab(Item).MinOutAirVolFlow);
+                    BaseSizer::reportSizerOutput(cMO_VentilatedSlab,
+                                                 VentSlab(Item).Name,
+                                                 "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
+                                                 VentSlab(Item).MinOutAirVolFlow);
                 }
             } else {
                 CheckZoneSizing(cMO_VentilatedSlab, VentSlab(Item).Name);
@@ -2037,17 +2038,17 @@ namespace VentilatedSlab {
                 }
                 if (IsAutoSize) {
                     VentSlab(Item).MinOutAirVolFlow = MinOutAirVolFlowDes;
-                    ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes);
                 } else { // Hard-size with sizing data
                     if (VentSlab(Item).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0) {
                         MinOutAirVolFlowUser = VentSlab(Item).MinOutAirVolFlow;
-                        ReportSizingOutput(cMO_VentilatedSlab,
-                                           VentSlab(Item).Name,
-                                           "Design Size Minimum Outdoor Air Flow Rate [m3/s]",
-                                           MinOutAirVolFlowDes,
-                                           "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
-                                           MinOutAirVolFlowUser);
+                        BaseSizer::reportSizerOutput(cMO_VentilatedSlab,
+                                                     VentSlab(Item).Name,
+                                                     "Design Size Minimum Outdoor Air Flow Rate [m3/s]",
+                                                     MinOutAirVolFlowDes,
+                                                     "User-Specified Minimum Outdoor Air Flow Rate [m3/s]",
+                                                     MinOutAirVolFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MinOutAirVolFlowDes - MinOutAirVolFlowUser) / MinOutAirVolFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
@@ -2074,10 +2075,10 @@ namespace VentilatedSlab {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (VentSlab(Item).MaxVolHotWaterFlow > 0.0) {
-                        ReportSizingOutput(cMO_VentilatedSlab,
-                                           VentSlab(Item).Name,
-                                           "User-Specified Maximum Hot Water Flow [m3/s]",
-                                           VentSlab(Item).MaxVolHotWaterFlow);
+                        BaseSizer::reportSizerOutput(cMO_VentilatedSlab,
+                                                     VentSlab(Item).Name,
+                                                     "User-Specified Maximum Hot Water Flow [m3/s]",
+                                                     VentSlab(Item).MaxVolHotWaterFlow);
                     }
                 } else { // Autosize or hard-size with sizing run
                     CheckZoneSizing(cMO_VentilatedSlab, VentSlab(Item).Name);
@@ -2165,17 +2166,17 @@ namespace VentilatedSlab {
 
                     if (IsAutoSize) {
                         VentSlab(Item).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-                        ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes);
                     } else { // Hard-size with sizing data
                         if (VentSlab(Item).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0) {
                             MaxVolHotWaterFlowUser = VentSlab(Item).MaxVolHotWaterFlow;
-                            ReportSizingOutput(cMO_VentilatedSlab,
-                                               VentSlab(Item).Name,
-                                               "Design Size Maximum Hot Water Flow [m3/s]",
-                                               MaxVolHotWaterFlowDes,
-                                               "User-Specified Maximum Hot Water Flow [m3/s]",
-                                               MaxVolHotWaterFlowUser);
+                            BaseSizer::reportSizerOutput(cMO_VentilatedSlab,
+                                                         VentSlab(Item).Name,
+                                                         "Design Size Maximum Hot Water Flow [m3/s]",
+                                                         MaxVolHotWaterFlowDes,
+                                                         "User-Specified Maximum Hot Water Flow [m3/s]",
+                                                         MaxVolHotWaterFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser) / MaxVolHotWaterFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
@@ -2205,7 +2206,7 @@ namespace VentilatedSlab {
             if (CurZoneEqNum > 0) {
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (VentSlab(Item).MaxVolHotSteamFlow > 0.0) {
-                        ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             cMO_VentilatedSlab, VentSlab(Item).Name, "User-Specified Maximum Steam Flow [m3/s]", VentSlab(Item).MaxVolHotSteamFlow);
                     }
                 } else { // Autosize or hard-size with sizing run
@@ -2282,16 +2283,17 @@ namespace VentilatedSlab {
                     }
                     if (IsAutoSize) {
                         VentSlab(Item).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
-                        ReportSizingOutput(cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
+                        BaseSizer::reportSizerOutput(
+                            cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes);
                     } else {
                         if (VentSlab(Item).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0) {
                             MaxVolHotSteamFlowUser = VentSlab(Item).MaxVolHotSteamFlow;
-                            ReportSizingOutput(cMO_VentilatedSlab,
-                                               VentSlab(Item).Name,
-                                               "Design Size Maximum Steam Flow [m3/s]",
-                                               MaxVolHotSteamFlowDes,
-                                               "User-Specified Maximum Steam Flow [m3/s]",
-                                               MaxVolHotSteamFlowUser);
+                            BaseSizer::reportSizerOutput(cMO_VentilatedSlab,
+                                                         VentSlab(Item).Name,
+                                                         "Design Size Maximum Steam Flow [m3/s]",
+                                                         MaxVolHotSteamFlowDes,
+                                                         "User-Specified Maximum Steam Flow [m3/s]",
+                                                         MaxVolHotSteamFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser) / MaxVolHotSteamFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
@@ -2319,7 +2321,7 @@ namespace VentilatedSlab {
         if (CurZoneEqNum > 0) {
             if (!IsAutoSize && !ZoneSizingRunDone) {
                 if (VentSlab(Item).MaxVolColdWaterFlow > 0.0) {
-                    ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         cMO_VentilatedSlab, VentSlab(Item).Name, "User-Specified Maximum Cold Water Flow [m3/s]", VentSlab(Item).MaxVolColdWaterFlow);
                 }
             } else {
@@ -2409,16 +2411,17 @@ namespace VentilatedSlab {
                 }
                 if (IsAutoSize) {
                     VentSlab(Item).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
-                    ReportSizingOutput(cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes);
+                    BaseSizer::reportSizerOutput(
+                        cMO_VentilatedSlab, VentSlab(Item).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes);
                 } else {
                     if (VentSlab(Item).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0) {
                         MaxVolColdWaterFlowUser = VentSlab(Item).MaxVolColdWaterFlow;
-                        ReportSizingOutput(cMO_VentilatedSlab,
-                                           VentSlab(Item).Name,
-                                           "Design Size Maximum Cold Water Flow [m3/s]",
-                                           MaxVolColdWaterFlowDes,
-                                           "User-Specified Maximum Cold Water Flow [m3/s]",
-                                           MaxVolColdWaterFlowUser);
+                        BaseSizer::reportSizerOutput(cMO_VentilatedSlab,
+                                                     VentSlab(Item).Name,
+                                                     "Design Size Maximum Cold Water Flow [m3/s]",
+                                                     MaxVolColdWaterFlowDes,
+                                                     "User-Specified Maximum Cold Water Flow [m3/s]",
+                                                     MaxVolColdWaterFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser) / MaxVolColdWaterFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \"" +
@@ -2456,7 +2459,8 @@ namespace VentilatedSlab {
         }
     }
 
-    void CalcVentilatedSlab(EnergyPlusData &state, int &Item,                     // number of the current ventilated slab being simulated
+    void CalcVentilatedSlab(EnergyPlusData &state,
+                            int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied (W)
@@ -2603,11 +2607,11 @@ namespace VentilatedSlab {
                         CheckSteamCoilSchedule(
                             "Coil:Heating:Steam", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
-                        CheckHeatingCoilSchedule(state,
-                            "Coil:Heating:Electric", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
+                        CheckHeatingCoilSchedule(
+                            state, "Coil:Heating:Electric", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
-                        CheckHeatingCoilSchedule(state,
-                            "Coil:Heating:Fuel", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
+                        CheckHeatingCoilSchedule(
+                            state, "Coil:Heating:Fuel", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else {
                     }
                 }
@@ -2624,7 +2628,8 @@ namespace VentilatedSlab {
                                                VentSlab(Item).CCoilSchedValue,
                                                VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                        CheckHXAssistedCoolingCoilSchedule(state,
+                                                           "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            VentSlab(Item).CCoilName,
                                                            VentSlab(Item).CCoilSchedValue,
                                                            VentSlab(Item).CCoil_Index);
@@ -2644,11 +2649,11 @@ namespace VentilatedSlab {
                         CheckSteamCoilSchedule(
                             "Coil:Heating:Steam", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
-                        CheckHeatingCoilSchedule(state,
-                            "Coil:Heating:Electric", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
+                        CheckHeatingCoilSchedule(
+                            state, "Coil:Heating:Electric", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
-                        CheckHeatingCoilSchedule(state,
-                            "Coil:Heating:Fuel", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
+                        CheckHeatingCoilSchedule(
+                            state, "Coil:Heating:Fuel", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else {
                     }
                 }
@@ -2667,7 +2672,8 @@ namespace VentilatedSlab {
                                                VentSlab(Item).CCoilSchedValue,
                                                VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                        CheckHXAssistedCoolingCoilSchedule(state,
+                                                           "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            VentSlab(Item).CCoilName,
                                                            VentSlab(Item).CCoilSchedValue,
                                                            VentSlab(Item).CCoil_Index);
@@ -2997,8 +3003,8 @@ namespace VentilatedSlab {
                     if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         HVACFan::fanObjs[VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                     } else if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        Fans::SimulateFanComponents(state,
-                            VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                        Fans::SimulateFanComponents(
+                            state, VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                     }
 
                     CpFan = PsyCpAirFnW(Node(FanOutletNode).HumRat);
@@ -3011,7 +3017,8 @@ namespace VentilatedSlab {
                         if (SELECT_CASE_var == Heating_WaterCoilType) {
                             // control water flow to obtain output matching QZnReq
 
-                            ControlCompOutput(state, VentSlab(Item).Name,
+                            ControlCompOutput(state,
+                                              VentSlab(Item).Name,
                                               cMO_VentilatedSlab,
                                               Item,
                                               FirstHVACIteration,
@@ -3250,14 +3257,15 @@ namespace VentilatedSlab {
                     if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                         HVACFan::fanObjs[VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                     } else if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                        Fans::SimulateFanComponents(state,
-                            VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                        Fans::SimulateFanComponents(
+                            state, VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                     }
 
                     CpFan = PsyCpAirFnW(Node(FanOutletNode).HumRat);
                     QZnReq = (Node(OutletNode).MassFlowRate) * CpFan * (RadInTemp - Node(FanOutletNode).Temp);
 
-                    ControlCompOutput(state, VentSlab(Item).Name,
+                    ControlCompOutput(state,
+                                      VentSlab(Item).Name,
                                       cMO_VentilatedSlab,
                                       Item,
                                       FirstHVACIteration,
@@ -3303,15 +3311,16 @@ namespace VentilatedSlab {
             if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                Fans::SimulateFanComponents(state,
-                    VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+                Fans::SimulateFanComponents(
+                    state, VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             }
         }
 
         CalcVentilatedSlabCoilOutput(Item, PowerMet, LatOutputProvided);
     }
 
-    void CalcVentilatedSlabComps(EnergyPlusData &state, int const Item,                // system index in ventilated slab array
+    void CalcVentilatedSlabComps(EnergyPlusData &state,
+                                 int const Item,                // system index in ventilated slab array
                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                  Real64 &LoadMet                // load met by the system (watts)
     )
@@ -3376,8 +3385,8 @@ namespace VentilatedSlab {
         if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
             HVACFan::fanObjs[VentSlab(Item).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
         } else if (VentSlab(Item).FanType_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-            Fans::SimulateFanComponents(state,
-                VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
+            Fans::SimulateFanComponents(
+                state, VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
         }
         if ((VentSlab(Item).CCoilPresent) && (VentSlab(Item).CCoilSchedValue >= 0.0)) {
             if (VentSlab(Item).CCoilType == Cooling_CoilHXAssisted) {
@@ -3495,7 +3504,8 @@ namespace VentilatedSlab {
         PowerMet = QUnitOut;
     }
 
-    void CalcVentilatedSlabRadComps(EnergyPlusData &state, int const Item,                          // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(EnergyPlusData &state,
+                                    int const Item,                          // System index in ventilated slab array
                                     bool const EP_UNUSED(FirstHVACIteration) // flag for 1st HVAV iteration in the time step !unused1208
     )
     {

@@ -54,26 +54,26 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -90,9 +90,9 @@ namespace BoilerSteam {
     // PURPOSE OF THIS MODULE:
     // Performs steam boiler simulation for plant simulation
 
-    const char * fluidNameSteam = "STEAM";
+    const char *fluidNameSteam = "STEAM";
 
-    PlantComponent *BoilerSpecs::factory(BoilerSteamData & boilers, std::string const &objectName)
+    PlantComponent *BoilerSpecs::factory(BoilerSteamData &boilers, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (boilers.getSteamBoilerInput) {
@@ -112,7 +112,8 @@ namespace BoilerSteam {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void BoilerSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void BoilerSpecs::simulate(
+        EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         this->initialize(state.dataBranchInputManager);
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
@@ -249,21 +250,21 @@ namespace BoilerSteam {
                 ErrorsFound = true;
             }
             thisBoiler.BoilerInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
-                                                                                       ErrorsFound,
-                                                                                       DataIPShortCuts::cCurrentModuleObject,
-                                                                                       DataIPShortCuts::cAlphaArgs(1),
-                                                                                       DataLoopNode::NodeType_Steam,
-                                                                                       DataLoopNode::NodeConnectionType_Inlet,
-                                                                                       1,
-                                                                                       DataLoopNode::ObjectIsNotParent);
+                                                                                ErrorsFound,
+                                                                                DataIPShortCuts::cCurrentModuleObject,
+                                                                                DataIPShortCuts::cAlphaArgs(1),
+                                                                                DataLoopNode::NodeType_Steam,
+                                                                                DataLoopNode::NodeConnectionType_Inlet,
+                                                                                1,
+                                                                                DataLoopNode::ObjectIsNotParent);
             thisBoiler.BoilerOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
-                                                                                        ErrorsFound,
-                                                                                        DataIPShortCuts::cCurrentModuleObject,
-                                                                                        DataIPShortCuts::cAlphaArgs(1),
-                                                                                        DataLoopNode::NodeType_Steam,
-                                                                                        DataLoopNode::NodeConnectionType_Outlet,
-                                                                                        1,
-                                                                                        DataLoopNode::ObjectIsNotParent);
+                                                                                 ErrorsFound,
+                                                                                 DataIPShortCuts::cCurrentModuleObject,
+                                                                                 DataIPShortCuts::cAlphaArgs(1),
+                                                                                 DataLoopNode::NodeType_Steam,
+                                                                                 DataLoopNode::NodeConnectionType_Outlet,
+                                                                                 1,
+                                                                                 DataLoopNode::ObjectIsNotParent);
             BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
                                                DataIPShortCuts::cAlphaArgs(1),
                                                DataIPShortCuts::cAlphaArgs(3),
@@ -317,7 +318,18 @@ namespace BoilerSteam {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
             PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
-                this->Name, DataPlant::TypeOf_Boiler_Steam, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
+                                                    this->Name,
+                                                    DataPlant::TypeOf_Boiler_Steam,
+                                                    this->LoopNum,
+                                                    this->LoopSideNum,
+                                                    this->BranchNum,
+                                                    this->CompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");
             }
@@ -423,12 +435,8 @@ namespace BoilerSteam {
                             "BOILERS",
                             _,
                             "Plant");
-        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
-                            OutputProcessor::Unit::W,
-                            this->FuelUsed,
-                            "System",
-                            "Average",
-                            this->Name);
+        SetupOutputVariable(
+            "Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate", OutputProcessor::Unit::W, this->FuelUsed, "System", "Average", this->Name);
         SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,
@@ -489,21 +497,21 @@ namespace BoilerSteam {
                 if (this->NomCapWasAutoSized) {
                     this->NomCap = tmpNomCap;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Boiler:Steam", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput("Boiler:Steam", this->Name, "Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput("Boiler:Steam", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
+                        BaseSizer::reportSizerOutput("Boiler:Steam", this->Name, "Initial Design Size Nominal Capacity [W]", tmpNomCap);
                     }
                 } else { // Hard-sized with sizing data
                     if (this->NomCap > 0.0 && tmpNomCap > 0.0) {
                         Real64 NomCapUser = this->NomCap;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("Boiler:Steam",
-                                                                    this->Name,
-                                                                    "Design Size Nominal Capacity [W]",
-                                                                    tmpNomCap,
-                                                                    "User-Specified Nominal Capacity [W]",
-                                                                    NomCapUser);
+                            BaseSizer::reportSizerOutput("Boiler:Steam",
+                                                         this->Name,
+                                                         "Design Size Nominal Capacity [W]",
+                                                         tmpNomCap,
+                                                         "User-Specified Nominal Capacity [W]",
+                                                         NomCapUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpNomCap - NomCapUser) / NomCapUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizePump: Potential issue with equipment sizing for " + this->Name);
@@ -525,7 +533,7 @@ namespace BoilerSteam {
                 ErrorsFound = true;
             }
             if (!this->NomCapWasAutoSized && this->NomCap > 0.0 && DataPlant::PlantFinalSizesOkayToReport) {
-                ReportSizingManager::ReportSizingOutput("Boiler:Steam", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
+                BaseSizer::reportSizerOutput("Boiler:Steam", this->Name, "User-Specified Nominal Capacity [W]", this->NomCap);
             }
         }
 

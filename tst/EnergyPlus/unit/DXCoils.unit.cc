@@ -2229,7 +2229,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     DataSizing::CurDuctType = DataHVACGlobals::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::displayEioSummary = true;
 
     // Setting predefined tables is needed though
@@ -2258,7 +2258,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
     EXPECT_NEAR(lowSpeedCondPumpPower, DXCoils::DXCoil(1).EvapCondPumpElecNomPower2, 0.1);
 
     // Write the EIO Table we need
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::WriteEioTables();
 
     // Now check output tables / EIO
@@ -2454,7 +2454,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     DataSizing::CurDuctType = DataHVACGlobals::Cooling;
 
     // We aim to test resulting values that are in this report, so request it
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::displayEioSummary = true;
 
     // Setting predefined tables is needed though
@@ -2475,7 +2475,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
     EXPECT_NEAR(condPumpPower, DXCoils::DXCoil(1).EvapCondPumpElecNomPower(1), 0.1);
 
     // Write the EIO Table we need
-    // We actually don't need this because ReportSizingOutput also outputs to the "ComponentSizes" table
+    // We actually don't need this because ReportSizerOutput also outputs to the "ComponentSizes" table
     // OutputReportTabular::WriteEioTables();
 
     // Now check output tables / EIO

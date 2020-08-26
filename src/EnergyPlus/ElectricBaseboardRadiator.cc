@@ -74,7 +74,6 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -132,7 +131,8 @@ namespace ElectricBaseboardRadiator {
     bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
 
     // Functions
-    void clear_state() {
+    void clear_state()
+    {
         NumElecBaseboards = 0;
         QBBElecRadSource.clear();
         QBBElecRadSrcAvg.clear();
@@ -149,7 +149,8 @@ namespace ElectricBaseboardRadiator {
         ZoneEquipmentListChecked = false;
     }
 
-    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimElecBaseboard(EnergyPlusData &state,
+                          std::string const &EquipName,
                           int const EP_UNUSED(ActualZoneNum),
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -172,7 +173,7 @@ namespace ElectricBaseboardRadiator {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int BaseboardNum;               // Index of unit in baseboard array
+        int BaseboardNum; // Index of unit in baseboard array
 
         if (GetInputFlag) {
             GetElectricBaseboardInput();

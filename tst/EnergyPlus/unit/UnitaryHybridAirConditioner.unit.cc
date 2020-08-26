@@ -78,7 +78,6 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/SystemReports.hh>
@@ -100,7 +99,6 @@ using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::OutputReportPredefined;
-using namespace EnergyPlus::ReportSizingManager;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::SystemReports;
 

@@ -189,7 +189,6 @@ Real64 SystemAirFlowSizer::size(Real64 _originalValue, bool &errorsFound)
                             if (this->autoSizedValue == this->finalZoneSizing(this->curZoneEqNum).DesCoolVolFlow) {
                                 if (this->finalZoneSizing(this->curZoneEqNum).CoolDDNum > 0 &&
                                     this->finalZoneSizing(this->curZoneEqNum).CoolDDNum <= DataEnvironment::TotDesDays) {
-                                    // This block of code is entered in Test ReportSizingManager.unit.cc::ReportSizingManager_FanPeak
                                     DDNameFanPeak = WeatherManager::DesDayInput(this->finalZoneSizing(this->curZoneEqNum).CoolDDNum).Title;
                                     dateTimeFanPeak =
                                         General::TrimSigDigits(

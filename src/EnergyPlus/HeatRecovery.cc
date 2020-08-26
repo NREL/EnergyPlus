@@ -55,8 +55,9 @@
 #include <EnergyPlus/Autosizing/All_Simple_Sizing.hh>
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -68,15 +69,13 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -222,7 +221,8 @@ namespace HeatRecovery {
         HeatExchangerUniqueNames.clear();
     }
 
-    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,             // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state,
+                         std::string const &CompName,             // name of the heat exchanger unit
                          bool const FirstHVACIteration,           // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                          // Pointer to Component
                          int const FanOpMode,                     // Supply air fan operating mode
@@ -1252,7 +1252,8 @@ namespace HeatRecovery {
         }
     }
 
-    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state,
+                          int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num)
     {
@@ -1683,7 +1684,7 @@ namespace HeatRecovery {
         bool errorsFound = false;
         SystemAirFlowSizer sizerSystemAirFlow;
         sizerSystemAirFlow.overrideSizingString(SizingString);
-        //sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+        // sizerSystemAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
         sizerSystemAirFlow.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
         ExchCond(ExchNum).NomSupAirVolFlow = sizerSystemAirFlow.size(TempSize, errorsFound);
         DataConstantUsedForSizing = 0.0;
@@ -1707,7 +1708,7 @@ namespace HeatRecovery {
             bool errorsFound = false;
             SystemAirFlowSizer sizerSystemAirFlow2;
             sizerSystemAirFlow2.overrideSizingString(SizingString);
-            //sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            // sizerSystemAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow2.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             ExchCond(ExchNum).NomSecAirVolFlow = sizerSystemAirFlow2.size(TempSize, errorsFound);
             DataConstantUsedForSizing = 0.0;
@@ -1727,7 +1728,7 @@ namespace HeatRecovery {
             bool errorsFound = false;
             SystemAirFlowSizer sizerSystemAirFlow3;
             sizerSystemAirFlow3.overrideSizingString(SizingString);
-            //sizerSystemAirFlow3.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+            // sizerSystemAirFlow3.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
             sizerSystemAirFlow3.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
             BalDesDehumPerfData(BalDesDehumPerfIndex).NomSupAirVolFlow = sizerSystemAirFlow3.size(TempSize, errorsFound);
 
@@ -2335,18 +2336,18 @@ namespace HeatRecovery {
                             ExchCond(ExNum).SensEffectiveness = 0.0;
                             if (!ExchCond(ExNum).SensEffectivenessFlag) {
                                 ShowWarningError("HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                    " sensible effectiveness is less than zero. Check the following inputs.");
+                                                 " sensible effectiveness is less than zero. Check the following inputs.");
                                 if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
                                     ShowContinueError("...Sensible Effectiveness at 100% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectSensible100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectSensible100, 2));
                                     ShowContinueError("...Sensible Effectiveness at 75% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectSensible75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectSensible75, 2));
                                     ShowContinueError("...Sensible effectiveness reset to zero and the simulation continues.");
                                 } else {
                                     ShowContinueError("...Sensible Effectiveness at 100% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectSensible100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectSensible100, 2));
                                     ShowContinueError("...Sensible Effectiveness at 75% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectSensible75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectSensible75, 2));
                                     ShowContinueError("...Sensible effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError("...Heat Exchanger Air Volume Flow Ratio = " + RoundSigDigits(HXAirVolFlowRatio, 2));
@@ -2358,18 +2359,18 @@ namespace HeatRecovery {
                             ExchCond(ExNum).LatEffectiveness = 0.0;
                             if (!ExchCond(ExNum).LatEffectivenessFlag) {
                                 ShowWarningError("HeatExchanger:AirToAir:SensibleAndLatent =\"" + ExchCond(ExNum).Name + "\"" +
-                                    " latent effectiveness is less than zero. Check the following inputs.");
+                                                 " latent effectiveness is less than zero. Check the following inputs.");
                                 if (ExchCond(ExNum).SupInTemp < ExchCond(ExNum).SecInTemp) {
                                     ShowContinueError("...Latent Effectiveness at 100% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectLatent100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectLatent100, 2));
                                     ShowContinueError("...Latent Effectiveness at 75% Heating Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).HeatEffectLatent75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).HeatEffectLatent75, 2));
                                     ShowContinueError("...Latent effectiveness reset to zero and the simulation continues.");
                                 } else {
                                     ShowContinueError("...Latent Effectiveness at 100% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectLatent100, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectLatent100, 2));
                                     ShowContinueError("...Latent Effectiveness at 75% Cooling Air Flow = " +
-                                        RoundSigDigits(ExchCond(ExNum).CoolEffectLatent75, 2));
+                                                      RoundSigDigits(ExchCond(ExNum).CoolEffectLatent75, 2));
                                     ShowContinueError("...Latent effectiveness reset to zero and the simulation continues.");
                                 }
                                 ShowContinueError("...Heat Exchanger Air Volume Flow Ratio = " + RoundSigDigits(HXAirVolFlowRatio, 2));

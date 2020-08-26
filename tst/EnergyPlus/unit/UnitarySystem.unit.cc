@@ -3889,7 +3889,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
     DataSizing::CurZoneEqNum = 1;
-    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in Sizer
 
     UnitarySys thisSys;
     UnitarySys *mySys(&thisSys);
@@ -11216,7 +11216,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     UnitarySys *mySys(&thisSys);
     UnitarySystems::numUnitarySystems = 1;
 
-    DataEnvironment::StdRhoAir = 1.2; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdRhoAir = 1.2; // Prevent divide by zero in Sizer
 
     thisSys.UnitType = "AirLoopHVAC:UnitarySystem";
     thisSys.m_MultiOrVarSpeedCoolCoil = false;
@@ -11237,7 +11237,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     thisSys.m_MaxNoCoolHeatAirVolFlow = DataSizing::AutoSize;
     thisSys.m_DesignFanVolFlowRate = DataSizing::AutoSize;
 
-    // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in ReportSizingManager)
+    // With Test Fan 3 fan heat - this fails before the #6026 fix in UnitarySystem (and in Sizer)
     thisSys.m_FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
     thisSys.m_FanIndex = 2; // Fan:SystemModel is zero-based subscripts, so 2 is 3
     Real64 expectedSize = 18976.394 + locDesignHeatGain3;

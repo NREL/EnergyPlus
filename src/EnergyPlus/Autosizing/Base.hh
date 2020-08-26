@@ -116,7 +116,7 @@ struct BaseSizer
     bool dataScalableCapSizingON = false;
     bool isCoilReportObject = false; // provides access to coil reporting
     bool isFanReportObject = false;  // provides access to fan reporting
-    bool initialized = false;     // indicates initializeWithinEP was called
+    bool initialized = false;        // indicates initializeWithinEP was called
     AutoSizingResultType errorType = AutoSizingResultType::NoError;
     AutoSizingType sizingType = AutoSizingType::Unknown;
     std::string sizingString = "";
@@ -223,7 +223,7 @@ struct BaseSizer
     // ASHRAEMinSATCoolingSizing, ASHRAEMaxSATHeatingSizing
     int dataZoneUsedForSizing = 0;
 
-    //HeatingCoilDesAirInletTempSizing,
+    // HeatingCoilDesAirInletTempSizing,
     int dataDesicDehumNum = 0;
 
     // WaterHeatingCoilUASizing
@@ -269,7 +269,6 @@ struct BaseSizer
     void overrideSizingString(std::string &string);
 
 protected:
-
     std::string lastErrorMessages = "";
 
     void addErrorMessage(std::string const &s);
@@ -278,16 +277,9 @@ protected:
 
     void preSize(Real64 originalValue);
 
-    static void reportSizerOutput(std::string const &CompType,
-                                  std::string const &CompName,
-                                  std::string const &VarDesc,
-                                  Real64 VarValue,
-                                  Optional_string_const UsrDesc = _,
-                                  Optional<Real64 const> UsrValue = _);
-
     void selectSizerOutput(bool &errorsFound);
 
-    void select2StgDXHumCtrlSizerOutput(bool& errorsFound);
+    void select2StgDXHumCtrlSizerOutput(bool &errorsFound);
 
     bool isValidCoilType(std::string const &compType);
 
@@ -295,22 +287,29 @@ protected:
 
     bool checkInitialized(bool &errorsFound);
 
-    Real64 setOAFracForZoneEqSizing(Real64 const& desMassFlow, DataSizing::ZoneEqSizingData const& zoneEqSizing);
-    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const& outAirFrac,
-        DataSizing::ZoneEqSizingData const& zoneEqSizing,
-        DataSizing::ZoneSizingData const& finalZoneSizing);
-    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const& outAirFrac,
-        DataSizing::ZoneEqSizingData const& zoneEqSizing,
-        DataSizing::ZoneSizingData const& finalZoneSizing);
-    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const& outAirFrac,
-        DataSizing::ZoneEqSizingData const& zoneEqSizing,
-        DataSizing::ZoneSizingData const& finalZoneSizing);
-    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const& outAirFrac,
-        DataSizing::ZoneEqSizingData const& zoneEqSizing,
-        DataSizing::ZoneSizingData const& finalZoneSizing);
-
     void clearState();
 
+public:
+    static void reportSizerOutput(std::string const &CompType,
+                                  std::string const &CompName,
+                                  std::string const &VarDesc,
+                                  Real64 VarValue,
+                                  Optional_string_const UsrDesc = _,
+                                  Optional<Real64 const> UsrValue = _);
+
+    Real64 setOAFracForZoneEqSizing(Real64 const &desMassFlow, DataSizing::ZoneEqSizingData const &zoneEqSizing);
+    Real64 setHeatCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setHeatCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletTempForZoneEqSizing(Real64 const &outAirFrac,
+                                               DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                               DataSizing::ZoneSizingData const &finalZoneSizing);
+    Real64 setCoolCoilInletHumRatForZoneEqSizing(Real64 const &outAirFrac,
+                                                 DataSizing::ZoneEqSizingData const &zoneEqSizing,
+                                                 DataSizing::ZoneSizingData const &finalZoneSizing);
 };
 
 extern bool oneTimeCompRptHeaderFlag;

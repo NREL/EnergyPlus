@@ -53,7 +53,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -326,8 +325,7 @@ void BaseSizer::reportSizerOutput(std::string const &CompType,
     // places so it involves touching most of E+
     auto &outputFiles = EnergyPlus::IOFiles::getSingleton();
     if (oneTimeCompRptHeaderFlag) {
-        if (ReportSizingManager::MyOneTimeFlag) print(outputFiles.eio, Format_990);
-        ReportSizingManager::MyOneTimeFlag = false;
+        print(outputFiles.eio, Format_990);
         oneTimeCompRptHeaderFlag = false;
     }
 

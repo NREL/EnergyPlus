@@ -93,7 +93,6 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/StandardRatings.hh>
@@ -159,14 +158,14 @@ namespace DXCoils {
     int const On(1);  // normal compressor operation
     int const Off(0); // signal DXCoil that compressor shouldn't run
 
-    Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
-    Real64 const RatedInletWetBulbTemp(19.4444); // 19.44 or 67F
+    Real64 const RatedInletAirTemp(26.6667);          // 26.6667C or 80F
+    Real64 const RatedInletWetBulbTemp(19.4444);      // 19.44 or 67F
     Real64 const RatedInletAirHumRat(0.0111847);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-    Real64 const RatedOutdoorAirTemp(35.0);                                            // 35 C or 95F
-    Real64 const RatedInletAirTempHeat(21.1111);                                       // 21.11C or 70F
-    Real64 const RatedOutdoorAirTempHeat(8.3333);                                      // 8.33 C or 47F
-    Real64 const RatedOutdoorWetBulbTempHeat(6.1111);                                  // 6.11 C or 43F
-    Real64 const RatedInletWetBulbTempHeat(15.5556);                                   // 15.55 or 60F
+    Real64 const RatedOutdoorAirTemp(35.0);           // 35 C or 95F
+    Real64 const RatedInletAirTempHeat(21.1111);      // 21.11C or 70F
+    Real64 const RatedOutdoorAirTempHeat(8.3333);     // 8.33 C or 47F
+    Real64 const RatedOutdoorWetBulbTempHeat(6.1111); // 6.11 C or 43F
+    Real64 const RatedInletWetBulbTempHeat(15.5556);  // 15.55 or 60F
 
     Real64 const DryCoilOutletHumRatioMin(0.00001); // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
@@ -6649,7 +6648,6 @@ namespace DXCoils {
         using CurveManager::CurveValue;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
         using namespace OutputReportPredefined;
         using StandardRatings::CalcDXCoilStandardRating;
 
@@ -7101,19 +7099,19 @@ namespace DXCoils {
                     SecCoilAirFlowDes = DXCoil(DXCoilNum).RatedAirVolFlowRate(1) * DXCoil(DXCoilNum).SecCoilAirFlowScalingFactor;
                     if (IsAutoSize) {
                         DXCoil(DXCoilNum).SecCoilAirFlow = SecCoilAirFlowDes;
-                        ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                           DXCoil(DXCoilNum).Name,
-                                           "Design Size Secondary Coil Air Flow Rate [m3/s]",
-                                           SecCoilAirFlowDes);
+                        BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                     DXCoil(DXCoilNum).Name,
+                                                     "Design Size Secondary Coil Air Flow Rate [m3/s]",
+                                                     SecCoilAirFlowDes);
                     } else {
                         if (DXCoil(DXCoilNum).SecCoilAirFlow > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                             SecCoilAirFlowUser = DXCoil(DXCoilNum).SecCoilAirFlow;
-                            ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                               DXCoil(DXCoilNum).Name,
-                                               "Design Size Secondary Coil Air Flow Rate [m3/s]",
-                                               SecCoilAirFlowDes,
-                                               "User-Specified Secondary Coil Air Flow Rate [m3/s]",
-                                               SecCoilAirFlowUser);
+                            BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                         DXCoil(DXCoilNum).Name,
+                                                         "Design Size Secondary Coil Air Flow Rate [m3/s]",
+                                                         SecCoilAirFlowDes,
+                                                         "User-Specified Secondary Coil Air Flow Rate [m3/s]",
+                                                         SecCoilAirFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(SecCoilAirFlowDes - SecCoilAirFlowUser) / SecCoilAirFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
@@ -7168,7 +7166,7 @@ namespace DXCoils {
                             if (DataGlobals::isEpJSON) stringOverride = "high_speed_evaporative_condenser_pump_rated_power_consumption [W]";
                         } else {
                             stringOverride = "Evaporative Condenser Pump Rated Power Consumption [W]";
-                            if (DataGlobals::isEpJSON)stringOverride = "evaporative_condenser_pump_rated_power_consumption [W]";
+                            if (DataGlobals::isEpJSON) stringOverride = "evaporative_condenser_pump_rated_power_consumption [W]";
                         }
                     }
                     SizingMethod = AutoCalculateSizing;
@@ -7536,19 +7534,19 @@ namespace DXCoils {
                 }
                 if (IsAutoSize) {
                     DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) = MSEvapCondAirFlowDes;
-                    ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                       DXCoil(DXCoilNum).Name,
-                                       "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
-                                       MSEvapCondAirFlowDes);
+                    BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                 DXCoil(DXCoilNum).Name,
+                                                 "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
+                                                 MSEvapCondAirFlowDes);
                 } else {
                     if (DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode) > 0.0 && MSEvapCondAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                         MSEvapCondAirFlowUser = DXCoil(DXCoilNum).MSEvapCondAirFlow(Mode);
-                        ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                           DXCoil(DXCoilNum).Name,
-                                           "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
-                                           MSEvapCondAirFlowDes,
-                                           "User-Specified Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
-                                           MSEvapCondAirFlowUser);
+                        BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                     DXCoil(DXCoilNum).Name,
+                                                     "Design Size Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
+                                                     MSEvapCondAirFlowDes,
+                                                     "User-Specified Speed " + TrimSigDigits(Mode) + " Evaporative Condenser Air Flow Rate [m3/s]",
+                                                     MSEvapCondAirFlowUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MSEvapCondAirFlowDes - MSEvapCondAirFlowUser) / MSEvapCondAirFlowUser) > AutoVsHardSizingThreshold) {
                                 ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
@@ -7594,19 +7592,21 @@ namespace DXCoils {
                 // Design Size data is always available
                 if (IsAutoSize) {
                     DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) = MSEvapCondPumpElecNomPowerDes;
-                    ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                       DXCoil(DXCoilNum).Name,
-                                       "Design Size Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
-                                       MSEvapCondPumpElecNomPowerDes);
+                    BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                 DXCoil(DXCoilNum).Name,
+                                                 "Design Size Speed " + TrimSigDigits(Mode) +
+                                                     " Rated Evaporative Condenser Pump Power Consumption [W]",
+                                                 MSEvapCondPumpElecNomPowerDes);
                 } else {
                     if (DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode) > 0.0 && MSEvapCondPumpElecNomPowerDes > 0.0 && !HardSizeNoDesRun) {
                         MSEvapCondPumpElecNomPowerUser = DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(Mode);
-                        ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                           DXCoil(DXCoilNum).Name,
-                                           "Design Size Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
-                                           MSEvapCondPumpElecNomPowerDes,
-                                           "User-Specified Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
-                                           MSEvapCondPumpElecNomPowerUser);
+                        BaseSizer::reportSizerOutput(
+                            DXCoil(DXCoilNum).DXCoilType,
+                            DXCoil(DXCoilNum).Name,
+                            "Design Size Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
+                            MSEvapCondPumpElecNomPowerDes,
+                            "User-Specified Speed " + TrimSigDigits(Mode) + " Rated Evaporative Condenser Pump Power Consumption [W]",
+                            MSEvapCondPumpElecNomPowerUser);
                         if (DisplayExtraWarnings) {
                             if ((std::abs(MSEvapCondPumpElecNomPowerDes - MSEvapCondPumpElecNomPowerUser) / MSEvapCondPumpElecNomPowerUser) >
                                 AutoVsHardSizingThreshold) {
@@ -7719,19 +7719,19 @@ namespace DXCoils {
                     SecCoilAirFlowDes = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) * DXCoil(DXCoilNum).MSSecCoilAirFlowScalingFactor(Mode);
                     if (IsAutoSize) {
                         DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) = SecCoilAirFlowDes;
-                        ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                           DXCoil(DXCoilNum).Name,
-                                           "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
-                                           SecCoilAirFlowDes);
+                        BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                     DXCoil(DXCoilNum).Name,
+                                                     "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
+                                                     SecCoilAirFlowDes);
                     } else {
                         if (DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode) > 0.0 && SecCoilAirFlowDes > 0.0 && !HardSizeNoDesRun) {
                             SecCoilAirFlowUser = DXCoil(DXCoilNum).MSSecCoilAirFlow(Mode);
-                            ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                               DXCoil(DXCoilNum).Name,
-                                               "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
-                                               SecCoilAirFlowDes,
-                                               "User-Specified Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
-                                               SecCoilAirFlowUser);
+                            BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                         DXCoil(DXCoilNum).Name,
+                                                         "Design Size Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
+                                                         SecCoilAirFlowDes,
+                                                         "User-Specified Speed " + TrimSigDigits(Mode) + " Secondary Coil Air Flow Rate [m3/s]",
+                                                         SecCoilAirFlowUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(SecCoilAirFlowDes - SecCoilAirFlowUser) / SecCoilAirFlowUser) > AutoVsHardSizingThreshold) {
                                     ShowMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
@@ -7857,17 +7857,17 @@ namespace DXCoils {
             }
             if (IsAutoSize) {
                 DXCoil(DXCoilNum).DefrostCapacity = DefrostCapacityDes;
-                ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     DXCoil(DXCoilNum).DXCoilType, DXCoil(DXCoilNum).Name, "Design Size Resistive Defrost Heater Capacity", DefrostCapacityDes);
             } else {
                 if (DXCoil(DXCoilNum).DefrostCapacity > 0.0 && DefrostCapacityDes > 0.0 && !HardSizeNoDesRun) {
                     DefrostCapacityUser = DXCoil(DXCoilNum).DefrostCapacity;
-                    ReportSizingOutput(DXCoil(DXCoilNum).DXCoilType,
-                                       DXCoil(DXCoilNum).Name,
-                                       "Design Size Resistive Defrost Heater Capacity",
-                                       DefrostCapacityDes,
-                                       "User-Specified Resistive Defrost Heater Capacity",
-                                       DefrostCapacityUser);
+                    BaseSizer::reportSizerOutput(DXCoil(DXCoilNum).DXCoilType,
+                                                 DXCoil(DXCoilNum).Name,
+                                                 "Design Size Resistive Defrost Heater Capacity",
+                                                 DefrostCapacityDes,
+                                                 "User-Specified Resistive Defrost Heater Capacity",
+                                                 DefrostCapacityUser);
                     if (DisplayExtraWarnings) {
                         if ((std::abs(DefrostCapacityDes - DefrostCapacityUser) / DefrostCapacityUser) > AutoVsHardSizingThreshold) {
                             ShowWarningMessage("SizeDxCoil: Potential issue with equipment sizing for " + DXCoil(DXCoilNum).DXCoilType + ' ' +
@@ -11146,7 +11146,7 @@ namespace DXCoils {
         Real64 HTinHumRatOut;                   // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
         Real64 AirMassFlowRate;                 // the standard air mass flow rate at the given capacity [kg/s]
         Real64 adjustedSHR;                     // SHR calculated using adjusted outlet air properties []
-        bool CBFErrors(false);           // Set to true if errors in CBF calculation, fatal at end of routine
+        bool CBFErrors(false);                  // Set to true if errors in CBF calculation, fatal at end of routine
 
         AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(StdPressureSeaLevel, InletAirTemp, InletAirHumRat, RoutineName);
         DeltaH = TotCap / AirMassFlowRate;
@@ -14159,7 +14159,8 @@ namespace DXCoils {
         }
     }
 
-    std::string GetDXCoilName(EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
+    std::string GetDXCoilName(
+        EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
     {
 
         // SUBROUTINE INFORMATION:

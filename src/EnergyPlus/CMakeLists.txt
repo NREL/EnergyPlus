@@ -537,8 +537,6 @@ SET( SRC
   RefrigeratedCase.hh
   ReportCoilSelection.cc
   ReportCoilSelection.hh
-  ReportSizingManager.cc
-  ReportSizingManager.hh
   ResultsFramework.cc
   ResultsFramework.hh
   ReturnAirPathManager.cc

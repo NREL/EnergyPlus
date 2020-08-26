@@ -50,7 +50,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
