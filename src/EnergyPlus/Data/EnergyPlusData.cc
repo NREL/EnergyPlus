@@ -58,6 +58,8 @@ namespace EnergyPlus {
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
+
+        this->dataWaterToAirHeatPump =  std::unique_ptr<WaterToAirHeatPumpData>(new WaterToAirHeatPumpData);
         this->dataWaterToAirHeatPumpSimple =  std::unique_ptr<WaterToAirHeatPumpSimpleData>(new WaterToAirHeatPumpSimpleData);
         this->dataWaterUse =  std::unique_ptr<WaterUseData>(new WaterUseData);
         this->dataWeatherManager =  std::unique_ptr<WeatherManagerData>(new WeatherManagerData);
@@ -100,6 +102,7 @@ namespace EnergyPlus {
         //outputReportTabular.clear_state();
         pipes.clear_state();
         dataPlantChillers.clear_state();
+        dataWaterToAirHeatPump->clear_state();
         dataWaterToAirHeatPumpSimple->clear_state();
         dataWaterUse->clear_state();
         dataWeatherManager->clear_state();
