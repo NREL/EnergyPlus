@@ -79,11 +79,11 @@ The parameters $d_0,b_1, b_2, b_3, c_0, c_2$ depend on several factors such as d
 $$Q_{max} = min(Q_{max}^{Li}, Q_{max}^{neg})$$
 
 #### Programming Approach
-The System Advisor Model (SAM) already has a battery module based on the models described in the previous section. In order to incorporate this  module in EnergyPlus, the battery model in SAM and all its dependencies can be imported into the third party liabrary in EnergyPlus. The battery model and its dependencies are contained in two folders of the SAM repository, the 'ssc' folder and the 'shared' folder. The link to the github repository of the SAM model is below. 
+The System Advisor Model (SAM) already has a battery module based on the models described in the previous section. In order to incorporate this  module in EnergyPlus, the battery model in SAM and all its dependencies can be imported into the third party library in EnergyPlus. The battery model and its dependencies are contained in two folders of the SAM repository, the 'ssc' folder and the 'shared' folder. The link to the github repository of the SAM model is below. 
 
 https://github.com/nrel/ssc
 
-The following liabraries from the SAM repository would be imported into EnergyPlus. 
+The following libraries from the SAM repository would be imported into EnergyPlus. 
 1.	cmod_battery.h
 2.	common.h 
 3.	core.h
@@ -101,7 +101,7 @@ The following liabraries from the SAM repository would be imported into EnergyPl
 
 A new class lifetime_calendar_t::runLithiumIonLifetimeModel has been programmed in the lib_battery module of SAM to model the capacity degradation of a lithium-ion battery based on the model described above by Smith et.al. [4]. The model outputs the updated capacity of the battery at every timestep taking into consideration the cycling history, state of charge, depth of discharge, and the ambient temperature to which the battery is exposed.  
 
-The electrical storage model in EnergyPlus is present in the file ElectricPowerServiceManager.cc. The storage model in this file currently has just two cases corresponding to the simple battery model (simpleBucketStorage) and the Kinetic Battery Model (kiBaMBattery). By importing the aforementioned liabraries from SAM, a more detailed and accurate capacity degaradation model for Lithium ion can be incorporated into EnergyPlus.  
+The electrical storage model in EnergyPlus is present in the file ElectricPowerServiceManager.cc. The storage model in this file currently has just two cases corresponding to the simple battery model (simpleBucketStorage) and the Kinetic Battery Model (kiBaMBattery). By importing the aforementioned libraries from SAM, a more detailed and accurate capacity degaradation model for Lithium ion can be incorporated into EnergyPlus.  
 
 # Inputs and Outputs
 The inputs and outputs that would be required to incorporate the Li-ion battery performance and lifetime degradation models are shown below. 
