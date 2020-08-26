@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,6;
 
@@ -107,7 +107,7 @@
     NONE,                    !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -437,6 +437,7 @@
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
+    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3
@@ -1575,9 +1576,9 @@
     16.0,                    !- Design Air Flow Rate {m3/s}
     1000,                    !- Design Fan Power {W}
     1750.0,                  !- Design U-Factor Times Area Value {W/K}
-    0.0,                     !- Free Convection Air Flow Rate {m3/s}
-    ,                        !- Free Convection Air Flow Rate Sizing Factor
-    0.0,                     !- Free Convection U-Factor Times Area Value {W/K}
+    0.0,                     !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    0.0,                     !- Free Convection Regime U-Factor Times Area Value {W/K}
     ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
@@ -1865,8 +1866,8 @@
     West Zone Radiant Floor, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -1875,8 +1876,8 @@
     East Zone Radiant Floor, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -1885,8 +1886,8 @@
     North Zone Radiant Floor,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneList,
     All Zones,               !- Name
@@ -1935,7 +1936,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     ,                        !- Heating Maximum Air Flow Fraction
-    ;                        !- Design Specification Zone Air Distribution Object Name
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   Sizing:Plant,
     Hot Water Loop,          !- Plant or Condenser Loop Name
@@ -1954,9 +1959,13 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     West Zone,               !- Zone Name
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
-    Autosize,                !- Hydronic Tubing Length {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
+    autosize,                !- Hydronic Tubing Length {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
     Autosize,                !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
@@ -1985,9 +1994,13 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     East Zone,               !- Zone Name
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
     0.0004,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
@@ -2016,9 +2029,13 @@
     RadiantSysAvailSched,    !- Availability Schedule Name
     North Zone,              !- Zone Name
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
+    ConvectionOnly,          !- Fluid to Radiant Surface Heat Transfer Model
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
+    0.016,                   !- Hydronic Tubing Outside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
+    0.35,                    !- Hydronic Tubing Conductivity {W/m-K}
     MeanAirTemperature,      !- Temperature Control Type
+    0.8,                     !- Running Mean Outdoor Air Temperature Weighting Factor
     0.0005,                  !- Rated Flow Rate {m3/s}
     ,                        !- Pump Flow Rate Schedule Name
     75000,                   !- Rated Pump Head {Pa}
@@ -2088,9 +2105,9 @@
 
   Output:Variable,*,Zone Radiant HVAC Pump Inlet Temperature,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Pump Electric Power,timestep;
+  Output:Variable,*,Zone Radiant HVAC Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Pump Electric Energy,timestep;
+  Output:Variable,*,Zone Radiant HVAC Pump Electricity Energy,timestep;
 
   Output:Variable,*,Zone Radiant HVAC Pump Mass Flow Rate,timestep;
 

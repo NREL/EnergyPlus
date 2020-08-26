@@ -386,13 +386,13 @@ This is calculation method used to determine site water mains temperature at eac
 
 \subsubsection{Water Mains Temperature Schedule Name}\label{water-mains-temperature-schedule-name}
 
-This is name of a schedule that contains site water mains temperature for each time step. 
+This is name of a schedule that contains site water mains temperature for each time step.
 
-\subsubsection{Annual Average Outdoor Air Temperature}\label{annual-average-outdoor-air-temperature} 
+\subsubsection{Annual Average Outdoor Air Temperature}\label{annual-average-outdoor-air-temperature}
 
 This is the annual average outdoor air dry-bulb temperature for the site.
 
-\subsubsection{Maximum Difference In Monthly Average Outdoor Air Temperatures}\label{maximum-difference-in-monthly-average-outdoor-air-temperatures} 
+\subsubsection{Maximum Difference In Monthly Average Outdoor Air Temperatures}\label{maximum-difference-in-monthly-average-outdoor-air-temperatures}
 
 This is the maximum difference in monthly-daily average of the outdoor air dry-bulb temperature for the site.
 
@@ -460,7 +460,7 @@ TMC = frac{ \text{AtmosphericTemperatureGradient} \cdot \text{EarthRadius} \cdot
 Then, the temperature at a height above ground is calculated as:
 
 \begin{equation}
-\text{ActualTemperature} = \text{Temperature}_{met} + TMC - 
+\text{ActualTemperature} = \text{Temperature}_{met} + TMC -
     frac{ \text{TemperatureGradient}_{site} * \text{EarthRadius} * \text{Height}_{site/component} }
         { \text{EarthRadius} + \text{Height}_{site/component} }
 \end{equation}
@@ -1808,12 +1808,12 @@ A nominal thermal conductance for the surface is calculated for the surface, inc
 For opaque surfaces, interior and exterior film coefficients are added to the surface construction based on the prescribed R-values for interior and exterior film coefficients as found in ASHRAE 90.1-2004, Appendix A, and shown below:~ The SI values are the exact values used inside EnergyPlus.
 
 \begin{longtable}[c]{p{1.2in}p{1.2in}p{1.2in}p{1.2in}p{1.2in}}
-\toprule 
+\toprule
 Surface Class & Interior Film Coefficient & Exterior Film Coefficient \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Surface Class & Interior Film Coefficient & Exterior Film Coefficient \tabularnewline
 \midrule
 \endhead
@@ -1945,12 +1945,12 @@ Surface Convection Parameters,PERIMETER\_ZN\_1\_WALL\_SOUTH,0,84.45,61.48,3.05,0
 This is an integer code for the type of model assigned to the outside face, if a specific model has been assigned. Surface(SurfLoop)\%ExtConvCoeff
 
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
-\toprule 
+\toprule
 Code value & meaning \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Code value & meaning \tabularnewline
 \midrule
 \endhead
@@ -4145,13 +4145,11 @@ Finally, grey interchange coefficients are presented. These are the coefficients
 Outputs are provided for air-cooled, single-speed direct expansion (DX) cooling coils as follows:
 
 \begin{lstlisting}
-! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}
+! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, SEER Default {Btu/W-h}, IEER {Btu/W-h}
 \end{lstlisting}
-
-~ DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_1:1\_COOLC DXCOIL, 29299.3, 3.04, 10.38, 10.47, 10.67
-
+~ DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_1:1\_COOLC DXCOIL, 23990.7, 2.57, 8.77, 9.30, 8.80, 9.03
 \begin{lstlisting}
-DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_2:2\_COOLC DXCOIL, 17427.1, 3.21, 10.95, 11.04, 11.20
+DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_2:2\_COOLC DXCOIL, 17626.1, 3.19, 10.88, 12.53, 11.46, 12.16
 \end{lstlisting}
 
 \subsubsection{Field: Component Type}\label{field-component-type-3}
@@ -4174,9 +4172,13 @@ The standard rated net COP or energy efficiency ratio (\emph{EER}) at standard r
 
 The energy efficiency ratio (\emph{EER}) at standard rating conditions for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
 
-\subsubsection{Field: SEER \{Btu/W-h\}}\label{field-seer-btuw-h}
+\subsubsection{Field: SEER User \{Btu/W-h\}}
 
-The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated.
+The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated. SEER User value calculation uses user specified Part Load Factor (PLF) curve to account for cycling effect.
+
+\subsubsection{Field: SEER Standard \{Btu/W-h\}}\label{field-seer-btuw-h}
+
+The seasonal energy efficiency ratio (SEER) for the DX cooling coil in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Single Speed DX Cooling Coil and Multi Speed DX Cooling Coil, Standard Ratings) for details on how this value is calculated. SEER Standard value calculation uses AHRI Standard 210/240-2008 default Part Load Factor (PLF) curve and cooling coefficient of degradation value of 0.25 to account for cycling effect. Otherwise, the SEER User and SEER Standard values calculation use identical procedure.
 
 \subsubsection{Field: IEER \{Btu/W-h\}}\label{field-ieer-btuw-h}
 
@@ -4229,7 +4231,7 @@ Rated net cooling capacity of unit at Test condition D per Standard ASHRAE 127. 
 Rated total electric power input of the unit at Test condition D per Standard ASHRAE 127. Units are Watts. See the EnergyPlus Engineering Reference (ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils) for details on how this value is calculated. The total electric power includes the supply fan power as well. The total electric power input is reported for class I, II, III and IV test conditions.
 
 \begin{lstlisting}
-! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W} 
+! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W}
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 1, 126953.8, 35918.5, 135678.7, 30852.7, 141523.1, 24400.1, 141727.0, 13951.0
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 2, 133377.6, 37330.3, 140336.0, 31647.7, 141727.0, 24424.7, 141727.0, 13951.0
  DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 3, 139488.4, 38673.3, 141354.0, 31821.4, 141727.0, 24424.7, 141727.0, 13951.0
@@ -4294,43 +4296,6 @@ The integrated part load value (\emph{IPLV}) for the Chiller:Electric:EIR and Ch
 \subsubsection{Field: IPLV in IP Units \{Btu/W-h\}}\label{field-iplv-in-ip-units-btuw-h}
 
 The integrated part load value (\emph{IPLV}) for the Chiller:Electric:EIR and Chiller:Electric:ReformulatedEIR in IP units of Btu/W-hr. See the EnergyPlus Engineering Reference (Electric Chiller Model Based on Condenser Entering Temperature, Standard Ratings) for details on how this value is calculated.
-
-\subsection{Lookup Table Outputs}\label{lookup-table-outputs}
-
-\textbf{The following fields are shown only when the diagnostics flag is set to DisplayExtraWarnings (ref. Output:Diagnotstics, DisplayAdvancedReportVariables).}
-
-Outputs are provided for lookup tables in two forms. The first being the outputs related to the creation of a performance curve. When the Interpolation Method for table objects is set to EvaluateCurveToLimits, a performance curve object is created. The coefficients of the performance curve are calculated and a curve object is written for review. The regression statistics are also included. This performance curve may be used in subsequent simulations or saved in a library file for future use.
-
-\begin{lstlisting}
-! <CREATING NEW CURVE OBJECT>
-CREATING NEW CURVE OBJECT
-! Input as Table:OneIndependentVariable "HPACCOOLCAPFFF"
-! RSquared       = 1.0000000000
-! Standard Error = 0.0000000000
-! Sample Size    = 3
-Curve:Quadratic,
-FromTable_HPACCOOLCAPFFF,  !- Name
-  0.8000000000,  !- Coefficient1 Constant
-  0.2000000000,  !- Coefficient2 x
-  -3.1086244690E-015,  !- Coefficient3 x**2
-  0.0000000000,  !- Minimum Value of x
-  1.5000000000,  !- Maximum Value of x
-  0.8000000000,  !- Minimum Curve Output
-  1.5000000000;  !- Maximum Curve Output
-END CREATING NEW CURVE OBJECT
-``
-\end{lstlisting}
-
-A second output form is provided to echo the reading of tabular data. The tabular data is echoed for each multi-variable lookup table object (ref. Table:MultiVariableLookup). The data is echoed using an increasing order sort format regardless of the format specified by the user. In addition, the tabular data is echoed when the data is included in the table object, or when read from an external file. This output form is provided as a verification step when reading tabular data. The normalization point is not included in the raw data varification.
-
-\begin{lstlisting}
-! READING LOOKUP TABLE DATA
-! Reading tabular data for Table:MultiVariableLookup ``HPACCOOLCAPFFF2''
-1 3
-0.000000000000000E+000 1.00000000000000 1.50000000000000
-0.800000000000000      1.00000000000000 1.10000000000000
-END READING LOOKUP TABLE DATA
-\end{lstlisting}
 
 \subsection{Warmup Days Line}
 

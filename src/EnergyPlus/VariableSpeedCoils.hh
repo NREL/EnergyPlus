@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,9 +53,11 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace VariableSpeedCoils {
 
@@ -372,7 +374,7 @@ namespace VariableSpeedCoils {
     // Functions
     void clear_state();
 
-    void SimVariableSpeedCoils(std::string const &CompName,   // Coil Name
+    void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -392,7 +394,7 @@ namespace VariableSpeedCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitVarSpeedCoil(int const DXCoilNum,                // Current DXCoilNum under simulation
+    void InitVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum,                // Current DXCoilNum under simulation
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,        // Heat pump time constant [s]
                           Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
@@ -404,7 +406,7 @@ namespace VariableSpeedCoils {
                           int const SpeedNum                  // compressor speed number
     );
 
-    void SizeVarSpeedCoil(int const DXCoilNum);
+    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum);
 
     void CalcVarSpeedCoilCooling(int const DXCoilNum,            // Heat Pump Number
                                  int const CyclingScheme,        // Fan/Compressor cycling scheme indicator
@@ -469,6 +471,10 @@ namespace VariableSpeedCoils {
 
     Real64 GetVSCoilMinOATCompressor(std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
+    );
+
+    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+                                               bool &ErrorsFound    // set to true if problem
     );
 
     int GetVSCoilNumOfSpeeds(std::string const &CoilName, // must match coil names for the coil type

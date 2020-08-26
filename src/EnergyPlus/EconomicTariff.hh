@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,17 +53,15 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct CostEstimateManagerData;
+
 namespace EconomicTariff {
-
-    // Using/Aliasing
-
-    // Data
-    // ECONOMCIS:TARIFF enumerated lists
 
     extern int const kindUnknown;
     extern int const kindTariff;
@@ -559,7 +557,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills();
+    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -583,13 +581,13 @@ namespace EconomicTariff {
 
     void GetInputEconomicsComputation(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsCurrencyType(bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound); // true if errors found during getting input objects.
 
     void parseComputeLine(std::string const &lineOfCompute, int const fromTariff);
 
     void GetLastWord(std::string const &lineOfText, std::string::size_type &endOfScan, std::string &aWord);
 
-    void initializeMonetaryUnit();
+    void initializeMonetaryUnit(CostEstimateManagerData &dataCostEstimateManager);
 
     int LookUpSeason(std::string const &nameOfSeason, std::string const &nameOfReferingObj);
 
@@ -649,7 +647,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff();
+    void ComputeTariff(IOFiles &ioFiles);
 
     void pushStack(Array1A<Real64> const monthlyArray, int const variablePointer);
 
@@ -671,14 +669,14 @@ namespace EconomicTariff {
 
     void LEEDtariffReporting();
 
-    void WriteTabularTariffReports();
+    void WriteTabularTariffReports(CostEstimateManagerData &dataCostEstimateManager);
 
     void showWarningsBasedOnTotal();
 
     void getMaxAndSum(int const varPointer, Real64 &sumResult, Real64 &maxResult);
 
     void
-    ReportEconomicVariable(std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
+    ReportEconomicVariable(CostEstimateManagerData &dataCostEstimateManager, std::string const &titleString, bool const includeCategory, bool const showCurrencySymbol, std::string const &forString);
 
     void selectTariff();
 

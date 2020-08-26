@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,10 +55,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
+class IOFiles;
 
 // Derived class for Site:GroundTemperature:Deep
 class SiteDeepGroundTemps : public BaseGroundTempsModel
@@ -69,22 +70,16 @@ public:
 
     // Default Constructor
     SiteDeepGroundTemps() : timeOfSimInMonths(0), deepGroundTemps(12, 13.0)
-
     {
     }
 
-    static std::shared_ptr<SiteDeepGroundTemps> DeepGTMFactory(int objectType, std::string objectName);
+    static std::shared_ptr<SiteDeepGroundTemps> DeepGTMFactory(IOFiles &ioFiles, int objectType, std::string objectName);
 
-    Real64 getGroundTemp();
+    Real64 getGroundTemp() override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
-
-    // Destructor
-    ~SiteDeepGroundTemps()
-    {
-    }
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

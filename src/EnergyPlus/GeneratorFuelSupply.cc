@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,21 +52,19 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataGenerators.hh>
-#include <DataGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <GeneratorFuelSupply.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include "IOFiles.hh"
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataGenerators.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneratorFuelSupply.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -102,10 +100,8 @@ namespace GeneratorFuelSupply {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGenerators;
     using DataGlobals::HoursInDay;
-    using DataGlobals::OutputFileInits;
 
     // <use statements for access to subroutines in other modules>
 
@@ -124,8 +120,13 @@ namespace GeneratorFuelSupply {
     // <name Public routines, optionally name Private routines within this module>
 
     // Functions
+    static bool MyOneTimeFlag(true);
 
-    void GetGeneratorFuelSupplyInput()
+    void clear_state() {
+        MyOneTimeFlag = true;
+    }
+
+    void GetGeneratorFuelSupplyInput(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -152,9 +153,8 @@ namespace GeneratorFuelSupply {
         int IOStat;                     // IO Status when calling get input subroutine
         Array1D_string AlphArray(25);   // character string data
         Array1D<Real64> NumArray(200);  // numeric data TODO deal with allocatable for extensible
-        static bool ErrorsFound(false); // error flag
+        bool ErrorsFound(false); // error flag
         int FuelSupNum;
-        static bool MyOneTimeFlag(true);
         std::string ObjMSGName;
         int ConstitNum;
 
@@ -255,7 +255,7 @@ namespace GeneratorFuelSupply {
             // now make calls to Setup
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
-                SetupFuelConstituentData(FuelSupNum, ErrorsFound);
+                SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
             }
 
             if (ErrorsFound) {
@@ -268,7 +268,7 @@ namespace GeneratorFuelSupply {
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(int const FuelSupplyNum, bool &ErrorsFound)
+    void SetupFuelConstituentData(IOFiles &ioFiles, int const FuelSupplyNum, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -289,7 +289,7 @@ namespace GeneratorFuelSupply {
         Real64 HHVfuel;               // higher heating value of fuel, working var
         Real64 O2Stoic;               // stochiometric oxygen coef in chemical equation (15)
         Real64 CO2ProdStoic;          // product gases carbon dioxide coeff
-        Real64 H20ProdStoic;          // product gases water coeff
+        Real64 H2OProdStoic;          // product gases water coeff
         int i;                        // loop index
         std::string thisName;         // working string var
         int thisGasID;                // working index in Gas phase data structure
@@ -303,9 +303,6 @@ namespace GeneratorFuelSupply {
         // unused  REAL(r64) :: h_i
         // unused  REAL(r64) :: LHV
 
-        // Formats
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt Format_501("(' Fuel Supply, ',A,',',G13.6E2,',',G13.6E2,',',G13.6E2,',',G13.6E2)");
 
         NumHardCodedConstituents = 14;
 
@@ -623,7 +620,7 @@ namespace GeneratorFuelSupply {
             // sum over each constituent
             O2Stoic = 0.0;
             CO2ProdStoic = 0.0;
-            H20ProdStoic = 0.0;
+            H2OProdStoic = 0.0;
             CO2dataID = 1;   // hard-coded above
             WaterDataID = 4; // hard-coded above
             // Loop over fuel constituents and do one-time setup
@@ -646,12 +643,12 @@ namespace GeneratorFuelSupply {
 
                 CO2ProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumCarbons;
 
-                H20ProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
+                H2OProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
             }
 
             FuelSupply(FuelSupplyNum).StoicOxygenRate = O2Stoic;
             FuelSupply(FuelSupplyNum).CO2ProductGasCoef = CO2ProdStoic;
-            FuelSupply(FuelSupplyNum).H20ProductGasCoef = H20ProdStoic;
+            FuelSupply(FuelSupplyNum).H2OProductGasCoef = H2OProdStoic;
 
             // Calculate LHV for an NdotFuel of 1.0
             LHVfuel = 0.0;
@@ -705,11 +702,16 @@ namespace GeneratorFuelSupply {
         }
 
         // report Heating Values in EIO.
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
-                                             "Heating Value [KJ/kg],  Molecular Weight [g/mol] ";
-        ObjexxFCL::gio::write(OutputFileInits, Format_501) << FuelSupply(FuelSupplyNum).Name << FuelSupply(FuelSupplyNum).LHV * 1000000.0
-                                                << FuelSupply(FuelSupplyNum).LHVJperkg / 1000.0 << FuelSupply(FuelSupplyNum).HHV / 1000.0
-                                                << FuelSupply(FuelSupplyNum).MW;
+        print(ioFiles.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
+                                             "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
+        static constexpr auto Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
+        print(ioFiles.eio,
+              Format_501,
+              FuelSupply(FuelSupplyNum).Name,
+              FuelSupply(FuelSupplyNum).LHV * 1000000.0,
+              FuelSupply(FuelSupplyNum).LHVJperkg / 1000.0,
+              FuelSupply(FuelSupplyNum).HHV / 1000.0,
+              FuelSupply(FuelSupplyNum).MW);
     }
 
 } // namespace GeneratorFuelSupply

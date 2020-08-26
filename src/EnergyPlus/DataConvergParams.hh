@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -126,6 +126,7 @@ namespace DataConvergParams {
     extern Real64 MinTimeStepSys;  // =1 minute
     extern Real64 MinTimeStepTol;  // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
     extern Real64 MaxZoneTempDiff; // 0.3 C = (1% OF 300 C) = max allowable difference between
+
     //   zone air temp at Time=T and Time=T-1
     extern Real64 MinSysTimeRemaining; // = 1 second
     extern int MaxIter;                // maximum number of iterations allowed

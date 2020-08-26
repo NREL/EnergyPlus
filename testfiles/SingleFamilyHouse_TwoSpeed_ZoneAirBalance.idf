@@ -99,13 +99,13 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Single family House,     !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.001,                   !- Loads Convergence Tolerance Value
+    0.001,                   !- Loads Convergence Tolerance Value {W}
     0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -119,7 +119,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
@@ -1368,12 +1370,12 @@
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZoneDirectAir,           !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneDirectAir ADU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
     TwoSpeed Heat Pump 1,    !- Name
@@ -1412,11 +1414,23 @@
     ,                        !- Cooling Speed 3 Supply Air Flow Rate {m3/s}
     ;                        !- Cooling Speed 4 Supply Air Flow Rate {m3/s}
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZoneDirectAir,           !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    Zone Inlet Node,         !- Zone Supply Air Node Name
-    0.7551;                  !- Maximum Air Flow Rate {m3/s}
+    Zone Inlet Node ATInlet, !- Air Inlet Node Name
+    Zone Inlet Node,         !- Air Outlet Node Name
+    0.7551,                  !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZoneDirectAir ADU,       !- Name
+    Zone Inlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZoneDirectAir,           !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   ZoneControl:Thermostat,
     Zone Thermostat,         !- Name
@@ -1445,7 +1459,7 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
-    Zone Inlet Node;         !- Outlet 1 Node Name
+    Zone Inlet Node ATInlet; !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name
@@ -1916,9 +1930,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1928,9 +1942,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

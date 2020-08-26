@@ -74,13 +74,13 @@
 ! HVAC:                       single duct VAV with hot water reheat, single boiler, chiller and
 !                             cooling tower, supply air temperature = 19C
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Building,                !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     ,                        !- Maximum Number of Warmup Days
@@ -494,7 +494,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     EW1-ZONE1,               !- Name
@@ -655,31 +655,31 @@
   InternalMass,
     Internal-ZONE1,          !- Name
     Medium Furniture,        !- Construction Name
-    ZONE1,                   !- Zone Name
+    ZONE1,                   !- Zone or ZoneList Name
     94.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-PER-2T,         !- Name
     Medium Furniture,        !- Construction Name
-    ZONE1,                   !- Zone Name
+    ZONE1,                   !- Zone or ZoneList Name
     59.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-PER-3T,         !- Name
     Medium Furniture,        !- Construction Name
-    ZONE1,                   !- Zone Name
+    ZONE1,                   !- Zone or ZoneList Name
     94.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-PER-4T,         !- Name
     Medium Furniture,        !- Construction Name
-    ZONE1,                   !- Zone Name
+    ZONE1,                   !- Zone or ZoneList Name
     59.;                     !- Surface Area {m2}
 
   InternalMass,
     Internal-COR-1T,         !- Name
     Medium Furniture,        !- Construction Name
-    ZONE1,                   !- Zone Name
+    ZONE1,                   !- Zone or ZoneList Name
     390.;                    !- Surface Area {m2}
 
   RoomAirModelType,
@@ -1216,7 +1216,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZONE1,           !- Name
@@ -2004,8 +2009,8 @@
     ZONE1 AHU,               !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     ZONE1 AHU,               !- Name
@@ -2140,9 +2145,9 @@
     autosize,                !- Design Air Flow Rate {m3/s}
     autosize,                !- Design Fan Power {W}
     autosize,                !- Design U-Factor Times Area Value {W/K}
-    0,                       !- Free Convection Air Flow Rate {m3/s}
-    ,                        !- Free Convection Air Flow Rate Sizing Factor
-    0,                       !- Free Convection U-Factor Times Area Value {W/K}
+    0,                       !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    0,                       !- Free Convection Regime U-Factor Times Area Value {W/K}
     ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
     ,                        !- Performance Input Method
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
@@ -2305,7 +2310,7 @@
 
   Output:Meter,Cooling:Electricity,monthly;
 
-  Output:Meter,Heating:Gas,monthly;
+  Output:Meter,Heating:NaturalGas,monthly;
 
   Output:Meter,Fans:Electricity,monthly;
 
@@ -2317,7 +2322,7 @@
 
   Output:Meter,Cooling:Electricity,runperiod;
 
-  Output:Meter,Heating:Gas,runperiod;
+  Output:Meter,Heating:NaturalGas,runperiod;
 
   Output:Meter,Fans:Electricity,runperiod;
 

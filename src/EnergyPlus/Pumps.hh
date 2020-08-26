@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct BranchInputManagerData;
 
 namespace Pumps {
 
@@ -252,7 +255,8 @@ namespace Pumps {
     // Functions
     void clear_state();
 
-    void SimPumps(std::string const &PumpName, // Name of pump to be managed
+    void SimPumps(BranchInputManagerData &dataBranchInputManager,
+                  std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
                   bool &PumpRunning,           // .TRUE. if the loop pump is actually operating
@@ -269,7 +273,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void InitializePumps(int const PumpNum);
+    void InitializePumps(BranchInputManagerData &dataBranchInputManager, int const PumpNum);
 
     //*************************************************************************!
 

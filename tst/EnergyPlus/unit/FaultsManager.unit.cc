@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,23 +52,26 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataLoopNode.hh>
-#include <Fans.hh>
-#include <FaultsManager.hh>
-#include <HVACControllers.hh>
-#include <MixedAir.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -96,9 +99,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     NumCurves = 1;
     PerfCurve.allocate(NumCurves);
 
-    NumFans = 2;
-    Fan.allocate(NumFans);
-    FaultsFouledAirFilters.allocate(NumFans);
+    state.fans.NumFans = 2;
+    Fan.allocate(state.fans.NumFans);
+    FaultsFouledAirFilters.allocate(state.fans.NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -130,21 +133,210 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
-    ;
 
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
     FanNum = 1;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(state);
     EXPECT_TRUE(TestRestult);
     // (2)The rated operational point of Fan_2 does not fall on the fan curve
     FanNum = 2;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(state);
     EXPECT_FALSE(TestRestult);
 
     // Clean up
     PerfCurve.deallocate();
     Fan.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_AutosizedFan)
+{
+    // #7896 - Cannot check check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
+    // covers the rated operational point of the corresponding fan before the Fan is sized
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Continuous;              !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "  OnOff,                   !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Discrete;                !- Numeric Type",
+
+        "Schedule:Constant,Always On Discrete,OnOff,1;",
+
+        "Schedule:Compact,",
+        "  AvailSched,              !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.00;       !- Field 3",
+
+        "Schedule:Compact,",
+        "  Pressure Fraction Schedule,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.25;       !- Field 3",
+
+        "Fan:ConstantVolume,",
+        "  Fan CV,                  !- Name",
+        "  Always On Discrete,      !- Availability Schedule Name",
+        "  0.7,                     !- Fan Total Efficiency",
+        "  150,                     !- Pressure Rise {Pa}",
+        "  AutoSize,                !- Maximum Flow Rate {m3/s}",
+        "  0.93,                    !- Motor Efficiency",
+        "  1,                       !- Motor In Airstream Fraction",
+        "  Node 21,                 !- Air Inlet Node Name",
+        "  Node 38;                 !- Air Outlet Node Name",
+
+        "FaultModel:Fouling:AirFilter,",
+        "  Fan CV Fouling Air Filter,  !- Name",
+        "  Fan:ConstantVolume,      !- Fan Object Type",
+        "  Fan CV,                  !- Fan Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  Pressure Fraction Schedule,  !- Pressure Fraction Schedule Name",
+        "  Fouled Fan Curve;        !- Fan Curve Name",
+
+        "Curve:Cubic,",
+        "  Fouled Fan Curve,        !- Name",
+        "  1015,                    !- Coefficient1 Constant",
+        "  -1750,                   !- Coefficient2 x",
+        "  59050,                   !- Coefficient3 x**2",
+        "  -1624000,                !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  0.09,                    !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+    });
+
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::StdRhoAir = 1.2;
+
+    // Run CheckAndReadFaults which will call GetFanInput if not done yet
+    EXPECT_NO_THROW(CheckAndReadFaults(state));
+    compare_err_stream("", true);
+
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurSysNum = 0;
+    DataSizing::CurOASysNum = 0;
+
+    // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
+    DataSizing::DataNonZoneNonAirloopValue = 0.114;
+    // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
+    int FanNum = 1;
+    EXPECT_NO_THROW(Fans::SizeFan(state, FanNum));
+    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+}
+
+TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_NonAutosizedFan)
+{
+    // #7896 - Ensure that the check is still done when the fan is NOT autosized (was moved inside Fans::SizeFan)
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Continuous;              !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "  OnOff,                   !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Discrete;                !- Numeric Type",
+
+        "Schedule:Constant,Always On Discrete,OnOff,1;",
+
+        "Schedule:Compact,",
+        "  AvailSched,              !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.00;       !- Field 3",
+
+        "Schedule:Compact,",
+        "  Pressure Fraction Schedule,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.25;       !- Field 3",
+
+        "Fan:ConstantVolume,",
+        "  Fan CV,                  !- Name",
+        "  Always On Discrete,      !- Availability Schedule Name",
+        "  0.7,                     !- Fan Total Efficiency",
+        "  400,                     !- Pressure Rise {Pa}",
+        "  0.114,                   !- Maximum Flow Rate {m3/s}",
+        "  0.93,                    !- Motor Efficiency",
+        "  1,                       !- Motor In Airstream Fraction",
+        "  Node 21,                 !- Air Inlet Node Name",
+        "  Node 38;                 !- Air Outlet Node Name",
+
+        "FaultModel:Fouling:AirFilter,",
+        "  Fan CV Fouling Air Filter,  !- Name",
+        "  Fan:ConstantVolume,      !- Fan Object Type",
+        "  Fan CV,                  !- Fan Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  Pressure Fraction Schedule,  !- Pressure Fraction Schedule Name",
+        "  Fouled Fan Curve;        !- Fan Curve Name",
+
+        "Curve:Cubic,",
+        "  Fouled Fan Curve,        !- Name",
+        "  1015,                    !- Coefficient1 Constant",
+        "  -1750,                   !- Coefficient2 x",
+        "  59050,                   !- Coefficient3 x**2",
+        "  -1624000,                !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  0.09,                    !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+    });
+
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::StdRhoAir = 1.2;
+
+    // Run CheckAndReadFaults which will call GetFanInput if not done yet
+    EXPECT_NO_THROW(CheckAndReadFaults(state));
+    compare_err_stream("", true);
+
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurSysNum = 0;
+    DataSizing::CurOASysNum = 0;
+
+    // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
+    DataSizing::DataNonZoneNonAirloopValue = 0.15;
+    // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
+    int FanNum = 1;
+    EXPECT_ANY_THROW(Fans::SizeFan(state, FanNum));
+    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
+        "   **   ~~~   ** Invalid Fan Curve Name = \"FOULED FAN CURVE\" does not cover ",
+        "   **   ~~~   ** the operational point of Fan FAN CV",
+        "   **  Fatal  ** SizeFan: Invalid FaultModel:Fouling:AirFilter=FAN CV FOULING AIR FILTER",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
+    });
+    compare_err_stream(error_string, true);
+
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFlowReduction)
@@ -162,8 +354,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     NumCurves = 1;
     PerfCurve.allocate(NumCurves);
 
-    NumFans = 1;
-    Fan.allocate(NumFans);
+    state.fans.NumFans = 1;
+    Fan.allocate(state.fans.NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
@@ -204,36 +396,66 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     //     to the corresponding coil controller
 
     std::string const idf_objects = delimited_string({
-        "                                                              ", "FaultModel:TemperatureSensorOffset:CoilSupplyAir,             ",
-        "   Fault_SAT_CoolCoil1,!- Name                                ", "   ,                   !- Availability Schedule Name          ",
-        "   ,                   !- Severity Schedule Name              ", "   Coil:Cooling:Water, !- Coil Object Type                    ",
-        "   Chilled Water Coil, !- Coil Object Name                    ", "   CW Coil Controller, !- Water Coil Controller Name          ",
-        "   2.0;                !- Reference Sensor Offset {deltaC}    ", "                                                              ",
-        "Coil:Cooling:Water,                                           ", "   Chilled Water Coil, !- Name                                ",
-        "   AvailSched,         !- Availability Schedule Name          ", "   autosize,           !- Design Water Flow Rate {m3/s}       ",
-        "   autosize,           !- Design Air Flow Rate {m3/s}         ", "   autosize,           !- Design Inlet Water Temperature {C}  ",
-        "   autosize,           !- Design Inlet Air Temperature {C}    ", "   autosize,           !- Design Outlet Air Temperature {C}   ",
-        "   autosize,           !- Design Inlet Air Humidity Ratio {-} ", "   autosize,           !- Design Outlet Air Humidity Ratio {-}",
-        "   Water Inlet Node,   !- Water Inlet Node Name               ", "   Water Outlet Node,  !- Water Outlet Node Name              ",
-        "   Air Inlet Node,     !- Air Inlet Node Name                 ", "   Air Outlet Node,    !- Air Outlet Node Name                ",
-        "   SimpleAnalysis,     !- Type of Analysis                    ", "   CrossFlow;          !- Heat Exchanger Configuration        ",
-        "                                                              ", "Controller:WaterCoil,                                         ",
-        "   CW Coil Controller, !- Name                                ", "   HumidityRatio,      !- Control Variable                    ",
-        "   Reverse,            !- Action                              ", "   FLOW,               !- Actuator Variable                   ",
-        "   Air Outlet Node,    !- Sensor Node Name                    ", "   Water Inlet Node,   !- Actuator Node Name                  ",
-        "   autosize,           !- Controller Convergence Tolerance {C}", "   autosize,           !- Maximum Actuated Flow {m3/s}        ",
-        "   0.0;                !- Minimum Actuated Flow {m3/s}        ", "                                                              ",
-        "SetpointManager:Scheduled,                                    ", "   HumRatSPManager,    !- Name                                ",
-        "   HumidityRatio,      !- Control Variable                    ", "   HumRatioSched,      !- Schedule Name                       ",
-        "   Air Outlet Node;    !- Setpoint Node or NodeList Name      ", "                                                              ",
-        "Schedule:Compact,                                             ", "   HumRatioSched,      !- Name                                ",
-        "   Any Number,         !- Schedule Type Limits Name           ", "   Through: 12/31,     !- Field 1                             ",
-        "   For: AllDays,       !- Field 2                             ", "   Until: 24:00, 0.015;!- Field 3                             ",
-        "Schedule:Compact,                                             ", "   AvailSched,         !- Name                                ",
-        "   Fraction,           !- Schedule Type Limits Name           ", "   Through: 12/31,     !- Field 1                             ",
-        "   For: AllDays,       !- Field 2                             ", "   Until: 24:00, 1.0;  !- Field 3                             ",
-        "                                                              ", "AirLoopHVAC:ControllerList,                                   ",
-        "   CW Coil Controller, !- Name                                ", "   Controller:WaterCoil,!- Controller 1 Object Type           ",
+        "                                                              ",
+        "FaultModel:TemperatureSensorOffset:CoilSupplyAir,             ",
+        "   Fault_SAT_CoolCoil1,!- Name                                ",
+        "   ,                   !- Availability Schedule Name          ",
+        "   ,                   !- Severity Schedule Name              ",
+        "   Coil:Cooling:Water, !- Coil Object Type                    ",
+        "   Chilled Water Coil, !- Coil Object Name                    ",
+        "   CW Coil Controller, !- Water Coil Controller Name          ",
+        "   2.0;                !- Reference Sensor Offset {deltaC}    ",
+        "                                                              ",
+        "Coil:Cooling:Water,                                           ",
+        "   Chilled Water Coil, !- Name                                ",
+        "   AvailSched,         !- Availability Schedule Name          ",
+        "   autosize,           !- Design Water Flow Rate {m3/s}       ",
+        "   autosize,           !- Design Air Flow Rate {m3/s}         ",
+        "   autosize,           !- Design Inlet Water Temperature {C}  ",
+        "   autosize,           !- Design Inlet Air Temperature {C}    ",
+        "   autosize,           !- Design Outlet Air Temperature {C}   ",
+        "   autosize,           !- Design Inlet Air Humidity Ratio {-} ",
+        "   autosize,           !- Design Outlet Air Humidity Ratio {-}",
+        "   Water Inlet Node,   !- Water Inlet Node Name               ",
+        "   Water Outlet Node,  !- Water Outlet Node Name              ",
+        "   Air Inlet Node,     !- Air Inlet Node Name                 ",
+        "   Air Outlet Node,    !- Air Outlet Node Name                ",
+        "   SimpleAnalysis,     !- Type of Analysis                    ",
+        "   CrossFlow;          !- Heat Exchanger Configuration        ",
+        "                                                              ",
+        "Controller:WaterCoil,                                         ",
+        "   CW Coil Controller, !- Name                                ",
+        "   HumidityRatio,      !- Control Variable                    ",
+        "   Reverse,            !- Action                              ",
+        "   FLOW,               !- Actuator Variable                   ",
+        "   Air Outlet Node,    !- Sensor Node Name                    ",
+        "   Water Inlet Node,   !- Actuator Node Name                  ",
+        "   autosize,           !- Controller Convergence Tolerance {C}",
+        "   autosize,           !- Maximum Actuated Flow {m3/s}        ",
+        "   0.0;                !- Minimum Actuated Flow {m3/s}        ",
+        "                                                              ",
+        "SetpointManager:Scheduled,                                    ",
+        "   HumRatSPManager,    !- Name                                ",
+        "   HumidityRatio,      !- Control Variable                    ",
+        "   HumRatioSched,      !- Schedule Name                       ",
+        "   Air Outlet Node;    !- Setpoint Node or NodeList Name      ",
+        "                                                              ",
+        "Schedule:Compact,                                             ",
+        "   HumRatioSched,      !- Name                                ",
+        "   Any Number,         !- Schedule Type Limits Name           ",
+        "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ",
+        "   Until: 24:00, 0.015;!- Field 3                             ",
+        "Schedule:Compact,                                             ",
+        "   AvailSched,         !- Name                                ",
+        "   Fraction,           !- Schedule Type Limits Name           ",
+        "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ",
+        "   Until: 24:00, 1.0;  !- Field 3                             ",
+        "                                                              ",
+        "AirLoopHVAC:ControllerList,                                   ",
+        "   CW Coil Controller, !- Name                                ",
+        "   Controller:WaterCoil,!- Controller 1 Object Type           ",
         "   CW Coil Controller; !- Controller 1 Name                   ",
     });
 
@@ -241,11 +463,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Readin inputs
-    SetPointManager::GetSetPointManagerInputs();
-    HVACControllers::GetControllerInput();
+    SetPointManager::GetSetPointManagerInputs(state);
+    HVACControllers::GetControllerInput(state);
 
     // Run
-    CheckAndReadFaults();
+    CheckAndReadFaults(state);
 
     // Check
     EXPECT_EQ(2.0, FaultsCoilSATSensor(1).Offset);
@@ -429,9 +651,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
-    MixedAir::GetOAControllerInputs();
+    MixedAir::GetOAControllerInputs(state);
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);
@@ -449,4 +671,315 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(1), 4);
     EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(2), 5);
 }
+
+
+TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
+{
+    // Test that an error is raised when coil not found
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,                                             ",
+        "   AvailSched,         !- Name                                ",
+        "   ,                   !- Schedule Type Limits Name           ",
+        "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ",
+        "   Until: 24:00, 1.0;  !- Field 3                             ",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledHeatingCoil,       !- Name",
+        "  Non Existent Cooling Coil, !- Coil Name",
+        "  ,                        !- Availability Schedule Name",
+        "  ,                        !- Severity Schedule Name",
+        "  FouledUARated,           !- Fouling Input Method",
+        "  3.32;                    !- UAFouled {W/K}",
+
+    });
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(state), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
+        "   **  Fatal  ** CheckAndReadFaults: Errors found in getting FaultModel input data. Preceding condition(s) cause termination.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_BadCoilType)
+{
+    // Test that an error is raised if the coil is found, but it's not one of the supported types
+    // Note JM 2020-02-04: As of today, only Simple Heating / Cooling water coils are supported
+
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,                                             ",
+        "   AvailSched,         !- Name                                ",
+        "   ,                   !- Schedule Type Limits Name           ",
+        "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ",
+        "   Until: 24:00, 1.0;  !- Field 3                             ",
+
+        "  Coil:Cooling:Water:DetailedGeometry,",
+        "    Detailed Pre Cooling Coil, !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "    autosize,                !- Tube Outside Surface Area {m2}",
+        "    autosize,                !- Total Tube Inside Area {m2}",
+        "    autosize,                !- Fin Surface Area {m2}",
+        "    autosize,                !- Minimum Airflow Area {m2}",
+        "    autosize,                !- Coil Depth {m}",
+        "    autosize,                !- Fin Diameter {m}",
+        "    ,                        !- Fin Thickness {m}",
+        "    ,                        !- Tube Inside Diameter {m}",
+        "    ,                        !- Tube Outside Diameter {m}",
+        "    ,                        !- Tube Thermal Conductivity {W/m-K}",
+        "    ,                        !- Fin Thermal Conductivity {W/m-K}",
+        "    ,                        !- Fin Spacing {m}",
+        "    ,                        !- Tube Depth Spacing {m}",
+        "    ,                        !- Number of Tube Rows",
+        "    autosize,                !- Number of Tubes per Row",
+        "    Main Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+        "    Main Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+        "    Main Cooling Coil 1 Inlet Node,  !- Air Inlet Node Name",
+        "    Main Cooling Coil 1 Outlet Node;  !- Air Outlet Node Name",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledHeatingCoil,       !- Name",
+        "  Detailed Pre Cooling Coil, !- Coil Name",
+        "  ,                        !- Availability Schedule Name",
+        "  ,                        !- Severity Schedule Name",
+        "  FouledUARated,           !- Fouling Input Method",
+        "  3.32;                    !- UAFouled {W/K}",
+
+    });
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(state), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\" invalid Coil Name = \"DETAILED PRE COOLING COIL\".",
+        "   **   ~~~   ** Coil was found but it is not one of the supported types (\"Coil:Cooling:Water\" or \"Coil:Heating:Water\").",
+        "   **  Fatal  ** CheckAndReadFaults: Errors found in getting FaultModel input data. Preceding condition(s) cause termination.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\" invalid Coil Name = \"DETAILED PRE COOLING COIL\".",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
+{
+    // Test for #6313. Ensure Faults and coils are correctly linked, fault input is properly read, and CalFaultyCoilFoulingFactor correctly works
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Continuous;              !- Numeric Type",
+
+        "Schedule:Compact,",
+        "  AvailSched,              !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.00;       !- Field 3",
+
+        "Schedule:Compact,",
+        "  SeveritySched,           !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,0.75;       !- Field 3",
+
+        "Coil:Heating:Water,",
+        "  AHU HW Heating Coil,     !- Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  6.64,                    !- U-Factor Times Area Value {W/K}",
+        "  0.000010,                !- Maximum Water Flow Rate {m3/s}",
+        "  AHU HW Heating Coil Water Inlet Node,  !- Water Inlet Node Name",
+        "  AHU HW Heating Coil Water Outlet Node,  !- Water Outlet Node Name",
+        "  Air Loop Referenz AHU Cooling Coil Air Outlet Node,  !- Air Inlet Node Name",
+        "  AHU HW Heating Coil Air Outlet Node,  !- Air Outlet Node Name",
+        "  UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+        "  438.32,                  !- Rated Capacity {W}",
+        "  80,                      !- Rated Inlet Water Temperature {C}",
+        "  16,                      !- Rated Inlet Air Temperature {C}",
+        "  70,                      !- Rated Outlet Water Temperature {C}",
+        "  35,                      !- Rated Outlet Air Temperature {C}",
+        "  0.50;                    !- Rated Ratio for Air and Water Convection",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledHeatingCoil,       !- Name",
+        "  AHU HW Heating Coil,     !- Coil Name",
+        "  ,                        !- Availability Schedule Name",
+        "  SeveritySched,           !- Severity Schedule Name",
+        "  FouledUARated,           !- Fouling Input Method",
+        "  3.32;                    !- UAFouled {W/K}",
+
+        "Coil:Cooling:Water,",
+        "   AHU CHW Cooling Coil,   !- Name",
+        "   AvailSched,             !- Availability Schedule Name",
+        "   autosize,               !- Design Water Flow Rate {m3/s}",
+        "   autosize,               !- Design Air Flow Rate {m3/s}",
+        "   autosize,               !- Design Inlet Water Temperature {C}",
+        "   autosize,               !- Design Inlet Air Temperature {C}",
+        "   autosize,               !- Design Outlet Air Temperature {C}",
+        "   autosize,               !- Design Inlet Air Humidity Ratio {-}",
+        "   autosize,               !- Design Outlet Air Humidity Ratio {-}",
+        "   Water Inlet Node,       !- Water Inlet Node Name",
+        "   Water Outlet Node,      !- Water Outlet Node Name",
+        "   Air Inlet Node,         !- Air Inlet Node Name",
+        "   Air Outlet Node,        !- Air Outlet Node Name",
+        "   SimpleAnalysis,         !- Type of Analysis",
+        "   CrossFlow;              !- Heat Exchanger Configuration",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledCoolingCoil,       !- Name",
+        "  AHU CHW Cooling Coil,    !- Coil Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  SeveritySched,           !- Severity Schedule Name",
+        "  FoulingFactor,           !- Fouling Input Method",
+        "  ,                        !- UAFouled {W/K}",
+        // Note: don't mind these values, there are plain bogus/unresearched
+        "  0.0005,                  !- Water Side Fouling Factor, m2-K/W",
+        "  0.0001,                  !- Air Side Fouling Factor, m2-K/W",
+        "  100.0,                   !- Outside Coil Surface Area, m2",
+        "  0.1;                     !- Inside to Outside Coil Surface Area Ratio",
+
+        "Coil:Cooling:Water,",
+        "   AHU CHW Coil With no fault, !- Name",
+        "   AvailSched,             !- Availability Schedule Name",
+        "   autosize,               !- Design Water Flow Rate {m3/s}",
+        "   autosize,               !- Design Air Flow Rate {m3/s}",
+        "   autosize,               !- Design Inlet Water Temperature {C}",
+        "   autosize,               !- Design Inlet Air Temperature {C}",
+        "   autosize,               !- Design Outlet Air Temperature {C}",
+        "   autosize,               !- Design Inlet Air Humidity Ratio {-}",
+        "   autosize,               !- Design Outlet Air Humidity Ratio {-}",
+        "   Water 2 Inlet Node,     !- Water Inlet Node Name",
+        "   Water 2 Outlet Node,    !- Water Outlet Node Name",
+        "   Air 2 Inlet Node,       !- Air Inlet Node Name",
+        "   Air 2 Outlet Node,      !- Air Outlet Node Name",
+        "   SimpleAnalysis,         !- Type of Analysis",
+        "   CrossFlow;              !- Heat Exchanger Configuration",
+    });
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataHVACGlobals::TimeStepSys = 1;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+
+    ScheduleManager::ProcessScheduleInput(state.files);  // read schedule data
+    int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
+    EXPECT_EQ(1, avaiSchedIndex);
+    int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");
+    EXPECT_EQ(2, severitySchedIndex);
+
+
+    // Readin inputs
+    //SetPointManager::GetSetPointManagerInputs();
+    //HVACControllers::GetControllerInput();
+
+    // Run
+    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults(state));
+
+    // Read schedule values
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::DayOfWeek = 1;
+    DataEnvironment::DayOfYear_Schedule = 1;
+    ScheduleManager::UpdateScheduleValues();
+
+    EXPECT_EQ(2, FaultsManager::NumFouledCoil);
+    // This should also have called WaterCoil::GetWaterCoilInput
+    EXPECT_EQ(3, WaterCoils::NumWaterCoils);
+
+
+    // Check that fault association actually happened
+    {
+        int CoilNum = 1;
+        int FaultIndex = 1;
+        EXPECT_EQ("AHU HW HEATING COIL", WaterCoils::WaterCoil(CoilNum).Name);
+        EXPECT_NEAR(6.64, WaterCoils::WaterCoil(CoilNum).UACoil, 0.0001);
+        EXPECT_EQ(WaterCoils::WaterCoil_SimpleHeating, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+
+        EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
+        EXPECT_EQ(WaterCoils::WaterCoil_SimpleHeating, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+
+        EXPECT_TRUE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(FaultIndex, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+
+        // Doesn't have an Availability Schedule
+        EXPECT_EQ(-1, FaultsManager::FouledCoils(FaultIndex).AvaiSchedPtr);
+        // Has a Severity Schedule
+        EXPECT_EQ("SEVERITYSCHED", FaultsManager::FouledCoils(FaultIndex).SeveritySchedule);
+        EXPECT_EQ(severitySchedIndex, FaultsManager::FouledCoils(FaultIndex).SeveritySchedPtr);
+
+        EXPECT_EQ(FaultsManager::iFouledCoil_UARated, FaultsManager::FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_NEAR(3.32, FaultsManager::FouledCoils(FaultIndex).UAFouled, 0.0001);
+
+        // Check calculation
+        // Expected FaultFrac * (1/UAfouled - 1 / UACoilTotal)
+        // Real64 expectedFoulingFactor = 0.75 * ((1.0 / 3.32) - (1.0 / 6.64));
+        // EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
+    }
+
+    // Cooling Coil, method is "FoulingFactor"
+    {
+        int CoilNum = 2;
+        int FaultIndex = 2;
+        EXPECT_EQ("AHU CHW COOLING COIL", WaterCoils::WaterCoil(CoilNum).Name);
+        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+
+        EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
+        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+
+        EXPECT_TRUE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(FaultIndex, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+
+        // Has an Availabity Schedule
+        EXPECT_EQ("AVAILSCHED", FaultsManager::FouledCoils(FaultIndex).AvaiSchedule);
+        EXPECT_EQ(avaiSchedIndex, FaultsManager::FouledCoils(FaultIndex).AvaiSchedPtr);
+        // Has a Severity Schedule
+        EXPECT_EQ("SEVERITYSCHED", FaultsManager::FouledCoils(FaultIndex).SeveritySchedule);
+        EXPECT_EQ(severitySchedIndex, FaultsManager::FouledCoils(FaultIndex).SeveritySchedPtr);
+
+        EXPECT_EQ(FaultsManager::iFouledCoil_FoulingFactor, FaultsManager::FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_NEAR(0.0005, FaultsManager::FouledCoils(FaultIndex).Rfw, 0.0001);
+        EXPECT_NEAR(0.0001, FaultsManager::FouledCoils(FaultIndex).Rfa, 0.0001);
+        EXPECT_NEAR(100.0, FaultsManager::FouledCoils(FaultIndex).Aout, 0.01);
+        EXPECT_NEAR(0.1, FaultsManager::FouledCoils(FaultIndex).Aratio, 0.0001);
+
+        // Check calculation
+        //Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
+        //Real64 airTerm = 0.0001 / 100.0;         // Rf_air/A_air = Rfa / Aout
+        // Expected FaultFrac * (waterTerm + airTerm)
+        // Real64 expectedFoulingFactor = 0.75 * (waterTerm + airTerm);
+        // EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
+    }
+
+    // No association if not meant!
+    {
+        int CoilNum = 3;
+        EXPECT_EQ("AHU CHW COIL WITH NO FAULT", WaterCoils::WaterCoil(CoilNum).Name);
+        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+
+        EXPECT_FALSE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(0, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+    }
+
+}
+
 } // namespace EnergyPlus

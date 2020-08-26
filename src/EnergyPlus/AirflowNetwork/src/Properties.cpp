@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,13 +45,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "AirflowNetwork/Solver.hpp"
-#include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Properties.hpp"
+#include <EnergyPlus/General.hh>
 
 namespace EnergyPlus {
 
 namespace AirflowNetwork {
+
+    int lowerLimitErrIdx(0);
+    int upperLimitErrIdx(0);
 
     Real64 airThermConductivity(Real64 T // Temperature in Celsius
     )
@@ -68,10 +70,22 @@ namespace AirflowNetwork {
         Real64 const c = -2.40977632412045e-8;
 
         if (T < LowerLimit) {
-            ShowWarningMessage("Air temperature below lower limit of -20C for conductivity calculation");
+            if (lowerLimitErrIdx == 0) {
+                ShowWarningMessage("Air temperature below lower limit of -20C for conductivity calculation");
+            }
+            ShowRecurringWarningErrorAtEnd("Air temperature below lower limit of -20C for conductivity calculation. "
+                                           "Air temperature of " + General::RoundSigDigits(LowerLimit, 1) +
+                                           " used for conductivity calculation.",
+                                           lowerLimitErrIdx);
             T = LowerLimit;
         } else if (T > UpperLimit) {
-            ShowWarningMessage("Air temperature above upper limit of 70C for conductivity calculation");
+            if (upperLimitErrIdx == 0) {
+                ShowWarningMessage("Air temperature above upper limit of 70C for conductivity calculation");
+            }
+            ShowRecurringWarningErrorAtEnd("Air temperature below lower limit of 70C for conductivity calculation. "
+                                           "Air temperature of " + General::RoundSigDigits(UpperLimit, 1) +
+                                           " used for conductivity calculation.",
+                                           upperLimitErrIdx);
             T = UpperLimit;
         }
 
@@ -123,7 +137,7 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airThermConductivity(T) / (AIRCP(W, T) * AIRDENSITY(P, T, W));
+        return airThermConductivity(T) / (AIRCP(W) * AIRDENSITY(P, T, W));
     }
 
     Real64 airPrandtl(Real64 T, // Temperature in Celsius

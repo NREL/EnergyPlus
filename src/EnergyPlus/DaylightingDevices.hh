@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,13 +48,11 @@
 #ifndef DaylightingDevices_hh_INCLUDED
 #define DaylightingDevices_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
-
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
 
 namespace DaylightingDevices {
 
@@ -70,7 +68,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices();
+    void InitDaylightingDevices(IOFiles &ioFiles);
 
     void GetTDDInput();
 
@@ -94,8 +92,8 @@ namespace DaylightingDevices {
                     int const RadiationType // Radiation type flag
     );
 
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,              // Cosine of the incident angle
-                                    Array1A<Real64> const transBeam // Table of beam transmittance vs. cosine angle
+    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
+                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     );
 
     int FindTDDPipe(int const WinNum);
@@ -105,6 +103,8 @@ namespace DaylightingDevices {
     void CalcViewFactorToShelf(int const ShelfNum); // Daylighting shelf object number
 
     void FigureTDDZoneGains();
+
+    void clear_state();
 
 } // namespace DaylightingDevices
 

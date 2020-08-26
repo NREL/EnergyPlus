@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,6;
 
@@ -1677,7 +1677,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Chiller Electric Power,timestep;
+  Output:Variable,*,Chiller Electricity Rate,timestep;
 
   Output:Variable,*,Chiller Source Steam Rate,timestep;
 

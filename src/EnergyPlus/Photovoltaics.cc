@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,25 +54,25 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPhotovoltaics.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <PhotovoltaicThermalCollectors.hh>
-#include <Photovoltaics.hh>
-#include <ScheduleManager.hh>
-#include <TranspiredCollector.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPhotovoltaics.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Photovoltaics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -131,20 +131,16 @@ namespace Photovoltaics {
     //   see DataPhotovoltaics.cc
 
     Array1D_bool CheckEquipName;
+    bool GetInputFlag(true); // one time get input flag
+    bool MyOneTimeFlag(true);
+    bool firstTime(true);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Photovoltaics
-
-    // The following subroutines are used for the SIMPLE model
-
-    // The following subroutines and functions are used for only the EQUIVALENT ONE-DIODE model
-
-    // The following subroutines and functions are used for the Sandia model.
-
-    //  OO get set methods for coupling to exterior vented baffle cavity mounting configurations
-
-    // *************
-
-    // Functions
+    void clear_state() {
+        CheckEquipName.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        firstTime = true;
+    }
 
     void SimPVGenerator(int const EP_UNUSED(GeneratorType), // type of Generator !unused1208
                         std::string const &GeneratorName,   // user specified name of Generator
@@ -170,7 +166,6 @@ namespace Photovoltaics {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PVnum;                      // index of unit in PV array for Equivalent one-diode model
-        static bool GetInputFlag(true); // one time get input flag
 
         // Get PV data from input file
         if (GetInputFlag) {
@@ -315,7 +310,7 @@ namespace Photovoltaics {
         int NumAlphas; // Number of PV Array parameter alpha names being passed
         int NumNums;   // Number of PV Array numeric parameters are being passed
         int IOStat;
-        static bool ErrorsFound(false); // if errors detected in input
+        bool ErrorsFound(false); // if errors detected in input
         int ThisParamObj;
         int dupPtr;
 
@@ -693,13 +688,13 @@ namespace Photovoltaics {
             }
 
             // set up report variables CurrentModuleObject='Photovoltaics'
-            SetupOutputVariable("Generator Produced DC Electric Power",
+            SetupOutputVariable("Generator Produced DC Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 PVarray(PVnum).Report.DCPower,
                                 "System",
                                 "Average",
                                 PVarray(PVnum).Name);
-            SetupOutputVariable("Generator Produced DC Electric Energy",
+            SetupOutputVariable("Generator Produced DC Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 PVarray(PVnum).Report.DCEnergy,
                                 "System",
@@ -745,7 +740,7 @@ namespace Photovoltaics {
                 if (!Surface(PVarray(PVnum).SurfacePtr).HeatTransSurf) {
                     ShowSevereError("Must use a surface with heat transfer for IntegratedSurfaceOutsideFace mode in " + PVarray(PVnum).Name);
                     ErrorsFound = true;
-                } else if (!Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
+                } else if (!dataConstruction.Construct(Surface(PVarray(PVnum).SurfacePtr).Construction).SourceSinkPresent) {
                     ShowSevereError("Must use a surface with internal source construction for IntegratedSurfaceOutsideFace mode in " +
                                     PVarray(PVnum).Name);
                     ErrorsFound = true;
@@ -1243,7 +1238,6 @@ namespace Photovoltaics {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
         Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 
@@ -1364,7 +1358,6 @@ namespace Photovoltaics {
         int K;
         Real64 CellTemp(0.0); // cell temperature in Kelvin
         Real64 CellTempC;     // cell temperature in degrees C
-        static bool firstTime(true);
         // unused1208  INTEGER :: thisZone
 
         // if the cell temperature mode is 2, convert the timestep to seconds

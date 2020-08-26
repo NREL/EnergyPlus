@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
+    struct EnergyPlusData;
 
 // note there are routines that lie outside of the Module at the end of this file
 
@@ -86,28 +88,29 @@ namespace EMSManager {
     // Functions
     void clear_state();
 
-    void CheckIfAnyEMS();
+    void CheckIfAnyEMS(IOFiles &ioFiles);
 
     // MODULE SUBROUTINES:
 
-    void ManageEMS(int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
+    void ManageEMS(EnergyPlusData &state,
+                   int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                       // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
-    void GetEMSInput();
+    void GetEMSInput(IOFiles &ioFiles);
 
     void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
     void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
-    void EchoOutActuatorKeyChoices();
+    void EchoOutActuatorKeyChoices(IOFiles &ioFiles);
 
-    void EchoOutInternalVariableChoices();
+    void EchoOutInternalVariableChoices(IOFiles &ioFiles);
 
     void SetupNodeSetPointsAsActuators();
 

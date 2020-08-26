@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,12 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct DataGlobal;
 
 namespace DataSystemVariables {
 
@@ -66,7 +69,6 @@ namespace DataSystemVariables {
     extern int const iASCII_CR;    // endline value when just CR instead of CR/LF
     extern int const iUnicode_end; // endline value when Unicode file
     extern char const tabchar;
-    extern int const GoodIOStatValue;       // good value for IOStat during reads/writes
     extern int const MaxTimingStringLength; // string length for timing string array
 
     extern std::string const DDOnlyEnvVar;             // Only run design days
@@ -87,6 +89,7 @@ namespace DataSystemVariables {
     extern std::string const cIgnoreBeamRadiation;
     extern std::string const cIgnoreDiffuseRadiation;
     extern std::string const cSutherlandHodgman;
+    extern std::string const cSlaterBarsky;
     extern std::string const cMinimalSurfaceVariables;
     extern std::string const cMinimalShadowing;
     extern std::string const cNumActiveSims;
@@ -117,9 +120,18 @@ namespace DataSystemVariables {
     extern bool FullAnnualRun;                    // TRUE if full annual simulation is to be run.
     extern bool DeveloperFlag;                    // TRUE if developer flag is turned on. (turns on more displays to console)
     extern bool TimingFlag;                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
+
+    // Shading methods
+    enum class ShadingMethod {PolygonClipping, PixelCounting, Scheduled, Imported};
+    extern ShadingMethod shadingMethod;           // defines the shading method used
     extern bool SutherlandHodgman;                // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    extern bool SlaterBarsky;                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     extern bool DetailedSkyDiffuseAlgorithm;      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     extern bool DetailedSolarTimestepIntegration; // when true, use detailed timestep integration for all solar,shading, etc.
+    extern bool ReportExtShadingSunlitFrac;              // when true, the sunlit fraction for all surfaces are exported as a csv format output
+    extern bool DisableGroupSelfShading; // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+    extern bool DisableAllSelfShading;   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+
     extern bool TrackAirLoopEnvFlag;              // If TRUE generates a file with runtime statistics for each HVAC
     //  controller on each air loop
     extern bool TraceAirLoopEnvFlag; // If TRUE generates a trace file with the converged solutions of all
@@ -130,13 +142,6 @@ namespace DataSystemVariables {
     extern bool ReportDuringHVACSizingSimulation;        // true when reporting outputs during HVAC sizing Simulation
     extern bool ReportDetailedWarmupConvergence;         // True when the detailed warmup convergence is requested
     extern bool UpdateDataDuringWarmupExternalInterface; // variable sets in the external interface.
-    extern bool UseScheduledSunlitFrac;                  // when true, the external shading calculation results will be exported
-    extern bool ReportExtShadingSunlitFrac;              // when true, the sunlit fraction for all surfaces are exported as a csv format output
-    extern bool UseImportedSunlitFrac;                   // when true, the sunlit fraction for all surfaces are imported altogether as a CSV file
-
-    extern bool DisableGroupSelfShading; // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
-    extern bool DisableAllSelfShading;   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
-
     // This update the value during the warmup added for FMI
     extern Real64 Elapsed_Time;            // For showing elapsed time at end of run
     extern Real64 Time_Start;              // Call to CPU_Time for start time of simulation
@@ -164,13 +169,16 @@ namespace DataSystemVariables {
 
     // Functions
 
-    void CheckForActualFileName(std::string const &originalInputFileName, // name as input for object
+    void CheckForActualFileName(IOFiles &ioFiles,
+                                std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName              // Blank if not found.
     );
 
     // Needed for unit tests, should not be normally called.
     void clear_state();
+
+    void processEnvironmentVariables(DataGlobal const &dataGlobals);
 
 } // namespace DataSystemVariables
 

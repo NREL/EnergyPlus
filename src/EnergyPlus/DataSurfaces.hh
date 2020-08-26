@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,11 +49,11 @@
 #define DataSurfaces_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataGlobals.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
-#include <Shape.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Shape.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -65,6 +65,10 @@
 #include <vector>
 
 namespace EnergyPlus {
+
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct WindowManagerData;
 
 namespace DataSurfaces {
 
@@ -167,6 +171,7 @@ namespace DataSurfaces {
     extern int const HeatTransferModel_ComplexFenestration; // BSDF
     extern int const HeatTransferModel_TDD;                 // tubular daylighting device
     extern int const HeatTransferModel_Kiva;                // Kiva ground calculations
+    extern int const HeatTransferModel_AirBoundaryNoHT;     // Construction:AirBoundary - not IRT or interior window
 
     // Parameters for classification of outside face of surfaces
     extern int const OutConvClass_WindwardVertWall;
@@ -477,10 +482,11 @@ namespace DataSurfaces {
     extern Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     extern Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
-    extern std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    extern std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces - simulation order
     extern std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     extern std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     extern std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    extern std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
@@ -691,6 +697,9 @@ namespace DataSurfaces {
         Real64 CosTilt;                   // Cosine of surface tilt angle
         bool IsConvex;                    // true if the surface is convex.
         bool IsDegenerate;                // true if the surface is degenerate.
+        bool VerticesProcessed;           // true if vertices have been processed (only used for base surfaces)
+        Real64 XShift;                    // relative coordinate shift data - used by child subsurfaces
+        Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
         // Precomputed parameters for PierceSurface performance
         ShapeCat shapeCat;   // Shape category
         Plane plane;         // Plane
@@ -737,6 +746,8 @@ namespace DataSurfaces {
         bool HasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
         int LinkedOutAirNode;              // Index of the an OutdoorAir:Node
 
+        int PenumbraID;    // Surface ID in penumbra
+
         std::string UNomWOFilm; // Nominal U Value without films stored as string
         std::string UNomFilm;   // Nominal U Value with films stored as string
         bool ExtEcoRoof;        // True if the top outside construction material is of type Eco Roof
@@ -767,9 +778,12 @@ namespace DataSurfaces {
         int IntConvWindowLocation;       // relative location of window in zone for interior Hc models
         bool IntConvSurfGetsRadiantHeat;
         bool IntConvSurfHasActiveInIt;
-        bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
+        bool IsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
         // LG added 1/6/12
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
+        // Air boundaries
+        int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
+        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
 
         std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
                                                     // the surface diffusion model
@@ -788,23 +802,24 @@ namespace DataSurfaces {
               ShadowSurfRecSurfNum(0), MaterialMovInsulExt(0), MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0),
               MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
-              CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
-              WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0), StormWinConstruction(0), StormWinShadedConstruction(0),
-              FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false),
-              OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0),
-              WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0),
+              CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
+              shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0),
+              StormWinConstruction(0), StormWinShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp),
+              OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
+              OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
+              WindSpeedEMSOverrideValue(0.0),
 
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
               SchedExternalShadingFrac(false), ExternalShadingSchInd(0), HasSurroundingSurfProperties(false), SurroundingSurfacesNum(0),
-              HasLinkedOutAirNode(false), LinkedOutAirNode(0),
+              HasLinkedOutAirNode(false), LinkedOutAirNode(0), PenumbraID(-1),
 
               UNomWOFilm("-              "), UNomFilm("-              "), ExtEcoRoof(false), ExtCavityPresent(false), ExtCavNum(0), IsPV(false),
               IsICS(false), IsPool(false), ICSPtr(0), MirroredSurf(false), IntConvClassification(0), IntConvHcModelEq(0), IntConvHcUserCurveIndex(0),
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
               OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
               IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0)
+              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
         {
         }
 
@@ -824,7 +839,7 @@ namespace DataSurfaces {
 
         Real64 getOutsideAirTemperature(const int t_SurfNum) const;
 
-        Real64 getOutsideIR(const int t_SurfNum) const;
+        Real64 getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const;
 
         static Real64 getSWIncident(const int t_SurfNum);
 
@@ -850,6 +865,74 @@ namespace DataSurfaces {
     struct SurfaceWindowCalc // Calculated window-related values
     {
         // Members
+
+        Real64 FrameQRadOutAbs;    // Radiation absorbed by outside of frame (solar) (W/m2)
+        Real64 FrameQRadInAbs;     // Radiation absorbed by inside of frame (short-wave from solar
+        //   and lights; long-wave from internal gains) (W/m2)
+        Real64 DividerQRadOutAbs;          // Radiation absorbed by outside of divider (solar) (W/m2)
+        Real64 DividerQRadInAbs;     // Radiation absorbed by inside of divider (short-wave from solar
+        //   and lights; long-wave from internal gains) (W/m2)
+        Real64 ExtBeamAbsByShade;        // Exterior beam solar absorbed by window shade (W/m2)
+        Real64 ExtDiffAbsByShade;        // Exterior diffuse solar absorbed by window shade (W/m2)
+        Real64 IntBeamAbsByShade;        // Interior beam solar absorbed by window shade (W/m2)
+        Real64 IntSWAbsByShade;          // Interior diffuse solar plus short-wave from lights absorbed by window shade (W/m2)
+        Real64 InitialDifSolAbsByShade;  // Initial diffuse solar from ext and int windows absorbed by window shade (W/m2)
+        Real64 IntLWAbsByShade;          // Interior long-wave from zone lights and equipment absorbed by window shade (W/m2)
+        Real64 ConvHeatFlowNatural;      // Convective heat flow from gap between glass and interior shade or blind (W)
+        Real64 ConvHeatGainToZoneAir;    // Convective heat gain to zone air from window gap airflow (W)
+        Real64 RetHeatGainToZoneAir;     // Convective heat gain to return air sent to zone [W]
+        Real64 DividerHeatGain;
+        Real64 BlTsolBmBm;                      // Time-step value of blind beam-beam solar transmittance (-)
+        Real64 BlTsolBmDif;                     // Time-step value of blind beam-diffuse solar transmittance (-)
+        Real64 BlTsolDifDif;                    // Time-step value of blind diffuse-diffuse solar transmittance (-)
+        Real64 BlGlSysTsolBmBm;                 // Time-step value of blind/glass system beam-beam solar transmittance (-)
+        Real64 BlGlSysTsolDifDif;               // Time-step value of blind/glass system diffuse-diffuse solar transmittance (-)
+        Real64 ScTsolBmBm;                      // Time-step value of screen beam-beam solar transmittance (-)
+        Real64 ScTsolBmDif;                     // Time-step value of screen beam-diffuse solar transmittance (-)
+        Real64 ScTsolDifDif;                    // Time-step value of screen diffuse-diffuse solar transmittance (-)
+        Real64 ScGlSysTsolBmBm;                 // Time-step value of screen/glass system beam-beam solar transmittance (-)
+        Real64 ScGlSysTsolDifDif;               // Time-step value of screen/glass system diffuse-diffuse solar transmittance (-)
+        Real64 GlTsolBmBm;                      // Time-step value of glass beam-beam solar transmittance (-)
+        Real64 GlTsolBmDif;                     // Time-step value of glass beam-diffuse solar transmittance (-)
+        Real64 GlTsolDifDif;                    // Time-step value of glass diffuse-diffuse solar transmittance (-)
+        Real64 BmSolTransThruIntWinRep;         // Beam solar transmitted through interior window [W]
+        Real64 BmSolAbsdOutsReveal;             // Multiplied by BeamSolarRad, gives beam solar absorbed by
+        //  outside reveal surfaces (m2)
+        Real64 BmSolRefldOutsRevealReport;      // Beam solar reflected by outside reveal surfaces, for reporting (m2)
+        Real64 BmSolAbsdInsReveal;  // Multiplied by BeamSolarRad, gives beam solar absorbed
+        //  by inside reveal surfaces (m2)
+        Real64 BmSolRefldInsReveal; // Multiplied by BeamSolarRad, gives beam solar reflected
+        //  by inside reveal surfaces (m2)
+        Real64 BmSolRefldInsRevealReport;  // Beam solar reflected by inside reveal surfaces, for reporting (W)
+        Real64 OutsRevealDiffOntoGlazing; // Multiplied by BeamSolarRad, gives diffuse from beam reflection from
+        //  outside reveal that is incident on the glazing per m2 of glazing (-)
+        Real64 InsRevealDiffOntoGlazing; // Multiplied by BeamSolarRad, gives diffuse from beam reflection
+        //  from inside reveal that is incident on the glazing per m2 of glazing (-)
+        Real64 InsRevealDiffIntoZone; // Multiplied by BeamSolarRad, gives diffuse from beam reflection
+        //  from inside reveal that goes into zone directly or reflected from glazing (m2)
+        Real64 OutsRevealDiffOntoFrame; // Multiplied by BeamSolarRad, gives diffuse from beam reflection from outside reveal
+        //  that is incident on the outside of the frame per m2 of frame (-)
+        Real64 InsRevealDiffOntoFrame; // Multiplied by BeamSolarRad, gives diffuse from beam reflection from inside reveal
+        //  that is incident on the outside of the frame per m2 of frame (-)
+        //  added for debugging CR 7596. TH 5/26/2009
+        Real64 InsRevealDiffOntoGlazingReport; // Diffuse solar from beam reflection
+        //  from inside reveal that is incident on the glazing (W)
+        Real64 InsRevealDiffIntoZoneReport; // Diffuse from beam reflection
+        //  from inside reveal that goes into zone directly or reflected from glazing (W)
+        Real64 InsRevealDiffOntoFrameReport; // Diffuse from beam reflection from inside reveal
+        //  that is incident on the frame (W)
+        Real64 BmSolAbsdInsRevealReport;      // Beam solar absorbed by inside reveal (W)
+        //  energy
+        Real64 BmSolTransThruIntWinRepEnergy; // energy of BmSolTransThruIntWinRep [J]
+        Real64 BmSolRefldOutsRevealRepEnergy; // energy of BmSolRefldOutsRevealReport [J]
+        Real64 BmSolRefldInsRevealRepEnergy;  // energy of BmSolRefldInsRevealReport [J]
+        Real64 ProfileAngHor;       // Horizontal beam solar profile angle (degrees)
+        Real64 ProfileAngVert;      // Vertical beam solar profile angle (degrees)
+        Real64 SkySolarInc;                     // Incident diffuse solar from sky; if CalcSolRefl is true, includes
+        //  reflection of sky diffuse and beam solar from exterior obstructions [W/m2]
+        Real64 GndSolarInc; // Incident diffuse solar from ground; if CalcSolRefl is true, accounts
+        //  for shadowing of ground by building and obstructions [W/m2]
+
         int ShadingFlag; // -1: window has no shading device
         //   0: shading device is off
         //   1: interior shade is on
@@ -931,9 +1014,9 @@ namespace DataSurfaces {
         Real64 FrameTempSurfIn;    // Frame inside surface temperature (C)
         Real64 FrameTempSurfInOld; // Previous value of frame inside surface temperature (C)
         Real64 FrameTempSurfOut;   // Frame outside surface temperature (C)
-        Real64 FrameQRadInAbs;     // Radiation absorbed by inside of frame (short-wave from solar
-        //   and lights; long-wave from internal gains) (W/m2)
-        Real64 FrameQRadOutAbs;    // Radiation absorbed by outside of frame (solar) (W/m2)
+        
+        
+
         Real64 ProjCorrFrOut;      // Correction factor to absorbed radiation due to frame outside projection
         Real64 ProjCorrFrIn;       // Correction factor to absorbed radiation due to frame inside projection
         int DividerType;           // Divider type (1=DividedLite, 2=Suspended (between-pane))
@@ -954,9 +1037,6 @@ namespace DataSurfaces {
         Real64 DividerTempSurfIn;    // Divider inside surface temperature (C)
         Real64 DividerTempSurfInOld; // Previous value of divider inside surface temperature (C)
         Real64 DividerTempSurfOut;   // Divider outside surface temperature (C)
-        Real64 DividerQRadInAbs;     // Radiation absorbed by inside of divider (short-wave from solar
-        //   and lights; long-wave from internal gains) (W/m2)
-        Real64 DividerQRadOutAbs;          // Radiation absorbed by outside of divider (solar) (W/m2)
         Real64 ProjCorrDivOut;             // Correction factor to absorbed radiation due to divider outside projection
         Real64 ProjCorrDivIn;              // Correction factor to absorbed radiation due to divider inside projection
         Real64 GlazedFrac;                 // (Glazed area)/(Glazed area + divider area)
@@ -972,20 +1052,11 @@ namespace DataSurfaces {
         // Glass Door - SurfaceClass_GlassDoor
         // tubular daylighting device dome - SurfaceClass_TDD_Dome
         // tubular daylighting device diffuser - SurfaceClass_TDD_Diffuser
-        Real64 ExtBeamAbsByShade;        // Exterior beam solar absorbed by window shade (W/m2)
-        Real64 ExtDiffAbsByShade;        // Exterior diffuse solar absorbed by window shade (W/m2)
-        Real64 IntBeamAbsByShade;        // Interior beam solar absorbed by window shade (W/m2)
-        Real64 IntSWAbsByShade;          // Interior diffuse solar plus short-wave from lights absorbed by window shade (W/m2)
-        Real64 InitialDifSolAbsByShade;  // Initial diffuse solar from ext and int windows absorbed by window shade (W/m2)
-        Real64 IntLWAbsByShade;          // Interior long-wave from zone lights and equipment absorbed by window shade (W/m2)
         Array1D<Real64> ShadeAbsFacFace; // Fraction of short-wave radiation incident on face 1 that is
         //  absorbed by face 1 and by the other face (face 2) when total absorbed
         //  radiation is apportioned to the two faces
         Real64 ConvCoeffWithShade; // Convection coefficient from glass or shade to gap air when
         //  interior or exterior shade is present (W/m2-K)
-        Real64 ConvHeatFlowNatural;      // Convective heat flow from gap between glass and interior shade or blind (W)
-        Real64 ConvHeatGainToZoneAir;    // Convective heat gain to zone air from window gap airflow (W)
-        Real64 RetHeatGainToZoneAir;     // Convective heat gain to return air sent to zone [W]
         Real64 OtherConvHeatGain;        // other convective = total conv - standard model prediction for EQL window model (W)
         int BlindNumber;                 // Blind number for a window with a blind
         Array1D<Real64> EffShBlindEmiss; // Effective emissivity of interior blind or shade
@@ -1001,8 +1072,6 @@ namespace DataSurfaces {
         Real64 BlindAirFlowPermeability; // Blind air-flow permeability for calculation of convective flow
         //  in gap between blind and glass
         Real64 TotGlazingThickness; // Total glazing thickness from outside of outer glass to inside of inner glass (m)
-        Real64 ProfileAngHor;       // Horizontal beam solar profile angle (degrees)
-        Real64 ProfileAngVert;      // Vertical beam solar profile angle (degrees)
         Real64 TanProfileAngHor;    // Tangent of horizontal profile angle
         Real64 TanProfileAngVert;   // Tangent of vertical profile angle
         Real64 InsideSillDepth;     // Depth of inside sill (m)
@@ -1010,46 +1079,8 @@ namespace DataSurfaces {
         Real64 InsideSillSolAbs;    // Solar absorptance of inside sill
         Real64 InsideRevealSolAbs;  // Solar absorptance of inside reveal
         Real64 OutsideRevealSolAbs; // Solar absorptance of outside reveal
-        Real64 BmSolAbsdInsReveal;  // Multiplied by BeamSolarRad, gives beam solar absorbed
-        // by inside reveal surfaces (m2)
-        Real64 BmSolRefldInsReveal; // Multiplied by BeamSolarRad, gives beam solar reflected
-        // by inside reveal surfaces (m2)
-        Real64 BmSolRefldInsRevealReport;  // Beam solar reflected by inside reveal surfaces, for reporting (W)
-        Real64 BmSolRefldOutsRevealReport; // Beam solar reflected by outside reveal surfaces, for reporting (m2)
-        Real64 BmSolAbsdOutsReveal;        // Multiplied by BeamSolarRad, gives beam solar absorbed by
-        // outside reveal surfaces (m2)
-        Real64 OutsRevealDiffOntoGlazing; // Multiplied by BeamSolarRad, gives diffuse from beam reflection from
-        //    outside reveal that is incident on the glazing per m2 of glazing (-)
-        Real64 InsRevealDiffOntoGlazing; // Multiplied by BeamSolarRad, gives diffuse from beam reflection
-        //  from inside reveal that is incident on the glazing per m2 of glazing (-)
-        Real64 InsRevealDiffIntoZone; // Multiplied by BeamSolarRad, gives diffuse from beam reflection
-        //  from inside reveal that goes into zone directly or reflected from glazing (m2)
-        Real64 OutsRevealDiffOntoFrame; // Multiplied by BeamSolarRad, gives diffuse from beam reflection from outside reveal
-        //   that is incident on the outside of the frame per m2 of frame (-)
-        Real64 InsRevealDiffOntoFrame; // Multiplied by BeamSolarRad, gives diffuse from beam reflection from inside reveal
-        //   that is incident on the outside of the frame per m2 of frame (-)
-        // added for debugging CR 7596. TH 5/26/2009
-        Real64 InsRevealDiffOntoGlazingReport; // Diffuse solar from beam reflection
-        //  from inside reveal that is incident on the glazing (W)
-        Real64 InsRevealDiffIntoZoneReport; // Diffuse from beam reflection
-        //  from inside reveal that goes into zone directly or reflected from glazing (W)
-        Real64 InsRevealDiffOntoFrameReport; // Diffuse from beam reflection from inside reveal
-        //  that is incident on the frame (W)
-        Real64 BmSolAbsdInsRevealReport;        // Beam solar absorbed by inside reveal (W)
-        Real64 BlTsolBmBm;                      // Time-step value of blind beam-beam solar transmittance (-)
-        Real64 BlTsolBmDif;                     // Time-step value of blind beam-diffuse solar transmittance (-)
-        Real64 BlTsolDifDif;                    // Time-step value of blind diffuse-diffuse solar transmittance (-)
-        Real64 BlGlSysTsolBmBm;                 // Time-step value of blind/glass system beam-beam solar transmittance (-)
-        Real64 BlGlSysTsolDifDif;               // Time-step value of blind/glass system diffuse-diffuse solar transmittance (-)
+
         int ScreenNumber;                       // Screen number for a window with a screen (do not confuse with material number)
-        Real64 ScTsolBmBm;                      // Time-step value of screen beam-beam solar transmittance (-)
-        Real64 ScTsolBmDif;                     // Time-step value of screen beam-diffuse solar transmittance (-)
-        Real64 ScTsolDifDif;                    // Time-step value of screen diffuse-diffuse solar transmittance (-)
-        Real64 ScGlSysTsolBmBm;                 // Time-step value of screen/glass system beam-beam solar transmittance (-)
-        Real64 ScGlSysTsolDifDif;               // Time-step value of screen/glass system diffuse-diffuse solar transmittance (-)
-        Real64 GlTsolBmBm;                      // Time-step value of glass beam-beam solar transmittance (-)
-        Real64 GlTsolBmDif;                     // Time-step value of glass beam-diffuse solar transmittance (-)
-        Real64 GlTsolDifDif;                    // Time-step value of glass diffuse-diffuse solar transmittance (-)
         int AirflowSource;                      // Source of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
         int AirflowDestination;                 // Destination of gap airflow (INSIDEAIR, OUTSIDEAIR, etc.)
         int AirflowReturnNodePtr;               // Return node pointer for destination = ReturnAir
@@ -1060,17 +1091,12 @@ namespace DataSurfaces {
         Real64 AirflowThisTS;                   // Gap airflow this timestep (m3/s per m of glazing width)
         Real64 TAirflowGapOutlet;               // Temperature of air leaving airflow gap between glass panes (C)
         int WindowCalcIterationsRep;            // Number of iterations in window heat balance calculation
-        Real64 BmSolTransThruIntWinRep;         // Beam solar transmitted through interior window [W]
         Real64 VentingOpenFactorRep;            // Window/door venting open factor, for reporting
         Real64 VentingOpenFactorMultRep;        // Window/door opening modulation multiplier on venting open factor, for reporting
         Real64 InsideTempForVentingRep;         // Inside air temp used to control window/door venting, for reporting (C)
         Real64 VentingAvailabilityRep;          // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
-        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point #1 [lux]
-        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point #1 [cd/m2]
-        Real64 LumWinFromRefPt2Rep;             // Window luminance as viewed from reference point #2 [cd/m2]
-        Real64 SkySolarInc;                     // Incident diffuse solar from sky; if CalcSolRefl is true, includes
-        // reflection of sky diffuse and beam solar from exterior obstructions [W/m2]
-        Real64 GndSolarInc; // Incident diffuse solar from ground; if CalcSolRefl is true, accounts
+        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
+        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
         Real64 SkyGndSolarInc; // Incident diffuse solar from ground-reflected sky radiation; used for
         // Complex Fen; if CalcSolRefl is true, accounts for shadowing of ground by building and obstructions [W/m2]
@@ -1085,13 +1111,9 @@ namespace DataSurfaces {
         //  due to light well losses)
         bool SolarDiffusing; // True if exterior window with a construction that contains a
         //  diffusing glass layer
-        // energy
-        Real64 BmSolRefldInsRevealRepEnergy;  // energy of BmSolRefldInsRevealReport [J]
-        Real64 BmSolRefldOutsRevealRepEnergy; // energy of BmSolRefldOutsRevealReport [J]
-        Real64 BmSolTransThruIntWinRepEnergy; // energy of BmSolTransThruIntWinRep [J]
+
         // Reporting
         Real64 FrameHeatGain;
-        Real64 DividerHeatGain;
         Real64 FrameHeatLoss;
         Real64 DividerHeatLoss;
         // Added TH for thermochromic windows. 12/22/2008
@@ -1105,37 +1127,43 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceWindowCalc()
-            : ShadingFlag(ShadeOff), ShadingFlagEMSOn(false), ShadingFlagEMSValue(0), StormWinFlag(-1), StormWinFlagPrevDay(-1),
+            : FrameQRadOutAbs(0.0), FrameQRadInAbs(0.0), DividerQRadOutAbs(0.0), DividerQRadInAbs(0.0),
+              ExtBeamAbsByShade(0.0), ExtDiffAbsByShade(0.0), IntBeamAbsByShade(0.0), IntSWAbsByShade(0.0),
+              InitialDifSolAbsByShade(0.0), IntLWAbsByShade(0.0), ConvHeatFlowNatural(0.0), ConvHeatGainToZoneAir(0.0),
+              RetHeatGainToZoneAir(0.0), DividerHeatGain(0.0), BlTsolBmBm(0.0), BlTsolBmDif(0.0), BlTsolDifDif(0.0),
+              BlGlSysTsolBmBm(0.0), BlGlSysTsolDifDif(0.0), ScTsolBmBm(0.0), ScTsolBmDif(0.0), ScTsolDifDif(0.0),
+              ScGlSysTsolBmBm(0.0), ScGlSysTsolDifDif(0.0), GlTsolBmBm(0.0), GlTsolBmDif(0.0), GlTsolDifDif(0.0),
+              BmSolTransThruIntWinRep(0.0), BmSolAbsdOutsReveal(0.0), BmSolRefldOutsRevealReport(0.0), BmSolAbsdInsReveal(0.0),
+              BmSolRefldInsReveal(0.0), BmSolRefldInsRevealReport(0.0), OutsRevealDiffOntoGlazing(0.0),
+              InsRevealDiffOntoGlazing(0.0), InsRevealDiffIntoZone(0.0), OutsRevealDiffOntoFrame(0.0),
+              InsRevealDiffOntoFrame(0.0), InsRevealDiffOntoGlazingReport(0.0), InsRevealDiffIntoZoneReport(0.0),
+              InsRevealDiffOntoFrameReport(0.0), BmSolAbsdInsRevealReport(0.0), BmSolTransThruIntWinRepEnergy(0.0),
+              BmSolRefldOutsRevealRepEnergy(0.0), BmSolRefldInsRevealRepEnergy(0.0), ProfileAngHor(0.0), ProfileAngVert(0.0),
+              SkySolarInc(0.0), GndSolarInc(0.0),
+              ShadingFlag(0), ShadingFlagEMSOn(0), ShadingFlagEMSValue(0), StormWinFlag(0), StormWinFlagPrevDay(0),
               FracTimeShadingDeviceOn(0.0), ExtIntShadePrevTS(0), ShadedConstruction(0), HasShadeOrBlindLayer(false), SurfDayLightInit(false),
               DaylFacPoint(0), VisTransSelected(0.0), SwitchingFactor(0.0), WinCenter(3, 0.0), Theta(0.0), Phi(0.0), RhoCeilingWall(0.0),
               RhoFloorWall(0.0), FractionUpgoing(0.0), VisTransRatio(0.0), ThetaFace(10, 296.15), IRfromParentZone(0.0), IRErrCount(0),
               IRErrCountC(0), FrameArea(0.0), FrameConductance(0.0), FrameSolAbsorp(0.0), FrameVisAbsorp(0.0), FrameEmis(0.0), FrameAreaXEmiss(0.0),
               FrameRadExchangeFactor(0.0), FrameHRadLinIn(0.0), FrameRadThermalFluxRec(0.0), FrameRadThermalFluxRecOld(0.0),
               FrEdgeToCenterGlCondRatio(1.0), FrameEdgeArea(0.0), FrameTempSurfIn(23.0), FrameTempSurfInOld(23.0), FrameTempSurfOut(23.0),
-              FrameQRadInAbs(0.0), FrameQRadOutAbs(0.0), ProjCorrFrOut(0.0), ProjCorrFrIn(0.0), DividerType(0), DividerArea(0.0),
+              ProjCorrFrOut(0.0), ProjCorrFrIn(0.0), DividerType(0), DividerArea(0.0),
               DividerConductance(0.0), DividerSolAbsorp(0.0), DividerVisAbsorp(0.0), DividerEmis(0.0), DividerAreaXEmiss(0.0),
               DividerRadExchangeFactor(0.0), DividerHRadLinIn(0.0), DividerRadThermalFluxRec(0.0), DividerRadThermalFluxRecOld(0.0),
               DivEdgeToCenterGlCondRatio(1.0), DividerEdgeArea(0.0), DividerTempSurfIn(23.0), DividerTempSurfInOld(23.0), DividerTempSurfOut(23.0),
-              DividerQRadInAbs(0.0), DividerQRadOutAbs(0.0), ProjCorrDivOut(0.0), ProjCorrDivIn(0.0), GlazedFrac(1.0), OutProjSLFracMult(24, 1.0),
-              InOutProjSLFracMult(24, 1.0), CenterGlArea(0.0), EdgeGlCorrFac(1.0), OriginalClass(0), ExtBeamAbsByShade(0.0), ExtDiffAbsByShade(0.0),
-              IntBeamAbsByShade(0.0), IntSWAbsByShade(0.0), InitialDifSolAbsByShade(0.0), IntLWAbsByShade(0.0), ShadeAbsFacFace(2, 0.5),
-              ConvCoeffWithShade(0.0), ConvHeatFlowNatural(0.0), ConvHeatGainToZoneAir(0.0), RetHeatGainToZoneAir(0.0), OtherConvHeatGain(0.0),
+              ProjCorrDivOut(0.0), ProjCorrDivIn(0.0), GlazedFrac(1.0), OutProjSLFracMult(24, 1.0),
+              InOutProjSLFracMult(24, 1.0), CenterGlArea(0.0), EdgeGlCorrFac(1.0), OriginalClass(0), ShadeAbsFacFace(2, 0.5),
+              ConvCoeffWithShade(0.0), OtherConvHeatGain(0.0),
               BlindNumber(0), EffShBlindEmiss(MaxSlatAngs, 0.0), EffGlassEmiss(MaxSlatAngs, 0.0), EffInsSurfTemp(23.0), MovableSlats(false),
               SlatAngThisTS(0.0), SlatAngThisTSDeg(0.0), SlatAngThisTSDegEMSon(false), SlatAngThisTSDegEMSValue(0.0), SlatsBlockBeam(false),
-              BlindAirFlowPermeability(0.0), TotGlazingThickness(0.0), ProfileAngHor(0.0), ProfileAngVert(0.0), TanProfileAngHor(0.0),
+              BlindAirFlowPermeability(0.0), TotGlazingThickness(0.0), TanProfileAngHor(0.0),
               TanProfileAngVert(0.0), InsideSillDepth(0.0), InsideReveal(0.0), InsideSillSolAbs(0.0), InsideRevealSolAbs(0.0),
-              OutsideRevealSolAbs(0.0), BmSolAbsdInsReveal(0.0), BmSolRefldInsReveal(0.0), BmSolRefldInsRevealReport(0.0),
-              BmSolRefldOutsRevealReport(0.0), BmSolAbsdOutsReveal(0.0), OutsRevealDiffOntoGlazing(0.0), InsRevealDiffOntoGlazing(0.0),
-              InsRevealDiffIntoZone(0.0), OutsRevealDiffOntoFrame(0.0), InsRevealDiffOntoFrame(0.0), InsRevealDiffOntoGlazingReport(0.0),
-              InsRevealDiffIntoZoneReport(0.0), InsRevealDiffOntoFrameReport(0.0), BmSolAbsdInsRevealReport(0.0), BlTsolBmBm(0.0), BlTsolBmDif(0.0),
-              BlTsolDifDif(0.0), BlGlSysTsolBmBm(0.0), BlGlSysTsolDifDif(0.0), ScreenNumber(0), ScTsolBmBm(0.0), ScTsolBmDif(0.0), ScTsolDifDif(0.0),
-              ScGlSysTsolBmBm(0.0), ScGlSysTsolDifDif(0.0), GlTsolBmBm(0.0), GlTsolBmDif(0.0), GlTsolDifDif(0.0), AirflowSource(0),
+              OutsideRevealSolAbs(0.0), ScreenNumber(0), AirflowSource(0),
               AirflowDestination(0), AirflowReturnNodePtr(0), MaxAirflow(0.0), AirflowControlType(0), AirflowHasSchedule(false),
-              AirflowSchedulePtr(0), AirflowThisTS(0.0), TAirflowGapOutlet(0.0), WindowCalcIterationsRep(0), BmSolTransThruIntWinRep(0.0),
-              VentingOpenFactorRep(0.0), VentingOpenFactorMultRep(0.0), InsideTempForVentingRep(0.0), VentingAvailabilityRep(0.0), SkySolarInc(0.0),
-              GndSolarInc(0.0), SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
-              LightWellEff(1.0), SolarDiffusing(false), BmSolRefldInsRevealRepEnergy(0.0), BmSolRefldOutsRevealRepEnergy(0.0),
-              BmSolTransThruIntWinRepEnergy(0.0), FrameHeatGain(0.0), DividerHeatGain(0.0), FrameHeatLoss(0.0), DividerHeatLoss(0.0),
+              AirflowSchedulePtr(0), AirflowThisTS(0.0), TAirflowGapOutlet(0.0), WindowCalcIterationsRep(0),
+              VentingOpenFactorRep(0.0), VentingOpenFactorMultRep(0.0), InsideTempForVentingRep(0.0), VentingAvailabilityRep(0.0),
+              SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
+              LightWellEff(1.0), SolarDiffusing(false), FrameHeatGain(0.0), FrameHeatLoss(0.0), DividerHeatLoss(0.0),
               TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel), TDDPipeNum(0)
         {
         }

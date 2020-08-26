@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,15 +51,16 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <WeatherManager.hh>
-#include <DataEnvironment.hh>
-#include <SimulationManager.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <ConfiguredFunctions.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -159,7 +160,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_NoWeather) {
     thisModel->evapotransCoeff = 0.408;
 
     // No Weather file specified, so we expect it to fail
-    ASSERT_THROW(thisModel->getWeatherData(), std::runtime_error);
+    ASSERT_THROW(thisModel->getWeatherData(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** Site:GroundTemperature:Undisturbed:FiniteDifference -- using this model requires specification of a weather file.",
@@ -180,8 +181,6 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     // I cannot hard set WeatherManager's GetBranchInputOneTimeFlag (in anonymous namespace) to false,
     // so it'll end up calling >WeatherManager::ReadUserWeatherInput which calls the inputProcessor to set the NumOfEnvrn in particular.
     std::string const idf_objects = delimited_string({
-
-  "Version,9.1;",
 
   "Timestep,4;"
 
@@ -277,18 +276,18 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // Set an actual weather file to Chicago EPW
     WeatherManager::WeatherFileExists = true;
-    DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+    state.files.inputWeatherFileName.fileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
 
     // Read the project data, such as Timestep
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(state);
     EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
     bool ErrorsFound(false);
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);
@@ -307,7 +306,7 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
     thisModel->evapotransCoeff = 0.408;
 
     // Shouldn't throw
-    thisModel->getWeatherData();
+    thisModel->getWeatherData(state);
 
     // It should have reverted the added period
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);

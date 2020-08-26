@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,16 +51,85 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Material.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::HeatBalanceIntRadExchange;
 
 namespace EnergyPlus {
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CarrollMRT) {
+    int N;                     // NUMBER OF SURFACES
+    Array1D<Real64> A;         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+    Array1D<Real64> FMRT;      // MRT "VIEW FACTORS"
+    Array1D<Real64> EMISS;     // Gray body emissivities
+    Array1D<Real64> Fp;        // Gray body radiative resistance
+
+    // Three surfaces of equal size
+    N = 3;
+
+    A.allocate(N);
+    A(1) = 1.0;
+    A(2) = 1.0;
+    A(3) = 1.0;
+
+    FMRT.allocate(N);
+    CalcFMRT(N, A, FMRT);
+
+    EMISS.allocate(N);
+    EMISS(1) = 1.0;
+    EMISS(2) = 1.0;
+    EMISS(3) = 1.0;
+
+    Fp.allocate(N);
+    CalcFp(N, EMISS, FMRT, Fp);
+
+    EXPECT_NEAR(FMRT(1), 1.5, 0.001);
+    EXPECT_NEAR(FMRT(2), 1.5, 0.001);
+    EXPECT_NEAR(FMRT(3), 1.5, 0.001);
+
+    // Special case where surfaces are equal area (each 50% of total).
+    N = 2;
+
+    A.redimension(N);
+    A(1) = 1.0;
+    A(2) = 1.0;
+
+    FMRT.redimension(N);
+
+    CalcFMRT(N, A, FMRT);
+
+    EXPECT_NEAR(FMRT(1), 2.0, 0.001);
+    EXPECT_NEAR(FMRT(2), 2.0, 0.001);
+
+    EMISS.redimension(N);
+    EMISS(1) = 1.0;
+    EMISS(2) = 1.0;
+
+    Fp.redimension(N);
+    CalcFp(N, EMISS, FMRT, Fp);
+
+    // Imbalanced areas
+    A(1) = 2.0;
+    A(2) = 1.0;
+
+    CalcFMRT(N, A, FMRT);
+
+    std::string const error_string = delimited_string({"   ** Severe  ** Geometry not compatible with Carroll MRT Zone Radiant Exchange method."});
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    CalcFp(N, EMISS, FMRT, Fp);
+
+}
 
 TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 {
@@ -98,11 +167,23 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
 
     DataHeatBalance::Zone.allocate(ZoneNum);
     DataHeatBalance::Zone(ZoneNum).Name = "Test";
+    DataViewFactorInformation::ZoneRadiantInfo.allocate(ZoneNum);
+    DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name = DataHeatBalance::Zone(ZoneNum).Name;
+    DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).ZoneNums.push_back(ZoneNum);
 
-    FixViewFactors(N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum);
+    FixViewFactors(N,
+                   A,
+                   F,
+                   DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
+                   DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).ZoneNums,
+                   OriginalCheckValue,
+                   FixedCheckValue,
+                   FinalCheckValue,
+                   NumIterations,
+                   RowSum);
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** Surfaces in Zone=\"Test\" do not define an enclosure.",
+        "   ** Warning ** Surfaces in Zone/Enclosure=\"Test\" do not define an enclosure.",
         "   **   ~~~   ** Number of surfaces <= 3, view factors are set to force reciprocity but may not fulfill completeness.",
         "   **   ~~~   ** Reciprocity means that radiant exchange between two surfaces will match and not lead to an energy loss.",
         "   **   ~~~   ** Completeness means that all of the view factors between a surface and the other surfaces in a zone add up to unity.",
@@ -128,7 +209,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     F(3, 2) = 0.9;
     F(3, 3) = 0.0;
 
-    FixViewFactors(N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum);
+    FixViewFactors(N,
+        A,
+        F,
+        DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
+        DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).ZoneNums,
+        OriginalCheckValue,
+        FixedCheckValue,
+        FinalCheckValue,
+        NumIterations,
+        RowSum);
+
     EXPECT_NEAR(F(1, 2), 0.07986, 0.001);
     EXPECT_NEAR(F(2, 1), 0.71875, 0.001);
     EXPECT_NEAR(F(3, 2), 0.28125, 0.001);
@@ -146,7 +237,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     F(3, 2) = 0.5;
     F(3, 3) = 0.0;
 
-    FixViewFactors(N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum);
+    FixViewFactors(N,
+        A,
+        F,
+        DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
+        DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).ZoneNums,
+        OriginalCheckValue,
+        FixedCheckValue,
+        FinalCheckValue,
+        NumIterations,
+        RowSum);
+
     EXPECT_NEAR(F(1, 2), 0.181818, 0.001);
     EXPECT_NEAR(F(2, 3), 0.25, 0.001);
     EXPECT_NEAR(F(3, 2), 0.5, 0.001);
@@ -164,7 +265,17 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_FixViewFactorsTest)
     F(3, 2) = 0.6;
     F(3, 3) = 0.0;
 
-    FixViewFactors(N, A, F, ZoneNum, OriginalCheckValue, FixedCheckValue, FinalCheckValue, NumIterations, RowSum);
+    FixViewFactors(N,
+        A,
+        F,
+        DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).Name,
+        DataViewFactorInformation::ZoneRadiantInfo(ZoneNum).ZoneNums,
+        OriginalCheckValue,
+        FixedCheckValue,
+        FinalCheckValue,
+        NumIterations,
+        RowSum);
+
     EXPECT_NEAR(F(1, 2), 0.21466, 0.001);
     EXPECT_NEAR(F(1, 3), 0.25445, 0.001);
     EXPECT_NEAR(F(2, 1), 0.32199, 0.001);
@@ -182,8 +293,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     bool DidMIChange;
     int SurfNum;
 
-    DataHeatBalance::Construct.allocate(1);
-    DataHeatBalance::Material.allocate(1);
+    dataConstruction.Construct.allocate(1);
+    dataMaterial.Material.allocate(1);
     DataSurfaces::Surface.allocate(1);
 
     SurfNum = 1;
@@ -192,11 +303,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
-    DataHeatBalance::Construct(1).InsideAbsorpThermal = 0.9;
-    DataHeatBalance::Material(1).AbsorpThermal = 0.5;
-    DataHeatBalance::Material(1).Resistance = 1.25;
+    dataConstruction.Construct(1).InsideAbsorpThermal = 0.9;
+    dataMaterial.Material(1).AbsorpThermal = 0.5;
+    dataMaterial.Material(1).Resistance = 1.25;
     DataSurfaces::Surface(1).SchedMovInsulInt = -1;
-    DataHeatBalance::Material(1).AbsorpSolar = 0.25;
+    dataMaterial.Material(1).AbsorpSolar = 0.25;
 
     // Test 1: Movable insulation present but wasn't in previous time step, also movable insulation emissivity different than base construction
     //         This should result in a true value from the algorithm which will cause interior radiant exchange matrices to be recalculated
@@ -211,9 +322,327 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_UpdateMovableInsulationFlagT
     // Test 2: Movable insulation present but wasn't in previous time step.  However, the emissivity of the movable insulation and that of the
     // 		   construction are the same so nothing has actually changed.  This should result in a false value.
     DataSurfaces::Surface(1).MovInsulIntPresentPrevTS = false;
-    DataHeatBalance::Material(1).AbsorpThermal = DataHeatBalance::Construct(1).InsideAbsorpThermal;
+    dataMaterial.Material(1).AbsorpThermal = dataConstruction.Construct(1).InsideAbsorpThermal;
     HeatBalanceIntRadExchange::UpdateMovableInsulationFlag(DidMIChange, SurfNum);
     EXPECT_TRUE(!DidMIChange);
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 3,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Perimeter Zones,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneList,",
+        "Perimeter Zones, !- Name",
+        "Zone 5, !- Zone 1 Name",
+        "Zone 2; !- Zone 2 Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 6,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataViewFactorInformation::NumOfRadiantEnclosures = 3;
+    DataViewFactorInformation::ZoneRadiantInfo.allocate(3);
+    DataViewFactorInformation::ZoneRadiantInfo(1).Name = "Enclosure 1";
+    DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(2).Name = "Enclosure 2";
+    DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(3).Name = "Zone 3";
+    DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+
+    ErrorsFound = false;
+    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Perimeter Zones\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.",
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Enclosure 1");
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(3).Name, "Zone 3");
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest2)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 3,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Perimeter Zones,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneList,",
+        "Perimeter Zones, !- Name",
+        "Zone 5, !- Zone 1 Name",
+        "Zone 2; !- Zone 2 Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 6,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataViewFactorInformation::NumOfSolarEnclosures = 3;
+    DataViewFactorInformation::ZoneSolarInfo.allocate(3);
+    DataViewFactorInformation::ZoneSolarInfo(1).Name = "Enclosure 1";
+    DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(2).Name = "Enclosure 2";
+    DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(3).Name = "Zone 3";
+    DataViewFactorInformation::ZoneSolarInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+
+    ErrorsFound = false;
+    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Perimeter Zones");
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(3).Name, "Zone 3");
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest3)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 3,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Perimeter Zones,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneList,",
+        "Perimeter Zones, !- Name",
+        "Zone 5, !- Zone 1 Name",
+        "Zone 2; !- Zone 2 Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 6,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataViewFactorInformation::NumOfSolarEnclosures = 3;
+    DataViewFactorInformation::ZoneSolarInfo.allocate(3);
+    DataViewFactorInformation::ZoneSolarInfo(1).Name = "Enclosure 1";
+    DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 1"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(2).Name = "Enclosure 2";
+    DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneSolarInfo(3).Name = "Zone 3";
+    DataViewFactorInformation::ZoneSolarInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+
+    ErrorsFound = false;
+    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Perimeter Zones\" found a matching ZoneList, but did not find a matching radiant or solar enclosure with the same zones.",
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(1).Name, "Enclosure 1");
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(DataViewFactorInformation::ZoneSolarInfo(3).Name, "Zone 3");
+}
+
+TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_AlignInputViewFactorsTest4)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "Zone 1;             !- Name",
+
+        "Zone,",
+        "Zone 2;             !- Name",
+
+        "Zone,",
+        "Zone 3;             !- Name",
+
+        "Zone,",
+        "Zone 4;             !- Name",
+
+        "Zone,",
+        "Zone 5;             !- Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 3,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Perimeter Zones,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+
+        "ZoneList,",
+        "Perimeter Zones, !- Name",
+        "Zone 5, !- Zone 1 Name",
+        "Zone 2; !- Zone 2 Name",
+
+        "ZoneProperty:UserViewFactors:BySurfaceName,",
+        "Zone 6,",
+        "SB51,SB51,0.000000,",
+        "SB51,SB52,2.672021E-002,",
+        "SB51,SB53,8.311358E-002,",
+        "SB51,SB54,2.672021E-002;",
+        });
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+
+    DataViewFactorInformation::NumOfRadiantEnclosures = 3;
+    DataViewFactorInformation::ZoneRadiantInfo.allocate(3);
+    DataViewFactorInformation::ZoneRadiantInfo(1).Name = "Enclosure 1";
+    DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 2"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(1).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(2).Name = "Enclosure 2";
+    DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 4"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(2).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 5"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+    DataViewFactorInformation::ZoneRadiantInfo(3).Name = "Zone 3";
+    DataViewFactorInformation::ZoneRadiantInfo(3).ZoneNums.push_back(UtilityRoutines::FindItemInList(
+        UtilityRoutines::MakeUPPERCase("Zone 3"), DataHeatBalance::Zone, DataGlobals::NumOfZones));
+
+    ErrorsFound = false;
+    HeatBalanceIntRadExchange::AlignInputViewFactors("ZoneProperty:UserViewFactors:BySurfaceName", ErrorsFound);
+    EXPECT_TRUE(ErrorsFound);
+    std::string const error_string = delimited_string({
+    "   ** Severe  ** AlignInputViewFactors: ZoneProperty:UserViewFactors:BySurfaceName=\"Zone 6\" did not find a matching radiant or solar enclosure name."
+        });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(1).Name, "Perimeter Zones");
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(2).Name, "Enclosure 2");
+    EXPECT_EQ(DataViewFactorInformation::ZoneRadiantInfo(3).Name, "Zone 3");
 }
 
 } // namespace EnergyPlus

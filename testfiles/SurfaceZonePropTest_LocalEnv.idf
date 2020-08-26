@@ -86,7 +86,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -94,7 +94,7 @@
     FICTITIOUS BUILDING,     !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -1163,13 +1163,13 @@
   InternalMass,
     Zn001:IntM001,           !- Name
     CUSTPARTITION,           !- Construction Name
-    HEARTLAND AREA,          !- Zone Name
+    HEARTLAND AREA,          !- Zone or ZoneList Name
     130.0000;                !- Surface Area {m2}
 
   InternalMass,
     Zn001:IntM002,           !- Name
     CUSTPARTITION,           !- Construction Name
-    HEARTLAND AREA,          !- Zone Name
+    HEARTLAND AREA,          !- Zone or ZoneList Name
     920.0000;                !- Surface Area {m2}
 
 ! Floor subdivided:
@@ -1388,7 +1388,7 @@
   InternalMass,
     Zn001:IntM003,           !- Name
     CUSTPARTITION,           !- Construction Name
-    HEARTLAND AREA,          !- Zone Name
+    HEARTLAND AREA,          !- Zone or ZoneList Name
     2380.000;                !- Surface Area {m2}
 
   BuildingSurface:Detailed,

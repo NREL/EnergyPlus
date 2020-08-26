@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,12 +55,16 @@
 #include <nlohmann/json.hpp>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
     namespace GroundHeatExchangers {
 
@@ -266,13 +270,13 @@ namespace EnergyPlus {
                       updateCurSimTime(true), triggerDesignDayReset(false) {
             }
 
-            virtual void calcGFunctions() = 0;
+            virtual void calcGFunctions(IOFiles &ioFiles) = 0;
 
             void calcAggregateLoad();
 
             void updateGHX();
 
-            void calcGroundHeatExchanger();
+            void calcGroundHeatExchanger(IOFiles &ioFiles);
 
             inline bool isEven(int const val);
 
@@ -284,16 +288,16 @@ namespace EnergyPlus {
 
             virtual void readCacheFileAndCompareWithThisGLHECache() = 0;
 
-            void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+            void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
+            void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
                           bool const RunFlag) override;
 
-            static PlantComponent *factory(int const objectType, std::string objectName);
+            static PlantComponent *factory(EnergyPlusData &state, int const objectType, std::string objectName);
 
             virtual Real64 getGFunc(Real64) = 0;
 
-            virtual void initGLHESimVars() = 0;
+            virtual void initGLHESimVars(BranchInputManagerData &dataBranchInputManager) = 0;
 
             virtual Real64 calcHXResistance() = 0;
 
@@ -341,11 +345,11 @@ namespace EnergyPlus {
 
             void calcLongTimestepGFunctions();
 
-            void calcGFunctions();
+            void calcGFunctions(IOFiles &ioFiles);
 
             Real64 calcHXResistance();
 
-            void initGLHESimVars();
+            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
 
             void getAnnualTimeConstant();
 
@@ -355,7 +359,7 @@ namespace EnergyPlus {
 
             void readCacheFileAndCompareWithThisGLHECache();
 
-            void writeGLHECacheToFile();
+            void writeGLHECacheToFile(IOFiles &ioFiles);
 
             Real64 calcBHAverageResistance();
 
@@ -405,9 +409,9 @@ namespace EnergyPlus {
 
             Real64 calcHXResistance();
 
-            void calcGFunctions();
+            void calcGFunctions(IOFiles &ioFiles);
 
-            void initGLHESimVars();
+            void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
 
             void getAnnualTimeConstant();
 
@@ -438,7 +442,7 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void GetGroundHeatExchangerInput();
+        void GetGroundHeatExchangerInput(EnergyPlusData &state);
 
         std::shared_ptr<GLHEResponseFactorsStruct>
         BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr);

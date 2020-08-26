@@ -122,13 +122,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Small Office,            !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.001,                   !- Loads Convergence Tolerance Value
+    0.001,                   !- Loads Convergence Tolerance Value {W}
     0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -142,7 +142,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier,              !- Name
@@ -407,1726 +409,722 @@
     FrontReflectanceData,    !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name
     BackRefelectanceData;    !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name
 
-  Table:TwoIndependentVariables,
-    TransmittanceData,       !- Name
-    BiQuadratic,             !- Curve Type
-    LinearInterpolationOfTable,  !- Interpolation Method
-    0.0,                     !- Minimum Value of X
-    90.0,                    !- Maximum Value of X
-    0.30,                    !- Minimum Value of Y
-    2.50,                    !- Maximum Value of Y
-    0.0,                     !- Minimum Table Output
-    1.0,                     !- Maximum Table Output
-    Angle,                   !- Input Unit Type for X
-    Wavelength,              !- Input Unit Type for Y
-    Dimensionless,           !- Output Unit Type
-    1.0,                     !- Normalization Reference
+  Table:IndependentVariable,
+    Incident Angles,         !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    0.0,                     !- Minimum Value
+    90.0,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    ,                        !- Unit Type
     ,                        !- External File Name
-    0.0,                     !- X Value #1
-    0.300,                   !- Y Value #1
-    0.00100,                 !- Output Value #1
-    0.0,                     !- X Value #2
-    0.310,                   !- Y Value #2
-    0.00100,                 !- Output Value #2
-    0.0,                     !- X Value #3
-    0.320,                   !- Y Value #3
-    0.00100,                 !- Output Value #3
-    0.0,                     !- X Value #4
-    0.330,                   !- Y Value #4
-    0.00100,                 !- Output Value #4
-    0.0,                     !- <none>
-    0.340,                   !- <none>
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    .00000,                  !- Value 1
+    90.00000;                !- Value 2
+
+  Table:IndependentVariable,
+    Wavelengths,             !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    0.30,                    !- Minimum Value
+    2.50,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Dimensionless,           !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    .30000,                  !- Value 1
+    .31000,                  !- Value 2
+    .32000,                  !- <none>
+    .33000,                  !- <none>
+    .34000,                  !- <none>
+    .35000,                  !- <none>
+    .36000,                  !- <none>
+    .37000,                  !- <none>
+    .38000,                  !- <none>
+    .39000,                  !- <none>
+    .40000,                  !- <none>
+    .41000,                  !- <none>
+    .42000,                  !- <none>
+    .43000,                  !- <none>
+    .44000,                  !- <none>
+    .45000,                  !- Extended Field
+    .46000,                  !- Extended Field
+    .47000,                  !- Extended Field
+    .48000,                  !- Extended Field
+    .49000,                  !- Extended Field
+    .50000,                  !- Extended Field
+    .51000,                  !- Extended Field
+    .52000,                  !- Extended Field
+    .53000,                  !- Extended Field
+    .54000,                  !- Extended Field
+    .55000,                  !- Extended Field
+    .56000,                  !- Extended Field
+    .57000,                  !- Extended Field
+    .58000,                  !- Extended Field
+    .59000,                  !- Extended Field
+    .60000,                  !- Extended Field
+    .61000,                  !- Extended Field
+    .62000,                  !- Extended Field
+    .63000,                  !- Extended Field
+    .64000,                  !- Extended Field
+    .65000,                  !- Extended Field
+    .66000,                  !- Extended Field
+    .67000,                  !- Extended Field
+    .68000,                  !- Extended Field
+    .69000,                  !- Extended Field
+    .70000,                  !- Extended Field
+    .71000,                  !- Extended Field
+    .72000,                  !- Extended Field
+    .73000,                  !- Extended Field
+    .74000,                  !- Extended Field
+    .75000,                  !- Extended Field
+    .76000,                  !- Extended Field
+    .77000,                  !- Extended Field
+    .78000,                  !- Extended Field
+    .79000,                  !- Extended Field
+    .80000,                  !- Extended Field
+    .81000,                  !- Extended Field
+    .82000,                  !- Extended Field
+    .83000,                  !- Extended Field
+    .84000,                  !- Extended Field
+    .85000,                  !- Extended Field
+    .86000,                  !- Extended Field
+    .87000,                  !- Extended Field
+    .88000,                  !- Extended Field
+    .89000,                  !- Extended Field
+    .90000,                  !- Extended Field
+    .95000,                  !- Extended Field
+    1.00000,                 !- Extended Field
+    1.05000,                 !- Extended Field
+    1.10000,                 !- Extended Field
+    1.15000,                 !- Extended Field
+    1.20000,                 !- Extended Field
+    1.25000,                 !- Extended Field
+    1.30000,                 !- Extended Field
+    1.35000,                 !- Extended Field
+    1.40000,                 !- Extended Field
+    1.45000,                 !- Extended Field
+    1.50000,                 !- Extended Field
+    1.55000,                 !- Extended Field
+    1.60000,                 !- Extended Field
+    1.65000,                 !- Extended Field
+    1.70000,                 !- Extended Field
+    1.75000,                 !- Extended Field
+    1.80000,                 !- Extended Field
+    1.85000,                 !- Extended Field
+    1.90000,                 !- Extended Field
+    1.95000,                 !- Extended Field
+    2.00000,                 !- Extended Field
+    2.05000,                 !- Extended Field
+    2.10000,                 !- Extended Field
+    2.15000,                 !- Extended Field
+    2.20000,                 !- Extended Field
+    2.25000,                 !- Extended Field
+    2.30000,                 !- Extended Field
+    2.35000,                 !- Extended Field
+    2.40000,                 !- Extended Field
+    2.45000,                 !- Extended Field
+    2.50000;                 !- Extended Field
+
+  Table:IndependentVariableList,
+    Spectral and Angular Data,  !- Name
+    Incident Angles,         !- Independent Variable 1 Name
+    Wavelengths;             !- Independent Variable 2 Name
+
+  Table:Lookup,
+    TransmittanceData,       !- Name
+    Spectral and Angular Data,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
+    0.0,                     !- Minimum Output
+    1.0,                     !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.00100,                 !- Output Value 1
+    0.00100,                 !- Output Value 2
     0.00100,                 !- <none>
-    0.0,                     !- <none>
-    0.350,                   !- <none>
     0.00100,                 !- <none>
-    0.0,                     !- <none>
-    0.360,                   !- <none>
+    0.00100,                 !- <none>
+    0.00100,                 !- <none>
     0.00900,                 !- <none>
-    0.0,                     !- <none>
-    0.370,                   !- <none>
     0.12000,                 !- <none>
-    0.0,                     !- <none>
-    0.380,                   !- <none>
     0.49200,                 !- <none>
-    0.0,                     !- <none>
-    0.390,                   !- <none>
     0.78200,                 !- <none>
-    0.0,                     !- <none>
-    0.400,                   !- <none>
     0.85600,                 !- <none>
-    0.0,                     !- <none>
-    0.410,                   !- <none>
     0.85800,                 !- <none>
-    0.0,                     !- <none>
-    0.420,                   !- <none>
     0.85800,                 !- <none>
-    0.0,                     !- <none>
-    0.430,                   !- <none>
     0.86000,                 !- <none>
-    0.0,                     !- <none>
-    0.440,                   !- <none>
     0.86100,                 !- <none>
-    0.0,                     !- <none>
-    0.450,                   !- <none>
     0.87100,                 !- <none>
-    0.0,                     !- <none>
-    0.460,                   !- <none>
     0.88000,                 !- <none>
-    0.0,                     !- <none>
-    0.470,                   !- <none>
     0.88300,                 !- <none>
-    0.0,                     !- <none>
-    0.480,                   !- <none>
     0.88700,                 !- <none>
-    0.0,                     !- <none>
-    0.490,                   !- <none>
     0.89000,                 !- <none>
-    0.0,                     !- <none>
-    0.500,                   !- <none>
     0.89000,                 !- <none>
-    0.0,                     !- <none>
-    0.510,                   !- <none>
     0.89100,                 !- <none>
-    0.0,                     !- <none>
-    0.520,                   !- <none>
     0.88700,                 !- <none>
-    0.0,                     !- <none>
-    0.530,                   !- <none>
     0.89000,                 !- <none>
-    0.0,                     !- <none>
-    0.540,                   !- <none>
     0.88300,                 !- <none>
-    0.0,                     !- <none>
-    0.550,                   !- <none>
     0.88800,                 !- <none>
-    0.0,                     !- <none>
-    0.560,                   !- <none>
     0.88200,                 !- <none>
-    0.0,                     !- <none>
-    0.570,                   !- <none>
     0.88100,                 !- <none>
-    0.0,                     !- <none>
-    0.580,                   !- <none>
     0.86500,                 !- <none>
-    0.0,                     !- <none>
-    0.590,                   !- <none>
     0.85800,                 !- <none>
-    0.0,                     !- <none>
-    0.600,                   !- <none>
     0.86500,                 !- <none>
-    0.0,                     !- <none>
-    0.610,                   !- <none>
     0.85600,                 !- <none>
-    0.0,                     !- <none>
-    0.620,                   !- <none>
     0.84500,                 !- <none>
-    0.0,                     !- <none>
-    0.630,                   !- <none>
     0.83700,                 !- <none>
-    0.0,                     !- <none>
-    0.640,                   !- <none>
     0.82700,                 !- <none>
-    0.0,                     !- <none>
-    0.650,                   !- <none>
     0.82000,                 !- <none>
-    0.0,                     !- <none>
-    0.660,                   !- <none>
     0.80700,                 !- <none>
-    0.0,                     !- <none>
-    0.670,                   !- <none>
     0.79800,                 !- <none>
-    0.0,                     !- <none>
-    0.680,                   !- <none>
     0.79100,                 !- <none>
-    0.0,                     !- <none>
-    0.690,                   !- <none>
     0.78100,                 !- <none>
-    0.0,                     !- <none>
-    0.700,                   !- <none>
     0.76800,                 !- <none>
-    0.0,                     !- <none>
-    0.710,                   !- <none>
     0.76100,                 !- <none>
-    0.0,                     !- <none>
-    0.720,                   !- <none>
     0.74400,                 !- <none>
-    0.0,                     !- <none>
-    0.730,                   !- <none>
     0.71300,                 !- <none>
-    0.0,                     !- <none>
-    0.740,                   !- <none>
     0.70300,                 !- <none>
-    0.0,                     !- <none>
-    0.750,                   !- <none>
     0.69400,                 !- <none>
-    0.0,                     !- <none>
-    0.760,                   !- <none>
     0.68500,                 !- <none>
-    0.0,                     !- <none>
-    0.770,                   !- <none>
     0.67500,                 !- <none>
-    0.0,                     !- <none>
-    0.780,                   !- <none>
     0.66700,                 !- <none>
-    0.0,                     !- <none>
-    0.790,                   !- <none>
     0.65500,                 !- <none>
-    0.0,                     !- <none>
-    0.800,                   !- <none>
     0.64600,                 !- <none>
-    0.0,                     !- <none>
-    0.810,                   !- <none>
     0.63800,                 !- <none>
-    0.0,                     !- <none>
-    0.820,                   !- <none>
     0.62900,                 !- <none>
-    0.0,                     !- <none>
-    0.830,                   !- <none>
     0.62300,                 !- <none>
-    0.0,                     !- <none>
-    0.840,                   !- <none>
     0.61400,                 !- <none>
-    0.0,                     !- <none>
-    0.850,                   !- <none>
     0.60800,                 !- <none>
-    0.0,                     !- <none>
-    0.860,                   !- <none>
     0.60100,                 !- <none>
-    0.0,                     !- <none>
-    0.870,                   !- <none>
     0.59700,                 !- <none>
-    0.0,                     !- <none>
-    0.880,                   !- <none>
     0.59200,                 !- <none>
-    0.0,                     !- <none>
-    0.890,                   !- <none>
     0.58700,                 !- <none>
-    0.0,                     !- <none>
-    0.900,                   !- <none>
     0.58200,                 !- <none>
-    0.0,                     !- <none>
-    0.950,                   !- <none>
     0.56800,                 !- <none>
-    0.0,                     !- <none>
-    1.000,                   !- <none>
     0.56200,                 !- <none>
-    0.0,                     !- <none>
-    1.050,                   !- <none>
     0.55600,                 !- <none>
-    0.0,                     !- <none>
-    1.100,                   !- <none>
     0.56300,                 !- <none>
-    0.0,                     !- <none>
-    1.150,                   !- <none>
     0.55600,                 !- <none>
-    0.0,                     !- <none>
-    1.200,                   !- <none>
     0.54700,                 !- <none>
-    0.0,                     !- <none>
-    1.250,                   !- <none>
     0.57700,                 !- <none>
-    0.0,                     !- <none>
-    1.300,                   !- <none>
     0.59800,                 !- <none>
-    0.0,                     !- <none>
-    1.350,                   !- <none>
     0.60800,                 !- <none>
-    0.0,                     !- <none>
-    1.400,                   !- <none>
     0.60300,                 !- <none>
-    0.0,                     !- <none>
-    1.450,                   !- <none>
     0.61400,                 !- <none>
-    0.0,                     !- <none>
-    1.500,                   !- <none>
     0.64800,                 !- <none>
-    0.0,                     !- <none>
-    1.550,                   !- <none>
     0.68000,                 !- <none>
-    0.0,                     !- <none>
-    1.600,                   !- <none>
     0.69900,                 !- <none>
-    0.0,                     !- <none>
-    1.650,                   !- <none>
     0.70600,                 !- <none>
-    0.0,                     !- <none>
-    1.700,                   !- <none>
     0.57000,                 !- <none>
-    0.0,                     !- <none>
-    1.750,                   !- <none>
     0.58500,                 !- <none>
-    0.0,                     !- <none>
-    1.800,                   !- <none>
     0.63700,                 !- <none>
-    0.0,                     !- <none>
-    1.850,                   !- <none>
     0.65500,                 !- <none>
-    0.0,                     !- <none>
-    1.900,                   !- <none>
     0.63700,                 !- <none>
-    0.0,                     !- <none>
-    1.950,                   !- <none>
     0.63400,                 !- <none>
-    0.0,                     !- <none>
-    2.000,                   !- <none>
     0.63400,                 !- <none>
-    0.0,                     !- <none>
-    2.050,                   !- <none>
     0.58600,                 !- <none>
-    0.0,                     !- <none>
-    2.100,                   !- <none>
     0.58800,                 !- <none>
-    0.0,                     !- <none>
-    2.150,                   !- <none>
     0.59700,                 !- <none>
-    0.0,                     !- <none>
-    2.200,                   !- <none>
     0.57600,                 !- <none>
-    0.0,                     !- <none>
-    2.250,                   !- <none>
     0.40400,                 !- <none>
-    0.0,                     !- <none>
-    2.300,                   !- <none>
     0.17900,                 !- <none>
-    0.0,                     !- <none>
-    2.350,                   !- <none>
     0.21900,                 !- <none>
-    0.0,                     !- <none>
-    2.400,                   !- <none>
     0.24000,                 !- <none>
-    0.0,                     !- <none>
-    2.450,                   !- <none>
     0.20000,                 !- <none>
-    0.0,                     !- <none>
-    2.500,                   !- <none>
     0.21400,                 !- <none>
-    90.0,                    !- <none>
-    0.300,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.310,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.320,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.330,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.340,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.350,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.360,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.370,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.380,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.390,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.400,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.410,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.420,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.430,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.440,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.450,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.460,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.470,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.480,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.490,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.500,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.510,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.520,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.530,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.540,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.550,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.560,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.570,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.580,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.590,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.600,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.610,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.620,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.630,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.640,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.650,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.660,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.670,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.680,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.690,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.700,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.710,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.720,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.730,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.740,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.750,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.760,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.770,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.780,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.790,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.800,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.810,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.820,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.830,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.840,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.850,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.860,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.870,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.880,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.890,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.900,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.950,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.000,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.050,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.100,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.150,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.200,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.250,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.300,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.350,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.400,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.450,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.500,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.550,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.600,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.650,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.700,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.750,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.800,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.850,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.900,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.950,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.000,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.050,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.100,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.150,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.200,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.250,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.300,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.350,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.400,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.450,                   !- <none>
     0.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.500,                   !- <none>
     0.00000;                 !- <none>
 
-  Table:TwoIndependentVariables,
+  Table:Lookup,
     FrontReflectanceData,    !- Name
-    BiQuadratic,             !- Curve Type
-    LinearInterpolationOfTable,  !- Interpolation Method
-    0.0,                     !- Minimum Value of X
-    90.0,                    !- Maximum Value of X
-    0.30,                    !- Minimum Value of Y
-    2.50,                    !- Maximum Value of Y
-    0.0,                     !- Minimum Table Output
-    1.0,                     !- Maximum Table Output
-    Angle,                   !- Input Unit Type for X
-    Wavelength,              !- Input Unit Type for Y
+    Spectral and Angular Data,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
+    0.0,                     !- Minimum Output
+    1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
-    1.0,                     !- Normalization Reference
     ,                        !- External File Name
-    0.0,                     !- X Value #1
-    0.300,                   !- Y Value #1
-    0.04500,                 !- Output Value #1
-    0.0,                     !- X Value #2
-    0.310,                   !- Y Value #2
-    0.04400,                 !- Output Value #2
-    0.0,                     !- X Value #3
-    0.320,                   !- Y Value #3
-    0.04400,                 !- Output Value #3
-    0.0,                     !- X Value #4
-    0.330,                   !- Y Value #4
-    0.04200,                 !- Output Value #4
-    0.0,                     !- <none>
-    0.340,                   !- <none>
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.04500,                 !- Output Value 1
+    0.04400,                 !- Output Value 2
+    0.04400,                 !- <none>
+    0.04200,                 !- <none>
     0.04100,                 !- <none>
-    0.0,                     !- <none>
-    0.350,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    0.360,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    0.370,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    0.380,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    0.390,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.400,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.410,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.420,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.430,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.440,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.450,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.460,                   !- <none>
     0.07600,                 !- <none>
-    0.0,                     !- <none>
-    0.470,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.480,                   !- <none>
     0.07600,                 !- <none>
-    0.0,                     !- <none>
-    0.490,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.500,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.510,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.520,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.530,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.540,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.550,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.560,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.570,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.580,                   !- <none>
     0.07100,                 !- <none>
-    0.0,                     !- <none>
-    0.590,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.600,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.610,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.620,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.630,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.640,                   !- <none>
     0.06900,                 !- <none>
-    0.0,                     !- <none>
-    0.650,                   !- <none>
     0.06700,                 !- <none>
-    0.0,                     !- <none>
-    0.660,                   !- <none>
     0.06700,                 !- <none>
-    0.0,                     !- <none>
-    0.670,                   !- <none>
     0.06500,                 !- <none>
-    0.0,                     !- <none>
-    0.680,                   !- <none>
     0.06500,                 !- <none>
-    0.0,                     !- <none>
-    0.690,                   !- <none>
     0.06500,                 !- <none>
-    0.0,                     !- <none>
-    0.700,                   !- <none>
     0.06400,                 !- <none>
-    0.0,                     !- <none>
-    0.710,                   !- <none>
     0.06400,                 !- <none>
-    0.0,                     !- <none>
-    0.720,                   !- <none>
     0.06200,                 !- <none>
-    0.0,                     !- <none>
-    0.730,                   !- <none>
     0.06400,                 !- <none>
-    0.0,                     !- <none>
-    0.740,                   !- <none>
     0.06200,                 !- <none>
-    0.0,                     !- <none>
-    0.750,                   !- <none>
     0.06100,                 !- <none>
-    0.0,                     !- <none>
-    0.760,                   !- <none>
     0.06100,                 !- <none>
-    0.0,                     !- <none>
-    0.770,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    0.780,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    0.790,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    0.800,                   !- <none>
     0.05900,                 !- <none>
-    0.0,                     !- <none>
-    0.810,                   !- <none>
     0.05900,                 !- <none>
-    0.0,                     !- <none>
-    0.820,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    0.830,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    0.840,                   !- <none>
     0.05600,                 !- <none>
-    0.0,                     !- <none>
-    0.850,                   !- <none>
     0.05600,                 !- <none>
-    0.0,                     !- <none>
-    0.860,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    0.870,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    0.880,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    0.890,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    0.900,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    0.950,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.000,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.050,                   !- <none>
     0.05000,                 !- <none>
-    0.0,                     !- <none>
-    1.100,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.150,                   !- <none>
     0.05000,                 !- <none>
-    0.0,                     !- <none>
-    1.200,                   !- <none>
     0.05000,                 !- <none>
-    0.0,                     !- <none>
-    1.250,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.300,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    1.350,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    1.400,                   !- <none>
     0.05200,                 !- <none>
-    0.0,                     !- <none>
-    1.450,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    1.500,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    1.550,                   !- <none>
     0.05900,                 !- <none>
-    0.0,                     !- <none>
-    1.600,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    1.650,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    1.700,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.750,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.800,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    1.850,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    1.900,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    1.950,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    2.000,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    2.050,                   !- <none>
     0.05200,                 !- <none>
-    0.0,                     !- <none>
-    2.100,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    2.150,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    2.200,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    2.250,                   !- <none>
     0.04500,                 !- <none>
-    0.0,                     !- <none>
-    2.300,                   !- <none>
     0.03700,                 !- <none>
-    0.0,                     !- <none>
-    2.350,                   !- <none>
     0.03700,                 !- <none>
-    0.0,                     !- <none>
-    2.400,                   !- <none>
     0.03900,                 !- <none>
-    0.0,                     !- <none>
-    2.450,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    2.500,                   !- <none>
     0.03900,                 !- <none>
-    90.0,                    !- <none>
-    0.300,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.310,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.320,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.330,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.340,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.350,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.360,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.370,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.380,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.390,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.400,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.410,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.420,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.430,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.440,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.450,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.460,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.470,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.480,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.490,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.500,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.510,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.520,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.530,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.540,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.550,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.560,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.570,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.580,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.590,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.600,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.610,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.620,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.630,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.640,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.650,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.660,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.670,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.680,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.690,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.700,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.710,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.720,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.730,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.740,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.750,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.760,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.770,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.780,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.790,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.800,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.810,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.820,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.830,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.840,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.850,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.860,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.870,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.880,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.890,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.900,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.950,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.000,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.050,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.100,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.150,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.200,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.250,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.300,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.350,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.400,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.450,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.500,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.550,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.600,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.650,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.700,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.750,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.800,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.850,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.900,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.950,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.000,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.050,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.100,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.150,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.200,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.250,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.300,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.350,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.400,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.450,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.500,                   !- <none>
     1.00000;                 !- <none>
 
-  Table:TwoIndependentVariables,
+  Table:Lookup,
     BackRefelectanceData,    !- Name
-    BiQuadratic,             !- Curve Type
-    LinearInterpolationOfTable,  !- Interpolation Method
-    0.0,                     !- Minimum Value of X
-    90.0,                    !- Maximum Value of X
-    0.30,                    !- Minimum Value of Y
-    2.50,                    !- Maximum Value of Y
-    0.0,                     !- Minimum Table Output
-    1.0,                     !- Maximum Table Output
-    Angle,                   !- Input Unit Type for X
-    Wavelength,              !- Input Unit Type for Y
+    Spectral and Angular Data,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    1.0,                     !- Normalization Divisor
+    0.0,                     !- Minimum Output
+    1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
-    1.0,                     !- Normalization Reference
     ,                        !- External File Name
-    0.0,                     !- X Value #1
-    0.300,                   !- Y Value #1
-    0.04500,                 !- Output Value #1
-    0.0,                     !- X Value #2
-    0.310,                   !- Y Value #2
-    0.04400,                 !- Output Value #2
-    0.0,                     !- X Value #3
-    0.320,                   !- Y Value #3
-    0.04400,                 !- Output Value #3
-    0.0,                     !- X Value #4
-    0.330,                   !- Y Value #4
-    0.04200,                 !- Output Value #4
-    0.0,                     !- <none>
-    0.340,                   !- <none>
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.04500,                 !- Output Value 1
+    0.04400,                 !- Output Value 2
+    0.04400,                 !- <none>
+    0.04200,                 !- <none>
     0.04100,                 !- <none>
-    0.0,                     !- <none>
-    0.350,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    0.360,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    0.370,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    0.380,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    0.390,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.400,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.410,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.420,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.430,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.440,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.450,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.460,                   !- <none>
     0.07600,                 !- <none>
-    0.0,                     !- <none>
-    0.470,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.480,                   !- <none>
     0.07600,                 !- <none>
-    0.0,                     !- <none>
-    0.490,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.500,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.510,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.520,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.530,                   !- <none>
     0.07500,                 !- <none>
-    0.0,                     !- <none>
-    0.540,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.550,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.560,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.570,                   !- <none>
     0.07400,                 !- <none>
-    0.0,                     !- <none>
-    0.580,                   !- <none>
     0.07100,                 !- <none>
-    0.0,                     !- <none>
-    0.590,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.600,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.610,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.620,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.630,                   !- <none>
     0.07000,                 !- <none>
-    0.0,                     !- <none>
-    0.640,                   !- <none>
     0.06900,                 !- <none>
-    0.0,                     !- <none>
-    0.650,                   !- <none>
     0.06700,                 !- <none>
-    0.0,                     !- <none>
-    0.660,                   !- <none>
     0.06700,                 !- <none>
-    0.0,                     !- <none>
-    0.670,                   !- <none>
     0.06500,                 !- <none>
-    0.0,                     !- <none>
-    0.680,                   !- <none>
     0.06500,                 !- <none>
-    0.0,                     !- <none>
-    0.690,                   !- <none>
     0.06500,                 !- <none>
-    0.0,                     !- <none>
-    0.700,                   !- <none>
     0.06400,                 !- <none>
-    0.0,                     !- <none>
-    0.710,                   !- <none>
     0.06400,                 !- <none>
-    0.0,                     !- <none>
-    0.720,                   !- <none>
     0.06200,                 !- <none>
-    0.0,                     !- <none>
-    0.730,                   !- <none>
     0.06400,                 !- <none>
-    0.0,                     !- <none>
-    0.740,                   !- <none>
     0.06200,                 !- <none>
-    0.0,                     !- <none>
-    0.750,                   !- <none>
     0.06100,                 !- <none>
-    0.0,                     !- <none>
-    0.760,                   !- <none>
     0.06100,                 !- <none>
-    0.0,                     !- <none>
-    0.770,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    0.780,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    0.790,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    0.800,                   !- <none>
     0.05900,                 !- <none>
-    0.0,                     !- <none>
-    0.810,                   !- <none>
     0.05900,                 !- <none>
-    0.0,                     !- <none>
-    0.820,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    0.830,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    0.840,                   !- <none>
     0.05600,                 !- <none>
-    0.0,                     !- <none>
-    0.850,                   !- <none>
     0.05600,                 !- <none>
-    0.0,                     !- <none>
-    0.860,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    0.870,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    0.880,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    0.890,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    0.900,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    0.950,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.000,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.050,                   !- <none>
     0.05000,                 !- <none>
-    0.0,                     !- <none>
-    1.100,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.150,                   !- <none>
     0.05000,                 !- <none>
-    0.0,                     !- <none>
-    1.200,                   !- <none>
     0.05000,                 !- <none>
-    0.0,                     !- <none>
-    1.250,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.300,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    1.350,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    1.400,                   !- <none>
     0.05200,                 !- <none>
-    0.0,                     !- <none>
-    1.450,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    1.500,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    1.550,                   !- <none>
     0.05900,                 !- <none>
-    0.0,                     !- <none>
-    1.600,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    1.650,                   !- <none>
     0.06000,                 !- <none>
-    0.0,                     !- <none>
-    1.700,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.750,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    1.800,                   !- <none>
     0.05500,                 !- <none>
-    0.0,                     !- <none>
-    1.850,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    1.900,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    1.950,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    2.000,                   !- <none>
     0.05700,                 !- <none>
-    0.0,                     !- <none>
-    2.050,                   !- <none>
     0.05200,                 !- <none>
-    0.0,                     !- <none>
-    2.100,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    2.150,                   !- <none>
     0.05400,                 !- <none>
-    0.0,                     !- <none>
-    2.200,                   !- <none>
     0.05100,                 !- <none>
-    0.0,                     !- <none>
-    2.250,                   !- <none>
     0.04500,                 !- <none>
-    0.0,                     !- <none>
-    2.300,                   !- <none>
     0.03700,                 !- <none>
-    0.0,                     !- <none>
-    2.350,                   !- <none>
     0.03700,                 !- <none>
-    0.0,                     !- <none>
-    2.400,                   !- <none>
     0.03900,                 !- <none>
-    0.0,                     !- <none>
-    2.450,                   !- <none>
     0.04000,                 !- <none>
-    0.0,                     !- <none>
-    2.500,                   !- <none>
     0.03900,                 !- <none>
-    90.0,                    !- <none>
-    0.300,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.310,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.320,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.330,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.340,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.350,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.360,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.370,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.380,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.390,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.400,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.410,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.420,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.430,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.440,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.450,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.460,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.470,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.480,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.490,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.500,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.510,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.520,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.530,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.540,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.550,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.560,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.570,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.580,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.590,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.600,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.610,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.620,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.630,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.640,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.650,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.660,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.670,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.680,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.690,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.700,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.710,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.720,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.730,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.740,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.750,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.760,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.770,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.780,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.790,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.800,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.810,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.820,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.830,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.840,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.850,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.860,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.870,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.880,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.890,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.900,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    0.950,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.000,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.050,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.100,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.150,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.200,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.250,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.300,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.350,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.400,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.450,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.500,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.550,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.600,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.650,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.700,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.750,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.800,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.850,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.900,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    1.950,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.000,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.050,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.100,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.150,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.200,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.250,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.300,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.350,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.400,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.450,                   !- <none>
     1.00000,                 !- <none>
-    90.0,                    !- <none>
-    2.500,                   !- <none>
     1.00000;                 !- <none>
 
   WindowMaterial:Glazing,
@@ -3569,8 +2567,8 @@
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -3579,24 +2577,24 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone3DirectAir,          !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone3DirectAir ADU,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Zone3 Exhaust Fan,       !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   Fan:ZoneExhaust,
     Zone3 Exhaust Fan,       !- Name
@@ -3629,11 +2627,23 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 1;              !- Cooling Coil Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone3DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 3 Inlet Node,       !- Zone Supply Air Node Name
-    0.74;                    !- Maximum Air Flow Rate {m3/s}
+    Zone 3 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 3 Inlet Node,       !- Air Outlet Node Name
+    0.74,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone3DirectAir ADU,      !- Name
+    Zone 3 Inlet Node,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone3DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Reheat Zone 1,           !- Name
@@ -3702,7 +2712,7 @@
     Zone Equipment Inlet Node,  !- Inlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Outlet 1 Node Name
     Zone 2 Reheat Air Inlet Node,  !- Outlet 2 Node Name
-    Zone 3 Inlet Node;       !- Outlet 3 Node Name
+    Zone 3 Inlet Node ATInlet;  !- Outlet 3 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name
@@ -3766,9 +2776,9 @@
     Mixed Air Node,          !- Air Inlet Node Name
     Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep,ReportSch;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep,ReportSch;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep,ReportSch;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep,ReportSch;
 
   Output:Variable,*,Zone Air Temperature,timestep,ReportSch;
 
@@ -3798,9 +2808,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3810,9 +2820,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

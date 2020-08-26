@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -232,15 +232,16 @@ namespace DataWindowEquivalentLayer {
     struct CFSTY
     {
         // Members
-        std::string Name;    // ID (Fenestration Name)
-        int NL;              // number of layers
-        Array1D<CFSLAYER> L; // layer array, L(1) is outside layer
-        Array1D<CFSGAP> G;   // gap array, G(1) is outside-most, betw L(1) and L(2)
-        bool ISControlled;   // CFS is not controlled, or has no controlled VB layer
-        int VBLayerPtr;      // Venetian blind layer pointer
+        std::string Name;         // ID (Fenestration Name)
+        int NL;                   // number of layers
+        Array1D<CFSLAYER> L;      // layer array, L(1) is outside layer
+        Array1D<CFSGAP> G;        // gap array, G(1) is outside-most, betw L(1) and L(2)
+        bool ISControlled;        // CFS is not controlled, or has no controlled VB layer
+        int VBLayerPtr;           // Venetian blind layer pointer
+        int WEQLSolverErrorIndex; // recurring error index
 
         // Default Constructor
-        CFSTY() : NL(0), L(CFSMAXNL), G(CFSMAXNL - 1), ISControlled(false), VBLayerPtr(0)
+        CFSTY() : NL(0), L(CFSMAXNL), G(CFSMAXNL - 1), ISControlled(false), VBLayerPtr(0), WEQLSolverErrorIndex(0)
         {
         }
     };

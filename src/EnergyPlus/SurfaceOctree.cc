@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,7 +90,7 @@ bool SurfaceOctreeCube::contains(Surface const &surface) const
 }
 
 // Surfaces Outer Cube Initilization
-void SurfaceOctreeCube::init(ObjexxFCL::Array1<Surface> &surfaces)
+void SurfaceOctreeCube::init(Array1D<Surface> &surfaces)
 {
     assert(d_ == 0u);
     assert(n_ == 0u);

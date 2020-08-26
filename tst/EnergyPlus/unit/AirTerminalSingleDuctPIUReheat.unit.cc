@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,11 +54,13 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -182,15 +184,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(state.files);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
-    GetZoneAirLoopEquipment();
+    GetZoneEquipmentData1(state);
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
 
-    GetPIUs();
+    GetPIUs(state);
 
     ASSERT_EQ(1, NumSeriesPIUs);
     EXPECT_EQ("SPACE1-1 ZONE COIL", PIU(1).HCoil);     // heating coil name
@@ -291,15 +293,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(state.files);  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
-    GetZoneAirLoopEquipment();
+    GetZoneEquipmentData1(state);
+    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
 
-    GetPIUs();
+    GetPIUs(state);
 
     int const PIUNum = 1;
     int const ADUNum = 1;
@@ -334,10 +336,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "    ;                        !- Minimum Number of Warmup Days",
 
         "ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    20,                      !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    ,                        !- Shading Calculation Update Frequency",
         "    15000,                   !- Maximum Figures in Shadow Overlap Calculations",
         "    ,                        !- Polygon Clipping Algorithm",
+        "    ,                        !- Pixel Counting Resolution",
         "    SimpleSkyDiffuseModeling;!- Sky Diffuse Modeling Algorithm",
 
         "SurfaceConvectionAlgorithm:Inside,",
@@ -1470,10 +1474,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(state); // run the design day over the warmup period (24 hrs, 25 days)
 
     int const PIUNum = 1;
     int const ADUNum = 1;

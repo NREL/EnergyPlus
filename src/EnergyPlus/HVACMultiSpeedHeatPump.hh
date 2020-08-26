@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace HVACMultiSpeedHeatPump {
 
@@ -145,12 +147,10 @@ namespace HVACMultiSpeedHeatPump {
         int HeatCoilType;                   // Heating coil type: 1 COIL:DX:MultiSpeed:Heating only
         int HeatCoilNum;                    // Heating coil number
         int DXHeatCoilIndex;                // DX heating coil index number
-        Real64 MinOATCompressor;            // Minimum outdoor dry-bulb temperature for compressor operation
         std::string HeatCoilName;           // Coil:Electric:MultiSpeed:Heating OR Coil:Gas:MultiSpeed:Heating name
         int HeatCoilIndex;                  // heating coil index number (Coil:Electric:MultiSpeed:Heating OR Coil:Gas:MultiSpeed:Heating)
         std::string DXCoolCoilName;         // COIL:DX:MultiSpeed:Cooling name
         int CoolCoilType;                   // Cooling coil type: 1 COIL:DX:MultiSpeed:Cooling only
-        int CoolCoilNum;                    // Cooling coil number
         int DXCoolCoilIndex;                // DX cooling coil index number
         std::string SuppHeatCoilName;       // Supplymental heating coil name
         int SuppHeatCoilType;               // Supplymental heating coil type: 1 Gas; 2 Electric; 3 Recovery
@@ -243,27 +243,38 @@ namespace HVACMultiSpeedHeatPump {
         int HeatCountAvail;            // Counter used to minimize the occurrence of output warnings
         int HeatIndexAvail;            // Index used to minimize the occurrence of output warnings
         bool FirstPass;                // used to determine when first call is made
+        Array1D<Real64> FullOutput;    // Full output for different speed
+        Real64 MinOATCompressorCooling; // min OAT from multispeed cooling coil object
+        Real64 MinOATCompressorHeating; // min OAT from multispeed heating coil object
+        bool MyEnvrnFlag;
+        bool MySizeFlag;
+        bool MyCheckFlag;
+        bool MyFlowFracFlag;
+        bool MyPlantScantFlag;
+        bool MyStagedFlag;
 
         // Default Constructor
         MSHeatPumpData()
             : AvaiSchedPtr(0), AirInletNodeNum(0), AirOutletNodeNum(0), ControlZoneNum(0), ZoneSequenceCoolingNum(0), ZoneSequenceHeatingNum(0),
               NodeNumOfControlledZone(0), FlowFraction(0.0), FanType(0), FanNum(0), FanPlaceType(0), FanInletNode(0), FanOutletNode(0),
-              FanVolFlow(0.0), FanSchedPtr(0), OpMode(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0), MinOATCompressor(0.0),
-              HeatCoilIndex(0), CoolCoilType(0), CoolCoilNum(0), DXCoolCoilIndex(0), SuppHeatCoilType(0), SuppHeatCoilNum(0),
-              DesignSuppHeatingCapacity(0.0), SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0), AuxOnCyclePower(0.0), AuxOffCyclePower(0.0),
-              DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0),
-              DesignHeatRecMassFlowRate(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), AuxElecPower(0.0), IdleVolumeAirRate(0.0),
-              IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0), NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(0),
-              HeatCoolMode(0), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0), CompPartLoadRatio(0.0), FanPartLoadRatio(0.0),
-              TotCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensCoolEnergyRate(0.0), SensHeatEnergyRate(0.0), LatCoolEnergyRate(0.0),
-              LatHeatEnergyRate(0.0), ElecPower(0.0), LoadMet(0.0), HeatRecoveryRate(0.0), HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0),
-              HeatRecoveryMassFlowRate(0.0), AirFlowControl(0), ErrIndexCyc(0), ErrIndexVar(0), LoadLoss(0.0), SuppCoilAirInletNode(0),
-              SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0), SuppCoilControlNode(0), MaxSuppCoilFluidFlow(0.0),
-              SuppCoilOutletNode(0), CoilAirInletNode(0), CoilControlNode(0), MaxCoilFluidFlow(0.0), CoilOutletNode(0), HotWaterCoilControlNode(0),
-              HotWaterCoilOutletNode(0), HotWaterCoilNum(0), LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), SuppLoopNum(0), SuppLoopSide(0),
-              SuppBranchNum(0), SuppCompNum(0), HotWaterLoopNum(0), HotWaterLoopSide(0), HotWaterBranchNum(0), HotWaterCompNum(0),
-              HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0), Staged(false), CoolCountAvail(0), CoolIndexAvail(0),
-              HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true)
+              FanVolFlow(0.0), FanSchedPtr(0), OpMode(0), HeatCoilType(0), HeatCoilNum(0), DXHeatCoilIndex(0), HeatCoilIndex(0), CoolCoilType(0),
+              DXCoolCoilIndex(0), SuppHeatCoilType(0), SuppHeatCoilNum(0), DesignSuppHeatingCapacity(0.0), SuppMaxAirTemp(0.0), SuppMaxOATemp(0.0),
+              AuxOnCyclePower(0.0), AuxOffCyclePower(0.0), DesignHeatRecFlowRate(0.0), HeatRecActive(false), HeatRecInletNodeNum(0),
+              HeatRecOutletNodeNum(0), MaxHeatRecOutletTemp(0.0), DesignHeatRecMassFlowRate(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0),
+              HRCompNum(0), AuxElecPower(0.0), IdleVolumeAirRate(0.0), IdleMassFlowRate(0.0), IdleSpeedRatio(0.0), NumOfSpeedCooling(0),
+              NumOfSpeedHeating(0), CheckFanFlow(true), LastMode(0), HeatCoolMode(0), AirLoopNumber(0), NumControlledZones(0), ZoneInletNode(0),
+              CompPartLoadRatio(0.0), FanPartLoadRatio(0.0), TotCoolEnergyRate(0.0), TotHeatEnergyRate(0.0), SensCoolEnergyRate(0.0),
+              SensHeatEnergyRate(0.0), LatCoolEnergyRate(0.0), LatHeatEnergyRate(0.0), ElecPower(0.0), LoadMet(0.0), HeatRecoveryRate(0.0),
+              HeatRecoveryInletTemp(0.0), HeatRecoveryOutletTemp(0.0), HeatRecoveryMassFlowRate(0.0), AirFlowControl(0), ErrIndexCyc(0),
+              ErrIndexVar(0), LoadLoss(0.0), SuppCoilAirInletNode(0), SuppCoilAirOutletNode(0), SuppHeatCoilType_Num(0), SuppHeatCoilIndex(0),
+              SuppCoilControlNode(0), MaxSuppCoilFluidFlow(0.0), SuppCoilOutletNode(0), CoilAirInletNode(0), CoilControlNode(0),
+              MaxCoilFluidFlow(0.0), CoilOutletNode(0), HotWaterCoilControlNode(0), HotWaterCoilOutletNode(0), HotWaterCoilNum(0), LoopNum(0),
+              LoopSide(0), BranchNum(0), CompNum(0), SuppLoopNum(0), SuppLoopSide(0), SuppBranchNum(0), SuppCompNum(0), HotWaterLoopNum(0),
+              HotWaterLoopSide(0), HotWaterBranchNum(0), HotWaterCompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), StageNum(0),
+              Staged(false), CoolCountAvail(0), CoolIndexAvail(0), HeatCountAvail(0), HeatIndexAvail(0), FirstPass(true),
+              MinOATCompressorCooling(0.0), MinOATCompressorHeating(0.0), MyEnvrnFlag(true), MySizeFlag(true), MyCheckFlag(true), MyFlowFracFlag(true),
+              MyPlantScantFlag(true), MyStagedFlag(true)
+
         {
         }
     };
@@ -271,13 +282,13 @@ namespace HVACMultiSpeedHeatPump {
     struct MSHeatPumpReportData
     {
         // Members
-        Real64 ElecPowerConsumption;   // Electricity power comsumption: CondenserFan+CrankcaseHeater+Defroster+aux
+        Real64 ElecPowerConsumption;   // Electricity Rate comsumption: CondenserFan+CrankcaseHeater+Defroster+aux
         Real64 HeatRecoveryEnergy;     // Heat recovery rate [J]
         Real64 CycRatio;               // Cycle ratio
         Real64 SpeedRatio;             // Speed ratio between two stages
         int SpeedNum;                  // Speed number
-        Real64 AuxElecCoolConsumption; // Auxiliary electricity power consumption during cooling
-        Real64 AuxElecHeatConsumption; // Auxiliary electricity power consumption during heating
+        Real64 AuxElecCoolConsumption; // Auxiliary Electricity Rate consumption during cooling
+        Real64 AuxElecHeatConsumption; // Auxiliary Electricity Rate consumption during heating
 
         // Default Constructor
         MSHeatPumpReportData()
@@ -293,7 +304,9 @@ namespace HVACMultiSpeedHeatPump {
 
     // Functions
 
-    void SimMSHeatPump(std::string const &CompName,   // Name of the unitary engine driven heat pump system
+    void clear_state();
+
+    void SimMSHeatPump(EnergyPlusData &state, std::string const &CompName,   // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
                        int &CompIndex                 // Index to changeover-bypass VAV system
@@ -301,7 +314,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void SimMSHP(int const MSHeatPumpNum,       // number of the current engine driven Heat Pump being simulated
+    void SimMSHP(EnergyPlusData &state, int const MSHeatPumpNum,       // number of the current engine driven Heat Pump being simulated
                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                  int const AirLoopNum,          // air loop index
                  Real64 &QSensUnitOut,          // cooling/heating deliveded to zones [W]
@@ -311,11 +324,11 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void GetMSHeatPumpInput();
+    void GetMSHeatPumpInput(EnergyPlusData &state);
 
     //******************************************************************************
 
-    void InitMSHeatPump(int const MSHeatPumpNum,       // Engine driven heat pump number
+    void InitMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // TRUE if first HVAC iteration
                         int const AirLoopNum,          // air loop index
                         Real64 &QZnReq,                // Heating/Cooling load for all served zones
@@ -328,7 +341,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void ControlMSHPOutput(int const MSHeatPumpNum,       // Unit index of engine driven heat pump
+    void ControlMSHPOutput(EnergyPlusData &state, int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -343,7 +356,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void CalcMSHeatPump(int const MSHeatPumpNum,       // Engine driven heat pump number
+    void CalcMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                         int const CompOp,              // Compressor on/off; 1=on, 0=off
                         int const SpeedNum,            // Speed number
@@ -357,14 +370,14 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    Real64 MSHPCyclingResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par  // par(1) = MSHPNum
+    Real64 MSHPCyclingResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               Array1D<Real64> const &Par // par(1) = MSHPNum
     );
 
     //******************************************************************************
 
-    Real64 MSHPVarSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1<Real64> const &Par // par(1) = MSHPNum
+    Real64 MSHPVarSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                Array1D<Real64> const &Par // par(1) = MSHPNum
     );
 
     //******************************************************************************
@@ -384,15 +397,15 @@ namespace HVACMultiSpeedHeatPump {
                            Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );
 
-    void CalcNonDXHeatingCoils(int const MSHeatPumpNum,       // multispeed heatpump index
+    void CalcNonDXHeatingCoils(EnergyPlusData &state, int const MSHeatPumpNum,       // multispeed heatpump index
                                bool const FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 const HeatingLoad,      // supplemental coil load to be met by unit (watts)
                                int const FanMode,             // fan operation mode
                                Real64 &HeatCoilLoadmet,       // Heating Load Met
                                Optional<Real64 const> PartLoadFrac = _);
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Array1D<Real64> const &Par // Par(5) is the requested coil load
     );
 
 } // namespace HVACMultiSpeedHeatPump

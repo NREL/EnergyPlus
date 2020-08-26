@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,34 +52,24 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct BranchInputManagerData;
+struct CTElectricGeneratorData;
+struct EnergyPlusData;
+
 namespace CTElectricGenerator {
 
-    // Using/Aliasing
     using DataGlobalConstants::iGeneratorCombTurbine;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumCTGenerators; // number of CT Generators specified in input
-    extern bool GetCTInput;     // then TRUE, calls subroutine to read input file.
-
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-
-    // Types
-
-    struct CTGeneratorSpecs
+    struct CTGeneratorData : PlantComponent
     {
         // Members
         std::string Name;   // user identifier
@@ -134,10 +124,15 @@ namespace CTElectricGenerator {
         Real64 ElecPowerGenerated;        // reporting: power generated (W)
         Real64 ElecEnergyGenerated;       // reporting: power generated (W)
         Real64 HeatRecMaxTemp;            // Max Temp that can be produced in heat recovery
-        int OAInletNode;                  // optional inlet node index pointer for outdoor air for compustion
+        int OAInletNode;                  // optional inlet node index pointer for outdoor air for combustion
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
+        bool MySizeAndNodeInitFlag;
+        bool CheckEquipName;
+        bool MyFlag;
 
         // Default Constructor
-        CTGeneratorSpecs()
+        CTGeneratorData()
             : TypeOf("Generator:CombustionTurbine"), CompType_Num(iGeneratorCombTurbine), RatedPowerOutput(0.0), ElectricCircuitNode(0),
               MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), PLBasedFuelInputCurve(0),
               TempBasedFuelInputCurve(0), ExhaustFlow(0.0), ExhaustFlowCurve(0), ExhaustTemp(0.0), PLBasedExhaustTempCurve(0),
@@ -146,117 +141,40 @@ namespace CTElectricGenerator {
               DesignHeatRecVolFlowRate(0.0), DesignHeatRecMassFlowRate(0.0), DesignMinExitGasTemp(0.0), DesignAirInletTemp(0.0),
               ExhaustStackTemp(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0), HeatRecInletTemp(0.0),
               HeatRecOutletTemp(0.0), HeatRecMdot(0.0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), FuelMdot(0.0),
-              FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0)
+              FuelHeatingValue(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), OAInletNode(0), MyEnvrnFlag(true),
+              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), CheckEquipName(true), MyFlag(true)
         {
         }
+
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void setupOutputVars();
+
+        void InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
+                              bool RunFlag, bool FirstHVACIteration);
+
+        void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+
+        static PlantComponent *factory(CTElectricGeneratorData &dataCTElectricGenerator, std::string const &objectName);
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 PowerGen;            // reporting: power (W)
-        Real64 EnergyGen;           // reporting: power (W)
-        Real64 QTotalHeatRecovered; // reporting: total Heat Recovered (W)
-        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
-        Real64 QExhaustRecovered;   // reporting: Heat Recovered from exhaust (W)
-        Real64 TotalHeatEnergyRec;  // reporting: total Heat Recovered (W)
-        Real64 LubeOilEnergyRec;    // reporting: Heat Recovered from Lubricant (W)
-        Real64 ExhaustEnergyRec;    // reporting: Heat Recovered from exhaust (W)
-        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy use rate (W)
-        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
-        Real64 FuelMdot;            // reporting: Fuel Amount used (kg/s)
-        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
-        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-
-        // Default Constructor
-        ReportVars()
-            : PowerGen(0.0), EnergyGen(0.0), QTotalHeatRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), TotalHeatEnergyRec(0.0),
-              LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergyUseRate(0.0), FuelEnergy(0.0), FuelMdot(0.0), ExhaustStackTemp(0.0),
-              HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0)
-        {
-        }
-    };
-
-    // Object Data
-    extern Array1D<CTGeneratorSpecs> CTGenerator; // dimension to number of machines
-    extern Array1D<ReportVars> CTGeneratorReport;
-
-    // Functions
-
-    void SimCTGenerator(int const GeneratorType,          // type of Generator
-                        std::string const &GeneratorName, // user specified name of Generator
-                        int &GeneratorIndex,
-                        bool const RunFlag,  // simulate Generator when TRUE
-                        Real64 const MyLoad, // generator demand
-                        bool const FirstHVACIteration);
-
-    void SimCTPlantHeatRecovery(std::string const &CompType, // unused1208
-                                std::string const &CompName,
-                                int const CompTypeNum, // unused1208
-                                int &CompNum,
-                                bool const RunFlag,
-                                bool &InitLoopEquip,
-                                Real64 &MyLoad,
-                                Real64 &MaxCap,
-                                Real64 &MinCap,
-                                Real64 &OptCap,
-                                bool const FirstHVACIteration // TRUE if First iteration of simulation
-    );
-
-    // End CT Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of CT Generator Module Get Input subroutines
-    //******************************************************************************
-
-    void GetCTGeneratorInput();
-
-    // End of Get Input subroutines for the CT Generator Module
-    //******************************************************************************
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
-
-    void CalcCTGeneratorModel(int const GeneratorNum, // Generator number
-                              bool const RunFlag,     // TRUE when Generator operating
-                              Real64 const MyLoad,    // Generator demand
-                              bool const FirstHVACIteration);
-
-    // End of CT Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin CT Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    void InitCTGenerators(int const GeneratorNum, // Generator number
-                          bool const RunFlag,     // TRUE when Generator operating
-                          Real64 const MyLoad,    // Generator demand
-                          bool const FirstHVACIteration);
-
-    // End CT Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the CT Generator Module
-    // *****************************************************************************
-
-    void UpdateCTGeneratorRecords(bool const RunFlag, // TRUE if Generator operating
-                                  int const Num       // Generator number
-    );
-
-    void GetCTGeneratorResults(int const GeneratorType, // type of Generator
-                               int const GeneratorIndex,
-                               Real64 &GeneratorPower,  // electrical power
-                               Real64 &GeneratorEnergy, // electrical energy
-                               Real64 &ThermalPower,    // heat power
-                               Real64 &ThermalEnergy    // heat energy
-    );
-
-    // End of Record Keeping subroutines for the CT Generator Module
-    // *****************************************************************************
+    void GetCTGeneratorInput(CTElectricGeneratorData &dataCTElectricGenerator);
 
 } // namespace CTElectricGenerator
+
+    struct CTElectricGeneratorData : BaseGlobalStruct {
+
+        int NumCTGenerators = 0;
+        bool getCTInputFlag = true;
+        Array1D<CTElectricGenerator::CTGeneratorData> CTGenerator;
+
+        void clear_state() override
+        {
+            NumCTGenerators = 0;
+            getCTInputFlag = true;
+            CTGenerator.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

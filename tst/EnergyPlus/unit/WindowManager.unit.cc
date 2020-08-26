@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,27 +57,30 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <ConvectionCoefficients.hh>
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataSurfaces.hh>
-#include <ElectricPowerServiceManager.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
-#include <HeatBalanceIntRadExchange.hh>
-#include <HeatBalanceManager.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SolarShading.hh>
-#include <WindowManager.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -201,7 +204,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(state);
 
     // This test will emulate NFRC 100 U-factor test
     int winNum;
@@ -214,8 +217,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 
     int cNum;
 
-    for (size_t i = 1; i <= DataHeatBalance::Construct.size(); ++i) {
-        if (DataHeatBalance::Construct(i).TypeIsWindow) {
+    for (size_t i = 1; i <= dataConstruction.Construct.size(); ++i) {
+        if (dataConstruction.Construct(i).TypeIsWindow) {
             cNum = i;
         }
     }
@@ -238,7 +241,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataHeatBalFanSys::MAT.dimension(1, T_in);
 
     // initial guess temperatures
-    int numTemps = 2 + 2 * DataHeatBalance::Construct(cNum).TotGlassLayers;
+    int numTemps = 2 + 2 * dataConstruction.Construct(cNum).TotGlassLayers;
     Real64 inSurfTemp = T_in - (1.0 / (numTemps - 1)) * (T_in - T_out);
     Real64 outSurfTemp = T_out + (1.0 / (numTemps - 1)) * (T_in - T_out);
 
@@ -251,8 +254,8 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         DataEnvironment::SunIsUp = true;
     }
 
-    HeatBalanceSurfaceManager::InitSolarHeatGains();
-    SolarShading::CalcInteriorSolarDistribution();
+    HeatBalanceSurfaceManager::InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
+    SolarShading::CalcInteriorSolarDistribution(state.dataWindowEquivalentLayer);
 
     // Calculate heat balance (iteratively solve for surface temperatures)
     Real64 outSurfTempPrev = outSurfTemp;
@@ -286,7 +289,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
             winNum, inSurfTemp,
             T_in); // This time it's actually being used as intended. HConvIn( 1 ) is referenced from the actual heat balance calculation.
 
-        WindowManager::CalcWindowHeatBalance(winNum, h_exterior, inSurfTemp, outSurfTemp);
+        WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, winNum, h_exterior, inSurfTemp, outSurfTemp);
 
         outSurfTempDiff = std::fabs(outSurfTemp - outSurfTempPrev);
         inSurfTempDiff = std::fabs(inSurfTemp - inSurfTempPrev);
@@ -431,11 +434,11 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
-    HeatBalanceManager::GetBuildingData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -468,21 +471,28 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalance::TempEffBulkAir.allocate(3);
     DataHeatBalSurface::TempSurfInTmp.allocate(3);
 
-    DataSurfaces::Surface(1).HeatTransSurf = true;
-    DataSurfaces::Surface(2).HeatTransSurf = true;
-    DataSurfaces::Surface(3).HeatTransSurf = true;
-    DataSurfaces::Surface(1).Area = 10.0;
-    DataSurfaces::Surface(2).Area = 10.0;
-    DataSurfaces::Surface(3).Area = 10.0;
-    DataSurfaces::Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
-    DataSurfaces::Surface(2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
-    DataSurfaces::Surface(3).TAirRef = DataSurfaces::AdjacentAirTemp;
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
-    DataHeatBalance::TempEffBulkAir(1) = 10.0;
-    DataHeatBalance::TempEffBulkAir(2) = 10.0;
-    DataHeatBalance::TempEffBulkAir(3) = 10.0;
+    int surfNum1 = UtilityRoutines::FindItemInList("WALL", DataSurfaces::Surface);
+    int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    int surfNum3 = UtilityRoutines::FindItemInList("FLOOR", DataSurfaces::Surface);
+
+    DataSurfaces::Surface(surfNum1).HeatTransSurf = true;
+    DataSurfaces::Surface(surfNum2).HeatTransSurf = true;
+    DataSurfaces::Surface(surfNum3).HeatTransSurf = true;
+    DataSurfaces::Surface(surfNum1).Area = 10.0;
+    DataSurfaces::Surface(surfNum2).Area = 10.0;
+    DataSurfaces::Surface(surfNum3).Area = 10.0;
+    DataSurfaces::Surface(surfNum1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
+    DataSurfaces::Surface(surfNum2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
+    DataSurfaces::Surface(surfNum3).TAirRef = DataSurfaces::AdjacentAirTemp;
+    DataSurfaces::Surface(surfNum1).SolarEnclIndex = 1;
+    DataSurfaces::Surface(surfNum2).SolarEnclIndex = 1;
+    DataSurfaces::Surface(surfNum3).SolarEnclIndex = 1;
+    DataHeatBalSurface::TempSurfInTmp(surfNum1) = 15.0;
+    DataHeatBalSurface::TempSurfInTmp(surfNum2) = 20.0;
+    DataHeatBalSurface::TempSurfInTmp(surfNum3) = 25.0;
+    DataHeatBalance::TempEffBulkAir(surfNum1) = 10.0;
+    DataHeatBalance::TempEffBulkAir(surfNum2) = 10.0;
+    DataHeatBalance::TempEffBulkAir(surfNum3) = 10.0;
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -494,9 +504,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataLoopNode::Node(4).MassFlowRate = 0.1;
 
     DataHeatBalance::HConvIn.allocate(3);
-    DataHeatBalance::HConvIn(1) = 0.5;
-    DataHeatBalance::HConvIn(2) = 0.5;
-    DataHeatBalance::HConvIn(3) = 0.5;
+    DataHeatBalance::HConvIn(surfNum1) = 0.5;
+    DataHeatBalance::HConvIn(surfNum2) = 0.5;
+    DataHeatBalance::HConvIn(surfNum3) = 0.5;
     DataHeatBalance::Zone(1).IsControlled = true;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
@@ -539,6 +549,8 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
     DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::QAirExtReport.allocate(3);
+    DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
     DataHeatBalance::QRadSWOutIncident = 0.0;
     DataHeatBalance::QRadSWwinAbs = 0.0;
@@ -555,28 +567,28 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     Real64 outSurfTemp;
 
     // Claculate temperature based on supply flow rate
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
     // Claculate temperature based on zone temperature with supply flow rate = 0
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(2).MassFlowRate = 0.0;
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
 
     // Adjacent surface
     DataLoopNode::Node(1).MassFlowRate = 0.1;
     DataLoopNode::Node(2).MassFlowRate = 0.1;
     DataSurfaces::Surface(1).ExtBoundCond = 2;
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(20.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
 
     DataLoopNode::Node(1).MassFlowRate = 0.0;
     DataLoopNode::Node(2).MassFlowRate = 0.0;
     DataSurfaces::Surface(1).ExtBoundCond = 2;
     DataSurfaces::Surface(2).ExtBoundCond = 1;
     DataSurfaces::Surface(1).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
-    EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(2), 0.0001);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
+    EXPECT_NEAR(25.0, DataHeatBalance::TempEffBulkAir(surfNum2), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
@@ -584,8 +596,6 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     DataIPShortCuts::lAlphaFieldBlanks = true;
 
     std::string const idf_objects = delimited_string({
-
-        "  Version,9.2;",
 
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",
@@ -604,8 +614,6 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
 
         "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
-        "  Output:DebuggingData,0,0;",
 
         "  ZoneCapacitanceMultiplier:ResearchSpecial,",
         "    Multiplier,              !- Name",
@@ -882,611 +890,723 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
         "    FrontReflectanceData,    !- Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name",
         "    BackRefelectanceData;    !- Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name",
 
-        "Table:TwoIndependentVariables,",
+        "Table:IndependentVariable,",
+        "  Incidence Angles,          !- Name",
+        "  Linear,                    !- Interpolation Method",
+        "  Constant,                  !- Extrapolation Method",
+        "  0,                         !- Minimum Value",
+        "  90,                        !- Maximum Value",
+        "  ,                          !- Normalization Reference Value",
+        "  ,                          !- Unit Type",
+        "  ,                          !- External File Name",
+        "  ,                          !- External File Column Number",
+        "  ,                          !- External File Starting Row Number",
+        "  0,                         !- Value 1",
+        "  90;",
+
+        "Table:IndependentVariable,",
+        "  Wavelengths,               !- Name",
+        "  Linear,                    !- Interpolation Method",
+        "  Constant,                  !- Extrapolation Method",
+        "  0.30,                      !- Minimum Value",
+        "  2.50,                      !- Maximum Value",
+        "  ,                          !- Normalization Reference Value",
+        "  ,                          !- Unit Type",
+        "  ,                          !- External File Name",
+        "  ,                          !- External File Column Number",
+        "  ,                          !- External File Starting Row Number",
+        "  0.300,                     !- Value 1",
+        "  0.310,",
+        "  0.320,",
+        "  0.330,",
+        "  0.340,",
+        "  0.350,",
+        "  0.360,",
+        "  0.370,",
+        "  0.380,",
+        "  0.390,",
+        "  0.400,",
+        "  0.410,",
+        "  0.420,",
+        "  0.430,",
+        "  0.440,",
+        "  0.450,",
+        "  0.460,",
+        "  0.470,",
+        "  0.480,",
+        "  0.490,",
+        "  0.500,",
+        "  0.510,",
+        "  0.520,",
+        "  0.530,",
+        "  0.540,",
+        "  0.550,",
+        "  0.560,",
+        "  0.570,",
+        "  0.580,",
+        "  0.590,",
+        "  0.600,",
+        "  0.610,",
+        "  0.620,",
+        "  0.630,",
+        "  0.640,",
+        "  0.650,",
+        "  0.660,",
+        "  0.670,",
+        "  0.680,",
+        "  0.690,",
+        "  0.700,",
+        "  0.710,",
+        "  0.720,",
+        "  0.730,",
+        "  0.740,",
+        "  0.750,",
+        "  0.760,",
+        "  0.770,",
+        "  0.780,",
+        "  0.790,",
+        "  0.800,",
+        "  0.810,",
+        "  0.820,",
+        "  0.830,",
+        "  0.840,",
+        "  0.850,",
+        "  0.860,",
+        "  0.870,",
+        "  0.880,",
+        "  0.890,",
+        "  0.900,",
+        "  0.950,",
+        "  1.000,",
+        "  1.050,",
+        "  1.100,",
+        "  1.150,",
+        "  1.200,",
+        "  1.250,",
+        "  1.300,",
+        "  1.350,",
+        "  1.400,",
+        "  1.450,",
+        "  1.500,",
+        "  1.550,",
+        "  1.600,",
+        "  1.650,",
+        "  1.700,",
+        "  1.750,",
+        "  1.800,",
+        "  1.850,",
+        "  1.900,",
+        "  1.950,",
+        "  2.000,",
+        "  2.050,",
+        "  2.100,",
+        "  2.150,",
+        "  2.200,",
+        "  2.250,",
+        "  2.300,",
+        "  2.350,",
+        "  2.400,",
+        "  2.450,",
+        "  2.500;",
+
+        "Table:IndependentVariableList,",
+        "  Spectral and Incident Angle Data Set,  !- Name",
+        "  Incidence Angles,     !- Independent Variable 1 Name",
+        "  Wavelengths;          !- Independent Variable 2 Name",
+
+        "Table:Lookup,",
         "  TransmittanceData,         !- Name",
-        "  BiQuadratic,               !- Curve Type",
-        "  LinearInterpolationOfTable,!- Interpolation Type",
-        "  0.0,                       !- Minimum Value of x,",
-        "  90.0,                      !- Maximum Value of x,",
-        "  0.30,                      !- Minimum Value of y,",
-        "  2.50,                      !- Maximum Value of y,",
-        "  0.0,                       !- Minimum Table Output",
-        "  1.0,                       !- Maximum Table Output",
-        "  Angle,                     !- Input Unit Type for x",
-        "  Wavelength,                !- Input Unit Type for y",
+        "  Spectral and Incident Angle Data Set,  !- Independent Variable List Name",
+        "  ,                          !- Normalization Method",
+        "  ,                          !- Normalization Divisor",
+        "  0.0,                       !- Minimum Output",
+        "  1.0,                       !- Maximum Output",
         "  Dimensionless,             !- Output Unit Type",
-        "  1.0,                       !- Normalization Point",
         "  ,                          !- External File Name",
-        " 0.0,  0.300, 0.00100,",
-        " 0.0,  0.310, 0.00100,",
-        " 0.0,  0.320, 0.00100,",
-        " 0.0,  0.330, 0.00100,",
-        " 0.0,  0.340, 0.00100,",
-        " 0.0,  0.350, 0.00100,",
-        " 0.0,  0.360, 0.00900,",
-        " 0.0,  0.370, 0.12000,",
-        " 0.0,  0.380, 0.49200,",
-        " 0.0,  0.390, 0.78200,",
-        " 0.0,  0.400, 0.85600,",
-        " 0.0,  0.410, 0.85800,",
-        " 0.0,  0.420, 0.85800,",
-        " 0.0,  0.430, 0.86000,",
-        " 0.0,  0.440, 0.86100,",
-        " 0.0,  0.450, 0.87100,",
-        " 0.0,  0.460, 0.88000,",
-        " 0.0,  0.470, 0.88300,",
-        " 0.0,  0.480, 0.88700,",
-        " 0.0,  0.490, 0.89000,",
-        " 0.0,  0.500, 0.89000,",
-        " 0.0,  0.510, 0.89100,",
-        " 0.0,  0.520, 0.88700,",
-        " 0.0,  0.530, 0.89000,",
-        " 0.0,  0.540, 0.88300,",
-        " 0.0,  0.550, 0.88800,",
-        " 0.0,  0.560, 0.88200,",
-        " 0.0,  0.570, 0.88100,",
-        " 0.0,  0.580, 0.86500,",
-        " 0.0,  0.590, 0.85800,",
-        " 0.0,  0.600, 0.86500,",
-        " 0.0,  0.610, 0.85600,",
-        " 0.0,  0.620, 0.84500,",
-        " 0.0,  0.630, 0.83700,",
-        " 0.0,  0.640, 0.82700,",
-        " 0.0,  0.650, 0.82000,",
-        " 0.0,  0.660, 0.80700,",
-        " 0.0,  0.670, 0.79800,",
-        " 0.0,  0.680, 0.79100,",
-        " 0.0,  0.690, 0.78100,",
-        " 0.0,  0.700, 0.76800,",
-        " 0.0,  0.710, 0.76100,",
-        " 0.0,  0.720, 0.74400,",
-        " 0.0,  0.730, 0.71300,",
-        " 0.0,  0.740, 0.70300,",
-        " 0.0,  0.750, 0.69400,",
-        " 0.0,  0.760, 0.68500,",
-        " 0.0,  0.770, 0.67500,",
-        " 0.0,  0.780, 0.66700,",
-        " 0.0,  0.790, 0.65500,",
-        " 0.0,  0.800, 0.64600,",
-        " 0.0,  0.810, 0.63800,",
-        " 0.0,  0.820, 0.62900,",
-        " 0.0,  0.830, 0.62300,",
-        " 0.0,  0.840, 0.61400,",
-        " 0.0,  0.850, 0.60800,",
-        " 0.0,  0.860, 0.60100,",
-        " 0.0,  0.870, 0.59700,",
-        " 0.0,  0.880, 0.59200,",
-        " 0.0,  0.890, 0.58700,",
-        " 0.0,  0.900, 0.58200,",
-        " 0.0,  0.950, 0.56800,",
-        " 0.0,  1.000, 0.56200,",
-        " 0.0,  1.050, 0.55600,",
-        " 0.0,  1.100, 0.56300,",
-        " 0.0,  1.150, 0.55600,",
-        " 0.0,  1.200, 0.54700,",
-        " 0.0,  1.250, 0.57700,",
-        " 0.0,  1.300, 0.59800,",
-        " 0.0,  1.350, 0.60800,",
-        " 0.0,  1.400, 0.60300,",
-        " 0.0,  1.450, 0.61400,",
-        " 0.0,  1.500, 0.64800,",
-        " 0.0,  1.550, 0.68000,",
-        " 0.0,  1.600, 0.69900,",
-        " 0.0,  1.650, 0.70600,",
-        " 0.0,  1.700, 0.57000,",
-        " 0.0,  1.750, 0.58500,",
-        " 0.0,  1.800, 0.63700,",
-        " 0.0,  1.850, 0.65500,",
-        " 0.0,  1.900, 0.63700,",
-        " 0.0,  1.950, 0.63400,",
-        " 0.0,  2.000, 0.63400,",
-        " 0.0,  2.050, 0.58600,",
-        " 0.0,  2.100, 0.58800,",
-        " 0.0,  2.150, 0.59700,",
-        " 0.0,  2.200, 0.57600,",
-        " 0.0,  2.250, 0.40400,",
-        " 0.0,  2.300, 0.17900,",
-        " 0.0,  2.350, 0.21900,",
-        " 0.0,  2.400, 0.24000,",
-        " 0.0,  2.450, 0.20000,",
-        " 0.0,  2.500, 0.21400,",
-        "90.0,  0.300, 0.00000,",
-        "90.0,  0.310, 0.00000,",
-        "90.0,  0.320, 0.00000,",
-        "90.0,  0.330, 0.00000,",
-        "90.0,  0.340, 0.00000,",
-        "90.0,  0.350, 0.00000,",
-        "90.0,  0.360, 0.00000,",
-        "90.0,  0.370, 0.00000,",
-        "90.0,  0.380, 0.00000,",
-        "90.0,  0.390, 0.00000,",
-        "90.0,  0.400, 0.00000,",
-        "90.0,  0.410, 0.00000,",
-        "90.0,  0.420, 0.00000,",
-        "90.0,  0.430, 0.00000,",
-        "90.0,  0.440, 0.00000,",
-        "90.0,  0.450, 0.00000,",
-        "90.0,  0.460, 0.00000,",
-        "90.0,  0.470, 0.00000,",
-        "90.0,  0.480, 0.00000,",
-        "90.0,  0.490, 0.00000,",
-        "90.0,  0.500, 0.00000,",
-        "90.0,  0.510, 0.00000,",
-        "90.0,  0.520, 0.00000,",
-        "90.0,  0.530, 0.00000,",
-        "90.0,  0.540, 0.00000,",
-        "90.0,  0.550, 0.00000,",
-        "90.0,  0.560, 0.00000,",
-        "90.0,  0.570, 0.00000,",
-        "90.0,  0.580, 0.00000,",
-        "90.0,  0.590, 0.00000,",
-        "90.0,  0.600, 0.00000,",
-        "90.0,  0.610, 0.00000,",
-        "90.0,  0.620, 0.00000,",
-        "90.0,  0.630, 0.00000,",
-        "90.0,  0.640, 0.00000,",
-        "90.0,  0.650, 0.00000,",
-        "90.0,  0.660, 0.00000,",
-        "90.0,  0.670, 0.00000,",
-        "90.0,  0.680, 0.00000,",
-        "90.0,  0.690, 0.00000,",
-        "90.0,  0.700, 0.00000,",
-        "90.0,  0.710, 0.00000,",
-        "90.0,  0.720, 0.00000,",
-        "90.0,  0.730, 0.00000,",
-        "90.0,  0.740, 0.00000,",
-        "90.0,  0.750, 0.00000,",
-        "90.0,  0.760, 0.00000,",
-        "90.0,  0.770, 0.00000,",
-        "90.0,  0.780, 0.00000,",
-        "90.0,  0.790, 0.00000,",
-        "90.0,  0.800, 0.00000,",
-        "90.0,  0.810, 0.00000,",
-        "90.0,  0.820, 0.00000,",
-        "90.0,  0.830, 0.00000,",
-        "90.0,  0.840, 0.00000,",
-        "90.0,  0.850, 0.00000,",
-        "90.0,  0.860, 0.00000,",
-        "90.0,  0.870, 0.00000,",
-        "90.0,  0.880, 0.00000,",
-        "90.0,  0.890, 0.00000,",
-        "90.0,  0.900, 0.00000,",
-        "90.0,  0.950, 0.00000,",
-        "90.0,  1.000, 0.00000,",
-        "90.0,  1.050, 0.00000,",
-        "90.0,  1.100, 0.00000,",
-        "90.0,  1.150, 0.00000,",
-        "90.0,  1.200, 0.00000,",
-        "90.0,  1.250, 0.00000,",
-        "90.0,  1.300, 0.00000,",
-        "90.0,  1.350, 0.00000,",
-        "90.0,  1.400, 0.00000,",
-        "90.0,  1.450, 0.00000,",
-        "90.0,  1.500, 0.00000,",
-        "90.0,  1.550, 0.00000,",
-        "90.0,  1.600, 0.00000,",
-        "90.0,  1.650, 0.00000,",
-        "90.0,  1.700, 0.00000,",
-        "90.0,  1.750, 0.00000,",
-        "90.0,  1.800, 0.00000,",
-        "90.0,  1.850, 0.00000,",
-        "90.0,  1.900, 0.00000,",
-        "90.0,  1.950, 0.00000,",
-        "90.0,  2.000, 0.00000,",
-        "90.0,  2.050, 0.00000,",
-        "90.0,  2.100, 0.00000,",
-        "90.0,  2.150, 0.00000,",
-        "90.0,  2.200, 0.00000,",
-        "90.0,  2.250, 0.00000,",
-        "90.0,  2.300, 0.00000,",
-        "90.0,  2.350, 0.00000,",
-        "90.0,  2.400, 0.00000,",
-        "90.0,  2.450, 0.00000,",
-        "90.0,  2.500, 0.00000;",
+        "  ,                          !- External File Column Number",
+        "  ,                          !- External File Starting Row Number",
+        "  0.00100,                   !- Output Value 1",
+        "  0.00100,",
+        "  0.00100,",
+        "  0.00100,",
+        "  0.00100,",
+        "  0.00100,",
+        "  0.00900,",
+        "  0.12000,",
+        "  0.49200,",
+        "  0.78200,",
+        "  0.85600,",
+        "  0.85800,",
+        "  0.85800,",
+        "  0.86000,",
+        "  0.86100,",
+        "  0.87100,",
+        "  0.88000,",
+        "  0.88300,",
+        "  0.88700,",
+        "  0.89000,",
+        "  0.89000,",
+        "  0.89100,",
+        "  0.88700,",
+        "  0.89000,",
+        "  0.88300,",
+        "  0.88800,",
+        "  0.88200,",
+        "  0.88100,",
+        "  0.86500,",
+        "  0.85800,",
+        "  0.86500,",
+        "  0.85600,",
+        "  0.84500,",
+        "  0.83700,",
+        "  0.82700,",
+        "  0.82000,",
+        "  0.80700,",
+        "  0.79800,",
+        "  0.79100,",
+        "  0.78100,",
+        "  0.76800,",
+        "  0.76100,",
+        "  0.74400,",
+        "  0.71300,",
+        "  0.70300,",
+        "  0.69400,",
+        "  0.68500,",
+        "  0.67500,",
+        "  0.66700,",
+        "  0.65500,",
+        "  0.64600,",
+        "  0.63800,",
+        "  0.62900,",
+        "  0.62300,",
+        "  0.61400,",
+        "  0.60800,",
+        "  0.60100,",
+        "  0.59700,",
+        "  0.59200,",
+        "  0.58700,",
+        "  0.58200,",
+        "  0.56800,",
+        "  0.56200,",
+        "  0.55600,",
+        "  0.56300,",
+        "  0.55600,",
+        "  0.54700,",
+        "  0.57700,",
+        "  0.59800,",
+        "  0.60800,",
+        "  0.60300,",
+        "  0.61400,",
+        "  0.64800,",
+        "  0.68000,",
+        "  0.69900,",
+        "  0.70600,",
+        "  0.57000,",
+        "  0.58500,",
+        "  0.63700,",
+        "  0.65500,",
+        "  0.63700,",
+        "  0.63400,",
+        "  0.63400,",
+        "  0.58600,",
+        "  0.58800,",
+        "  0.59700,",
+        "  0.57600,",
+        "  0.40400,",
+        "  0.17900,",
+        "  0.21900,",
+        "  0.24000,",
+        "  0.20000,",
+        "  0.21400,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000,",
+        "  0.00000;",
 
-        "Table:TwoIndependentVariables,",
+        "Table:Lookup,",
         "  FrontReflectanceData,      !- Name",
-        "  BiQuadratic,               !- Curve Type",
-        "  LinearInterpolationOfTable,!- Interpolation Type",
-        "  0.0,                       !- Minimum Value of x,",
-        "  90.0,                      !- Maximum Value of x,",
-        "  0.30,                      !- Minimum Value of y,",
-        "  2.50,                      !- Maximum Value of y,",
-        "  0.0,                       !- Minimum Table Output",
-        "  1.0,                       !- Maximum Table Output",
-        "  Angle,                     !- Input Unit Type for x",
-        "  Wavelength,                !- Input Unit Type for y",
+        "  Spectral and Incident Angle Data Set,  !- Independent Variable List Name",
+        "  ,                          !- Normalization Method",
+        "  ,                          !- Normalization Divisor",
+        "  0.0,                       !- Minimum Output",
+        "  1.0,                       !- Maximum Output",
         "  Dimensionless,             !- Output Unit Type",
-        "  1.0,                       !- Normalization Point",
         "  ,                          !- External File Name",
-        " 0.0,  0.300, 0.04500,",
-        " 0.0,  0.310, 0.04400,",
-        " 0.0,  0.320, 0.04400,",
-        " 0.0,  0.330, 0.04200,",
-        " 0.0,  0.340, 0.04100,",
-        " 0.0,  0.350, 0.04000,",
-        " 0.0,  0.360, 0.04000,",
-        " 0.0,  0.370, 0.04000,",
-        " 0.0,  0.380, 0.05100,",
-        " 0.0,  0.390, 0.07000,",
-        " 0.0,  0.400, 0.07500,",
-        " 0.0,  0.410, 0.07500,",
-        " 0.0,  0.420, 0.07500,",
-        " 0.0,  0.430, 0.07500,",
-        " 0.0,  0.440, 0.07500,",
-        " 0.0,  0.450, 0.07500,",
-        " 0.0,  0.460, 0.07600,",
-        " 0.0,  0.470, 0.07500,",
-        " 0.0,  0.480, 0.07600,",
-        " 0.0,  0.490, 0.07500,",
-        " 0.0,  0.500, 0.07500,",
-        " 0.0,  0.510, 0.07500,",
-        " 0.0,  0.520, 0.07500,",
-        " 0.0,  0.530, 0.07500,",
-        " 0.0,  0.540, 0.07400,",
-        " 0.0,  0.550, 0.07400,",
-        " 0.0,  0.560, 0.07400,",
-        " 0.0,  0.570, 0.07400,",
-        " 0.0,  0.580, 0.07100,",
-        " 0.0,  0.590, 0.07000,",
-        " 0.0,  0.600, 0.07000,",
-        " 0.0,  0.610, 0.07000,",
-        " 0.0,  0.620, 0.07000,",
-        " 0.0,  0.630, 0.07000,",
-        " 0.0,  0.640, 0.06900,",
-        " 0.0,  0.650, 0.06700,",
-        " 0.0,  0.660, 0.06700,",
-        " 0.0,  0.670, 0.06500,",
-        " 0.0,  0.680, 0.06500,",
-        " 0.0,  0.690, 0.06500,",
-        " 0.0,  0.700, 0.06400,",
-        " 0.0,  0.710, 0.06400,",
-        " 0.0,  0.720, 0.06200,",
-        " 0.0,  0.730, 0.06400,",
-        " 0.0,  0.740, 0.06200,",
-        " 0.0,  0.750, 0.06100,",
-        " 0.0,  0.760, 0.06100,",
-        " 0.0,  0.770, 0.06000,",
-        " 0.0,  0.780, 0.06000,",
-        " 0.0,  0.790, 0.06000,",
-        " 0.0,  0.800, 0.05900,",
-        " 0.0,  0.810, 0.05900,",
-        " 0.0,  0.820, 0.05700,",
-        " 0.0,  0.830, 0.05700,",
-        " 0.0,  0.840, 0.05600,",
-        " 0.0,  0.850, 0.05600,",
-        " 0.0,  0.860, 0.05500,",
-        " 0.0,  0.870, 0.05400,",
-        " 0.0,  0.880, 0.05400,",
-        " 0.0,  0.890, 0.05400,",
-        " 0.0,  0.900, 0.05500,",
-        " 0.0,  0.950, 0.05100,",
-        " 0.0,  1.000, 0.05100,",
-        " 0.0,  1.050, 0.05000,",
-        " 0.0,  1.100, 0.05100,",
-        " 0.0,  1.150, 0.05000,",
-        " 0.0,  1.200, 0.05000,",
-        " 0.0,  1.250, 0.05100,",
-        " 0.0,  1.300, 0.05400,",
-        " 0.0,  1.350, 0.05500,",
-        " 0.0,  1.400, 0.05200,",
-        " 0.0,  1.450, 0.05500,",
-        " 0.0,  1.500, 0.05700,",
-        " 0.0,  1.550, 0.05900,",
-        " 0.0,  1.600, 0.06000,",
-        " 0.0,  1.650, 0.06000,",
-        " 0.0,  1.700, 0.05100,",
-        " 0.0,  1.750, 0.05100,",
-        " 0.0,  1.800, 0.05500,",
-        " 0.0,  1.850, 0.05700,",
-        " 0.0,  1.900, 0.05700,",
-        " 0.0,  1.950, 0.05700,",
-        " 0.0,  2.000, 0.05700,",
-        " 0.0,  2.050, 0.05200,",
-        " 0.0,  2.100, 0.05400,",
-        " 0.0,  2.150, 0.05400,",
-        " 0.0,  2.200, 0.05100,",
-        " 0.0,  2.250, 0.04500,",
-        " 0.0,  2.300, 0.03700,",
-        " 0.0,  2.350, 0.03700,",
-        " 0.0,  2.400, 0.03900,",
-        " 0.0,  2.450, 0.04000,",
-        " 0.0,  2.500, 0.03900,",
-        "90.0,  0.300, 1.00000,",
-        "90.0,  0.310, 1.00000,",
-        "90.0,  0.320, 1.00000,",
-        "90.0,  0.330, 1.00000,",
-        "90.0,  0.340, 1.00000,",
-        "90.0,  0.350, 1.00000,",
-        "90.0,  0.360, 1.00000,",
-        "90.0,  0.370, 1.00000,",
-        "90.0,  0.380, 1.00000,",
-        "90.0,  0.390, 1.00000,",
-        "90.0,  0.400, 1.00000,",
-        "90.0,  0.410, 1.00000,",
-        "90.0,  0.420, 1.00000,",
-        "90.0,  0.430, 1.00000,",
-        "90.0,  0.440, 1.00000,",
-        "90.0,  0.450, 1.00000,",
-        "90.0,  0.460, 1.00000,",
-        "90.0,  0.470, 1.00000,",
-        "90.0,  0.480, 1.00000,",
-        "90.0,  0.490, 1.00000,",
-        "90.0,  0.500, 1.00000,",
-        "90.0,  0.510, 1.00000,",
-        "90.0,  0.520, 1.00000,",
-        "90.0,  0.530, 1.00000,",
-        "90.0,  0.540, 1.00000,",
-        "90.0,  0.550, 1.00000,",
-        "90.0,  0.560, 1.00000,",
-        "90.0,  0.570, 1.00000,",
-        "90.0,  0.580, 1.00000,",
-        "90.0,  0.590, 1.00000,",
-        "90.0,  0.600, 1.00000,",
-        "90.0,  0.610, 1.00000,",
-        "90.0,  0.620, 1.00000,",
-        "90.0,  0.630, 1.00000,",
-        "90.0,  0.640, 1.00000,",
-        "90.0,  0.650, 1.00000,",
-        "90.0,  0.660, 1.00000,",
-        "90.0,  0.670, 1.00000,",
-        "90.0,  0.680, 1.00000,",
-        "90.0,  0.690, 1.00000,",
-        "90.0,  0.700, 1.00000,",
-        "90.0,  0.710, 1.00000,",
-        "90.0,  0.720, 1.00000,",
-        "90.0,  0.730, 1.00000,",
-        "90.0,  0.740, 1.00000,",
-        "90.0,  0.750, 1.00000,",
-        "90.0,  0.760, 1.00000,",
-        "90.0,  0.770, 1.00000,",
-        "90.0,  0.780, 1.00000,",
-        "90.0,  0.790, 1.00000,",
-        "90.0,  0.800, 1.00000,",
-        "90.0,  0.810, 1.00000,",
-        "90.0,  0.820, 1.00000,",
-        "90.0,  0.830, 1.00000,",
-        "90.0,  0.840, 1.00000,",
-        "90.0,  0.850, 1.00000,",
-        "90.0,  0.860, 1.00000,",
-        "90.0,  0.870, 1.00000,",
-        "90.0,  0.880, 1.00000,",
-        "90.0,  0.890, 1.00000,",
-        "90.0,  0.900, 1.00000,",
-        "90.0,  0.950, 1.00000,",
-        "90.0,  1.000, 1.00000,",
-        "90.0,  1.050, 1.00000,",
-        "90.0,  1.100, 1.00000,",
-        "90.0,  1.150, 1.00000,",
-        "90.0,  1.200, 1.00000,",
-        "90.0,  1.250, 1.00000,",
-        "90.0,  1.300, 1.00000,",
-        "90.0,  1.350, 1.00000,",
-        "90.0,  1.400, 1.00000,",
-        "90.0,  1.450, 1.00000,",
-        "90.0,  1.500, 1.00000,",
-        "90.0,  1.550, 1.00000,",
-        "90.0,  1.600, 1.00000,",
-        "90.0,  1.650, 1.00000,",
-        "90.0,  1.700, 1.00000,",
-        "90.0,  1.750, 1.00000,",
-        "90.0,  1.800, 1.00000,",
-        "90.0,  1.850, 1.00000,",
-        "90.0,  1.900, 1.00000,",
-        "90.0,  1.950, 1.00000,",
-        "90.0,  2.000, 1.00000,",
-        "90.0,  2.050, 1.00000,",
-        "90.0,  2.100, 1.00000,",
-        "90.0,  2.150, 1.00000,",
-        "90.0,  2.200, 1.00000,",
-        "90.0,  2.250, 1.00000,",
-        "90.0,  2.300, 1.00000,",
-        "90.0,  2.350, 1.00000,",
-        "90.0,  2.400, 1.00000,",
-        "90.0,  2.450, 1.00000,",
-        "90.0,  2.500, 1.00000;",
+        "  ,                          !- External File Column Number",
+        "  ,                          !- External File Starting Row Number",
+        "  0.04500,                   !- Output Value 1",
+        "  0.04400,",
+        "  0.04400,",
+        "  0.04200,",
+        "  0.04100,",
+        "  0.04000,",
+        "  0.04000,",
+        "  0.04000,",
+        "  0.05100,",
+        "  0.07000,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07600,",
+        "  0.07500,",
+        "  0.07600,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07400,",
+        "  0.07400,",
+        "  0.07400,",
+        "  0.07400,",
+        "  0.07100,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.06900,",
+        "  0.06700,",
+        "  0.06700,",
+        "  0.06500,",
+        "  0.06500,",
+        "  0.06500,",
+        "  0.06400,",
+        "  0.06400,",
+        "  0.06200,",
+        "  0.06400,",
+        "  0.06200,",
+        "  0.06100,",
+        "  0.06100,",
+        "  0.06000,",
+        "  0.06000,",
+        "  0.06000,",
+        "  0.05900,",
+        "  0.05900,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05600,",
+        "  0.05600,",
+        "  0.05500,",
+        "  0.05400,",
+        "  0.05400,",
+        "  0.05400,",
+        "  0.05500,",
+        "  0.05100,",
+        "  0.05100,",
+        "  0.05000,",
+        "  0.05100,",
+        "  0.05000,",
+        "  0.05000,",
+        "  0.05100,",
+        "  0.05400,",
+        "  0.05500,",
+        "  0.05200,",
+        "  0.05500,",
+        "  0.05700,",
+        "  0.05900,",
+        "  0.06000,",
+        "  0.06000,",
+        "  0.05100,",
+        "  0.05100,",
+        "  0.05500,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05200,",
+        "  0.05400,",
+        "  0.05400,",
+        "  0.05100,",
+        "  0.04500,",
+        "  0.03700,",
+        "  0.03700,",
+        "  0.03900,",
+        "  0.04000,",
+        "  0.03900,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000;",
 
-        "Table:TwoIndependentVariables,",
+        "Table:Lookup,",
         "  BackRefelectanceData,      !- Name",
-        "  BiQuadratic,               !- Curve Type",
-        "  LinearInterpolationOfTable,!- Interpolation Type",
-        "  0.0,                       !- Minimum Value of x,",
-        "  90.0,                      !- Maximum Value of x,",
-        "  0.30,                      !- Minimum Value of y,",
-        "  2.50,                      !- Maximum Value of y,",
-        "  0.0,                       !- Minimum Table Output",
-        "  1.0,                       !- Maximum Table Output",
-        "  Angle,                     !- Input Unit Type for x",
-        "  Wavelength,                !- Input Unit Type for y",
+        "  Spectral and Incident Angle Data Set,  !- Independent Variable List Name",
+        "  ,                          !- Normalization Method",
+        "  ,                          !- Normalization Divisor",
+        "  0.0,                       !- Minimum Output",
+        "  1.0,                       !- Maximum Output",
         "  Dimensionless,             !- Output Unit Type",
-        "  1.0,                       !- Normalization Point",
         "  ,                          !- External File Name",
-        " 0.0,  0.300, 0.04500,",
-        " 0.0,  0.310, 0.04400,",
-        " 0.0,  0.320, 0.04400,",
-        " 0.0,  0.330, 0.04200,",
-        " 0.0,  0.340, 0.04100,",
-        " 0.0,  0.350, 0.04000,",
-        " 0.0,  0.360, 0.04000,",
-        " 0.0,  0.370, 0.04000,",
-        " 0.0,  0.380, 0.05100,",
-        " 0.0,  0.390, 0.07000,",
-        " 0.0,  0.400, 0.07500,",
-        " 0.0,  0.410, 0.07500,",
-        " 0.0,  0.420, 0.07500,",
-        " 0.0,  0.430, 0.07500,",
-        " 0.0,  0.440, 0.07500,",
-        " 0.0,  0.450, 0.07500,",
-        " 0.0,  0.460, 0.07600,",
-        " 0.0,  0.470, 0.07500,",
-        " 0.0,  0.480, 0.07600,",
-        " 0.0,  0.490, 0.07500,",
-        " 0.0,  0.500, 0.07500,",
-        " 0.0,  0.510, 0.07500,",
-        " 0.0,  0.520, 0.07500,",
-        " 0.0,  0.530, 0.07500,",
-        " 0.0,  0.540, 0.07400,",
-        " 0.0,  0.550, 0.07400,",
-        " 0.0,  0.560, 0.07400,",
-        " 0.0,  0.570, 0.07400,",
-        " 0.0,  0.580, 0.07100,",
-        " 0.0,  0.590, 0.07000,",
-        " 0.0,  0.600, 0.07000,",
-        " 0.0,  0.610, 0.07000,",
-        " 0.0,  0.620, 0.07000,",
-        " 0.0,  0.630, 0.07000,",
-        " 0.0,  0.640, 0.06900,",
-        " 0.0,  0.650, 0.06700,",
-        " 0.0,  0.660, 0.06700,",
-        " 0.0,  0.670, 0.06500,",
-        " 0.0,  0.680, 0.06500,",
-        " 0.0,  0.690, 0.06500,",
-        " 0.0,  0.700, 0.06400,",
-        " 0.0,  0.710, 0.06400,",
-        " 0.0,  0.720, 0.06200,",
-        " 0.0,  0.730, 0.06400,",
-        " 0.0,  0.740, 0.06200,",
-        " 0.0,  0.750, 0.06100,",
-        " 0.0,  0.760, 0.06100,",
-        " 0.0,  0.770, 0.06000,",
-        " 0.0,  0.780, 0.06000,",
-        " 0.0,  0.790, 0.06000,",
-        " 0.0,  0.800, 0.05900,",
-        " 0.0,  0.810, 0.05900,",
-        " 0.0,  0.820, 0.05700,",
-        " 0.0,  0.830, 0.05700,",
-        " 0.0,  0.840, 0.05600,",
-        " 0.0,  0.850, 0.05600,",
-        " 0.0,  0.860, 0.05500,",
-        " 0.0,  0.870, 0.05400,",
-        " 0.0,  0.880, 0.05400,",
-        " 0.0,  0.890, 0.05400,",
-        " 0.0,  0.900, 0.05500,",
-        " 0.0,  0.950, 0.05100,",
-        " 0.0,  1.000, 0.05100,",
-        " 0.0,  1.050, 0.05000,",
-        " 0.0,  1.100, 0.05100,",
-        " 0.0,  1.150, 0.05000,",
-        " 0.0,  1.200, 0.05000,",
-        " 0.0,  1.250, 0.05100,",
-        " 0.0,  1.300, 0.05400,",
-        " 0.0,  1.350, 0.05500,",
-        " 0.0,  1.400, 0.05200,",
-        " 0.0,  1.450, 0.05500,",
-        " 0.0,  1.500, 0.05700,",
-        " 0.0,  1.550, 0.05900,",
-        " 0.0,  1.600, 0.06000,",
-        " 0.0,  1.650, 0.06000,",
-        " 0.0,  1.700, 0.05100,",
-        " 0.0,  1.750, 0.05100,",
-        " 0.0,  1.800, 0.05500,",
-        " 0.0,  1.850, 0.05700,",
-        " 0.0,  1.900, 0.05700,",
-        " 0.0,  1.950, 0.05700,",
-        " 0.0,  2.000, 0.05700,",
-        " 0.0,  2.050, 0.05200,",
-        " 0.0,  2.100, 0.05400,",
-        " 0.0,  2.150, 0.05400,",
-        " 0.0,  2.200, 0.05100,",
-        " 0.0,  2.250, 0.04500,",
-        " 0.0,  2.300, 0.03700,",
-        " 0.0,  2.350, 0.03700,",
-        " 0.0,  2.400, 0.03900,",
-        " 0.0,  2.450, 0.04000,",
-        " 0.0,  2.500, 0.03900,",
-        "90.0,  0.300, 1.00000,",
-        "90.0,  0.310, 1.00000,",
-        "90.0,  0.320, 1.00000,",
-        "90.0,  0.330, 1.00000,",
-        "90.0,  0.340, 1.00000,",
-        "90.0,  0.350, 1.00000,",
-        "90.0,  0.360, 1.00000,",
-        "90.0,  0.370, 1.00000,",
-        "90.0,  0.380, 1.00000,",
-        "90.0,  0.390, 1.00000,",
-        "90.0,  0.400, 1.00000,",
-        "90.0,  0.410, 1.00000,",
-        "90.0,  0.420, 1.00000,",
-        "90.0,  0.430, 1.00000,",
-        "90.0,  0.440, 1.00000,",
-        "90.0,  0.450, 1.00000,",
-        "90.0,  0.460, 1.00000,",
-        "90.0,  0.470, 1.00000,",
-        "90.0,  0.480, 1.00000,",
-        "90.0,  0.490, 1.00000,",
-        "90.0,  0.500, 1.00000,",
-        "90.0,  0.510, 1.00000,",
-        "90.0,  0.520, 1.00000,",
-        "90.0,  0.530, 1.00000,",
-        "90.0,  0.540, 1.00000,",
-        "90.0,  0.550, 1.00000,",
-        "90.0,  0.560, 1.00000,",
-        "90.0,  0.570, 1.00000,",
-        "90.0,  0.580, 1.00000,",
-        "90.0,  0.590, 1.00000,",
-        "90.0,  0.600, 1.00000,",
-        "90.0,  0.610, 1.00000,",
-        "90.0,  0.620, 1.00000,",
-        "90.0,  0.630, 1.00000,",
-        "90.0,  0.640, 1.00000,",
-        "90.0,  0.650, 1.00000,",
-        "90.0,  0.660, 1.00000,",
-        "90.0,  0.670, 1.00000,",
-        "90.0,  0.680, 1.00000,",
-        "90.0,  0.690, 1.00000,",
-        "90.0,  0.700, 1.00000,",
-        "90.0,  0.710, 1.00000,",
-        "90.0,  0.720, 1.00000,",
-        "90.0,  0.730, 1.00000,",
-        "90.0,  0.740, 1.00000,",
-        "90.0,  0.750, 1.00000,",
-        "90.0,  0.760, 1.00000,",
-        "90.0,  0.770, 1.00000,",
-        "90.0,  0.780, 1.00000,",
-        "90.0,  0.790, 1.00000,",
-        "90.0,  0.800, 1.00000,",
-        "90.0,  0.810, 1.00000,",
-        "90.0,  0.820, 1.00000,",
-        "90.0,  0.830, 1.00000,",
-        "90.0,  0.840, 1.00000,",
-        "90.0,  0.850, 1.00000,",
-        "90.0,  0.860, 1.00000,",
-        "90.0,  0.870, 1.00000,",
-        "90.0,  0.880, 1.00000,",
-        "90.0,  0.890, 1.00000,",
-        "90.0,  0.900, 1.00000,",
-        "90.0,  0.950, 1.00000,",
-        "90.0,  1.000, 1.00000,",
-        "90.0,  1.050, 1.00000,",
-        "90.0,  1.100, 1.00000,",
-        "90.0,  1.150, 1.00000,",
-        "90.0,  1.200, 1.00000,",
-        "90.0,  1.250, 1.00000,",
-        "90.0,  1.300, 1.00000,",
-        "90.0,  1.350, 1.00000,",
-        "90.0,  1.400, 1.00000,",
-        "90.0,  1.450, 1.00000,",
-        "90.0,  1.500, 1.00000,",
-        "90.0,  1.550, 1.00000,",
-        "90.0,  1.600, 1.00000,",
-        "90.0,  1.650, 1.00000,",
-        "90.0,  1.700, 1.00000,",
-        "90.0,  1.750, 1.00000,",
-        "90.0,  1.800, 1.00000,",
-        "90.0,  1.850, 1.00000,",
-        "90.0,  1.900, 1.00000,",
-        "90.0,  1.950, 1.00000,",
-        "90.0,  2.000, 1.00000,",
-        "90.0,  2.050, 1.00000,",
-        "90.0,  2.100, 1.00000,",
-        "90.0,  2.150, 1.00000,",
-        "90.0,  2.200, 1.00000,",
-        "90.0,  2.250, 1.00000,",
-        "90.0,  2.300, 1.00000,",
-        "90.0,  2.350, 1.00000,",
-        "90.0,  2.400, 1.00000,",
-        "90.0,  2.450, 1.00000,",
-        "90.0,  2.500, 1.00000;",
+        "  ,                          !- External File Column Number",
+        "  ,                          !- External File Starting Row Number",
+        "  0.04500,                   !- Output Value 1",
+        "  0.04400,",
+        "  0.04400,",
+        "  0.04200,",
+        "  0.04100,",
+        "  0.04000,",
+        "  0.04000,",
+        "  0.04000,",
+        "  0.05100,",
+        "  0.07000,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07600,",
+        "  0.07500,",
+        "  0.07600,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07500,",
+        "  0.07400,",
+        "  0.07400,",
+        "  0.07400,",
+        "  0.07400,",
+        "  0.07100,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.07000,",
+        "  0.06900,",
+        "  0.06700,",
+        "  0.06700,",
+        "  0.06500,",
+        "  0.06500,",
+        "  0.06500,",
+        "  0.06400,",
+        "  0.06400,",
+        "  0.06200,",
+        "  0.06400,",
+        "  0.06200,",
+        "  0.06100,",
+        "  0.06100,",
+        "  0.06000,",
+        "  0.06000,",
+        "  0.06000,",
+        "  0.05900,",
+        "  0.05900,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05600,",
+        "  0.05600,",
+        "  0.05500,",
+        "  0.05400,",
+        "  0.05400,",
+        "  0.05400,",
+        "  0.05500,",
+        "  0.05100,",
+        "  0.05100,",
+        "  0.05000,",
+        "  0.05100,",
+        "  0.05000,",
+        "  0.05000,",
+        "  0.05100,",
+        "  0.05400,",
+        "  0.05500,",
+        "  0.05200,",
+        "  0.05500,",
+        "  0.05700,",
+        "  0.05900,",
+        "  0.06000,",
+        "  0.06000,",
+        "  0.05100,",
+        "  0.05100,",
+        "  0.05500,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05700,",
+        "  0.05200,",
+        "  0.05400,",
+        "  0.05400,",
+        "  0.05100,",
+        "  0.04500,",
+        "  0.03700,",
+        "  0.03700,",
+        "  0.03900,",
+        "  0.04000,",
+        "  0.03900,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000,",
+        "  1.00000;",
 
         "  WindowMaterial:Gas,",
         "    WinAirGap,               !- Name",
@@ -2333,10 +2453,10 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(state);
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -2345,19 +2465,19 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(FoundError);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
     EXPECT_FALSE(FoundError);
 
-    HeatBalanceManager::GetConstructData(FoundError);
+    HeatBalanceManager::GetConstructData(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(FoundError);
+    SurfaceGeometry::GetGeometryParameters(state.files, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(4);
@@ -2378,32 +2498,32 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
-    WindowManager::InitGlassOpticalCalculations();
+    WindowManager::InitGlassOpticalCalculations(state.dataWindowComplexManager, state.dataWindowManager, state.files);
 
     int NumAngles = 10; // Number of incident angles
     Real64 sum;
     // total transmittance
     Array1D<Real64> correctT(
-        NumAngles, {0.529017128, 0.472866571, 0.370790548, 0.248928459, 0.138553744, 0.061213244, 0.020072976, 0.00430128, 0.00042861, 0.0});
+        NumAngles, {0.529017128, 0.472866571, 0.414862350, 0.355230972, 0.294204731, 0.232087506, 0.169331950, 0.10672958, 0.04626078, 0.0});
     // total reflectance
     Array1D<Real64> correctR(
-        NumAngles, {0.097222311, 0.194253146, 0.36875691, 0.57565985, 0.762546964, 0.89393376, 0.964537901, 0.99210584, 0.99912202, 1.00000000});
+        NumAngles, {0.097222311, 0.194253146, 0.29213968, 0.39110239, 0.491349618, 0.59297952, 0.695822715, 0.79917258, 0.90138662, 1.00000000});
     // Layer 1 absortance
     Array1D<Real64> correctabs1(
-        NumAngles, {0.242079608, 0.214464137, 0.165811001, 0.109778385, 0.060620181, 0.02682869, 0.008920102, 0.001979289, 0.000219736, 0.0});
+        NumAngles, {0.242079608, 0.214464137, 0.187033583, 0.159840540, 0.132932950, 0.10633161, 0.079994699, 0.053758780, 0.027261664, 0.0});
     // Layer 2 absortance
     Array1D<Real64> correctabs2(
-        NumAngles, {0.131680954, 0.118416146, 0.094641541, 0.065633305, 0.03827911, 0.018024306, 0.006469021, 0.001613591, 0.000229628, 0.0});
+        NumAngles, {0.131680954, 0.118416146, 0.105964377, 0.093826087, 0.08151269, 0.068601358, 0.054850634, 0.040339052, 0.025090929, 0.0});
 
     for (int i = 1; i <= NumAngles; i++) {
-        EXPECT_NEAR(correctT(i), WindowManager::tsolPhi(i), 0.0001);
-        EXPECT_NEAR(correctR(i), WindowManager::rfsolPhi(i), 0.0001);
-        EXPECT_NEAR(correctabs1(i), WindowManager::solabsPhi(1, i), 0.0001);
-        EXPECT_NEAR(correctabs2(i), WindowManager::solabsPhi(2, i), 0.0001);
-        sum = tsolPhi(i) + rfsolPhi(i) + solabsPhi(1, i) + solabsPhi(2, i);
+        EXPECT_NEAR(correctT(i), state.dataWindowManager.tsolPhi(i), 0.0001);
+        EXPECT_NEAR(correctR(i), state.dataWindowManager.rfsolPhi(i), 0.0001);
+        EXPECT_NEAR(correctabs1(i), state.dataWindowManager.solabsPhi(1, i), 0.0001);
+        EXPECT_NEAR(correctabs2(i), state.dataWindowManager.solabsPhi(2, i), 0.0001);
+        sum = state.dataWindowManager.tsolPhi(i) + state.dataWindowManager.rfsolPhi(i) + state.dataWindowManager.solabsPhi(1, i) + state.dataWindowManager.solabsPhi(2, i);
         EXPECT_NEAR(sum, 1.0, 0.0001);
     }
 
@@ -2533,16 +2653,16 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  autocalculate;           !- Volume {m3}"});
 
     ASSERT_TRUE(process_idf(idf_objects));
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(state.files);
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
-    HeatBalanceManager::GetBuildingData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
+    HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
 
@@ -2578,21 +2698,28 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalance::TempEffBulkAir.allocate(3);
     DataHeatBalSurface::TempSurfInTmp.allocate(3);
 
-    DataSurfaces::Surface(1).HeatTransSurf = true;
-    DataSurfaces::Surface(2).HeatTransSurf = true;
-    DataSurfaces::Surface(3).HeatTransSurf = true;
-    DataSurfaces::Surface(1).Area = 10.0;
-    DataSurfaces::Surface(2).Area = 10.0;
-    DataSurfaces::Surface(3).Area = 10.0;
-    DataSurfaces::Surface(1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
-    DataSurfaces::Surface(2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
-    DataSurfaces::Surface(3).TAirRef = DataSurfaces::AdjacentAirTemp;
-    DataHeatBalSurface::TempSurfInTmp(1) = 15.0;
-    DataHeatBalSurface::TempSurfInTmp(2) = 20.0;
-    DataHeatBalSurface::TempSurfInTmp(3) = 25.0;
-    DataHeatBalance::TempEffBulkAir(1) = 10.0;
-    DataHeatBalance::TempEffBulkAir(2) = 10.0;
-    DataHeatBalance::TempEffBulkAir(3) = 10.0;
+    int surfNum1 = UtilityRoutines::FindItemInList("WALL", DataSurfaces::Surface);
+    int surfNum2 = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
+    int surfNum3 = UtilityRoutines::FindItemInList("FLOOR", DataSurfaces::Surface);
+
+    DataSurfaces::Surface(surfNum1).HeatTransSurf = true;
+    DataSurfaces::Surface(surfNum2).HeatTransSurf = true;
+    DataSurfaces::Surface(surfNum3).HeatTransSurf = true;
+    DataSurfaces::Surface(surfNum1).Area = 10.0;
+    DataSurfaces::Surface(surfNum2).Area = 10.0;
+    DataSurfaces::Surface(surfNum3).Area = 10.0;
+    DataSurfaces::Surface(surfNum1).TAirRef = DataSurfaces::ZoneMeanAirTemp;
+    DataSurfaces::Surface(surfNum2).TAirRef = DataSurfaces::ZoneSupplyAirTemp;
+    DataSurfaces::Surface(surfNum3).TAirRef = DataSurfaces::AdjacentAirTemp;
+    DataSurfaces::Surface(surfNum1).SolarEnclIndex = 1;
+    DataSurfaces::Surface(surfNum2).SolarEnclIndex = 1;
+    DataSurfaces::Surface(surfNum3).SolarEnclIndex = 1;
+    DataHeatBalSurface::TempSurfInTmp(surfNum1) = 15.0;
+    DataHeatBalSurface::TempSurfInTmp(surfNum2) = 20.0;
+    DataHeatBalSurface::TempSurfInTmp(surfNum3) = 25.0;
+    DataHeatBalance::TempEffBulkAir(surfNum1) = 10.0;
+    DataHeatBalance::TempEffBulkAir(surfNum2) = 10.0;
+    DataHeatBalance::TempEffBulkAir(surfNum3) = 10.0;
 
     DataLoopNode::Node(1).Temp = 20.0;
     DataLoopNode::Node(2).Temp = 20.0;
@@ -2604,9 +2731,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataLoopNode::Node(4).MassFlowRate = 0.1;
 
     DataHeatBalance::HConvIn.allocate(3);
-    DataHeatBalance::HConvIn(1) = 0.5;
-    DataHeatBalance::HConvIn(2) = 0.5;
-    DataHeatBalance::HConvIn(3) = 0.5;
+    DataHeatBalance::HConvIn(surfNum1) = 0.5;
+    DataHeatBalance::HConvIn(surfNum2) = 0.5;
+    DataHeatBalance::HConvIn(surfNum3) = 0.5;
     DataHeatBalance::Zone(1).IsControlled = true;
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.011;
@@ -2649,6 +2776,8 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
     DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::QAirExtReport.allocate(3);
+    DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
     DataHeatBalance::QRadSWOutIncident = 0.0;
     DataHeatBalance::QRadSWwinAbs = 0.0;
@@ -2668,7 +2797,56 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     ScheduleManager::Schedule(1).CurrentValue = 25.0; // Srd Srfs Temp
     // Claculate temperature based on supply flow rate
 
-    WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
+    WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(2));
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(state.dataWindowManager.thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(surfNum2));
+    EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(surfNum2),3);
 }
+TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
+{
+
+   std::string const idf_objects =
+        delimited_string({
+   "WindowMaterial:ComplexShade,",
+    "Shade_14_Layer,          !- Name",
+    "VenetianHorizontal,      !- Layer Type",
+    "1.016000e-003,           !- Thickness {m}",
+    "1.592276e+002,           !- Conductivity {W / m - K}",
+    "0.000000e+000,           !- IR Transmittance",
+    "0.9,                     !- Front Emissivity",
+    "0.9,                       !- Back Emissivity",
+    "0.000000e+000,           !- Top Opening Multiplier",
+    "0.000000e+000,           !- Bottom Opening Multiplier",
+    "0.000000e+000,           !- Left Side Opening Multiplier",
+    "0.000000e+000,           !- Right Side Opening Multiplier",
+    "5.000000e-002,           !- Front Opening Multiplier",
+    "0.0254,                  !- Slat Width {m}",
+    "0.0201,                  !- Slat Spacing {m}",
+    "0.0010,                  !- Slat Thickness {m}",
+    "45.0000,                 !- Slat Angle {deg}",
+    "159.2276,                !- Slat Conductivity {W / m - K}",
+    "0.0000;                  !- Slat Curve {m}" });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool errors_found = false;
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errors_found);
+    EXPECT_FALSE(errors_found);
+    EXPECT_EQ(DataHeatBalance::ComplexShade(1).Name, "SHADE_14_LAYER");
+    EXPECT_EQ(DataHeatBalance::ComplexShade(1).LayerType, 1);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).IRTransmittance, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).FrontEmissivity, 0.9,1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).BackEmissivity, 0.9,1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).TopOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).BottomOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).LeftOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).RightOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).FrontOpeningMultiplier, 5.000000e-002, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatWidth, 0.0254, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatSpacing, 0.0201, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatThickness, 0.0010, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatAngle, 45.0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatCurve, 0, 1e-5);
+    }

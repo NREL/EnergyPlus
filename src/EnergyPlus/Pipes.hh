@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,39 +52,23 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
-// Forward Declarations
-struct PlantLocation;
+    // Forward declarations
+    struct EnergyPlusData;
+    struct PlantLocation;
+    struct PipesData;
 
 namespace Pipes {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int NumLocalPipes;
-    extern bool GetPipeInputFlag;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
-
-    // Types
-
     struct LocalPipeData : public PlantComponent
     {
-        virtual ~LocalPipeData()
-        {
-        }
+        virtual ~LocalPipeData() = default;
 
         // Members
         std::string Name;
@@ -106,11 +90,8 @@ namespace Pipes {
         {
         }
 
-    public:
-        static PlantComponent *factory(int objectType, std::string objectName);
-
-    public:
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        static PlantComponent *factory(PipesData &pipes, int objectType, std::string objectName);
+        void simulate(EnergyPlusData &EP_UNUSED(states), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     // Object Data
@@ -119,9 +100,21 @@ namespace Pipes {
     // Functions
     void clear_state();
 
-    void GetPipeInput();
+    void GetPipeInput(PipesData &pipes);
 
 } // namespace Pipes
+
+    struct PipesData : BaseGlobalStruct {
+        int NumLocalPipes;
+        bool GetPipeInputFlag;
+
+        PipesData() : NumLocalPipes(0), GetPipeInputFlag(true) {}
+
+        void clear_state() override {
+            NumLocalPipes = 0;
+            GetPipeInputFlag = true;
+        }
+    };
 
 } // namespace EnergyPlus
 

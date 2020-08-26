@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,15 +51,14 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DXFEarClipping.hh>
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <UtilityRoutines.hh>
+#include "IOFiles.hh"
+#include <EnergyPlus/DXFEarClipping.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -90,7 +89,6 @@ namespace DXFEarClipping {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataVectorTypes;
-    using DataGlobals::OutputFileDebug;
     using DataGlobals::Pi;
     using DataGlobals::RadToDeg;
     using DataGlobals::TwoPi;
@@ -109,7 +107,7 @@ namespace DXFEarClipping {
 
     // Functions
 
-    bool InPolygon(Vector const &point, Array1A<Vector> poly, int const nsides)
+    bool InPolygon(Vector const &point, Array1D<Vector> &poly, int const nsides)
     {
         // this routine is not used in the current scheme
 
@@ -117,7 +115,7 @@ namespace DXFEarClipping {
         bool InPolygon;
 
         // Argument array dimensioning
-        poly.dim(nsides);
+        EP_SIZE_CHECK(poly, nsides);
 
         // Locals
         //'Return TRUE if the point (xp,yp) lies inside the circumcircle
@@ -183,8 +181,9 @@ namespace DXFEarClipping {
         return rModulus;
     }
 
-    int Triangulate(int const nsides, // number of sides to polygon
-                    Array1A<Vector> polygon,
+    int Triangulate(IOFiles &ioFiles,
+                    int const nsides, // number of sides to polygon
+                    Array1D<Vector> &polygon,
                     Array1D<dTriangle> &outtriangles,
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
@@ -217,20 +216,18 @@ namespace DXFEarClipping {
         using DataSurfaces::SurfaceClass_Floor;
         using DataSurfaces::SurfaceClass_Overhang;
         using DataSurfaces::SurfaceClass_Roof;
-        using General::RoundSigDigits;
 
         // Return value
         int Triangulate;
 
         // Argument array dimensioning
-        polygon.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
 
         // Locals
         // Subroutine argument definitions:
 
         // Subroutine parameter definitions:
         Real64 const point_tolerance(0.00001);
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // Interface block specifications:
         // na
@@ -253,9 +250,6 @@ namespace DXFEarClipping {
         Array1D<Real64> yvt(nsides);
         Array1D<Real64> zvt(nsides);
 
-        //'General Variables
-        int i;
-        int j;
         // unused  integer k
         int ntri;
         // unused  logical inpoly
@@ -319,7 +313,7 @@ namespace DXFEarClipping {
         evert = 3;
         removed = false;
         while (nvertcur > 3) {
-            generate_ears(nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
+            generate_ears(ioFiles, nsides, vertex, ears, nears, r_angles, nrangles, c_vertices, ncverts, removed, earverts, rangles);
             if (!any_gt(ears, 0)) {
                 ShowWarningError("DXFOut: Could not triangulate surface=\"" + surfname + "\", type=\"" + cSurfaceClass(surfclass) +
                                  "\", check surface vertex order(entry)");
@@ -328,21 +322,14 @@ namespace DXFEarClipping {
                     ShowContinueError("...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces.");
                 }
                 if (DisplayExtraWarnings) {
-                    ObjexxFCL::gio::write(line, fmtLD) << "surface=" << surfname << " class=" << cSurfaceClass(surfclass);
-                    ShowMessage(line);
-                    for (j = 1; j <= nsides; ++j) {
-                        //          write(line,"(' side=',i2,' (',2(f6.1,','),f6.1,')')") j,polygon(j)
-                        line = " side=" + RoundSigDigits(j) + " (" + RoundSigDigits(polygon(j).x, 1) + ',' + RoundSigDigits(polygon(j).y, 1) + ',' +
-                               RoundSigDigits(polygon(j).z, 1) + ')';
-                        ShowMessage(line);
+                    ShowMessage(format(" surface={} class={}", surfname, cSurfaceClass(surfclass)));
+
+                    for (int j = 1; j <= nsides; ++j) {
+                        ShowMessage(format(" side={} ({:.1R},{:.1R},{:.1R})",j,polygon(j).x,polygon(j).y, polygon(j).z));
                     }
-                    ObjexxFCL::gio::write(line, fmtLD) << "number of triangles found=" << ncount;
-                    ShowMessage(line);
-                    for (j = 1; j <= nrangles; ++j) {
-                        //          write(line,"(' r angle=',i2,' vert=',i2,' deg=',f6.1)") j,r_angles(j),rangles(j)*RadToDeg
-                        line = " r angle=" + RoundSigDigits(j) + " vert=" + RoundSigDigits(r_angles(j)) +
-                               " deg=" + RoundSigDigits(rangles(j) * RadToDeg, 1);
-                        ShowMessage(line);
+                    ShowMessage(format(" number of triangles found={:12}", ncount));
+                    for (int j = 1; j <= nrangles; ++j) {
+                        ShowMessage(format(" r angle={} vert={} deg={:.1R}", j, r_angles(j), rangles(j) * RadToDeg));
                     }
                 }
                 break; // while loop
@@ -360,9 +347,9 @@ namespace DXFEarClipping {
                 --nvertcur;
             }
             if (nvertcur == 3) {
-                j = 1;
+                int j = 1;
                 ++ncount;
-                for (i = 1; i <= nsides; ++i) {
+                for (int i = 1; i <= nsides; ++i) {
                     if (removed(i)) continue;
                     earvert(ncount, j) = i;
                     ++j;
@@ -372,14 +359,14 @@ namespace DXFEarClipping {
 
         ntri = ncount;
 
-        for (i = 1; i <= ntri; ++i) {
+        for (int i = 1; i <= ntri; ++i) {
             Triangle(i).vv0 = earvert(i, 1);
             Triangle(i).vv1 = earvert(i, 2);
             Triangle(i).vv2 = earvert(i, 3);
         }
 
         outtriangles.allocate(ntri);
-        for (i = 1; i <= ntri; ++i) {
+        for (int i = 1; i <= ntri; ++i) {
             outtriangles(i) = Triangle(i);
         }
 
@@ -465,9 +452,9 @@ namespace DXFEarClipping {
         return angle;
     }
 
-    bool polygon_contains_point_2d(int const nsides,           // number of sides (vertices)
-                                   Array1A<Vector_2d> polygon, // points of polygon
-                                   Vector_2d const &point      // point to be tested
+    bool polygon_contains_point_2d(int const nsides,            // number of sides (vertices)
+                                   Array1D<Vector_2d> &polygon, // points of polygon
+                                   Vector_2d const &point       // point to be tested
     )
     {
 
@@ -495,7 +482,7 @@ namespace DXFEarClipping {
         bool inside; // return value, true=inside, false = not inside
 
         // Argument array dimensioning
-        polygon.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
 
         // Locals
         // Function argument definitions:
@@ -532,17 +519,18 @@ namespace DXFEarClipping {
         return inside;
     }
 
-    void generate_ears(int const nvert, // number of vertices in polygon
-                       Array1A<Vector_2d> vertex,
-                       Array1A_int ears,       // number of ears possible (dimensioned to nvert)
-                       int &nears,             // number of ears found
-                       Array1A_int r_vertices, // number of reflex vertices (>180) possible
-                       int &nrverts,           // number of reflex vertices found (>=180)
-                       Array1A_int c_vertices, // number of convex vertices
-                       int &ncverts,           // number of convex vertices found (< 180)
-                       Array1A_bool removed,   // array that shows if a vertex has been removed (calling routine)
-                       Array1A_int earvert,    // vertex indicators for first ear
-                       Array1A<Real64> rangles)
+    void generate_ears(IOFiles &ioFiles,
+                       int const nvert, // number of vertices in polygon
+                       Array1D<Vector_2d> &vertex,
+                       Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
+                       int &nears,              // number of ears found
+                       Array1D_int &r_vertices, // number of reflex vertices (>180) possible
+                       int &nrverts,            // number of reflex vertices found (>=180)
+                       Array1D_int &c_vertices, // number of convex vertices
+                       int &ncverts,            // number of convex vertices found (< 180)
+                       Array1D_bool &removed,   // array that shows if a vertex has been removed (calling routine)
+                       Array1D_int &earvert,    // vertex indicators for first ear
+                       Array1D<Real64> &rangles)
     {
 
         // Subroutine information:
@@ -567,19 +555,18 @@ namespace DXFEarClipping {
         // na
 
         // Argument array dimensioning
-        vertex.dim(nvert);
-        ears.dim(nvert);
-        r_vertices.dim(nvert);
-        c_vertices.dim(nvert);
-        removed.dim(nvert);
-        earvert.dim(3);
-        rangles.dim(nvert);
+        EP_SIZE_CHECK(vertex, nvert);
+        EP_SIZE_CHECK(ears, nvert);
+        EP_SIZE_CHECK(r_vertices, nvert);
+        EP_SIZE_CHECK(c_vertices, nvert);
+        EP_SIZE_CHECK(removed, nvert);
+        EP_SIZE_CHECK(earvert, 3);
+        EP_SIZE_CHECK(rangles, nvert);
 
         // Locals
         // Subroutine argument definitions:
 
         // Subroutine parameter definitions:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // Interface block specifications:
         // na
@@ -678,19 +665,19 @@ namespace DXFEarClipping {
                     earvert(3) = evert;
                 }
                 if (trackit) {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << "ear=" << nears << " triangle=" << svert << mvert << evert;
+                    print(ioFiles.debug, "ear={} triangle={:12}{:12}{:12}\n", nears, svert, mvert, evert);
                 }
             }
         }
     }
 
     void CalcWallCoordinateTransformation(int const nsides,
-                                          Array1A<Vector> polygon,
+                                          Array1D<Vector> &polygon,
                                           Real64 const surfazimuth,
                                           Real64 const EP_UNUSED(surftilt), // unused1208
-                                          Array1A<Real64> xvt,
-                                          Array1A<Real64> yvt,
-                                          Array1A<Real64> zvt)
+                                          Array1D<Real64> &xvt,
+                                          Array1D<Real64> &yvt,
+                                          Array1D<Real64> &zvt)
     {
 
         // Subroutine information:
@@ -713,10 +700,10 @@ namespace DXFEarClipping {
         // na
 
         // Argument array dimensioning
-        polygon.dim(nsides);
-        xvt.dim(nsides);
-        yvt.dim(nsides);
-        zvt.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
+        EP_SIZE_CHECK(xvt, nsides);
+        EP_SIZE_CHECK(yvt, nsides);
+        EP_SIZE_CHECK(zvt, nsides);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -749,12 +736,12 @@ namespace DXFEarClipping {
     }
 
     void CalcRfFlrCoordinateTransformation(int const nsides,
-                                           Array1A<Vector> polygon,
+                                           Array1D<Vector> &polygon,
                                            Real64 const EP_UNUSED(surfazimuth), // unused1208
                                            Real64 const surftilt,
-                                           Array1A<Real64> xvt,
-                                           Array1A<Real64> yvt,
-                                           Array1A<Real64> zvt)
+                                           Array1D<Real64> &xvt,
+                                           Array1D<Real64> &yvt,
+                                           Array1D<Real64> &zvt)
     {
 
         // Subroutine information:
@@ -777,10 +764,10 @@ namespace DXFEarClipping {
         // na
 
         // Argument array dimensioning
-        polygon.dim(nsides);
-        xvt.dim(nsides);
-        yvt.dim(nsides);
-        zvt.dim(nsides);
+        EP_SIZE_CHECK(polygon, nsides);
+        EP_SIZE_CHECK(xvt, nsides);
+        EP_SIZE_CHECK(yvt, nsides);
+        EP_SIZE_CHECK(zvt, nsides);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

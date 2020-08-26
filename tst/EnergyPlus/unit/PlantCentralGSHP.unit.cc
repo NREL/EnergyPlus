@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/PlantCentralGSHP.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -65,9 +65,8 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Allocate One Wrapper with One module (=distinct ChillerHeaterPerformance:Electric:EIR)
     // but with a number of identical number module of 2 in CentralHeatPumpSystem
     int NumWrappers = 1;
-    PlantCentralGSHP::NumWrappers = NumWrappers;
+    PlantCentralGSHP::numWrappers = NumWrappers;
     PlantCentralGSHP::Wrapper.allocate(NumWrappers);
-    PlantCentralGSHP::WrapperReport.allocate(NumWrappers);
 
     int NumberOfComp = 1;
     PlantCentralGSHP::Wrapper(1).NumOfComp = NumberOfComp;
@@ -78,14 +77,12 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     PlantCentralGSHP::Wrapper(1).WrapperComp(1).CHSchedPtr = DataGlobals::ScheduleAlwaysOn;
     PlantCentralGSHP::Wrapper(1).ChillerHeaterNums = 2;
     PlantCentralGSHP::Wrapper(1).ChillerHeater.allocate(2);
-    PlantCentralGSHP::Wrapper(1).ChillerHeaterReport.allocate(2);
     // First test in SizeWrapper, so need to set that
     PlantCentralGSHP::Wrapper(1).ControlMode = PlantCentralGSHP::SmartMixing;
 
     int NumChillerHeaters = 1;
-    PlantCentralGSHP::NumChillerHeaters = NumChillerHeaters;
+    PlantCentralGSHP::numChillerHeaters = NumChillerHeaters;
     PlantCentralGSHP::ChillerHeater.allocate(NumChillerHeaters);
-    PlantCentralGSHP::ChillerHeaterReport.allocate(NumChillerHeaters);
     PlantCentralGSHP::ChillerHeater(1).ConstantFlow = false;
     PlantCentralGSHP::ChillerHeater(1).VariableFlow = true;
     PlantCentralGSHP::ChillerHeater(1).CondenserType = PlantCentralGSHP::WaterCooled;
@@ -102,8 +99,8 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     PlantCentralGSHP::ChillerHeater(1).CondVolFlowRateWasAutoSized = true;
 
     // Needed for calcs
-    PlantCentralGSHP::ChillerHeater(1).RefCOPCooling =  1.5;
-    PlantCentralGSHP::ChillerHeater(1).OpenMotorEff =  0.98;
+    PlantCentralGSHP::ChillerHeater(1).RefCOPCooling = 1.5;
+    PlantCentralGSHP::ChillerHeater(1).OpenMotorEff = 0.98;
     PlantCentralGSHP::ChillerHeater(1).TempRefCondInCooling = 29.4;
     PlantCentralGSHP::ChillerHeater(1).ClgHtgToCoolingCapRatio = 0.74;
     PlantCentralGSHP::ChillerHeater(1).ClgHtgtoCogPowerRatio = 1.38;
@@ -111,13 +108,9 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Add the References onto the wrapper
     PlantCentralGSHP::Wrapper(1).ChillerHeater(1) = PlantCentralGSHP::ChillerHeater(1);
     PlantCentralGSHP::Wrapper(1).ChillerHeater(2) = PlantCentralGSHP::ChillerHeater(1);
-    PlantCentralGSHP::Wrapper(1).ChillerHeaterReport(1) = PlantCentralGSHP::ChillerHeaterReport(1);
-    PlantCentralGSHP::Wrapper(1).ChillerHeaterReport(2) = PlantCentralGSHP::ChillerHeaterReport(1);
 
     // De-allocate temporary arrays (happens in GetInput too...)
-    PlantCentralGSHP::ChillerHeaterReport.deallocate();
     PlantCentralGSHP::ChillerHeater.deallocate();
-
 
     DataPlant::PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(2);
@@ -144,22 +137,21 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Assign to the wrapper
     PlantCentralGSHP::Wrapper(1).GLHELoopNum = PltSizCondNum;
 
-
     // Calculate expected values
-    Real64 rho_evap = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PltSizNum).FluidName ,
+    Real64 rho_evap = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PltSizNum).FluidName,
                                                         DataGlobals::CWInitConvTemp,
                                                         DataPlant::PlantLoop(PltSizNum).FluidIndex,
-                                                       "ChillerHeater_Autosize_TEST");
+                                                        "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_evap = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PltSizNum).FluidName,
                                                             DataGlobals::CWInitConvTemp,
                                                             DataPlant::PlantLoop(PltSizNum).FluidIndex,
                                                             "ChillerHeater_Autosize_TEST");
 
-    Real64 rho_cond = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PltSizCondNum).FluidName ,
+    Real64 rho_cond = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(PltSizCondNum).FluidName,
                                                         DataGlobals::CWInitConvTemp,
                                                         DataPlant::PlantLoop(PltSizCondNum).FluidIndex,
-                                                       "ChillerHeater_Autosize_TEST");
+                                                        "ChillerHeater_Autosize_TEST");
 
     Real64 Cp_cond = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(PltSizCondNum).FluidName,
                                                             PlantCentralGSHP::Wrapper(1).ChillerHeater(1).TempRefCondInCooling,
@@ -171,16 +163,16 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     // Flow is multiplied by the SizFac
     Real64 EvapVolFlowRateExpected = DataSizing::PlantSizData(PltSizNum).DesVolFlowRate * PlantCentralGSHP::Wrapper(1).ChillerHeater(1).SizFac;
 
-    Real64 RefCapCoolingExpected = rho_evap * Cp_evap * EvapVolFlowRateExpected *  DataSizing::PlantSizData(PltSizNum).DeltaT;
+    Real64 RefCapCoolingExpected = rho_evap * Cp_evap * EvapVolFlowRateExpected * DataSizing::PlantSizData(PltSizNum).DeltaT;
 
-    Real64 CondVolFlowRateExpected = RefCapCoolingExpected *
-        (1.0 + (1.0 / PlantCentralGSHP::Wrapper(1).ChillerHeater(1).RefCOPCooling) *
-            PlantCentralGSHP::Wrapper(1).ChillerHeater(1).OpenMotorEff) /
+    Real64 CondVolFlowRateExpected =
+        RefCapCoolingExpected *
+        (1.0 + (1.0 / PlantCentralGSHP::Wrapper(1).ChillerHeater(1).RefCOPCooling) * PlantCentralGSHP::Wrapper(1).ChillerHeater(1).OpenMotorEff) /
         (rho_cond * Cp_cond * DataSizing::PlantSizData(PltSizCondNum).DeltaT);
 
     // now call sizing routine
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    PlantCentralGSHP::SizeWrapper(1);
+    PlantCentralGSHP::Wrapper(1).SizeWrapper();
 
     // Careful of actually using PlantCentralGSHP::Wrapper(1).ChillerHeater(1) and not PlantCentralGSHP::ChillerHeater since this array isn't used
     // anymore by the module
@@ -196,8 +188,8 @@ TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
     EXPECT_DOUBLE_EQ(RefCapClgHtgExpected, PlantCentralGSHP::Wrapper(1).ChillerHeater(1).RefCapClgHtg);
 
     // Heating Power: Calc cooling Power = Cap / COP, and multiply by ratio
-    Real64 RefPowerClgHtgExpected = (RefCapCoolingExpected / PlantCentralGSHP::Wrapper(1).ChillerHeater(1).RefCOPCooling)
-                                  * PlantCentralGSHP::Wrapper(1).ChillerHeater(1).ClgHtgtoCogPowerRatio;
+    Real64 RefPowerClgHtgExpected = (RefCapCoolingExpected / PlantCentralGSHP::Wrapper(1).ChillerHeater(1).RefCOPCooling) *
+                                    PlantCentralGSHP::Wrapper(1).ChillerHeater(1).ClgHtgtoCogPowerRatio;
     EXPECT_DOUBLE_EQ(RefPowerClgHtgExpected, PlantCentralGSHP::Wrapper(1).ChillerHeater(1).RefPowerClgHtg);
 
     // Heating COP = Heating Cap / Heating Power

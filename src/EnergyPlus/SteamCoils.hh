@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SteamCoils {
 
@@ -183,7 +185,7 @@ namespace SteamCoils {
 
     // Functions
 
-    void SimulateSteamCoilComponents(std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq = _, // coil load to be met
@@ -199,9 +201,9 @@ namespace SteamCoils {
 
     // Beginning Initialization Section of the Module
 
-    void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration);
+    void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
-    void SizeSteamCoil(int const CoilNum);
+    void SizeSteamCoil(EnergyPlusData &state, int const CoilNum);
 
     // End Initialization Section of the Module
 
@@ -279,7 +281,7 @@ namespace SteamCoils {
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );

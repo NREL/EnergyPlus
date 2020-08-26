@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,20 +52,20 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataAirLoop.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataContaminantBalance.hh>
-#include <DataConvergParams.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <FluidProperties.hh>
-#include <HVACInterfaceManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -115,8 +115,6 @@ namespace HVACInterfaceManager {
 
     // MODULE VARIABLE DECLARATIONS:
     bool CommonPipeSetupFinished(false);
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
 
     // Object Data
     Array1D<CommonPipeData> PlantCommonPipe;
@@ -392,7 +390,7 @@ namespace HVACInterfaceManager {
     //***************
 
     // In-Place Right Shift by 1 of Array Elements
-    void rshift1(Array1<Real64> &a)
+    void rshift1(Array1D<Real64> &a)
     {
         assert(a.size_bounded());
         for (int i = a.u(), e = a.l(); i > e; --i) {
@@ -691,13 +689,23 @@ namespace HVACInterfaceManager {
 
         } else { // tank has mass
             if (MassFlowRate > 0.0) {
-                TankFinalTemp = (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                    std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds) +
-                                (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp);
-                TankAverageTemp = ((ThisTankMass * Cp) / (MassFlowRate * Cp) *
-                                       (LastTankOutletTemp - (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp)) *
-                                       (1.0 - std::exp(-(MassFlowRate * Cp) / (ThisTankMass * Cp) * TimeStepSeconds)) / TimeStepSeconds +
-                                   (MassFlowRate * Cp * TankInletTemp + PumpHeat) / (MassFlowRate * Cp));
+                Real64 const mdotCp = MassFlowRate * Cp;
+                Real64 const mdotCpTempIn = mdotCp * TankInletTemp;
+                Real64 const tankMassCp = ThisTankMass * Cp;
+                Real64 const ExponentTerm = mdotCp / tankMassCp * TimeStepSeconds;
+                if (ExponentTerm >= 700.0) {
+                    TankFinalTemp = (mdotCp * TankInletTemp + PumpHeat) / mdotCp;
+
+                    TankAverageTemp = (tankMassCp / mdotCp * (LastTankOutletTemp - (mdotCpTempIn + PumpHeat) / mdotCp) / TimeStepSeconds +
+                                       (mdotCpTempIn + PumpHeat) / mdotCp);
+                } else {
+                    TankFinalTemp = (LastTankOutletTemp - (mdotCpTempIn + PumpHeat) / mdotCp) * std::exp(-ExponentTerm) +
+                                    (mdotCpTempIn + PumpHeat) / (MassFlowRate * Cp);
+
+                    TankAverageTemp = (tankMassCp / mdotCp * (LastTankOutletTemp - (mdotCpTempIn + PumpHeat) / mdotCp) *
+                                           (1.0 - std::exp(-ExponentTerm)) / TimeStepSeconds +
+                                       (mdotCpTempIn + PumpHeat) / mdotCp);
+                }
             } else {
                 TankFinalTemp = PumpHeat / (ThisTankMass * Cp) * TimeStepSeconds + LastTankOutletTemp;
                 TankAverageTemp = (TankFinalTemp + LastTankOutletTemp) / 2.0;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,32 +53,32 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataConvergParams.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <EMSManager.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PlantPressureSystem.hh>
-#include <PlantUtilities.hh>
-#include <Pumps.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantPressureSystem.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Pumps.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -190,7 +190,8 @@ namespace Pumps {
         PumpUniqueNames.clear();
     }
 
-    void SimPumps(std::string const &PumpName, // Name of pump to be managed
+    void SimPumps(BranchInputManagerData &dataBranchInputManager,
+                  std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
                   bool &PumpRunning,           // .TRUE. if the loop pump is actually operating
@@ -254,7 +255,7 @@ namespace Pumps {
         }
 
         // Perform one-time and begin-environment initialization
-        InitializePumps(PumpNum);
+        InitializePumps(dataBranchInputManager, PumpNum);
 
         // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
         if (PlantLoop(LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).FlowLock == FlowPumpQuery) {
@@ -1083,19 +1084,19 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PumpType == Pump_VarSpeed || PumpEquip(PumpNum).PumpType == Pump_ConSpeed ||
                 PumpEquip(PumpNum).PumpType == Pump_Cond) {
 
-                SetupOutputVariable("Pump Electric Energy",
+                SetupOutputVariable("Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquip(PumpNum).Energy,
                                     "System",
                                     "Sum",
                                     PumpEquip(PumpNum).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Pumps",
                                     PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
-                    "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
+                    "Pump Electricity Rate", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable(
                     "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport(PumpNum).ShaftPower, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable("Pump Fluid Heat Gain Rate",
@@ -1126,19 +1127,19 @@ namespace Pumps {
             if (PumpEquip(PumpNum).PumpType == PumpBank_VarSpeed ||
                 PumpEquip(PumpNum).PumpType == PumpBank_ConSpeed) { // CurrentModuleObject='HeaderedPumps'
 
-                SetupOutputVariable("Pump Electric Energy",
+                SetupOutputVariable("Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     PumpEquip(PumpNum).Energy,
                                     "System",
                                     "Sum",
                                     PumpEquip(PumpNum).Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Pumps",
                                     PumpEquip(PumpNum).EndUseSubcategoryName,
                                     "Plant");
                 SetupOutputVariable(
-                    "Pump Electric Power", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
+                    "Pump Electricity Rate", OutputProcessor::Unit::W, PumpEquip(PumpNum).Power, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable(
                     "Pump Shaft Power", OutputProcessor::Unit::W, PumpEquipReport(PumpNum).ShaftPower, "System", "Average", PumpEquip(PumpNum).Name);
                 SetupOutputVariable("Pump Fluid Heat Gain Rate",
@@ -1224,41 +1225,41 @@ namespace Pumps {
                                               "Pump:VariableSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_VarSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == Pump_ConSpeed) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "Pump:ConstantSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_ConSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == Pump_Cond) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "Pump:VariableSpeed:Condensate",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_Pump_Cond,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == PumpBank_VarSpeed) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "HeaderedPumps:VariableSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_PumpBank_VarSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     } else if (SELECT_CASE_var == PumpBank_ConSpeed) {
                         SetupZoneInternalGain(PumpEquip(PumpNum).ZoneNum,
                                               "HeaderedPumps:ConstantSpeed",
                                               PumpEquip(PumpNum).Name,
                                               IntGainTypeOf_PumpBank_ConSpeed,
-                                              PumpEquipReport(PumpNum).ZoneConvGainRate,
-                                              _,
-                                              PumpEquipReport(PumpNum).ZoneRadGainRate);
+                                              &PumpEquipReport(PumpNum).ZoneConvGainRate,
+                                              nullptr,
+                                              &PumpEquipReport(PumpNum).ZoneRadGainRate);
                     }
                 }
             }
@@ -1269,7 +1270,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void InitializePumps(int const PumpNum)
+    void InitializePumps(BranchInputManagerData &dataBranchInputManager, int const PumpNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1330,7 +1331,8 @@ namespace Pumps {
         if (PumpEquip(PumpNum).PumpOneTimeFlag) {
 
             errFlag = false;
-            ScanPlantLoopsForObject(PumpEquip(PumpNum).Name,
+            ScanPlantLoopsForObject(dataBranchInputManager,
+                                    PumpEquip(PumpNum).Name,
                                     PumpEquip(PumpNum).TypeOf_Num,
                                     PumpEquip(PumpNum).LoopNum,
                                     PumpEquip(PumpNum).LoopSideNum,

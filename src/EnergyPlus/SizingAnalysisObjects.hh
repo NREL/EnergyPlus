@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,9 +54,11 @@
 #include <vector>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    void SizingAnalysisObjects_clear_state();
 
 class SystemTimestepObject
 {
@@ -182,7 +184,7 @@ public:
 
     PlantCoinicidentAnalysis(std::string loopName, int loopIndex, int nodeNum, Real64 density, Real64 cp, int numStepsInAvg, int sizingIndex);
 
-    void ResolveDesignFlowRate(int const HVACSizingIterCount);
+    void ResolveDesignFlowRate(IOFiles &ioFiles, int const HVACSizingIterCount);
 
 private:
     std::string name = "";                // name of analysis object

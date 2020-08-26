@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.2;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -12,7 +12,7 @@
     ExampleForRVI,           !- Name
     0,                       !- North Axis {deg}
     Country,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -37,8 +37,9 @@
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWING CALCULATIONS ===========
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    20;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20;                      !- Shading Calculation Update Frequency
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE VOLUME CAPACITANCE MULTIPLIER ===========
 
@@ -298,7 +299,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    WorldCoordinateSystem;   !- Coordinate System
+    World;                   !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER ===========
 
@@ -1017,7 +1018,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZONE ONE,        !- Name
@@ -1204,12 +1210,12 @@
   ZoneHVAC:EquipmentList,
     ZONE ONE Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZONE ONE Direct Air,     !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZONE ONE Direct Air ADU, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FURNACE:HEATCOOL ===========
 
@@ -1235,11 +1241,23 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: DIRECT AIR ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZONE ONE Direct Air,     !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    ZONE ONE Supply Inlet,   !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ZONE ONE Supply Inlet ATInlet,  !- Air Inlet Node Name
+    ZONE ONE Supply Inlet,   !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZONE ONE Direct Air ADU, !- Name
+    ZONE ONE Supply Inlet,   !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZONE ONE Direct Air,     !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE CONTROL:THERMOSTATIC ===========
 ! Student Exercise 2
@@ -1297,7 +1315,7 @@
   AirLoopHVAC:ZoneSplitter,
     AHU 1 Zone Splitter,     !- Name
     AHU 1 Zone Equip Inlet,  !- Inlet Node Name
-    ZONE ONE Supply Inlet;   !- Outlet 1 Node Name
+    ZONE ONE Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
 
@@ -1371,61 +1389,61 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,Monthly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Monthly;
+  Output:Variable,*,Cooling Coil Electricity Energy,Monthly;
 
-  Output:Variable,*,Fan Electric Energy,Monthly;
+  Output:Variable,*,Fan Electricity Energy,Monthly;
 
   Output:Variable,*,Zone Air Temperature,Monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Timestep;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Daily;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil Gas Energy,Monthly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Annual;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Annual;
 
-  Output:Variable,*,Heating Coil Electric Energy,Timestep;
+  Output:Variable,*,Heating Coil Electricity Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Electric Energy,Hourly;
+  Output:Variable,*,Heating Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Daily;
+  Output:Variable,*,Heating Coil Electricity Energy,Daily;
 
-  Output:Variable,*,Heating Coil Electric Energy,Monthly;
+  Output:Variable,*,Heating Coil Electricity Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Annual;
+  Output:Variable,*,Heating Coil Electricity Energy,Annual;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Timestep;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Daily;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Annual;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,Timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Hourly;
+  Output:Variable,*,Cooling Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Daily;
+  Output:Variable,*,Cooling Coil Electricity Energy,Daily;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Monthly;
+  Output:Variable,*,Cooling Coil Electricity Energy,Monthly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Annual;
+  Output:Variable,*,Cooling Coil Electricity Energy,Annual;
 
-  Output:Variable,*,Fan Electric Energy,Timestep;
+  Output:Variable,*,Fan Electricity Energy,Timestep;
 
-  Output:Variable,*,Fan Electric Energy,Hourly;
+  Output:Variable,*,Fan Electricity Energy,Hourly;
 
-  Output:Variable,*,Fan Electric Energy,Daily;
+  Output:Variable,*,Fan Electricity Energy,Daily;
 
-  Output:Variable,*,Fan Electric Energy,Monthly;
+  Output:Variable,*,Fan Electricity Energy,Monthly;
 
-  Output:Variable,*,Fan Electric Energy,Annual;
+  Output:Variable,*,Fan Electricity Energy,Annual;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Daily;
 
@@ -1545,11 +1563,11 @@
 
   Output:Meter,Electricity:Facility,Monthly;
 
-  Output:Meter,Heating:Gas,Monthly;
+  Output:Meter,Heating:NaturalGas,Monthly;
 
-  Output:Meter,Gas:HVAC,Monthly;
+  Output:Meter,NaturalGas:HVAC,Monthly;
 
-  Output:Meter,Gas:Facility,Monthly;
+  Output:Meter,NaturalGas:Facility,Monthly;
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT ===========
 

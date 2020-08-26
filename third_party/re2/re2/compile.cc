@@ -695,7 +695,7 @@ static struct ByteRangeProg {
 
 void Compiler::Add_80_10ffff() {
   int inst[arraysize(prog_80_10ffff)] = { 0 }; // does not need to be initialized; silences gcc warning
-  for (int i = 0; i < arraysize(prog_80_10ffff); i++) {
+  for (size_t i = 0; i < arraysize(prog_80_10ffff); i++) {
     const ByteRangeProg& p = prog_80_10ffff[i];
     int next = 0;
     if (p.next >= 0)
@@ -1202,7 +1202,10 @@ Prog* Compiler::Finish() {
   if (max_mem_ <= 0) {
     prog_->set_dfa_mem(1<<20);
   } else {
-    int64_t m = max_mem_ - sizeof(Prog) - prog_->size_*sizeof(Prog::Inst);
+    int64_t m = max_mem_ - sizeof(Prog);
+    m -= prog_->size_*sizeof(Prog::Inst);  // account for inst_
+    if (prog_->CanBitState())
+      m -= prog_->size_*sizeof(uint16_t);  // account for list_heads_
     if (m < 0)
       m = 0;
     prog_->set_dfa_mem(m);

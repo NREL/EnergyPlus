@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,21 +52,22 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <EMSManager.hh>
-#include <FluidProperties.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantLoadProfile.hh>
-#include <PlantUtilities.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantLoadProfile.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -121,12 +122,12 @@ namespace PlantLoadProfile {
         return nullptr;
     }
 
-    void PlantProfileData::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void PlantProfileData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitPlantProfile();
+        this->InitPlantProfile(state.dataBranchInputManager);
     }
 
-    void PlantProfileData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PlantProfileData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool const EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool const EP_UNUSED(RunFlag))
@@ -157,7 +158,7 @@ namespace PlantLoadProfile {
         static std::string const RoutineName("SimulatePlantProfile");
         Real64 DeltaTemp;
 
-        this->InitPlantProfile();
+        this->InitPlantProfile(state.dataBranchInputManager);
 
         if (this->MassFlowRate > 0.0) {
             Real64 Cp =
@@ -175,7 +176,7 @@ namespace PlantLoadProfile {
 
     } // simulate()
 
-    void PlantProfileData::InitPlantProfile()
+    void PlantProfileData::InitPlantProfile(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -213,7 +214,7 @@ namespace PlantLoadProfile {
         if (this->SetLoopIndexFlag) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(
+                ScanPlantLoopsForObject(dataBranchInputManager,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");
@@ -372,7 +373,7 @@ namespace PlantLoadProfile {
 
         // Locals
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int IOStatus;                   // Used in GetObjectItem
         int NumAlphas;                  // Number of Alphas for each GetObjectItem call
         int NumNumbers;                 // Number of Numbers for each GetObjectItem call

@@ -17,7 +17,7 @@
   Output:SQLite,
     Simple;                  !- Option Type
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -25,7 +25,7 @@
     CTF TEST ZONES,          !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     3.9999999E-02,           !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     35,                      !- Maximum Number of Warmup Days

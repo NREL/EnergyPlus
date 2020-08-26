@@ -82,7 +82,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -90,7 +90,7 @@
     BUILDING WITH MANY SHADING EFFECTS,  !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -659,12 +659,13 @@
     World;                   !- Coordinate System
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1,                       !- Calculation Frequency
+    Scheduled,               !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1,                       !- Shading Calculation Update Frequency
     ,                        !- Maximum Figures in Shadow Overlap Calculations
     ,                        !- Polygon Clipping Algorithm
+    ,                        !- Pixel Counting Resolution
     ,                        !- Sky Diffuse Modeling Algorithm
-    ScheduledShading,        !- External Shading Calculation Method
     Yes;                     !- Output External Shading Calculation Results
 
   SurfaceProperty:LocalEnvironment,
@@ -680,9 +681,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     2,                       !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -698,9 +699,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     4,                       !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -716,9 +717,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     6,                       !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -734,9 +735,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     8,                       !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -752,9 +753,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     10,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -768,11 +769,11 @@
     ExtShadingSch:ZN004:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    12,                       !- Column Number
+    12,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -786,11 +787,11 @@
     ExtShadingSch:ZN005:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    14,                       !- Column Number
+    14,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -804,11 +805,11 @@
     ExtShadingSch:ZN006:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    16,                       !- Column Number
+    16,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -822,11 +823,11 @@
     ExtShadingSch:ZN007:WALL001:SHADE001,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    18,                       !- Column Number
+    18,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -842,9 +843,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     20,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -860,9 +861,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     22,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -878,9 +879,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     24,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -896,9 +897,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     25,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -914,9 +915,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     26,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -932,9 +933,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     27,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -950,9 +951,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     28,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -968,9 +969,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     29,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -986,9 +987,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     30,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1004,9 +1005,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     31,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1022,9 +1023,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     32,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1040,9 +1041,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     33,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1058,9 +1059,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     34,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1076,9 +1077,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     35,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1094,9 +1095,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     36,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1112,9 +1113,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     37,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1130,9 +1131,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     38,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1148,9 +1149,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     39,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1166,9 +1167,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     40,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1184,9 +1185,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     41,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1202,9 +1203,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     42,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1220,9 +1221,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     43,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1238,9 +1239,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     44,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1256,9 +1257,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     45,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1274,9 +1275,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     46,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1292,9 +1293,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     47,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1310,9 +1311,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     48,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1328,9 +1329,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     49,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1346,9 +1347,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     50,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1364,9 +1365,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     51,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1382,9 +1383,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     52,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1400,9 +1401,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     53,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1418,9 +1419,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     54,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1436,9 +1437,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     55,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1454,9 +1455,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     56,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1472,9 +1473,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     57,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1490,9 +1491,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     58,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1508,9 +1509,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     59,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1526,9 +1527,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     60,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1544,9 +1545,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     61,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1562,9 +1563,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     62,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1580,9 +1581,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     63,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1598,9 +1599,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     64,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1616,9 +1617,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     65,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1634,9 +1635,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     66,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1652,9 +1653,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     67,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1670,9 +1671,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     68,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1688,9 +1689,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     69,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1706,9 +1707,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     70,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1724,9 +1725,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     71,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1742,9 +1743,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     72,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1760,9 +1761,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     73,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1778,9 +1779,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     74,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1796,9 +1797,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     75,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1814,9 +1815,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     76,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1832,9 +1833,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     77,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1850,9 +1851,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     78,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1868,9 +1869,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     79,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1886,9 +1887,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     80,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1904,9 +1905,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     81,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1922,9 +1923,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     82,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1940,9 +1941,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     83,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1958,9 +1959,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     84,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1976,9 +1977,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     85,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -1994,9 +1995,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     86,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2012,9 +2013,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     87,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2030,9 +2031,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     88,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2048,9 +2049,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     89,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2066,9 +2067,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     90,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2084,9 +2085,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     91,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2102,9 +2103,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     92,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2120,9 +2121,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     93,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2138,9 +2139,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     94,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2156,9 +2157,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     95,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2174,9 +2175,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     96,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2192,9 +2193,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     97,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2210,9 +2211,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     98,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2228,9 +2229,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     99,                      !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2246,9 +2247,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     100,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2262,11 +2263,11 @@
     ExtShadingSch:ZN008:WALL004,  !- Name
     Fraction,                !- Schedule Type Limits Name
     SolarShadingTest_Shading_Data.csv,  !- File Name
-    101,                      !- Column Number
+    101,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2282,9 +2283,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     102,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2300,9 +2301,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     103,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2318,9 +2319,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     104,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2336,9 +2337,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     105,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2354,9 +2355,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     106,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2372,9 +2373,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     107,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2390,9 +2391,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     108,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2408,9 +2409,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     109,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2426,9 +2427,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     110,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2444,9 +2445,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     111,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2462,9 +2463,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     112,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2480,9 +2481,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     113,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   SurfaceProperty:LocalEnvironment,
@@ -2498,9 +2499,9 @@
     SolarShadingTest_Shading_Data.csv,  !- File Name
     114,                     !- Column Number
     1,                       !- Rows to Skip at Top
-    ,
-    ,
-    ,
+    ,                        !- Number of Hours of Data
+    ,                        !- Column Separator
+    ,                        !- Interpolate to Timestep
     15;                      !- Minutes per Item
 
   Shading:Site:Detailed,
@@ -4118,8 +4119,8 @@
     ZONE 1 @ 200 601 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 1 @ 200 601 0 T PURCHASED AIR,  !- Name
@@ -4195,8 +4196,8 @@
     ZONE 2 @ 200 200 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 2 @ 200 200 0 T PURCHASED AIR,  !- Name
@@ -4272,8 +4273,8 @@
     ZONE 3 @ 200 610 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 3 @ 200 610 0 T PURCHASED AIR,  !- Name
@@ -4349,8 +4350,8 @@
     ZONE 4 @ 200 600 0 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 4 @ 200 600 0 T PURCHASED AIR,  !- Name
@@ -4426,8 +4427,8 @@
     ZONE 5 @ 200 601 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 5 @ 200 601 1 T PURCHASED AIR,  !- Name
@@ -4503,8 +4504,8 @@
     ZONE 6 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 6 @ 200 200 1 T PURCHASED AIR,  !- Name
@@ -4580,8 +4581,8 @@
     ZONE 7 @ 200 610 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 7 @ 200 610 1 T PURCHASED AIR,  !- Name
@@ -4657,8 +4658,8 @@
     ZONE 8 @ 200 200 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 8 @ 200 200 1 T PURCHASED AIR,  !- Name
@@ -4734,8 +4735,8 @@
     ZONE 9 @ 200 600 1 T PURCHASED AIR,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 9 @ 200 600 1 T PURCHASED AIR,  !- Name
@@ -4809,3 +4810,4 @@
   Output:Meter:MeterFileOnly,DistrictCooling:Facility,runperiod;
 
   Output:Surfaces:List,Details;
+

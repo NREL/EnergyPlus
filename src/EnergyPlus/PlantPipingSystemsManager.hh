@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,12 +59,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
     namespace PlantPipingSystemsManager {
 
@@ -636,9 +638,9 @@ namespace EnergyPlus {
 
             void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
-            static PlantComponent *factory(int objectType, std::string objectName);
+            static PlantComponent *factory(EnergyPlusData &state, int, std::string objectName);
 
-            void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+            void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                           bool RunFlag) override;
 
             bool operator==(std::string const & a) {
@@ -911,7 +913,7 @@ namespace EnergyPlus {
 
             void PerformIterationLoop(Circuit * thisCircuit);
 
-            void InitPipingSystems(Circuit * thisCircuit);
+            void InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit);
 
             void UpdatePipingSystems(Circuit * thisCircuit);
 
@@ -926,26 +928,34 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void SimulateGroundDomains(bool initOnly);
+        void SimulateGroundDomains(EnergyPlusData &state, bool initOnly);
 
         void CheckIfAnySlabs();
 
-        void CheckIfAnyBasements();
+        void CheckIfAnyBasements(EnergyPlusData &EP_UNUSED(state));
 
-        void GetPipingSystemsAndGroundDomainsInput();
+        void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state);
 
-        void ReadGeneralDomainInputs(int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
+        void ReadGeneralDomainInputs(EnergyPlusData &state, const int IndexStart, const int NumGeneralizedDomains, bool &ErrorsFound);
 
-        void ReadZoneCoupledDomainInputs(int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
+        void ReadZoneCoupledDomainInputs(EnergyPlusData &state, const int StartingDomainNumForZone, const int NumZoneCoupledDomains, bool &ErrorsFound);
 
-        void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
+        void ReadBasementInputs(EnergyPlusData &state, const int StartingDomainNumForBasement, const int NumBasements, bool &ErrorsFound);
+
+        bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
+                                            int const MaterialNum);
+
+        void SiteGroundDomainNoMassMatError(std::string const &FieldName,
+                                            std::string const &UserInputField,
+                                            std::string const &ObjectName);
 
         void ReadPipeCircuitInputs(bool &ErrorsFound);
 
         void ReadPipeSegmentInputs(bool &ErrorsFound);
 
-        void ReadHorizontalTrenchInputs(int StartingDomainNumForHorizontal,
-                                        int StartingCircuitNumForHorizontal,
+        void ReadHorizontalTrenchInputs(EnergyPlusData &state,
+                                        const int StartingDomainNumForHorizontal,
+                                        const int StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound);
 
         void SetupPipingSystemOutputVariables();

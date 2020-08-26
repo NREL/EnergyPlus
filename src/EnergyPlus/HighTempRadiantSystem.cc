@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,26 +53,29 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <HighTempRadiantSystem.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -159,6 +162,11 @@ namespace HighTempRadiantSystem {
     // Object Data
     Array1D<HighTempRadiantSystemData> HighTempRadSys;
     Array1D<HighTempRadSysNumericFieldData> HighTempRadSysNumericFields;
+    bool GetInputFlag(true);
+    bool firstTime(true); // For one-time initializations
+    bool MyEnvrnFlag(true);
+    bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+
 
     // Functions
     void clear_state()
@@ -174,9 +182,13 @@ namespace HighTempRadiantSystem {
         CheckEquipName.deallocate();
         HighTempRadSys.deallocate();
         HighTempRadSysNumericFields.deallocate();
+        GetInputFlag = true;
+        firstTime = true;
+        MyEnvrnFlag = true;
+        ZoneEquipmentListChecked = false;
     }
 
-    void SimHighTempRadiantSystem(std::string const &CompName,   // name of the low temperature radiant system
+    void SimHighTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   Real64 &LoadMet,               // load met by the radiant system, in Watts
                                   int &CompIndex)
@@ -200,7 +212,6 @@ namespace HighTempRadiantSystem {
         using General::TrimSigDigits;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true); // First time, input is "gotten"
         bool ErrorsFoundInGet;          // Set to true when there are severe errors during the Get routine
         int RadSysNum;                  // Radiant system number/index in local derived types
 
@@ -234,18 +245,18 @@ namespace HighTempRadiantSystem {
             }
         }
 
-        InitHighTempRadiantSystem(FirstHVACIteration, RadSysNum);
+        InitHighTempRadiantSystem(state, FirstHVACIteration, RadSysNum);
 
         {
             auto const SELECT_CASE_var(HighTempRadSys(RadSysNum).ControlType);
             if ((SELECT_CASE_var == MATControl) || (SELECT_CASE_var == MRTControl) || (SELECT_CASE_var == OperativeControl)) {
                 CalcHighTempRadiantSystem(RadSysNum);
             } else if ((SELECT_CASE_var == MATSPControl) || (SELECT_CASE_var == MRTSPControl) || (SELECT_CASE_var == OperativeSPControl)) {
-                CalcHighTempRadiantSystemSP(FirstHVACIteration, RadSysNum);
+                CalcHighTempRadiantSystemSP(state, FirstHVACIteration, RadSysNum);
             }
         }
 
-        UpdateHighTempRadiantSystem(RadSysNum, LoadMet);
+        UpdateHighTempRadiantSystem(state, RadSysNum, LoadMet);
 
         ReportHighTempRadiantSystem(RadSysNum);
     }
@@ -274,7 +285,6 @@ namespace HighTempRadiantSystem {
         using DataSizing::CapacityPerFloorArea;
         using DataSizing::FractionOfAutosizedHeatingCapacity;
         using DataSizing::HeatingDesignCapacity;
-        using DataSurfaces::Surface;
         using General::TrimSigDigits;
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
@@ -560,20 +570,13 @@ namespace HighTempRadiantSystem {
             AllFracsSummed = HighTempRadSys(Item).FracDistribPerson;
             for (SurfNum = 1; SurfNum <= HighTempRadSys(Item).TotSurfToDistrib; ++SurfNum) {
                 HighTempRadSys(Item).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 7);
-                HighTempRadSys(Item).SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 7), Surface);
+                HighTempRadSys(Item).SurfacePtr(SurfNum) =
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCurrentModuleObject,
+                                                                       HighTempRadSys(Item).Name,
+                                                                       HighTempRadSys(Item).ZonePtr,
+                                                                       HighTempRadSys(Item).SurfaceName(SurfNum),
+                                                                       ErrorsFound);
                 HighTempRadSys(Item).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 9);
-                // Error trap for surfaces that do not exist or surfaces not in the zone the radiant heater is in
-                if (HighTempRadSys(Item).SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(RoutineName + "Invalid Surface name = " + HighTempRadSys(Item).SurfaceName(SurfNum));
-                    ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                    ErrorsFound = true;
-                } else if (Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).Zone != HighTempRadSys(Item).ZonePtr) {
-                    ShowWarningError("Surface referenced in ZoneHVAC:HighTemperatureRadiant not in same zone as Radiant System, surface=" +
-                                     HighTempRadSys(Item).SurfaceName(SurfNum));
-                    ShowContinueError("Surface is in Zone=" + Zone(Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).Zone).Name +
-                                      " ZoneHVAC:HighTemperatureRadiant in Zone=" + cAlphaArgs(3));
-                    ShowContinueError("Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs(1));
-                }
                 // Error trap for fractions that are out of range
                 if (HighTempRadSys(Item).FracDistribToSurf(SurfNum) < MinFraction) {
                     HighTempRadSys(Item).FracDistribToSurf(SurfNum) = MinFraction;
@@ -587,7 +590,7 @@ namespace HighTempRadiantSystem {
                 }
 
                 if (HighTempRadSys(Item).SurfacePtr(SurfNum) != 0) {
-                    Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
+                    DataSurfaces::Surface(HighTempRadSys(Item).SurfacePtr(SurfNum)).IntConvSurfGetsRadiantHeat = true;
                 }
 
                 AllFracsSummed += HighTempRadSys(Item).FracDistribToSurf(SurfNum);
@@ -639,31 +642,31 @@ namespace HighTempRadiantSystem {
                                 _,
                                 "System");
             if (HighTempRadSys(Item).HeaterType == Gas) {
-                SetupOutputVariable("Zone Radiant HVAC Gas Rate",
+                SetupOutputVariable("Zone Radiant HVAC NaturalGas Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).GasPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Gas Energy",
+                SetupOutputVariable("Zone Radiant HVAC NaturalGas Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).GasEnergy,
                                     "System",
                                     "Sum",
                                     HighTempRadSys(Item).Name,
                                     _,
-                                    "Gas",
+                                    "NaturalGas",
                                     "Heating",
                                     _,
                                     "System");
             } else if (HighTempRadSys(Item).HeaterType == Electric) {
-                SetupOutputVariable("Zone Radiant HVAC Electric Power",
+                SetupOutputVariable("Zone Radiant HVAC Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     HighTempRadSys(Item).ElecPower,
                                     "System",
                                     "Average",
                                     HighTempRadSys(Item).Name);
-                SetupOutputVariable("Zone Radiant HVAC Electric Energy",
+                SetupOutputVariable("Zone Radiant HVAC Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     HighTempRadSys(Item).ElecEnergy,
                                     "System",
@@ -678,7 +681,7 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void InitHighTempRadiantSystem(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitHighTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    int const RadSysNum // Index for the low temperature radiant system under consideration within the derived types
     )
     {
@@ -718,10 +721,7 @@ namespace HighTempRadiantSystem {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool firstTime(true); // For one-time initializations
         int ZoneNum;                 // Intermediate variable for keeping track of the zone number
-        static bool MyEnvrnFlag(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
 
         // FLOW:
@@ -748,7 +748,7 @@ namespace HighTempRadiantSystem {
 
         if (!SysSizingCalc && MySizeFlag(RadSysNum)) {
             // for each radiant systen do the sizing once.
-            SizeHighTempRadiantSystem(RadSysNum);
+            SizeHighTempRadiantSystem(state, RadSysNum);
             MySizeFlag(RadSysNum) = false;
         }
 
@@ -775,7 +775,7 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void SizeHighTempRadiantSystem(int const RadSysNum)
+    void SizeHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -877,7 +877,7 @@ namespace HighTempRadiantSystem {
                 } else {
                     TempSize = HighTempRadSys(RadSysNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 HighTempRadSys(RadSysNum).MaxPowerCapac = TempSize;
                 DataScalableCapSizingON = false;
             }
@@ -980,9 +980,9 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void CalcHighTempRadiantSystemSP(
-        bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
-        int const RadSysNum                       // name of the low temperature radiant system
+    void CalcHighTempRadiantSystemSP(EnergyPlusData &state,
+                                     bool const EP_UNUSED(FirstHVACIteration), // true if this is the first HVAC iteration at this system time step !unused1208
+                                     int const RadSysNum                       // name of the low temperature radiant system
     )
     {
 
@@ -1062,8 +1062,8 @@ namespace HighTempRadiantSystem {
             DistributeHTRadGains();
 
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // First determine whether or not the unit should be on
             // Determine the proper temperature on which to control
@@ -1105,8 +1105,8 @@ namespace HighTempRadiantSystem {
                     DistributeHTRadGains();
 
                     // Now "simulate" the system by recalculating the heat balances
-                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                    HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
                     // Redetermine the current value of the controlling temperature
                     {
@@ -1142,7 +1142,7 @@ namespace HighTempRadiantSystem {
         }
     }
 
-    void UpdateHighTempRadiantSystem(int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void UpdateHighTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                      Real64 &LoadMet      // load met by the radiant system, in Watts
     )
     {
@@ -1199,15 +1199,7 @@ namespace HighTempRadiantSystem {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneNum; // Zone index number for the current radiant system
-        static bool MyEnvrnFlag(true);
 
-        // FLOW:
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            MyEnvrnFlag = false;
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
-        }
         // First, update the running average if necessary...
         if (LastSysTimeElapsed(RadSysNum) == SysTimeElapsed) {
             // Still iterating or reducing system time step, so subtract old values which were
@@ -1232,8 +1224,8 @@ namespace HighTempRadiantSystem {
 
                 // Now "simulate" the system by recalculating the heat balances
                 ZoneNum = HighTempRadSys(RadSysNum).ZonePtr;
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
             }
         }
 

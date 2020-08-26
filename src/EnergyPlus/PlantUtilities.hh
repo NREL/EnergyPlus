@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct BranchInputManagerData;
 
 namespace PlantUtilities {
 
@@ -91,16 +94,12 @@ namespace PlantUtilities {
     Real64 RegulateCondenserCompFlowReqOp(
         int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, Real64 const TentativeFlowRequest);
 
-    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum);
-
     bool AnyPlantSplitterMixerLacksContinuity();
 
     void
     CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration);
 
     void CheckForRunawayPlantTemps(int const LoopNum, int const LoopSideNum);
-
-    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum);
 
     void SetAllFlowLocks(int const Value);
 
@@ -178,9 +177,8 @@ namespace PlantUtilities {
 
     void LogPlantConvergencePoints(bool const FirstHVACIteration);
 
-    bool CheckPlantConvergence(int const ThisLoopNum, int const ThisLoopSide, bool const FirstHVACIteration);
-
-    void ScanPlantLoopsForObject(std::string const &CompName,
+    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+                                 std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,

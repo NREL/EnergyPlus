@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,17 +53,18 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataGenerators.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <GeneratorDynamicsManager.hh>
-#include <PlantUtilities.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataGenerators.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/GeneratorDynamicsManager.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -80,8 +81,6 @@ namespace GeneratorDynamicsManager {
     // MODULE INFORMATION:
     //       AUTHOR        B. Griffith
     //       DATE WRITTEN   July 2006
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // collect routines for managing generator states
@@ -90,44 +89,17 @@ namespace GeneratorDynamicsManager {
     //  given load request data
     //   models requiring calculations across timesteps
 
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
     using namespace DataGenerators;
     using DataGlobals::CurrentTime;
     using DataGlobals::DayOfSim;
     using DataGlobals::HoursInDay;
     using DataGlobals::SecInHour;
-    // <use statements for access to subroutines in other modules>
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
-
-    // Functions
 
     void SetupGeneratorControlStateManager(int const GenNum) // index of generator to setup
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith
         //       DATE WRITTEN   July 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // sets up data structures
@@ -136,71 +108,47 @@ namespace GeneratorDynamicsManager {
         // like a get input routine but feeds from
         //  parent objects, could have its own input object someday
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // get the number of generators that might use this module
-        NumGensWDynamics = NumMicroCHPs; // TODO  + NumFuelCellCGenerators
+        NumGensWDynamics = MicroCHPElectricGenerator::NumMicroCHPs; // TODO  + NumFuelCellCGenerators
 
         if (!allocated(GeneratorDynamics)) {
-            GeneratorDynamics.allocate(NumGensWDynamics);
-        } else {
-            GeneratorDynamics.deallocate();
             GeneratorDynamics.allocate(NumGensWDynamics);
         }
 
         // first populate with Micro CHP data
 
-        // DO GenNum = 1, NumMicroCHPs
-        GeneratorDynamics(GenNum).Name = MicroCHP(GenNum).Name;
-        GeneratorDynamics(GenNum).PelMin = MicroCHP(GenNum).A42Model.MinElecPower;
-        GeneratorDynamics(GenNum).PelMax = MicroCHP(GenNum).A42Model.MaxElecPower;
-        GeneratorDynamics(GenNum).UpTranLimit = MicroCHP(GenNum).A42Model.DeltaPelMax;
-        GeneratorDynamics(GenNum).DownTranLimit = MicroCHP(GenNum).A42Model.DeltaPelMax;
-        GeneratorDynamics(GenNum).UpTranLimitFuel = MicroCHP(GenNum).A42Model.DeltaFuelMdotMax;
-        GeneratorDynamics(GenNum).DownTranLimitFuel = MicroCHP(GenNum).A42Model.DeltaFuelMdotMax;
-        GeneratorDynamics(GenNum).WarmUpByTimeDelay = MicroCHP(GenNum).A42Model.WarmUpByTimeDelay;
-        GeneratorDynamics(GenNum).WarmUpByEngineTemp = MicroCHP(GenNum).A42Model.WarmUpByEngineTemp;
-        GeneratorDynamics(GenNum).MandatoryFullCoolDown = MicroCHP(GenNum).A42Model.MandatoryFullCoolDown;
-        GeneratorDynamics(GenNum).WarmRestartOkay = MicroCHP(GenNum).A42Model.WarmRestartOkay;
-        GeneratorDynamics(GenNum).WarmUpDelay = MicroCHP(GenNum).A42Model.WarmUpDelay;
-        GeneratorDynamics(GenNum).CoolDownDelay = MicroCHP(GenNum).A42Model.CoolDownDelay / SecInHour; // seconds to hours
-        GeneratorDynamics(GenNum).PcoolDown = MicroCHP(GenNum).A42Model.PcoolDown;
-        GeneratorDynamics(GenNum).Pstandby = MicroCHP(GenNum).A42Model.Pstandby;
-        GeneratorDynamics(GenNum).MCeng = MicroCHP(GenNum).A42Model.MCeng;
-        GeneratorDynamics(GenNum).MCcw = MicroCHP(GenNum).A42Model.MCcw;
-        GeneratorDynamics(GenNum).kf = MicroCHP(GenNum).A42Model.kf;
-        GeneratorDynamics(GenNum).TnomEngOp = MicroCHP(GenNum).A42Model.TnomEngOp;
-        GeneratorDynamics(GenNum).kp = MicroCHP(GenNum).A42Model.kp;
-        GeneratorDynamics(GenNum).AvailabilitySchedID = MicroCHP(GenNum).AvailabilitySchedID;
-        GeneratorDynamics(GenNum).StartUpTimeDelay = MicroCHP(GenNum).A42Model.WarmUpDelay / SecInHour; // seconds to hours
+        GeneratorDynamics(GenNum).Name = MicroCHPElectricGenerator::MicroCHP(GenNum).Name;
+        GeneratorDynamics(GenNum).PelMin = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MinElecPower;
+        GeneratorDynamics(GenNum).PelMax = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MaxElecPower;
+        GeneratorDynamics(GenNum).UpTranLimit = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.DeltaPelMax;
+        GeneratorDynamics(GenNum).DownTranLimit = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.DeltaPelMax;
+        GeneratorDynamics(GenNum).UpTranLimitFuel = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.DeltaFuelMdotMax;
+        GeneratorDynamics(GenNum).DownTranLimitFuel = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.DeltaFuelMdotMax;
+        GeneratorDynamics(GenNum).WarmUpByTimeDelay = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.WarmUpByTimeDelay;
+        GeneratorDynamics(GenNum).WarmUpByEngineTemp = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.WarmUpByEngineTemp;
+        GeneratorDynamics(GenNum).MandatoryFullCoolDown = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MandatoryFullCoolDown;
+        GeneratorDynamics(GenNum).WarmRestartOkay = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.WarmRestartOkay;
+        GeneratorDynamics(GenNum).WarmUpDelay = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.WarmUpDelay;
+        GeneratorDynamics(GenNum).CoolDownDelay = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.CoolDownDelay / SecInHour; // seconds to hours
+        GeneratorDynamics(GenNum).PcoolDown = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.PcoolDown;
+        GeneratorDynamics(GenNum).Pstandby = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.Pstandby;
+        GeneratorDynamics(GenNum).MCeng = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MCeng;
+        GeneratorDynamics(GenNum).MCcw = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MCcw;
+        GeneratorDynamics(GenNum).kf = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.kf;
+        GeneratorDynamics(GenNum).TnomEngOp = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.TnomEngOp;
+        GeneratorDynamics(GenNum).kp = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.kp;
+        GeneratorDynamics(GenNum).AvailabilitySchedID = MicroCHPElectricGenerator::MicroCHP(GenNum).AvailabilitySchedID;
+        GeneratorDynamics(GenNum).StartUpTimeDelay = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.WarmUpDelay / SecInHour; // seconds to hours
 
-        GeneratorDynamics(GenNum).ElectEffNom = MicroCHP(GenNum).A42Model.ElecEff;
-        GeneratorDynamics(GenNum).ThermEffNom = MicroCHP(GenNum).A42Model.ThermEff;
+        GeneratorDynamics(GenNum).ElectEffNom = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ElecEff;
+        GeneratorDynamics(GenNum).ThermEffNom = MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ThermEff;
         GeneratorDynamics(GenNum).QdotHXMax =
-            MicroCHP(GenNum).A42Model.ThermEff * MicroCHP(GenNum).A42Model.MaxElecPower / MicroCHP(GenNum).A42Model.ElecEff;
+            MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ThermEff * MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MaxElecPower / MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ElecEff;
         GeneratorDynamics(GenNum).QdotHXMin =
-            MicroCHP(GenNum).A42Model.ThermEff * MicroCHP(GenNum).A42Model.MinElecPower / MicroCHP(GenNum).A42Model.ElecEff;
+            MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ThermEff * MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.MinElecPower / MicroCHPElectricGenerator::MicroCHP(GenNum).A42Model.ElecEff;
         GeneratorDynamics(GenNum).QdotHXOpt = GeneratorDynamics(GenNum).QdotHXMax;
-        MicroCHP(GenNum).DynamicsControlID = GenNum;
-        // ENDDO
+        MicroCHPElectricGenerator::MicroCHP(GenNum).DynamicsControlID = GenNum;
     }
 
     void ManageGeneratorControlState(int const GeneratorType,                     // type of Generator
@@ -334,14 +282,14 @@ namespace GeneratorDynamicsManager {
         {
             auto const SELECT_CASE_var(GeneratorType);
             if (SELECT_CASE_var == iGeneratorMicroCHP) {
-                DynaCntrlNum = MicroCHP(GeneratorNum).DynamicsControlID;
-                // OutletCWnode = MicroCHP(GeneratorNum)%PlantOutletNodeID
-                InletCWnode = MicroCHP(GeneratorNum).PlantInletNodeID;
-                TcwIn = Node(MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
-                if (MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
+                DynaCntrlNum = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).DynamicsControlID;
+                // OutletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum)%PlantOutletNodeID
+                InletCWnode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).PlantInletNodeID;
+                TcwIn = Node(MicroCHPElectricGenerator::MicroCHP(GeneratorNum).PlantInletNodeID).Temp;
+                if (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.InternalFlowControl) {
                     InternalFlowControl = true;
                 }
-                LimitMinMdotcw = MicroCHP(GeneratorNum).A42Model.MinWaterMdot;
+                LimitMinMdotcw = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.MinWaterMdot;
             } else if (SELECT_CASE_var == iGeneratorFuelCell) {
                 // not yet
             } else {
@@ -408,14 +356,14 @@ namespace GeneratorDynamicsManager {
                         }
                     }
                     if (GeneratorDynamics(DynaCntrlNum).WarmUpByEngineTemp) {
-                        if (MicroCHP(GeneratorNum).A42Model.Teng >= GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
+                        if (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.Teng >= GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
                             newOpMode = OpModeNormal;
                             // assume linear interpolation for PLR
                             PLRStartUp = true;
-                            if ((MicroCHP(GeneratorNum).A42Model.Teng - MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
+                            if ((MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.Teng - MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
                                 // protect divide by zero or neg
-                                PLRforSubtimestepStartUp = (MicroCHP(GeneratorNum).A42Model.Teng - GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
-                                                           (MicroCHP(GeneratorNum).A42Model.Teng - MicroCHP(GeneratorNum).A42Model.TengLast);
+                                PLRforSubtimestepStartUp = (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.Teng - GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
+                                                           (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.Teng - MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.TengLast);
                             } else {
                                 PLRforSubtimestepStartUp = 1.0;
                             }
@@ -481,14 +429,14 @@ namespace GeneratorDynamicsManager {
                     } else if (GeneratorDynamics(DynaCntrlNum).WarmUpByEngineTemp) {
                         if (GeneratorType == iGeneratorMicroCHP) {
                             // only change to normal if this is result from completed timestep, not just an interation
-                            if (MicroCHP(GeneratorNum).A42Model.TengLast >= GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
+                            if (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.TengLast >= GeneratorDynamics(DynaCntrlNum).TnomEngOp) {
                                 newOpMode = OpModeNormal;
                                 // assume linear interpolation for PLR
                                 PLRStartUp = true;
-                                if ((MicroCHP(GeneratorNum).A42Model.Teng - MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
+                                if ((MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.Teng - MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.TengLast) > 0.0) {
                                     // protect divide by zero or neg
-                                    PLRforSubtimestepStartUp = (MicroCHP(GeneratorNum).A42Model.Teng - GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
-                                                               (MicroCHP(GeneratorNum).A42Model.Teng - MicroCHP(GeneratorNum).A42Model.TengLast);
+                                    PLRforSubtimestepStartUp = (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.Teng - GeneratorDynamics(DynaCntrlNum).TnomEngOp) /
+                                                               (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.Teng - MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.TengLast);
                                 } else {
                                     PLRforSubtimestepStartUp = 1.0;
                                 }
@@ -725,64 +673,64 @@ namespace GeneratorDynamicsManager {
             auto const SELECT_CASE_var(GeneratorType);
             if (SELECT_CASE_var == iGeneratorMicroCHP) {
                 // first clear out values
-                MicroCHP(GeneratorNum).A42Model.OffModeTime = 0.0;
-                MicroCHP(GeneratorNum).A42Model.StandyByModeTime = 0.0;
-                MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = 0.0;
-                MicroCHP(GeneratorNum).A42Model.NormalModeTime = 0.0;
-                MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = 0.0;
+                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.OffModeTime = 0.0;
+                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.StandyByModeTime = 0.0;
+                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = 0.0;
+                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.NormalModeTime = 0.0;
+                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = 0.0;
                 {
                     auto const SELECT_CASE_var1(newOpMode);
 
                     if (SELECT_CASE_var1 == OpModeOff) {
                         if (PLRforSubtimestepShutDown == 0.0) {
-                            MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * SecInHour;
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                            MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
-                            MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
                         } else {
-                            MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * SecInHour;
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.OffModeTime = TimeStepSys * SecInHour;
                         }
                     } else if (SELECT_CASE_var1 == OpModeStandby) {
                         if (PLRforSubtimestepShutDown == 0.0) {
-                            MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * SecInHour;
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                            MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
-                            MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
                         } else {
-                            MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * SecInHour;
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.StandyByModeTime = TimeStepSys * SecInHour;
                         }
                     } else if (SELECT_CASE_var1 == OpModeWarmUp) {
                         if (PLRforSubtimestepShutDown == 0.0) {
-                            MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour;
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour;
                         } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                            MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
-                            MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
                         } else {
-                            MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour;
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour;
                         }
 
                     } else if (SELECT_CASE_var1 == OpModeNormal) {
                         if (PLRforSubtimestepStartUp == 0.0) {
-                            MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour;
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour;
 
                         } else if ((PLRforSubtimestepStartUp > 0.0) && (PLRforSubtimestepStartUp < 1.0)) {
-                            MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepStartUp);
-                            MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepStartUp);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WarmUpModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepStartUp);
+                            MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepStartUp);
 
                         } else {
                             if (PLRforSubtimestepShutDown == 0.0) {
-                                MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour;
+                                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour;
                             } else if ((PLRforSubtimestepShutDown > 0.0) && (PLRforSubtimestepShutDown < 1.0)) {
-                                MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
-                                MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
+                                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour * (PLRforSubtimestepShutDown);
+                                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour * (1.0 - PLRforSubtimestepShutDown);
                             } else {
-                                MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour;
+                                MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.NormalModeTime = TimeStepSys * SecInHour;
                             }
                         }
 
                     } else if (SELECT_CASE_var1 == OpModeCoolDown) {
 
-                        MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour;
+                        MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.CoolDownModeTime = TimeStepSys * SecInHour;
                     }
                 }
 
@@ -856,7 +804,7 @@ namespace GeneratorDynamicsManager {
         {
             auto const SELECT_CASE_var(GeneratorType);
             if (SELECT_CASE_var == iGeneratorMicroCHP) {
-                DynaCntrlNum = MicroCHP(GeneratorNum).DynamicsControlID;
+                DynaCntrlNum = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).DynamicsControlID;
             }
         }
 
@@ -928,24 +876,24 @@ namespace GeneratorDynamicsManager {
         int InletNode;
         int OutletNode;
 
-        InletNode = MicroCHP(GeneratorNum).PlantInletNodeID;
-        OutletNode = MicroCHP(GeneratorNum).PlantOutletNodeID;
+        InletNode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).PlantInletNodeID;
+        OutletNode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).PlantOutletNodeID;
 
         // first evaluate curve
-        MdotCW = CurveValue(MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
+        MdotCW = CurveValue(MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
 
         // now apply constraints
         MdotCW = max(0.0, MdotCW);
 
         // make sure plant can provide, utility call may change flow
-        if (MicroCHP(GeneratorNum).CWLoopNum > 0) { // protect early calls
+        if (MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWLoopNum > 0) { // protect early calls
             SetComponentFlowRate(MdotCW,
                                  InletNode,
                                  OutletNode,
-                                 MicroCHP(GeneratorNum).CWLoopNum,
-                                 MicroCHP(GeneratorNum).CWLoopSideNum,
-                                 MicroCHP(GeneratorNum).CWBranchNum,
-                                 MicroCHP(GeneratorNum).CWCompNum);
+                                 MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWLoopNum,
+                                 MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWLoopSideNum,
+                                 MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWBranchNum,
+                                 MicroCHPElectricGenerator::MicroCHP(GeneratorNum).CWCompNum);
         }
 
         FuncDetermineCWMdotForInternalFlowControl = MdotCW;

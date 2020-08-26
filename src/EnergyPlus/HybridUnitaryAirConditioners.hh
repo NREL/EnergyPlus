@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,10 +51,10 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <EnergyPlus.hh>
-#include <HybridEvapCoolingModel.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
 
 namespace EnergyPlus {
 
@@ -63,6 +63,8 @@ namespace HybridUnitaryAirConditioners {
     using HybridEvapCoolingModel::CSetting;
     using HybridEvapCoolingModel::Model;
     extern Array1D<Model> ZoneHybridUnitaryAirConditioner;
+
+    void clear_state();
 
     // MODULE PARAMETER DEFINITIONS
     void SimZoneHybridUnitaryAirConditioners(std::string const &CompName,    // name of the packaged terminal heat pump
@@ -85,6 +87,12 @@ namespace HybridUnitaryAirConditioners {
     );
 
     void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
+
+    int GetHybridUnitaryACOutAirNode(int const UnitNum);
+
+    int GetHybridUnitaryACZoneInletNode(int const UnitNum);
+
+    int GetHybridUnitaryACReturnAirNode(int const UnitNum);
 
 } // namespace HybridUnitaryAirConditioners
 } // namespace EnergyPlus

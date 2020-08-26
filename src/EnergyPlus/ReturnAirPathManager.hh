@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,9 +49,11 @@
 #define ReturnAirPathManager_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace ReturnAirPathManager {
 
@@ -71,13 +73,13 @@ namespace ReturnAirPathManager {
 
     void clear_state();
 
-    void SimReturnAirPath();
+    void SimReturnAirPath(EnergyPlusData &state);
 
     void GetReturnAirPathInput();
 
     void InitReturnAirPath(int &ReturnAirPathNum); // unused1208
 
-    void CalcReturnAirPath(int &ReturnAirPathNum);
+    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum);
 
     void ReportReturnAirPath(int &ReturnAirPathNum); // unused1208
 

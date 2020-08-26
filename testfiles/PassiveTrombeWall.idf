@@ -18,7 +18,7 @@
 ! Plant:    None.
 !
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -26,7 +26,7 @@
     BUILDING #1,             !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.2500000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -400,7 +400,9 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    World;                   !- Coordinate System
+    World,                   !- Coordinate System
+    ,                        !- Daylighting Reference Point Coordinate System
+    World;                   !- Rectangular Surface Coordinate System
 
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name

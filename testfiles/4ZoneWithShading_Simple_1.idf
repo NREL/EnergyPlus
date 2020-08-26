@@ -83,7 +83,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -91,7 +91,7 @@
     BUILDING #1,             !- Name
     0.0000000E+00,           !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -471,7 +471,9 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    World;                   !- Coordinate System
+    World,                   !- Coordinate System
+    ,                        !- Daylighting Reference Point Coordinate System
+    World;                   !- Rectangular Surface Coordinate System
 
   Shading:Site,
     Bushes-South,            !- Name
@@ -519,8 +521,8 @@
     ZONE 1,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -584,8 +586,8 @@
     ZONE 1,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -596,8 +598,8 @@
     ZONE 1,                  !- Zone Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -608,8 +610,8 @@
     ZONE 1,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -620,8 +622,8 @@
     ZONE 1,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -633,8 +635,8 @@
     Zn003:Flr001,            !- Outside Boundary Condition Object
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -645,8 +647,8 @@
     ZONE 2,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -688,8 +690,8 @@
     ZONE 2,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -734,8 +736,8 @@
     ZONE 2,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -746,8 +748,8 @@
     ZONE 2,                  !- Zone Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
@@ -758,8 +760,8 @@
     ZONE 2,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     0,                       !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -771,8 +773,8 @@
     Zn004:Flr001,            !- Outside Boundary Condition Object
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
     10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
@@ -783,9 +785,9 @@
     ZONE 3,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -806,9 +808,9 @@
     ZONE 3,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -818,9 +820,9 @@
     ZONE 3,                  !- Zone Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -831,9 +833,9 @@
     Zn004:Wall004,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -855,9 +857,9 @@
     Zn001:Roof001,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
@@ -867,9 +869,9 @@
     ZONE 3,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    10,                      !- Starting Z Coordinate {m}
+    6,                       !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    20,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
@@ -879,9 +881,9 @@
     ZONE 4,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -902,9 +904,9 @@
     ZONE 4,                  !- Zone Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -914,9 +916,9 @@
     ZONE 4,                  !- Zone Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    20,                      !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    46,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -927,9 +929,9 @@
     Zn003:Wall004,           !- Outside Boundary Condition Object
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    20,                      !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    26,                      !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     10;                      !- Height {m}
 
@@ -951,9 +953,9 @@
     Zn002:Roof001,           !- Outside Boundary Condition Object
     90,                      !- Azimuth Angle {deg}
     180,                     !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    0,                       !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    10,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
@@ -963,9 +965,9 @@
     ZONE 4,                  !- Zone Name
     180,                     !- Azimuth Angle {deg}
     0,                       !- Tilt Angle {deg}
-    0,                       !- Starting X Coordinate {m}
-    0,                       !- Starting Y Coordinate {m}
-    10,                      !- Starting Z Coordinate {m}
+    26,                      !- Starting X Coordinate {m}
+    6,                       !- Starting Y Coordinate {m}
+    20,                      !- Starting Z Coordinate {m}
     20,                      !- Length {m}
     20;                      !- Width {m}
 
@@ -1037,8 +1039,8 @@
     ZONE 1 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 1 Ideal Loads,      !- Name
@@ -1100,8 +1102,8 @@
     ZONE 2 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 2 Ideal Loads,      !- Name
@@ -1163,8 +1165,8 @@
     ZONE 3 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 3 Ideal Loads,      !- Name
@@ -1226,8 +1228,8 @@
     ZONE 4 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     ZONE 4 Ideal Loads,      !- Name

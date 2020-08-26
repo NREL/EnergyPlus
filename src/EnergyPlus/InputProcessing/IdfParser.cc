@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -90,8 +90,8 @@ json IdfParser::decode(std::string const &idf, json const &schema, bool &success
 
 std::string IdfParser::encode(json const &root, json const &schema)
 {
-    std::string end_of_field("," + NL + "  ");
-    std::string end_of_object(";" + NL + NL);
+    std::string end_of_field(",\n  ");
+    std::string end_of_object(";\n\n");
 
     std::string encoded, extension_key;
 
@@ -115,7 +115,7 @@ std::string IdfParser::encode(json const &root, json const &schema)
                     continue;
                 }
                 for (size_t j = 0; j < skipped_fields; j++)
-                    encoded += "," + NL + "  ";
+                    encoded += end_of_field;
                 skipped_fields = 0;
                 encoded += end_of_field;
                 auto const &val = obj_in.value()[entry];
@@ -218,7 +218,8 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
             next_token(idf, index);
             continue;
         } else if (token == Token::COMMA) {
-            errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) + " - Extraneous comma found.");
+            errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
+                                 " - Extraneous comma found.");
             success = false;
             return root;
         } else if (token == Token::EXCLAMATION) {
@@ -253,7 +254,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 auto found_index = idf.find_first_of('\n', beginning_of_line_index);
                 std::string line;
                 if (found_index != std::string::npos) {
-                    line = idf.substr(beginning_of_line_index, index - beginning_of_line_index);
+                    line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index);
                 }
                 errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
                                      " - Error parsing \"" + obj_name + "\". Error in following line.");
@@ -268,7 +269,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 auto const &name_iter = obj.find("name");
                 // If you find a name field, use that
                 if (name_iter != obj.end()) {
-                    name = name_iter.value();
+                    name = name_iter.value().get<std::string>();
                     obj.erase(name_iter);
                 } else {
                     // Otherwise, see if it should have a name field
@@ -327,7 +328,7 @@ json IdfParser::parse_object(
             success = false;
             return root;
         }
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
         schema_obj_extensions = &schema_obj_props[extension_key]["items"]["properties"];
     }
 
@@ -388,13 +389,16 @@ json IdfParser::parse_object(
             eat_comment(idf, index);
         } else if (legacy_idd_index >= legacy_idd_fields_array.size()) {
             if (legacy_idd_extensibles_iter == legacy_idd.end()) {
+                errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
+                                     " - Object contains more field values than maximum number of IDD fields and is not extensible.");
                 success = false;
                 return root;
             }
             auto const &legacy_idd_extensibles_array = legacy_idd_extensibles_iter.value();
             auto const size = legacy_idd_extensibles_array.size();
             std::string const &field_name = legacy_idd_extensibles_array[extensible_index % size];
-            auto const val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
+            auto val = parse_value(idf, index, success, schema_obj_extensions->at(field_name));
+            if (!success) return root;
             extensible[field_name] = std::move(val);
             was_value_parsed = true;
             extensible_index++;
@@ -415,6 +419,7 @@ json IdfParser::parse_object(
                 }
             } else {
                 auto const val = parse_value(idf, index, success, find_field_iter.value());
+                if (!success) return root;
                 root[field] = std::move(val);
             }
             if (!success) return root;
@@ -478,7 +483,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const double_val = stod(num_str, nullptr);
             val = double_val;
-        } catch (std::exception & e) {
+        } catch (std::exception &e) {
             auto const double_val = stold(num_str, nullptr);
             val = double_val;
         }
@@ -486,7 +491,7 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
         try {
             auto const int_val = stoi(num_str, nullptr);
             val = int_val;
-        } catch (std::exception & e) {
+        } catch (std::exception &e) {
             auto const int_val = stoll(num_str, nullptr);
             val = int_val;
         }
@@ -497,68 +502,69 @@ json IdfParser::parse_number(std::string const &idf, size_t &index, bool &succes
 
 json IdfParser::parse_value(std::string const &idf, size_t &index, bool &success, json const &field_loc)
 {
+    Token token;
     auto const &field_type = field_loc.find("type");
     if (field_type != field_loc.end()) {
         if (field_type.value() == "number" || field_type.value() == "integer") {
-            return parse_number(idf, index, success);
+            token = Token::NUMBER;
         } else {
-            auto const parsed_string = parse_string(idf, index, success);
-            auto const &enum_it = field_loc.find("enum");
-            if (enum_it == field_loc.end()) return parsed_string;
+            token = Token::STRING;
+        }
+    } else {
+        token = look_ahead(idf, index);
+    }
+
+    switch (token) {
+    case Token::STRING: {
+        auto const parsed_string = parse_string(idf, index, success);
+        auto const &enum_it = field_loc.find("enum");
+        if (enum_it != field_loc.end()) {
             for (auto const &s : enum_it.value()) {
                 auto const &str = s.get<std::string>();
                 if (icompare(str, parsed_string)) {
                     return str;
                 }
             }
-            return parsed_string;
-        }
-    } else {
-        switch (look_ahead(idf, index)) {
-        case Token::STRING: {
-            auto const parsed_string = parse_string(idf, index, success);
-            auto const &enum_it = field_loc.find("enum");
-            if (enum_it != field_loc.end()) {
-                for (auto const &s : enum_it.value()) {
-                    auto const &str = s.get<std::string>();
-                    if (icompare(str, parsed_string)) {
-                        return str;
-                    }
-                }
-            } else if (icompare(parsed_string, "Autosize") || icompare(parsed_string, "Autocalculate")) {
-                auto const &default_it = field_loc.find("default");
-                // The following is hacky because it abuses knowing the consistent generated structure
-                // in the future this might not hold true for the array indexes.
-                if (default_it != field_loc.end()) {
-                    return field_loc["anyOf"][1]["enum"][1];
-                } else {
-                    return field_loc["anyOf"][1]["enum"][0];
-                }
+        } else if (icompare(parsed_string, "Autosize") || icompare(parsed_string, "Autocalculate")) {
+            auto const &default_it = field_loc.find("default");
+            auto const &anyOf_it = field_loc.find("anyOf");
+
+            if (anyOf_it == field_loc.end()) {
+                errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) + " - Field cannot be Autosize or Autocalculate");
+                return parsed_string;
             }
-            return parsed_string;
-        }
-        case Token::NUMBER: {
-            size_t save_line_index = index_into_cur_line;
-            size_t save_line_num = cur_line_num;
-            json value = parse_number(idf, index, success);
-            if (!success) {
-                cur_line_num = save_line_num;
-                index_into_cur_line = save_line_index;
-                success = true;
-                return parse_string(idf, index, success);
+            // The following is hacky because it abuses knowing the consistent generated structure
+            // in the future this might not hold true for the array indexes.
+            if (default_it != field_loc.end()) {
+                return field_loc.at("anyOf")[1]["enum"][1];
+            } else {
+                return field_loc.at("anyOf")[1]["enum"][0];
             }
-            return value;
         }
-        case Token::NONE:
-        case Token::END:
-        case Token::EXCLAMATION:
-        case Token::COMMA:
-        case Token::SEMICOLON:
-            break;
-        }
-        success = false;
-        return nullptr;
+        return parsed_string;
     }
+    case Token::NUMBER: {
+        size_t save_line_index = index_into_cur_line;
+        size_t save_line_num = cur_line_num;
+        json value = parse_number(idf, index, success);
+        if (!success) {
+            cur_line_num = save_line_num;
+            index_into_cur_line = save_line_index;
+            success = true;
+            return parse_string(idf, index, success);
+        }
+        return value;
+    }
+    case Token::NONE:
+    case Token::END:
+    case Token::EXCLAMATION:
+    case Token::COMMA:
+    case Token::SEMICOLON:
+    default:
+        break;
+    }
+    success = false;
+    return nullptr;
 }
 
 std::string IdfParser::parse_string(std::string const &idf, size_t &index, bool &success)

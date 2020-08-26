@@ -94,7 +94,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -329,7 +329,13 @@
     COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FluidTemperatureControl,  !- Heating Coil Object Type
     TU1 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU2,                     !- Zone Terminal Unit Name
@@ -354,7 +360,13 @@
     COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FluidTemperatureControl,  !- Heating Coil Object Type
     TU2 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU3,                     !- Zone Terminal Unit Name
@@ -379,7 +391,13 @@
     COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FluidTemperatureControl,  !- Heating Coil Object Type
     TU3 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU4,                     !- Zone Terminal Unit Name
@@ -404,7 +422,13 @@
     COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FluidTemperatureControl,  !- Heating Coil Object Type
     TU4 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU5,                     !- Zone Terminal Unit Name
@@ -429,7 +453,13 @@
     COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FluidTemperatureControl,  !- Heating Coil Object Type
     TU5 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   Schedule:Compact,
     VRFFanSchedule,          !- Name
@@ -1995,7 +2025,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -2015,7 +2045,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -3614,7 +3644,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -3645,7 +3680,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -3676,7 +3716,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
@@ -3707,7 +3752,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -3738,7 +3788,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
@@ -4087,8 +4142,8 @@
     TU1,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
@@ -4097,8 +4152,8 @@
     TU2,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -4107,8 +4162,8 @@
     TU3,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
@@ -4117,8 +4172,8 @@
     TU4,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
@@ -4127,8 +4182,8 @@
     TU5,                     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,detailed;
 
@@ -4160,27 +4215,27 @@
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Total Cooling Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Total Heating Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature,timestep;
 
@@ -4190,17 +4245,17 @@
 
   Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporating Temperature,timestep;
 
-  Output:Variable,*,VRF Heat Pump Compressor Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Compressor Electricity Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Compressor Rotating Speed,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Power,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Power,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Energy,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Energy,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Energy,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Energy,timestep;
 
   Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,timestep;
 

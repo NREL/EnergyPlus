@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,18 +56,19 @@
 #include <EnergyPlus/TarcogShading.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::TarcogShading;
 using namespace EnergyPlus::TARCOGParams;
 
-TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_0_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, horizontal venetian blind 0 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -93,14 +94,13 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_0_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, vertical venetian blind 0 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -126,14 +126,13 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessHorizontalVenetianBlind_45_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, horizontal venetian blind 45 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -159,14 +158,13 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessVerticalVenetianBlind_45_deg)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, vertical venetian blind 45 deg slat.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -192,14 +190,13 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
     }
 }
 
-TEST(WindowRoutines, EffectiveOpennessOtherShades)
+TEST_F(EnergyPlusFixture, WindowRoutines_EffectiveOpennessOtherShades)
 {
-    EnergyPlus::ShowMessage("Begin Test: Effective openness, other shades.");
     {
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -213,7 +210,7 @@ TEST(WindowRoutines, EffectiveOpennessOtherShades)
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
         LayerType(1) = DIFFSHADE;
-        Array1A<Real64> const SlatAngle(nlayer, 0);
+        Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 

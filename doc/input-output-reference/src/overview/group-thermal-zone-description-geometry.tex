@@ -248,20 +248,41 @@ This output variable represents the sensible heating energy in Joules that is ac
 \begin{callout}
 Zone Air System Sensible Heating (and Cooling) Energy (and Rate) all report the heating or cooling delivered by the HVAC system to a zone. These values are calculated by multiplying the supply air mass flow rate by the difference between the supply air temperature and the zone air temperature. This does not always indicate the operation of heating or cooling coils. For example, cooling will be reported if the supply air is cooled due to the introduction of outside air, even if all coils are off.
 
-Note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variables will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
+In addition, certain "non-air" zone-based systems will also add their heating or cooling contribution to this output variable.  For example, the following zone equipment will also add their output to the appropriate heating or cooling energy/rate output variable:
+
+\begin{itemize}
+\item
+ZoneHVAC:Baseboard:RadiantConvective:Water
+\item
+ZoneHVAC:Baseboard:RadiantConvective:Steam
+\item
+ZoneHVAC:Baseboard:RadiantConvective:Electric
+\item
+ZoneHVAC:Baseboard:Convective:Water
+\item
+ZoneHVAC:Baseboard:Convective:Electric
+\item
+ZoneHVAC:CoolingPanel:RadiantConvective:Water
+\item
+ZoneHVAC:RefrigerationChillerSet
+\end{itemize}
+
+This means that system output from equipment such as high and low temperature radiant systems are NOT included in this output variable as the control of these radiant systems are handled separately with their own unique controls.
+
+Finally, note that these variables are calculated at the system timestep. When reported at the ``detailed'' reporting frequency, these variables will never show heating and cooling both in the same system timestep. If reported at a frequency less than ``Detailed'' (for example, Hourly) values may appear in both the heating and cooling variable for the same hour if the system cooled the zone for part of the reporting period and heated the zone for another part of the reporting period.
 \end{callout}
 
 \subsubsection{Zone Air System Sensible Cooling Energy {[}J{]}}\label{zone-air-system-sensible-cooling-energy-j}
 
-This output variable represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible cooling energy in Joules that is actually supplied by the system to that zone for the timestep reported. This is the sensible cooling rate multiplied by the simulation timestep. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
 \subsubsection{Zone Air System Sensible Heating Rate {[}W{]}}\label{zone-air-system-sensible-heating-rate-w}
 
-This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible heating rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
 \subsubsection{Zone Air System Sensible Cooling Rate {[}W{]}}\label{zone-air-system-sensible-cooling-rate-w}
 
-This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers.
+This output variable represents the sensible cooling rate in Watts that is actually supplied by the system to that zone for the timestep reported. This is calculated and reported from the Correct step in the Zone Predictor-Corrector module. This field is not multiplied by zone or group multipliers. For additional information on this output variable, see the note that accompanies the Zone Air System Sensible Heating Energy output variable above.
 
 \subsubsection{Zone Air Humidity Ratio {[}kgWater/kgDryAir{]}}\label{zone-air-humidity-ratio-kgwaterkgdryair}
 
@@ -499,6 +520,10 @@ During specification of surfaces, several ``outside'' environments may be chosen
 Note that heat transfer surfaces are fully represented with each description. As stated earlier in the Construction description, materials in the construction (outside to inside) are included but film coefficients neither inside nor outside are used in the description -- these are automatically calculated during the EnergyPlus run. Interzone surfaces which do not have a symmetrical construction (such as a ceiling/floor) require two Construction objects with the layers in reverse order. For example, CEILING with carpet, concrete, ceiling tile and FLOOR with ceiling tile, concrete, carpet. If interzone surfaces have a symmetrical construction, the specification for the two surfaces can reference the same Construction. When a surface is connected as the outside boundary condition for another surface, the two surfaces may be in the same plane, or they may be separated to imply thickness.
 \end{callout}
 
+\begin{callout}
+Note also that if interzone constructions include either \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} or \hyperref[windowmaterialglazingequivalentlayer]{WindowMaterial:Glazing:EquivalentLayer} then the materials properties of layers consisting of those material types will have front and back side values that may differ from one another.  So, if using such materials in the definition of an interzone construction, reversed materials must also have their front and back properties inverted so as to match in reverse order.  For example, if there is a single layer of glass of type \hyperref[windowmaterialglazing]{WindowMaterial:Glazing} defined for an interzone construction and the front and back properties differ, the user must define two materials with equivalent properties except that the front and back values must be reversed.  This means that one material used for the definition on one side might have a front side solar reflectance at normal incidence of 0.35 and a back side solar reflectance at normal incidence of 0.25.  The material used for the other side of the interzone construction must then have a front side solar reflectance at normal incidence of 0.25 and a back side solar reflectance at normal incidence of 0.35 to match properly in reverse.  EnergyPlus checks for all of the user input properties for single and multiple layer interzone constructions that use these two material types to confirm that this has been done correctly so that the simulation accurately reflects the properties of the materials on each side.
+\end{callout}
+
 \textbf{Shading} surfaces are used to describe aspects of the site which do not directly impact the physical interactions of the environmental parameters but may significantly shade the building during specific hours of the day or time so the year (e.g.~trees, bushes, mountains, nearby buildings which aren't being simulated as part of this facility, etc.)
 
 \begin{callout}
@@ -583,7 +608,7 @@ Surfaces are always specified as being viewed from the outside of the zone to wh
 
 \paragraph{Field: Coordinate System}\label{field-coordinate-system}
 
-Vertices can be specified in two ways: using ``Absolute''/``World'' coordinates, or a \textbf{relative} coordinate specification. Relative coordinates allow flexibility of rapid change to observe changes in building results due to orientation and position. ``World'' coordinates will facilitate use within a CADD system structure.
+Vertices can be specified in two ways: using \textbf{World} coordinates, or a \textbf{Relative} coordinate specification. Relative coordinates allow flexibility of rapid change to observe changes in building results due to orientation and position. \textbf{World} coordinates will facilitate use within a CADD system structure.
 
 \textbf{Relative} coordinates make use of both Building and Zone North Axis values as well as Zone Origin values to locate the surface in 3D coordinate space. \textbf{World} coordinates do not use these values.
 
@@ -591,7 +616,7 @@ Typically, all zone origin values for ``World'' coordinates will be (0,0,0) but 
 
 \paragraph{Field: Daylighting Reference Point Coordinate System}\label{field-daylighting-reference-point-coordinate-system}
 
-Daylighting reference points need to be specified as well. Again, there can be two flavors; \textbf{relative} and \textbf{world}. Daylighting reference points must fit within the zone boundaries.
+Daylighting reference points need to be specified as well. Again, there can be two flavors; \textbf{Relative} and \textbf{World}. Daylighting reference points must fit within the zone boundaries.
 
 \textbf{Relative} coordinates make use of both Building and Zone North Axis values as well as Zone Origin values to locate the reference point in 3D coordinate space. \textbf{World} coordinates do not use these values.
 
@@ -627,11 +652,11 @@ This is the name of the construction (ref: Construction object) used in the surf
 
 This is the zone name to which the surface belongs.
 
-\paragraph{Field: Azimuth Angle}\label{field-azimuth-angle}
+\paragraph{Field: Azimuth Angle}
 
 The Azimuth Angle indicates the direction that the wall faces (outward normal). The angle is specified in degrees where East = 90, South = 180, West = 270, North = 0.
 
-\paragraph{Field: Tilt Angle}\label{field-tilt-angle}
+\paragraph{Field: Tilt Angle}
 
 The tilt angle is the angle (in degrees) that the wall is tilted from horizontal (or the ground). Normally, walls are tilted 90 degrees and that is the default for this field.
 
@@ -1725,7 +1750,7 @@ This field specifies the number of sides in the surface (number of X,Y,Z vertex 
 
 \subsection{RoofCeiling:Detailed}\label{roofceilingdetailed}
 
-The RoofCeiling:Detailed object is used to describe walls.
+The RoofCeiling:Detailed object is used to describe a roof or ceiling.
 
 \subsubsection{Inputs}\label{inputs-21-007}
 
@@ -1834,7 +1859,7 @@ This field specifies the number of sides in the surface (number of X,Y,Z vertex 
 
 \subsection{Floor:Detailed}\label{floordetailed}
 
-The Floor:Detailed object is used to describe walls.
+The Floor:Detailed object is used to describe floors.
 
 \subsubsection{Inputs}\label{inputs-22-006}
 
@@ -2382,6 +2407,7 @@ Additionally, the output variables applicable to all heat transfer surfaces:
 \begin{lstlisting}
 Zone,Sum,Surface Inside Face Heat Balance Calculation Iteration Count []
 Zone,Average,Surface Inside Face Temperature [C]
+Zone,Average,Surface Inside Face Interior Movable Insulation Temperature [C]
 Zone,Average,Surface Outside Face Temperature [C]
 Zone,Average,Surface Inside Face Adjacent Air Temperature [C]
 Zone,Average,Surface Inside Face Convection Heat Transfer Coefficient [W/m2-K]
@@ -2601,7 +2627,7 @@ If the user requests to display advanced report/output variables (e.g.~see \hype
 Zone,Average, Surface Window Inside Face Other Convection Heat Gain Rate [W]
 \end{lstlisting}
 
-Output variables applicable to interior and exterior windows and doors are:
+Output variables applicable to interior and exterior windows and doors under certain conditions (see next three subsections for more information) are:
 
 \begin{lstlisting}
 Zone,Average,Surface Window Total Absorbed Shortwave Radiation Rate Layer <x> [W]
@@ -2611,15 +2637,16 @@ Zone,Average,Surface Window Back Face Temperature Layer <x> [C]
 
 \subsubsection{Surface Window Total Absorbed Shortwave Radiation Rate Layer \textless{}x\textgreater{} {[}W{]}}\label{surface-window-total-absorbed-shortwave-radiation-rate-layer-x-w}
 
-This will output shortwave radiation absorbed in a window layer. The key values for this output variable are the surface name. Layers are numbered from the outside to the inside of the surface. The full listing will appear in the RDD file.
+This will output shortwave radiation absorbed in a window layer. The key values for this output variable are the surface name. Layers are numbered from the outside to the inside of the surface. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.
 
 \subsubsection{Surface Window Front Face Temperature Layer \textless{}x\textgreater{} {[}C{]}}\label{surface-window-front-face-temperature-layer-x-c}
 
-This will output a temperature for the front face of the layer. The layer front face is considered to be the face closest to the outside environment. The full listing will appear in the RDD file.
+This will output a temperature for the front face of the layer. The layer front face is considered to be the face closest to the outside environment. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.  For other window constructions, this variable is also defined for the outer layer (Layer 1) only. The value will be identical to the \hyperref[surface-outside-face-temperature-c]{Surface Outside Face Temperature}.
+
 
 \subsubsection{Surface Window Back Face Temperature Layer \textless{}x\textgreater{} {[}C{]}}\label{surface-window-back-face-temperature-layer-x-c}
 
-This will output a temperature for the back face of the layer. The layer back face is considered to be the face closest to the inside environment. The full listing will appear in the RDD file.
+This will output a temperature for the back face of the layer. The layer back face is considered to be the face closest to the inside environment. The full listing will appear in the RDD file. Note that this variable is only defined for constructions defined by a \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState}.  For other window constructions, this variable is also defined for the inner layer only. The value will be identical to the \hyperref[surface-inside-face-temperature-c]{Surface Inside Face Temperature}.
 
 \subsection{Surface Output Variables (all heat transfer surfaces)}\label{surface-output-variables-all-heat-transfer-surfaces}
 
@@ -2632,6 +2659,16 @@ This output is the number of iterations used in a part of the solution for surfa
 \subsubsection{Surface Inside Face Temperature {[}C{]}}\label{surface-inside-face-temperature-c}
 
 This is the temperature of the surface's inside face, in degrees Celsius. Former Name: Prior to version 7.1 this output was called Surface Inside Temperature.
+
+\subsubsection{Surface Inside Face Interior Movable Insulation Temperature {[}C{]}}\label{surface-inside-face-interior-movable-insulation-temperature-c}
+
+This is the temperature of movable insulation installed on the inside of the construction at the movable insulation's inside face (the one facing the zone), in degrees Celsius. This variable is only valid when the surface has movable insulation and the movable insulation is actually scheduled to be present.  For surfaces that have no movable insulation or the movable insulation is not scheduled to be present, the value of this variable is set to the Surface Inside Face Temperature.  It should be noted that users can limit how often this output variable is generating by using a schedule to control when this output is produced.  For example, this user could add the following syntax to an input file that includes movable insulation:
+
+\begin{lstlisting}
+  Output:Variable,Zone1:WestWall,Surface Inside Face Interior Movable Insulation Temperature,timestep,MovableInsulationSchedule;
+\end{lstlisting}
+
+In this example, interior movable insulation is used on the west wall of zone 1 and is only present when the schedule (MovableInsulationSchedule) is greater than zero.  Adding this output variable syntax to the input file reports the temperature at the inside face of the interior movable insulation only when the movable insulation is present.  The use of the movable insulation schedule in the output variable designation limits when this value shows up in the EnergyPlus output file to when it is actually scheduled to be present.  At other times, no value will be reported.  The limiting of when the output is generated allows the user to generate useful statistics instead of having those statistics influenced by values for when the movable insulation is not present.  If the user does not use the output variable schedule feature, the output for this variable will equal the surface inside face temperature when the movable insulation is not present.
 
 \subsubsection{Surface Outside Face Temperature {[}C{]}}\label{surface-outside-face-temperature-c}
 
@@ -4908,6 +4945,8 @@ Zone,Average,Zone Mean Air Temperature [C]
 HVAC,Average,Zone Air Temperature [C]
 Zone,Average,Zone Mean Radiant Temperature [C]
 Zone,Average,Zone Operative Temperature [C]
+Zone,Average,Zone Heat Index [C]
+Zone,Average,Zone Humidity Index [C]
 HVAC,Sum,Zone Air System Sensible Heating Energy [J]
 HVAC,Sum,Zone Air System Sensible Cooling Energy [J]
 HVAC,Average,Zone Air System Sensible Heating Rate [W]
@@ -4940,6 +4979,15 @@ The Mean Radiant Temperature (MRT) in degrees Celsius of a space is really the m
 \subsubsection{Zone Operative Temperature {[}C{]}}\label{zone-operative-temperature-c-1}
 
 Zone Operative Temperature (OT) is the average of the Zone Mean Air Temperature (MAT) and Zone Mean Radiant Temperature (MRT), OT = 0.5*MAT + 0.5*MRT. This output variable is not affected by the type of thermostat controls in the zone, and does not include the direct effect of high temperature radiant systems.~ See also Zone Thermostat Operative Temperature.
+
+\subsubsection{Zone Heat Index {[}C{]}}\label{zone-heat-index-c-1}
+
+Zone heat index (HI) is an index that combines air temperature and relative humidity in shaded areas, to posit a human-perceived equivalent temperature, as how hot it would feel if the humidity were some other value in the shade. The HI measures the temperature feels like to the human body when relative humidity is combined with the air temperature. Zone Heat Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
+
+
+\subsubsection{Zone Humdity Index {[}C{]}}\label{zone-humidity-index-c-1}
+
+The Humdity Index (humidex) is an index number used by Canadian meteorologists to describe how hot the weather feels to the average person, by combining the effect of heat and humidity. The humidex is a nominally dimensionless quantity (though generally recognized by the public as equivalent to the degree Celsius) based on the dew-point temperature. Zone Humdity Index is only reported when ThermalResilienceSummary is declared in Output:Table:SummaryReports.  
 
 \subsubsection{Zone Air System Sensible Heating Energy {[}J{]}}\label{zone-air-system-sensible-heating-energy-j-1}
 

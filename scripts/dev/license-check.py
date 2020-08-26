@@ -1,7 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import os
-import glob
 import licensetext
 
 TOOL_NAME = 'license-check'
@@ -30,4 +28,4 @@ checker = licensetext.Checker(current, toolname=TOOL_NAME)
 
 # Check files
 for base in dirs:
-    checker.check(base)
+    checker.visit(base)

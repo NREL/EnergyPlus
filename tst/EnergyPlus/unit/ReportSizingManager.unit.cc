@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 #include "Fixtures/SQLiteFixture.hh"
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -62,10 +63,12 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -185,7 +188,6 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT)
     EXPECT_FALSE(has_err_output(true));
     EXPECT_DOUBLE_EQ(10, designExitTemp);
     EXPECT_NEAR(0.119823, designFlowValue, 0.0001);
-
 }
 TEST_F(EnergyPlusFixture, ReportSizingManager_GetCoilDesFlowT_NoPeak)
 {
@@ -310,8 +312,16 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
+
+    // confirm that sizing data is saved for use by parent object
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirInTemp, 28.0, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirInHumRat, 0.0075, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirOutTemp,12.0, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingAirOutHumRat, 0.0075, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingFanCoolLoad, 0.0, 0.0000001);
+    EXPECT_NEAR(DataSizing::DataCoilSizingCapFT, 1.0, 0.0000001);
 
     CompType = "COIL:COOLING:WATER";
     CompName = "Chilled Water Cooling Coil";
@@ -320,9 +330,8 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystem)
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(19234.6, SizingResult, 0.1);
-
 }
 
 TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
@@ -395,33 +404,33 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     ASSERT_TRUE(process_idf(idf_objects));
 
     std::string fanName = "TEST FAN 1";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataSizing::CurZoneEqNum = 0;
     DataSizing::CurSysNum = 0;
     DataSizing::CurOASysNum = 0;
     DataEnvironment::StdRhoAir = 1.2;
-    HVACFan::fanObjs[0]->simulate(_, _, _, _);                         // triggers sizing call
+    HVACFan::fanObjs[0]->simulate(state, _, _, _, _);                         // triggers sizing call
     Real64 locFanSizeVdot = HVACFan::fanObjs[0]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain1 = HVACFan::fanObjs[0]->getFanDesignHeatGain(locFanSizeVdot);
+    Real64 locDesignHeatGain1 = HVACFan::fanObjs[0]->getFanDesignHeatGain(state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain1, 100.0, 0.1);
 
     fanName = "TEST FAN 2";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
-    HVACFan::fanObjs[1]->simulate(_, _, _, _);                      // triggers sizing call
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
+    HVACFan::fanObjs[1]->simulate(state, _, _, _, _);                      // triggers sizing call
     locFanSizeVdot = HVACFan::fanObjs[1]->designAirVolFlowRate;     // get function
-    Real64 locDesignHeatGain2 = HVACFan::fanObjs[1]->getFanDesignHeatGain(locFanSizeVdot);
+    Real64 locDesignHeatGain2 = HVACFan::fanObjs[1]->getFanDesignHeatGain(state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain2, 200.0, 0.1);
 
     fanName = "TEST FAN 3";
-    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(fanName)); // call constructor
+    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, fanName)); // call constructor
     DataEnvironment::StdRhoAir = 1.2;
-    HVACFan::fanObjs[2]->simulate(_, _, _, _);                  // triggers sizing call
+    HVACFan::fanObjs[2]->simulate(state, _, _, _, _);                  // triggers sizing call
     locFanSizeVdot = HVACFan::fanObjs[2]->designAirVolFlowRate; // get function
-    Real64 locDesignHeatGain3 = HVACFan::fanObjs[2]->getFanDesignHeatGain(locFanSizeVdot);
+    Real64 locDesignHeatGain3 = HVACFan::fanObjs[2]->getFanDesignHeatGain(state, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain3, 400.0, 0.1);
 
-    GetFanInput();
-    Real64 locDesignHeatGain4 = FanDesHeatGain(1, locFanSizeVdot);
+    GetFanInput(state);
+    Real64 locDesignHeatGain4 = FanDesHeatGain(state, 1, locFanSizeVdot);
     EXPECT_NEAR(locDesignHeatGain4, 50.0, 0.1);
 
     std::string CompName;       // component name
@@ -478,7 +487,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(18882.0, SizingResult, 0.1);
     Real64 dxCoilSizeNoFan = SizingResult;
 
@@ -498,7 +507,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     Real64 expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain4;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
 
     // With Test Fan 3 fan heat - this fails before the #6126 fix in ReportSizingManager
@@ -518,9 +527,8 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingSystemWithFans)
     expectedDXCoilSize = dxCoilSizeNoFan + locDesignHeatGain3;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(expectedDXCoilSize, SizingResult, 0.1);
-
 }
 
 TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
@@ -572,7 +580,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
     DataIsDXCoil = true;
 
     // dx cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(5664.6, SizingResult, 0.1);
 
     CompType = "COIL:COOLING:WATER";
@@ -583,9 +591,8 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_RequestSizingZone)
     DataIsDXCoil = false;
 
     // chilled water cooling coil capacity sizing
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
     EXPECT_NEAR(5770.4, SizingResult, 0.1);
-
 }
 
 TEST_F(SQLiteFixture, ReportSizingManager_SQLiteRecordReportSizingOutputTest)
@@ -919,7 +926,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak)
     ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingType) = DataSizing::SupplyAirFlowRate;
 
     // Now, we're ready to call the function
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingType, SizingString, SizingResult, PrintWarning, CallingRoutine);
 
     // Check that the Design Day/Time is filled
     EXPECT_EQ(DDTitle, OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchFanDesDay, CompName));
@@ -927,4 +934,503 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_FanPeak)
 
     // Bonus test for #6949
     EXPECT_EQ("End Use Subcategory", OutputReportPredefined::columnTag(OutputReportPredefined::pdchFanEndUse).heading);
+}
+TEST_F(EnergyPlusFixture, ReportSizingManager_SupplyAirTempLessThanZoneTStatTest)
+{
+    // GitHub issue 7039
+    std::string const idf_objects = delimited_string({
+
+        "  Timestep,1;",
+
+        "  Building,",
+        "    Simple One Zone,         !- Name",
+        "    0,                       !- North Axis {deg}",
+        "    Suburbs,                 !- Terrain",
+        "    0.04,                    !- Loads Convergence Tolerance Value",
+        "    0.004,                   !- Temperature Convergence Tolerance Value {deltaC}",
+        "    MinimalShadowing,        !- Solar Distribution",
+        "    30,                      !- Maximum Number of Warmup Days",
+        "    6;                       !- Minimum Number of Warmup Days",
+
+        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
+
+        "  SurfaceConvectionAlgorithm:Inside,TARP;",
+
+        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
+
+        "  SimulationControl,",
+        "    Yes,                     !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    No,                      !- Run Simulation for Sizing Periods",
+        "    No;                      !- Run Simulation for Weather File Run Periods",
+
+        "    Site:Location,",
+        "      Phoenix Sky Harbor Intl Ap_AZ_USA,  !- Name",
+        "      33.45,                   !- Latitude {deg}",
+        "      -111.98,                 !- Longitude {deg}",
+        "      -7,                      !- Time Zone {hr}",
+        "      337;                     !- Elevation {m}",
+
+        "    Site:GroundTemperature:BuildingSurface,20.83,20.81,20.88,20.96,21.03,23.32,23.68,23.74,23.75,21.42,21.09,20.9;",
+
+        "    SizingPeriod:DesignDay,",
+        "      Phoenix Sky Harbor Intl Ap Ann Clg .4% Condns DB=>MWB,  !- Name",
+        "      7,                       !- Month",
+        "      21,                      !- Day of Month",
+        "      SummerDesignDay,         !- Day Type",
+        "      43.4,                    !- Maximum Dry-Bulb Temperature {C}",
+        "      12,                      !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "      DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type",
+        "      ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "      Wetbulb,                 !- Humidity Condition Type",
+        "      21.1,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "      ,                        !- Humidity Condition Day Schedule Name",
+        "      ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "      ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "      ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "      97342,                   !- Barometric Pressure {Pa}",
+        "      4.1,                     !- Wind Speed {m/s}",
+        "      260,                     !- Wind Direction {deg}",
+        "      No,                      !- Rain Indicator",
+        "      No,                      !- Snow Indicator",
+        "      No,                      !- Daylight Saving Time Indicator",
+        "      ASHRAETau,               !- Solar Model Indicator",
+        "      ,                        !- Beam Solar Day Schedule Name",
+        "      ,                        !- Diffuse Solar Day Schedule Name",
+        "      0.588,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "      1.653;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "  ",
+        "    SizingPeriod:DesignDay,",
+        "      Phoenix Sky Harbor Intl Ap Ann Htg 99.6% Condns DB,  !- Name",
+        "      12,                      !- Month",
+        "      21,                      !- Day of Month",
+        "      WinterDesignDay,         !- Day Type",
+        "      3.7,                     !- Maximum Dry-Bulb Temperature {C}",
+        "      0,                       !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "      DefaultMultipliers,      !- Dry-Bulb Temperature Range Modifier Type",
+        "      ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "      Wetbulb,                 !- Humidity Condition Type",
+        "      3.7,                     !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "      ,                        !- Humidity Condition Day Schedule Name",
+        "      ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "      ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "      ,                        !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "      97342,                   !- Barometric Pressure {Pa}",
+        "      1.7,                     !- Wind Speed {m/s}",
+        "      100,                     !- Wind Direction {deg}",
+        "      No,                      !- Rain Indicator",
+        "      No,                      !- Snow Indicator",
+        "      No,                      !- Daylight Saving Time Indicator",
+        "      ASHRAEClearSky,          !- Solar Model Indicator",
+        "      ,                        !- Beam Solar Day Schedule Name",
+        "      ,                        !- Diffuse Solar Day Schedule Name",
+        "      ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "      ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+        "      0;                       !- Sky Clearness",
+
+        "  Material:NoMass,",
+        "    R13LAYER,                !- Name",
+        "    Rough,                   !- Roughness",
+        "    2.290965,                !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material:NoMass,",
+        "    R31LAYER,                !- Name",
+        "    Rough,                   !- Roughness",
+        "    5.456,                   !- Thermal Resistance {m2-K/W}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.7500000,               !- Solar Absorptance",
+        "    0.7500000;               !- Visible Absorptance",
+
+        "  Material,",
+        "    C5 - 4 IN HW CONCRETE,   !- Name",
+        "    MediumRough,             !- Roughness",
+        "    0.1014984,               !- Thickness {m}",
+        "    1.729577,                !- Conductivity {W/m-K}",
+        "    2242.585,                !- Density {kg/m3}",
+        "    836.8000,                !- Specific Heat {J/kg-K}",
+        "    0.9000000,               !- Thermal Absorptance",
+        "    0.6500000,               !- Solar Absorptance",
+        "    0.6500000;               !- Visible Absorptance",
+
+        "  Construction,",
+        "    R13WALL,                 !- Name",
+        "    R13LAYER;                !- Outside Layer",
+
+        "  Construction,",
+        "    FLOOR,                   !- Name",
+        "    C5 - 4 IN HW CONCRETE;   !- Outside Layer",
+
+        "  Construction,",
+        "    ROOF31,                  !- Name",
+        "    R31LAYER;                !- Outside Layer",
+
+        "  Zone,",
+        "    ZONE ONE,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    autocalculate,           !- Ceiling Height {m}",
+        "    autocalculate;           !- Volume {m3}",
+
+        "  ScheduleTypeLimits,",
+        "    Fraction,                !- Name",
+        "    0.0,                     !- Lower Limit Value",
+        "    1.0,                     !- Upper Limit Value",
+        "    CONTINUOUS;              !- Numeric Type",
+
+        "  GlobalGeometryRules,",
+        "    UpperLeftCorner,         !- Starting Vertex Position",
+        "    CounterClockWise,        !- Vertex Entry Direction",
+        "    World;                   !- Coordinate System",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall001,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,0,4.572000,            !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,0,0,                   !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,0,0,            !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,0,4.572000;     !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall002,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    15.24000,0,4.572000,     !- X,Y,Z ==> Vertex 1 {m}",
+        "    15.24000,0,0,            !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,15.24000,0,     !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,15.24000,4.572000;  !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall003,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    15.24000,15.24000,4.572000,  !- X,Y,Z ==> Vertex 1 {m}",
+        "    15.24000,15.24000,0,     !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,15.24000,0,            !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,15.24000,4.572000;     !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Wall004,           !- Name",
+        "    Wall,                    !- Surface Type",
+        "    R13WALL,                 !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0.5000000,               !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0,15.24000,4.572000,     !- X,Y,Z ==> Vertex 1 {m}",
+        "    0,15.24000,0,            !- X,Y,Z ==> Vertex 2 {m}",
+        "    0,0,0,                   !- X,Y,Z ==> Vertex 3 {m}",
+        "    0,0,4.572000;            !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Flr001,            !- Name",
+        "    Floor,                   !- Surface Type",
+        "    FLOOR,                   !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Surface,                 !- Outside Boundary Condition",
+        "    Zn001:Flr001,            !- Outside Boundary Condition Object",
+        "    NoSun,                   !- Sun Exposure",
+        "    NoWind,                  !- Wind Exposure",
+        "    1.000000,                !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    15.24000,0.000000,0.0,   !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000000,0.000000,0.0,   !- X,Y,Z ==> Vertex 2 {m}",
+        "    0.000000,15.24000,0.0,   !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,15.24000,0.0;   !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  BuildingSurface:Detailed,",
+        "    Zn001:Roof001,           !- Name",
+        "    Roof,                    !- Surface Type",
+        "    ROOF31,                  !- Construction Name",
+        "    ZONE ONE,                !- Zone Name",
+        "    Outdoors,                !- Outside Boundary Condition",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    SunExposed,              !- Sun Exposure",
+        "    WindExposed,             !- Wind Exposure",
+        "    0,                       !- View Factor to Ground",
+        "    4,                       !- Number of Vertices",
+        "    0.000000,15.24000,4.572, !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.000000,0.000000,4.572, !- X,Y,Z ==> Vertex 2 {m}",
+        "    15.24000,0.000000,4.572, !- X,Y,Z ==> Vertex 3 {m}",
+        "    15.24000,15.24000,4.572; !- X,Y,Z ==> Vertex 4 {m}",
+
+        "  FenestrationSurface:Detailed,",
+        "    Zn001:Wall001:Win001,    !- Name",
+        "    Window,                  !- Surface Type",
+        "    SimpleWindowConstruct,   !- Construction Name",
+        "    Zn001:Wall001,           !- Building Surface Name",
+        "    ,                        !- Outside Boundary Condition Object",
+        "    0.5000000,               !- View Factor to Ground",
+        "    ,                        !- Frame and Divider Name",
+        "    1.0,                     !- Multiplier",
+        "    4,                       !- Number of Vertices",
+        "    0.548000,0,2.5000,       !- X,Y,Z ==> Vertex 1 {m}",
+        "    0.548000,0,0.5000,       !- X,Y,Z ==> Vertex 2 {m}",
+        "    5.548000,0,0.5000,       !- X,Y,Z ==> Vertex 3 {m}",
+        "    5.548000,0,2.5000;       !- X,Y,Z ==> Vertex 4 {m}",
+
+        "    Construction,",
+        "      SimpleWindowConstruct,   !- Name",
+        "      SimpleWindowTest;        !- Outside Layer",
+
+        "    WindowMaterial:SimpleGlazingSystem,",
+        "      SimpleWindowTest,        !- Name",
+        "      0.600,                   !- U-Factor {W/m2-K}",
+        "      0.700,                   !- Solar Heat Gain Coefficient",
+        "      0.700;                   !- Visible Transmittance",
+
+        "    Sizing:Zone,",
+        "      ZONE ONE,                !- Zone or ZoneList Name",
+        "      SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method",
+        "      12.0,                    !- Zone Cooling Design Supply Air Temperature {C}",
+        "      ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}",
+        "      SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method",
+        "      12.0,                    !- Zone Heating Design Supply Air Temperature {C}",
+        "      ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}",
+        "      0.0075,                  !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "      0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "      SZ DSOA Zone One,        !- Design Specification Outdoor Air Object Name",
+        "      0.0,                     !- Zone Heating Sizing Factor",
+        "      0.0,                     !- Zone Cooling Sizing Factor",
+        "      DesignDay,               !- Cooling Design Air Flow Method",
+        "      0,                       !- Cooling Design Air Flow Rate {m3/s}",
+        "      ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}",
+        "      ,                        !- Cooling Minimum Air Flow {m3/s}",
+        "      ,                        !- Cooling Minimum Air Flow Fraction",
+        "      DesignDay,               !- Heating Design Air Flow Method",
+        "      0,                       !- Heating Design Air Flow Rate {m3/s}",
+        "      ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}",
+        "      ,                        !- Heating Maximum Air Flow {m3/s}",
+        "      ;                        !- Heating Maximum Air Flow Fraction",
+
+        "    DesignSpecification:OutdoorAir,",
+        "      SZ DSOA Zone One,        !- Name",
+        "      Sum,                     !- Outdoor Air Method",
+        "      0.0,                     !- Outdoor Air Flow per Person {m3/s-person}",
+        "      0.0,                     !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+        "      0.0;                     !- Outdoor Air Flow per Zone {m3/s}",
+
+        "    ZoneControl:Thermostat,",
+        "      Zone Thermostat,         !- Name",
+        "      ZONE ONE,                !- Zone or ZoneList Name",
+        "      Zone Control Type Sched, !- Control Type Schedule Name",
+        "      ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type",
+        "      Temperature Setpoints;   !- Control 1 Name",
+
+        "    Schedule:Compact,",
+        "      Zone Control Type Sched, !- Name",
+        "      Control Type,            !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,4;          !- Field 3",
+
+        "    ThermostatSetpoint:DualSetpoint,",
+        "      Temperature Setpoints,   !- Name",
+        "      Heating Setpoints,       !- Heating Setpoint Temperature Schedule Name",
+        "      Cooling Setpoints;       !- Cooling Setpoint Temperature Schedule Name",
+
+        "    Schedule:Compact,",
+        "      Heating Setpoints,       !- Name",
+        "      Temperature,             !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,21.0;       !- Field 3",
+
+        "    Schedule:Compact,",
+        "      Cooling Setpoints,       !- Name",
+        "      Temperature,             !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,24.0;       !- Field 3",
+
+        "    ScheduleTypeLimits,",
+        "      Control Type,            !- Name",
+        "      0,                       !- Lower Limit Value",
+        "      4,                       !- Upper Limit Value",
+        "      DISCRETE;                !- Numeric Type",
+
+        "    ScheduleTypeLimits,",
+        "      Temperature,             !- Name",
+        "      -60,                     !- Lower Limit Value",
+        "      200,                     !- Upper Limit Value",
+        "      CONTINUOUS,              !- Numeric Type",
+        "      Temperature;             !- Unit Type",
+
+        "    ZoneHVAC:EquipmentConnections,",
+        "      ZONE ONE,                  !- Zone Name",
+        "      ZONE 1 EQUIPMENT,        !- Zone Conditioning Equipment List Name",
+        "      ZONE 1 INLETS,           !- Zone Air Inlet Node or NodeList Name",
+        "      ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "      ZONE 1 NODE,             !- Zone Air Node Name",
+        "      ZONE 1 OUTLET;           !- Zone Return Air Node or NodeList Name",
+
+        "    ZoneHVAC:EquipmentList,",
+        "      ZONE 1 EQUIPMENT,        !- Name",
+        "      SequentialLoad,          !- Load Distribution Scheme",
+        "      ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type",
+        "      ZONE 1 Ideal Loads,      !- Zone Equipment 1 Name",
+        "      1,                       !- Zone Equipment 1 Cooling Sequence",
+        "      1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "      ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
+        "      ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "    ZoneHVAC:IdealLoadsAirSystem,",
+        "      ZONE 1 Ideal Loads,      !- Name",
+        "      ,                        !- Availability Schedule Name",
+        "      ZONE 1 INLETS,           !- Zone Supply Air Node Name",
+        "      ,                        !- Zone Exhaust Air Node Name",
+        "      ,                        !- System Inlet Air Node Name",
+        "      50,                      !- Maximum Heating Supply Air Temperature {C}",
+        "      13,                      !- Minimum Cooling Supply Air Temperature {C}",
+        "      0.015,                   !- Maximum Heating Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "      0.009,                   !- Minimum Cooling Supply Air Humidity Ratio {kgWater/kgDryAir}",
+        "      NoLimit,                 !- Heating Limit",
+        "      autosize,                !- Maximum Heating Air Flow Rate {m3/s}",
+        "      ,                        !- Maximum Sensible Heating Capacity {W}",
+        "      NoLimit,                 !- Cooling Limit",
+        "      autosize,                !- Maximum Cooling Air Flow Rate {m3/s}",
+        "      ,                        !- Maximum Total Cooling Capacity {W}",
+        "      ,                        !- Heating Availability Schedule Name",
+        "      ,                        !- Cooling Availability Schedule Name",
+        "      ConstantSupplyHumidityRatio,  !- Dehumidification Control Type",
+        "      ,                        !- Cooling Sensible Heat Ratio {dimensionless}",
+        "      ConstantSupplyHumidityRatio,  !- Humidification Control Type",
+        "      ,                        !- Design Specification Outdoor Air Object Name",
+        "      ,                        !- Outdoor Air Inlet Node Name",
+        "      ,                        !- Demand Controlled Ventilation Type",
+        "      ,                        !- Outdoor Air Economizer Type",
+        "      ,                        !- Heat Recovery Type",
+        "      ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}",
+        "      ;                        !- Latent Heat Recovery Effectiveness {dimensionless}",
+
+        "    NodeList,",
+        "      ZONE 1 INLETS,           !- Name",
+        "      ZONE 1 INLET;            !- Node 1 Name",
+
+        "  People,",
+        "      OpenOffice People,       !- Name",
+        "      ZONE ONE,                !- Zone or ZoneList Name",
+        "      BLDG_OCC_SCH,            !- Number of People Schedule Name",
+        "      People/Area,             !- Number of People Calculation Method",
+        "      ,                        !- Number of People",
+        "      0.010,                    !- People per Zone Floor Area {person/m2}",
+        "      ,                        !- Zone Floor Area per Person {m2/person}",
+        "      0.3,                     !- Fraction Radiant",
+        "      ,                        !- Sensible Heat Fraction",
+        "      ACTIVITY_SCH;            !- Activity Level Schedule Name",
+
+        "  Lights,",
+        "      OfficeLights,            !- Name",
+        "      ZONE ONE,                !- Zone or ZoneList Name",
+        "      BLDG_LIGHT_SCH,          !- Schedule Name",
+        "      Watts/Area,              !- Design Level Calculation Method",
+        "      ,                        !- Lighting Level {W}",
+        "      8.0,                    !- Watts per Zone Floor Area {W/m2}",
+        "      ,                        !- Watts per Person {W/person}",
+        "      ,                        !- Return Air Fraction",
+        "      ,                        !- Fraction Radiant",
+        "      ,                        !- Fraction Visible",
+        "      ;                        !- Fraction Replaceable",
+
+        "  ElectricEquipment,",
+        "      ElectricEquipment,       !- Name",
+        "      ZONE ONE,                !- Zone or ZoneList Name",
+        "      BLDG_EQUIP_SCH,          !- Schedule Name",
+        "      Watts/Area,              !- Design Level Calculation Method",
+        "      ,                        !- Design Level {W}",
+        "      8.0,                    !- Watts per Zone Floor Area {W/m2}",
+        "      ,                        !- Watts per Person {W/person}",
+        "      ,                        !- Fraction Latent",
+        "      ,                        !- Fraction Radiant",
+        "      ;                        !- Fraction Lost",
+
+        "  Schedule:Compact,",
+        "      BLDG_EQUIP_SCH,          !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,            !- Field 3",
+        "      0.7;                     !- Field 4",
+
+        "  Schedule:Compact,",
+        "      BLDG_LIGHT_SCH,          !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,            !- Field 3",
+        "      0.5;                     !- Field 4",
+
+        "  Schedule:Compact,",
+        "      BLDG_OCC_SCH,            !- Name",
+        "      Fraction,                !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,            !- Field 3",
+        "      0.5;                     !- Field 4",
+
+        "  Schedule:Compact,",
+        "      ACTIVITY_SCH,            !- Name",
+        "      Any Number,              !- Schedule Type Limits Name",
+        "      Through: 12/31,          !- Field 1",
+        "      For: AllDays,            !- Field 2",
+        "      Until: 24:00,            !- Field 3",
+        "      120.;                    !- Field 4",
+
+        "    ScheduleTypeLimits,",
+        "      Any Number;              !- Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::ManageSimulation(state);
+
+    int CtrlZoneNum(1);
+    // design peak load conditons and design supply air temperature
+    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).HeatTstatTemp, 21.0); // expects specified value
+    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).HeatDesTemp, 12.0);   // less than zone air Temp
+    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).HeatDesDay, "PHOENIX SKY HARBOR INTL AP ANN HTG 99.6% CONDNS DB");
+    // actual zone air temperature at peak load
+    EXPECT_NEAR(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.08, 0.01);
+    EXPECT_NEAR(DataSizing::FinalZoneSizing(CtrlZoneNum).ZoneTempAtHeatPeak, 17.08, 0.01);
+    // Check heating design flow rates, expected to be zero due the above conditions
+    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);  // expects zero
+    EXPECT_EQ(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0); // expects zero
+    EXPECT_EQ(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatVolFlow, 0.0);      // expects zero
+    EXPECT_EQ(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatMassFlow, 0.0);     // expects zero
+    // expects non-zero peak heating load
+    EXPECT_NEAR(DataSizing::CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
+    EXPECT_NEAR(DataSizing::FinalZoneSizing(CtrlZoneNum).DesHeatLoad, 6911.42, 0.01);
 }

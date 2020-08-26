@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,28 +55,30 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataPlant.hh>
-#include <DataReportingFlags.hh>
-#include <DataSizing.hh>
-#include <DataSystemVariables.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <ExteriorEnergyUse.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <HeatBalanceManager.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantPipingSystemsManager.hh>
-#include <SQLiteProcedures.hh>
-#include <SimulationManager.hh>
-#include <SizingAnalysisObjects.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingAnalysisObjects.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 class HVACSizingSimulationManager
 {
@@ -89,9 +91,9 @@ public:
     void DetermineSizingAnalysesNeeded();
     void SetupSizingAnalyses();
 
-    void RedoKickOffAndResize();
+    void RedoKickOffAndResize(EnergyPlusData &state);
     void PostProcessLogs();
-    void ProcessCoincidentPlantSizeAdjustments(int const HVACSizingIterCount);
+    void ProcessCoincidentPlantSizeAdjustments(IOFiles &ioFiles, int const HVACSizingIterCount);
 
     void UpdateSizingLogsZoneStep();
     void UpdateSizingLogsSystemStep();
@@ -102,7 +104,7 @@ private:
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(bool &ErrorsFound);
+void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
 } // namespace EnergyPlus
 

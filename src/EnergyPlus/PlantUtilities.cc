@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,17 +54,17 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchInputManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <PlantUtilities.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -271,7 +271,7 @@ namespace PlantUtilities {
             DataLoopNode::Node(OutletNode).MassFlowRateMaxAvail = min(DataLoopNode::Node(InletNode).MassFlowRateMaxAvail, DataLoopNode::Node(InletNode).MassFlowRateMax);
         } else {
             if (!DataGlobals::SysSizingCalc && DataPlant::PlantFirstSizesOkayToFinalize) {
-                // throw error for developers, need to change a componennt model to set hardware limits on inlet
+                // throw error for developers, need to change a component model to set hardware limits on inlet
                 if (!DataLoopNode::Node(InletNode).plantNodeErrorMsgIssued) {
                     ShowSevereError("SetComponentFlowRate: check component model implementation for component with inlet node named=" +
                                             DataLoopNode::NodeID(InletNode));
@@ -300,7 +300,7 @@ namespace PlantUtilities {
                     bool EMSLoadOverride = false;
 
                     for (int CompNum = 1; CompNum <= loop_side.Branch(BranchIndex).TotalComponents; ++CompNum) {
-                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));  
+                        auto &thisComp(loop_side.Branch(BranchIndex).Comp(CompNum));
                         int const CompInletNodeNum = thisComp.NodeNumIn;
                         auto &thisInletNode(DataLoopNode::Node(CompInletNodeNum));
                         SeriesBranchHighFlowRequest = max(thisInletNode.MassFlowRateRequest, SeriesBranchHighFlowRequest);
@@ -577,79 +577,6 @@ namespace PlantUtilities {
         return FlowVal;
     }
 
-    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brandon Anderson, Dan Fisher
-        //       DATE WRITTEN   October 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // calculate the outlet conditions at the mixer
-        // this is expected to only be called for loops with a mixer
-
-        // Find mixer outlet node number
-        int const MixerOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
-
-        // Find corresponding splitter inlet node number--correspondence, but currently
-        //  hard code things to a single split/mix setting it to the mixer number
-        int const SplitterInNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
-        // Initialize Mixer outlet temp and mass flow rate
-        Real64 MixerOutletTemp = 0.0;
-        Real64 MixerOutletMassFlow = 0.0;
-        Real64 MixerOutletMassFlowMaxAvail = 0.0;
-        Real64 MixerOutletMassFlowMinAvail = 0.0;
-        Real64 MixerOutletPress = 0.0;
-        Real64 MixerOutletQuality = 0.0;
-
-        // Calculate Mixer outlet mass flow rate
-        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++InletNodeNum) {
-            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(InletNodeNum);
-            MixerOutletMassFlow += DataLoopNode::Node(MixerInletNode).MassFlowRate;
-        }
-
-        // Calculate Mixer outlet temperature
-        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++InletNodeNum) {
-            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(InletNodeNum);
-            if (MixerOutletMassFlow > 0.0) {
-                Real64 const MixerInletMassFlow = DataLoopNode::Node(MixerInletNode).MassFlowRate;
-                Real64 const MassFrac = MixerInletMassFlow / MixerOutletMassFlow;
-                // mass flow weighted temp and enthalpy for each mixer inlet
-                MixerOutletTemp += MassFrac * DataLoopNode::Node(MixerInletNode).Temp;
-                MixerOutletQuality += MassFrac * DataLoopNode::Node(MixerInletNode).Quality;
-                MixerOutletMassFlowMaxAvail += DataLoopNode::Node(MixerInletNode).MassFlowRateMaxAvail;
-                MixerOutletMassFlowMinAvail += DataLoopNode::Node(MixerInletNode).MassFlowRateMinAvail;
-                MixerOutletPress = max(MixerOutletPress, DataLoopNode::Node(MixerInletNode).Press);
-            } else { // MixerOutletMassFlow <=0, then perform the 'no flow' update.
-                MixerOutletTemp = DataLoopNode::Node(SplitterInNode).Temp;
-                MixerOutletQuality = DataLoopNode::Node(SplitterInNode).Quality;
-                MixerOutletMassFlowMaxAvail = DataLoopNode::Node(SplitterInNode).MassFlowRateMaxAvail;
-                MixerOutletMassFlowMinAvail = DataLoopNode::Node(SplitterInNode).MassFlowRateMinAvail;
-                MixerOutletPress = DataLoopNode::Node(SplitterInNode).Press;
-                break;
-            }
-        }
-
-        DataLoopNode::Node(MixerOutletNode).MassFlowRate = MixerOutletMassFlow;
-        DataLoopNode::Node(MixerOutletNode).Temp = MixerOutletTemp;
-        if (DataPlant::PlantLoop(LoopNum).HasPressureComponents) {
-            // Don't update pressure, let pressure system handle this...
-        } else {
-            // Go ahead and update!
-            DataLoopNode::Node(MixerOutletNode).Press = MixerOutletPress;
-        }
-        DataLoopNode::Node(MixerOutletNode).Quality = MixerOutletQuality;
-
-        // set max/min avails on mixer outlet to be consistent with the following rules
-        // 1.  limited by the max/min avails on splitter inlet
-        // 2.  limited by the sum of max/min avails for each branch's mixer inlet node
-
-        DataLoopNode::Node(MixerOutletNode).MassFlowRateMaxAvail = min(MixerOutletMassFlowMaxAvail, DataLoopNode::Node(SplitterInNode).MassFlowRateMaxAvail);
-        DataLoopNode::Node(MixerOutletNode).MassFlowRateMinAvail = max(MixerOutletMassFlowMinAvail, DataLoopNode::Node(SplitterInNode).MassFlowRateMinAvail);
-    }
-
     bool AnyPlantSplitterMixerLacksContinuity()
     {
 
@@ -663,7 +590,7 @@ namespace PlantUtilities {
         // Similar to CheckPlantMixerSplitterConsistency, but used to decide if plant needs to iterate again
         for (int LoopNum = 1; LoopNum <= DataPlant::TotNumLoops; ++LoopNum) {
             for (int LoopSide = DataPlant::DemandSide; LoopSide <= DataPlant::SupplySide; ++LoopSide) {
-                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).SplitterExists) {
+                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.Exists) {
                     int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.NodeNumIn;
                     // loop across branch outlet nodes and check mass continuity
                     int const NumSplitterOutlets = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.TotalOutletNodes;
@@ -721,7 +648,7 @@ namespace PlantUtilities {
         int LastNodeOnBranch;
 
         if (!PlantLoop(LoopNum).LoopHasConnectionComp) {
-            if (!DoingSizing && !WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).MixerExists && !FirstHVACIteration) {
+            if (!DoingSizing && !WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
                 // Find mixer outlet node number
                 MixerOutletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
                 // Find splitter inlet node number
@@ -826,7 +753,6 @@ namespace PlantUtilities {
         using DataLoopNode::NodeID;
         using DataPlant::DemandSide;
         using DataPlant::PlantLoop;
-        using DataPlant::PlantReport;
         using DataPlant::SupplySide;
         using General::RoundSigDigits;
 
@@ -921,7 +847,7 @@ namespace PlantUtilities {
             }
             ShowContinueError("PlantLoop Outlet Node (" + DemandSupply + "Side) \"" + NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut) +
                               "\" has temperature=" + RoundSigDigits(Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumOut).Temp, 1) + " {C}");
-            ShowContinueError("PlantLoop  Inlet Node (" + DemandSupply + "Side) \"" + NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn) +
+            ShowContinueError("PlantLoop Inlet Node (" + DemandSupply + "Side) \"" + NodeID(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn) +
                               "\" has temperature=" + RoundSigDigits(Node(PlantLoop(LoopNum).LoopSide(LoopSideNum).NodeNumIn).Temp, 1) + " {C}");
             ShowContinueError("PlantLoop Minimum Temperature=" + RoundSigDigits(PlantLoop(LoopNum).MinTemp, 1) + " {C}");
             ShowContinueError("PlantLoop Maximum Temperature=" + RoundSigDigits(PlantLoop(LoopNum).MaxTemp, 1) + " {C}");
@@ -934,10 +860,10 @@ namespace PlantUtilities {
                               " {kg/s}");
             ShowContinueError("PlantLoop PumpHeat (SupplySide)=" + RoundSigDigits(PlantLoop(LoopNum).LoopSide(SupplySide).TotalPumpHeat, 1) + " {W}");
             ShowContinueError("PlantLoop PumpHeat (DemandSide)=" + RoundSigDigits(PlantLoop(LoopNum).LoopSide(DemandSide).TotalPumpHeat, 1) + " {W}");
-            ShowContinueError("PlantLoop Cooling Demand=" + RoundSigDigits(PlantReport(LoopNum).CoolingDemand, 1) + " {W}");
-            ShowContinueError("PlantLoop Heating Demand=" + RoundSigDigits(PlantReport(LoopNum).HeatingDemand, 1) + " {W}");
-            ShowContinueError("PlantLoop Demand not Dispatched=" + RoundSigDigits(PlantReport(LoopNum).DemandNotDispatched, 1) + " {W}");
-            ShowContinueError("PlantLoop Unmet Demand=" + RoundSigDigits(PlantReport(LoopNum).UnmetDemand, 1) + " {W}");
+            ShowContinueError("PlantLoop Cooling Demand=" + RoundSigDigits(PlantLoop(LoopNum).CoolingDemand, 1) + " {W}");
+            ShowContinueError("PlantLoop Heating Demand=" + RoundSigDigits(PlantLoop(LoopNum).HeatingDemand, 1) + " {W}");
+            ShowContinueError("PlantLoop Demand not Dispatched=" + RoundSigDigits(PlantLoop(LoopNum).DemandNotDispatched, 1) + " {W}");
+            ShowContinueError("PlantLoop Unmet Demand=" + RoundSigDigits(PlantLoop(LoopNum).UnmetDemand, 1) + " {W}");
 
             LoopCapacity = 0.0;
             DispatchedCapacity = 0.0;
@@ -973,58 +899,6 @@ namespace PlantUtilities {
             ShowContinueError("  If this is happening during Warmup, you can use Output:Diagnostics,ReportDuringWarmup;");
             ShowContinueError("  This is detected at the loop level, but the typical problems are in the components.");
             ShowFatalError("CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too " + hotcold);
-        }
-    }
-
-    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brandon Anderson, Dan Fisher
-        //       DATE WRITTEN   October 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set the outlet conditions of the splitter
-
-        // Update Temperatures across splitter
-        if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).SplitterExists) {
-
-            // Set branch number at splitter inlet
-            int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
-
-            // Loop over outlet nodes
-            for (int CurNode = 1; CurNode <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++CurNode) {
-                int const SplitterOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut(CurNode);
-
-                // Inlet Temp equals exit Temp to all outlet branches
-                DataLoopNode::Node(SplitterOutletNode).Temp = DataLoopNode::Node(SplitterInletNode).Temp;
-                DataLoopNode::Node(SplitterOutletNode).TempMin = DataLoopNode::Node(SplitterInletNode).TempMin;
-                DataLoopNode::Node(SplitterOutletNode).TempMax = DataLoopNode::Node(SplitterInletNode).TempMax;
-                if (DataPlant::PlantLoop(LoopNum).HasPressureComponents) {
-                    // Don't update pressure, let pressure system handle this...
-                } else {
-                    // Go ahead and update!
-                    DataLoopNode::Node(SplitterOutletNode).Press = DataLoopNode::Node(SplitterInletNode).Press;
-                }
-                DataLoopNode::Node(SplitterOutletNode).Quality = DataLoopNode::Node(SplitterInletNode).Quality;
-
-                // DSU? These two blocks and the following one which I added need to be cleaned up
-                // I think we will always pass maxavail down the splitter, min avail is the issue.
-                // Changed to include hardware max in next line 7/26/2011
-                DataLoopNode::Node(SplitterOutletNode).MassFlowRateMaxAvail =
-                    min(DataLoopNode::Node(SplitterInletNode).MassFlowRateMaxAvail, DataLoopNode::Node(SplitterOutletNode).MassFlowRateMax);
-                DataLoopNode::Node(SplitterOutletNode).MassFlowRateMinAvail = 0.0;
-
-                // DSU? Not sure about passing min avail if it is nonzero.  I am testing a pump with nonzero
-                // min flow rate, and it is causing problems because this routine passes zero down.  Perhaps if
-                // it is a single parallel branch, we are safe to assume we need to just pass it down.
-                // But need to test for multiple branches (or at least think about it), to see what we need to do...
-                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes == 1) {
-                    DataLoopNode::Node(SplitterOutletNode).MassFlowRateMinAvail = DataLoopNode::Node(SplitterInletNode).MassFlowRateMinAvail;
-                }
-            }
         }
     }
 
@@ -1216,13 +1090,11 @@ namespace PlantUtilities {
         static std::string const RoutineName("UpdateChillerComponentCondenserSide");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool DidAnythingChange(false); // set to true if conditions changed
+        bool DidAnythingChange(false); // set to true if conditions changed
         int OtherLoopNum;                     // local loop pointer for remote connected loop
         int OtherLoopSide;                    // local loop side pointer for remote connected loop
         int ConnectLoopNum;                   // local do loop counter
         Real64 Cp;
-
-        DidAnythingChange = false;
 
         // check if any conditions have changed
         if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
@@ -1305,13 +1177,11 @@ namespace PlantUtilities {
         static std::string const RoutineName("UpdateComponentHeatRecoverySide");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool DidAnythingChange(false); // set to true if conditions changed
+        bool DidAnythingChange(false); // set to true if conditions changed
         int OtherLoopNum;                     // local loop pointer for remote connected loop
         int OtherLoopSide;                    // local loop side pointer for remote connected loop
         int ConnectLoopNum;                   // local do loop counter
         Real64 Cp;                            // local fluid specific heat
-
-        DidAnythingChange = false;
 
         // check if any conditions have changed
         if (Node(InletNodeNum).MassFlowRate != ModelMassFlowRate) DidAnythingChange = true;
@@ -1387,12 +1257,10 @@ namespace PlantUtilities {
         using DataPlant::PlantLoop;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool DidAnythingChange(false); // set to true if conditions changed
+        bool DidAnythingChange(false); // set to true if conditions changed
         int OtherLoopNum;                     // local loop pointer for remote connected loop
         int OtherLoopSide;                    // local loop side pointer for remote connected loop
         int ConnectLoopNum;                   // local do loop counter
-
-        DidAnythingChange = false;
 
 //        TODO: Umm, this block seems like it doesn't do much...
 //        // check if node heat rate compares well with generator heat rate
@@ -1805,7 +1673,7 @@ namespace PlantUtilities {
     }
 
     // In-Place Right Shift by 1 of Array Elements
-    void rshift1(Array1<Real64> &a, Real64 const a_l)
+    void rshift1(Array1D<Real64> &a, Real64 const a_l)
     {
         assert(a.size_bounded());
         for (int i = a.u(), e = a.l(); i > e; --i) {
@@ -1860,69 +1728,8 @@ namespace PlantUtilities {
         }
     }
 
-    bool CheckPlantConvergence(int const ThisLoopNum, int const ThisLoopSide, bool const FirstHVACIteration)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This routine checks the history values in the convergence arrays of this loop/LoopSide combination
-
-        // METHODOLOGY EMPLOYED:
-        // On FirstHVAC, we are not converged yet, thus forcing at least two iterations
-        // Calculate the average of each related variable history (generalized: could be any number of history terms)
-        // If any of the history terms do not match this average, then at least one value is different, so not converged
-        // Although this routine appears to check for convergence, it is also used to check for stuck (max iteration) conditions
-        //  in cases where demand side (air loop, for example) equipment is "fighting" with the plant loop
-        // The result of this routine can help the plant "lock-in" and take action to stop the iteration
-
-        // Using/Aliasing
-        using namespace DataPlant;
-        using namespace DataLoopNode;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InletAvgTemp;
-        Real64 InletAvgMdot;
-        Real64 OutletAvgTemp;
-        Real64 OutletAvgMdot;
-
-        if (FirstHVACIteration) {
-            return false;
-        }
-
-        InletAvgTemp = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory) /
-                       size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory, InletAvgTemp)) {
-            return false;
-        }
-
-        InletAvgMdot = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory) /
-                       size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory, InletAvgMdot)) {
-            return false;
-        }
-
-        OutletAvgTemp = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory) /
-                        size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory, OutletAvgTemp)) {
-            return false;
-        }
-
-        OutletAvgMdot = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory) /
-                        size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory, OutletAvgMdot)) {
-            return false;
-        }
-
-        // If we made it this far, we're good!
-        return true;
-    }
-
-    void ScanPlantLoopsForObject(std::string const &CompName,
+    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+                                 std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,
                                  int &LoopSideNum,
@@ -2027,7 +1834,7 @@ namespace PlantUtilities {
                 if (!present(SingleLoopSearch)) {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on any plant loops.");
-                    AuditBranches(true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
+                    AuditBranches(dataBranchInputManager, true, DataPlant::ccSimPlantEquipTypes(CompType), CompName);
                 } else {
                     ShowSevereError("Plant Component " + DataPlant::ccSimPlantEquipTypes(CompType) + " called \"" + CompName +
                                     "\" was not found on plant loop=\"" + DataPlant::PlantLoop(SingleLoopSearch).Name + "\".");

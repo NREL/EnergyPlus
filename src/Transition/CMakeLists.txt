@@ -1,5 +1,9 @@
 project(Transition Fortran)
 
+cmake_minimum_required(VERSION 3.5.1)
+
+cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
@@ -60,6 +64,8 @@ list( APPEND VERSIONS 8_9_0 )
 list( APPEND VERSIONS 9_0_0 )
 list( APPEND VERSIONS 9_1_0 )
 list( APPEND VERSIONS 9_2_0 )
+list( APPEND VERSIONS 9_3_0 )
+list( APPEND VERSIONS 9_4_0 )
 
 if(APPLE)
   if( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
@@ -123,6 +129,7 @@ foreach( i RANGE 1 ${end} )
 
   set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
   add_executable( "${LAST_NAME}" ${SRC} )
+  set_target_properties("${LAST_NAME}" PROPERTIES FOLDER Auxiliary)
   target_link_libraries( "${LAST_NAME}" TransitionLib )
 
   if( "${i}" GREATER "22" )
@@ -136,6 +143,11 @@ endforeach()
 
 # then install all the support files
 
+install(FILES "InputRulesFiles/Rules7-2-0-to-8-0-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-0-0-to-8-1-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-1-0-to-8-2-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-2-0-to-8-3-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules8-3-0-to-8-4-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules8-4-0-to-8-5-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules8-5-0-to-8-6-0.xls" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules8-6-0-to-8-7-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
@@ -144,7 +156,10 @@ install(FILES "InputRulesFiles/Rules8-8-0-to-8-9-0.md" DESTINATION "PreProcess/I
 install(FILES "InputRulesFiles/Rules8-9-0-to-9-0-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules9-0-0-to-9-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "InputRulesFiles/Rules9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules9-2-0-to-9-3-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "InputRulesFiles/Rules9-3-0-to-9-4-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
+# output changes file first introduced with v8.5.0, so no older ones exist
 install(FILES "OutputRulesFiles/OutputChanges8-4-0-to-8-5-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges8-5-0-to-8-6-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges8-6-0-to-8-7-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
@@ -153,7 +168,14 @@ install(FILES "OutputRulesFiles/OutputChanges8-8-0-to-8-9-0.md" DESTINATION "Pre
 install(FILES "OutputRulesFiles/OutputChanges8-9-0-to-9-0-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-0-0-to-9-1-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 install(FILES "OutputRulesFiles/OutputChanges9-1-0-to-9-2-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "OutputRulesFiles/OutputChanges9-2-0-to-9-3-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
+install(FILES "OutputRulesFiles/OutputChanges9-3-0-to-9-4-0.md" DESTINATION "PreProcess/IDFVersionUpdater")
 
+install(FILES "SupportFiles/Report Variables 7-2-0-006 to 8-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-0-0-007 to 8-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-1-0-009 to 8-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-2-0 to 8-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 8-3-0 to 8-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-4-0 to 8-5-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-5-0 to 8-6-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 8-6-0 to 8-7-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -162,3 +184,5 @@ install(FILES "SupportFiles/Report Variables 8-8-0 to 8-9-0.csv" DESTINATION "Pr
 install(FILES "SupportFiles/Report Variables 8-9-0 to 9-0-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 9-0-0 to 9-1-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
 install(FILES "SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "SupportFiles/Report Variables 9-3-0 to 9-4-0.csv" DESTINATION "PreProcess/IDFVersionUpdater/")

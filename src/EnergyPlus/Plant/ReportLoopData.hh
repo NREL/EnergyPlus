@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,7 +48,7 @@
 #ifndef PlantReportingReporting_hh_INCLUDED
 #define PlantReportingReporting_hh_INCLUDED
 
-#include <Plant/ReportBranchData.hh>
+#include <EnergyPlus/Plant/ReportBranchData.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

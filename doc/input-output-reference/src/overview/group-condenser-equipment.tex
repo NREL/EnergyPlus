@@ -53,7 +53,7 @@ Design\;Air\;Flow\;Rate = \frac{{0.5{\rho_{air}}(Fan\;power\;at\;Design\;Air\;Fl
 
 where a fan pressure rise of 190 Pascals and total fan efficiency of 0.5 are assumed.
 
-\paragraph{Field: Design Fan Power}\label{field-design-fan-power}
+\paragraph{Field: Design Fan Power}
 
 This numeric field contains the fan power (in watts) at the design air flow rate specified in the previous field. A value greater than zero must be specified regardless of the tower performance input method, or this field can be autosized. If autosized, the fan power is calculated as follows:
 
@@ -85,7 +85,7 @@ This numeric field contains the air flow rate (m\(^{3}\)/s) when the tower is in
 
 This numeric field contains the sizing factor to use when calculating the free convection regime air flow rate.~ The default is 0.1.
 
-\paragraph{Field: Free Convection Regime U-Factor Times Area Value}\label{fieldfree-convection-regine-u-factor-times-area-value}
+\paragraph{Field: Free Convection Regime U-Factor Times Area Value}\label{fieldfree-convection-regime-u-factor-times-area-value}
 
 This numeric field contains the heat transfer coefficient-area product (W/K) when the tower is in the ``free convection'' regime (water flow exists but tower fan is turned off). This value must be less than the value specified for the field ``U-Factor Times Area Value at Design Air Flow Rate''. This field may be autosized, in which case it is set to a fraction of the ``U-Factor Times Area Value at Design Air Flow Rate'' determined in the following input field. If the user does not wish to model ``free convection'' and is using the~ Performance Input Method ``UFactorTimesAreaAndDesignWaterFlowRate'', then this field should be set to 0.0. If ``Performance Input Method'' is specified as ``NominalCapacity'', then this field must be left blank since the model automatically calculates the tower UA based on the tower capacity specified in the field ``Free Convection Capacity''.\textbackslash{}
 
@@ -115,19 +115,23 @@ This numeric field contains the sizing factor to use when calculating the Free C
 
 \paragraph{Field: Design Inlet Air Dry-Bulb Temperature}\label{field-design-inlet-air-drybulb-temperature}
 
-This numeric field specifies the design inlet air dry-bulb temperature of the tower. The default is 35.0\(*^{\circ}\)C.
+This numeric field specifies the design inlet air dry-bulb temperature of the tower. The default is \SI{35.0}{\celsius}.
 
 \paragraph{Field: Design Inlet Air Wet-Bulb Temperature}\label{field-design-inlet-air-wetbulb-temperature}
 
-This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is 25.6\(*^{\circ}\)C.
+This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is \SI{25.6}{\celsius}.
 
-\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature}
+\paragraph{Field: Design Approach Temperature}
 
-This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.  The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions. This parameter is autosizable and when autosized it is set to 3.9\(*^{\circ}\)C.
+This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.
+The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{3.9}{\celsius}.
 
 \paragraph{Field: Design Temperature Range}\label{field-design-temperature-range}
 
-This numeric field specifies the design  temperature range of the tower corresponding to the design inlet air wet-bulb temperature and the design approach temperature.  The design range  should be the inlet water temperature minus the outlet water temperature at design conditions. This parameter is autosizable and when autosized it is set to 5.5\(*^{\circ}\)C.
+This numeric field specifies the design temperature range of the tower corresponding to the design inlet air wet-bulb temperature and the design approach temperature.
+The design range  should be the inlet water temperature minus the outlet water temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{5.5}{\celsius}.
 
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity}
 
@@ -135,7 +139,7 @@ This numeric field contains the capacity of the tower's electric basin heater in
 
 \paragraph{Field: Basin Heater Setpoint Temperature}\label{field-basin-heater-setpoint-temperature}
 
-This numeric field contains the set point temperature (˚C) for the basin heater described in the previous field. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the tower fan is off and water is not flowing through the tower. This set point temperature must be greater than or equal to 2˚C, and the default value is 2˚C if this field is left blank.
+This numeric field contains the set point temperature (°C) for the basin heater described in the previous field. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the tower fan is off and water is not flowing through the tower. This set point temperature must be greater than or equal to 2˚C, and the default value is 2˚C if this field is left blank.
 
 \paragraph{Field: Basin Heater Operating Schedule Name}\label{field-basin-heater-operating-schedule-name}
 
@@ -224,25 +228,33 @@ Three examples of an IDF specification for this object are shown below:
 
 \begin{lstlisting}
 
-CoolingTower:SingleSpeed,
+  CoolingTower:SingleSpeed,
     My Tower,                     !- Name
     Condenser Tower Inlet Node,   !- Water Inlet Node Name
     Condenser Tower Outlet Node,  !- Water Outlet Node Name
-    .0011,                        !- Design Water Flow Rate (m3/s)
-    16.0,                         !- Design Air Flow Rate (m3/s)
-    10000.,                       !- Fan Power at Design Air Flow Rate (W)
-    3500.,  !- U-Factor Times Area Value at Design Air Flow Fate (W/C)
-    0.0,    !- Air Flow Rate in Free Convection Regime (m3/s)
-    0.0,    !- U-Factor Times Area Value at Free Convection Air Flow Rate (W/C)
-    UFactorTimesAreaAndDesignWaterFlowRate,!- Performance Input Method
-    ,                             !- Nominal Capacity (W)
-    ,                             !- Free Convection Capacity (W)
+    .0011,                        !- Design Water Flow Rate {m3/s}
+    16.0,                         !- Design Air Flow Rate {m3/s}
+    10000.,                       !- Design Fan Power {W}
+    3500.,                        !- Design U-Factor Times Area Value {W/K}
+    0.0,                          !- Free Convection Air Flow Rate {m3/s}
+    ,                             !- Free Convection Air Flow Rate Sizing Factor
+    0.0,                          !- Free Convection U-Factor Times Area Value {W/K}
+    ,                             !- Free Convection U-Factor Times Area Value Sizing Factor
+    UFactorTimesAreaAndDesignWaterFlowRate,   !- Performance Input Method
+    ,                             !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    ,                             !- Nominal Capacity {W}
+    ,                             !- Free Convection Capacity {W}
+    ,                             !- Free Convection Nominal Capacity Sizing Factor
+    ,                             !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                             !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                             !- Design Approach Temperature {deltaC}
+    ,                             !- Design Range Temperature {deltaC}
     ,                             !- Basin Heater Capacity {W/K}
     ,                             !- Basin Heater Setpoint Temperature {C}
     ,                             !- Basin Heater Operating Schedule Name
     ,                             !- Evaporation Loss Mode
-    ,                             !- Evaporation Loss Factor (percent/K)
-    ,                             !- Drift Loss Percent (percent)
+    ,                             !- Evaporation Loss Factor {percent/K}
+    ,                             !- Drift Loss Percent {percent}
     ,                             !- Blowdown Calculation Mode
     ,                             !- Blowdown Concentration Ratio
     ,                             !- Blowdown Makeup Water Usage Schedule Name
@@ -251,55 +263,69 @@ CoolingTower:SingleSpeed,
     FluidBypass,                  !- Capacity Control
     4,                            !- Number of Cells
     MinimalCell,                  !- Cell Control
-    0.25,                         !- Cell Minimum Water Flow Rate Fraction
-    1.50;                         !- Cell Maximum Water Flow Rate Fraction
-
+    ,                             !- Cell Minimum  Water Flow Rate Fraction
+    ,                             !- Cell Maximum Water Flow Rate Fraction
+    1.0000;                       !- Sizing Factor
 
   CoolingTower:SingleSpeed,
     My Tower,                   !- Name
     Condenser Tower Inlet Node, !- Water Inlet Node Name
     Condenser Tower Outlet Node,!- Water Outlet Node Name
-    ,                           !- Design Water Flow Rate (m3/s)
-    autosize,                   !- Design Air Flow Rate (m3/s)
-    1000.,                      !- Fan Power at Design Air Flow Rate (W)
-    ,                !- U-Factor Times Area Value at Design Air Flow Fate (W/C)
-    autosize,        !- Air Flow Rate in Free Convection Regime (m3/s)
-    ,       !- U-Factor Times Area Value at Free Convection Air Flow Rate (W/C)
+    ,                           !- Design Water Flow Rate {m3/s}
+    Autosize,                   !- Design Air Flow Rate {m3/s}
+    1000.,                      !- Design Fan Power {W}
+    ,                           !- Design U-Factor Times Area Value {W/K}
+    autocalculate,              !- Free Convection Air Flow Rate {m3/s}
+    ,                           !- Free Convection Air Flow Rate Sizing Factor
+    autocalculate,              !- Free Convection U-Factor Times Area Value {W/K}
+    ,                           !- Free Convection U-Factor Times Area Value Sizing Factor
     NominalCapacity,            !- Performance Input Method
-    95250.,                     !- Nominal Capacity (W)
-    9525.;                      !- Free Convection Capacity (W)
-
+    ,                           !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    95250.,                     !- Nominal Capacity {W}
+    9525.;                      !- Free Convection Capacity {W}
 
   CoolingTower:SingleSpeed,
-      TowerWaterSys CoolTower, !- Name
-      TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Water Inlet Node Name
-      TowerWaterSys Supply Equipment Outlet Node,  !- Water Outlet Node Name
-      AUTOSIZE,                !- Design Water Flow Rate {m3/s}
-      AUTOSIZE,                !- Design Air Flow Rate {m3/s}
-      AUTOSIZE,                !- Fan Power at Design Air Flow Rate {W}
-      AUTOSIZE,   !- U-Factor Times Area Value at Design Air Flow Rate {W/K}
-      AUTOSIZE,   !- Air Flow Rate in Free Convection Regime {m3/s}
-      AUTOSIZE,   !- U-Factor Times Area at Free Convection Air Flow Rate {W/K}
-      UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-      ,                        !- Nominal Capacity {W}
-      ,                        !- Free Convection Capacity {W}
-      ,                        !- Basin Heater Capacity {W/K}
-      ,                        !- Basin Heater Setpoint Temperature {C}
-      ,                        !- Basin Heater Operating Schedule Name
-      SaturatedExit,           !- Evaporation Loss Mode
-      ,                        !- Evaporation Loss Factor {percent/K}
-      0.0080,                  !- Drift Loss Percent {percent}
-      ConcentrationRatio,      !- Blowdown Calculation Mode
-      3.0000,                  !- Blowdown Concentration Ratio
-      ,                        !- Blowdown Makeup Water Usage Schedule Name
-      ,                        !- Supply Water Storage Tank Name
-      TowerWaterSys CoolTowerOA ref Node,  !- Outdoor Air Inlet Node Name
-      FanCycling,              !- Capacity Control
-      4,                       !- Number of Cells
-      MinimalCell,             !- Cell Control
-      0.25,                    !- Cell Minimum Water Flow Rate Fraction
-      1.50,                    !- Cell Maximum Water Flow Rate Fraction
-      1.0000;                  !- Sizing Factor
+    TowerWaterSys CoolTower, !- Name
+    TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Water Inlet Node Name
+    TowerWaterSys Supply Equipment Outlet Node,  !- Water Outlet Node Name
+    AUTOSIZE,                !- Design Water Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Design Fan Power {W}
+    AUTOSIZE,                !- Design U-Factor Times Area Value {W/K}
+    autocalculate,           !- Free Convection Air Flow Rate {m3/s}
+    ,                        !- Free Convection Air Flow Rate Sizing Factor
+    autocalculate,           !- Free Convection U-Factor Times Area Value {W/K}
+    ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
+    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
+    ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    ,                        !- Nominal Capacity {W}
+    ,                        !- Free Convection Capacity {W}
+    ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    SaturatedExit,           !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    0.0080,                  !- Drift Loss Percent {percent}
+    ConcentrationRatio,      !- Blowdown Calculation Mode
+    3.0000,                  !- Blowdown Concentration Ratio
+    ,                        !- Blowdown Makeup Water Usage Schedule Name
+    ,                        !- Supply Water Storage Tank Name
+    TowerWaterSys CoolTower OA ref Node,  !- Outdoor Air Inlet Node Name
+    FanCycling,              !- Capacity Control
+    4,                       !- Number of Cells
+    MinimalCell,             !- Cell Control
+    ,                        !- Cell Minimum  Water Flow Rate Fraction
+    ,                        !- Cell Maximum Water Flow Rate Fraction
+    1.0000;                  !- Sizing Factor
+
+  OutdoorAir:Node,
+    TowerWaterSys CoolTower OA ref Node;  !- Name
+
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-004}
@@ -475,11 +501,11 @@ For multi-cell towers, the following inputs are assumed to be for the entire tow
   BASIN HEATER (we assume that there is a common basin)
 \end{itemize}
 
-\textbf{\emph{Field: Name}}
+\subsubsection{Inputs}\label{inputs-1-006}
+
+\paragraph{Field: Name}\label{ct-twospeed-field-name}
 
 This alpha field contains the identifying name for the cooling tower.
-
-\subsubsection{Inputs}\label{inputs-1-006}
 
 \paragraph{Field: Water Inlet Node Name}\label{field-water-inlet-node-name-1}
 
@@ -595,6 +621,26 @@ This numeric input field contains the ``nominal'' heat rejection capacity of the
 
 This numeric field contains the sizing factor to use when calculating the Free Convection Capacity. The default is 0.1.
 
+\paragraph{Field: Design Inlet Air Dry-Bulb Temperature}\label{field-design-inlet-air-drybulb-temperature-1}
+
+This numeric field specifies the design inlet air dry-bulb temperature of the tower. The default is \SI{35.0}{\celsius}.
+
+\paragraph{Field: Design Inlet Air Wet-Bulb Temperature}\label{field-design-inlet-air-wetbulb-temperature-1}
+
+This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is \SI{25.6}{\celsius}.
+
+\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature-1}
+
+This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.
+The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{3.9}{\celsius}.
+
+\paragraph{Field: Design Temperature Range}\label{field-design-temperature-range-1}
+
+This numeric field specifies the design temperature range of the tower corresponding to the design inlet air wet-bulb temperature and the design approach temperature.
+The design range  should be the inlet water temperature minus the outlet water temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{5.5}{\celsius}.
+
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-1}
 
 This numeric field contains the capacity of the tower's electric basin heater in watts per degree Kelvin. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the tower fan is off and water is not flowing through the tower, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
@@ -691,104 +737,141 @@ Four examples of an IDF specification for this object are shown below:
 
 \begin{lstlisting}
 
-CoolingTower:TwoSpeed,
-     My Tower,                      !- Name
-     Condenser Tower Inlet Node,    !- Water inlet node name
-     Condenser Tower Outlet Node,   !- Water outlet node name
-     .0011,                         !- Design water flow rate, m3/s
-     16.0,                          !- Air flow rate at high fan speed, m3/s
-     10000,                         !- Fan power at high fan speed, W
-     3500.,                         !- Tower UA at high fan speed, W/C
-     8.0,                           !- Air flow rate at low fan speed, m3/s
-     1600,                          !- Fan power at low fan speed, W
-     2100.,                         !- Tower UA at low fan speed, W/C
-     1.6,                           !- Air flow rate for free convection, m3/s
-     350,                          !- Tower UA at free convection air flow, W/C
-     UFactorTimesAreaAndDesignWaterFlowRate; !- Tower performance input method
-
-
-    CoolingTower:TwoSpeed,
-      My Tower,                !- Name
-      Condenser Tower Inlet Node,   !- Water Inlet Node Name
-      Condenser Tower Outlet Node,  !- Water Outlet Node Name
-      ,                        !- Design Water Flow Rate {m3/s}
-      8.0,                     !- Air Flow Rate at High Fan Speed {m3/s}
-      500,                     !- Fan Power at High Fan Speed {W}
-      ,                   !- U-Factor Times Area Value at High Fan Speed {W/K}
-      4.0,                     !- Air Flow Rate at Low Fan Speed {m3/s}
-      125,                     !- Fan Power at Low Fan Speed {W}
-      ,                   !- U-Factor Times Area Value at Low Fan Speed {W/K}
-      0.8,                !- Air Flow Rate in Free Convection Regime {m3/s}
-      ,     !- U-Factor Times Area Value at Free Convection Air Flow Rate {W/K}
-      NominalCapacity,         !- Performance Input Method
-      20000.0,                 !- High Speed Nominal Capacity {W}
-      10000.0,                 !- Low Speed Nominal Capacity {W}
-      2000.0;                  !- Free Convection Capacity {W}
+  CoolingTower:TwoSpeed,
+    My Tower,                     !- Name
+    Condenser Tower Inlet Node,   !- Water Inlet Node Name
+    Condenser Tower Outlet Node,  !- Water Outlet Node Name
+    .0011,                        !- Design Water Flow Rate {m3/s}
+    16.0,                         !- High Fan Speed Air Flow Rate {m3/s}
+    10000.,                       !- High Fan Speed Fan Power {W}
+    3500.,                        !- High Fan Speed U-Factor Times Area Value {W/K}
+    8.0,                          !- Low Fan Speed Air Flow Rate {m3/s}
+    ,                             !- Low Fan Speed Air Flow Rate Sizing Factor
+    1600.,                        !- Low Fan Speed Fan Power {W}
+    ,                             !- Low Fan Speed Fan Power Sizing Factor
+    2100.,                        !- Low Fan Speed U-Factor Times Area Value {W/K}
+    ,                             !- Low Fan Speed U-Factor Times Area Sizing Factor
+    1.6,                          !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                             !- Free Convection Regime Air Flow Rate Sizing Factor
+    350.,                         !- Free Convection Regime U-Factor Times Area Value {W/K}
+    ,                             !- Free Convection U-Factor Times Area Value Sizing Factor
+    UFactorTimesAreaAndDesignWaterFlowRate; !- Performance Input Method
 
 
   CoolingTower:TwoSpeed,
-    Big Tower1,  !- Tower Name
-    Condenser Tower 1 Inlet Node,  !- Water Inlet Node Name
-    Condenser Tower 1 Outlet Node,  !- Water Outlet Node Name
-    ,  !- Design Water Flow Rate {m3/s}
-    8.0,  !- Design High Speed Air Flow Rate {m3/s}
-    500,  !- Fan Power at Design High Speed Air Flow Rate {W}
-    ,  !- Tower UA Value at Design High Speed Air Flow Rate {W/K}
-    4.0,  !- Design Low Speed Air Flow Rate {m3/s}
-    125,  !- Fan Power at Design Low Speed Air Flow Rate {W}
-    ,  !- Tower UA Value at Design Low Speed Air Flow Rate {W/K}
-    0.8,  !- Air Flow Rate in Free Convection Regime {m3/s}
-    ,  !- Tower UA Value at Free Convection Air Flow Rate {W/K}
-    NominalCapacity,  !- Tower Performance Input Method
-    20000.0,  !- Tower High Speed Nominal Capacity
-    10000.0,  !- Tower Low Speed Nominal Capacity
-    2000.0,  !- Tower Free Convection Nominal Capacity
-    ,        !- Basin Heater Capacity {W/K}
-    ,        !- Basin Heater Setpoint Temperature {C}
-    ,        !- Basin Heater Operating Schedule Name
-    SaturatedExit,  !- Evaporation Loss Mode
-    ,  !- Evaporation Loss Factor [%/C]
-    0.008 ,  !- Drift Loss Percent
-    ConcentrationRatio,  !- Blowdown Calculation Mode
-    3.0,  !- Blowdown Concentration Ratio
-    ,  !- Schedule Name for Makeup Water Usage due to Blowdown
-    Recovery Tank;  !- Name of Water Storage Tank for Supply
+    My Tower,                    !- Name
+    Condenser Tower Inlet Node,  !- Water Inlet Node Name
+    Condenser Tower Outlet Node, !- Water Outlet Node Name
+    ,                            !- Design Water Flow Rate {m3/s}
+    8.0,                         !- High Fan Speed Air Flow Rate {m3/s}
+    500,                         !- High Fan Speed Fan Power {W}
+    ,                            !- High Fan Speed U-Factor Times Area Value {W/K}
+    4.0,                         !- Low Fan Speed Air Flow Rate {m3/s}
+    ,                            !- Low Fan Speed Air Flow Rate Sizing Factor
+    125,                         !- Low Fan Speed Fan Power {W}
+    ,                            !- Low Fan Speed Fan Power Sizing Factor
+    ,                            !- Low Fan Speed U-Factor Times Area Value {W/K}
+    ,                            !- Low Fan Speed U-Factor Times Area Sizing Factor
+    0.8,                         !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                            !- Free Convection Regime Air Flow Rate Sizing Factor
+    ,                            !- Free Convection Regime U-Factor Times Area Value {W/K}
+    ,                            !- Free Convection U-Factor Times Area Value Sizing Factor
+    NominalCapacity,             !- Performance Input Method
+    ,                            !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    20000.0,                     !- High Speed Nominal Capacity {W}
+    10000.0,                     !- Low Speed Nominal Capacity {W}
+    ,                            !- Low Speed Nominal Capacity Sizing Factor
+    2000.0,                      !- Free Convection Nominal Capacity {W}
+    ;                            !- Free Convection Nominal Capacity Sizing Factor
 
 
   CoolingTower:TwoSpeed,
-      TowerWaterSys CoolTower,   !- Name
-      TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Water Inlet Node Name
-      TowerWaterSys Supply Equipment Outlet Node,  !- Water Outlet Node Name
-      AUTOSIZE,                        !- Design Water Flow Rate {m3/s}
-      AUTOSIZE,                     !- Air Flow Rate at High Fan Speed {m3/s}
-      AUTOSIZE,                     !- Fan Power at High Fan Speed {W}
-      AUTOSIZE,           !- U-Factor Times Area Value at High Fan Speed {W/K}
-      AUTOSIZE,           !- Air Flow Rate at Low Fan Speed {m3/s}
-      AUTOSIZE,                     !- Fan Power at Low Fan Speed {W}
-      AUTOSIZE,           !- U-Factor Times Area Value at Low Fan Speed {W/K}
-      AUTOSIZE,           !- Air Flow Rate in Free Convection Regime {m3/s}
-      AUTOSIZE,   !- U-Factor Times Area at Free Convection Air Flow Rate {W/K}
-      UFactorTimesAreaAndDesignWaterFlowRate,     !- Performance Input Method
-      ,                 !- High Speed Nominal Capacity {W}
-      ,                 !- Low Speed Nominal Capacity {W}
-      ,                  !- Free Convection Capacity {W}
-      ,  !- Basin Heater Capacity {W/K}
-      ,  !- Basin Heater Setpoint Temperature {C}
-      ,  !- Basin Heater Operating Schedule Name
-      SaturatedExit,  !- Evaporation Loss Mode { LossFactor | SaturatedExit }
-      ,  !- Evaporation Loss Factor
-      0.0080,  !- Drift Loss Percent
-      ConcentrationRatio,  !- Blowdown Calculation Mode { ConcentrationRatio |
-                           !- ScheduledRate }
-      3.0000,  !- Blowdown Concentration Ratio
-      ,  !- Blowdown Makeup Water Usage Schedule Name
-      ,  !- Supply Water Storage Tank Name
-      TowerWaterSys CoolTower OA ref Node,  !- Outdoor Air Inlet Node Name
-      ,         !- Number of cells available
-      MinimalCell, !- Cell Control
-      ,        !- Cell Minimum Water Flow Rate Fraction
-      ,        !- Cell Maximum Water Flow Rate Fraction
-      1.0000;  !- Sizing Factor
+    Big Tower1,                  !- Name
+    Condenser Tower Inlet Node,  !- Water Inlet Node Name
+    Condenser Tower Outlet Node, !- Water Outlet Node Name
+    ,                            !- Design Water Flow Rate {m3/s}
+    8.0,                         !- High Fan Speed Air Flow Rate {m3/s}
+    500,                         !- High Fan Speed Fan Power {W}
+    ,                            !- High Fan Speed U-Factor Times Area Value {W/K}
+    4.0,                         !- Low Fan Speed Air Flow Rate {m3/s}
+    ,                            !- Low Fan Speed Air Flow Rate Sizing Factor
+    125,                         !- Low Fan Speed Fan Power {W}
+    ,                            !- Low Fan Speed Fan Power Sizing Factor
+    ,                            !- Low Fan Speed U-Factor Times Area Value {W/K}
+    ,                            !- Low Fan Speed U-Factor Times Area Sizing Factor
+    0.8,                         !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                            !- Free Convection Regime Air Flow Rate Sizing Factor
+    ,                            !- Free Convection Regime U-Factor Times Area Value {W/K}
+    ,                            !- Free Convection U-Factor Times Area Value Sizing Factor
+    NominalCapacity,             !- Performance Input Method
+    ,                            !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    20000.0,                     !- High Speed Nominal Capacity {W}
+    10000.0,                     !- Low Speed Nominal Capacity {W}
+    ,                            !- Low Speed Nominal Capacity Sizing Factor
+    2000.0,                      !- Free Convection Nominal Capacity {W}
+    ;                            !- Free Convection Nominal Capacity Sizing Factor
+    ,                            !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                            !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                            !- Design Approach Temperature {deltaC}
+    ,                            !- Design Range Temperature {deltaC}
+    ,                            !- Basin Heater Capacity {W/K}
+    ,                            !- Basin Heater Setpoint Temperature {C}
+    ,                            !- Basin Heater Operating Schedule Name
+    SaturatedExit,               !- Evaporation Loss Mode
+    ,                            !- Evaporation Loss Factor {percent/K}
+    0.0080,                      !- Drift Loss Percent {percent}
+    ConcentrationRatio,          !- Blowdown Calculation Mode
+    3.0000,                      !- Blowdown Concentration Ratio
+    ,                            !- Blowdown Makeup Water Usage Schedule Name
+    Recovery Tank;               !- Supply Water Storage Tank Name
+
+
+  CoolingTower:TwoSpeed,
+    TowerWaterSys CoolTower, !- Name
+    TowerWaterSys Pump-TowerWaterSys CoolTowerNode,  !- Water Inlet Node Name
+    TowerWaterSys Supply Equipment Outlet Node,  !- Water Outlet Node Name
+    AUTOSIZE,                !- Design Water Flow Rate {m3/s}
+    AUTOSIZE,                !- High Fan Speed Air Flow Rate {m3/s}
+    AUTOSIZE,                !- High Fan Speed Fan Power {W}
+    AUTOSIZE,                !- High Fan Speed U-Factor Times Area Value {W/K}
+    autocalculate,           !- Low Fan Speed Air Flow Rate {m3/s}
+    ,                        !- Low Fan Speed Air Flow Rate Sizing Factor
+    autocalculate,           !- Low Fan Speed Fan Power {W}
+    ,                        !- Low Fan Speed Fan Power Sizing Factor
+    autocalculate,           !- Low Fan Speed U-Factor Times Area Value {W/K}
+    ,                        !- Low Fan Speed U-Factor Times Area Sizing Factor
+    autocalculate,           !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    autocalculate,           !- Free Convection Regime U-Factor Times Area Value {W/K}
+    ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
+    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
+    ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    ,                        !- High Speed Nominal Capacity {W}
+    ,                        !- Low Speed Nominal Capacity {W}
+    ,                        !- Low Speed Nominal Capacity Sizing Factor
+    ,                        !- Free Convection Nominal Capacity {W}
+    ,                        !- Free Convection Nominal Capacity Sizing Factor
+    ,                        !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                        !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                        !- Design Approach Temperature {deltaC}
+    ,                        !- Design Range Temperature {deltaC}
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    SaturatedExit,           !- Evaporation Loss Mode
+    ,                        !- Evaporation Loss Factor {percent/K}
+    0.0080,                  !- Drift Loss Percent {percent}
+    ConcentrationRatio,      !- Blowdown Calculation Mode
+    3.0000,                  !- Blowdown Concentration Ratio
+    ,                        !- Blowdown Makeup Water Usage Schedule Name
+    ,                        !- Supply Water Storage Tank Name
+    TowerWaterSys CoolTower OA ref Node,  !- Outdoor Air Inlet Node Name
+    4,                       !- Number of Cells
+    MinimalCell,             !- Cell Control
+    ,                        !- Cell Minimum  Water Flow Rate Fraction
+    ,                        !- Cell Maximum Water Flow Rate Fraction
+    1.0000;                  !- Sizing Factor
+
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-1-003}
@@ -965,7 +1048,10 @@ This alpha field contains the identifying name for the cooling tower's water out
 
 \paragraph{Field: Performance Input Method}\label{field-performance-input-method-2}
 
-This alpha field contains the method by which the user will specify tower performance: ``\textbf{UFactorTimesAreaAndDesignWaterFlowRate}'' or ``\textbf{NominalCapacity}''. If this field is left blank in the input data file, the default input method is assumed to be ``\textbf{NominalCapacity}''. If the method ``'' is selected, then the user must enter design UA values, design water flow rates and air flow rates as described for the previous input fields. If the method ``NominalCapacity'' is selected then the fields ``Design Water Flow Rate'', ``U-Factor Times Area Value at Design Air Flow Rate'' and ``U-Factor Times Area Value at Free Convection Air Flow Rate'' must be left blank, but the fields ``Nominal Capacity'' and ``Free Convection Capacity'' must be entered as described below.
+This alpha field contains the method by which the user will specify tower performance: ``\textbf{UFactorTimesAreaAndDesignWaterFlowRate}'' or ``\textbf{NominalCapacity}''.
+If this field is left blank in the input data file, the default input method is assumed to be ``\textbf{NominalCapacity}''.
+If the method ``UFactorTimesAreaAndDesignWaterFlowRate'' is selected, then the user must enter design UA values, design water flow rates and air flow rates as described for the previous input fields.
+If the method ``NominalCapacity'' is selected then the fields ``Design Water Flow Rate'', ``U-Factor Times Area Value at Design Air Flow Rate'' and ``U-Factor Times Area Value at Free Convection Air Flow Rate'' must be left blank, but the fields ``Nominal Capacity'' and ``Free Convection Capacity'' must be entered as described below.
 
 \paragraph{Field: Heat Rejection Capacity and Nominal Capacity Sizing Ratio}\label{field-heat-rejection-capacity-and-nominal-capacity-sizing-ratio-2}
 
@@ -1047,6 +1133,26 @@ This alpha field contains the name of a curve or table object that describes how
 
 This alpha field contains the name of a curve or table object that describes how the UA value varies as a function of the current water flow rate ratio (water flow rate/design water flow rate). The result of this curve is multiplied by the design UA value to adjust for water flow rates that differ from design level, along with the other two modifiers discussed above. The curve or table object must be for one independent variable and should be normalized to 1.0 at a water flow ratio of 1.0.~ This field is required
 
+\paragraph{Field: Design Inlet Air Dry-Bulb Temperature}\label{field-design-inlet-air-drybulb-temperature-2}
+
+This numeric field specifies the design inlet air dry-bulb temperature of the tower. The default is \SI{35.0}{\celsius}.
+
+\paragraph{Field: Design Inlet Air Wet-Bulb Temperature}\label{field-design-inlet-air-wetbulb-temperature-2}
+
+This numeric field specifies the design inlet air wet-bulb temperature of the tower. The default is \SI{25.6}{\celsius}.
+
+\paragraph{Field: Design Approach Temperature}\label{field-design-approach-temperature-2}
+
+This numeric field specifies the design approach temperature of the tower corresponding to the design inlet air wet-bulb temperature and the design temperature range.
+The approach temperature should be the outlet water temperature minus the inlet air wet-bulb temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{3.9}{\celsius}.
+
+\paragraph{Field: Design Temperature Range}\label{field-design-temperature-range-2}
+
+This numeric field specifies the design temperature range of the tower corresponding to the design inlet air wet-bulb temperature and the design approach temperature.
+The design range  should be the inlet water temperature minus the outlet water temperature at design conditions.
+This parameter is autosizable and when autosized it is set to \SI{5.5}{\celsius}.
+
 \paragraph{Field: Basin Heater Capacity}\label{field-basin-heater-capacity-2}
 
 This numeric field contains the capacity of the tower's electric basin heater in watts per degree Kelvin. This field is used in conjunction with the Basin Heater Setpoint Temperature described in the following field. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the tower fan is off and water is not flowing through the tower, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
@@ -1124,82 +1230,102 @@ An example IDF specification follows.
 \begin{lstlisting}
 
   CoolingTower:VariableSpeed:Merkel,
-      Big Tower1, !- Name
-      Condenser Tower 1 Inlet Node, !- Water Inlet Node Name
-      Condenser Tower 1 Outlet Node, !- Water Outlet Node Name
-      NominalCapacity, !- Performance Input Method
-      1.25, !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
-      20000.0,  !- Nominal Capacity
-      autocalculate, !- Free Convection Nominal Capacity
-      0.1, !- Free Convection Nominal Capacity Sizing Factor
-      autocalculate, !- Design Water Flow Rate
-      5.382E-8, !- Design Water Flow Rate per Unit of Nominal Capacity
-      autocalculate, !- Design Air Flow Rate
-      2.76316E-5, !- Design Air Flow Rate Per Unit of Nominal Capacity
-      0.2, !- Minimum Air Flow Rate Ratio
-      autocalculate, !- Design Fan Power
-      0.0105, !- Design Fan Power Per Unit of Nominal Capacity
-      VS tower fan power mod func air flow ratio, !- Fan Power Modifier Function of Air Flow Rate Ratio Curve Name
-      autocalculate, !- Free Convection Regime Air Flow Rate
-      0.1, !- Free Convection Regime Air Flow Rate Sizing Factor
-      , !- Design Air Flow Rate U-Factor Times Area Value
-      , !- Free Convection Regime U-Factor Times Area Value
-      , !- Free Convection U-Factor Times Area Value Sizing Factor
-      VS tower UA mod func air flow ratio, !- U-Factor Times Area Modifier Function of Air Flow Ratio Curve Name
-      VS tower UA mod func wetbulb difference, !- U-Factor Times Area Modifier Function of Wetbulb Temperature Difference Curve Name
-      VS tower UA mod func water flow ratio; !- U-Factor Times Area Modifier Function of Water Flow Ratio Curve Name
+    Big Tower1,                    !- Name
+    Condenser Tower 1 Inlet Node,  !- Water Inlet Node Name
+    Condenser Tower 1 Outlet Node, !- Water Outlet Node Name
+    NominalCapacity,               !- Performance Input Method
+    1.25,                          !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
+    20000.0,                       !- Nominal Capacity {W}
+    autocalculate,                 !- Free Convection Nominal Capacity {W}
+    0.1,                           !- Free Convection Nominal Capacity Sizing Factor
+    autocalculate,                 !- Design Water Flow Rate {m3/s}
+    5.382E-8,                      !- Design Water Flow Rate per Unit of Nominal Capacity {m3/s-W}
+    autocalculate,                 !- Design Air Flow Rate {m3/s}
+    2.76316E-5,                    !- Design Air Flow Rate Per Unit of Nominal Capacity {m3/s-W}
+    0.2,                           !- Minimum Air Flow Rate Ratio
+    autocalculate,                 !- Design Fan Power {W}
+    0.0105,                        !- Design Fan Power Per Unit of Nominal Capacity {dimensionless}
+    VS tower fan power mod func air flow ratio,  !- Fan Power Modifier Function of Air Flow Rate Ratio Curve Name
+    autocalculate,                 !- Free Convection Regime Air Flow Rate {m3/s}
+    0.1,                           !- Free Convection Regime Air Flow Rate Sizing Factor
+    ,                              !- Design Air Flow Rate U-Factor Times Area Value {W/K}
+    ,                              !- Free Convection Regime U-Factor Times Area Value {W/K}
+    ,                              !- Free Convection U-Factor Times Area Value Sizing Factor
+    VS tower UA mod func air flow ratio,  !- U-Factor Times Area Modifier Function of Air Flow Ratio Curve Name
+    VS tower UA mod func wetbulb difference,  !- U-Factor Times Area Modifier Function of Wetbulb Temperature Difference Curve Name
+    VS tower UA mod func water flow ratio,  !- U-Factor Times Area Modifier Function of Water Flow Ratio Curve Name
+    ,                              !- Design Inlet Air Dry-Bulb Temperature {C}
+    ,                              !- Design Inlet Air Wet-Bulb Temperature {C}
+    ,                              !- Design Approach Temperature {deltaC}
+    ,                              !- Design Range Temperature {deltaC}
+    ,                              !- Basin Heater Capacity {W/K}
+    ,                              !- Basin Heater Setpoint Temperature {C}
+    ,                              !- Basin Heater Operating Schedule Name
+    ,                              !- Evaporation Loss Mode
+    ,                              !- Evaporation Loss Factor {percent/K}
+    ,                              !- Drift Loss Percent {percent}
+    ,                              !- Blowdown Calculation Mode
+    ,                              !- Blowdown Concentration Ratio
+    ,                              !- Blowdown Makeup Water Usage Schedule Name
+    ,                              !- Supply Water Storage Tank Name
+    ,                              !- Outdoor Air Inlet Node Name
+    ,                              !- Number of Cells
+    ,                              !- Cell Control
+    ,                              !- Cell Minimum  Water Flow Rate Fraction
+    ,                              !- Cell Maximum Water Flow Rate Fraction
+    1.0;                           !- Sizing Factor
+
+  Curve:Cubic,
+    VS tower fan power mod func air flow ratio, !- Name
+    0.02 , !- Coefficient1 Constant
+    0.0 ,  !- Coefficient2 x
+    0.0 ,  !- Coefficient3 x**2
+    0.98 , !- Coefficient4 x**3
+    0.2,   !- Minimum Value of x
+    1.0 ,  !- Maximum Value of x
+    0.0 ,  !- Minimum Curve Output
+    1.0 ,  !- Maximum Curve Output
+    Dimensionless,  !- Input Unit Type for X
+    Dimensionless;  !- Output Unit Type
 
 
-    Curve:Cubic,
-      VS tower fan power mod func air flow ratio, !- Name
-      0.02 , !- Coefficient1 Constant
-      0.0 ,  !- Coefficient2 x
-      0.0 ,  !- Coefficient3 x**2
-      0.98 , !- Coefficient4 x**3
-      0.2,   !- Minimum Value of x
-      1.0 ,  !- Maximum Value of x
-      0.0 ,  !- Minimum Curve Output
-      1.0 ,  !- Maximum Curve Output
-      Dimensionless,  !- Input Unit Type for X
-      Dimensionless;  !- Output Unit Type
+  Curve:Quadratic,
+    VS tower UA mod func air flow ratio, !- Name
+    0.0 , !- Coefficient1 Constant
+    1.3 , !- Coefficient2 x
+    -0.3 , !- Coefficient3 x**2
+    0.2 , !- Minimum Value of x
+    1.0 , !- Maximum Value of x
+    0.0 , !- Minimum Curve Output
+    1.0 , !- Maximum Curve Output
+    Dimensionless,  !- Input Unit Type for X
+    Dimensionless;  !- Output Unit Type
 
 
-    Curve:Quadratic,
-      VS tower UA mod func air flow ratio, !- Name
-      0.0 , !- Coefficient1 Constant
-      1.3 , !- Coefficient2 x
-      -0.3 , !- Coefficient3 x**2
-      0.2 , !- Minimum Value of x
-      1.0 , !- Maximum Value of x
-      0.0 , !- Minimum Curve Output
-      1.0 , !- Maximum Curve Output
-      Dimensionless,  !- Input Unit Type for X
-      Dimensionless;  !- Output Unit Type
+  Curve:Linear,
+    VS tower UA mod func wetbulb difference , !- Name
+    1.0 , !- Coefficient1 Constant
+    0.0081 , !- Coefficient2 x
+    -10 , !- Minimum Value of x
+    25.0 , !- Maximum Value of x
+    0.85 , !- Minimum Curve Output
+    1.3 , !- Maximum Curve Output
+    Dimensionless,  !- Input Unit Type for X
+    Dimensionless; !- Output Unit Type
 
 
-    Curve:Linear,
-      VS tower UA mod func wetbulb difference , !- Name
-      1.0 , !- Coefficient1 Constant
-      0.0081 , !- Coefficient2 x
-      -10 , !- Minimum Value of x
-      25.0 , !- Maximum Value of x
-      0.85 , !- Minimum Curve Output
-      1.3 , !- Maximum Curve Output
-      Dimensionless,  !- Input Unit Type for X
-      Dimensionless; !- Output Unit Type
+  Curve:Quadratic,
+    VS tower UA mod func water flow ratio, !- Name
+    0.1082 , !- Coefficient1 Constant
+    1.667 , !- Coefficient2 x
+    -0.7713 , !- Coefficient3 x**2
+    0.3 , !- Minimum Value of x
+    1.0 , !- Maximum Value of x
+    0.5 , !- Minimum Curve Output
+    1.1 , !- Maximum Curve Output
+    Dimensionless,  !- Input Unit Type for X
+    Dimensionless;  !- Output Unit Type
 
-
-    Curve:Quadratic,
-      VS tower UA mod func water flow ratio, !- Name
-      0.1082 , !- Coefficient1 Constant
-      1.667 , !- Coefficient2 x
-      -0.7713 , !- Coefficient3 x**2
-      0.3 , !- Minimum Value of x
-      1.0 , !- Maximum Value of x
-      0.5 , !- Minimum Curve Output
-      1.1 , !- Maximum Curve Output
-      Dimensionless,  !- Input Unit Type for X
-      Dimensionless;  !- Output Unit Type
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-2-003}
@@ -3414,11 +3540,11 @@ This numeric field is the number of parallel trenches. Design flow rate will be 
 
 This numeric field is the center-to-center distance in between parallel trenches, in meters.
 
-\paragraph{Field: Type of Undisturbed Ground Temperature Object}\label{field-type-of-undisturbed-ground-temperature-object}
+\paragraph{Field: Type of Undisturbed Ground Temperature Object}
 
 The type of undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 
-\paragraph{Field: Name of Undisturbed Ground Temperature Object}\label{field-name-of-undisturbed-ground-temperature-object}
+\paragraph{Field: Name of Undisturbed Ground Temperature Object}
 
 The name of the undisturbed ground temperature object used to determine ground temperature for the farfield boundary conditions.
 

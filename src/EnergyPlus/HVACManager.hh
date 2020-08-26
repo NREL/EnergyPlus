@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
+    struct EnergyPlusData;
 
 namespace HVACManager {
 
@@ -73,11 +75,11 @@ namespace HVACManager {
     // Functions
     void clear_state();
 
-    void ManageHVAC();
+    void ManageHVAC(EnergyPlusData &state);
 
-    void SimHVAC();
+    void SimHVAC(EnergyPlusData &state);
 
-    void SimSelectedEquipment(bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(EnergyPlusData &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -97,7 +99,7 @@ namespace HVACManager {
 
     void UpdateZoneListAndGroupLoads();
 
-    void ReportAirHeatBalance();
+    void ReportAirHeatBalance(EnergyPlusData &state);
 
     void SetHeatToReturnAirFlag();
 

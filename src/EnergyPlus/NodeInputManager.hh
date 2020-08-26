@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,15 +50,15 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
 
 namespace NodeInputManager {
 
@@ -116,7 +116,7 @@ namespace NodeInputManager {
 
     void GetNodeNums(std::string const &Name,                      // Name for which to obtain information
                      int &NumNodes,                                // Number of nodes accompanying this Name
-                     Array1S_int NodeNumbers,                      // Node Numbers accompanying this Name
+                     Array1D_int &NodeNumbers,                     // Node Numbers accompanying this Name
                      bool &ErrorsFound,                            // True when errors are found...
                      int const NodeFluidType,                      // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,            // Node Object Type (i.e. "Chiller:Electric")
@@ -128,7 +128,7 @@ namespace NodeInputManager {
                      Optional_string_const InputFieldName = _      // Input Field Name
     );
 
-    void SetupNodeVarsForReporting();
+    void SetupNodeVarsForReporting(IOFiles &ioFiles);
 
     void GetNodeListsInput(bool &ErrorsFound);                // Set to true when requested Node List not found, unchanged otherwise
 

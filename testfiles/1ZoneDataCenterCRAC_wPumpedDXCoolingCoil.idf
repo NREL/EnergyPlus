@@ -26,7 +26,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,6;
 
@@ -34,7 +34,7 @@
     Bldg,                    !- Name
     0.0,                     !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.05,                    !- Loads Convergence Tolerance Value
+    0.05,                    !- Loads Convergence Tolerance Value {W}
     0.05,                    !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     30,                      !- Maximum Number of Warmup Days
@@ -410,140 +410,98 @@
     ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
     Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
 
-  Table:TwoIndependentVariables,
-    Cool Cap Mod func of Temperature,  !- Name
-    Biquadratic,             !- Curve Type
-    LinearInterpolationOfTable,  !- Interpolation Method
-    13.0,                    !- Minimum Value of X
-    23.89,                   !- Maximum Value of X
-    -10.0,                   !- Minimum Value of Y
-    46.0,                    !- Maximum Value of Y
-    ,                        !- Minimum Table Output
-    ,                        !- Maximum Table Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless,           !- Output Unit Type
-    ,                        !- Normalization Reference
+  Table:IndependentVariable,
+    Cool Cap Mod func of Temperature_IndependentVariable1,  !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    13.0,                    !- Minimum Value
+    23.89,                   !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Temperature,             !- Unit Type
     ,                        !- External File Name
-    13.0,                    !- X Value #1
-    -10.0,                   !- Y Value #1
-    1.00,                    !- Output Value #1
-    13.0,                    !- X Value #2
-    15.0,                    !- Y Value #2
-    1.00,                    !- Output Value #2
-    13.0,                    !- X Value #3
-    18.0,                    !- Y Value #3
-    1.00,                    !- Output Value #3
-    13.0,                    !- X Value #4
-    24.0,                    !- Y Value #4
-    0.924738271,             !- Output Value #4
-    13.0,                    !- <none>
-    30.0,                    !- <none>
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    13.00000,                !- Value 1
+    17.00000,                !- Value 2
+    19.44440,                !- <none>
+    21.00000,                !- <none>
+    23.90000;                !- <none>
+
+  Table:IndependentVariable,
+    Cool Cap Mod func of Temperature_IndependentVariable2,  !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    -10.0,                   !- Minimum Value
+    46.0,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Temperature,             !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    -10.00000,               !- Value 1
+    15.00000,                !- Value 2
+    18.00000,                !- <none>
+    24.00000,                !- <none>
+    30.00000,                !- <none>
+    35.00000,                !- <none>
+    38.00000,                !- <none>
+    46.00000;                !- <none>
+
+  Table:IndependentVariableList,
+    Cool Cap Mod func of Temperature_IndependentVariableList,  !- Name
+    Cool Cap Mod func of Temperature_IndependentVariable1,  !- Independent Variable 1 Name
+    Cool Cap Mod func of Temperature_IndependentVariable2;  !- Independent Variable 2 Name
+
+  Table:Lookup,
+    Cool Cap Mod func of Temperature,  !- Name
+    Cool Cap Mod func of Temperature_IndependentVariableList,  !- Independent Variable List Name
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
+    ,                        !- Minimum Output
+    ,                        !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    1.00,                    !- Output Value 1
+    1.00,                    !- Output Value 2
+    1.00,                    !- <none>
+    0.924738271,             !- <none>
     0.883909339,             !- <none>
-    13.0,                    !- <none>
-    35.0,                    !- <none>
     0.835522309,             !- <none>
-    13.0,                    !- <none>
-    38.0,                    !- <none>
     0.800222635,             !- <none>
-    13.0,                    !- <none>
-    46.0,                    !- <none>
     0.683109499,             !- <none>
-    17.0,                    !- <none>
-    -10.0,                   !- <none>
     1.00,                    !- <none>
-    17.0,                    !- <none>
-    15.0,                    !- <none>
     1.00,                    !- <none>
-    17.0,                    !- <none>
-    18.0,                    !- <none>
     1.00,                    !- <none>
-    17.0,                    !- <none>
-    24.0,                    !- <none>
     1.00,                    !- <none>
-    17.0,                    !- <none>
-    30.0,                    !- <none>
     0.976933863,             !- <none>
-    17.0,                    !- <none>
-    35.0,                    !- <none>
     0.937696593,             !- <none>
-    17.0,                    !- <none>
-    38.0,                    !- <none>
     0.907886775,             !- <none>
-    17.0,                    !- <none>
-    46.0,                    !- <none>
     0.805413255,             !- <none>
-    19.4444,                 !- <none>
-    -10.0,                   !- <none>
     1.00,                    !- <none>
-    19.4444,                 !- <none>
-    15.0,                    !- <none>
     1.00,                    !- <none>
-    19.4444,                 !- <none>
-    18.0,                    !- <none>
     1.00,                    !- <none>
-    19.4444,                 !- <none>
-    24.0,                    !- <none>
     1.00,                    !- <none>
-    19.4444,                 !- <none>
-    30.0,                    !- <none>
     1.00,                    !- <none>
-    19.4444,                 !- <none>
-    35.0,                    !- <none>
     1.00,                    !- <none>
-    19.4444,                 !- <none>
-    38.0,                    !- <none>
     0.9718,                  !- <none>
-    19.4444,                 !- <none>
-    46.0,                    !- <none>
     0.8782,                  !- <none>
-    21.0,                    !- <none>
-    -10.0,                   !- <none>
     1.00,                    !- <none>
-    21.0,                    !- <none>
-    15.0,                    !- <none>
     1.00,                    !- <none>
-    21.0,                    !- <none>
-    18.0,                    !- <none>
     1.00,                    !- <none>
-    21.0,                    !- <none>
-    24.0,                    !- <none>
     1.00,                    !- <none>
-    21.0,                    !- <none>
-    30.0,                    !- <none>
     1.00,                    !- <none>
-    21.0,                    !- <none>
-    35.0,                    !- <none>
     1.0385,                  !- <none>
-    21.0,                    !- <none>
-    38.0,                    !- <none>
     1.0142,                  !- <none>
-    21.0,                    !- <none>
-    46.0,                    !- <none>
     0.9264,                  !- <none>
-    23.9,                    !- <none>
-    -10.0,                   !- <none>
     1.00,                    !- <none>
-    23.9,                    !- <none>
-    15.0,                    !- <none>
     1.00,                    !- <none>
-    23.9,                    !- <none>
-    18.0,                    !- <none>
     1.00,                    !- <none>
-    23.9,                    !- <none>
-    24.0,                    !- <none>
     1.00,                    !- <none>
-    23.9,                    !- <none>
-    30.0,                    !- <none>
     1.00,                    !- <none>
-    23.9,                    !- <none>
-    35.0,                    !- <none>
     1.110828252,             !- <none>
-    23.9,                    !- <none>
-    38.0,                    !- <none>
     1.090488436,             !- <none>
-    23.9,                    !- <none>
-    46.0,                    !- <none>
     1.013268253;             !- <none>
 
   Curve:Quadratic,
@@ -572,122 +530,98 @@
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
 
-  Table:TwoIndependentVariables,
-    Liebert Econophase EIR Func T,  !- Name
-    Biquadratic,             !- Curve Type
-    LinearInterpolationOfTable,  !- Interpolation Method
-    12.7,                    !- Minimum Value of X
-    23.8,                    !- Maximum Value of X
-    -50,                     !- Minimum Value of Y
-    50,                      !- Maximum Value of Y
-    0.03,                    !- Minimum Table Output
-    1.5,                     !- Maximum Table Output
-    Temperature,             !- Input Unit Type for X
-    Temperature,             !- Input Unit Type for Y
-    Dimensionless,           !- Output Unit Type
-    ,                        !- Normalization Reference
+  Table:IndependentVariable,
+    Liebert Econophase EIR Func T_IndependentVariable1,  !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    12.7,                    !- Minimum Value
+    23.8,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Temperature,             !- Unit Type
     ,                        !- External File Name
-    12.7,                    !- X Value #1
-    -50,                     !- Y Value #1
-    0.042,                   !- Output Value #1
-    12.7,                    !- X Value #2
-    -4.0,                    !- Y Value #2
-    0.042,                   !- Output Value #2
-    12.7,                    !- X Value #3
-    -1.2222,                 !- Y Value #3
-    0.084,                   !- Output Value #3
-    12.7,                    !- X Value #4
-    1.5555,                  !- Y Value #4
-    0.084,                   !- Output Value #4
-    12.7,                    !- <none>
-    4.3333,                  !- <none>
-    0.2269,                  !- <none>
-    12.7,                    !- <none>
-    7.1111,                  !- <none>
-    0.2395,                  !- <none>
-    12.7,                    !- <none>
-    9.8888,                  !- <none>
-    0.311,                   !- <none>
-    12.7,                    !- <none>
-    12.6667,                 !- <none>
-    0.3697,                  !- <none>
-    12.7,                    !- <none>
-    15.4444,                 !- <none>
-    0.4454,                  !- <none>
-    12.7,                    !- <none>
-    18.222,                  !- <none>
-    0.5462,                  !- <none>
-    12.7,                    !- <none>
-    21.0,                    !- <none>
-    0.6723,                  !- <none>
-    12.7,                    !- <none>
-    23.777778,               !- <none>
-    0.7227,                  !- <none>
-    12.7,                    !- <none>
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    12.70000,                !- Value 1
+    23.80000;                !- Value 2
+
+  Table:IndependentVariable,
+    Liebert Econophase EIR Func T_IndependentVariable2,  !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    -50,                     !- Minimum Value
+    50,                      !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Temperature,             !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    -50.00000,               !- Value 1
+    -4.00000,                !- Value 2
+    -1.22220,                !- <none>
+    1.55550,                 !- <none>
+    4.33330,                 !- <none>
+    7.11110,                 !- <none>
+    9.88880,                 !- <none>
+    12.66670,                !- <none>
+    15.44440,                !- <none>
+    18.22200,                !- <none>
+    21.00000,                !- <none>
+    23.77778,                !- <none>
     26.55556,                !- <none>
-    0.7773,                  !- <none>
-    12.7,                    !- <none>
     29.33333,                !- <none>
-    0.8193,                  !- <none>
-    12.7,                    !- <none>
     32.11111,                !- <none>
+    34.88889,                !- Extended Field
+    50.00000;                !- Extended Field
+
+  Table:IndependentVariableList,
+    Liebert Econophase EIR Func T_IndependentVariableList,  !- Name
+    Liebert Econophase EIR Func T_IndependentVariable1,  !- Independent Variable 1 Name
+    Liebert Econophase EIR Func T_IndependentVariable2;  !- Independent Variable 2 Name
+
+  Table:Lookup,
+    Liebert Econophase EIR Func T,  !- Name
+    Liebert Econophase EIR Func T_IndependentVariableList,  !- Independent Variable List Name
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
+    0.03,                    !- Minimum Output
+    1.5,                     !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.042,                   !- Output Value 1
+    0.042,                   !- Output Value 2
+    0.084,                   !- <none>
+    0.084,                   !- <none>
+    0.2269,                  !- <none>
+    0.2395,                  !- <none>
+    0.311,                   !- <none>
+    0.3697,                  !- <none>
+    0.4454,                  !- <none>
+    0.5462,                  !- <none>
+    0.6723,                  !- <none>
+    0.7227,                  !- <none>
+    0.7773,                  !- <none>
+    0.8193,                  !- <none>
     0.895,                   !- <none>
-    12.7,                    !- <none>
-    34.88889,                !- <none>
     1.0,                     !- <none>
-    12.7,                    !- <none>
-    50.0,                    !- <none>
     1.5,                     !- <none>
-    23.8,                    !- <none>
-    -50,                     !- <none>
     0.042,                   !- <none>
-    23.8,                    !- <none>
-    -4.0,                    !- <none>
     0.042,                   !- <none>
-    23.8,                    !- <none>
-    -1.2222,                 !- <none>
     0.084,                   !- <none>
-    23.8,                    !- <none>
-    1.5555,                  !- <none>
     0.084,                   !- <none>
-    23.8,                    !- <none>
-    4.3333,                  !- <none>
     0.2269,                  !- <none>
-    23.8,                    !- <none>
-    7.1111,                  !- <none>
     0.2395,                  !- <none>
-    23.8,                    !- <none>
-    9.8888,                  !- <none>
     0.311,                   !- <none>
-    23.8,                    !- <none>
-    12.6667,                 !- <none>
     0.3697,                  !- <none>
-    23.8,                    !- <none>
-    15.4444,                 !- <none>
     0.4454,                  !- <none>
-    23.8,                    !- <none>
-    18.222,                  !- <none>
     0.5462,                  !- <none>
-    23.8,                    !- <none>
-    21.0,                    !- <none>
     0.6723,                  !- <none>
-    23.8,                    !- <none>
-    23.777778,               !- <none>
     0.7227,                  !- <none>
-    23.8,                    !- <none>
-    26.55556,                !- <none>
     0.7773,                  !- <none>
-    23.8,                    !- <none>
-    29.33333,                !- <none>
     0.8193,                  !- <none>
-    23.8,                    !- <none>
-    32.11111,                !- <none>
     0.895,                   !- <none>
-    23.8,                    !- <none>
-    34.88889,                !- <none>
     1.0,                     !- <none>
-    23.8,                    !- <none>
-    50.0,                    !- <none>
     1.5;                     !- <none>
 
   Curve:Quadratic,
@@ -779,14 +713,14 @@
     Main Zone ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Main Zone Baseboard,     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Main Zone ATU,           !- Name
@@ -1010,7 +944,7 @@
 
   Output:Variable,*,Zone Mean Air Temperature,Hourly;
 
-  Output:Variable,*,Baseboard Electric Power,Hourly;
+  Output:Variable,*,Baseboard Electricity Rate,Hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -1059,7 +993,7 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Rate,Hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,Hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,Hourly;
 
@@ -1067,11 +1001,11 @@
 
   Output:Variable,*,Coil System Frost Control Status,Hourly;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,Hourly;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,Hourly;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,Hourly;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,Hourly;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Hourly;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Hourly;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Hourly;
 
@@ -1079,21 +1013,21 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Hourly;
+  Output:Variable,*,Fan Electricity Rate,Hourly;
 
   Output:Variable,*,Fan Rise in Air Temperature,Hourly;
 
   Output:Variable,*,Schedule Value,Hourly;
 
-  Output:Variable,*,ITE CPU Electric Power,Hourly;
+  Output:Variable,*,ITE CPU Electricity Rate,Hourly;
 
-  Output:Variable,*,ITE Fan Electric Power,Hourly;
+  Output:Variable,*,ITE Fan Electricity Rate,Hourly;
 
-  Output:Variable,*,ITE UPS Electric Power,Hourly;
+  Output:Variable,*,ITE UPS Electricity Rate,Hourly;
 
-  Output:Variable,*,ITE CPU Electric Power at Design Inlet Conditions,Hourly;
+  Output:Variable,*,ITE CPU Electricity Rate at Design Inlet Conditions,Hourly;
 
-  Output:Variable,*,ITE Fan Electric Power at Design Inlet Conditions,Hourly;
+  Output:Variable,*,ITE Fan Electricity Rate at Design Inlet Conditions,Hourly;
 
   Output:Variable,*,ITE UPS Heat Gain to Zone Rate,Hourly;
 
@@ -1166,12 +1100,12 @@
   EnergyManagementSystem:Sensor,
     Power_DX_Coil_Elec,      !- Name
     Main Cooling Coil 1,     !- Output:Variable or Output:Meter Index Key Name
-    Cooling Coil Electric Power;  !- Output:Variable or Output:Meter Name
+    Cooling Coil Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Power_SupplyFan_Elec,    !- Name
     EC Plug Fan 1,           !- Output:Variable or Output:Meter Index Key Name
-    Fan Electric Power;      !- Output:Variable or Output:Meter Name
+    Fan Electricity Rate;      !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     DeltaT_SupplyFan,        !- Name
@@ -1230,7 +1164,7 @@
 
   EnergyManagementSystem:Program,
     CalcSCOP,                !- Name
-    set cpair = @CpAirFnWTdb Wout_SupplyFan  Tout_SupplyFan,  !- Program Line 1
+    set cpair = @CpAirFnW Wout_SupplyFan,  !- Program Line 1
     set FanSensHeat = (Mdot_SupplyFan * cpair ) * DeltaT_SupplyFan,  !- Program Line 2
     set numerator = Qdot_DXCoil_Sens - FanSensHeat,  !- <none>
     set denominator = Power_DX_Coil_Elec + Power_SupplyFan_Elec,  !- <none>
@@ -1255,12 +1189,12 @@
   EnergyManagementSystem:Sensor,
     IT_Equip_power,          !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Building Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total Building Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     whole_building_power,    !- Name
     Whole Building,          !- Output:Variable or Output:Meter Index Key Name
-    Facility Total Electric Demand Power;  !- Output:Variable or Output:Meter Name
+    Facility Total Electricity Demand Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:OutputVariable,
     PUE,                     !- Name
@@ -1282,4 +1216,3 @@
     ENDIF;                   !- <none>
 
   Output:Variable,*,PUE,Hourly;
-

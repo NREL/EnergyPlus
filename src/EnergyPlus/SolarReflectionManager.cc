@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,18 +53,17 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataVectorTypes.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <PierceSurface.hh>
-#include <ScheduleManager.hh>
-#include <SolarReflectionManager.hh>
-#include <Vectors.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/PierceSurface.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarReflectionManager.hh>
 
 namespace EnergyPlus {
 
@@ -87,7 +86,6 @@ namespace SolarReflectionManager {
     // OTHER NOTES: na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
@@ -127,18 +125,6 @@ namespace SolarReflectionManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Initializes the derived type SolReflRecSurf, which contains information
         // needed to calculate factors for solar reflection from obstructions and ground.
-
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
-        // Using/Aliasing
-        using namespace Vectors;
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS: na
-        // INTERFACE BLOCK SPECIFICATIONS: na
-        // DERIVED TYPE DEFINITIONS: na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;            // Surface number
@@ -535,9 +521,9 @@ namespace SolarReflectionManager {
                         ObsConstrNum = Surface(NearestHitSurfNum).Construction;
                         if (ObsConstrNum > 0) {
                             // Exterior building surface is nearest hit
-                            if (!Construct(ObsConstrNum).TypeIsWindow) {
+                            if (!dataConstruction.Construct(ObsConstrNum).TypeIsWindow) {
                                 // Obstruction is not a window, i.e., is an opaque surface
-                                SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = 1.0 - Construct(ObsConstrNum).OutsideAbsorpSolar;
+                                SolReflRecSurf(RecSurfNum).HitPtSolRefl(RayNum, RecPtNum) = 1.0 - dataConstruction.Construct(ObsConstrNum).OutsideAbsorpSolar;
                             } else {
                                 // Obstruction is a window. Assume it is bare so that there is no beam-to-diffuse reflection
                                 // (beam-to-beam reflection is calculated in subroutine CalcBeamSolSpecularReflFactors).
@@ -1060,12 +1046,12 @@ namespace SolarReflectionManager {
                                 SpecReflectance = 0.0;
                                 if (Surface(ReflSurfNum).Class == SurfaceClass_Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
-                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                    SpecReflectance = POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 if (Surface(ReflSurfNum).ShadowingSurf && Surface(ReflSurfNum).ShadowSurfGlazingConstruct > 0) {
                                     ConstrNumRefl = Surface(ReflSurfNum).ShadowSurfGlazingConstruct;
                                     SpecReflectance = Surface(ReflSurfNum).ShadowSurfGlazingFrac *
-                                                      POLYF(std::abs(CosIncAngRefl), Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
+                                                      POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }
                                 // Angle of incidence of reflected beam on receiving surface
                                 CosIncAngRec = dot(SolReflRecSurf(RecSurfNum).NormVec, SunVecMir);
@@ -1109,18 +1095,8 @@ namespace SolarReflectionManager {
         // Calculates factors for irradiance on exterior heat transfer surfaces due to
         // reflection of sky diffuse solar radiation from obstructions and ground.
 
-        // METHODOLOGY EMPLOYED: na
-
-        // REFERENCES: na
-
         // Using/Aliasing
         using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
-        using namespace Vectors;
-
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS: na
-        // INTERFACE BLOCK SPECIFICATIONS: na
-        // DERIVED TYPE DEFINITIONS: na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int RecSurfNum(0);   // Receiving surface number

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,25 +52,25 @@
 #include <istream>
 #include <unordered_set>
 
-// ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <DataIPShortCuts.hh>
-#include <DataOutputs.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <DisplayRoutines.hh>
-#include <FileSystem.hh>
-#include <InputProcessing/DataStorage.hh>
-#include <InputProcessing/EmbeddedEpJSONSchema.hh>
-#include <InputProcessing/IdfParser.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InputProcessing/InputValidation.hh>
-#include <SortAndStringUtilities.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/InputProcessing/DataStorage.hh>
+#include <EnergyPlus/InputProcessing/EmbeddedEpJSONSchema.hh>
+#include <EnergyPlus/InputProcessing/IdfParser.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/SortAndStringUtilities.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <milo/dtoa.h>
 #include <milo/itoa.h>
 
@@ -159,10 +159,10 @@ json const &InputProcessor::getFields(std::string const &objectType)
     return it2.value();
 }
 
-json const & InputProcessor::getPatternProperties(json const &schema_obj)
+json const &InputProcessor::getPatternProperties(json const &schema_obj)
 {
     std::string pattern_property;
-    auto const & pattern_properties = schema_obj["patternProperties"];
+    auto const &pattern_properties = schema_obj["patternProperties"];
     int dot_star_present = pattern_properties.count(".*");
     int no_whitespace_present = pattern_properties.count(R"(^.*\S.*$)");
     if (dot_star_present) {
@@ -238,19 +238,26 @@ void InputProcessor::markObjectAsUsed(const std::string &objectType, const std::
     }
 }
 
+void cleanEPJSON(json &epjson)
+{
+    if (epjson.type() == json::value_t::object) {
+        epjson.erase("idf_order");
+        epjson.erase("idf_max_fields");
+        epjson.erase("idf_max_extensible_fields");
+        for (auto it = epjson.begin(); it != epjson.end(); ++it) {
+            cleanEPJSON(epjson[it.key()]);
+        }
+    }
+}
+
 void InputProcessor::processInput()
 {
-    std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in);
+    std::ifstream input_stream(DataStringGlobals::inputFileName, std::ifstream::in | std::ifstream::binary);
     if (!input_stream.is_open()) {
         ShowFatalError("Input file path " + DataStringGlobals::inputFileName + " not found");
         return;
     }
 
-    std::string input_file;
-    std::string line;
-    while (std::getline(input_stream, line)) {
-        input_file.append(line + DataStringGlobals::NL);
-    }
     // For some reason this does not work properly on Windows. This will be faster so should investigate in future.
     // std::ifstream::pos_type size = input_stream.tellg();
     // char *memblock = new char[(size_t) size + 1];
@@ -265,38 +272,52 @@ void InputProcessor::processInput()
     // std::vector<char> v;
     // if (FILE *fp = fopen("filename", "r"))
     // {
-    // 	char buf[1024];
-    // 	while (size_t len = fread(buf, 1, sizeof(buf), fp))
-    // 		v.insert(v.end(), buf, buf + len);
-    // 	fclose(fp);
+    //  char buf[1024];
+    //  while (size_t len = fread(buf, 1, sizeof(buf), fp))
+    //      v.insert(v.end(), buf, buf + len);
+    //  fclose(fp);
     // }
-
-    if (input_file.empty()) {
-        ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
-        return;
-    }
 
     try {
         if (!DataGlobals::isEpJSON) {
+            std::string input_file;
+            std::string line;
+            while (std::getline(input_stream, line)) {
+                input_file.append(line + DataStringGlobals::NL);
+            }
+            if (input_file.empty()) {
+                ShowFatalError("Failed to read input file: " + DataStringGlobals::inputFileName);
+                return;
+            }
+
             bool success = true;
             epJSON = idf_parser->decode(input_file, schema, success);
-            //			bool hasErrors = processErrors();
-            //			if ( !success || hasErrors ) {
-            //				ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
-            //			}
-            if (DataGlobals::outputEpJSONConversion) {
-                input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
+
+            //          bool hasErrors = processErrors();
+            //          if ( !success || hasErrors ) {
+            //              ShowFatalError( "Errors occurred on processing input file. Preceding condition(s) cause termination." );
+            //          }
+
+            if (DataGlobals::outputEpJSONConversion || DataGlobals::outputEpJSONConversionOnly) {
+                json epJSONClean = epJSON;
+                cleanEPJSON(epJSONClean);
+                input_file = epJSONClean.dump(4, ' ', false, json::error_handler_t::replace);
+                // input_file = epJSON.dump(4, ' ', false, json::error_handler_t::replace);
                 std::string convertedIDF(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".epJSON");
                 FileSystem::makeNativePath(convertedIDF);
                 std::ofstream convertedFS(convertedIDF, std::ofstream::out);
                 convertedFS << input_file << std::endl;
             }
         } else if (DataGlobals::isCBOR) {
-            epJSON = json::from_cbor(input_file);
+            epJSON = json::from_cbor(input_stream);
         } else if (DataGlobals::isMsgPack) {
-            epJSON = json::from_msgpack(input_file);
+            epJSON = json::from_msgpack(input_stream);
+        } else if (DataGlobals::isUBJSON) {
+            epJSON = json::from_ubjson(input_stream);
+        } else if (DataGlobals::isBSON) {
+            epJSON = json::from_bson(input_stream);
         } else {
-            epJSON = json::parse(input_file);
+            epJSON = json::parse(input_stream);
         }
     } catch (const std::exception &e) {
         ShowSevereError(e.what());
@@ -311,7 +332,7 @@ void InputProcessor::processInput()
         ShowFatalError("Errors occurred on processing input file. Preceding condition(s) cause termination.");
     }
 
-    if (DataGlobals::isEpJSON && DataGlobals::outputEpJSONConversion) {
+    if (DataGlobals::isEpJSON && (DataGlobals::outputEpJSONConversion || DataGlobals::outputEpJSONConversionOnly)) {
         if (versionMatch) {
             std::string const encoded = idf_parser->encode(epJSON, schema);
             std::string convertedEpJSON(DataStringGlobals::outputDirPathName + DataStringGlobals::inputFileNameOnly + ".idf");
@@ -336,6 +357,8 @@ void InputProcessor::processInput()
     DataIPShortCuts::cNumericFieldNames.allocate(MaxNumeric);
     DataIPShortCuts::rNumericArgs.dimension(MaxNumeric, 0.0);
     DataIPShortCuts::lNumericFieldBlanks.dimension(MaxNumeric, false);
+
+    reportIDFRecordsStats();
 }
 
 bool InputProcessor::checkVersionMatch()
@@ -540,11 +563,157 @@ std::pair<std::string, bool> InputProcessor::getObjectItemValue(std::string cons
     return output;
 }
 
+const json &InputProcessor::getObjectInstances(std::string const &ObjType)
+{
+    return epJSON.find(ObjType).value();
+}
+
+InputProcessor::MaxFields InputProcessor::findMaxFields(json const &ep_object, std::string const &extension_key, json const &legacy_idd)
+{
+    InputProcessor::MaxFields maxFields;
+    if (!DataGlobals::isEpJSON) {
+        auto found_idf_max_fields = ep_object.find("idf_max_fields");
+        if (found_idf_max_fields != ep_object.end()) {
+            maxFields.max_fields = *found_idf_max_fields;
+        }
+        auto found_idf_max_extensible_fields = ep_object.find("idf_max_extensible_fields");
+        if (found_idf_max_extensible_fields != ep_object.end()) {
+            maxFields.max_extensible_fields = *found_idf_max_extensible_fields;
+        }
+    } else {
+        auto const &legacy_idd_fields = legacy_idd["fields"];
+        for (auto const &field : ep_object.items()) {
+            auto const &field_key = field.key();
+            if (field_key == extension_key) continue;
+            for (std::size_t i = maxFields.max_fields; i < legacy_idd_fields.size(); ++i) {
+                if (field_key == legacy_idd_fields[i]) {
+                    maxFields.max_fields = (i + 1);
+                }
+            }
+        }
+
+        auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
+        if (legacy_idd_extensibles_iter != legacy_idd.end()) {
+            auto const epJSON_extensions_array_itr = ep_object.find(extension_key);
+            if (epJSON_extensions_array_itr != ep_object.end()) {
+                auto const &legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
+                auto const &epJSON_extensions_array = epJSON_extensions_array_itr.value();
+
+                for (auto const &exts : epJSON_extensions_array.items()) {
+                    std::size_t max_extensible_field = 0;
+                    for (auto const &ext : exts.value().items()) {
+                        auto const &ext_key = ext.key();
+                        for (std::size_t i = max_extensible_field; i < legacy_idd_extensibles.size(); ++i) {
+                            if (ext_key == legacy_idd_extensibles[i]) {
+                                max_extensible_field = (i + 1);
+                            }
+                        }
+                    }
+                    maxFields.max_extensible_fields += max_extensible_field;
+                }
+            }
+        }
+    }
+    return maxFields;
+}
+
+void InputProcessor::setObjectItemValue(json const &ep_object,
+                                        json const &ep_schema_object,
+                                        std::string const &field,
+                                        json const &legacy_field_info,
+                                        int &alpha_index,
+                                        int &numeric_index,
+                                        bool within_max_fields,
+                                        Array1S_string Alphas,
+                                        int &NumAlphas,
+                                        Array1D<Real64> &Numbers,
+                                        int &NumNumbers,
+                                        Optional<Array1D_bool> NumBlank,
+                                        Optional<Array1D_bool> AlphaBlank,
+                                        Optional<Array1D_string> AlphaFieldNames,
+                                        Optional<Array1D_string> NumericFieldNames)
+{
+    auto const is_AlphaBlank = present(AlphaBlank);
+    auto const is_AlphaFieldNames = present(AlphaFieldNames);
+    auto const is_NumBlank = present(NumBlank);
+    auto const is_NumericFieldNames = present(NumericFieldNames);
+
+    auto const &field_type = legacy_field_info.at("field_type").get<std::string>();
+    auto const &schema_field_obj = ep_schema_object[field];
+    auto it = ep_object.find(field);
+    if (it != ep_object.end()) {
+        auto const &field_value = it.value();
+        if (field_type == "a") {
+            // process alpha value
+            if (field_value.is_string()) {
+                auto const value = getObjectItemValue(field_value.get<std::string>(), schema_field_obj);
+
+                Alphas(alpha_index) = value.first;
+                if (is_AlphaBlank) AlphaBlank()(alpha_index) = value.second;
+
+            } else {
+                if (field_value.is_number_integer()) {
+                    i64toa(field_value.get<std::int64_t>(), s);
+                } else {
+                    dtoa(field_value.get<double>(), s);
+                }
+                Alphas(alpha_index) = s;
+                if (is_AlphaBlank) AlphaBlank()(alpha_index) = false;
+            }
+        } else if (field_type == "n") {
+            // process numeric value
+            if (field_value.is_number()) {
+                if (field_value.is_number_integer()) {
+                    Numbers(numeric_index) = field_value.get<std::int64_t>();
+                } else {
+                    Numbers(numeric_index) = field_value.get<double>();
+                }
+                if (is_NumBlank) NumBlank()(numeric_index) = false;
+            } else {
+                bool is_empty = field_value.get<std::string>().empty();
+                if (is_empty) {
+                    findDefault(Numbers(numeric_index), schema_field_obj);
+                } else {
+                    Numbers(numeric_index) = -99999; // autosize and autocalculate
+                }
+                if (is_NumBlank) NumBlank()(numeric_index) = is_empty;
+            }
+        }
+    } else {
+        if (field_type == "a") {
+            if (!(within_max_fields && findDefault(Alphas(alpha_index), schema_field_obj))) {
+                Alphas(alpha_index) = "";
+            }
+            if (is_AlphaBlank) AlphaBlank()(alpha_index) = true;
+        } else if (field_type == "n") {
+            if (within_max_fields) {
+                findDefault(Numbers(numeric_index), schema_field_obj);
+            } else {
+                Numbers(numeric_index) = 0;
+            }
+            if (is_NumBlank) NumBlank()(numeric_index) = true;
+        }
+    }
+    if (field_type == "a") {
+        if (within_max_fields) NumAlphas++;
+        if (is_AlphaFieldNames) {
+            AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+        }
+        alpha_index++;
+    } else if (field_type == "n") {
+        if (within_max_fields) NumNumbers++;
+        if (is_NumericFieldNames) {
+            NumericFieldNames()(numeric_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+        }
+        numeric_index++;
+    }
+}
+
 void InputProcessor::getObjectItem(std::string const &Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
-                                   Array1S<Real64> Numbers,
+                                   Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
                                    Optional<Array1D_bool> NumBlank,
@@ -580,10 +749,10 @@ void InputProcessor::getObjectItem(std::string const &Object,
     NumAlphas = 0;
     NumNumbers = 0;
     Status = -1;
-    auto const &is_AlphaBlank = present(AlphaBlank);
-    auto const &is_AlphaFieldNames = present(AlphaFieldNames);
-    auto const &is_NumBlank = present(NumBlank);
-    auto const &is_NumericFieldNames = present(NumericFieldNames);
+    auto const is_AlphaBlank = present(AlphaBlank);
+    auto const is_AlphaFieldNames = present(AlphaFieldNames);
+    auto const is_NumBlank = present(NumBlank);
+    auto const is_NumericFieldNames = present(NumericFieldNames);
 
     auto const &epJSON_it = find_iterators->second.inputObjectIterators.at(adjustedNumber - 1);
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
@@ -597,12 +766,21 @@ void InputProcessor::getObjectItem(std::string const &Object,
     auto const &legacy_idd_field_info = legacy_idd["field_info"];
     auto const &legacy_idd_fields = legacy_idd["fields"];
     auto const &schema_name_field = epJSON_schema_it_val.find("name");
+    auto const has_idd_name_field = schema_name_field != epJSON_schema_it_val.end();
 
     auto key = legacy_idd.find("extension");
     std::string extension_key;
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
+
+    auto const &obj = epJSON_it;
+    auto const &obj_val = obj.value();
+    objectInfo.objectName = obj.key();
+
+    int alpha_index = 1;
+    int numeric_index = 1;
+    auto maxFields = findMaxFields(obj_val, extension_key, legacy_idd);
 
     Alphas = "";
     Numbers = 0;
@@ -619,40 +797,22 @@ void InputProcessor::getObjectItem(std::string const &Object,
         NumericFieldNames() = "";
     }
 
-    auto const &obj = epJSON_it;
-    auto const &obj_val = obj.value();
-
-    objectInfo.objectName = obj.key();
-
     auto const find_unused = unusedInputs.find(objectInfo);
     if (find_unused != unusedInputs.end()) {
         unusedInputs.erase(find_unused);
     }
 
-    size_t idf_max_fields = 0;
-    auto found_idf_max_fields = obj_val.find("idf_max_fields");
-    if (found_idf_max_fields != obj_val.end()) {
-        idf_max_fields = *found_idf_max_fields;
-    }
-
-    size_t idf_max_extensible_fields = 0;
-    auto found_idf_max_extensible_fields = obj_val.find("idf_max_extensible_fields");
-    if (found_idf_max_extensible_fields != obj_val.end()) {
-        idf_max_extensible_fields = *found_idf_max_extensible_fields;
-    }
-
-    int alpha_index = 1;
-    int numeric_index = 1;
-
     for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
         std::string const &field = legacy_idd_fields[i];
         auto const &field_info = legacy_idd_field_info.find(field);
+        auto const &field_info_val = field_info.value();
         if (field_info == legacy_idd_field_info.end()) {
             ShowFatalError("Could not find field = \"" + field + "\" in \"" + Object + "\" in epJSON Schema.");
         }
-        auto const &field_type = field_info.value().at("field_type").get<std::string>();
-        bool within_idf_fields = (i < idf_max_fields);
-        if (field == "name" && schema_name_field != epJSON_schema_it_val.end()) {
+
+        bool within_idf_fields = (i < maxFields.max_fields);
+
+        if (has_idd_name_field && field == "name") {
             auto const &name_iter = schema_name_field.value();
             if (name_iter.find("retaincase") != name_iter.end()) {
                 Alphas(alpha_index) = objectInfo.objectName;
@@ -661,175 +821,67 @@ void InputProcessor::getObjectItem(std::string const &Object,
             }
             if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
             if (is_AlphaFieldNames) {
-                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
+                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
             }
             NumAlphas++;
             alpha_index++;
             continue;
         }
 
-        auto const &schema_field_obj = schema_obj_props[field];
-        auto it = obj_val.find(field);
-        if (it != obj_val.end()) {
-            auto const &field_value = it.value();
-            if (field_type == "a") {
-                // process alpha value
-                if (field_value.is_string()) {
-                    auto const value = getObjectItemValue(field_value.get<std::string>(), schema_field_obj);
-
-                    Alphas(alpha_index) = value.first;
-                    if (is_AlphaBlank) AlphaBlank()(alpha_index) = value.second;
-
-                } else {
-                    if (field_value.is_number_integer()) {
-                        i64toa(field_value.get<std::int64_t>(), s);
-                    } else {
-                        dtoa(field_value.get<double>(), s);
-                    }
-                    Alphas(alpha_index) = s;
-                    if (is_AlphaBlank) AlphaBlank()(alpha_index) = false;
-                }
-            } else if (field_type == "n") {
-                // process numeric value
-                if (field_value.is_number()) {
-                    if (field_value.is_number_integer()) {
-                        Numbers(numeric_index) = field_value.get<std::int64_t>();
-                    } else {
-                        Numbers(numeric_index) = field_value.get<double>();
-                    }
-                    if (is_NumBlank) NumBlank()(numeric_index) = false;
-                } else {
-                    bool is_empty = field_value.get<std::string>().empty();
-                    if (is_empty) {
-                        findDefault(Numbers(numeric_index), schema_field_obj);
-                    } else {
-                        Numbers(numeric_index) = -99999; // autosize and autocalculate
-                    }
-                    if (is_NumBlank) NumBlank()(numeric_index) = is_empty;
-                }
-            }
-        } else {
-            if (field_type == "a") {
-                if (!(within_idf_fields && findDefault(Alphas(alpha_index), schema_field_obj))) {
-                    Alphas(alpha_index) = "";
-                }
-                if (is_AlphaBlank) AlphaBlank()(alpha_index) = true;
-            } else if (field_type == "n") {
-                if (within_idf_fields) {
-                    findDefault(Numbers(numeric_index), schema_field_obj);
-                } else {
-                    Numbers(numeric_index) = 0;
-                }
-                if (is_NumBlank) NumBlank()(numeric_index) = true;
-            }
-        }
-        if (field_type == "a") {
-            if (within_idf_fields) NumAlphas++;
-            if (is_AlphaFieldNames) {
-                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
-            }
-            alpha_index++;
-        } else if (field_type == "n") {
-            if (within_idf_fields) NumNumbers++;
-            if (is_NumericFieldNames) {
-                NumericFieldNames()(numeric_index) = (DataGlobals::isEpJSON) ? field : field_info.value().at("field_name").get<std::string>();
-            }
-            numeric_index++;
-        }
+        setObjectItemValue(obj_val,
+                           schema_obj_props,
+                           field,
+                           field_info_val,
+                           alpha_index,
+                           numeric_index,
+                           within_idf_fields,
+                           Alphas,
+                           NumAlphas,
+                           Numbers,
+                           NumNumbers,
+                           NumBlank,
+                           AlphaBlank,
+                           AlphaFieldNames,
+                           NumericFieldNames);
     }
 
     size_t extensible_count = 0;
     auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
     if (legacy_idd_extensibles_iter != legacy_idd.end()) {
-        auto const epJSON_extensions_array_itr = obj.value().find(extension_key);
-        if (epJSON_extensions_array_itr != obj.value().end()) {
+        auto const epJSON_extensions_array_itr = obj_val.find(extension_key);
+        if (epJSON_extensions_array_itr != obj_val.end()) {
             auto const &legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
             auto const &epJSON_extensions_array = epJSON_extensions_array_itr.value();
             auto const &schema_extension_fields = schema_obj_props[extension_key]["items"]["properties"];
 
             for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
                 auto const &epJSON_extension_obj = it.value();
-
                 for (size_t i = 0; i < legacy_idd_extensibles.size(); i++, extensible_count++) {
                     std::string const &field_name = legacy_idd_extensibles[i];
-                    auto const &epJSON_obj_field_iter = epJSON_extension_obj.find(field_name);
-                    auto const &schema_field = schema_extension_fields[field_name];
-
                     auto const &field_info = legacy_idd_field_info.find(field_name);
+                    auto const &field_info_val = field_info.value();
+
                     if (field_info == legacy_idd_field_info.end()) {
                         ShowFatalError("Could not find field = \"" + field_name + "\" in \"" + Object + "\" in epJSON Schema.");
                     }
-                    auto const &field_type = field_info.value().at("field_type").get<std::string>();
-                    bool within_idf_extensible_fields = (extensible_count < idf_max_extensible_fields);
 
-                    if (epJSON_obj_field_iter != epJSON_extension_obj.end()) {
-                        auto const &field_value = epJSON_obj_field_iter.value();
+                    bool within_idf_extensible_fields = (extensible_count < maxFields.max_extensible_fields);
 
-                        if (field_type == "a") {
-                            if (field_value.is_string()) {
-                                auto const value = getObjectItemValue(field_value.get<std::string>(), schema_field);
-
-                                Alphas(alpha_index) = value.first;
-                                if (is_AlphaBlank) AlphaBlank()(alpha_index) = value.second;
-                            } else {
-                                if (field_value.is_number_integer()) {
-                                    i64toa(field_value.get<std::int64_t>(), s);
-                                } else {
-                                    dtoa(field_value.get<double>(), s);
-                                }
-                                Alphas(alpha_index) = s;
-                                if (is_AlphaBlank) AlphaBlank()(alpha_index) = false;
-                            }
-                        } else if (field_type == "n") {
-                            if (field_value.is_number()) {
-                                if (field_value.is_number_integer()) {
-                                    Numbers(numeric_index) = field_value.get<std::int64_t>();
-                                } else {
-                                    Numbers(numeric_index) = field_value.get<double>();
-                                }
-                                if (is_NumBlank) NumBlank()(numeric_index) = false;
-                            } else {
-                                bool is_empty = field_value.get<std::string>().empty();
-                                if (is_empty) {
-                                    findDefault(Numbers(numeric_index), schema_field);
-                                } else {
-                                    Numbers(numeric_index) = -99999; // autosize and autocalculate
-                                }
-                                if (is_NumBlank) NumBlank()(numeric_index) = is_empty;
-                            }
-                        }
-                    } else {
-
-                        if (field_type == "a") {
-                            if (!(within_idf_extensible_fields && findDefault(Alphas(alpha_index), schema_field))) {
-                                Alphas(alpha_index) = "";
-                            }
-                            if (is_AlphaBlank) AlphaBlank()(alpha_index) = true;
-                        } else if (field_type == "n") {
-                            if (within_idf_extensible_fields) {
-                                findDefault(Numbers(numeric_index), schema_field);
-                            } else {
-                                Numbers(numeric_index) = 0;
-                            }
-                            if (is_NumBlank) NumBlank()(numeric_index) = true;
-                        }
-                    }
-
-                    if (field_type == "a") {
-                        if (within_idf_extensible_fields) NumAlphas++;
-                        if (is_AlphaFieldNames) {
-                            AlphaFieldNames()(alpha_index) =
-                                (DataGlobals::isEpJSON) ? field_name : field_info.value().at("field_name").get<std::string>();
-                        }
-                        alpha_index++;
-                    } else if (field_type == "n") {
-                        if (within_idf_extensible_fields) NumNumbers++;
-                        if (is_NumericFieldNames) {
-                            NumericFieldNames()(numeric_index) =
-                                (DataGlobals::isEpJSON) ? field_name : field_info.value().at("field_name").get<std::string>();
-                        }
-                        numeric_index++;
-                    }
+                    setObjectItemValue(epJSON_extension_obj,
+                                       schema_extension_fields,
+                                       field_name,
+                                       field_info_val,
+                                       alpha_index,
+                                       numeric_index,
+                                       within_idf_extensible_fields,
+                                       Alphas,
+                                       NumAlphas,
+                                       Numbers,
+                                       NumNumbers,
+                                       NumBlank,
+                                       AlphaBlank,
+                                       AlphaFieldNames,
+                                       NumericFieldNames);
                 }
             }
         }
@@ -1092,7 +1144,7 @@ void InputProcessor::getMaxSchemaArgs(int &NumArgs, int &NumAlpha, int &NumNumer
         const json &legacy_idd = schema_properties.at(object.key()).at("legacy_idd");
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
 
         size_t max_size = 0;
@@ -1175,7 +1227,7 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
     std::string extension_key;
     auto key = legacy_idd.find("extension");
     if (key != legacy_idd.end()) {
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
     }
 
     for (auto const obj : *objects) {
@@ -1204,6 +1256,180 @@ void InputProcessor::getObjectDefMaxArgs(std::string const &ObjectWord, // Objec
         }
     }
     NumArgs = NumAlpha + NumNumeric;
+}
+
+void InputProcessor::reportIDFRecordsStats()
+{
+
+    // SUBROUTINE INFORMATION: (previously called GetIDFRecordsStats)
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   February 2009
+    //       MODIFIED       na
+    //       RE-ENGINEERED  Julien Marrec of EffiBEM, 2020 (ported to the new InputProcessor/epJSON)
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This routine provides some statistics on the current IDF, such as number of records, total fields with defaults,
+    // number of fields that overrode the default (even if it was default value), and similarly for AutoSize.
+
+    // METHODOLOGY EMPLOYED:
+    // Traverses the IDF Records looking at each field vs object definition for defaults and autosize.
+
+    // Reset the globals
+    DataOutputs::iNumberOfRecords = 0;             // Number of IDF Records
+    DataOutputs::iNumberOfDefaultedFields = 0;     // Number of defaulted fields in IDF
+    DataOutputs::iTotalFieldsWithDefaults = 0;     // Total number of fields that could be defaulted
+    DataOutputs::iNumberOfAutoSizedFields = 0;     // Number of autosized fields in IDF
+    DataOutputs::iTotalAutoSizableFields = 0;      // Total number of autosizeable fields
+    DataOutputs::iNumberOfAutoCalcedFields = 0;    // Number of autocalculated fields
+    DataOutputs::iTotalAutoCalculatableFields = 0; // Total number of autocalculatable fields
+
+    auto const &schema_properties = schema.at("properties");
+
+    // Lambda to avoid repeating code twice (when processing regular fields, and extensible fields)
+    auto processField = [](const std::string& field, const json& epJSONObj, const json& schema_field_obj) {
+        bool hasDefault = false;
+        bool canBeAutosized = false;
+        bool canBeAutocalculated = false;
+
+        // If we wanted to count number of fields, would do it here
+
+        std::string defaultValue;
+
+        auto const &default_it = schema_field_obj.find("default");
+        if (default_it != schema_field_obj.end()) {
+            ++DataOutputs::iTotalFieldsWithDefaults;
+            hasDefault = true;
+            auto const &default_val = default_it.value();
+            if (default_val.is_string()) {
+                defaultValue = default_val.get<std::string>();
+            }
+        }
+
+        auto const &anyOf_it = schema_field_obj.find("anyOf");
+        if (anyOf_it != schema_field_obj.end()) {
+            for (auto const &anyOf : anyOf_it.value()) {
+                auto const &enum_it = anyOf.find("enum");
+                if (enum_it != anyOf.end()) {
+                    for (auto const &e: enum_it.value()) {
+                        if (e.is_string()) {
+                            auto const &enumVal = e.get<std::string>();
+                            if (enumVal == "Autosize") {
+                                ++DataOutputs::iTotalAutoSizableFields;
+                                canBeAutosized = true;
+                            } else if (enumVal == "Autocalculate") {
+                                ++DataOutputs::iTotalAutoCalculatableFields;
+                                canBeAutocalculated = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Locate the field in the ep_object
+        auto it = epJSONObj.find(field);
+        if (it != epJSONObj.end()) { // && !it.value().empty()) {
+            // Found it: check if Autosized or Autocalculated
+            auto const &field_value = it.value();
+            if (field_value.is_string()) {
+                std::string const val = field_value.get<std::string>();
+                // In the IDF, casing is an issue and Autosize/Autocalculate are accepted as synonyms
+                // but once converted to epJSON everything should is resolved, eg:
+                // * if "AutoSize" is entered for an autosizable field, the result is "Autosize"
+                // * if "AutoSize" is entered for an autocalculatable field, the result is "Autocalculate"
+                if (canBeAutosized && (val == "Autosize")) {
+                    ++DataOutputs::iNumberOfAutoSizedFields;
+                } else if (canBeAutocalculated && (val == "Autocalculate")) {
+                    ++DataOutputs::iNumberOfAutoCalcedFields;
+                }
+            }
+        } else if (hasDefault) {
+            // Not found: was defaulted
+            ++DataOutputs::iNumberOfDefaultedFields;
+            if (canBeAutosized && (defaultValue == "Autosize")) {
+                ++DataOutputs::iNumberOfAutoSizedFields;
+            } else if (canBeAutocalculated && (defaultValue == "Autocalculate")) {
+                ++DataOutputs::iNumberOfAutoCalcedFields;
+            }
+        }
+    };
+
+
+
+    // Loop on all objectTypes
+    for (auto epJSON_iter = epJSON.begin(); epJSON_iter != epJSON.end(); ++epJSON_iter) {
+        auto const &objectType = epJSON_iter.key();
+        auto const &objects = epJSON_iter.value();
+
+        const json &object_schema = schema_properties.at(objectType);
+
+        // Locations in JSON schema relating to normal fields
+        auto const &schema_obj_props = getPatternProperties(object_schema);
+        auto const &schema_name_field = object_schema.find("name");
+        auto const has_idd_name_field = schema_name_field != object_schema.end();
+
+        // Locations in JSON schema storing the positional aspects from the IDD format, legacy prefixed
+        auto const &legacy_idd = object_schema["legacy_idd"];
+        auto const &legacy_idd_fields = legacy_idd["fields"];
+
+        // Look for extensible
+        auto key = legacy_idd.find("extension");
+        std::string extension_key;
+        if (key != legacy_idd.end()) {
+            extension_key = key.value().get<std::string>();
+        }
+
+        for (auto const &ep_object: objects) {
+
+            // Count number of objects
+            ++DataOutputs::iNumberOfRecords;
+
+            // Loop on all regular fields
+            for (size_t i = 0; i < legacy_idd_fields.size(); ++i) {
+
+                std::string const &field = legacy_idd_fields[i];
+
+                // This is weird, but some objects like Building have a Name default... and it's not in the patternProperties
+                if (has_idd_name_field && field == "name") {
+                    auto const &name_iter = schema_name_field.value();
+                    if (name_iter.find("default") != name_iter.end()) {
+                        ++DataOutputs::iTotalFieldsWithDefaults;
+                        auto it = ep_object.find(field);
+                        if (it == ep_object.end()) {
+                            ++DataOutputs::iNumberOfDefaultedFields;
+                        }
+                    }
+                    continue;
+                }
+
+                auto const &schema_field_obj = schema_obj_props[field];
+
+                processField(field, ep_object, schema_field_obj);
+
+            } // End regular fields
+
+            auto const &legacy_idd_extensibles_iter = legacy_idd.find("extensibles");
+            if (legacy_idd_extensibles_iter != legacy_idd.end()) {
+                auto const epJSON_extensions_array_itr = ep_object.find(extension_key);
+                if (epJSON_extensions_array_itr != ep_object.end()) {
+                    auto const &legacy_idd_extensibles = legacy_idd_extensibles_iter.value();
+                    auto const &epJSON_extensions_array = epJSON_extensions_array_itr.value();
+                    auto const &schema_extension_fields = schema_obj_props[extension_key]["items"]["properties"];
+
+                    for (auto it = epJSON_extensions_array.begin(); it != epJSON_extensions_array.end(); ++it) {
+                        auto const &epJSON_extension_obj = it.value();
+                        for (size_t i = 0; i < legacy_idd_extensibles.size(); ++i) {
+                            std::string const &field = legacy_idd_extensibles[i];
+                            auto const &schema_extension_field_obj = schema_extension_fields[field];
+
+                            processField(field, epJSON_extension_obj, schema_extension_field_obj);
+                        }
+                    }
+                }
+            } // End extensible fields
+
+        } // End loop on each object of a given objectType
+    } // End loop on all objectTypes
 }
 
 void InputProcessor::reportOrphanRecordObjects()
@@ -1403,6 +1629,9 @@ void InputProcessor::preScanReportingVariables()
     // consider those variables for output.  (At this time, all metered variables are
     // allowed to pass through).
 
+    // This routine also scans any variables requested by API call for library usage.
+    // These variables are stored in a vector in output processor, and the values are added before E+ begins.
+
     // METHODOLOGY EMPLOYED:
     // Uses internal records and structures.
     // Looks at:
@@ -1420,7 +1649,7 @@ void InputProcessor::preScanReportingVariables()
     static std::string const OutputVariable("Output:Variable");
     static std::string const MeterCustom("Meter:Custom");
     static std::string const MeterCustomDecrement("Meter:CustomDecrement");
-    //		static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
+    //      static std::string const MeterCustomDifference( "METER:CUSTOMDIFFERENCE" );
     static std::string const OutputTableMonthly("Output:Table:Monthly");
     static std::string const OutputTableAnnual("Output:Table:Annual");
     static std::string const OutputTableTimeBins("Output:Table:TimeBins");
@@ -1454,7 +1683,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustom]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1475,7 +1704,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][MeterCustomDecrement]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1512,6 +1741,10 @@ void InputProcessor::preScanReportingVariables()
         }
     }
 
+    for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
+        addRecordToOutputVariableStructure(requestedVar.varKey, requestedVar.varName);
+    }
+
     epJSON_objects = epJSON.find(OutputTableTimeBins);
     if (epJSON_objects != epJSON.end()) {
         auto const &epJSON_object = epJSON_objects.value();
@@ -1531,7 +1764,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableMonthly]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1551,7 +1784,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableAnnual]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1571,7 +1804,7 @@ void InputProcessor::preScanReportingVariables()
         auto const &legacy_idd = schema["properties"][OutputTableSummaries]["legacy_idd"];
         auto key = legacy_idd.find("extension");
         if (key != legacy_idd.end()) {
-            extension_key = key.value();
+            extension_key = key.value().get<std::string>();
         }
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             json const &fields = obj.value();
@@ -1620,8 +1853,8 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE");
 
     } else if (reportName == "ZONEELECTRICSUMMARYMONTHLY") {
-        addRecordToOutputVariableStructure("*", "ZONE LIGHTS ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "ZONE LIGHTS ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "ZONE ELECTRIC EQUIPMENT ELECTRICITY ENERGY");
 
     } else if (reportName == "SPACEGAINSMONTHLY") {
         addRecordToOutputVariableStructure("*", "ZONE PEOPLE TOTAL HEATING ENERGY");
@@ -1683,15 +1916,15 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "ZONE THERMAL COMFORT FANGER MODEL PPD");
 
     } else if (reportName == "CHILLERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "CHILLER ELECTRIC ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "CHILLER ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY ENERGY"); // on meter
+        addRecordToOutputVariableStructure("*", "CHILLER ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "CHILLER EVAPORATOR COOLING ENERGY");      // on meter
         addRecordToOutputVariableStructure("*", "CHILLER CONDENSER HEAT TRANSFER ENERGY"); // on meter
         addRecordToOutputVariableStructure("*", "CHILLER COP");
 
     } else if (reportName == "TOWERREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRIC ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY ENERGY"); // on meter
+        addRecordToOutputVariableStructure("*", "COOLING TOWER FAN ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER HEAT TRANSFER RATE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER INLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "COOLING TOWER OUTLET TEMPERATURE");
@@ -1699,27 +1932,27 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
 
     } else if (reportName == "BOILERREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "BOILER HEATING ENERGY");  // on meter
-        addRecordToOutputVariableStructure("*", "BOILER GAS CONSUMPTION"); // on meter
+        addRecordToOutputVariableStructure("*", "BOILER NATURALGAS CONSUMPTION"); // on meter
         addRecordToOutputVariableStructure("*", "BOILER HEATING ENERGY");  // on meter
         addRecordToOutputVariableStructure("*", "BOILER HEATING RATE");
-        addRecordToOutputVariableStructure("*", "BOILER GAS CONSUMPTION RATE");
+        addRecordToOutputVariableStructure("*", "BOILER NATURALGAS CONSUMPTION RATE");
         addRecordToOutputVariableStructure("*", "BOILER INLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "BOILER OUTLET TEMPERATURE");
         addRecordToOutputVariableStructure("*", "BOILER MASS FLOW RATE");
-        addRecordToOutputVariableStructure("*", "BOILER ANCILLARY ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "BOILER ANCILLARY ELECTRICITY RATE");
 
     } else if (reportName == "DXREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING ENERGY"); // on meter
-        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRIC ENERGY");      // on meter
+        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRICITY ENERGY");      // on meter
         addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "COOLING COIL LATENT COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "COOLING COIL RUNTIME FRACTION");
         addRecordToOutputVariableStructure("*", "COOLING COIL TOTAL COOLING RATE");
         addRecordToOutputVariableStructure("*", "COOLING COIL SENSIBLE COOLING RATE");
         addRecordToOutputVariableStructure("*", "COOLING COIL LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRIC POWER");
-        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "COOLING COIL ELECTRICITY RATE");
+        addRecordToOutputVariableStructure("*", "COOLING COIL CRANKCASE HEATER ELECTRICITY RATE");
 
     } else if (reportName == "WINDOWREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE");
@@ -1812,20 +2045,20 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
 
     } else if (reportName == "WINDOWACREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING ENERGY");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING RATE");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER SENSIBLE COOLING RATE");
         addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE");
-        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "ZONE WINDOW AIR CONDITIONER ELECTRICITY RATE");
 
     } else if (reportName == "WATERHEATERREPORTMONTHLY") {
         addRecordToOutputVariableStructure("*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER BURNER HEATING ENERGY");
-        addRecordToOutputVariableStructure("*", "WATER HEATER GAS CONSUMPTION");
+        addRecordToOutputVariableStructure("*", "WATER HEATER NATURALGAS CONSUMPTION");
         addRecordToOutputVariableStructure("*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER LOSS DEMAND ENERGY");
         addRecordToOutputVariableStructure("*", "WATER HEATER HEAT LOSS ENERGY");
@@ -1834,10 +2067,10 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "WATER HEATER SOURCE ENERGY");
 
     } else if (reportName == "GENERATORREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR DIESEL CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "GENERATOR GAS CONSUMPTION");
-        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "GENERATOR NATURALGAS CONSUMPTION");
+        addRecordToOutputVariableStructure("*", "GENERATOR PRODUCED AC ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR TOTAL HEAT RECOVERY");
         addRecordToOutputVariableStructure("*", "GENERATOR JACKET HEAT RECOVERY ENERGY");
         addRecordToOutputVariableStructure("*", "GENERATOR LUBE HEAT RECOVERY");
@@ -1871,14 +2104,14 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "PLANT SUPPLY SIDE HEATING DEMAND RATE");
 
     } else if (reportName == "FANREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "FAN ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "FAN ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "FAN RISE IN AIR TEMPERATURE");
-        addRecordToOutputVariableStructure("*", "FAN ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "FAN ELECTRICITY RATE");
 
     } else if (reportName == "PUMPREPORTMONTHLY") {
-        addRecordToOutputVariableStructure("*", "PUMP ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN ENERGY");
-        addRecordToOutputVariableStructure("*", "PUMP ELECTRIC POWER");
+        addRecordToOutputVariableStructure("*", "PUMP ELECTRICITY RATE");
         addRecordToOutputVariableStructure("*", "PUMP SHAFT POWER");
         addRecordToOutputVariableStructure("*", "PUMP FLUID HEAT GAIN RATE");
         addRecordToOutputVariableStructure("*", "PUMP OUTLET TEMPERATURE");
@@ -1898,8 +2131,8 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "AIR SYSTEM HOT WATER ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM STEAM ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM CHILLED WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM GAS ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM NATURALGAS ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM WATER VOLUME");
 
     } else if (reportName == "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY") {
@@ -1913,17 +2146,17 @@ void InputProcessor::addVariablesForMonthlyReport(std::string const &reportName)
         addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY");
 
     } else if (reportName == "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY") {
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM FAN ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM FAN ELECTRICITY ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX HEATING COIL ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX COOLING COIL ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL GAS ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX HEATING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM DX COOLING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL NATURALGAS ENERGY");
         addRecordToOutputVariableStructure("*", "AIR SYSTEM HEATING COIL STEAM ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM HUMIDIFIER ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRIC ENERGY");
-        addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRIC ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM HUMIDIFIER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRICITY ENERGY");
+        addRecordToOutputVariableStructure("*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRICITY ENERGY");
 
     } else if (reportName == "MECHANICALVENTILATIONLOADSMONTHLY") {
         addRecordToOutputVariableStructure("*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY");

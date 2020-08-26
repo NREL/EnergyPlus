@@ -110,13 +110,13 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     NONE,                    !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -450,7 +450,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA West Zone,       !- Name
@@ -481,7 +486,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA EAST ZONE,       !- Name
@@ -512,7 +522,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA NORTH ZONE,      !- Name
@@ -2569,8 +2584,8 @@
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2579,8 +2594,8 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2589,8 +2604,8 @@
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone1TermReheat,         !- Name
@@ -2764,7 +2779,7 @@
     ,                        !- Heater Minimum Capacity {W}
     ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
     ,                        !- Heater Ignition Delay {s}
-    ELECTRIC,                !- Heater Fuel Type
+    Electricity,             !- Heater Fuel Type
     1.0,                     !- Heater Thermal Efficiency
     ,                        !- Part Load Factor Curve Name
     ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}
@@ -2801,9 +2816,9 @@
     AUTOSIZE,                !- Design Air Flow Rate {m3/s}
     AUTOSIZE,                !- Design Fan Power {W}
     AUTOSIZE,                !- Design U-Factor Times Area Value {W/K}
-    autocalculate,           !- Free Convection Air Flow Rate {m3/s}
-    ,                        !- Free Convection Air Flow Rate Sizing Factor
-    autocalculate,           !- Free Convection U-Factor Times Area Value {W/K}
+    autocalculate,           !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    autocalculate,           !- Free Convection Regime U-Factor Times Area Value {W/K}
     ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
@@ -3109,7 +3124,7 @@
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Plant Supply Side Cooling Demand Rate,hourly;
 
@@ -3227,25 +3242,25 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Electric Energy,hourly;
+  Output:Variable,*,Water Heater Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,hourly;
 
   Output:Variable,*,Water Heater Water Volume,hourly;
 
-  Output:Variable,*,Facility Total Produced Electric Power,hourly;
+  Output:Variable,*,Facility Total Produced Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,hourly;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,hourly;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,hourly;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,hourly;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,hourly;
 
-  Output:Variable,*,Facility Total Electric Demand Power,hourly;
+  Output:Variable,*,Facility Total Electricity Demand Rate,hourly;
 
   Output:Variable,*,Generator Produced Thermal Rate,hourly;
 
@@ -3259,13 +3274,13 @@
 
   Output:Variable,Capstone C65,Generator Heat Recovery Water Mass Flow Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Produced Electric Power,hourly;
+  Output:Variable,Capstone C65,Generator Produced AC Electricity Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Rate,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Rate,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Energy,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Energy,hourly;
 
-  Output:Variable,Capstone C65,Generator Gas Mass Flow Rate,hourly;
+  Output:Variable,Capstone C65,Generator NaturalGas Mass Flow Rate,hourly;
 
   Output:Variable,Capstone C65,Generator LHV Basis Electric Efficiency,hourly;
 
@@ -3422,9 +3437,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3436,9 +3451,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   Output:VariableDictionary,IDF;
 

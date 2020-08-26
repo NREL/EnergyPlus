@@ -60,7 +60,7 @@
 ! Environmental Emissions:        Yes
 ! Utility Tariffs:                Yes, (circa 2004, Reliant , TX)
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,6;
 
@@ -117,19 +117,20 @@
     10;                      !- Maximum HVAC Iterations
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    30;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    30;                      !- Shading Calculation Update Frequency
 
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   Building,
     AutoBuilt Model: All,    !- Name
     0.0,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.0400,                  !- Loads Convergence Tolerance Value
+    0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -1094,7 +1095,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_1,        !- Zone Name
+    ZN_1_FLR_1_SEC_1,        !- Zone or ZoneList Name
     157.0784;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -1208,7 +1209,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_1,!- Name
@@ -1244,18 +1250,30 @@
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZN_1_FLR_1_SEC_1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZN_1_FLR_1_SEC_1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZN_1_FLR_1_SEC_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN_1_FLR_1_SEC_1 Direct Air Inlet Node,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    ZN_1_FLR_1_SEC_1 Direct Air Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_1 Direct Air Inlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZN_1_FLR_1_SEC_1 Direct Air ADU,  !- Name
+    ZN_1_FLR_1_SEC_1 Direct Air Inlet Node,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZN_1_FLR_1_SEC_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrZN_1_FLR_1_SEC_1,  !- Name
@@ -1451,7 +1469,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_2,        !- Zone Name
+    ZN_1_FLR_1_SEC_2,        !- Zone or ZoneList Name
     122.1516;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -1565,7 +1583,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_2,!- Name
@@ -1601,18 +1624,30 @@
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_2 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZN_1_FLR_1_SEC_2 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZN_1_FLR_1_SEC_2 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZN_1_FLR_1_SEC_2 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN_1_FLR_1_SEC_2 Direct Air Inlet Node,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    ZN_1_FLR_1_SEC_2 Direct Air Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_2 Direct Air Inlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZN_1_FLR_1_SEC_2 Direct Air ADU,  !- Name
+    ZN_1_FLR_1_SEC_2 Direct Air Inlet Node,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZN_1_FLR_1_SEC_2 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrZN_1_FLR_1_SEC_2,  !- Name
@@ -1808,7 +1843,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_3,        !- Zone Name
+    ZN_1_FLR_1_SEC_3,        !- Zone or ZoneList Name
     157.0784;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -1922,7 +1957,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_3,!- Name
@@ -1958,18 +1998,30 @@
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZN_1_FLR_1_SEC_3 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZN_1_FLR_1_SEC_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZN_1_FLR_1_SEC_3 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN_1_FLR_1_SEC_3 Direct Air Inlet Node,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    ZN_1_FLR_1_SEC_3 Direct Air Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_3 Direct Air Inlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZN_1_FLR_1_SEC_3 Direct Air ADU,  !- Name
+    ZN_1_FLR_1_SEC_3 Direct Air Inlet Node,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZN_1_FLR_1_SEC_3 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrZN_1_FLR_1_SEC_3,  !- Name
@@ -2165,7 +2217,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_4,        !- Zone Name
+    ZN_1_FLR_1_SEC_4,        !- Zone or ZoneList Name
     122.1516;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2279,7 +2331,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_4,!- Name
@@ -2315,18 +2372,30 @@
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_4 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZN_1_FLR_1_SEC_4 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZN_1_FLR_1_SEC_4 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZN_1_FLR_1_SEC_4 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN_1_FLR_1_SEC_4 Direct Air Inlet Node,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    ZN_1_FLR_1_SEC_4 Direct Air Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_4 Direct Air Inlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZN_1_FLR_1_SEC_4 Direct Air ADU,  !- Name
+    ZN_1_FLR_1_SEC_4 Direct Air Inlet Node,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZN_1_FLR_1_SEC_4 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrZN_1_FLR_1_SEC_4,  !- Name
@@ -2507,7 +2576,7 @@
   InternalMass,
     ZN_1_FLR_1_SEC_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN_1_FLR_1_SEC_5,        !- Zone Name
+    ZN_1_FLR_1_SEC_5,        !- Zone or ZoneList Name
     221.8999;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2621,7 +2690,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN_1_FLR_1_SEC_5,!- Name
@@ -2657,18 +2731,30 @@
   ZoneHVAC:EquipmentList,
     ZN_1_FLR_1_SEC_5 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZN_1_FLR_1_SEC_5 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZN_1_FLR_1_SEC_5 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZN_1_FLR_1_SEC_5 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN_1_FLR_1_SEC_5 Direct Air Inlet Node,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    ZN_1_FLR_1_SEC_5 Direct Air Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_5 Direct Air Inlet Node,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZN_1_FLR_1_SEC_5 Direct Air ADU,  !- Name
+    ZN_1_FLR_1_SEC_5 Direct Air Inlet Node,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZN_1_FLR_1_SEC_5 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrZN_1_FLR_1_SEC_5,  !- Name
@@ -2987,7 +3073,7 @@
   AirLoopHVAC:ZoneSplitter,
     ZN_1_FLR_1_SEC_1:Sys Supply Air Splitter,  !- Name
     ZN_1_FLR_1_SEC_1:Sys Zone Equipment Inlet Node,  !- Inlet Node Name
-    ZN_1_FLR_1_SEC_1 Direct Air Inlet Node;  !- Outlet 1 Node Name
+    ZN_1_FLR_1_SEC_1 Direct Air Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     ZN_1_FLR_1_SEC_1:Sys Return Air Path,  !- Name
@@ -3207,7 +3293,7 @@
   AirLoopHVAC:ZoneSplitter,
     ZN_1_FLR_1_SEC_2:Sys Supply Air Splitter,  !- Name
     ZN_1_FLR_1_SEC_2:Sys Zone Equipment Inlet Node,  !- Inlet Node Name
-    ZN_1_FLR_1_SEC_2 Direct Air Inlet Node;  !- Outlet 1 Node Name
+    ZN_1_FLR_1_SEC_2 Direct Air Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     ZN_1_FLR_1_SEC_2:Sys Return Air Path,  !- Name
@@ -3427,7 +3513,7 @@
   AirLoopHVAC:ZoneSplitter,
     ZN_1_FLR_1_SEC_3:Sys Supply Air Splitter,  !- Name
     ZN_1_FLR_1_SEC_3:Sys Zone Equipment Inlet Node,  !- Inlet Node Name
-    ZN_1_FLR_1_SEC_3 Direct Air Inlet Node;  !- Outlet 1 Node Name
+    ZN_1_FLR_1_SEC_3 Direct Air Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     ZN_1_FLR_1_SEC_3:Sys Return Air Path,  !- Name
@@ -3647,7 +3733,7 @@
   AirLoopHVAC:ZoneSplitter,
     ZN_1_FLR_1_SEC_4:Sys Supply Air Splitter,  !- Name
     ZN_1_FLR_1_SEC_4:Sys Zone Equipment Inlet Node,  !- Inlet Node Name
-    ZN_1_FLR_1_SEC_4 Direct Air Inlet Node;  !- Outlet 1 Node Name
+    ZN_1_FLR_1_SEC_4 Direct Air Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     ZN_1_FLR_1_SEC_4:Sys Return Air Path,  !- Name
@@ -3867,7 +3953,7 @@
   AirLoopHVAC:ZoneSplitter,
     ZN_1_FLR_1_SEC_5:Sys Supply Air Splitter,  !- Name
     ZN_1_FLR_1_SEC_5:Sys Zone Equipment Inlet Node,  !- Inlet Node Name
-    ZN_1_FLR_1_SEC_5 Direct Air Inlet Node;  !- Outlet 1 Node Name
+    ZN_1_FLR_1_SEC_5 Direct Air Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     ZN_1_FLR_1_SEC_5:Sys Return Air Path,  !- Name
@@ -4434,7 +4520,7 @@
 
   UtilityCost:Tariff,
     TX_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -4496,31 +4582,31 @@
   Output:Table:Monthly,
     Load Center Performance Summary,  !- Name
     2,                       !- Digits After Decimal
-    Electric Load Center Produced Electric Power,  !- Variable or Meter 1 Name
+    Electric Load Center Produced Electricity Rate,  !- Variable or Meter 1 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Electric Load Center Produced Electric Power,  !- Variable or Meter 2 Name
+    Electric Load Center Produced Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
     PV Performance Summary,  !- Name
     2,                       !- Digits After Decimal
-    Generator Produced DC Electric Power,  !- Variable or Meter 1 Name
+    Generator Produced DC Electricity Rate,  !- Variable or Meter 1 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Generator Produced DC Electric Power,  !- Variable or Meter 2 Name
+    Generator Produced DC Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
     Generator PV Array Efficiency,  !- Variable or Meter 3 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 3
-    Generator Produced DC Electric Energy,  !- Variable or Meter 4 Name
+    Generator Produced DC Electricity Energy,  !- Variable or Meter 4 Name
     SumOrAverageDuringHoursShown;  !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
     Inverter Performance Summary,  !- Name
     3,                       !- Digits After Decimal
-    Inverter DC Input Electric Power,  !- Variable or Meter 1 Name
+    Inverter DC Input Electricity Rate,  !- Variable or Meter 1 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 1
-    Inverter DC Input Electric Power,  !- Variable or Meter 2 Name
+    Inverter DC Input Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 2
-    Inverter AC Output Electric Power,  !- Variable or Meter 3 Name
+    Inverter AC Output Electricity Rate,  !- Variable or Meter 3 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 3
     Inverter Thermal Loss Rate,  !- Variable or Meter 4 Name
     SumOrAverageDuringHoursShown,  !- Aggregation Type for Variable or Meter 4
@@ -4550,17 +4636,17 @@
   Output:Table:Monthly,
     AC Power Summary,        !- Name
     3,                       !- Digits After Decimal
-    Facility Total Purchased Electric Power,  !- Variable or Meter 1 Name
+    Facility Total Purchased Electricity Rate,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Facility Net Purchased Electric Power,  !- Variable or Meter 2 Name
+    Facility Net Purchased Electricity Rate,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Facility Total Produced Electric Power,  !- Variable or Meter 3 Name
+    Facility Total Produced Electricity Rate,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Facility Total Electric Demand Power,  !- Variable or Meter 4 Name
+    Facility Total Electricity Demand Rate,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Facility Total Building Electric Demand Power,  !- Variable or Meter 5 Name
+    Facility Total Building Electricity Demand Rate,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Facility Total HVAC Electric Demand Power,  !- Variable or Meter 6 Name
+    Facility Total HVAC Electricity Demand Rate,  !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
 !!*********************************************
@@ -4608,52 +4694,52 @@
     PV:ZN_1_FLR_1_SEC_1_Ceiling,  !- Generator 1 Name
     Generator:Photovoltaic,  !- Generator 1 Object Type
     9000.0,                  !- Generator 1 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 1 Availability Schedule Name
+    ,                        !- Generator 1 Availability Schedule Name
     ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_2_Ceiling,  !- Generator 2 Name
     Generator:Photovoltaic,  !- Generator 2 Object Type
     6000.0,                  !- Generator 2 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 2 Availability Schedule Name
+    ,                        !- Generator 2 Availability Schedule Name
     ,                        !- Generator 2 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_3_Ceiling,  !- Generator 3 Name
     Generator:Photovoltaic,  !- Generator 3 Object Type
     9000.0,                  !- Generator 3 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 3 Availability Schedule Name
+    ,                        !- Generator 3 Availability Schedule Name
     ,                        !- Generator 3 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_4_Ceiling,  !- Generator 4 Name
     Generator:Photovoltaic,  !- Generator 4 Object Type
     6000.0,                  !- Generator 4 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 4 Availability Schedule Name
+    ,                        !- Generator 4 Availability Schedule Name
     ,                        !- Generator 4 Rated Thermal to Electrical Power Ratio
     PV:ZN_1_FLR_1_SEC_5_Ceiling,  !- Generator 5 Name
     Generator:Photovoltaic,  !- Generator 5 Object Type
     9000.0,                  !- Generator 5 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 5 Availability Schedule Name
+    ,                        !- Generator 5 Availability Schedule Name
     ,                        !- Generator 5 Rated Thermal to Electrical Power Ratio
     Collector 1 PV,          !- Generator 6 Name
     Generator:Photovoltaic,  !- Generator 6 Object Type
     800.0,                   !- Generator 6 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 6 Availability Schedule Name
+    ,                        !- Generator 6 Availability Schedule Name
     1.5,                     !- Generator 6 Rated Thermal to Electrical Power Ratio
     Collector 2 PV,          !- Generator 7 Name
     Generator:Photovoltaic,  !- Generator 7 Object Type
     800.0,                   !- Generator 7 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 7 Availability Schedule Name
+    ,                        !- Generator 7 Availability Schedule Name
     1.5,                     !- Generator 7 Rated Thermal to Electrical Power Ratio
     Collector 3 PV,          !- Generator 8 Name
     Generator:Photovoltaic,  !- Generator 8 Object Type
     800.0,                   !- Generator 8 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 8 Availability Schedule Name
+    ,                        !- Generator 8 Availability Schedule Name
     1.5,                     !- Generator 8 Rated Thermal to Electrical Power Ratio
     Collector 4 PV,          !- Generator 9 Name
     Generator:Photovoltaic,  !- Generator 9 Object Type
     800.0,                   !- Generator 9 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 9 Availability Schedule Name
+    ,                        !- Generator 9 Availability Schedule Name
     1.5,                     !- Generator 9 Rated Thermal to Electrical Power Ratio
     Collector 5 PV,          !- Generator 10 Name
     Generator:Photovoltaic,  !- Generator 10 Object Type
     800.0,                   !- Generator 10 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 10 Availability Schedule Name
+    ,                        !- Generator 10 Availability Schedule Name
     1.5;                     !- Generator 10 Rated Thermal to Electrical Power Ratio
 
   PhotovoltaicPerformance:Simple,
@@ -5217,13 +5303,13 @@
 
   Output:Variable,*,Inverter DC to AC Efficiency,timestep;
 
-  Output:Variable,*,Inverter DC Input Electric Power,timestep;
+  Output:Variable,*,Inverter DC Input Electricity Rate,timestep;
 
-  Output:Variable,*,Inverter DC Input Electric Energy,timestep;
+  Output:Variable,*,Inverter DC Input Electricity Energy,timestep;
 
-  Output:Variable,*,Inverter AC Output Electric Power,timestep;
+  Output:Variable,*,Inverter AC Output Electricity Rate,timestep;
 
-  Output:Variable,*,Inverter AC Output Electric Energy,timestep;
+  Output:Variable,*,Inverter AC Output Electricity Energy,timestep;
 
   Output:Variable,*,Inverter Thermal Loss Rate,timestep;
 
@@ -5243,45 +5329,45 @@
 
   Output:Variable,*,Electric Storage Thermal Loss Energy,timestep;
 
-  Output:Variable,*,Electric Load Center Produced Electric Power,timestep;
+  Output:Variable,*,Electric Load Center Produced Electricity Rate,timestep;
 
-  Output:Variable,*,Electric Load Center Produced Electric Energy,timestep;
+  Output:Variable,*,Electric Load Center Produced Electricity Energy,timestep;
 
   Output:Variable,*,Electric Load Center Produced Thermal Rate,timestep;
 
   Output:Variable,*,Electric Load Center Produced Thermal Energy,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,timestep;
 
-  Output:Variable,*,Facility Total Surplus Electric Energy,timestep;
+  Output:Variable,*,Facility Total Surplus Electricity Energy,timestep;
 
-  Output:Variable,*,Facility Net Purchased Electric Power,timestep;
+  Output:Variable,*,Facility Net Purchased Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Net Purchased Electric Energy,timestep;
+  Output:Variable,*,Facility Net Purchased Electricity Energy,timestep;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,timestep;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Power,timestep;
+  Output:Variable,*,Facility Total Produced Electricity Rate,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Energy,timestep;
+  Output:Variable,*,Facility Total Produced Electricity Energy,timestep;
 
-  Output:Variable,*,Generator Produced DC Electric Power,timestep;
+  Output:Variable,*,Generator Produced DC Electricity Rate,timestep;
 
-  Output:Variable,*,Generator Produced DC Electric Energy,timestep;
+  Output:Variable,*,Generator Produced DC Electricity Energy,timestep;
 
   Output:Variable,*,Generator PV Array Efficiency,timestep;
 
-  Output:Variable,*,Generator Requested Electric Power,timestep;
+  Output:Variable,*,Generator Requested Electricity Rate,timestep;
 
-  Output:Variable,*,Heating Coil Electric Power,timestep;
+  Output:Variable,*,Heating Coil Electricity Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Generator Produced Thermal Rate,timestep;
 
@@ -5361,7 +5447,7 @@
 
   Output:Variable,*,Water Heater Heating Rate,timestep;
 
-  Output:Variable,*,Water Heater Electric Power,timestep;
+  Output:Variable,*,Water Heater Electricity Rate,timestep;
 
   Output:Variable,*,Water Heater Use Side Outlet Temperature,timestep;
 

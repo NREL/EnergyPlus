@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,14 +102,14 @@ TEST_F(EnergyPlusFixture, ChillerIndirectAbsorption_GetInput)
 
     DataGlobals::DoWeathSim = true;
 
-    GetIndirectAbsorberInput();
+    GetIndirectAbsorberInput(state.dataChillerIndirectAbsorption);
 
-    EXPECT_EQ(IndirectAbsorber.size(), 1u);
-    EXPECT_EQ(IndirectAbsorber(1).Name, "BIG CHILLER");
-    EXPECT_EQ(IndirectAbsorber(1).NomCap, 10000.);
-    EXPECT_EQ(IndirectAbsorber(1).NomPumpPower, 150.);
-    EXPECT_EQ(IndirectAbsorber(1).MinPartLoadRat, 0.15);
-    EXPECT_EQ(IndirectAbsorber(1).MaxPartLoadRat, 1.00);
-    EXPECT_EQ(IndirectAbsorber(1).OptPartLoadRat, 0.65);
-    EXPECT_EQ(IndirectAbsorber(1).LoopSubcool, 12.0);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber.size(), 1u);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).Name, "BIG CHILLER");
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).NomCap, 10000.);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).NomPumpPower, 150.);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).MinPartLoadRat, 0.15);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).MaxPartLoadRat, 1.00);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).OptPartLoadRat, 0.65);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).LoopSubcool, 12.0);
 }

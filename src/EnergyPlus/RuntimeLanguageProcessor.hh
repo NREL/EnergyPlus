@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,13 +50,12 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataRuntimeLanguage.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -120,6 +119,8 @@ namespace RuntimeLanguageProcessor {
     extern int DayOfWeekVariableNum;
     extern int DayOfYearVariableNum;
     extern int HourVariableNum;
+    extern int TimeStepsPerHourVariableNum;
+    extern int TimeStepNumVariableNum;
     extern int MinuteVariableNum;
     extern int HolidayVariableNum;
     extern int DSTVariableNum;
@@ -175,11 +176,11 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage();
+    void InitializeRuntimeLanguage(IOFiles &ioFiles);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(int const StackNum);
+    void ParseStack(IOFiles &ioFiles, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -192,13 +193,10 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(int const StackNum);
+    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum);
 
-    void WriteTrace(int const StackNum,
-                    int const InstructionNum,
-                    ErlValueType const &ReturnValue,
-                    bool const seriousErrorFound // if true then also call energyplus error severe->fatal with Erl program line info
-    );
+    void
+    WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -206,23 +204,32 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(std::string const &InString, // String of expression text written in the Runtime Language
+    void ParseExpression(IOFiles &ioFiles,
+                         std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(Array1S<TokenType> const TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
     int NewExpression();
 
     ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
 
-    void GetRuntimeLanguageUserInput();
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
+
+    void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
 
     void ReportRuntimeLanguage();
-
-    std::string IntegerToString(int const Number);
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 

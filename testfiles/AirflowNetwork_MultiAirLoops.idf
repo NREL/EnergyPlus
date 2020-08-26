@@ -134,13 +134,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.001,                   !- Loads Convergence Tolerance Value
+    0.001,                   !- Loads Convergence Tolerance Value {W}
     0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -154,7 +154,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier,              !- Name
@@ -2257,6 +2259,12 @@
     3.0;                     !- Node Height {m}
 
   AirflowNetwork:Distribution:Node,
+    Zone1SupplyRegisterNode ATInlet,  !- Name
+    Zone 1 Inlet Node ATInlet,  !- Component Name or Node Name
+    Other,                   !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
+
+  AirflowNetwork:Distribution:Node,
     Zone1SupplyRegisterNode, !- Name
     Zone 1 Inlet Node,       !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
@@ -2569,9 +2577,28 @@
     Attic Zone;              !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
+    Zone1Supply2Link ATInlet,!- Name
+    Zone1SupplyRegisterNode ATInlet,  !- Node 1 Name
+    Zone1SupplyRegisterNode, !- Node 2 Name
+    Zone1Supply2Link ATInlet Duct,  !- Component Name
+    Attic Zone;              !- Thermal Zone Name
+
+  AirflowNetwork:Distribution:Component:Duct,
+    Zone1Supply2Link ATInlet Duct,  !- Name
+    0.0001,                  !- Duct Length {m}
+    0.4,                     !- Hydraulic Diameter {m}
+    0.1256,                  !- Cross Section Area {m2}
+    0.0009,                  !- Surface Roughness {m}
+    0.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
+    0.0000001,               !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
+
+  AirflowNetwork:Distribution:Linkage,
     Zone1Supply2Link,        !- Name
     Zone1SupplyNode,         !- Node 1 Name
-    Zone1SupplyRegisterNode, !- Node 2 Name
+    Zone1SupplyRegisterNode ATInlet,  !- Node 2 Name
     Zone1Supply,             !- Component Name
     Attic Zone;              !- Thermal Zone Name
 
@@ -2783,6 +2810,12 @@
     3.0;                     !- Node Height {m}
 
   AirflowNetwork:Distribution:Node,
+    Heat Pump 1 Zone1SupplyRegisterNode ATInlet,  !- Name
+    NORTH ZONE Zone Equip Inlet ATInlet,  !- Component Name or Node Name
+    Other,                   !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
+
+  AirflowNetwork:Distribution:Node,
     Heat Pump 1 Zone1SupplyRegisterNode,  !- Name
     NORTH ZONE Zone Equip Inlet,  !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
@@ -2980,9 +3013,28 @@
     Attic NORTH Zone;        !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
+    Heat Pump 1 Zone1InletlLink ATInlet,  !- Name
+    Heat Pump 1 Zone1SupplyRegisterNode ATInlet,  !- Node 1 Name
+    Heat Pump 1 Zone1SupplyRegisterNode,  !- Node 2 Name
+    Heat Pump 1 Zone1InletlLink ATInlet Duct,  !- Component Name
+    Attic NORTH Zone;        !- Thermal Zone Name
+
+  AirflowNetwork:Distribution:Component:Duct,
+    Heat Pump 1 Zone1InletlLink ATInlet Duct,  !- Name
+    0.0001,                  !- Duct Length {m}
+    0.4,                     !- Hydraulic Diameter {m}
+    0.1256,                  !- Cross Section Area {m2}
+    0.0009,                  !- Surface Roughness {m}
+    0.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
+    0.0000001,               !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
+
+  AirflowNetwork:Distribution:Linkage,
     Heat Pump 1 Zone1InletlLink,  !- Name
     Heat Pump 1 Zone1SupplyNode,  !- Node 1 Name
-    Heat Pump 1 Zone1SupplyRegisterNode,  !- Node 2 Name
+    Heat Pump 1 Zone1SupplyRegisterNode ATInlet,  !- Node 2 Name
     Heat Pump 1 Zone1Supply, !- Component Name
     Attic NORTH Zone;        !- Thermal Zone Name
 
@@ -3137,12 +3189,12 @@
   ZoneHVAC:EquipmentList,
     Zone1Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone1DirectAir,          !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone1DirectAir ADU,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -3151,14 +3203,26 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone1DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 1 Inlet Node,       !- Zone Supply Air Node Name
-    0.64;                    !- Maximum Air Flow Rate {m3/s}
+    Zone 1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 1 Inlet Node,       !- Air Outlet Node Name
+    0.64,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone1DirectAir ADU,      !- Name
+    Zone 1 Inlet Node,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone1DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone2TermReheat,         !- Name
@@ -3216,7 +3280,7 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
-    Zone 1 Inlet Node,       !- Outlet 1 Node Name
+    Zone 1 Inlet Node ATInlet,  !- Outlet 1 Node Name
     Zone 2 Reheat Air Inlet Node;  !- Outlet 2 Node Name
 
   AirLoopHVAC:ZoneMixer,
@@ -3285,13 +3349,29 @@
 
   Output:Variable,*,AFN Node Temperature,timestep;
 
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Energy,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Loss Energy,timestep;
+
   Output:Variable,Zn001:Wall001:Win001,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
 
   Output:Variable,Zn001:Wall001:Win001,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
@@ -3317,9 +3397,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3329,9 +3409,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 
@@ -3468,7 +3548,11 @@
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
     0,                       !- Heating Maximum Air Flow Fraction
-    SZ DSZAD NORTH ZONE;     !- Design Specification Zone Air Distribution Object Name
+    SZ DSZAD NORTH ZONE,     !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:ZoneAirDistribution,
     SZ DSZAD NORTH ZONE,     !- Name
@@ -3486,18 +3570,30 @@
   ZoneHVAC:EquipmentList,
     NORTH ZONE Equipment,    !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    NORTH ZONE Air Terminal, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    NORTH ZONE Air Terminal ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     NORTH ZONE Air Terminal, !- Name
     ,                        !- Availability Schedule Name
-    NORTH ZONE Zone Equip Inlet,  !- Zone Supply Air Node Name
-    0.5;                     !- Maximum Air Flow Rate {m3/s}
+    NORTH ZONE Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    NORTH ZONE Zone Equip Inlet,  !- Air Outlet Node Name
+    0.5,                     !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    NORTH ZONE Air Terminal ADU,  !- Name
+    NORTH ZONE Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    NORTH ZONE Air Terminal, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirLoopHVAC,
     Heat Pump 1,             !- Name
@@ -3536,7 +3632,7 @@
   AirLoopHVAC:ZoneSplitter,
     Heat Pump 1 Zone Splitter,  !- Name
     Heat Pump 1 Supply Path Inlet,  !- Inlet Node Name
-    NORTH ZONE Zone Equip Inlet;  !- Outlet 1 Node Name
+    NORTH ZONE Zone Equip Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     Heat Pump 1 Return Path, !- Name
@@ -3862,8 +3958,6 @@
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
   Output:Diagnostics,
-    DisplayExtraWarnings;    !- Key 1
-
-  Output:Diagnostics,
-    DisplayUnusedSchedules;  !- Key 1
+    DisplayExtraWarnings,    !- Key 1
+    DisplayUnusedSchedules;  !- Key 2
 

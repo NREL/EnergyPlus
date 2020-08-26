@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,7 +49,8 @@
 #define DisplacementVentMgr_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -75,9 +76,9 @@ namespace DisplacementVentMgr {
 
     // SUBROUTINE SPECIFICATIONS:
 
-    // Functions
+    void clear_state();
 
-    void ManageUCSDDVModel(int const ZoneNum); // index number for the specified zone
+    void ManageUCSDDVModel(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // index number for the specified zone
 
     //**************************************************************************************************
 
@@ -85,7 +86,7 @@ namespace DisplacementVentMgr {
 
     //**************************************************************************************************
 
-    void HcUCSDDV(int const ZoneNum, Real64 const FractionHeight);
+    void HcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum, Real64 const FractionHeight);
 
     //**************************************************************************************************
 
@@ -99,7 +100,7 @@ namespace DisplacementVentMgr {
                                                Real64 zoneMultiplier,
                                                Real64 airCap);
 
-    void CalcUCSDDV(int const ZoneNum); // Which Zonenum
+    void CalcUCSDDV(ConvectionCoefficientsData &dataConvectionCoefficients, int const ZoneNum); // Which Zonenum
 
 } // namespace DisplacementVentMgr
 

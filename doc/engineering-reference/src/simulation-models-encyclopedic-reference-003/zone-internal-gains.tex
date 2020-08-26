@@ -292,15 +292,15 @@ It should be noted that, when \textbf{FlowControlWithApproachTemperatures} is ch
 \item Apart from a single VAV terminal unit, other HVAC systems do not apply this method in the ITE zone.
 \end{itemize}
 
-When \textbf{FlowControlWithApproachTemperatures} method is applied, during sizing and simulation, as the zone is assumed to be unevenly distributed, the supply air flow rate is calculated as:
+When \textbf{FlowControlWithApproachTemperatures} method is applied, during sizing and simulation, as the zone is assumed to be unevenly distributed, the supply air flow rate of the AHU is calculated as:
 
 \begin{equation}
-{\dot m_{sys}} = {Q_{sys}}/({C_{p,air}} \cdot ({T_{in}} - {T_{return}}))
+{\dot m_{sys}} = {Q_{sys}}/({C_{p,air}} \cdot ({T_{return}} - {T_{supply}}))
 \end{equation}
 
-where $T_{return}$ is the weighted return air temperature from all ITE objects in the zone. 
+where $T_{return}$ is the weighted return air temperature from all ITE objects in the zone, and $T_{supply}$ is the designed supply air temperature to the ITE objects.
 
-In this case, in zones with ITE objects, to make sure the zone heat balance converge, unlike the original thermostat setpoint control logic, the well-mixed zone temperature is not controlled. The actual controlled object is the supply air temperature. So when using this method, the user input of zone cooling setpoint is ignored and the unmet hour for cooling does not apply.
+Another modified assumption for this case is, in zones with ITE objects, to make sure the zone heat balance converge, unlike the original thermostat setpoint control logic, the well-mixed zone temperature is not controlled. The actual controlled object is the supply air temperature. So when using this method, the user input of zone cooling setpoint is ignored and the unmet hour for cooling does not apply.
 
 \subsection{Heat Gain from Baseboard Heat}\label{heat-gain-from-baseboard-heat}
 

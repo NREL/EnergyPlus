@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,10 +57,11 @@
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
 
 namespace DaylightingManager {
 
@@ -74,9 +75,9 @@ namespace DaylightingManager {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int TotWindowsWithDayl;    // Total number of exterior windows in all daylit zones
-    extern int OutputFileDFS;         // Unit number for daylight factors
     extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
     extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
+    extern int maxNumRefPtInAnyEncl;  // The most number of reference points that any single enclosure has
     extern Real64 PHSUN;              // Solar altitude (radians)
     extern Real64 SPHSUN;             // Sine of solar altitude
     extern Real64 CPHSUN;             // Cosine of solar altitude
@@ -120,14 +121,12 @@ namespace DaylightingManager {
 
     extern Array1D_bool CheckTDDZone;
 
-    extern std::string mapLine; // character variable to hold map outputs
-
     // Functions
     void clear_state();
 
     void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
 
-    void CalcDayltgCoefficients();
+    void CalcDayltgCoefficients(IOFiles &ioFiles);
 
     void CalcDayltgCoeffsRefMapPoints(int const ZoneNum);
 
@@ -332,9 +331,9 @@ namespace DaylightingManager {
                                                 int const ICtrl // Window control counter
     );
 
-    void GetDaylightingParametersInput();
+    void GetDaylightingParametersInput(IOFiles &ioFiles);
 
-    void GetInputIlluminanceMap(bool &ErrorsFound);
+    void GetInputIlluminanceMap(IOFiles &ioFiles, bool &ErrorsFound);
 
     void GetDaylightingControls(int const TotDaylightingControls, // Total daylighting controls inputs
                                 bool &ErrorsFound);
@@ -357,8 +356,8 @@ namespace DaylightingManager {
                      int &ZoneNum    // Zone number
     );
 
-    void DayltgGlareWithIntWins(Array1<Real64> &GLINDX, // Glare index
-                                int const ZoneNum       // Zone number
+    void DayltgGlareWithIntWins(Array1D<Real64> &GLINDX, // Glare index
+                                int const ZoneNum        // Zone number
     );
 
     void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
@@ -389,7 +388,7 @@ namespace DaylightingManager {
 
     void DayltgInteriorTDDIllum();
 
-    void DayltgElecLightingControl(int &ZoneNum); // Zone number
+    void DayltgElecLightingControl(IOFiles &ioFiles, int &ZoneNum); // Zone number
 
     Real64 DayltgGlarePositionFactor(Real64 &X, // Lateral and vertical distance of luminous window element from
                                      Real64 &Y);
@@ -405,9 +404,9 @@ namespace DaylightingManager {
                                        int const NBasis,
                                        int const IHR,
                                        int const iRefPoint,
-                                       Array2<Real64> &ElementLuminanceSky,     // sky related luminance at window element (exterior side)
-                                       Array1<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
-                                       Array1<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
+                                       Array2<Real64> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
+                                       Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
+                                       Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
                                        int const CalledFrom,
                                        Optional_int_const MapNum = _);
 
@@ -462,13 +461,13 @@ namespace DaylightingManager {
 
     void DayltgInteriorMapIllum(int &ZoneNum); // Zone number
 
-    void ReportIllumMap(int const MapNum);
+    void ReportIllumMap(IOFiles &ioFiles, int const MapNum);
 
-    void CloseReportIllumMaps();
+    void CloseReportIllumMaps(IOFiles &ioFiles);
 
-    void CloseDFSFile();
+    void CloseDFSFile(IOFiles &ioFiles);
 
-    void DayltgSetupAdjZoneListsAndPointers();
+    void DayltgSetupAdjZoneListsAndPointers(IOFiles &ioFiles);
 
     void CreateShadeDeploymentOrder(int &ZoneNum);
 
@@ -481,7 +480,7 @@ namespace DaylightingManager {
     void CheckForGeometricTransform(bool &doTransform, Real64 &OldAspectRatio, Real64 &NewAspectRatio);
 
     void WriteDaylightMapTitle(int const mapNum,
-                               int const unitNo,
+                               InputOutputFile &mapFile,
                                std::string const &mapName,
                                std::string const &environmentName,
                                int const ZoneNum,

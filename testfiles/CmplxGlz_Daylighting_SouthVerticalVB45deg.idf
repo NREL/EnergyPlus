@@ -75,7 +75,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.2;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -83,15 +83,16 @@
     Office,                  !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExteriorWithReflections,  !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    20,                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20,                      !- Shading Calculation Update Frequency
     50000;                   !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP IN HOUR ===========
@@ -85501,7 +85502,7 @@
   InternalMass,
     COMFENZone Internal Mass,!- Name
     InteriorFurnishings,     !- Construction Name
-    COMFENZone,              !- Zone Name
+    COMFENZone,              !- Zone or ZoneList Name
     55.753993988;            !- Surface Area {m2}
 
 ! Schedule.inc
@@ -86134,7 +86135,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA COMFENZone,      !- Name
@@ -86154,22 +86160,34 @@
   ZoneHVAC:EquipmentList,
     COMFENZone Equipment,    !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    COMFENZone Direct Air,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    COMFENZone Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   NodeList,
     COMFENZone Inlets,       !- Name
     COMFENZone Supply Inlet; !- Node 1 Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     COMFENZone Direct Air,   !- Name
     ALWAYSON,                !- Availability Schedule Name
-    COMFENZone Supply Inlet, !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    COMFENZone Supply Inlet ATInlet,  !- Air Inlet Node Name
+    COMFENZone Supply Inlet, !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    COMFENZone Direct Air ADU,  !- Name
+    COMFENZone Supply Inlet, !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    COMFENZone Direct Air,   !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-- DirectAirZone-Autosize[] --End--: COMFENZone
 !-- PSZAirLoop-Autosize[] --Begin--: SYS-1
@@ -86259,7 +86277,7 @@
   AirLoopHVAC:ZoneSplitter,
     SYS-1 Zone Splitter,     !- Name
     SYS-1 Zone Equip Inlet,  !- Inlet Node Name
-    COMFENZone Supply Inlet; !- Outlet 1 Node Name
+    COMFENZone Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     SYS-1 Return Path,       !- Name
@@ -86470,13 +86488,13 @@
 
   Output:Variable,*,Zone Mean Air Temperature,Hourly;
 
-  Output:Variable,*,Zone Lights Electric Energy,Hourly;
+  Output:Variable,*,Zone Lights Electricity Energy,Hourly;
 
-  Output:Variable,*,Air System DX Cooling Coil Electric Energy,Hourly;
+  Output:Variable,*,Air System DX Cooling Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Air System Fan Electric Energy,Hourly;
+  Output:Variable,*,Air System Fan Electricity Energy,Hourly;
 
-  Output:Variable,*,Air System Gas Energy,Hourly;
+  Output:Variable,*,Air System NaturalGas Energy,Hourly;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PPD,Hourly;
 
@@ -86525,13 +86543,13 @@
   Output:Table:Monthly,
     Zone Electric Summary,   !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -86543,17 +86561,17 @@
   Output:Table:Monthly,
     Air Loop System Component Energy Use,  !- Name
     2,                       !- Digits After Decimal
-    Air System Fan Electric Energy,  !- Variable or Meter 1 Name
+    Air System Fan Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Air System Fan Electric Energy,  !- Variable or Meter 2 Name
+    Air System Fan Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Air System DX Cooling Coil Electric Energy,  !- Variable or Meter 3 Name
+    Air System DX Cooling Coil Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Air System DX Cooling Coil Electric Energy,  !- Variable or Meter 4 Name
+    Air System DX Cooling Coil Electricity Energy,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Air System Heating Coil Gas Energy,  !- Variable or Meter 5 Name
+    Air System Heating Coil NaturalGas Energy,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Air System Heating Coil Gas Energy,  !- Variable or Meter 6 Name
+    Air System Heating Coil NaturalGas Energy,  !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,

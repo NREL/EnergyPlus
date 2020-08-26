@@ -56,7 +56,7 @@ extension_renaming = {
     'Meter:Custom': 'variable_details',
     'UnitarySystemPerformance:Multispeed': 'flow_ratios',
     'SurfaceProperty:ExteriorNaturalVentedCavity': 'surface',
-    'ZoneProperty:UserViewFactors:bySurfaceName': 'view_factors',
+    'ZoneProperty:UserViewFactors:BySurfaceName': 'view_factors',
     'SurfaceProperty:HeatTransferAlgorithm:SurfaceList': 'surface',
     'AirLoopHVAC:ZoneSplitter': 'nodes',
     'AirLoopHVAC:SupplyPath': 'components',
@@ -80,9 +80,9 @@ extension_renaming = {
     'Parametric:RunControl': 'runs',
     'ZoneHVAC:EquipmentList': 'equipment',
     'AvailabilityManagerAssignmentList': 'managers',
-    'Table:MultiVariableLookup': 'values',
-    'Table:OneIndependentVariable': 'values',
-    'Table:TwoIndependentVariables': 'values',
+    'Table:IndependentVariable': 'values',
+    'Table:IndependentVariableList': 'independent_variables',
+    'Table:Lookup': 'values',
     'Matrix:TwoDimension': 'values',
     'WindowMaterial:GlazingGroup:Thermochromic': 'temperature_data',
     'Schedule:Compact': 'data',
@@ -117,12 +117,18 @@ extension_renaming = {
     'Schedule:Year': 'schedule_weeks',
     'WindowShadingControl': 'fenestration_surfaces',
     'PlantEquipmentList': 'equipment',
-    'CondenserEquipmentList': 'equipment'
+    'CondenserEquipmentList': 'equipment',
+    'AirLoopHVAC:Mixer': 'nodes',
+    'AirLoopHVAC:Splitter': 'nodes',
+    'AirLoopHVAC:DedicatedOutdoorAirSystem': 'airloophvacs',
+    'PythonPlugin:Variables': 'global_py_vars',
+    'PythonPlugin:SearchPaths': 'py_search_paths',
+    'Output:Diagnostics': 'diagnostics',
 }
 remaining_objects = [
     'Site:SpectrumData',
     'Schedule:Day:List',
-    'MaterialProperty:GlazingSpectralData'
+    'MaterialProperty:GlazingSpectralData',
 ]
 
 
@@ -266,7 +272,7 @@ def change_89_release_issues(schema):
         'Curve:Linear', 'Curve:Quadratic', 'Curve:Cubic', 'Curve:Quartic', 'Curve:Exponent',
         'Curve:Bicubic', 'Curve:Biquadratic', 'Curve:QuadraticLinear', 'Curve:CubicLinear', 'Curve:Triquadratic',
         'Curve:ExponentialSkewNormal', 'Curve:Sigmoid', 'Curve:RectangularHyperbola1', 'Curve:RectangularHyperbola2', 'Curve:ExponentialDecay',
-        'Curve:DoubleExponentialDecay', 'Curve:ChillerPartLoadWithLift', 'Table:OneIndependentVariable', 'Table:TwoIndependentVariables', 'Table:MultiVariableLookup'
+        'Curve:DoubleExponentialDecay', 'Curve:ChillerPartLoadWithLift', 'Table:Lookup'
     ]
     for curve in curves:
         get_schema_object(schema, curve)['properties']['output_unit_type']['enum'] = [
@@ -277,20 +283,7 @@ def change_89_release_issues(schema):
             'Pressure',
             'Temperature'
         ]
-    get_schema_object(schema, 'OtherEquipment')['properties']['fuel_type']['enum'].append('Water')
-    get_schema_object(schema, 'WindowMaterial:Glazing:EquivalentLayer')['properties']['optical_data_type']['enum'].append('SpectralAverage')
-    get_schema_object(schema, 'ZoneHVAC:CoolingPanel:RadiantConvective:Water')['properties']['control_type']['enum'].append('ZoneTotalLoad')
-    get_schema_object(schema, 'ZoneHVAC:CoolingPanel:RadiantConvective:Water')['properties']['control_type']['enum'].append('ZoneConvectiveLoad')
 
-    get_schema_object(schema, 'FuelFactors')['properties']['existing_fuel_resource_name'].pop('enum')
-    get_schema_object(schema, 'LifeCycleCost:UsePriceEscalation')['properties']['resource'].pop('enum')
-    get_schema_object(schema, 'AirConditioner:VariableRefrigerantFlow')['properties']['fuel_type'].pop('enum')
-    get_schema_object(schema, 'GlobalGeometryRules')['properties']['starting_vertex_position'].pop('enum')
-    get_schema_object(schema, 'GlobalGeometryRules')['properties']['vertex_entry_direction'].pop('enum')
-    get_schema_object(schema, 'GlobalGeometryRules')['properties']['coordinate_system'].pop('enum')
-    get_schema_object(schema, 'WaterHeater:Mixed')['properties']['heater_fuel_type'].pop('enum')
-    get_schema_object(schema, 'Boiler:HotWater')['properties']['fuel_type'].pop('enum')
     get_schema_object(schema, 'Schedule:Week:Compact')['properties']['data']['items']['properties']['daytype_list'].pop('enum')
-    get_schema_object(schema, 'Output:Table:SummaryReports')['properties']['reports']['items']['properties']['report_name'].pop('enum')
 
 

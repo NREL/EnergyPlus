@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct BranchInputManagerData;
 
 namespace WaterToAirHeatPump {
 
@@ -79,19 +82,8 @@ namespace WaterToAirHeatPump {
     extern int WaterIndex;         // Water index
     extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
     // Subroutine Specifications for the Module
-    // Driver/Manager Routines
 
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Computational routines
-
-    // Update routine to check convergence and update nodes
-
-    // Utility routines
-
-    // Types
+    void clear_state();
 
     struct WatertoAirHPEquipConditions
     {
@@ -191,7 +183,8 @@ namespace WaterToAirHeatPump {
 
     // Functions
 
-    void SimWatertoAirHP(std::string const &CompName,   // component name
+    void SimWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+                         std::string const &CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
                          int const CyclingScheme,       // cycling scheme--either continuous fan/cycling compressor or
@@ -217,7 +210,8 @@ namespace WaterToAirHeatPump {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWatertoAirHP(int const HPNum, // index to main heat pump data structure
+    void InitWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+                          int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,        // Heat pump time constant [s]
@@ -243,7 +237,7 @@ namespace WaterToAirHeatPump {
                                  Real64 const PartLoadRatio);
 
     Real64 CalcCompSuctionTempResidual(Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1<Real64> const &Par     // Function parameters
+                                       Array1D<Real64> const &Par    // Function parameters
     );
 
     void CalcWatertoAirHPHeating(int const HPNum,               // heat pump number
@@ -289,17 +283,17 @@ namespace WaterToAirHeatPump {
                      bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );

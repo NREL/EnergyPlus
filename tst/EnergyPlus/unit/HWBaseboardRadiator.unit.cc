@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,14 +51,15 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <FluidProperties.hh>
-#include <HWBaseboardRadiator.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -104,7 +105,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_CalcHWBaseboard)
     PlantLoop(1).FluidType = 2;
     QBBRadSource(1) = 0.0;
 
-    CalcHWBaseboard(BBNum, LoadMet);
+    CalcHWBaseboard(state, BBNum, LoadMet);
 
     EXPECT_NEAR(14746.226690452937, HWBaseboard(1).TotPower, 0.000001);
     EXPECT_NEAR(50.349854486072232, HWBaseboard(1).AirOutletTemp, 0.000001);
@@ -183,7 +184,7 @@ TEST_F(EnergyPlusFixture, HWBaseboardRadiator_HWBaseboardWaterFlowResetTest)
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = HWBaseboard(1).WaterOutletNode;
 
     // zero zone load case, so zero LoadMet must be returned
-    CalcHWBaseboard(BBNum, LoadMet);
+    CalcHWBaseboard(state, BBNum, LoadMet);
 
     EXPECT_EQ(0.0, LoadMet);
     EXPECT_EQ(0.0, HWBaseboard(1).TotPower);

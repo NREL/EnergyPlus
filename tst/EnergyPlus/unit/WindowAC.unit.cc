@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,18 +48,20 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "DataGlobals.hh"
-#include "DataHVACGlobals.hh"
-#include "DataZoneEnergyDemands.hh"
-#include "ElectricPowerServiceManager.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
-#include "HeatBalanceManager.hh"
-#include "OutputProcessor.hh"
-#include "OutputReportPredefined.hh"
-#include "ScheduleManager.hh"
-#include "SimulationManager.hh"
-#include "SizingManager.hh"
-#include "WindowAC.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/WindowAC.hh>
 
 using namespace EnergyPlus;
 
@@ -68,8 +70,6 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
     // set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
     std::string const idf_objects = delimited_string({
-        " Version,9.2;",
-
         "  Timestep,6;",
 
         "  Site:Location,",
@@ -432,15 +432,15 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedule data
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -449,26 +449,34 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     DataGlobals::ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(state);
 
-    SimulationManager::SetupSimulation(errorsFound);
+    SimulationManager::SetupSimulation(state, errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap
     Real64 lDotProvid(0.0); // latent removal kg/s
     int compIndex(0);
-    WindowAC::SimWindowAC("ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check input processing
     EXPECT_EQ(compIndex, 1);
 
-    EXPECT_EQ(WindowAC::WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
+    EXPECT_EQ(state.dataWindowAC.WindAC(1).DXCoilType_Num, DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed);
     // check Sizing
-    EXPECT_NEAR(WindowAC::WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
+    EXPECT_NEAR(state.dataWindowAC.WindAC(1).MaxAirVolFlow, 0.0415, 0.0001);
 
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -295.0;
     DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
 
-    WindowAC::SimWindowAC("ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
+    WindowAC::SimWindowAC(state, "ZONE1WINDAC", 1, true, qDotMet, lDotProvid, compIndex);
     // check output
     EXPECT_NEAR(qDotMet, -295.0, 0.1);
+
+    // #8124 Retrieve zero value data without heating loads
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtCalcDesLd, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtCalcDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("0.0", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtUserDesAirFlow, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtDesDay, "WEST ZONE"));
+    EXPECT_EQ("N/A", OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchZnHtPkTime, "WEST ZONE"));
+
 }

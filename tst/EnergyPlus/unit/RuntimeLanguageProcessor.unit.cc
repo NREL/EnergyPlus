@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,10 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataGlobals.hh>
-#include <DataRuntimeLanguage.hh>
-#include <EMSManager.hh>
-#include <RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
 
 using namespace EnergyPlus;
 
@@ -136,7 +136,7 @@ TEST_F(EnergyPlusFixture, TestOutOfRangeAlphaFields)
         "  J;"
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    RuntimeLanguageProcessor::GetRuntimeLanguageUserInput();
+    RuntimeLanguageProcessor::GetRuntimeLanguageUserInput(state.files);
 
 
 }

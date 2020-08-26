@@ -132,13 +132,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.001,                   !- Loads Convergence Tolerance Value
+    0.001,                   !- Loads Convergence Tolerance Value {W}
     0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -152,7 +152,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
@@ -1456,18 +1458,18 @@
   Schedule:Compact,
     INF-SCHED,               !- Name
     Any Number,              !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,0.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: WeekDays SummerDesignDay, !- Field 6
-    Until: 6:00,1.0,         !- Field 7
-    Until: 18:00,0.0,        !- Field 9
-    Until: 24:00,1.0,        !- Field 11
-    For: AllOtherDays,       !- Field 13
-    Until: 6:00,1.0,         !- Field 14
-    Until: 13:00,0.0,        !- Field 16
-    Until: 24:00,1.0;        !- Field 18
+    Through: 9/30,           !- Field 1
+    For: WeekDays SummerDesignDay, !- Field 2
+    Until: 6:00,1.0,         !- Field 3
+    Until: 18:00,0.0,        !- Field 5
+    Until: 24:00,1.0,        !- Field 7
+    For: AllOtherDays,       !- Field 9
+    Until: 6:00,1.0,         !- Field 10
+    Until: 13:00,0.0,        !- Field 12
+    Until: 24:00,1.0,        !- Field 14
+    Through: 12/31,          !- Field 16
+    For: AllDays,            !- Field 17
+    Until: 24:00,0.0;        !- Field 18
 
   People,
     West Zone People,        !- Name
@@ -2180,6 +2182,12 @@
     3.0;                     !- Node Height {m}
 
   AirflowNetwork:Distribution:Node,
+    Zone3SupplyRegisterNode ATInlet,  !- Name
+    Zone 3 Inlet Node ATInlet,  !- Component Name or Node Name
+    ,                        !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
+
+  AirflowNetwork:Distribution:Node,
     Zone3SupplyRegisterNode, !- Name
     Zone 3 Inlet Node,       !- Component Name or Node Name
     ,                        !- Component Object Type or Node Type
@@ -2550,9 +2558,26 @@
     Attic Zone;              !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
+    Zone3SupplyLink ATInlet, !- Name
+    Zone3SupplyRegisterNode ATInlet,  !- Node 1 Name
+    Zone3SupplyRegisterNode, !- Node 2 Name
+    Zone3SupplyLink ATInlet Duct,  !- Component Name
+    Attic Zone;              !- Thermal Zone Name
+
+  AirflowNetwork:Distribution:Component:Duct,
+    Zone3SupplyLink ATInlet Duct,  !- Name
+    0.0001,                  !- Duct Length {m}
+    0.44,                    !- Hydraulic Diameter {m}
+    0.1521,                  !- Cross Section Area {m2}
+    0.0009,                  !- Surface Roughness {m}
+    0.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
+    0.0000001,               !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001;               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+
+  AirflowNetwork:Distribution:Linkage,
     Zone3SupplyLink,         !- Name
     Zone3SupplyNode,         !- Node 1 Name
-    Zone3SupplyRegisterNode, !- Node 2 Name
+    Zone3SupplyRegisterNode ATInlet,  !- Node 2 Name
     Zone3Supply,             !- Component Name
     Attic Zone;              !- Thermal Zone Name
 
@@ -2769,8 +2794,8 @@
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2779,18 +2804,18 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone3DirectAir,          !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone3DirectAir ADU,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone1TermReheat,         !- Name
@@ -2813,11 +2838,23 @@
     Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil 1;              !- Cooling Coil Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone3DirectAir,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    Zone 3 Inlet Node,       !- Zone Supply Air Node Name
-    0.76;                    !- Maximum Air Flow Rate {m3/s}
+    Zone 3 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Zone 3 Inlet Node,       !- Air Outlet Node Name
+    0.76,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone3DirectAir ADU,      !- Name
+    Zone 3 Inlet Node,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone3DirectAir,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AirTerminal:SingleDuct:ConstantVolume:Reheat,
     Reheat Zone 1,           !- Name
@@ -2886,7 +2923,7 @@
     Zone Equipment Inlet Node,  !- Inlet Node Name
     Zone 1 Reheat Air Inlet Node,  !- Outlet 1 Node Name
     Zone 2 Reheat Air Inlet Node,  !- Outlet 2 Node Name
-    Zone 3 Inlet Node;       !- Outlet 3 Node Name
+    Zone 3 Inlet Node ATInlet;  !- Outlet 3 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name
@@ -2974,9 +3011,9 @@
 
   Output:Variable,*,AFN Linkage Node 1 to Node 2 Mass Flow Rate,timestep,ReportSch;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep,ReportSch;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep,ReportSch;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep,ReportSch;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep,ReportSch;
 
   Output:Variable,*,Zone Air Temperature,timestep,ReportSch;
 
@@ -3008,9 +3045,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3020,9 +3057,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

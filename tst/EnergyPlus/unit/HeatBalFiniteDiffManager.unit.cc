@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,11 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalSurface.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus::HeatBalFiniteDiffManager;
 
@@ -215,7 +217,7 @@ TEST_F(EnergyPlusFixture, HeatBalFiniteDiffManager_adjustPropertiesForPhaseChang
     SurfaceFD(surfaceIndex).PhaseChangeStateOld(finiteDiffLayerIndex) = HysteresisPhaseChange::PhaseChangeStates::MELTING;
 
     // create a materials data object and assign the phase change variable based on above IDF processing
-    DataHeatBalance::MaterialProperties material;
+    Material::MaterialProperties material;
     material.phaseChange = HysteresisPhaseChange::HysteresisPhaseChange::factory("PCMNAME");
 
     // create local variables to calculate and call the new worker function

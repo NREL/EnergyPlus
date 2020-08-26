@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,63 +53,55 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace SolarCollectors {
-
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // Fluid Type Flags
-    extern int const WATER;
-    extern int const AIR;
-
-    // Test Correlation Type Flags
-    extern int const INLET;
-    extern int const AVERAGE;
-    extern int const OUTLET;
-
-    // ICS Collector Type Flag
-    extern int const ICSRectangularTank;
-    // INTEGER, PARAMETER :: ICSProgressiveTube = 2
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
 
     extern Array1D_bool CheckEquipName;
 
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumOfParameters;
     extern int NumOfCollectors;
 
-    extern Array1D<Real64> TransSysSkyDiff; // transmittance of cover system for sky diffuse solar rad.
-    extern Array1D<Real64> TransSysGrnDiff; // transmittance of cover system for ground diffuse solar rad.
-    extern Array1D<Real64> RefSysSkyDiff;   // reflectance of cover system for sky diffuse solar rad.
-    extern Array1D<Real64> RefSysGrnDiff;   // reflectance of cover system for ground diffuse solar rad.
+    enum struct FluidEnum
+    {
+        WATER,
+        AIR
+    };
 
-    // SUBROUTINE SPECIFICATIONS:
+    enum struct TestTypeEnum
+    {
+        INLET,
+        AVERAGE,
+        OUTLET
+    };
 
-    // Types
+    enum struct TankTypeEnum
+    {
+        ICSRectangularTank
+    };
 
     struct ParametersData
     {
         // Members
         std::string Name;                      // Name of solar collector parameters
         Real64 Area;                           // Gross area of collector (m2)
-        int TestFluid;                         // Test fluid (only WATER for now)
+        FluidEnum TestFluid;                   // Test fluid (only WATER for now)
         Real64 TestMassFlowRate;               // Test volumetric flow rate (m3/s)
-        int TestType;                          // Test correlation type (INLET | AVERAGE | OUTLET)
+        TestTypeEnum TestType;                 // Test correlation type (INLET | AVERAGE | OUTLET)
         Real64 eff0;                           // Coefficient 1 of efficiency equation (Y-intercept)
         Real64 eff1;                           // Coefficient 2 of efficiency equation (1st order)
         Real64 eff2;                           // Coefficient 3 of efficiency equation (2nd order)
         Real64 iam1;                           // Coefficient 2 of incident angle modifier (1st order)
         Real64 iam2;                           // Coefficient 3 of incident angle modifier (2nd order)
-        int ICSType_Num;                       // ICS collector type
+        TankTypeEnum ICSType_Num;              // ICS collector type
         Real64 Volume;                         // collector water net volume (m3)
         Real64 SideHeight;                     // collector side height (m)
         Real64 ThermalMass;                    // thermal mass of the absorber plate (J/m2C)
@@ -126,40 +118,43 @@ namespace SolarCollectors {
 
         // Default Constructor
         ParametersData()
-            : Area(0.0), TestFluid(WATER), TestMassFlowRate(0.0), TestType(INLET), ICSType_Num(0), Volume(0.0), SideHeight(0.0), ThermalMass(0.0),
-              ULossSide(0.0), ULossBottom(0.0), AspectRatio(0.0), NumOfCovers(0), CoverSpacing(0.0), RefractiveIndex(2, 0.0),
-              ExtCoefTimesThickness(2, 0.0), EmissOfCover(2, 0.0), EmissOfAbsPlate(0.0), AbsorOfAbsPlate(0.0)
+            : Area(0.0), TestFluid(FluidEnum::WATER), TestMassFlowRate(0.0), TestType(TestTypeEnum::INLET), eff0(0.0), eff1(0.0), eff2(0.0),
+              iam1(0.0), iam2(0.0), ICSType_Num(TankTypeEnum::ICSRectangularTank), Volume(0.0), SideHeight(0.0), ThermalMass(0.0), ULossSide(0.0),
+              ULossBottom(0.0), AspectRatio(0.0), NumOfCovers(0), CoverSpacing(0.0), RefractiveIndex(2, 0.0), ExtCoefTimesThickness(2, 0.0),
+              EmissOfCover(2, 0.0), EmissOfAbsPlate(0.0), AbsorOfAbsPlate(0.0)
         {
         }
+
+        Real64 IAM(Real64 IncidentAngle // Angle of incidence (radians)
+        );
     };
 
-    struct CollectorData
+    struct CollectorData : PlantComponent
     {
         // Members
-        std::string Name;       // Name of solar collector
-        std::string BCType;     // Boundary condition Type
-        std::string BCName;     // Boundary condition Name
-        std::string OSCMName;   // OtherSideConditionsModel
-        int VentCavIndex;       // index of ventilated cavity object
-        int ICSType_Num;        // ICS collector type number
-        int TypeNum;            // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
-        int WLoopNum;           // Water plant loop index number                      !DSU
-        int WLoopSideNum;       // Water plant loop side index                        !DSU
-        int WLoopBranchNum;     // Water plant loop branch index                      !DSU
-        int WLoopCompNum;       // Water plant loop component index                   !DSU
-        bool Init;              // Flag for initialization:  TRUE means do the init
-        bool InitSizing;        // Flag for initialization of plant sizing
-        int Parameters;         // Parameters object number
-        int Surface;            // Surface object number
-        int InletNode;          // Inlet node
-        Real64 InletTemp;       // Inlet temperature from plant (C)
-        int OutletNode;         // Outlet node
-        Real64 OutletTemp;      // Outlet temperature or stagnation temperature in the collector (C)
-        Real64 MassFlowRate;    // Mass flow rate through the collector (kg/s)
-        Real64 MassFlowRateMax; // Maximum mass flow rate through the collector (kg/s)
-        Real64 VolFlowRateMax;  // Maximum volumetric flow rate through the collector (m3/s)
-        int ErrIndex;           // Error index for recurring error
-        int IterErrIndex;       // Error index for recurring error (iteration - did not converge)
+        std::string Name;         // Name of solar collector
+        std::string BCType;       // Boundary condition Type
+        std::string OSCMName;     // OtherSideConditionsModel
+        int VentCavIndex;         // index of ventilated cavity object
+        TankTypeEnum ICSType_Num; // ICS collector type number
+        int TypeNum;              // Plant Side Connection: 'TypeOf_Num' assigned in DataPlant !DSU
+        int WLoopNum;             // Water plant loop index number                      !DSU
+        int WLoopSideNum;         // Water plant loop side index                        !DSU
+        int WLoopBranchNum;       // Water plant loop branch index                      !DSU
+        int WLoopCompNum;         // Water plant loop component index                   !DSU
+        bool Init;                // Flag for initialization:  TRUE means do the init
+        bool InitSizing;          // Flag for initialization of plant sizing
+        int Parameters;           // Parameters object number
+        int Surface;              // Surface object number
+        int InletNode;            // Inlet node
+        Real64 InletTemp;         // Inlet temperature from plant (C)
+        int OutletNode;           // Outlet node
+        Real64 OutletTemp;        // Outlet temperature or stagnation temperature in the collector (C)
+        Real64 MassFlowRate;      // Mass flow rate through the collector (kg/s)
+        Real64 MassFlowRateMax;   // Maximum mass flow rate through the collector (kg/s)
+        Real64 VolFlowRateMax;    // Maximum volumetric flow rate through the collector (m3/s)
+        int ErrIndex;             // Error index for recurring error
+        int IterErrIndex;         // Error index for recurring error (iteration - did not converge)
         // Report variables
         Real64 IncidentAngleModifier; // Net incident angle modifier
         Real64 Efficiency;            // Thermal efficiency of solar energy conversion
@@ -215,22 +210,83 @@ namespace SolarCollectors {
         Real64 Volume;                 // collector net volume (m3)
         bool OSCM_ON;                  // Boundary condition is OSCM
         bool InitICS;                  // used to initialize ICS variables only
+        bool SetLoopIndexFlag;
+        bool SetDiffRadFlag;
+        bool MyOneTimeFlag;
 
         // Default Constructor
         CollectorData()
-            : VentCavIndex(0), ICSType_Num(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0), WLoopCompNum(0), Init(true), InitSizing(true),
-              Parameters(0), Surface(0), InletNode(0), InletTemp(0.0), OutletNode(0), OutletTemp(0.0), MassFlowRate(0.0), MassFlowRateMax(0.0),
-              VolFlowRateMax(0.0), ErrIndex(0), IterErrIndex(0), IncidentAngleModifier(0.0), Efficiency(0.0), Power(0.0), HeatGain(0.0),
-              HeatLoss(0.0), Energy(0.0), HeatRate(0.0), HeatEnergy(0.0), StoredHeatRate(0.0), StoredHeatEnergy(0.0), HeatGainRate(0.0),
-              HeatGainEnergy(0.0), HeatLossRate(0.0), HeatLossEnergy(0.0), SkinHeatLossRate(0.0), CollHeatLossEnergy(0.0), TauAlpha(0.0),
-              UTopLoss(0.0), TempOfWater(0.0), TempOfAbsPlate(0.0), TempOfInnerCover(0.0), TempOfOuterCover(0.0), TauAlphaNormal(0.0),
+            : VentCavIndex(0), ICSType_Num(TankTypeEnum::ICSRectangularTank), TypeNum(0), WLoopNum(0), WLoopSideNum(0), WLoopBranchNum(0),
+              WLoopCompNum(0), Init(true), InitSizing(true), Parameters(0), Surface(0), InletNode(0), InletTemp(0.0), OutletNode(0), OutletTemp(0.0),
+              MassFlowRate(0.0), MassFlowRateMax(0.0), VolFlowRateMax(0.0), ErrIndex(0), IterErrIndex(0), IncidentAngleModifier(0.0), Efficiency(0.0),
+              Power(0.0), HeatGain(0.0), HeatLoss(0.0), Energy(0.0), HeatRate(0.0), HeatEnergy(0.0), StoredHeatRate(0.0), StoredHeatEnergy(0.0),
+              HeatGainRate(0.0), HeatGainEnergy(0.0), HeatLossRate(0.0), HeatLossEnergy(0.0), SkinHeatLossRate(0.0), CollHeatLossEnergy(0.0),
+              TauAlpha(0.0), UTopLoss(0.0), TempOfWater(0.0), TempOfAbsPlate(0.0), TempOfInnerCover(0.0), TempOfOuterCover(0.0), TauAlphaNormal(0.0),
               TauAlphaSkyDiffuse(0.0), TauAlphaGndDiffuse(0.0), TauAlphaBeam(0.0), CoversAbsSkyDiffuse(2, 0.0), CoversAbsGndDiffuse(2, 0.0),
               CoverAbs(2, 0.0), TimeElapsed(0.0), UbLoss(0.0), UsLoss(0.0), AreaRatio(0.0), RefSkyDiffInnerCover(0.0), RefGrnDiffInnerCover(0.0),
               RefDiffInnerCover(0.0), SavedTempOfWater(0.0), SavedTempOfAbsPlate(0.0), SavedTempOfInnerCover(0.0), SavedTempOfOuterCover(0.0),
               SavedTempCollectorOSCM(0.0), Length(1.0), TiltR2V(0.0), Tilt(0.0), CosTilt(0.0), SinTilt(0.0), SideArea(0.0), Area(0.0), Volume(0.0),
-              OSCM_ON(false), InitICS(false)
+              OSCM_ON(false), InitICS(false), SetLoopIndexFlag(true), SetDiffRadFlag(true), MyOneTimeFlag(true)
         {
         }
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void setupOutputVars();
+
+        void initialize(BranchInputManagerData &dataBranchInputManager);
+
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void CalcTransRefAbsOfCover(Real64 IncidentAngle,              // Angle of incidence (radians)
+                                    Real64 &TransSys,                  // cover system solar transmittance
+                                    Real64 &ReflSys,                   // cover system solar reflectance
+                                    Real64 &AbsCover1,                 // Inner cover solar absorbtance
+                                    Real64 &AbsCover2,                 // Outer cover solar absorbtance
+                                    Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
+                                    Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
+        );
+
+        void CalcSolarCollector();
+
+        void CalcICSSolarCollector();
+
+        void CalcTransAbsorProduct(Real64 IncidAngle);
+
+        void CalcHeatTransCoeffAndCoverTemp();
+
+        static void ICSCollectorAnalyticalSolution(Real64 SecInTimeStep,     // seconds in a time step
+                                                   Real64 a1,                // coefficient of ODE for Tp
+                                                   Real64 a2,                // coefficient of ODE for Tp
+                                                   Real64 a3,                // coefficient of ODE for Tp
+                                                   Real64 b1,                // coefficient of ODE for TW
+                                                   Real64 b2,                // coefficient of ODE for TW
+                                                   Real64 b3,                // coefficient of ODE for TW
+                                                   Real64 TempAbsPlateOld,   // absorber plate temperature at previous time step [C]
+                                                   Real64 TempWaterOld,      // collector water temperature at previous time step [C]
+                                                   Real64 &TempAbsPlate,     // absorber plate temperature at current time step [C]
+                                                   Real64 &TempWater,        // collector water temperature at current time step [C]
+                                                   bool AbsorberPlateHasMass // flag for absorber thermal mass
+        );
+
+        static Real64 CalcConvCoeffBetweenPlates(Real64 TempSurf1, // temperature of surface 1
+                                                 Real64 TempSurf2, // temperature of surface 1
+                                                 Real64 AirGap,    // characteristic length [m]
+                                                 Real64 CosTilt,   // cosine of surface tilt angle relative to the horizontal
+                                                 Real64 SinTilt    // sine of surface tilt angle relative to the horizontal
+        );
+
+        static Real64 CalcConvCoeffAbsPlateAndWater(Real64 TAbsorber, // temperature of absorber plate [C]
+                                                    Real64 TWater,    // temperature of water [C]
+                                                    Real64 Lc,        // characteristic length [m]
+                                                    Real64 TiltR2V    // collector tilt angle relative to the vertical [degree]
+        );
+
+        static void GetExtVentedCavityIndex(int SurfacePtr, int &VentCavIndex);
+
+        void update();
+
+        void report();
     };
 
     // Object Data
@@ -238,75 +294,8 @@ namespace SolarCollectors {
     extern Array1D<CollectorData> Collector;
 
     // Functions
-
     void clear_state();
-
-    void
-    SimSolarCollector(int const EquipTypeNum, std::string const &CompName, int &CompIndex, bool const InitLoopEquip, bool const FirstHVACIteration);
-
     void GetSolarCollectorInput();
-
-    void InitSolarCollector(int const CollectorNum);
-
-    void CalcSolarCollector(int const CollectorNum);
-
-    Real64 IAM(int const ParamNum,        // Collector parameters object number
-               Real64 const IncidentAngle // Angle of incidence (radians)
-    );
-
-    void CalcICSSolarCollector(int const ColleNum);
-
-    void ICSCollectorAnalyticalSoluton(int const ColleNum,             // solar collector index
-                                       Real64 const SecInTimeStep,     // seconds in a time step
-                                       Real64 const a1,                // coefficient of ODE for Tp
-                                       Real64 const a2,                // coefficient of ODE for Tp
-                                       Real64 const a3,                // coefficient of ODE for Tp
-                                       Real64 const b1,                // coefficient of ODE for TW
-                                       Real64 const b2,                // coefficient of ODE for TW
-                                       Real64 const b3,                // coefficient of ODE for TW
-                                       Real64 const TempAbsPlateOld,   // absorber plate temperature at previous time step [C]
-                                       Real64 const TempWaterOld,      // collector water temperature at previous time step [C]
-                                       Real64 &TempAbsPlate,           // absorber plate temperature at current time step [C]
-                                       Real64 &TempWater,              // collector water temperature at current time step [C]
-                                       bool const AbsorberPlateHasMass // flag for absober thermal mass
-    );
-
-    void CalcTransAbsorProduct(int const ColleNum,     // Collector object number
-                               Real64 const IncidAngle // Angle of incidence (radians)
-    );
-
-    void CalcTransRefAbsOfCover(int const ColleNum,                // Collector object number
-                                Real64 const IncidentAngle,        // Angle of incidence (radians)
-                                Real64 &TransSys,                  // cover system solar transmittance
-                                Real64 &ReflSys,                   // cover system solar reflectance
-                                Real64 &AbsCover1,                 // Inner cover solar absorbtance
-                                Real64 &AbsCover2,                 // Outer cover solar absorbtance
-                                Optional_bool_const InOUTFlag = _, // flag for calc. diffuse solar refl of cover from inside out
-                                Optional<Real64> RefSysDiffuse = _ // cover system solar reflectance from inner to outer cover
-    );
-
-    void CalcHeatTransCoeffAndCoverTemp(int const ColleNum); // Collector object number
-
-    Real64 CalcConvCoeffBetweenPlates(Real64 const TempSurf1, // temperature of surface 1
-                                      Real64 const TempSurf2, // temperature of surface 1
-                                      Real64 const AirGap,    // characteristic length [m]
-                                      Real64 const CosTilt,   // cosine of surface tilt angle relative to the horizontal
-                                      Real64 const SinTilt    // sine of surface tilt angle relative to the horizontal
-    );
-
-    Real64 CalcConvCoeffAbsPlateAndWater(Real64 const TAbsorber, // temperature of absorber plate [C]
-                                         Real64 const TWater,    // temperature of water [C]
-                                         Real64 const Lc,        // characteristic length [m]
-                                         Real64 const TiltR2V    // collector tilt angle relative to the vertical [degree]
-    );
-
-    void UpdateSolarCollector(int const CollectorNum);
-
-    void ReportSolarCollector(int const CollectorNum);
-
-    void GetExtVentedCavityIndex(int const SurfacePtr, int &VentCavIndex);
-
-    void GetExtVentedCavityTsColl(int const VentModNum, Real64 &TsColl);
 
 } // namespace SolarCollectors
 

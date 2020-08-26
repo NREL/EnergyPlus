@@ -1,13 +1,11 @@
-import codecs
 import datetime
-import fnmatch
 import json
 import glob
 import os
 #
 # The previous year that is in the license. It should be a string
 #
-_previous_year = '2018'
+_previous_year = '2019'
 #
 # From file "EnergyPlus License DRAFT 112015 100 fixed.txt"
 #
@@ -131,6 +129,7 @@ def error(dictionary):
 
 def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
                  message=error):
+    '''Check for a few of the usual issues with the license'''
     if possible == correct:
         return
     try:
@@ -171,6 +170,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
              'messagetype':'error',
              'message':'Non-year differences in license text, check entire license'})
 
+
 def mergeParagraphs(text):
     '''Merge license text lines into a single line per paragraph.'''
     lines = []
@@ -185,124 +185,131 @@ def mergeParagraphs(text):
     lines.append(current.lstrip())
     return '\n'.join(lines)+'\n'
 
-class Visitor:
-    def __init__(self):
-        self.count = 0
-    def filecheck(self, filepath):
-        pass
-    def files(self, path):
-        return glob.glob(path+'*')
-    def check(self, path):
-        for file in self.files(path):
-            self.filecheck(file)
-            self.count += 1
 
-class CodeChecker(Visitor):
-    def __init__(self):
-        Visitor.__init__(self)
+class FileVisitor:
+    def __init__(self, extensions = None):
+        self.visited_files = []
+        if extensions == None:
+            self.extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
+        else:
+            self.extensions = extensions
+
     def files(self, path):
-        extensions = ['cc', 'cpp', 'c', 'hh', 'hpp', 'h']
         results = []
-        for ext in extensions:
-            results.extend(glob.glob(path+'*.'+ext))
-            for root, _, filenames in os.walk(path):
-                for filename in fnmatch.filter(filenames, '*.'+ext):
-                    results.append(os.path.join(root, filename))
+        for ext in self.extensions:
+            results.extend(glob.glob(path+'**/*.'+ext, recursive=True))
         return results
 
-class Checker(CodeChecker):
-    def __init__(self, boilerplate, toolname='unspecified', message=error):
-        CodeChecker.__init__(self)
+    def visit_file(self, filepath):
+        pass
+
+    def error(self, file, line_number, mesg):
+        pass
+
+    def visit(self, path):
+        for file in self.files(path):
+            self.visit_file(file)
+            self.visited_files.append(file)
+
+    def readtext(self, filepath):
+        fp = open(filepath, 'r', encoding='utf-8')
+        try:
+            txt = fp.read()
+        except UnicodeDecodeError as exc:
+            self.error(filepath, 0, 'UnicodeDecodeError: '+ str(exc))
+            txt = None
+        except Exception as exc:
+            self.error(filepath, 0, 'Exception: '+ str(exc))
+            txt = None
+        fp.close()
+        return txt
+
+
+class Checker(FileVisitor):
+    def __init__(self, boilerplate, toolname='unspecified'):
+        super().__init__()
         lines = boilerplate.splitlines()
         self.n = len(lines)
         self.text = boilerplate
         self.toolname = toolname
-        self.message = message
-    def filecheck(self, filepath):
-        fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
-        try:
-            txt = fp.read()
-        except UnicodeDecodeError as exc:
-            try:
-                fp.close()
-                fp = codecs.open(filepath,'r',encoding='utf8')
-                txt = fp.read()
-            except:
-                self.message({'tool':self.toolname,
-                              'filename':filepath,
-                              'file':filepath,
-                              'line':0,
-                              'messagetype':'error',
-                              'message':'UnicodeDecodeError: '+ str(exc)})
-                fp.close()
-                return
-        fp.close()
-        n = txt.count(self.text)
-        if n == 0:
-            lines = txt.splitlines()[:self.n]
-            shortened = '\n'.join(lines)+'\n'
-            checkLicense(filepath,shortened,self.text,offset=3,
-                         toolname=self.toolname,message=self.message)
-        else:
-            if n > 1:
-                self.message({'tool':self.toolname,
-                              'filename':filepath,
-                              'file':filepath,
-                              'line':1,
-                              'messagetype':'error',
-                              'message':'Multiple instances of license text'})
-            if not txt.startswith(self.text):
-                self.message({'tool':self.toolname,
-                              'filename':filepath,
-                              'file':filepath,
-                              'line':1,
-                              'messagetype':'error',
-                              'message':'License text is not at top of file'})
+
+    def error(self, file, line_number, mesg):
+        dictionary = {'tool':self.toolname,
+                      'filename':file,
+                      'file':file,
+                      'line':line_number,
+                      'messagetype':'error',
+                      'message':mesg}
+        print(json.dumps(dictionary))
+
+    def visit_file(self, filepath):
+        txt = self.readtext(filepath)
+        if txt != None:
+            n = txt.count(self.text)
+            if n == 0:
+                lines = txt.splitlines()[:self.n]
+                shortened = '\n'.join(lines)+'\n'
+                checkLicense(filepath,shortened,self.text,offset=3,
+                             toolname=self.toolname,message=error)
+            else:
+                if n > 1:
+                    self.error(filepath, 1, 'Multiple instances of license text')
+                if not txt.startswith(self.text):
+                    self.error(filepath, 1, 'License text is not at top of file')
 
 
-class Replacer(CodeChecker):
+class Replacer(FileVisitor):
     def __init__(self, oldtext, newtext, dryrun=True):
-        CodeChecker.__init__(self)
+        super().__init__()
         self.oldtxt = oldtext
         self.newtxt = newtext
         self.dryrun = dryrun
-        self.replaced = 0
+        self.replaced = []
         self.failures = []
-    def filecheck(self,filepath):
-        fp = codecs.open(filepath,'r',encoding='utf-8',errors='ignore')
-        try:
-            txt = fp.read()
-        except UnicodeDecodeError as exc:
-            message = filepath + ', UnicodeDecodeError: '+ str(exc)
-            try:
-                fp.close()
-                fp = codecs.open(filepath,'r',encoding='utf8')
-                txt = fp.read()
-            except:
-                self.failures.append(message)
-                return
+
+    def error(self, file, line, mesg):
+        self.failures.append(file + ', ' + mesg)
+
+    def writetext(self, filepath, txt):
+        fp = open(filepath, 'w', encoding='utf-8')
+        fp.write(txt)
         fp.close()
-        if self.dryrun:
-            if self.oldtxt in txt:
-                self.replaced += 1
-        else:
-            txt = txt.replace(self.oldtxt, self.newtxt)
-            if self.newtxt in txt:
-                fp = codecs.open(filepath,'w',encoding='utf-8',errors='ignore')
-                fp.write(txt)
-                fp.close()
-                self.replaced += 1
+
+    def visit_file(self,filepath):
+        txt = self.readtext(filepath)
+        if txt != None:
+            if self.dryrun:
+                if self.oldtxt in txt:
+                    self.replaced.append(filepath)
+            else:
+                txt = txt.replace(self.oldtxt, self.newtxt)
+                if self.newtxt in txt:
+                    self.writetext(filepath, txt)
+                    self.replaced.append(filepath)
+
     def summary(self):
-        txt = ['Checked %d files' % self.count]
+        txt = ['Checked %d files' % len(self.visited_files)]
         if self.dryrun:
-            txt.append('Would have replaced text in %d files' % self.replaced)
+            txt.append('Would have replaced text in %d files' % len(self.replaced))
         else:
-            txt.append('Replaced text in %d files' % self.replaced)
+            txt.append('Replaced text in %d files' % len(self.replaced))
         if len(self.failures):
             txt.append('Failures in %d files' % len(self.failures))
             for message in self.failures:
                 txt.append('\t' + message)
         return '\n'.join(txt)
+
+    def report(self):
+        remaining = self.visited_files[:]
+        txt = ['Replaced text in the following files']
+        for file in self.replaced:
+            remaining.remove(file)
+            txt.append('\t'+file)
+        txt.append('No changes made to the following files')
+        for file in remaining:
+            txt.append('\t'+file)
+        return self.summary() + '\n\n' + '\n'.join(txt)
+
 
 if __name__ == '__main__':
     text = current()

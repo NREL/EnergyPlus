@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,9 +54,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include "DataHeatBalance.hh"
-#include "DataRoomAirModel.hh"
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 
 #include <sqlite3.h>
 
@@ -113,8 +115,8 @@ public:
     void addZoneListData(int const number, DataHeatBalance::ZoneListData const &zoneListData);
     void addSurfaceData(int const number, DataSurfaces::SurfaceData const &surfaceData, std::string const &surfaceClass);
     void addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData const &zoneGroupData);
-    void addMaterialData(int const number, DataHeatBalance::MaterialProperties const &materialData);
-    void addConstructionData(int const number, DataHeatBalance::ConstructionData const &constructionData, double const &constructionUValue);
+    void addMaterialData(int const number, Material::MaterialProperties const &materialData);
+    void addConstructionData(int const number, Construction::ConstructionProps const &constructionData, double const &constructionUValue);
     void addNominalLightingData(int const number, DataHeatBalance::LightsData const &nominalLightingData);
     void addNominalPeopleData(int const number, DataHeatBalance::PeopleData const &nominalPeopleData);
     void addNominalElectricEquipmentData(int const number, DataHeatBalance::ZoneEquipData const &nominalElectricEquipmentData);
@@ -230,9 +232,9 @@ public:
                                  int const dayOfMonth,
                                  int const hourOfDay,
                                  int const nX,
-                                 Array1<Real64> const &x,
+                                 Array1D<Real64> const &x,
                                  int const nY,
-                                 Array1<Real64> const &y,
+                                 Array1D<Real64> const &y,
                                  Array2<Real64> const &illuminance);
 
     void createSQLiteTabularDataRecords(Array2D_string const &body, // row,column
@@ -553,7 +555,7 @@ private:
         Material(std::shared_ptr<std::ostream> const &errorStream,
                  std::shared_ptr<sqlite3> const &db,
                  int const materialNumber,
-                 DataHeatBalance::MaterialProperties const &materialData)
+                 EnergyPlus::Material::MaterialProperties const &materialData)
             : SQLiteData(errorStream, db), number(materialNumber), name(materialData.Name), group(materialData.Group),
               roughness(materialData.Roughness), conductivity(materialData.Conductivity), density(materialData.Density),
               isoMoistCap(materialData.IsoMoistCap), porosity(materialData.Porosity), resistance(materialData.Resistance), rOnly(materialData.ROnly),
@@ -587,7 +589,7 @@ private:
         Construction(std::shared_ptr<std::ostream> const &errorStream,
                      std::shared_ptr<sqlite3> const &db,
                      int const constructionNumber,
-                     DataHeatBalance::ConstructionData const &constructionData,
+                     EnergyPlus::Construction::ConstructionProps const &constructionData,
                      double const &constructionUValue)
             : SQLiteData(errorStream, db), number(constructionNumber), name(constructionData.Name), totLayers(constructionData.TotLayers),
               totSolidLayers(constructionData.TotSolidLayers), totGlassLayers(constructionData.TotGlassLayers),
@@ -992,7 +994,7 @@ private:
 
 extern std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase();
+std::unique_ptr<SQLite> CreateSQLiteDatabase(IOFiles & ioFiles);
 
 void CreateSQLiteZoneExtendedOutput();
 

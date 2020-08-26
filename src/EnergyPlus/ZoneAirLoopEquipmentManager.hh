@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,27 +52,18 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ZoneAirLoopEquipmentManagerData;
+
 namespace ZoneAirLoopEquipmentManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
-
-    // Functions
-    void clear_state();
-
-    void ManageZoneAirLoopEquipment(std::string const &ZoneAirLoopEquipName,
+    void ManageZoneAirLoopEquipment(EnergyPlusData &state, std::string const &ZoneAirLoopEquipName,
                                     bool const FirstHVACIteration,
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
@@ -81,13 +72,13 @@ namespace ZoneAirLoopEquipmentManager {
                                     int &ControlledZoneNum,
                                     int &CompIndex);
 
-    void GetZoneAirLoopEquipment();
+    void GetZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
 
-    void InitZoneAirLoopEquipment(int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
+    void InitZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
 
     void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
 
-    void SimZoneAirLoopEquipment(int const AirDistUnitNum,
+    void SimZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
@@ -95,14 +86,26 @@ namespace ZoneAirLoopEquipmentManager {
                                  int const ControlledZoneNum,
                                  int const ActualZoneNum);
 
-    void UpdateZoneAirLoopEquipment();
-
-    // void
-    // ReportZoneAirLoopEquipment(
-    // 	int const AirDistUnitNum
-    // );
-
 } // namespace ZoneAirLoopEquipmentManager
+
+    struct ZoneAirLoopEquipmentManagerData : BaseGlobalStruct {
+        bool MyOneTimeFlag;
+        bool GetAirDistUnitsFlag;  // If TRUE, Air Distribution Data has not been read in yet
+        bool InitAirDistUnitsFlag; // If TRUE, not all Air Distribution Units have been initialized
+        Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
+        int numADUInitialized;        // Count of ADUs that have been initialized
+
+        void clear_state() override {
+            GetAirDistUnitsFlag = true;
+            EachOnceFlag.deallocate();
+            MyOneTimeFlag = true;
+            InitAirDistUnitsFlag = true;
+            numADUInitialized = 0;
+        }
+
+        // Default Constructor
+        ZoneAirLoopEquipmentManagerData() : MyOneTimeFlag(true), GetAirDistUnitsFlag(true), InitAirDistUnitsFlag(true), numADUInitialized(0) {}
+    };
 
 } // namespace EnergyPlus
 

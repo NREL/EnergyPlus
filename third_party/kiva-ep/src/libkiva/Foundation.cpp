@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2018 Big Ladder Software LLC. All rights reserved.
+/* Copyright (c) 2012-2019 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
 #include "Foundation.hpp"
@@ -227,6 +227,9 @@ void Foundation::createMeshData() {
         // Block is likely part of wall if it's narrow relative to wall or if there is any foundation depth
         if (std::abs(b.width) <= wall.totalWidth() / 2. || foundationDepth > 0.0) {
           xyWallTopInterior = std::min(bXmin, xyWallTopInterior);
+          if (foundationDepth == 0.0) {
+              xySlabNear = xyWallTopInterior;
+          }
         }
       }
       if (isLessOrEqual(bXmin,xyWallTopExterior) && isGreaterThan(bXmax,xyWallTopExterior)) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataHeatBalSurface.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -56,19 +56,10 @@ namespace DataHeatBalSurface {
     // MODULE INFORMATION:
     //       AUTHOR         Rick Strand
     //       DATE WRITTEN   December 2000
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // The purpose of this module is to contain data needed for the surface
     // heat balances which are now "external" subroutines.
-
-    // METHODOLOGY EMPLOYED:
-    // NA
-
-    // REFERENCES: none
-
-    // OTHER NOTES: none
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
@@ -80,20 +71,40 @@ namespace DataHeatBalSurface {
     Real64 const DefaultSurfaceTempLimit(200.0);         // Highest inside surface temperature allowed in Celsius
     std::vector<bool> Zone_has_mixed_HT_models;          // True if any surfaces in zone use CondFD, HAMT, or Kiva
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalSurface
     // Integer Variables for the Heat Balance Simulation
     Array1D_int SUMH; // From Old Bldctf.inc
 
-    // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
+    // Surface heat balance limits and convergence parameters
     Real64 MaxSurfaceTempLimit(200.0);            // Highest inside surface temperature allowed in Celsius
     Real64 MaxSurfaceTempLimitBeforeFatal(500.0); // 2.5 times MaxSurfaceTempLimit
+    Real64 const IterDampConst(5.0);              // Damping constant for inside surface temperature iterations
+    int const ItersReevalConvCoeff(30);           // Number of iterations between inside convection coefficient reevaluations
+    int MinIterations(1);                         // Minimum number of iterations for surface heat balance
+    int const MaxIterations(500);                 // Maximum number of iterations allowed for inside surface temps
+    Real64 const PoolIsOperatingLimit(0.0001);    // Limit to determine if swimming pool is operating or not
+    int const MinEMPDIterations(4);               // Minimum number of iterations required for EMPD solution
+    int const IterationsForCondFDRelaxChange(5);  // number of iterations for inside temps that triggers a change
+
+    // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
     Array1D<Real64> CTFConstInPart;               // Constant Inside Portion of the CTF calculation
     Array1D<Real64> CTFConstOutPart;              // Constant Outside Portion of the CTF calculation
+    // This group of arrays (soon to be vectors) added to facilitate vectorizable loops in CalcHeatBalanceInsideSurf2CTFOnly
+    Array1D<Real64> CTFCross0;                    // Construct.CTFCross(0)
+    Array1D<Real64> CTFInside0;                   // Construct.CTFInside(0)
+    Array1D<Real64> CTFSourceIn0;                 // Construct.CTFSourceIn(0)
+    Array1D<Real64> TH11Surf;                     // TH(1,1,SurfNum)
+    Array1D<Real64> QsrcHistSurf1;                // QsrcHist(SurfNum, 1)
+    Array1D_int IsAdiabatic;                      // 0 not adiabatic, 1 is adiabatic
+    Array1D_int IsNotAdiabatic;                   // 1 not adiabatic, 0 is adiabatic
+    Array1D_int IsSource;                         // 0 no internal source/sink, 1 has internal source/sing
+    Array1D_int IsNotSource;                      // 1 no internal source/sink, 0 has internal source/sing
+    Array1D_int IsPoolSurf;                       // 0 not pool, 1 is pool
+    Array1D_int IsNotPoolSurf;                    // 1 not pool, 0 is pool
+    Array1D<Real64> TempTermSurf;                 // TempTerm for heatbalance equation
+    Array1D<Real64> TempDivSurf;                  // Divisor for heatbalance equation
+    // end group added to support CalcHeatBalanceInsideSurf2CTFOnly
     Array1D<Real64> TempSurfIn;                   // Temperature of the Inside Surface for each heat transfer surface
+    Array1D<Real64> TempInsOld;                   // TempSurfIn from previous iteration for convergence check
     Array1D<Real64> TempSurfInTmp;                // Inside Surface Temperature Of Each Heat Transfer Surface
     Array1D<Real64> HcExtSurf;                    // Outside Convection Coefficient
     Array1D<Real64> HAirExtSurf;                  // Outside Convection Coefficient to Air
@@ -102,6 +113,7 @@ namespace DataHeatBalSurface {
     Array1D<Real64> TempSource;                   // Temperature at the source location for each heat transfer surface
     Array1D<Real64> TempUserLoc;                  // Temperature at the user specified location for each heat transfer surface
     Array1D<Real64> TempSurfInRep;                // Temperature of the Inside Surface for each heat transfer surface
+    Array1D<Real64> TempSurfInMovInsRep;          // Temperature of interior movable insulation on the side facing the zone
     // (report)
     Array1D<Real64> QConvInReport; // Surface convection heat gain at inside face [J]
     Array1D<Real64> QdotConvInRep; // Surface convection heat transfer rate at inside face surface [W]
@@ -214,7 +226,6 @@ namespace DataHeatBalSurface {
     // Originally QD, now used only for QSDifSol calc for daylighting
     Array1D<Real64> QDV; // Diffuse solar radiation in a zone from sky and ground diffuse entering
     // through exterior windows
-    Array1D<Real64> TCONV;             // Fraction Of Radiated Thermal Converted To Convection In Interior Shades
     Array1D<Real64> VMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     Array1D<Real64> VCONV;             // Fraction Of Short-Wave Radiation From Lights Converted To Convection
     Array1D<Real64> NetLWRadToSurf;    // Net interior long wavelength radiation to a surface from other surfaces
@@ -261,10 +272,25 @@ namespace DataHeatBalSurface {
         SUMH.deallocate();
         MaxSurfaceTempLimit = 200.0;
         MaxSurfaceTempLimitBeforeFatal = 500.0;
+        MinIterations = 1;
         Zone_has_mixed_HT_models.clear();
         CTFConstInPart.deallocate();
         CTFConstOutPart.deallocate();
+        CTFCross0.deallocate();
+        CTFInside0.deallocate();
+        CTFSourceIn0.deallocate();
+        TH11Surf.deallocate();
+        QsrcHistSurf1.deallocate();
+        IsAdiabatic.deallocate();
+        IsNotAdiabatic.deallocate();
+        IsSource.deallocate();
+        IsNotSource.deallocate();
+        IsPoolSurf.deallocate();
+        IsNotPoolSurf.deallocate();
+        TempTermSurf.deallocate();
+        TempDivSurf.deallocate();
         TempSurfIn.deallocate();
+        TempInsOld.deallocate();
         TempSurfInTmp.deallocate();
         HcExtSurf.deallocate();
         HAirExtSurf.deallocate();
@@ -273,6 +299,7 @@ namespace DataHeatBalSurface {
         TempSource.deallocate();
         TempUserLoc.deallocate();
         TempSurfInRep.deallocate();
+        TempSurfInMovInsRep.deallocate();
         QConvInReport.deallocate();
         QdotConvInRep.deallocate();
         QdotConvInRepPerArea.deallocate();
@@ -324,7 +351,6 @@ namespace DataHeatBalSurface {
         QD.deallocate();
         QDforDaylight.deallocate();
         QDV.deallocate();
-        TCONV.deallocate();
         VMULT.deallocate();
         VCONV.deallocate();
         NetLWRadToSurf.deallocate();

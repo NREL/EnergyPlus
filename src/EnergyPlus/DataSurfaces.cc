@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,23 +45,25 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <Psychrometrics.hh>
-#include <UtilityRoutines.hh>
-#include <WindowManager.hh>
-
 // C++ Headers
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <limits>
 #include <tuple>
+
+// EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 namespace EnergyPlus {
 
@@ -120,7 +122,7 @@ namespace DataSurfaces {
     int const GroundFCfactorMethod(-5);
     int const KivaFoundation(-6);
 
-    Array1D_string const cExtBoundCondition({-5, 0}, {"FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
+    Array1D_string const cExtBoundCondition({-6, 0}, {"KivaFoundation", "FCGround", "OSCM", "OSC", "OSC", "Ground", "ExternalEnvironment"});
 
     // Parameters to indicate the first "corner" of a surface
     // Currently, these are used only during input of surfaces
@@ -180,7 +182,7 @@ namespace DataSurfaces {
 
     // Parameters to indicate heat transfer model to use for surface
     int const HeatTransferModel_NotSet(-1);
-    int const HeatTransferModel_None(0); // shading surfaces for example
+    int const HeatTransferModel_None(0); // shading surfaces
     int const HeatTransferModel_CTF(1);
     int const HeatTransferModel_EMPD(2);
     int const HeatTransferModel_CondFD(5);
@@ -189,6 +191,7 @@ namespace DataSurfaces {
     int const HeatTransferModel_ComplexFenestration(8); // BSDF
     int const HeatTransferModel_TDD(9);                 // tubular daylighting device
     int const HeatTransferModel_Kiva(10);               // Kiva ground calculations
+    int const HeatTransferModel_AirBoundaryNoHT(11);    // Construction:AirBoundary - not IRT or interior window
 
     // Parameters for classification of outside face of surfaces
     int const OutConvClass_WindwardVertWall(101);
@@ -502,6 +505,7 @@ namespace DataSurfaces {
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     bool AnyHeatBalanceInsideSourceTerm(false);  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     bool AnyHeatBalanceOutsideSourceTerm(false); // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
@@ -759,7 +763,7 @@ namespace DataSurfaces {
                 for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
                     Real64 NodeTemp = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
                     Real64 MassFlowRate = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-                    Real64 CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(Zone), NodeTemp);
+                    Real64 CpAir = PsyCpAirFnW(ZoneAirHumRat(Zone));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -820,7 +824,7 @@ namespace DataSurfaces {
         return temperature;
     }
 
-    Real64 SurfaceData::getOutsideIR(const int t_SurfNum) const
+    Real64 SurfaceData::getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Simon Vidanovic
@@ -836,8 +840,8 @@ namespace DataSurfaces {
                     QSteamBaseboardSurf(ExtBoundCond) + QElecBaseboardSurf(ExtBoundCond);
         } else {
             Real64 tout = getOutsideAirTemperature(t_SurfNum) + KelvinConv;
-            value = sigma * pow_4(tout);
-            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
+            value = dataWindowManager.sigma * pow_4(tout);
+            value = ViewFactorSkyIR * (AirSkyRadSplit(t_SurfNum) * dataWindowManager.sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(t_SurfNum)) * value) +
                     ViewFactorGroundIR * value;
         }
         return value;
@@ -854,7 +858,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave incident to the surface
 
-        return QRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).Zone);
+        return QRadSWOutIncident(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     Real64 SurfaceData::getSWBeamIncident(const int t_SurfNum)
@@ -882,7 +886,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Return total short wave diffuse incident to the surface
 
-        return QRadSWOutIncidentSkyDiffuse(t_SurfNum) + QRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).Zone);
+        return QRadSWOutIncidentSkyDiffuse(t_SurfNum) + QRadSWOutIncidentGndDiffuse(t_SurfNum) + QS(Surface(t_SurfNum).SolarEnclIndex);
     }
 
     int SurfaceData::getTotLayers() const
@@ -896,7 +900,7 @@ namespace DataSurfaces {
         // PURPOSE OF THIS SUBROUTINE:
         // Returns total number of layer for current surface
 
-        auto &construction(Construct(Construction));
+        auto &construction(dataConstruction.Construct(Construction));
         return construction.TotLayers;
     }
 
@@ -1160,6 +1164,7 @@ namespace DataSurfaces {
         AllIZSurfaceList.clear();
         AllHTNonWindowSurfaceList.clear();
         AllHTWindowSurfaceList.clear();
+        AllSurfaceListReportOrder.clear();
         AnyHeatBalanceInsideSourceTerm = false;
         AnyHeatBalanceOutsideSourceTerm = false;
         Surface.deallocate();

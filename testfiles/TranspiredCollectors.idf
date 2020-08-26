@@ -30,7 +30,7 @@
 !        ZN15_Shop_1 is a floating zone
 !
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -85,13 +85,13 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   Building,
     AutoBuilt model,         !- Name
     0.00,                    !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.2,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -2453,31 +2453,31 @@
   InternalMass,
     ZN1_S_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN1_S_Space_1,           !- Zone Name
+    ZN1_S_Space_1,           !- Zone or ZoneList Name
     429.875;                 !- Surface Area {m2}
 
   InternalMass,
     ZN2_E_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN2_E_Space_1,           !- Zone Name
+    ZN2_E_Space_1,           !- Zone or ZoneList Name
     144.875;                 !- Surface Area {m2}
 
   InternalMass,
     ZN3_N_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN3_N_Space_1,           !- Zone Name
+    ZN3_N_Space_1,           !- Zone or ZoneList Name
     429.875;                 !- Surface Area {m2}
 
   InternalMass,
     ZN4_W_Space_1,           !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN4_W_Space_1,           !- Zone Name
+    ZN4_W_Space_1,           !- Zone or ZoneList Name
     144.875;                 !- Surface Area {m2}
 
   InternalMass,
     ZN5_Core_Space_1,        !- Name
     InteriorFurnishings,     !- Construction Name
-    ZN5_Core_Space_1,        !- Zone Name
+    ZN5_Core_Space_1,        !- Zone or ZoneList Name
     850.500;                 !- Surface Area {m2}
 
   FenestrationSurface:Detailed,
@@ -3183,7 +3183,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN1_S_Space_1,   !- Name
@@ -3347,12 +3352,12 @@
   ZoneHVAC:EquipmentList,
     Zone ZN1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone ZN1 DirectAir,      !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone ZN1 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN1,    !- Name
@@ -3363,13 +3368,25 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN1,  !- Name
     Zone Equipment Inlet Node ZN1,  !- Inlet Node Name
-    ZN1 Inlet Node;          !- Outlet 1 Node Name
+    ZN1 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone ZN1 DirectAir,      !- Name
     Always_On,               !- Availability Schedule Name
-    ZN1 Inlet Node,          !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ZN1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN1 Inlet Node,          !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone ZN1 DirectAir ADU,  !- Name
+    ZN1 Inlet Node,          !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone ZN1 DirectAir,      !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System ZN1,  !- Name
@@ -3476,7 +3493,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN2_E_Space_1,   !- Name
@@ -3640,12 +3662,12 @@
   ZoneHVAC:EquipmentList,
     Zone ZN2 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone ZN2 DirectAir,      !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone ZN2 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN2,    !- Name
@@ -3656,13 +3678,25 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN2,  !- Name
     Zone Equipment Inlet Node ZN2,  !- Inlet Node Name
-    ZN2 Inlet Node;          !- Outlet 1 Node Name
+    ZN2 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone ZN2 DirectAir,      !- Name
     Always_On,               !- Availability Schedule Name
-    ZN2 Inlet Node,          !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ZN2 Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN2 Inlet Node,          !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone ZN2 DirectAir ADU,  !- Name
+    ZN2 Inlet Node,          !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone ZN2 DirectAir,      !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System ZN2,  !- Name
@@ -3769,7 +3803,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN3_N_Space_1,   !- Name
@@ -3933,12 +3972,12 @@
   ZoneHVAC:EquipmentList,
     Zone ZN3 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone ZN3 DirectAir,      !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone ZN3 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN3,    !- Name
@@ -3949,13 +3988,25 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN3,  !- Name
     Zone Equipment Inlet Node ZN3,  !- Inlet Node Name
-    ZN3 Inlet Node;          !- Outlet 1 Node Name
+    ZN3 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone ZN3 DirectAir,      !- Name
     Always_On,               !- Availability Schedule Name
-    ZN3 Inlet Node,          !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ZN3 Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN3 Inlet Node,          !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone ZN3 DirectAir ADU,  !- Name
+    ZN3 Inlet Node,          !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone ZN3 DirectAir,      !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System ZN3,  !- Name
@@ -4062,7 +4113,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN4_W_Space_1,   !- Name
@@ -4226,12 +4282,12 @@
   ZoneHVAC:EquipmentList,
     Zone ZN4 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone ZN4 DirectAir,      !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone ZN4 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN4,    !- Name
@@ -4242,13 +4298,25 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN4,  !- Name
     Zone Equipment Inlet Node ZN4,  !- Inlet Node Name
-    ZN4 Inlet Node;          !- Outlet 1 Node Name
+    ZN4 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone ZN4 DirectAir,      !- Name
     Always_On,               !- Availability Schedule Name
-    ZN4 Inlet Node,          !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ZN4 Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN4 Inlet Node,          !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone ZN4 DirectAir ADU,  !- Name
+    ZN4 Inlet Node,          !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone ZN4 DirectAir,      !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System ZN4,  !- Name
@@ -4355,7 +4423,12 @@
     ,                        !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ZN5_Core_Space_1,!- Name
@@ -4519,12 +4592,12 @@
   ZoneHVAC:EquipmentList,
     Zone ZN5 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone ZN5 DirectAir,      !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone ZN5 DirectAir ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN5,    !- Name
@@ -4535,13 +4608,25 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN5,  !- Name
     Zone Equipment Inlet Node ZN5,  !- Inlet Node Name
-    ZN5 Inlet Node;          !- Outlet 1 Node Name
+    ZN5 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone ZN5 DirectAir,      !- Name
     Always_On,               !- Availability Schedule Name
-    ZN5 Inlet Node,          !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ZN5 Inlet Node ATInlet,  !- Air Inlet Node Name
+    ZN5 Inlet Node,          !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone ZN5 DirectAir ADU,  !- Name
+    ZN5 Inlet Node,          !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone ZN5 DirectAir,      !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System ZN5,  !- Name
@@ -4726,12 +4811,12 @@
   ZoneHVAC:EquipmentList,
     Zone11Equipment,         !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone11DirectAir,         !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone11DirectAir ADU,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath11,      !- Name
@@ -4748,18 +4833,30 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN11,  !- Name
     Zone Equipment Inlet Node ZN11,  !- Inlet Node Name
-    ZN11 Inlet Node;         !- Outlet 1 Node Name
+    ZN11 Inlet Node ATInlet; !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     ZN11 Return Air Mixer,   !- Name
     Return Air Mixer Outlet ZN11,  !- Outlet Node Name
     ZN11 Outlet Node;        !- Inlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone11DirectAir,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN11 Inlet Node,         !- Zone Supply Air Node Name
-    3.0;                     !- Maximum Air Flow Rate {m3/s}
+    ZN11 Inlet Node ATInlet, !- Air Inlet Node Name
+    ZN11 Inlet Node,         !- Air Outlet Node Name
+    3.0,                     !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone11DirectAir ADU,     !- Name
+    ZN11 Inlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone11DirectAir,         !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   Coil:Heating:Fuel,
     Main Heating Coil ZN11,  !- Name
@@ -4929,12 +5026,12 @@
   ZoneHVAC:EquipmentList,
     Zone12Equipment,         !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone12DirectAir,         !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone12DirectAir ADU,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath12,      !- Name
@@ -4951,18 +5048,30 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN12,  !- Name
     Zone Equipment Inlet Node ZN12,  !- Inlet Node Name
-    ZN12 Inlet Node;         !- Outlet 1 Node Name
+    ZN12 Inlet Node ATInlet; !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     ZN12 Return Air Mixer,   !- Name
     Return Air Mixer Outlet ZN12,  !- Outlet Node Name
     ZN12 Outlet Node;        !- Inlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone12DirectAir,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN12 Inlet Node,         !- Zone Supply Air Node Name
-    3.0;                     !- Maximum Air Flow Rate {m3/s}
+    ZN12 Inlet Node ATInlet, !- Air Inlet Node Name
+    ZN12 Inlet Node,         !- Air Outlet Node Name
+    3.0,                     !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone12DirectAir ADU,     !- Name
+    ZN12 Inlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone12DirectAir,         !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   Coil:Heating:Fuel,
     Main Heating Coil ZN12,  !- Name
@@ -5129,12 +5238,12 @@
   ZoneHVAC:EquipmentList,
     Zone13Equipment,         !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone13DirectAir,         !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone13DirectAir ADU,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath13,      !- Name
@@ -5151,18 +5260,30 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN13,  !- Name
     Zone Equipment Inlet Node ZN13,  !- Inlet Node Name
-    ZN13 Inlet Node;         !- Outlet 1 Node Name
+    ZN13 Inlet Node ATInlet; !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     ZN13 Return Air Mixer,   !- Name
     Return Air Mixer Outlet ZN13,  !- Outlet Node Name
     ZN13 Outlet Node;        !- Inlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone13DirectAir,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN13 Inlet Node,         !- Zone Supply Air Node Name
-    3.0;                     !- Maximum Air Flow Rate {m3/s}
+    ZN13 Inlet Node ATInlet, !- Air Inlet Node Name
+    ZN13 Inlet Node,         !- Air Outlet Node Name
+    3.0,                     !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone13DirectAir ADU,     !- Name
+    ZN13 Inlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone13DirectAir,         !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   Fan:ConstantVolume,
     Supply Fan ZN13,         !- Name
@@ -5321,12 +5442,12 @@
   ZoneHVAC:EquipmentList,
     Zone14Equipment,         !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone14DirectAir,         !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone14DirectAir ADU,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath14,      !- Name
@@ -5343,18 +5464,30 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter ZN14,  !- Name
     Zone Equipment Inlet Node ZN14,  !- Inlet Node Name
-    ZN14 Inlet Node;         !- Outlet 1 Node Name
+    ZN14 Inlet Node ATInlet; !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     ZN14 Return Air Mixer,   !- Name
     Return Air Mixer Outlet ZN14,  !- Outlet Node Name
     ZN14 Outlet Node;        !- Inlet 1 Node Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone14DirectAir,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ZN14 Inlet Node,         !- Zone Supply Air Node Name
-    3.0;                     !- Maximum Air Flow Rate {m3/s}
+    ZN14 Inlet Node ATInlet, !- Air Inlet Node Name
+    ZN14 Inlet Node,         !- Air Outlet Node Name
+    3.0,                     !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone14DirectAir ADU,     !- Name
+    ZN14 Inlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone14DirectAir,         !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   Coil:Heating:Fuel,
     Main Heating Coil ZN14,  !- Name
@@ -5463,12 +5596,13 @@
     PV:ZN15:S_Wall,          !- Generator 1 Name
     Generator:Photovoltaic,  !- Generator 1 Object Type
     100000.000,              !- Generator 1 Rated Electric Power Output {W}
-    ALWAYS_ON,               !- Generator 1 Availability Schedule Name
+    ,                        !- Generator 1 Availability Schedule Name
     ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio
     PV_UTSC:ZN14:S_Wall,     !- Generator 2 Name
     Generator:Photovoltaic,  !- Generator 2 Object Type
     100000.000,              !- Generator 2 Rated Electric Power Output {W}
-    ALWAYS_ON;               !- Generator 2 Availability Schedule Name
+    ,                        !- Generator 2 Availability Schedule Name
+    ;                        !- Generator 2 Rated Thermal to Electrical Power Ratio
 
   Generator:Photovoltaic,
     PV:ZN15:S_Wall,          !- Name

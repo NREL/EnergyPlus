@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,7 +49,6 @@
 #define ScheduleManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2A.hh>
@@ -58,10 +57,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
 
 namespace ScheduleManager {
 
@@ -191,17 +191,21 @@ namespace ScheduleManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ProcessScheduleInput();
+    void ProcessScheduleInput(IOFiles &ioFiles);
 
-    void ReportScheduleDetails(int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(IOFiles &ioFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
+    // Returns the CurrentScheduleValue
     Real64 GetCurrentScheduleValue(int const ScheduleIndex);
 
+    // Updates each schedule value to the current timestep
+    // Uses EMS value if actuated, otherwise calls LookUpScheduleValue with ThisHour=DataGlobals::HourOfDay, ThisTimeStep=DataGlobals::TimeStep
     void UpdateScheduleValues();
 
+    // Looks up a given Schedule value for an hour & timestep, minding whether DST is enabled or not
     Real64 LookUpScheduleValue(int const ScheduleIndex,
-                               int const ThisHour = -1,    // Negative => unspecified
-                               int const ThisTimeStep = -1 // Negative => unspecified
+                               int const ThisHour,
+                               int const ThisTimeStep = -1 // Negative => unspecified, will use NumOfTimeStepInHour
     );
 
     int GetScheduleIndex(std::string const &ScheduleName);
@@ -245,8 +249,8 @@ namespace ScheduleManager {
     bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep);
 
     void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1A_bool TheseDays,         // Array to contain returned "true" days
-                            Array1A_bool AlReady,           // Array of days already done
+                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
+                            Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     );
 

@@ -75,7 +75,7 @@
 ! End SimMetaData
 ! Number of Zones: 11
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,6;
 
@@ -135,8 +135,9 @@
     20;                      !- Maximum HVAC Iterations
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    7,                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    7,                       !- Shading Calculation Update Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   GlobalGeometryRules,
@@ -149,7 +150,7 @@
     Primary School Low-Energy Dual Duct and Fan Coil,  !- Name
     0.0000,                  !- North Axis {deg}
     City,                    !- Terrain
-    0.0400,                  !- Loads Convergence Tolerance Value
+    0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -1511,7 +1512,7 @@
   InternalMass,
     Corner_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_1,    !- Zone Name
+    Corner_Class_1_Pod_1,    !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -1602,7 +1603,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corner_Class_1_Pod_1,  !- Name
@@ -1647,14 +1653,14 @@
     Corner_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corner_Class_1_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corner_Class_1_Pod_1 Dual Duct Box,  !- Name
@@ -2376,7 +2382,7 @@
   InternalMass,
     Mult_Class_1_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_1,      !- Zone Name
+    Mult_Class_1_Pod_1,      !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2467,7 +2473,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Mult_Class_1_Pod_1,  !- Name
@@ -2512,14 +2523,14 @@
     Mult_Class_1_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Mult_Class_1_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mult_Class_1_Pod_1 Dual Duct Box,  !- Name
@@ -2788,7 +2799,7 @@
   InternalMass,
     Corridor_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_1,          !- Zone Name
+    Corridor_Pod_1,          !- Zone or ZoneList Name
     384.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2844,7 +2855,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_Pod_1,  !- Name
@@ -2889,14 +2905,14 @@
     Corridor_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corridor_Pod_1 Fan Coil, !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corridor_Pod_1 Dual Duct Box,  !- Name
@@ -3238,7 +3254,7 @@
   InternalMass,
     Corner_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_1,    !- Zone Name
+    Corner_Class_2_Pod_1,    !- Zone or ZoneList Name
     198.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -3329,7 +3345,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corner_Class_2_Pod_1,  !- Name
@@ -3374,14 +3395,14 @@
     Corner_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Corner_Class_2_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Corner_Class_2_Pod_1 Dual Duct Box,  !- Name
@@ -3903,7 +3924,7 @@
   InternalMass,
     Mult_Class_2_Pod_1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_1,      !- Zone Name
+    Mult_Class_2_Pod_1,      !- Zone or ZoneList Name
     954.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -3994,7 +4015,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Mult_Class_2_Pod_1,  !- Name
@@ -4039,14 +4065,14 @@
     Mult_Class_2_Pod_1 Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:FourPipeFanCoil,!- Zone Equipment 2 Object Type
     Mult_Class_2_Pod_1 Fan Coil,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mult_Class_2_Pod_1 Dual Duct Box,  !- Name
@@ -4481,7 +4507,7 @@
   InternalMass,
     Main_Corridor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Main_Corridor,           !- Zone Name
+    Main_Corridor,           !- Zone or ZoneList Name
     1092.0000;               !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -4537,7 +4563,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Main_Corridor,   !- Name
@@ -4577,14 +4608,14 @@
     Main_Corridor Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Main_Corridor Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Main_Corridor Dual Duct Box,  !- Name
@@ -4953,7 +4984,7 @@
   InternalMass,
     Lobby Internal Mass,     !- Name
     InteriorFurnishings,     !- Construction Name
-    Lobby,                   !- Zone Name
+    Lobby,                   !- Zone or ZoneList Name
     342.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5009,7 +5040,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Lobby,           !- Name
@@ -5049,14 +5085,14 @@
     Lobby Dual Duct Box,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Lobby Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Lobby Dual Duct Box,     !- Name
@@ -5390,7 +5426,7 @@
   InternalMass,
     Mech Internal Mass,      !- Name
     InteriorFurnishings,     !- Construction Name
-    Mech,                    !- Zone Name
+    Mech,                    !- Zone or ZoneList Name
     504.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5446,7 +5482,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Mech,            !- Name
@@ -5486,14 +5527,14 @@
     Mech Dual Duct Box,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Mech Baseboard Heater,   !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Mech Dual Duct Box,      !- Name
@@ -5782,7 +5823,7 @@
   InternalMass,
     Bathrooms Internal Mass, !- Name
     InteriorFurnishings,     !- Construction Name
-    Bathrooms,               !- Zone Name
+    Bathrooms,               !- Zone or ZoneList Name
     380.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -5838,7 +5879,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Bathrooms,       !- Name
@@ -5882,20 +5928,20 @@
     Bathrooms Dual Duct Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Bathrooms Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 3 Object Type
     Bathrooms Exhaust Fan 1, !- Zone Equipment 3 Name
     3,                       !- Zone Equipment 3 Cooling Sequence
     3,                       !- Zone Equipment 3 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 3 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 3 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 3 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 3 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Bathrooms Dual Duct Box, !- Name
@@ -6609,7 +6655,7 @@
   InternalMass,
     Offices Internal Mass,   !- Name
     InteriorFurnishings,     !- Construction Name
-    Offices,                 !- Zone Name
+    Offices,                 !- Zone or ZoneList Name
     882.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -6700,7 +6746,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Offices,         !- Name
@@ -6740,14 +6791,14 @@
     Offices Dual Duct Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Offices Baseboard Heater,!- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Offices Dual Duct Box,   !- Name
@@ -7261,7 +7312,7 @@
   InternalMass,
     Media_Center Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Media_Center,            !- Zone Name
+    Media_Center,            !- Zone or ZoneList Name
     798.0000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -7352,7 +7403,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     .002032,                 !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     .1415762,                !- Heating Maximum Air Flow {m3/s}
-    0.3;                     !- Heating Maximum Air Flow Fraction
+    0.3,                     !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Media_Center,    !- Name
@@ -7392,14 +7448,14 @@
     Media_Center Dual Duct Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Water,  !- Zone Equipment 2 Object Type
     Media_Center Baseboard Heater,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Media_Center Dual Duct Box,  !- Name
@@ -9221,9 +9277,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,hourly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,hourly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,hourly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,hourly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -9235,7 +9291,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, DisplacementVentMgr_HcUCSDDV_Door_Test)
     EnergyPlus::DataHeatBalSurface::TempSurfIn(2) = 23.0;
     EnergyPlus::DataHeatBalSurface::TempSurfIn(3) = 23.0;
 
-    HcUCSDDV(1, 0.5);
+    HcUCSDDV(state.dataConvectionCoefficients, 1, 0.5);
 
     EXPECT_NEAR(1.889346, DVHcIn(1), 0.0001);
     EXPECT_NEAR(1.650496, DVHcIn(2), 0.0001);

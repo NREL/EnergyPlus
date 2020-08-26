@@ -498,7 +498,7 @@ Note: All heat pump water heater output variables, including off-cycle ancillary
 
 \subsection{Stratified Water Thermal Tank}\label{stratified-water-thermal-tank}
 
-The input objects WaterHeater:Stratified and ThermalStorage:ChilledWater:Stratified provide models for a stratified water thermal tank that divides the water tank into multiple nodes of equal volume. This model is used for both the stratified water heater and the stratified chilled water storage tank. The nodes are coupled by vertical conduction effects, internode fluid flow, and temperature inversion mixing. The object simultaneously solves the differential equations governing the energy balances on the nodes using an analytical solution to a simplified representation of the heat balance equation. The system time step is divided into one minute substeps at which control decisions are evaluated that allow the simulation to capture events that occur on a short time scale.
+The input objects WaterHeater:Stratified and ThermalStorage:ChilledWater:Stratified provide models for a stratified water thermal tank that divides the water tank into multiple nodes of equal volume. This model is used for both the stratified water heater and the stratified chilled water storage tank. The nodes are coupled by vertical conduction effects, internode fluid flow, and temperature inversion mixing. The object simultaneously solves the differential equations governing the energy balances on the nodes using an analytical solution to a simplified representation of the heat balance equation. The system time step is divided into multiple substeps at which control decisions are evaluated that allow the simulation to capture events that occur on a short time scale.
 
 \subsubsection{Energy Balance}\label{energy-balance-1}
 
@@ -745,7 +745,7 @@ where:
 
 To solve the differential equations the nodal heat balance equations are modified into the form:
 
-\begin{equation}
+\begin{equation}\label{strat-tank-diffeq}
   \frac{d{T_n}}{dt} = a T_n + b
 \end{equation}
 
@@ -768,7 +768,19 @@ Where $b$ is a function of the average temperature as calculated by
 
 The solution is obtained by separating the $q_{net}$ terms described above into their respective $a$ and $b$ parts, solving for $T_{final}$ and $T_{avg}$, recalculating $b$ using the new average temperatures and iterating until the temperatures converge, at which point temperature inversions are resolved and controls decisions are made before moving on to the next sub timestep.
 
-\paragraph{Control Logic Evaluation}
+\paragraph{Adaptive Sub Timestep}
+
+The sub timestep is allowed to vary between 10 seconds and 10 minutes. The length of the sub timestep is determined by the current heat transfer rates in the tank, which are used to predict the amount of time until a control decision (\ref{control-logic-evaluation}) will need to be made. The sub timestep is then selected to approach the time of the control decision.
+
+First, the temperature difference required for a heater to turn on or off for each control node is calculated by determining the difference between its setpoint temperature and the current temperature if the heater is on or its cut in temperature and current temperature if the heater is off. The minimum of the temperature differences is selected as the maximum allowable nodal temperature change $dT_{max}$. The time until that temperature change occurs is estimated for each node by rearranging \ref{strat-tank-diffeq} to solve for $dt$.
+
+\begin{equation}
+  dt = \frac{dT_{max}}{aT + b}
+\end{equation}
+
+Finally, the minimum of the nodal $dt$ values is used as the sub timestep unless it is outside the allowable bounds or it will extend beyond the end of the timestep. In those cases, the sub timestep is adjusted to fit within the bounds.
+
+\paragraph{Control Logic Evaluation}\label{control-logic-evaluation}
 
 Before each system time step is calculated the following evaluations are made:
 
@@ -777,12 +789,13 @@ Before each system time step is calculated the following evaluations are made:
 \item Internode flow is determined and net flow rates are determined
 \end{enumerate}
 
-Before each substep is calculated, the following evaluations are made:
+Before each sub timestep is calculated, the following evaluations are made:
 
 \begin{enumerate}
 \item Thermostatic controls for heater 1 and heater 2 are evaluated to determine if the heater elements should turn on or off
 \item Node 1 temperature is compared against the maximum limit to determine if venting is necessary
 \item Adjoining node temperatures are compared to determine if there are any temperature inversions for which the inversion mixing rate should be used.
+\item Source inlet temperatures for the desuperheater are recalculated and applied to the inlet nodes using the heat rate calculated in the system time step loop
 \end{enumerate}
 
 The solution continues looping through all substeps until the system time step is completed.

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,16 +49,16 @@
 #include <cmath>
 
 // EnergyPlus Headers
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <Psychrometrics.hh>
-#include <SplitterComponent.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -101,6 +101,7 @@ namespace SplitterComponent {
     // Public because Used by SimAirServingZones and the Direct Air Unit
     int NumSplitters(0); // The Number of Splitters found in the Input
     Array1D_bool CheckEquipName;
+    bool MyEnvrnFlag(true);
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -128,6 +129,7 @@ namespace SplitterComponent {
         NumSplitters = 0;
         CheckEquipName.deallocate();
         SplitterCond.deallocate();
+        MyEnvrnFlag = true;
     }
 
     void
@@ -226,7 +228,7 @@ namespace SplitterComponent {
         int NumNums;
         int NodeNum;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         int NumParams;
         int OutNodeNum1;
         int OutNodeNum2;
@@ -390,7 +392,6 @@ namespace SplitterComponent {
         int OutletNode;
         int NodeNum;
         Real64 AirEnthalpy; // [J/kg]
-        static bool MyEnvrnFlag(true);
 
         // FLOW:
 

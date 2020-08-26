@@ -61,13 +61,13 @@
 ! BUILDING, SURFACEGEOMETRY, LOCATION and DESIGNDAY (or RUNPERIOD) are the absolute minimal required input objects.
 ! This file illustrates using EnergyPlus to create a "bin" report for weather data.
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     None,                    !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.40,                    !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,13 +52,17 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
+    struct EnergyPlusData;
 
 namespace ReportSizingManager {
 
     // Functions
+
+    void clear_state();
 
     void ReportSizingOutput(std::string const &CompType,        // the type of the component
                             std::string const &CompName,        // the name of the component
@@ -68,13 +72,14 @@ namespace ReportSizingManager {
                             Optional<Real64 const> UsrValue = _ // the value from the user for the desc item
     );
 
-    void RequestSizing(std::string const &CompType,      // type of component
+    void RequestSizing(EnergyPlusData &state, std::string const &CompType,      // type of component
                        std::string const &CompName,      // name of component
                        int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
                        std::string const &SizingString,  // string containing info for eio report
                        Real64 &SizingResult,             // result of the sizing procedure
                        bool const PrintWarningFlag,      // TRUE when requesting output (eio) reporting
-                       std::string const &CallingRoutine // name of calling rotuine for warning messages
+                       std::string const &CallingRoutine, // name of calling rotuine for warning messages
+                       Real64 const fraction = 1.0
     );
 
     void GetCoilDesFlowT(int SysNum,           // central air system index

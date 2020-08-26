@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,12 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace FaultsManager {
 
@@ -229,7 +231,8 @@ namespace FaultsManager {
     {
         // Members
         std::string FouledCoilName; // The fouled coil name
-        int FouledCoilID;           // Point to a fouling coil
+        int FouledCoiledType;       // Type of coil that's fouled
+        int FouledCoilNum;          // The "FouledUARated" implies having to use the Coil's UA, which could be autosized, so have to use this index
         int FoulingInputMethod;     // Coil fouling input method
         Real64 UAFouled;            // Fouling coil UA under rating conditions
         Real64 Rfw;                 // Water side fouling factor
@@ -239,12 +242,19 @@ namespace FaultsManager {
 
         // Default Constructor
         FaultPropertiesFoulingCoil()
-            : FouledCoilName(""), FouledCoilID(0), FoulingInputMethod(0), UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
+            : FouledCoilName(""), FouledCoiledType(0), FouledCoilNum(0), FoulingInputMethod(0),
+              UAFouled(0.0), Rfw(0.0), Rfa(0.0), Aout(0.0), Aratio(0.0)
         {
         }
 
         // Destructor
         virtual ~FaultPropertiesFoulingCoil() = default;
+      public:
+        // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
+        // Real64 CalFaultyCoilFoulingFactor();
+
+        // Calculate the Fault Fraction based on Availability and Severity Schedules
+        Real64 FaultFraction();
     };
 
     struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties
@@ -270,7 +280,7 @@ namespace FaultsManager {
         virtual ~FaultPropertiesAirFilter() = default;
 
     public:
-        bool CheckFaultyAirFilterFanCurve();
+        bool CheckFaultyAirFilterFanCurve(EnergyPlusData &state);
     };
 
     struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
@@ -405,7 +415,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults();
+    void CheckAndReadFaults(EnergyPlusData &state);
 
     void clear_state();
 

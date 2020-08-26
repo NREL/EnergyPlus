@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -88,9 +88,6 @@ namespace DataGlobalConstants {
     extern std::string const cRT_Natural_Gas;
     extern std::string const cRT_Natural_GasUC;
     extern int const iRT_Natural_Gas;
-    extern std::string const cRT_Gas;
-    extern std::string const cRT_GasUC;
-    extern int const iRT_Gas;
     extern std::string const cRT_Gasoline;
     extern std::string const cRT_GasolineUC;
     extern int const iRT_Gasoline;
@@ -103,21 +100,12 @@ namespace DataGlobalConstants {
     extern std::string const cRT_FuelOil_1;
     extern std::string const cRT_FuelOil_1UC;
     extern int const iRT_FuelOil_1;
-    extern std::string const cRT_DistillateOil;
-    extern std::string const cRT_DistillateOilUC;
-    extern int const iRT_DistillateOil;
     extern std::string const cRT_FuelOil_2;
     extern std::string const cRT_FuelOil_2UC;
     extern int const iRT_FuelOil_2;
-    extern std::string const cRT_ResidualOil;
-    extern std::string const cRT_ResidualOilUC;
-    extern int const iRT_ResidualOil;
     extern std::string const cRT_Propane;
     extern std::string const cRT_PropaneUC;
     extern int const iRT_Propane;
-    extern std::string const cRT_LPG;
-    extern std::string const cRT_LPGUC;
-    extern int const iRT_LPG;
     extern std::string const cRT_Water;
     extern std::string const cRT_WaterUC;
     extern int const iRT_Water;

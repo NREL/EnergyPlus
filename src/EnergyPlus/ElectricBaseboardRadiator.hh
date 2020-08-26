@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,17 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    struct ConvectionCoefficientsData;
+    struct ZoneTempPredictorCorrectorData;
+
+    // Forward Declarations
+    struct EnergyPlusData;
 
 namespace ElectricBaseboardRadiator {
 
@@ -142,8 +149,9 @@ namespace ElectricBaseboardRadiator {
     extern Array1D<ElecBaseboardNumericFieldData> ElecBaseboardNumericFields;
 
     // Functions
+    void clear_state();
 
-    void SimElecBaseboard(std::string const &EquipName,
+    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
                           int const ActualZoneNum,
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -152,11 +160,11 @@ namespace ElectricBaseboardRadiator {
 
     void GetElectricBaseboardInput();
 
-    void InitElectricBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeElectricBaseboard(int const BaseboardNum);
+    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
-    void CalcElectricBaseboard(int const BaseboardNum, int const ControlledZoneNum);
+    void CalcElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum);
 
     void UpdateElectricBaseboardOff(Real64 &LoadMet,
                                     Real64 &QBBCap,

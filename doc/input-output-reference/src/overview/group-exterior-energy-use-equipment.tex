@@ -67,7 +67,7 @@ This descriptive name allows the values of exterior equipment consumption to app
 
 \paragraph{Field: Fuel Use Type}\label{exteriorfuelequipment-field-fuel-use-type}
 
-This field designates the appropriate meter for the exterior fuel equipment. Valid fuel types are: Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
+This field designates the appropriate meter for the exterior fuel equipment. Valid fuel types are: Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, Steam, \hyperref[districtheating]{DistrictHeating}, \hyperref[districtcooling]{DistrictCooling}, OtherFuel1 and OtherFuel2. The fuel type triggers the application of consumption amounts to the appropriate energy meters.
 
 \paragraph{Field: Schedule Name}\label{field-schedule-name-1-000}
 
@@ -87,9 +87,9 @@ IDF Examples:
 
 Exterior:FuelEquipment,OutsideGasEq,NaturalGas,ON,1000;
   Exterior:FuelEquipment,OutsideCoalEq,Coal,ON,1000;
-  Exterior:FuelEquipment,OutsideFuelOil1Eq,FuelOil#1,ON,1000;
-  Exterior:FuelEquipment,OutsideFuelOil2Eq,FuelOil#2,ON,1000;
-  Exterior:FuelEquipment,OutsideLPGEq,PropaneGas,ON,1000;
+  Exterior:FuelEquipment,OutsideFuelOilNo1Eq,FuelOilNo1,ON,1000;
+  Exterior:FuelEquipment,OutsideFuelOilNo2Eq,FuelOilNo2,ON,1000;
+  Exterior:FuelEquipment,OutsideLPGEq,Propane,ON,1000;
 \end{lstlisting}
 
 \subsection{Exterior:WaterEquipment}\label{exteriorwaterequipment}
@@ -149,9 +149,9 @@ Output for exterior equipment consumption appears in three possible places. It w
 \item
   Zone,Sum, Exterior Equipment Coal Energy {[}J{]}
 \item
-  Zone,Sum, Exterior Equipment FuelOil\#1 Energy {[}J{]}
+  Zone,Sum, Exterior Equipment FuelOilNo1 Energy {[}J{]}
 \item
-  Zone,Sum, Exterior Equipment FuelOil\#2 Energy {[}J{]}
+  Zone,Sum, Exterior Equipment FuelOilNo2 Energy {[}J{]}
 \item
   Zone,Sum, Exterior Equipment Propane Energy {[}J{]}
 \item

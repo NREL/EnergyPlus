@@ -110,7 +110,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -118,7 +118,7 @@
     NONE,                    !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -241,7 +241,9 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   Material,
     A1 - 1 IN STUCCO,        !- Name
@@ -2210,9 +2212,9 @@
     0.991,                   !- Design Air Flow Rate {m3/s}
     375.0,                   !- Design Fan Power {W}
     630.1,                   !- Design U-Factor Times Area Value {W/K}
-    0.0,                     !- Free Convection Air Flow Rate {m3/s}
-    ,                        !- Free Convection Air Flow Rate Sizing Factor
-    0.0,                     !- Free Convection U-Factor Times Area Value {W/K}
+    0.0,                     !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    0.0,                     !- Free Convection Regime U-Factor Times Area Value {W/K}
     ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
@@ -2309,8 +2311,8 @@
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2319,8 +2321,8 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2329,8 +2331,8 @@
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone1TermReheat,         !- Name
@@ -2527,37 +2529,37 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Source Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Rate,timestep;
+  Output:Variable,*,Heat Pump Source Side Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Load Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Inlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Inlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Outlet Temperature,timestep;
+  Output:Variable,*,Heat Pump Source Side Outlet Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Mass Flow Rate,timestep;
+  Output:Variable,*,Heat Pump Load Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Mass Flow Rate,timestep;
+  Output:Variable,*,Heat Pump Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 
@@ -2571,11 +2573,11 @@
 
   Output:Variable,*,Ground Heat Exchanger Average Fluid Temperature,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Energy,timestep;
+  Output:Variable,*,Heat Pump Load Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Energy,timestep;
+  Output:Variable,*,Heat Pump Source Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Pump Electric Power,timestep;
+  Output:Variable,*,Pump Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
@@ -2589,7 +2591,7 @@
 
   Output:Variable,*,Site Outdoor Air Wetbulb Temperature,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
   Output:Variable,Chilled Water Loop,Plant Supply Side Cooling Demand Rate,timestep;
 

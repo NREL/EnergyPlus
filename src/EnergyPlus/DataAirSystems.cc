@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,9 +46,10 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <Fans.hh>
-#include <HVACFan.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -117,7 +118,7 @@ namespace DataAirSystems {
         AirSysSubSubCompToPlant.deallocate(); // Connections
     }
 
-    Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
+    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
     {
         Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
 
@@ -125,11 +126,11 @@ namespace DataAirSystems {
 
         switch (dataFanEnumType) {
         case DataAirSystems::structArrayLegacyFanModels: {
-            fanDesHeatLoad = Fans::FanDesHeatGain(dataFanIndex, desVolFlow);
+            fanDesHeatLoad = Fans::FanDesHeatGain(state, dataFanIndex, desVolFlow);
             break;
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
-            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(desVolFlow);
+            fanDesHeatLoad = HVACFan::fanObjs[dataFanIndex]->getFanDesignHeatGain(state, desVolFlow);
             break;
         }
         case DataAirSystems::fanModelTypeNotYetSet: {

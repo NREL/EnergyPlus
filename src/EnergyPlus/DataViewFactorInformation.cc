@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <DataViewFactorInformation.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
 
 namespace EnergyPlus {
 
@@ -59,38 +59,22 @@ namespace DataViewFactorInformation {
     // MODULE INFORMATION:
     //       AUTHOR         Rob Hitchcock
     //       DATE WRITTEN   September 2007; Moved from HeatBalanceIntRadExchange
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
-    // PURPOSE OF THIS MODULE:
-    // <description>
-
-    // METHODOLOGY EMPLOYED:
-    // <description>
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // USE STATEMENTS:
-    // <use statements for data only modules>
-    // Using/Aliasing
     using namespace DataPrecisionGlobals;
 
-    // <use statements for access to subroutines in other modules>
+    int NumOfRadiantEnclosures(0); // Number of radiant enclosures
+    int NumOfSolarEnclosures(0);   // Number of solar enclosures
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    Array1D<ZoneViewFactorInformation> ZoneRadiantInfo;
+    Array1D<ZoneViewFactorInformation> ZoneSolarInfo;
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    // Object Data
-    Array1D<ZoneViewFactorInformation> ZoneInfo;
+    void clear_state()
+    {
+        NumOfRadiantEnclosures = 0;
+        NumOfSolarEnclosures = 0;
+        ZoneRadiantInfo.deallocate();
+        ZoneSolarInfo.deallocate();
+    }
 
 } // namespace DataViewFactorInformation
 

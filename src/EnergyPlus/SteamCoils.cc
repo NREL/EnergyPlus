@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,31 +53,32 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <Fans.hh>
-#include <FaultsManager.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportCoilSelection.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SteamCoils.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -172,7 +173,7 @@ namespace SteamCoils {
         CheckEquipName.deallocate();
     }
 
-    void SimulateSteamCoilComponents(std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq, // coil load to be met
@@ -229,7 +230,7 @@ namespace SteamCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitSteamCoil(CoilNum, FirstHVACIteration); // Initialize all SteamCoil related parameters
+        InitSteamCoil(state, CoilNum, FirstHVACIteration); // Initialize all SteamCoil related parameters
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -291,7 +292,7 @@ namespace SteamCoils {
         int NumAlphas;
         int NumNums;
         int IOStat;
-        static bool ErrorsFound(false);  // If errors detected in input
+        bool ErrorsFound(false);  // If errors detected in input
         std::string CurrentModuleObject; // for ease in getting objects
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
@@ -475,7 +476,7 @@ namespace SteamCoils {
 
     // Beginning Initialization Section of the Module
 
-    void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration)
+    void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
@@ -535,7 +536,8 @@ namespace SteamCoils {
 
         if (MyPlantScanFlag(CoilNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(SteamCoil(CoilNum).Name,
+            ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                    SteamCoil(CoilNum).Name,
                                     SteamCoil(CoilNum).Coil_PlantTypeNum,
                                     SteamCoil(CoilNum).LoopNum,
                                     SteamCoil(CoilNum).LoopSide,
@@ -555,7 +557,7 @@ namespace SteamCoils {
 
         if (!SysSizingCalc && MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
-            SizeSteamCoil(CoilNum);
+            SizeSteamCoil(state, CoilNum);
             MySizeFlag(CoilNum) = false;
         }
 
@@ -670,7 +672,7 @@ namespace SteamCoils {
         //                                                   SteamCoil(CoilNum)%MaxSteamMassFlowRate)
     }
 
-    void SizeSteamCoil(int const CoilNum)
+    void SizeSteamCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -749,7 +751,7 @@ namespace SteamCoils {
         DesVolFlow = 0.0;
         CpWater = 0.0;
         RhoAirStd = PsyRhoAirFnPbTdbW(StdBaroPress, 20.0, 0.0);
-        CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+        CpAirStd = PsyCpAirFnW(0.0);
         bool coilWasAutosized(false); // coil report
 
         // If this is a steam coil
@@ -779,10 +781,10 @@ namespace SteamCoils {
                         SizingString = "";
                         bPRINT = false;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DataDesInletAirTemp = TempSize;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DataDesOutletAirTemp = TempSize;
                         if (CurOASysNum > 0) {
                             OASysEqSizing(CurOASysNum).AirFlow = true;
@@ -809,7 +811,7 @@ namespace SteamCoils {
                     if (DataDesicRegCoil) {
                         bPRINT = false;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DesVolFlow = TempSize;
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;
@@ -869,7 +871,7 @@ namespace SteamCoils {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum;
                     if (SupFanNum > 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(SteamCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilSupplyFanInfo(state, SteamCoil(CoilNum).Name,
                                                                      "Coil:Heating:Steam",
                                                                      Fans::Fan(DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
@@ -880,7 +882,7 @@ namespace SteamCoils {
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
                     if (DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(
+                        coilSelectionReportObj->setCoilSupplyFanInfo(state,
                             SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
                             HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
@@ -917,7 +919,7 @@ namespace SteamCoils {
                         CoilOutHumRat = FinalZoneSizing(CurZoneEqNum).HeatDesHumRat;
                         DesMassFlow = FinalZoneSizing(CurZoneEqNum).DesHeatMassFlow;
                         DesVolFlow = DesMassFlow / RhoAirStd;
-                        DesCoilLoad = PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp)) * DesMassFlow * (CoilOutTemp - CoilInTemp);
+                        DesCoilLoad = PsyCpAirFnW(CoilOutHumRat) * DesMassFlow * (CoilOutTemp - CoilInTemp);
                         if (DesCoilLoad >= SmallLoad) {
                             TempSteamIn = 100.0;
                             // RefrigIndex is set during GetInput for this module
@@ -1129,7 +1131,7 @@ namespace SteamCoils {
         }
 
         if (AirMassFlow > 0.0) { // If the coil is operating
-            CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+            CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
         } else {
             CapacitanceAir = 0.0;
         }
@@ -1197,7 +1199,7 @@ namespace SteamCoils {
                     HeatingCoilLoad = QCoilCap;
 
                     // Temperature of air at outlet
-                    TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                    TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
 
                     SteamCoil(CoilNum).OutletSteamMassFlowRate = SteamMassFlowRate;
                     SteamCoil(CoilNum).InletSteamMassFlowRate = SteamMassFlowRate;
@@ -1307,7 +1309,7 @@ namespace SteamCoils {
                         QCoilCap = QSteamCoilMaxHT;
 
                         // Temperature of air at outlet
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
 
                         // In practice Sensible & Superheated heat transfer is negligible compared to latent part.
                         // This is required for outlet water temperature, otherwise it will be saturation temperature.
@@ -1329,7 +1331,7 @@ namespace SteamCoils {
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
 
                         // Total Heat Transfer to air
                         HeatingCoilLoad = QCoilCap;
@@ -1363,7 +1365,7 @@ namespace SteamCoils {
 
                         // recalculate in case previous call changed mass flow rate
                         QCoilCap = SteamMassFlowRate * (LatentHeatSteam + SubcoolDeltaTemp * CpWater);
-                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnWTdb(Win, TempAirIn));
+                        TempAirOut = TempAirIn + QCoilCap / (AirMassFlow * PsyCpAirFnW(Win));
 
                         // Total Heat Transfer to air
                         HeatingCoilLoad = QCoilCap;
@@ -2068,7 +2070,7 @@ namespace SteamCoils {
         return NodeNumber;
     }
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )

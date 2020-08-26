@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -64,6 +65,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -168,7 +170,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -198,7 +201,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cNumericFields);
 
     ErrorsFound = false;
-    ProcessOAControllerInputs(CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -485,7 +489,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
     EXPECT_EQ(2, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -570,7 +574,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     AirLoopControlInfo(AirLoopNum).HeatingActiveFlag = true;
     // setup OA system and initialize nodes
     //		ManageOutsideAirSystem( "OA Sys 1", true, AirLoopNum, OAControllerNum );
-    OAController(OAControllerNum).CalcOAController(AirLoopNum, true);
+    OAController(OAControllerNum).CalcOAController(state, AirLoopNum, true);
 
     expectedMinOAflow =
         0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
@@ -592,7 +596,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     OAController(OAControllerNum).OATemp = 0.0;
     Node(OAControllerNum * 4 - 2).Temp = OAController(OAControllerNum).OATemp; // OA inlet (actuated) air nodes, dry air
 
-    OAController(OAControllerNum).CalcOAController(AirLoopNum, true);
+    OAController(OAControllerNum).CalcOAController(state, AirLoopNum, true);
 
     expectedMinOAflow =
         0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
@@ -613,7 +617,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     OAController(OAControllerNum).InletTemp = 20.0; // This is the same as the outdoor air dry bulb for these tests
     OAController(OAControllerNum).OATemp = 20.0;
     Node(OAControllerNum * 4 - 2).Temp = OAController(OAControllerNum).OATemp; // OA inlet (actuated) air nodes, dry air
-    OAController(OAControllerNum).CalcOAController(AirLoopNum, true);
+    OAController(OAControllerNum).CalcOAController(state, AirLoopNum, true);
 
     expectedMinOAflow =
         0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
@@ -635,7 +639,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     OAController(OAControllerNum).OATemp = 0.0;
     Node(OAControllerNum * 4 - 2).Temp = OAController(OAControllerNum).OATemp; // OA inlet (actuated) air nodes, dry air
 
-    OAController(OAControllerNum).CalcOAController(AirLoopNum, true);
+    OAController(OAControllerNum).CalcOAController(state, AirLoopNum, true);
 
     expectedMinOAflow =
         0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
@@ -658,7 +662,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HXBypassOptionTest)
     Node(OAControllerNum * 4 - 3).MassFlowRate = OAController(OAControllerNum).MixMassFlow; // set the mixed air node mass flow rate
     Node(OAControllerNum * 4 - 2).Temp = OAController(OAControllerNum).OATemp;              // OA inlet (actuated) air nodes, dry air
 
-    OAController(OAControllerNum).CalcOAController(AirLoopNum, true);
+    OAController(OAControllerNum).CalcOAController(state, AirLoopNum, true);
 
     expectedMinOAflow =
         0.2 * StdRhoAir * OAController(OAControllerNum).MixMassFlow / AirLoopFlow(AirLoopNum).DesSupply; // For Proportional minimum input
@@ -751,7 +755,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
     AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(7, VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
@@ -792,7 +796,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     OutBaroPress = 101325;
     ZoneSysEnergyDemand.allocate(1);
 
-    OAController(1).CalcOAController(1, true);
+    OAController(1).CalcOAController(state, 1, true);
 
     EXPECT_NEAR(0.0194359, OAController(1).OAMassFlow, 0.00001);
     EXPECT_NEAR(0.009527, OAController(1).MinOAFracLimit, 0.00001);
@@ -829,7 +833,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     AirLoopZoneInfo(1).ActualZoneNumber.allocate(1);
     AirLoopZoneInfo(1).ActualZoneNumber(1) = 1;
 
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy", DataSizing::cOAFlowMethodTypes(VentilationMechanical(1).ZoneOAFlowMethod(1)));
 
     OutsideAirSys.deallocate();
@@ -957,7 +961,7 @@ TEST_F(EnergyPlusFixture, MissingDesignOccupancyTest)
     GetZoneAirDistribution();
     GetZoneSizingInput();
     DataGlobals::DoZoneSizing = true;
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(0.00944, VentilationMechanical(1).ZoneOAPeopleRate(1));
     EXPECT_EQ(0.00, VentilationMechanical(1).ZoneOAAreaRate(1));
@@ -1075,7 +1079,7 @@ TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
     AirLoopFlow(AirloopNum).DesSupply = 1.0 * DataEnvironment::StdRhoAir;
 
     // setup OA system and initialize nodes
-    ManageOutsideAirSystem("OA Sys 1", true, AirloopNum, OASysNum);
+    ManageOutsideAirSystem(state, "OA Sys 1", true, AirloopNum, OASysNum);
 
     // reset nodes to common property
     for (int i = 1; i <= DataLoopNode::NumOfNodes; ++i) {
@@ -1088,14 +1092,14 @@ TEST_F(EnergyPlusFixture, MixedAir_TestHXinOASystem)
     }
 
     // simulate OA system, common node property is propogated
-    ManageOutsideAirSystem("OA Sys 1", true, AirloopNum, OASysNum);
+    ManageOutsideAirSystem(state, "OA Sys 1", true, AirloopNum, OASysNum);
 
     // change node property at OA inlet and mixer inlet
     Node(2).Temp = 18.0; // reset temps at HX
     Node(5).Temp = 24.0;
 
     // simulate OA system
-    ManageOutsideAirSystem("OA Sys 1", true, AirloopNum, OASysNum);
+    ManageOutsideAirSystem(state, "OA Sys 1", true, AirloopNum, OASysNum);
 
     int mixedAirNode = OAController(OAControllerNum).MixNode;
     int mixerIntletNode = OAController(OAControllerNum).InletNode;
@@ -1233,12 +1237,12 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     DataSizing::SysSizingRunDone = false;
     DataSizing::CurSysNum = 1;
 
-    GetOutsideAirSysInputs();
+    GetOutsideAirSysInputs(state);
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("DOAS OA SYSTEM", OutsideAirSys(OASysNum).Name);
 
     // setup OA system and initialize nodes
-    ManageOutsideAirSystem(OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
+    ManageOutsideAirSystem(state, OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
     // reset nodes to common property
     for (int i = 1; i <= DataLoopNode::NumOfNodes; ++i) {
         Node(i).Temp = 20.0;
@@ -1249,7 +1253,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
         Node(i).Press = 101250.0;
     }
     // simulate OA system, common node properties are propagated
-    ManageOutsideAirSystem(OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
+    ManageOutsideAirSystem(state, OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
     // humidifier water and electric use rate are zero (no Hum Rat setpoint applied)
     EXPECT_EQ(0.0, Humidifiers::Humidifier(HumNum).WaterAdd);
     EXPECT_EQ(0.0, Humidifiers::Humidifier(HumNum).ElecUseRate);
@@ -1257,7 +1261,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HumidifierOnOASystemTest)
     // Add humidity ratio setpoint to the humidifier air outlet node
     Node(2).HumRatMin = 0.005; // humidity ratio setpoint value
     // simulate OA system
-    ManageOutsideAirSystem(OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
+    ManageOutsideAirSystem(state, OutsideAirSys(OASysNum).Name, true, AirloopNum, OASysNum);
     // get humidifier's air inlet and outlet node number
     AirInNode = Humidifiers::Humidifier(HumNum).AirInNode;
     AirOutNode = Humidifiers::Humidifier(HumNum).AirOutNode;
@@ -1302,7 +1306,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     AirLoopControlInfo.allocate(1); // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
     AirLoopFlow.allocate(1);        // will be deallocated by MixedAir::clear_state(); in EnergyPlusFixture
@@ -1347,7 +1351,7 @@ TEST_F(EnergyPlusFixture, FreezingCheckTest)
     OAController(1).CoolCoilFreezeCheck = true;
     Schedule(1).CurrentValue = 1.0;
 
-    OAController(OAControllerNum).CalcOAController(AirLoopNum, true);
+    OAController(OAControllerNum).CalcOAController(state, AirLoopNum, true);
 
     EXPECT_NEAR(0.2408617, OAController(1).OAFractionRpt, 0.00001);
 }
@@ -1498,7 +1502,8 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(CurrentModuleObject,
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -1520,6 +1525,178 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
         "   **   ~~~   ** ...Control High Indoor Humidity Based on Outdoor Humidity Ratio will default to Yes when High Humidity Control= \"Yes\"",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
+{
+    std::string const idf_objects = delimited_string({
+        "  OutdoorAir:Node,",
+        "    Outside Air Inlet Node 1; !- Name",
+
+        "  Schedule:Constant,",
+        "    Min OA Sched,             !- Name",
+        "     Any Number,              !- Schedule Type Limits Name",
+        "     0.5;                     !- Value",
+
+        "  ScheduleTypeLimits,",
+        "    Any Number;              !- Name",
+
+        "  Controller:OutdoorAir,",
+        "    OA Controller 1,          !- Name",
+        "    Relief Air Outlet Node 1, !- Relief Air Outlet Node Name",
+        "    VAV Sys 1 Inlet Node,     !- Return Air Node Name",
+        "    Mixed Air Node 1,         !- Mixed Air Node Name",
+        "    Outside Air Inlet Node 1, !- Actuator Node Name",
+        "    0.0,                      !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    2.5,                      !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    DifferentialDryBulb,      !- Economizer Control Type",
+        "    ModulateFlow,             !- Economizer Control Action Type",
+        "    ,                         !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    ,                         !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                         !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                         !- Electronic Enthalpy Limit Curve Name",
+        "    ,                         !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,                !- Lockout Type",
+        "    ProportionalMinimum,      !- Minimum Limit Type",
+        "    Min OA Sched,             !- Minimum Outdoor Air Schedule Name",
+        "    ,                         !- Minimum Fraction of Outdoor Air Schedule Name",
+        "    ,                         !- Maximum Fraction of Outdoor Air Schedule Name",
+        "    ,                         !- Mechanical Ventilation Controller Name",
+        "    ,                         !- Time of Day Economizer Control Schedule Name",
+        "    Yes,                      !- High Humidity Control",
+        "    Zone1,                    !- Humidistat Control Zone Name",
+        "    0.8,                      !- High Humidity Outdoor Air Flow Ratio",
+        "    Yes;                      !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    compare_err_stream(""); // just for debugging
+
+    bool ErrorsFound(false); // If errors detected in input
+    int ControllerNum(0);    // Controller number
+    int NumArg(0);
+    int NumNums(0);
+    int NumAlphas(0);
+    int IOStat(0);
+    std::string const CurrentModuleObject = CurrentModuleObjects(CMO_OAController);
+
+    inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
+
+    Array1D<Real64> NumArray(NumNums, 0.0);
+    Array1D_string AlphArray(NumAlphas);
+    Array1D_string cAlphaFields(NumAlphas);
+    Array1D_string cNumericFields(NumNums);
+    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    Array1D_bool lNumericBlanks(NumNums, true);
+
+    NumOAControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+    OAController.allocate(NumOAControllers);
+
+    ControllerNum = 1;
+    Zone.allocate(1);
+    Zone(1).Name = "ZONE1";
+    NumOfZones = 1;
+    ZoneEquipConfig.allocate(1);
+    ZoneEquipConfig(1).ActualZoneNum = 1;
+    ZoneEquipConfig(1).ZoneNode = 2;
+    ZoneEquipConfig(1).NumInletNodes = 1;
+    ZoneEquipConfig(1).InletNodeAirLoopNum.allocate(1);
+    ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
+    PrimaryAirSystem.allocate(1);
+    AirLoopControlInfo.allocate(1);
+    PrimaryAirSystem(1).NumBranches = 1;
+    PrimaryAirSystem(1).Branch.allocate(1);
+    PrimaryAirSystem(1).Branch(1).Comp.allocate(1);
+    PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+    PrimaryAirSystem(1).Branch(1).Comp(1).Name = "OASysName";
+    PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+    OutsideAirSys.allocate(1);
+    OutsideAirSys(1).Name = "OASysName";
+    OutsideAirSys(1).NumControllers = 1;
+    OutsideAirSys(1).ControllerType.allocate(1);
+    OutsideAirSys(1).ControllerType(1) = "Controller:OutdoorAir";
+    OutsideAirSys(1).ControllerName.allocate(1);
+    OutsideAirSys(1).ControllerName(1) = "OA Controller 1";
+    DataAirLoop::NumOASystems = 1;
+    HumidityControlZone.allocate(1);
+    HumidityControlZone(1).ActualZoneNum = 1;
+    NumHumidityControlZones = 1;
+
+    inputProcessor->getObjectItem(CurrentModuleObject,
+                                  ControllerNum,
+                                  AlphArray,
+                                  NumAlphas,
+                                  NumArray,
+                                  NumNums,
+                                  IOStat,
+                                  lNumericBlanks,
+                                  lAlphaBlanks,
+                                  cAlphaFields,
+                                  cNumericFields);
+
+    ProcessOAControllerInputs(state,
+                              CurrentModuleObject,
+                              ControllerNum,
+                              AlphArray,
+                              NumAlphas,
+                              NumArray,
+                              NumNums,
+                              lNumericBlanks,
+                              lAlphaBlanks,
+                              cAlphaFields,
+                              cNumericFields,
+                              ErrorsFound);
+    // compare_err_stream( "" ); // just for debugging
+
+    EXPECT_FALSE(ErrorsFound);
+    EXPECT_FALSE(OAController(ControllerNum)
+                     .ModifyDuringHighOAMoisture); // "Control High Indoor Humidity Based on Outdoor Humidity Ratio = Yes" sets this to false
+    EXPECT_FALSE(has_err_output(true));
+    EXPECT_EQ(OAController(ControllerNum).HumidistatZoneNum, 1);
+
+    // Set up conditions
+    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).TotalOutputRequired = -1.0; // dehumidification requested by humidistat
+    EXPECT_EQ(OAController(ControllerNum).NodeNumofHumidistatZone, ZoneEquipConfig(1).ZoneNode);
+    int airLoopNum = 1;
+    int outAirMinFrac = 0.0;
+    Real64 OASignal = 0.0;
+    bool HighHumidityOperationFlag = false;
+    bool firstHVACIteration = false;
+    OAController(ControllerNum).MixSetTemp = 15.0;
+    OAController(ControllerNum).RetTemp = 20.0;
+    OAController(ControllerNum).InletTemp = 25.0;
+    OAController(ControllerNum).MixMassFlow = 2.5;
+    OAController(ControllerNum).MaxOAMassFlowRate = 2.5;
+
+    // Case 1 - OA humrat = zone humrat - no high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006;
+    OAController(ControllerNum).CalcOAEconomizer(state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_FALSE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.0, 0.00001);
+
+    // Case 2 - OA humrat < zone humrat - high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff;
+    OAController(ControllerNum).CalcOAEconomizer(state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_TRUE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.8, 0.00001);
+
+    // Case 3 - OA humrat within tolerance of zone humrat - no high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006 - DataHVACGlobals::SmallHumRatDiff / 2.0;
+    OAController(ControllerNum).CalcOAEconomizer(state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_FALSE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.0, 0.00001);
+
+    // Case 4 - OA humrat slightly above zone humrat - no high humidity operation
+    Node(ZoneEquipConfig(1).ZoneNode).HumRat = 0.006;
+    OAController(ControllerNum).OAHumRat = 0.006 + DataHVACGlobals::SmallHumRatDiff / 2.0;
+    OAController(ControllerNum).CalcOAEconomizer(state, airLoopNum, outAirMinFrac, OASignal, HighHumidityOperationFlag, firstHVACIteration);
+    EXPECT_FALSE(OAController(ControllerNum).HighHumCtrlActive);
+    EXPECT_NEAR(OASignal, 0.0, 0.00001);
 }
 
 TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
@@ -1564,7 +1741,7 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
     AirLoopControlInfo.allocate(1);
     AirLoopControlInfo(1).LoopFlowRateSet = true;
 
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     StdRhoAir = 1.2;
     OAController(1).MixMassFlow = 1.7 * StdRhoAir;
@@ -1599,17 +1776,17 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
     PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
 
     // mixed node temperature set point has not yet been set, expect OA controller mixed temp SP to be equal to low temp limit
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ(OAController(1).MixSetTemp, OAController(1).TempLowLim);
 
     // expect OA controller mixed node temp SP to be equal to 0.5 C.
     Node(1).TempSetPoint = 0.5;
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ(OAController(1).MixSetTemp, 0.5);
 
     // expect OA controller mixed node temp SP to be less than 0 and equal to -5.0 C.
     Node(1).TempSetPoint = -5.0;
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ(OAController(1).MixSetTemp, -5.0);
 }
 
@@ -1708,7 +1885,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart1)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(1, GetNumOAMixers());
     EXPECT_EQ(1, GetNumOAControllers());
@@ -5036,7 +5213,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MiscGetsPart2)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(6, GetNumOAMixers());
     EXPECT_EQ(1, GetNumOAControllers());
@@ -5086,7 +5263,7 @@ TEST_F(EnergyPlusFixture, MechVentController_IAQPTests)
     DataContaminantBalance::ZoneSysContDemand(1).OutputRequiredToGCSP = 1.0;
     DataContaminantBalance::ZoneSysContDemand(2).OutputRequiredToGCSP = 0.5;
 
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     // Case 1 - System OA method = IndoorAirQualityProcedure, SOAM_IAQP, controls to OutputRequiredToCO2SP
     OAMassFlow = 0.0;
@@ -5294,7 +5471,7 @@ TEST_F(EnergyPlusFixture, MechVentController_ZoneSumTests)
     DataHeatBalance::ZoneIntGain(6).NOFOCC = 6;
 
     SizingManager::GetOARequirements();
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
     EXPECT_EQ(SOAM_ZoneSum, VentilationMechanical(1).SystemOAMethod);
 
     // Summary of inputs and expected OA flow rate for each zone, StdRho = 1, so mass flow = volume flow for these tests
@@ -5442,7 +5619,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     AirLoopFlow(1).OAFrac = 0.01;    // DataAirLoop variable (AirloopHVAC)
     AirLoopFlow(1).OAMinFrac = 0.01; // DataAirLoop variable (AirloopHVAC)
 
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
     EXPECT_EQ(8, VentilationMechanical(1).SystemOAMethod);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
@@ -5492,10 +5669,24 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOARateTest)
     Zone(1).ZoneMaxCO2SchedIndex = 7;
     Schedule(8).CurrentValue = 0.01;
 
-    OAController(1).CalcOAController(1, true);
+    OAController(1).CalcOAController(state, 1, true);
 
     EXPECT_NEAR(0.003183055786, OAController(1).OAMassFlow, 0.00001);
     EXPECT_NEAR(0.001560321463, OAController(1).MinOAFracLimit, 0.00001);
+
+    // #5846
+    OAController(1).MinOAMassFlowRate = 0.05;
+    DataGlobals::WarmupFlag = false;
+    OAController(1).CalcOAController(state, 1, true);
+    EXPECT_NEAR(0.006, OAController(1).OAMassFlow, 0.0001);
+    std::string const error_string = delimited_string({
+        "   ** Warning ** CalcOAController: Minimum OA fraction > Mechanical Ventilation Controller request for Controller:OutdoorAir=OA CONTROLLER 1, Min OA fraction is used.",
+        "   **   ~~~   ** This may be overriding desired ventilation controls. Check inputs for Minimum Outdoor Air Flow Rate, Minimum Outdoor Air Schedule Name and Controller:MechanicalVentilation",
+        "   **   ~~~   ** Minimum OA fraction = 2.9412E-003, Mech Vent OA fraction = 1.5603E-003",
+        "   **   ~~~   **  Environment=, at Simulation time= 00:00 - 00:00",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     AirLoopControlInfo.deallocate();
     OARequirements.deallocate();
@@ -5733,9 +5924,9 @@ TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
 
-    GetOutsideAirSysInputs();
+    GetOutsideAirSysInputs(state);
 
     auto &CurrentOASystem(DataAirLoop::OutsideAirSys[0]);
 
@@ -5751,7 +5942,7 @@ TEST_F(EnergyPlusFixture, MixedAir_OAControllerOrderInControllersListTest)
     int AirLoopNum = 0;
     bool FirstHVACIteration = true;
     // sim OAController with OAControllerIndex = 0 for the first time only
-    SimOAController(CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
+    SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
     // OAControllerIndex is set during first time InitOAController run
     EXPECT_EQ(CurrentOASystem.OAControllerIndex, 1);
 }
@@ -5815,7 +6006,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
     EXPECT_EQ(2, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -5902,7 +6093,7 @@ TEST_F(EnergyPlusFixture, OAController_ProportionalMinimum_HXBypassTest)
     OAMassFlowActual = OutAirMassFlowFracActual * MixedAirMassFlow;
 
     // run OA controller and OA economizer
-    curOACntrl.CalcOAController(AirLoopNum, true);
+    curOACntrl.CalcOAController(state, AirLoopNum, true);
 
     // check min OA flow and fraction
     EXPECT_EQ(OAMassFlowAMin, curAirLoopFlow.MinOutAir);
@@ -6001,7 +6192,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetOutsideAirSysInputs();
+    GetOutsideAirSysInputs(state);
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("OA SYS", OutsideAirSys(1).Name);
 
@@ -6009,7 +6200,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     EXPECT_EQ("OA HEAT RECOVERY", OutsideAirSys(1).ComponentName(1));
     EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(2));
 
-    GetOAControllerInputs();
+    GetOAControllerInputs(state);
     EXPECT_EQ(5, OAController(1).OANode);
     EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
 
@@ -6097,7 +6288,7 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     OAMassFlowActual = OutAirMassFlowFracActual * MixedAirMassFlow;
 
     // run OA controller and OA economizer
-    curOACntrl.CalcOAController(AirLoopNum, true);
+    curOACntrl.CalcOAController(state, AirLoopNum, true);
 
     // check min OA flow and fraction
     EXPECT_EQ(OAMassFlowAMin, curAirLoopFlow.MinOutAir);
@@ -6111,4 +6302,500 @@ TEST_F(EnergyPlusFixture, OAController_FixedMinimum_MinimumLimitTypeTest)
     EXPECT_TRUE(AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass);
 }
 
+TEST_F(EnergyPlusFixture, OAController_HighExhaustMassFlowTest)
+{
+    std::string const idf_objects = delimited_string({
+
+        "  OutdoorAir:Node,",
+        "    Outside Air Inlet Node;  !- Name",
+
+        "  Controller:OutdoorAir,",
+        "    OA Controller,           !- Name",
+        "    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
+        "    VAV Sys Inlet Node,      !- Return Air Node Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    Outside Air Inlet Node,  !- Actuator Node Name",
+        "    0.2,                     !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    1.0,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    DifferentialDryBulb,     !- Economizer Control Type",
+        "    ModulateFlow,            !- Economizer Control Action Type",
+        "    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                        !- Electronic Enthalpy Limit Curve Name",
+        "    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,               !- Lockout Type",
+        "    FixedMinimum,            !- Minimum Limit Type",
+        "    ,                        !- Minimum Outdoor Air Schedule Name",
+        "    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+        "    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+        "    ,                        !- Mechanical Ventilation Controller Name",
+        "    ,                        !- Time of Day Economizer Control Schedule Name",
+        "    No,                      !- High Humidity Control",
+        "    ,                        !- Humidistat Control Zone Name",
+        "    ,                        !- High Humidity Outdoor Air Flow Ratio",
+        "    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+        "    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type",
+
+        "  HeatExchanger:AirToAir:SensibleAndLatent,",
+        "    OA Heat Recovery,        !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}",
+        "    0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "    0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "    0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "    0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "    Outside Air Inlet Node,  !- Supply Air Inlet Node Name",
+        "    OA HR Outlet Node,       !- Supply Air Outlet Node Name",
+        "    Relief Air Outlet Node,  !- Exhaust Air Inlet Node Name",
+        "    HR Exhaust Air Outlet Node,  !- Exhaust Air Outlet Node Name",
+        "    1500.0,                  !- Nominal Electric Power {W}",
+        "    Yes,                     !- Supply Air Outlet Temperature Control",
+        "    Rotary,                  !- Heat Exchanger Type",
+        "    ExhaustOnly,             !- Frost Control Type",
+        "    -23.3,                   !- Threshold Temperature {C}",
+        "    0.167,                   !- Initial Defrost Time Fraction {dimensionless}",
+        "    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}",
+
+        "  OutdoorAir:Mixer,",
+        "    OA Mixer,                !- Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    OA HR Outlet Node,       !- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node,  !- Relief Air Stream Node Name",
+        "    VAV Sys Inlet Node;      !- Return Air Stream Node Name",
+
+        " AirLoopHVAC:ControllerList,",
+        "    OA Sys Controller,       !- Name",
+        "    Controller:OutdoorAir,   !- Controller 1 Object Type",
+        "    OA Controller;           !- Controller 1 Name",
+
+        " AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+        "    OA Sys Equipment list,   !- Name",
+        "    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type",
+        "    OA Heat Recovery,        !- Component 1 Name",
+        "    Coil:Heating:Electric,   !- Component 2 Object Type",
+        "    OA Sys Heating Coil,     !- Component 2 Name",
+        "    OutdoorAir:Mixer,        !- Component 3 Object Type",
+        "    OA Mixer;                !- Component 3 Name",
+
+        " AirLoopHVAC:OutdoorAirSystem,",
+        "    OA Sys,                  !- Name",
+        "    OA Sys controller,       !- Controller List Name",
+        "    OA Sys Equipment list;   !- Outdoor Air Equipment List Name",
+
+        " Coil:Heating:Electric,",
+        "    OA Sys Heating Coil,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    1,                       !- Efficiency",
+        "    2500,                    !- Nominal Capacity{ W }",
+        "    Outside Air Inlet Node,  !- Air Inlet Node Name",
+        "    OA Sys HC Outlet Node,   !- Air Outlet Node Name",
+        "    OA Sys HC Outlet Node;   !- Temperature Setpoint Node Name"
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetOutsideAirSysInputs(state);
+    EXPECT_EQ(1, NumOASystems);
+    EXPECT_EQ("OA SYS", OutsideAirSys(1).Name);
+
+    EXPECT_EQ(3, OutsideAirSys(1).NumComponents);
+    EXPECT_EQ("OA HEAT RECOVERY", OutsideAirSys(1).ComponentName(1));
+    EXPECT_EQ("OA SYS HEATING COIL", OutsideAirSys(1).ComponentName(2));
+    EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(3));
+
+    GetOAControllerInputs(state);
+    EXPECT_EQ(5, OAController(1).OANode);
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+
+    int OAControllerNum(1);
+    int AirLoopNum(1);
+
+    DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataEnvironment::StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+    // assume dry air (zero humidity ratio)
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, 20.0, 0.0);
+
+    AirLoopFlow.allocate(1);
+    PrimaryAirSystem.allocate(1);
+    AirLoopControlInfo.allocate(1);
+
+    auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
+    auto &curOACntrl(OAController(OAControllerNum));
+    auto &AirLoopCntrlInfo(AirLoopControlInfo(AirLoopNum));
+    auto &PrimaryAirSys(PrimaryAirSystem(AirLoopNum));
+
+    PrimaryAirSys.NumBranches = 1;
+    PrimaryAirSys.Branch.allocate(1);
+    PrimaryAirSys.Branch(1).TotalComponents = 1;
+    PrimaryAirSys.Branch(1).Comp.allocate(1);
+    PrimaryAirSys.Branch(1).Comp(1).Name = "OA Sys";
+    PrimaryAirSys.Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+
+    Real64 DesignSupplyAirMassFlow = 1.0 * DataEnvironment::StdRhoAir;
+    Real64 MixedAirMassFlow = DesignSupplyAirMassFlow;
+
+    curAirLoopFlow.DesSupply = DesignSupplyAirMassFlow;
+
+    // Initialize common AirLoop data
+    AirLoopCntrlInfo.OASysNum = AirLoopNum;
+    AirLoopCntrlInfo.EconoLockout = false;
+    AirLoopCntrlInfo.NightVent = false;
+    AirLoopCntrlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
+    AirLoopCntrlInfo.LoopFlowRateSet = false;
+    AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
+    AirLoopCntrlInfo.OASysComponentsSimulated = true;
+    AirLoopCntrlInfo.EconomizerFlowLocked = false;
+    AirLoopCntrlInfo.HeatRecoveryBypass = false;
+    AirLoopCntrlInfo.HeatRecoveryResimFlag = false;
+    AirLoopCntrlInfo.HeatingActiveFlag = false;
+
+    // Initialize OA controller and node data
+    curOACntrl.MinOAMassFlowRate = curOACntrl.MinOA * DataEnvironment::StdRhoAir;
+    curOACntrl.MaxOAMassFlowRate = curOACntrl.MaxOA * DataEnvironment::StdRhoAir;
+    curOACntrl.InletNode = curOACntrl.OANode;
+    curOACntrl.RetTemp = 20.0;
+    curOACntrl.OATemp = -10.0;
+    curOACntrl.InletTemp = curOACntrl.OATemp;
+    curOACntrl.MixSetTemp = 5.0;
+    // exhaust mass flow rate is set to design supply flow rate
+    curOACntrl.ExhMassFlow = DesignSupplyAirMassFlow;
+    curOACntrl.MixMassFlow = MixedAirMassFlow;
+
+    // Initialize air node data
+    Node(curOACntrl.MixNode).MassFlowRate = curOACntrl.MixMassFlow;
+    Node(curOACntrl.MixNode).MassFlowRateMaxAvail = curOACntrl.MixMassFlow;
+    Node(curOACntrl.RetNode).Temp = curOACntrl.RetTemp;
+    Node(curOACntrl.RetNode).Enthalpy = Psychrometrics::PsyHFnTdbW(curOACntrl.RetTemp, 0.0);
+    Node(curOACntrl.MixNode).TempSetPoint = curOACntrl.MixSetTemp;
+    Node(curOACntrl.OANode).Temp = curOACntrl.OATemp;
+    Node(curOACntrl.OANode).Enthalpy = Psychrometrics::PsyHFnTdbW(curOACntrl.InletTemp, 0.0);
+
+    Real64 OAMassFlowActual(0.0);
+    Real64 OAMassFlowAMin(0.0);
+    Real64 OutAirMassFlowFracMin(0.0);
+    Real64 OutAirMassFlowFracActual(0.0);
+
+    // check OA controller inputs
+    EXPECT_EQ(curOACntrl.MinOA, 0.2);                 // user specified minimum OA vol flow rate
+    EXPECT_TRUE(curOACntrl.FixedMin);                 // Economizer Minimum Limit Type = FixedMinimum
+    EXPECT_EQ(curOACntrl.Lockout, NoLockoutPossible); // NoLockout (ecoomizer always active)
+    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+
+    // calc minimum OA mass flow for FixedMinimum
+    OAMassFlowAMin = curOACntrl.MinOA * DataEnvironment::StdRhoAir;
+    // calc minimum OA mass flow fraction
+    OutAirMassFlowFracMin = OAMassFlowAMin / DesignSupplyAirMassFlow;
+
+    // calc actual OA mass flow fraction
+    OutAirMassFlowFracActual = (curOACntrl.MixSetTemp - curOACntrl.RetTemp) / (curOACntrl.InletTemp - curOACntrl.RetTemp);
+    EXPECT_EQ(0.5, OutAirMassFlowFracActual);
+    // calc actual OA mass flow
+    OAMassFlowActual = OutAirMassFlowFracActual * MixedAirMassFlow;
+
+    // run OA controller and OA economizer
+    curOACntrl.CalcOAController(state, AirLoopNum, true);
+    // actual OA mass flow is not allowed to fall below exhaust mass flow
+    // actual OA mass flow is dectated by the amount of exhaust mass flow
+    OAMassFlowActual = max(curOACntrl.ExhMassFlow, curOACntrl.OAMassFlow);
+    OutAirMassFlowFracActual = OAMassFlowActual / curOACntrl.MixMassFlow;
+    // check min OA flow and fraction
+    EXPECT_EQ(OAMassFlowAMin, curAirLoopFlow.MinOutAir);
+    EXPECT_EQ(0.2, curAirLoopFlow.OAMinFrac);
+    EXPECT_EQ(OutAirMassFlowFracMin, curAirLoopFlow.OAMinFrac);
+    // check actual OA flow and fraction
+    EXPECT_EQ(OAMassFlowActual, curOACntrl.OAMassFlow);
+    EXPECT_EQ(OAMassFlowActual, curAirLoopFlow.OAFlow);
+    EXPECT_EQ(1.0, curAirLoopFlow.OAFrac);
+    EXPECT_EQ(OutAirMassFlowFracActual, curAirLoopFlow.OAFrac);
+    // check HX bypass status
+    EXPECT_GT(OAMassFlowActual, OAMassFlowAMin);
+    EXPECT_EQ(OAMassFlowActual, curOACntrl.MixMassFlow);
+    EXPECT_EQ(1, curOACntrl.HeatRecoveryBypassStatus);
+    EXPECT_TRUE(AirLoopCntrlInfo.HeatRecoveryBypass);
+    EXPECT_FALSE(AirLoopCntrlInfo.HeatingActiveFlag);
+    EXPECT_EQ(0, curOACntrl.HRHeatingCoilActive);
+
+    // reduced mixed air temperature setpoint such that it increases
+    // the actual OA mass flow and trigger the heat recovery by pass
+    curOACntrl.MixSetTemp = 2.0;
+    AirLoopCntrlInfo.HeatingActiveFlag = true; // active heating coil
+    // calc actual OA mass flow fraction
+    OutAirMassFlowFracActual = (curOACntrl.MixSetTemp - curOACntrl.RetTemp) / (curOACntrl.InletTemp - curOACntrl.RetTemp);
+    EXPECT_EQ(0.6, OutAirMassFlowFracActual);
+    // calc actual OA mass flow
+    OAMassFlowActual = OutAirMassFlowFracActual * MixedAirMassFlow;
+    // run OA controller and OA economizer
+    curOACntrl.CalcOAController(state, AirLoopNum, true);
+    // actual OA mass flow is not allowed to fall below exhaust mass flow
+    // actual OA mass flow is dectated by the amount of exhaust mass flow
+    OAMassFlowActual = max(curOACntrl.ExhMassFlow, curOACntrl.OAMassFlow);
+    OutAirMassFlowFracActual = OAMassFlowActual / curOACntrl.MixMassFlow;
+    // check min OA flow and fraction
+    EXPECT_EQ(OAMassFlowAMin, curAirLoopFlow.MinOutAir);
+    EXPECT_EQ(0.2, curAirLoopFlow.OAMinFrac);
+    EXPECT_EQ(OutAirMassFlowFracMin, curAirLoopFlow.OAMinFrac);
+    // check actual OA flow and fraction
+    EXPECT_EQ(OAMassFlowActual, curOACntrl.OAMassFlow);
+    EXPECT_EQ(OAMassFlowActual, curAirLoopFlow.OAFlow);
+    EXPECT_EQ(1.0, curAirLoopFlow.OAFrac);
+    EXPECT_EQ(OutAirMassFlowFracActual, curAirLoopFlow.OAFrac);
+    // check HX bypass status
+    EXPECT_GT(OAMassFlowActual, OAMassFlowAMin);
+    EXPECT_EQ(OAMassFlowActual, curOACntrl.MixMassFlow);
+    EXPECT_EQ(1, curOACntrl.HeatRecoveryBypassStatus);
+    EXPECT_TRUE(AirLoopCntrlInfo.HeatRecoveryBypass);
+    EXPECT_TRUE(AirLoopCntrlInfo.HeatingActiveFlag);
+    EXPECT_EQ(1, curOACntrl.HRHeatingCoilActive);
+}
+
+TEST_F(EnergyPlusFixture, OAController_LowExhaustMassFlowTest)
+{
+    std::string const idf_objects = delimited_string({
+
+        "  OutdoorAir:Node,",
+        "    Outside Air Inlet Node;  !- Name",
+
+        "  Controller:OutdoorAir,",
+        "    OA Controller,           !- Name",
+        "    Relief Air Outlet Node,  !- Relief Air Outlet Node Name",
+        "    VAV Sys Inlet Node,      !- Return Air Node Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    Outside Air Inlet Node,  !- Actuator Node Name",
+        "    0.5,                     !- Minimum Outdoor Air Flow Rate {m3/s}",
+        "    1.0,                     !- Maximum Outdoor Air Flow Rate {m3/s}",
+        "    DifferentialDryBulb,     !- Economizer Control Type",
+        "    ModulateFlow,            !- Economizer Control Action Type",
+        "    ,                        !- Economizer Maximum Limit Dry-Bulb Temperature {C}",
+        "    ,                        !- Economizer Maximum Limit Enthalpy {J/kg}",
+        "    ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}",
+        "    ,                        !- Electronic Enthalpy Limit Curve Name",
+        "    ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}",
+        "    NoLockout,               !- Lockout Type",
+        "    FixedMinimum,            !- Minimum Limit Type",
+        "    ,                        !- Minimum Outdoor Air Schedule Name",
+        "    ,                        !- Minimum Fraction of Outdoor Air Schedule Name",
+        "    ,                        !- Maximum Fraction of Outdoor Air Schedule Name",
+        "    ,                        !- Mechanical Ventilation Controller Name",
+        "    ,                        !- Time of Day Economizer Control Schedule Name",
+        "    No,                      !- High Humidity Control",
+        "    ,                        !- Humidistat Control Zone Name",
+        "    ,                        !- High Humidity Outdoor Air Flow Ratio",
+        "    Yes,                     !- Control High Indoor Humidity Based on Outdoor Humidity Ratio",
+        "    BypassWhenOAFlowGreaterThanMinimum;  !- Heat Recovery Bypass Control Type",
+
+        "  HeatExchanger:AirToAir:SensibleAndLatent,",
+        "    OA Heat Recovery,        !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    AUTOSIZE,                !- Nominal Supply Air Flow Rate {m3/s}",
+        "    0.70,                    !- Sensible Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 100% Heating Air Flow {dimensionless}",
+        "    0.70,                    !- Sensible Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 75% Heating Air Flow {dimensionless}",
+        "    0.75,                    !- Sensible Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 100% Cooling Air Flow {dimensionless}",
+        "    0.75,                    !- Sensible Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "    0.60,                    !- Latent Effectiveness at 75% Cooling Air Flow {dimensionless}",
+        "    OA Sys HC Outlet Node,   !- Supply Air Inlet Node Name",
+        "    OA HR Outlet Node,       !- Supply Air Outlet Node Name",
+        "    Relief Air Outlet Node,  !- Exhaust Air Inlet Node Name",
+        "    HR Exhaust Air Outlet Node,  !- Exhaust Air Outlet Node Name",
+        "    1500.0,                  !- Nominal Electric Power {W}",
+        "    Yes,                     !- Supply Air Outlet Temperature Control",
+        "    Rotary,                  !- Heat Exchanger Type",
+        "    ExhaustOnly,             !- Frost Control Type",
+        "    -23.3,                   !- Threshold Temperature {C}",
+        "    0.167,                   !- Initial Defrost Time Fraction {dimensionless}",
+        "    1.44;                    !- Rate of Defrost Time Fraction Increase {1/K}",
+
+        "  OutdoorAir:Mixer,",
+        "    OA Mixer,                !- Name",
+        "    Mixed Air Node,          !- Mixed Air Node Name",
+        "    OA HR Outlet Node,       !- Outdoor Air Stream Node Name",
+        "    Relief Air Outlet Node,  !- Relief Air Stream Node Name",
+        "    VAV Sys Inlet Node;      !- Return Air Stream Node Name",
+
+        " AirLoopHVAC:ControllerList,",
+        "    OA Sys Controller,       !- Name",
+        "    Controller:OutdoorAir,   !- Controller 1 Object Type",
+        "    OA Controller;           !- Controller 1 Name",
+
+        " AirLoopHVAC:OutdoorAirSystem:EquipmentList,",
+        "    OA Sys Equipment list,   !- Name",
+        "    HeatExchanger:AirToAir:SensibleAndLatent,  !- Component 1 Object Type",
+        "    OA Heat Recovery,        !- Component 1 Name",
+        "    Coil:Heating:Electric,   !- Component 2 Object Type",
+        "    OA Sys Heating Coil,     !- Component 2 Name",
+        "    OutdoorAir:Mixer,        !- Component 3 Object Type",
+        "    OA Mixer;                !- Component 3 Name",
+
+        " AirLoopHVAC:OutdoorAirSystem,",
+        "    OA Sys,                  !- Name",
+        "    OA Sys controller,       !- Controller List Name",
+        "    OA Sys Equipment list;   !- Outdoor Air Equipment List Name",
+
+        " Coil:Heating:Electric,",
+        "    OA Sys Heating Coil,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    1,                       !- Efficiency",
+        "    2500,                    !- Nominal Capacity{ W }",
+        "    Outside Air Inlet Node,  !- Air Inlet Node Name",
+        "    OA Sys HC Outlet Node,   !- Air Outlet Node Name",
+        "    OA Sys HC Outlet Node;   !- Temperature Setpoint Node Name"
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    GetOutsideAirSysInputs(state);
+    EXPECT_EQ(1, NumOASystems);
+    EXPECT_EQ("OA SYS", OutsideAirSys(1).Name);
+
+    EXPECT_EQ(3, OutsideAirSys(1).NumComponents);
+    EXPECT_EQ("OA HEAT RECOVERY", OutsideAirSys(1).ComponentName(1));
+    EXPECT_EQ("OA SYS HEATING COIL", OutsideAirSys(1).ComponentName(2));
+    EXPECT_EQ("OA MIXER", OutsideAirSys(1).ComponentName(3));
+
+    GetOAControllerInputs(state);
+    EXPECT_EQ(5, OAController(1).OANode);
+    EXPECT_TRUE(OutAirNodeManager::CheckOutAirNodeNumber(OAController(1).OANode));
+
+    int OAControllerNum(1);
+    int AirLoopNum(1);
+
+    DataHVACGlobals::NumPrimaryAirSys = 1;
+    DataEnvironment::StdBaroPress = DataEnvironment::StdPressureSeaLevel;
+    // assume dry air (zero humidity ratio)
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, 20.0, 0.0);
+
+    AirLoopFlow.allocate(1);
+    PrimaryAirSystem.allocate(1);
+    AirLoopControlInfo.allocate(1);
+
+    auto &curAirLoopFlow(AirLoopFlow(AirLoopNum));
+    auto &curOACntrl(OAController(OAControllerNum));
+    auto &AirLoopCntrlInfo(AirLoopControlInfo(AirLoopNum));
+    auto &PrimaryAirSys(PrimaryAirSystem(AirLoopNum));
+
+    PrimaryAirSys.NumBranches = 1;
+    PrimaryAirSys.Branch.allocate(1);
+    PrimaryAirSys.Branch(1).TotalComponents = 1;
+    PrimaryAirSys.Branch(1).Comp.allocate(1);
+    PrimaryAirSys.Branch(1).Comp(1).Name = "OA Sys";
+    PrimaryAirSys.Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
+
+    Real64 DesignSupplyAirMassFlow = 1.0 * DataEnvironment::StdRhoAir;
+    Real64 MixedAirMassFlow = DesignSupplyAirMassFlow;
+
+    curAirLoopFlow.DesSupply = DesignSupplyAirMassFlow;
+
+    // Initialize common AirLoop data
+    AirLoopCntrlInfo.OASysNum = AirLoopNum;
+    AirLoopCntrlInfo.EconoLockout = false;
+    AirLoopCntrlInfo.NightVent = false;
+    AirLoopCntrlInfo.FanOpMode = DataHVACGlobals::ContFanCycCoil;
+    AirLoopCntrlInfo.LoopFlowRateSet = false;
+    AirLoopCntrlInfo.CheckHeatRecoveryBypassStatus = true;
+    AirLoopCntrlInfo.OASysComponentsSimulated = true;
+    AirLoopCntrlInfo.EconomizerFlowLocked = false;
+    AirLoopCntrlInfo.HeatRecoveryBypass = false;
+    AirLoopCntrlInfo.HeatRecoveryResimFlag = false;
+    AirLoopCntrlInfo.HeatingActiveFlag = false;
+
+    // Initialize OA controller and node data
+    curOACntrl.MinOAMassFlowRate = curOACntrl.MinOA * DataEnvironment::StdRhoAir;
+    curOACntrl.MaxOAMassFlowRate = curOACntrl.MaxOA * DataEnvironment::StdRhoAir;
+    curOACntrl.InletNode = curOACntrl.OANode;
+    curOACntrl.RetTemp = 20.0;
+    curOACntrl.OATemp = -10.0;
+    curOACntrl.InletTemp = curOACntrl.OATemp;
+    curOACntrl.MixSetTemp = 5.0;
+    // exhaust mass flow rate is set to a third of design supply flow rate
+    curOACntrl.ExhMassFlow = 0.30 * DesignSupplyAirMassFlow;
+    curOACntrl.MixMassFlow = MixedAirMassFlow;
+
+    // Initialize air node data
+    Node(curOACntrl.MixNode).MassFlowRate = curOACntrl.MixMassFlow;
+    Node(curOACntrl.MixNode).MassFlowRateMaxAvail = curOACntrl.MixMassFlow;
+    Node(curOACntrl.RetNode).Temp = curOACntrl.RetTemp;
+    Node(curOACntrl.RetNode).Enthalpy = Psychrometrics::PsyHFnTdbW(curOACntrl.RetTemp, 0.0);
+    Node(curOACntrl.MixNode).TempSetPoint = curOACntrl.MixSetTemp;
+    Node(curOACntrl.OANode).Temp = curOACntrl.OATemp;
+    Node(curOACntrl.OANode).Enthalpy = Psychrometrics::PsyHFnTdbW(curOACntrl.InletTemp, 0.0);
+
+    Real64 OAMassFlowActual(0.0);
+    Real64 OAMassFlowAMin(0.0);
+    Real64 OutAirMassFlowFracMin(0.0);
+    Real64 OutAirMassFlowFracActual(0.0);
+
+    // check OA controller inputs
+    EXPECT_EQ(curOACntrl.MinOA, 0.5);                 // user specified minimum OA vol flow rate
+    EXPECT_TRUE(curOACntrl.FixedMin);                 // Economizer Minimum Limit Type = FixedMinimum
+    EXPECT_EQ(curOACntrl.Lockout, NoLockoutPossible); // NoLockout (ecoomizer always active)
+    EXPECT_EQ(curOACntrl.HeatRecoveryBypassControlType, DataHVACGlobals::BypassWhenOAFlowGreaterThanMinimum);
+
+    // calc minimum OA mass flow for FixedMinimum
+    OAMassFlowAMin = curOACntrl.MinOA * DataEnvironment::StdRhoAir;
+    // calc minimum OA mass flow fraction
+    OutAirMassFlowFracMin = OAMassFlowAMin / DesignSupplyAirMassFlow;
+
+    // calc actual OA mass flow fraction
+    OutAirMassFlowFracActual = (curOACntrl.MixSetTemp - curOACntrl.RetTemp) / (curOACntrl.InletTemp - curOACntrl.RetTemp);
+    EXPECT_EQ(0.5, OutAirMassFlowFracActual);
+    // calc actual OA mass flow
+    OAMassFlowActual = OutAirMassFlowFracActual * MixedAirMassFlow;
+    // run OA controller and OA economizer
+    curOACntrl.CalcOAController(state, AirLoopNum, true);
+    OAMassFlowActual = max(curOACntrl.ExhMassFlow, curOACntrl.OAMassFlow);
+    OutAirMassFlowFracActual = OAMassFlowActual / curOACntrl.MixMassFlow;
+    // check min OA flow and fraction
+    EXPECT_EQ(OAMassFlowAMin, curAirLoopFlow.MinOutAir);
+    EXPECT_EQ(0.5, curAirLoopFlow.OAMinFrac);
+    EXPECT_EQ(OutAirMassFlowFracMin, curAirLoopFlow.OAMinFrac);
+    // check actual OA flow and fraction
+    EXPECT_EQ(OAMassFlowActual, curOACntrl.OAMassFlow);
+    EXPECT_EQ(OAMassFlowActual, curAirLoopFlow.OAFlow);
+    EXPECT_EQ(0.5, curAirLoopFlow.OAFrac);
+    EXPECT_EQ(OutAirMassFlowFracActual, curAirLoopFlow.OAFrac);
+    // check HX bypass status
+    EXPECT_EQ(OAMassFlowActual, OAMassFlowAMin);
+    EXPECT_LT(OAMassFlowActual, curOACntrl.MixMassFlow);
+    EXPECT_EQ(0, curOACntrl.HeatRecoveryBypassStatus);
+    EXPECT_FALSE(AirLoopCntrlInfo.HeatRecoveryBypass);
+    EXPECT_FALSE(AirLoopCntrlInfo.HeatingActiveFlag);
+    EXPECT_EQ(0, curOACntrl.HRHeatingCoilActive);
+
+    // reduced mixed air temperature setpoint such that it increases
+    // the actual OA mass flow and trigger the heat recovery by pass
+    curOACntrl.MixSetTemp = 2.0;
+    AirLoopCntrlInfo.HeatingActiveFlag = true; // active heating coil
+    // calc actual OA mass flow fraction
+    OutAirMassFlowFracActual = (curOACntrl.MixSetTemp - curOACntrl.RetTemp) / (curOACntrl.InletTemp - curOACntrl.RetTemp);
+    EXPECT_EQ(0.6, OutAirMassFlowFracActual);
+    // calc actual OA mass flow
+    OAMassFlowActual = OutAirMassFlowFracActual * MixedAirMassFlow;
+    // actual OA mass flow is not allowed to fall below exhaust mass flow
+    curOACntrl.CalcOAController(state, AirLoopNum, true);
+    OAMassFlowActual = max(curOACntrl.ExhMassFlow, curOACntrl.OAMassFlow);
+    OutAirMassFlowFracActual = OAMassFlowActual / curOACntrl.MixMassFlow;
+    // check min OA flow and fraction
+    EXPECT_EQ(OAMassFlowAMin, curAirLoopFlow.MinOutAir);
+    EXPECT_EQ(0.5, curAirLoopFlow.OAMinFrac);
+    EXPECT_EQ(OutAirMassFlowFracMin, curAirLoopFlow.OAMinFrac);
+    // check actual OA flow and fraction
+    EXPECT_EQ(OAMassFlowActual, curOACntrl.OAMassFlow);
+    EXPECT_EQ(OAMassFlowActual, curAirLoopFlow.OAFlow);
+    EXPECT_EQ(0.6, curAirLoopFlow.OAFrac);
+    EXPECT_EQ(OutAirMassFlowFracActual, curAirLoopFlow.OAFrac);
+    // check HX bypass status
+    EXPECT_GT(OAMassFlowActual, OAMassFlowAMin);
+    EXPECT_LT(OAMassFlowActual, curOACntrl.MixMassFlow);
+    EXPECT_EQ(1, curOACntrl.HeatRecoveryBypassStatus);
+    EXPECT_TRUE(AirLoopCntrlInfo.HeatRecoveryBypass);
+    EXPECT_TRUE(AirLoopCntrlInfo.HeatingActiveFlag);
+    EXPECT_EQ(1, curOACntrl.HRHeatingCoilActive);
+}
 } // namespace EnergyPlus

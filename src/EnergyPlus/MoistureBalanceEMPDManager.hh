@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,9 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Material.hh>
 
 namespace EnergyPlus {
 
@@ -89,14 +90,15 @@ namespace MoistureBalanceEMPDManager {
 
     // Functions
     Real64 CalcDepthFromPeriod(Real64 const period,                           // in seconds
-                               DataHeatBalance::MaterialProperties const &mat // material
+                               Material::MaterialProperties const &mat // material
     );
 
-    void GetMoistureBalanceEMPDInput();
+    void GetMoistureBalanceEMPDInput(IOFiles &ioFiles);
 
-    void InitMoistureBalanceEMPD();
+    void InitMoistureBalanceEMPD(IOFiles &ioFiles);
 
-    void CalcMoistureBalanceEMPD(int const SurfNum,
+    void CalcMoistureBalanceEMPD(IOFiles &ioFiles,
+                                 int const SurfNum,
                                  Real64 const TempSurfIn, // INSIDE SURFACE TEMPERATURE at current time step
                                  Real64 const TempZone,   // Zone temperature at current time step.
                                  Real64 &TempSat          // Satutare surface temperature.
@@ -106,7 +108,7 @@ namespace MoistureBalanceEMPDManager {
 
     void UpdateMoistureBalanceEMPD(int const SurfNum); // Surface number
 
-    void ReportMoistureBalanceEMPD();
+    void ReportMoistureBalanceEMPD(IOFiles &ioFiles);
 
 } // namespace MoistureBalanceEMPDManager
 

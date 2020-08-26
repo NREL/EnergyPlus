@@ -104,13 +104,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.5,                     !- Loads Convergence Tolerance Value
+    0.5,                     !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     40,                      !- Maximum Number of Warmup Days
@@ -560,7 +560,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   BuildingSurface:Detailed,
     WALL-1PF,                !- Name
@@ -2352,8 +2352,8 @@
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
@@ -2362,8 +2362,8 @@
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -2372,8 +2372,8 @@
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
@@ -2382,18 +2382,18 @@
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    SPCAE5-1 Direct Air,     !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPCAE5-1 Direct Air ADU, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 ATU,            !- Name
@@ -2419,11 +2419,23 @@
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
     SPACE4-1 VAV Reheat;     !- Air Terminal Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     SPCAE5-1 Direct Air,     !- Name
     Constant,                !- Availability Schedule Name
-    SPACE5-1 In Node,        !- Zone Supply Air Node Name
-    1.05;                    !- Maximum Air Flow Rate {m3/s}
+    SPACE5-1 In Node ATInlet,!- Air Inlet Node Name
+    SPACE5-1 In Node,        !- Air Outlet Node Name
+    1.05,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    SPCAE5-1 Direct Air ADU, !- Name
+    SPACE5-1 In Node,        !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    SPCAE5-1 Direct Air,     !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   CoilSystem:Cooling:DX,
     DX Cooling Coil System 1,!- Name
@@ -2653,7 +2665,7 @@
   AirLoopHVAC:ZoneSplitter,
     Desiccant DXSystem Zone Supply Air Splitter,  !- Name
     Desiccant DXSystem Zone Equipment Inlet Node,  !- Inlet Node Name
-    SPACE5-1 In Node;        !- Outlet 1 Node Name
+    SPACE5-1 In Node ATInlet;!- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Desiccant DXSystem Zone Return Air Mixer,  !- Name
@@ -3105,7 +3117,7 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,timestep;
 
@@ -3113,9 +3125,9 @@
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Heat Exchanger Sensible Heating Rate,timestep;
 
@@ -3141,9 +3153,9 @@
 
   Output:Variable,*,Heat Exchanger Total Cooling Energy,timestep;
 
-  Output:Variable,*,Heat Exchanger Electric Power,timestep;
+  Output:Variable,*,Heat Exchanger Electricity Rate,timestep;
 
-  Output:Variable,*,Heat Exchanger Electric Energy,timestep;
+  Output:Variable,*,Heat Exchanger Electricity Energy,timestep;
 
   Output:Variable,*,Dehumidifier Removed Water Mass Flow Rate,timestep;
 
@@ -3151,9 +3163,9 @@
 
   Output:Variable,*,Dehumidifier Part Load Ratio,timestep;
 
-  Output:Variable,*,Dehumidifier Exhaust Fan Electric Power,timestep;
+  Output:Variable,*,Dehumidifier Exhaust Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Dehumidifier Exhaust Fan Electric Energy,timestep;
+  Output:Variable,*,Dehumidifier Exhaust Fan Electricity Energy,timestep;
 
   Output:Variable,HX Process Outlet Node,System Node Setpoint Temperature,timestep;
 
@@ -3203,7 +3215,7 @@
 
   Output:Meter,Cooling:Electricity,timestep;
 
-  Output:Meter,Heating:Gas,timestep;
+  Output:Meter,Heating:NaturalGas,timestep;
 
   Output:Meter,Fans:Electricity,timestep;
 
@@ -3213,9 +3225,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3223,9 +3235,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

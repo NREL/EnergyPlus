@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,37 +52,29 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace MicroturbineElectricGenerator {
 
-    // Using/Aliasing
     using DataGlobalConstants::iGeneratorMicroturbine;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumMTGenerators; // number of MT Generators specified in input
     extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
 
-    extern Array1D_bool CheckEquipName;
+    void clear_state();
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE MicroturbineElectricGenerator
-
-    // Types
-
-    struct MTGeneratorSpecs
+    struct MTGeneratorSpecs : PlantComponent
     {
         // Members
-        //      User inputs
         std::string Name;                  // User identifier (name)
         Real64 RefElecPowerOutput;         // Reference Electrical Power Output from generator (W)
         Real64 MinElecPowerOutput;         // Minimum Electrical Power Output (W)
@@ -154,40 +146,35 @@ namespace MicroturbineElectricGenerator {
         Real64 StandbyPowerRate;          // Standby power rate this time step (W)
         Real64 AncillaryPowerRate;        // Ancillary power rate this time step (W)
         //     Warning message variables
-        int PowerFTempElevErrorIndex; // Index to power as a function of temp/elevation warning message
-        //       INTEGER    :: PowerFTempElevErrorCount     = 0   ! Counter for power as a function of temp/elevation warning messages
-        int EffFTempErrorIndex; // Index to efficiency as a function of temperature warning message
-        //       INTEGER    :: EffFTempErrorCount           = 0   ! Counter for efficiency as a function of temperature warning messages
-        int EffFPLRErrorIndex; // Index to efficiency as a function of PLR warning message
-        //       INTEGER    :: EffFPLRErrorCount            = 0   ! Counter for efficiency as a function of PLR warning messages
-        int ExhFlowFTempErrorIndex; // Index to exhaust flow as a function of temp warning message
-        //       INTEGER    :: ExhFlowFTempErrorCount       = 0   ! Counter for exhaust flow as a function of temp warning messages
-        int ExhFlowFPLRErrorIndex; // Index to exhaust flow as a function of PLR warning message
-        //       INTEGER    :: ExhFlowFPLRErrorCount        = 0   ! Counter for exhaust flow as a function of PLR warning messages
-        int ExhTempFTempErrorIndex; // Index to exhaust temp as a function of temp warning message
-        //       INTEGER    :: ExhTempFTempErrorCount       = 0   ! Counter for exhaust temp as a function of temp warning messages
-        int ExhTempFPLRErrorIndex; // Index to exhaust temp as a function of PLR warning message
-        //       INTEGER    :: ExhTempFPLRErrorCount        = 0   ! Counter for exhaust temp as a function of PLR warning messages
-        int HRMinFlowErrorIndex; // Index to reclaim water flow rate warning message
-        //       INTEGER    :: HRMinFlowErrorCount          = 0   ! Counter for reclaim water flow rate warning messages
-        int HRMaxFlowErrorIndex; // Index to reclaim water flow rate warning message
-        //       INTEGER    :: HRMaxFlowErrorCount          = 0   ! Counter for reclaim water flow rate warning messages
-        int ExhTempLTInletTempIndex; // Index to exhaust temp < combustion inlet air temp warning messages
-        //       INTEGER    :: ExhTempLTInletTempCount      = 0   ! Counter for exhaust temp < combustion inlet air temp warning messages
-        int ExhHRLTInletHRIndex; // Index to exhaust hum rat < combustion inlet air hum rat warning messages
-        //       INTEGER    :: ExhHRLTInletHRCount          = 0   ! Counter for exhaust hum rat < combustion inlet air hum rat warn messages
-        int AnciPowerIterErrorIndex; // Index to Ancillary Power iteration loop warning messages
-        //       INTEGER    :: AnciPowerIterErrorCount      = 0   ! Count for Ancillary Power iteration loop warning messages
+        int PowerFTempElevErrorIndex;     // Index to power as a function of temp/elevation warning message
+        int EffFTempErrorIndex;           // Index to efficiency as a function of temperature warning message
+        int EffFPLRErrorIndex;            // Index to efficiency as a function of PLR warning message
+        int ExhFlowFTempErrorIndex;       // Index to exhaust flow as a function of temp warning message
+        int ExhFlowFPLRErrorIndex;        // Index to exhaust flow as a function of PLR warning message
+        int ExhTempFTempErrorIndex;       // Index to exhaust temp as a function of temp warning message
+        int ExhTempFPLRErrorIndex;        // Index to exhaust temp as a function of PLR warning message
+        int HRMinFlowErrorIndex;          // Index to reclaim water flow rate warning message
+        int HRMaxFlowErrorIndex;          // Index to reclaim water flow rate warning message
+        int ExhTempLTInletTempIndex;      // Index to exhaust temp < combustion inlet air temp warning messages
+        int ExhHRLTInletHRIndex;          // Index to exhaust hum rat < combustion inlet air hum rat warning messages
+        int AnciPowerIterErrorIndex;      // Index to Ancillary Power iteration loop warning messages
         int AnciPowerFMdotFuelErrorIndex; // Index to Ancillary Power as a function of fuel input warning messages
-        //       INTEGER    :: AnciPowerFMdotFuelErrorCount = 0   ! Count for Ancillary Power as a function of fuel input warning messages
-        int HeatRecRateFPLRErrorIndex; // Index to heat recovery rate as a function of PLR warning messages
-        //       INTEGER    :: HeatRecRateFPLRErrorCount    = 0   ! Count for heat recovery rate as a function of PLR warning messages
-        int HeatRecRateFTempErrorIndex; // Index to heat recovery rate as a function of temp warning messages
-        //       INTEGER    :: HeatRecRateFTempErrorCount   = 0   ! Count for heat recovery rate as a function of temp warning messages
-        int HeatRecRateFFlowErrorIndex; // Index to heat recovery rate as a function of flow warning messages
-        //       INTEGER    :: HeatRecRateFFlowErrorCount   = 0   ! Count for heat recovery rate as a function of flow warning messages
-        int ThermEffFTempElevErrorIndex; // Index to thermal efficiency as a function of temp/elevation warnings
-        //       INTEGER    :: ThermEffFTempElevErrorCount  = 0   ! Count for thermal efficiency as a function of temp/elevation warnings
+        int HeatRecRateFPLRErrorIndex;    // Index to heat recovery rate as a function of PLR warning messages
+        int HeatRecRateFTempErrorIndex;   // Index to heat recovery rate as a function of temp warning messages
+        int HeatRecRateFFlowErrorIndex;   // Index to heat recovery rate as a function of flow warning messages
+        int ThermEffFTempElevErrorIndex;  // Index to thermal efficiency as a function of temp/elevation warnings
+        bool CheckEquipName;
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
+        bool MySizeAndNodeInitFlag;
+        Real64 EnergyGen;             // Reporting: Electric energy produced (J)
+        Real64 FuelEnergyHHV;         // Reporting: Fuel Energy used (J)
+        Real64 ElectricEfficiencyLHV; // Reporting: Electric efficiency LHV (-)
+        Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
+        Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
+        Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
+        std::string FuelType;
+        bool myFlag;
 
         // Default Constructor
         MTGeneratorSpecs()
@@ -208,121 +195,38 @@ namespace MicroturbineElectricGenerator {
               PowerFTempElevErrorIndex(0), EffFTempErrorIndex(0), EffFPLRErrorIndex(0), ExhFlowFTempErrorIndex(0), ExhFlowFPLRErrorIndex(0),
               ExhTempFTempErrorIndex(0), ExhTempFPLRErrorIndex(0), HRMinFlowErrorIndex(0), HRMaxFlowErrorIndex(0), ExhTempLTInletTempIndex(0),
               ExhHRLTInletHRIndex(0), AnciPowerIterErrorIndex(0), AnciPowerFMdotFuelErrorIndex(0), HeatRecRateFPLRErrorIndex(0),
-              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0)
+              HeatRecRateFTempErrorIndex(0), HeatRecRateFFlowErrorIndex(0), ThermEffFTempElevErrorIndex(0), CheckEquipName(true), MyEnvrnFlag(true),
+              MyPlantScanFlag(true), MySizeAndNodeInitFlag(true), EnergyGen(0.0), FuelEnergyHHV(0.0), ElectricEfficiencyLHV(0.0),
+              ThermalEfficiencyLHV(0.0), AncillaryEnergy(0.0), StandbyEnergy(0.0), myFlag(true)
         {
         }
+
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
+                                 Real64 &EP_UNUSED(MaxLoad),
+                                 Real64 &EP_UNUSED(MinLoad),
+                                 Real64 &EP_UNUSED(OptLoad)) override;
+
+        void InitMTGenerators(BranchInputManagerData &dataBranchInputManager,
+                              bool RunFlag,
+                              Real64 MyLoad, // electrical load in W
+                              bool FirstHVACIteration);
+
+        void CalcMTGeneratorModel(bool RunFlag, // TRUE when generator is being asked to operate
+                                  Real64 MyLoad // Generator demand (W)
+        );
+
+        void UpdateMTGeneratorRecords();
+
+        void setupOutputVars();
+
+        static PlantComponent *factory(std::string const &objectName);
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 PowerGen;              // Reporting: Electric power produced (W)
-        Real64 EnergyGen;             // Reporting: Electric energy produced (J)
-        Real64 QHeatRecovered;        // Reporting: Heat recovered from exhaust to heat water (W)
-        Real64 ExhaustEnergyRec;      // Reporting: Heat recovered from exhaust to heat water (J)
-        Real64 FuelEnergyUseRateHHV;  // Reporting: Fuel Energy use rate, HHV basis (W)
-        Real64 FuelEnergyHHV;         // Reporting: Fuel Energy used (J)
-        Real64 FuelMdot;              // Reporting: Fuel Amount used (kg/s)
-        Real64 ElectricEfficiencyLHV; // Reporting: Electric efficiency LHV (-)
-        Real64 ThermalEfficiencyLHV;  // Reporting: Thermal (heat recovery to water) efficiency LHV (-)
-        Real64 HeatRecInletTemp;      // Reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;     // Reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;           // Reporting: Heat Recovery Loop Mass flow rate (kg/s)
-        Real64 AncillaryPowerRate;    // Reporting: Ancillary power use rate (W)
-        Real64 AncillaryEnergy;       // Reporting: Ancillary energy use (J)
-        Real64 StandbyPowerRate;      // Reporting: Standby power use rate (W)
-        Real64 StandbyEnergy;         // Reporting: Standby energy use (J)
-        Real64 ExhAirMassFlowRate;    // Actual Exhaust Air Mass Flow Rate (kg/s)
-        Real64 ExhAirTemperature;     // Combustion exhaust air temperature (C)
-
-        // Default Constructor
-        ReportVars()
-            : PowerGen(0.0), EnergyGen(0.0), QHeatRecovered(0.0), ExhaustEnergyRec(0.0), FuelEnergyUseRateHHV(0.0), FuelEnergyHHV(0.0), FuelMdot(0.0),
-              ElectricEfficiencyLHV(0.0), ThermalEfficiencyLHV(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0),
-              AncillaryPowerRate(0.0), AncillaryEnergy(0.0), StandbyPowerRate(0.0), StandbyEnergy(0.0), ExhAirMassFlowRate(0.0),
-              ExhAirTemperature(0.0)
-        {
-        }
-    };
-
-    // Object Data
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
-    extern Array1D<ReportVars> MTGeneratorReport;
-
-    // Functions
-
-    void SimMTGenerator(int const GeneratorType,          // Type of generator !unused1208
-                        std::string const &GeneratorName, // User-specified name of generator
-                        int &GeneratorIndex,              // Index to microturbine generator
-                        bool const RunFlag,               // Simulate generator when TRUE
-                        Real64 const MyLoad,              // Generator demand (W)
-                        bool const FirstHVACIteration     // Simulation flag for First HVAC (system) iteration
-    );
-
-    void SimMTPlantHeatRecovery(std::string const &CompType, // unused1208
-                                std::string const &CompName,
-                                int const CompTypeNum, // unused1208
-                                int &CompNum,
-                                bool const RunFlag, // unused1208
-                                bool &InitLoopEquip,
-                                Real64 &MyLoad, // unused1208
-                                Real64 &MaxCap,
-                                Real64 &MinCap,
-                                Real64 &OptCap,
-                                bool const FirstHVACIteration // TRUE if First iteration of simulation !unused1208
-    );
-
-    // End MT Generator Module Driver Subroutine
-    //******************************************************************************
-
-    // Beginning of Microturbine (MT) Generator Module Get Input Subroutine
-    //******************************************************************************
 
     void GetMTGeneratorInput();
-
-    // End of Get Input subroutine for the MT Generator Module
-    //******************************************************************************
-
-    // Begin MT Generator Module Initialize Subroutine
-    // *****************************************************************************
-
-    void InitMTGenerators(int const GenNum,
-                          bool const RunFlag,
-                          Real64 const MyLoad, // electrical load in W
-                          bool const FirstHVACIteration);
-
-    //  End of MT Generator Module Initialize Subroutine
-    // *****************************************************************************
-
-    //  Beginning of MT Generator Model Calculation Subroutine
-    // *****************************************************************************
-
-    void CalcMTGeneratorModel(int const GeneratorNum,       // Generator number
-                              bool const RunFlag,           // TRUE when generator is being asked to operate
-                              Real64 const MyLoad,          // Generator demand (W)
-                              bool const FirstHVACIteration // unused1208
-    );
-
-    //  End of MT Generator Model Calculation Subroutine
-    // *****************************************************************************
-
-    //  Beginning of record keeping subroutine for the MT Generator Module
-    // *****************************************************************************
-
-    void UpdateMTGeneratorRecords(int const Num); // Generator number
-
-    void GetMTGeneratorResults(int const GeneratorType, // type of Generator !unused1208
-                               int const GeneratorIndex,
-                               Real64 &GeneratorPower,  // electrical power
-                               Real64 &GeneratorEnergy, // electrical energy
-                               Real64 &ThermalPower,    // heat power
-                               Real64 &ThermalEnergy    // heat energy
-    );
-
-    void GetMTGeneratorExhaustNode(int const CompType, std::string const &CompName, int &ExhaustOutletNodeNum);
-
-    // End of Record Keeping subroutine for the MT Generator Module
-    // *****************************************************************************
 
 } // namespace MicroturbineElectricGenerator
 

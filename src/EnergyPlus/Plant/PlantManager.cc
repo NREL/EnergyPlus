@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,47 +55,71 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <Boilers.hh>
-#include <BranchInputManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataConvergParams.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <EMSManager.hh>
-#include <FluidCoolers.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GroundHeatExchangers.hh>
-#include <HVACInterfaceManager.hh>
-#include <HeatPumpWaterToWaterSimple.hh>
-#include <HeatPumpWaterToWaterCOOLING.hh>
-#include <HeatPumpWaterToWaterHEATING.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutsideEnergySources.hh>
-#include <PipeHeatTransfer.hh>
-#include <Pipes.hh>
-#include <Plant/PlantLoopSolver.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantLoadProfile.hh>
-#include <PlantLoopEquip.hh>
-#include <PlantPipingSystemsManager.hh>
-#include <PlantUtilities.hh>
-#include <PlantValves.hh>
-#include <PondGroundHeatExchanger.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SurfaceGroundHeatExchanger.hh>
-#include <SystemAvailabilityManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/GroundHeatExchangers.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/ICEngineElectricGenerator.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
+#include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
+#include <EnergyPlus/PlantLoadProfile.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PlantValves.hh>
+#include <EnergyPlus/PondGroundHeatExchanger.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 
 namespace EnergyPlus {
 
@@ -117,14 +141,12 @@ namespace EnergyPlus {
         // connections are performed in this module.
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using namespace DataGlobals;
         using namespace DataHVACGlobals;
         using namespace DataPlant;
         using namespace DataBranchAirLoopPlant;
         using namespace DataLoopNode;
         using namespace FluidProperties;
-        using PlantLoopSolver::PlantHalfLoopSolver;
 
         // MODULE PARAMETER DEFINITIONS
         int const Plant(1);
@@ -138,7 +160,6 @@ namespace EnergyPlus {
         Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
         Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
         Array1D_int DemandSideInletNode;  // Inlet node on the demand side
-        TempLoopData TempLoop;            // =(' ',' ',' ',0, , , ,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.)
 
         void clear_state() {
             InitLoopEquip = true;
@@ -146,10 +167,9 @@ namespace EnergyPlus {
             SupplySideInletNode.deallocate();
             SupplySideOutletNode.deallocate();
             DemandSideInletNode.deallocate();
-            TempLoop = TempLoopData();
         }
 
-        void ManagePlantLoops(bool const FirstHVACIteration,
+        void ManagePlantLoops(EnergyPlusData &state, bool const FirstHVACIteration,
                               bool &SimAirLoops,                    // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,               // True when zone equipment components need to be (re)simulated
                               bool &EP_UNUSED(
@@ -202,7 +222,7 @@ namespace EnergyPlus {
             }
 
             IterPlant = 0;
-            InitializeLoops(FirstHVACIteration);
+            InitializeLoops(state, FirstHVACIteration);
 
             while ((SimPlantLoops) && (IterPlant <= MaxPlantSubIterations)) {
                 // go through half loops in predetermined calling order
@@ -220,7 +240,7 @@ namespace EnergyPlus {
 
                     if (SimHalfLoopFlag || IterPlant <= CurntMinPlantSubIterations) {
 
-                        PlantHalfLoopSolver(FirstHVACIteration, LoopSide, LoopNum, other_loop_side.SimLoopSideNeeded);
+                        this_loop_side.solve(state, FirstHVACIteration, other_loop_side.SimLoopSideNeeded);
 
                         // Always set this side to false,  so that it won't keep being turned on just because of first hvac
                         this_loop_side.SimLoopSideNeeded = false;
@@ -233,7 +253,7 @@ namespace EnergyPlus {
                         }
 
                         // Update the report variable
-                        PlantReport(LoopNum).LastLoopSideSimulated = LoopSide;
+                        this_loop.LastLoopSideSimulated = LoopSide;
 
                         ++PlantManageHalfLoopCalls;
                     }
@@ -273,7 +293,7 @@ namespace EnergyPlus {
             LogPlantConvergencePoints(FirstHVACIteration);
         }
 
-        void GetPlantLoopData() {
+        void GetPlantLoopData(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
@@ -467,10 +487,10 @@ namespace EnergyPlus {
                         Alpha(11), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Outlet, 1, ObjectIsParent);
 
-                this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumIn, localTempSetPt);
-                this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumOut, localTempSetPt);
-                this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumIn, localTempSetPt);
-                this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumOut, localTempSetPt);
+                this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumIn, localTempSetPt);
+                this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumOut, localTempSetPt);
+                this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.NodeNumIn, localTempSetPt);
+                this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.NodeNumOut, localTempSetPt);
                 this_loop.TempSetPointNodeNum = GetOnlySingleNode(
                         Alpha(5), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Sensor, 1, ObjectIsParent);
@@ -635,14 +655,14 @@ namespace EnergyPlus {
                     ErrorsFound = true;
                 }
 
-                if (GetFirstBranchInletNodeName(this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
+                if (GetFirstBranchInletNodeName(state.dataBranchInputManager, this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError("The inlet node of the first branch in the " + cAlphaFieldNames(12) + '=' +
                                       Alpha(12));                                                          //"Plant Demand Side Branch List"
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(10) + '=' +
                                       Alpha(10)); // "Plant Demand Side Inlet Node Name"
                     ShowContinueError("Branch List Inlet Node Name=" +
-                                      GetFirstBranchInletNodeName(this_demand_side.BranchList)); // TODO rename point
+                                      GetFirstBranchInletNodeName(state.dataBranchInputManager, this_demand_side.BranchList)); // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch."); // TODO
                     // rename
@@ -650,7 +670,7 @@ namespace EnergyPlus {
                     ErrorsFound = true;
                 }
 
-                if (GetLastBranchOutletNodeName(this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
+                if (GetLastBranchOutletNodeName(state.dataBranchInputManager, this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
                     //"Plant Demand Side Branch List"
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
@@ -658,14 +678,14 @@ namespace EnergyPlus {
                     //"Plant Demand Side Outlet Node Name"
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(11) + '=' + Alpha(11));
                     ShowContinueError("Branch List Outlet Node Name=" +
-                                      GetLastBranchOutletNodeName(this_demand_side.BranchList)); // TODO rename point
+                                      GetLastBranchOutletNodeName(state.dataBranchInputManager, this_demand_side.BranchList)); // TODO rename point
                     // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
                     ErrorsFound = true;
                 }
 
-                if (GetFirstBranchInletNodeName(this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
+                if (GetFirstBranchInletNodeName(state.dataBranchInputManager, this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
                     //"Plant Supply Side Branch List"
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
@@ -673,14 +693,14 @@ namespace EnergyPlus {
                     //"Plant Supply Side Inlet Node Name
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(6) + '=' + Alpha(6));
                     ShowContinueError("Branch List Inlet Node Name=" +
-                                      GetFirstBranchInletNodeName(this_supply_side.BranchList)); // TODO rename point
+                                      GetFirstBranchInletNodeName(state.dataBranchInputManager, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
                     ErrorsFound = true;
                 }
 
-                if (GetLastBranchOutletNodeName(this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
+                if (GetLastBranchOutletNodeName(state.dataBranchInputManager, this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
                     //"Plant Supply Side Branch List"
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
@@ -688,7 +708,7 @@ namespace EnergyPlus {
                     //"Plant Supply Side Outlet Node Name"
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(7) + '=' + Alpha(7));
                     ShowContinueError("Branch List Outlet Node Name=" +
-                                      GetLastBranchOutletNodeName(this_supply_side.BranchList)); // TODO rename point
+                                      GetLastBranchOutletNodeName(state.dataBranchInputManager, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
@@ -715,7 +735,7 @@ namespace EnergyPlus {
             }
         }
 
-        void GetPlantInput() {
+        void GetPlantInput(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
@@ -750,7 +770,6 @@ namespace EnergyPlus {
             int MixNum;
             int NumConnectorsInLoop;
             int ConnNum;
-            std::string::size_type Pos;
             int TotCompsOnBranch;
             int MaxNumAlphas;
 
@@ -773,73 +792,63 @@ namespace EnergyPlus {
             static Array1D_bool SplitOutBranch;
             static Array1D_bool MixerInBranch;
             bool errFlag;
-            int GeneralEquipType;
-            int TypeOfNum;
             int LoopNumInArray;
 
             inputProcessor->getObjectDefMaxArgs("Connector:Splitter", NumParams, NumAlphas, NumNumbers);
             MaxNumAlphas = NumAlphas;
             inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
-            NumPipes = 0;
-            NumPlantPipes = 0;
-            NumCondPipes = 0;
             HalfLoopNum = 0;
 
-            for (LoopNum = 1; LoopNum <=
-                              TotNumLoops; ++LoopNum) { // Begin demand side loops ... When condenser is added becomes NumLoops
-                TempLoop.LoopHasConnectionComp = false;
-                TempLoop.Name = PlantLoop(LoopNum).Name;
+            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                auto &plantLoop = PlantLoop(LoopNum);
+                plantLoop.LoopHasConnectionComp = false;
 
                 for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+                    auto &loopSide = plantLoop.LoopSide(LoopSideNum);
                     ASeriesBranchHasPump = false;
                     AParallelBranchHasPump = false;
                     NumOfPipesInLoop = 0; // Initialization
                     ++HalfLoopNum;
-                    TempLoop.BypassExists = false;
-                    if (PlantLoop(LoopNum).TypeOfLoop == Plant && LoopSideNum == DemandSide) {
+                    loopSide.BypassExists = false;
+                    if (plantLoop.TypeOfLoop == Plant && LoopSideNum == DemandSide) {
                         LoopIdentifier = "Plant Demand";
-                    } else if (PlantLoop(LoopNum).TypeOfLoop == Plant && LoopSideNum == SupplySide) {
+                    } else if (plantLoop.TypeOfLoop == Plant && LoopSideNum == SupplySide) {
                         LoopIdentifier = "Plant Supply";
-                    } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser && LoopSideNum == DemandSide) {
+                    } else if (plantLoop.TypeOfLoop == Condenser && LoopSideNum == DemandSide) {
                         LoopIdentifier = "Condenser Demand";
-                    } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser && LoopSideNum == SupplySide) {
+                    } else if (plantLoop.TypeOfLoop == Condenser && LoopSideNum == SupplySide) {
                         LoopIdentifier = "Condenser Supply";
                     }
 
-                    TempLoop.BranchList = PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchList;
-                    TempLoop.ConnectList = PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList;
-
                     // Get the branch list and size the Branch portion of the Loop derived type
-                    TempLoop.TotalBranches = NumBranchesInBranchList(TempLoop.BranchList);
-                    BranchNames.allocate(TempLoop.TotalBranches);
+                    loopSide.TotalBranches = NumBranchesInBranchList(state.dataBranchInputManager, loopSide.BranchList);
+                    BranchNames.allocate(loopSide.TotalBranches);
                     BranchNames = "";
-                    GetBranchList(TempLoop.Name, TempLoop.BranchList, TempLoop.TotalBranches, BranchNames,
-                                  LoopIdentifier);
-                    TempLoop.Branch.allocate(TempLoop.TotalBranches);
+                    GetBranchList(state.dataBranchInputManager, plantLoop.Name, loopSide.BranchList, loopSide.TotalBranches, BranchNames, LoopIdentifier);
+                    loopSide.Branch.allocate(loopSide.TotalBranches);
 
                     // Cycle through all of the branches and set up the node data
-                    for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
+                    for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
+                        auto &branch = loopSide.Branch(BranchNum);
+                        branch.Name = BranchNames(BranchNum);
+                        branch.TotalComponents = NumCompsInBranch(state.dataBranchInputManager, BranchNames(BranchNum));
+                        branch.IsBypass = false;
 
-                        TempLoop.Branch(BranchNum).Name = BranchNames(BranchNum);
+                        CompTypes.allocate(branch.TotalComponents);
+                        CompNames.allocate(branch.TotalComponents);
+                        CompCtrls.dimension(branch.TotalComponents, 0);
+                        InletNodeNames.allocate(branch.TotalComponents);
+                        InletNodeNumbers.dimension(branch.TotalComponents, 0);
+                        OutletNodeNames.allocate(branch.TotalComponents);
+                        OutletNodeNumbers.dimension(branch.TotalComponents, 0);
 
-                        TempLoop.Branch(BranchNum).TotalComponents = NumCompsInBranch(BranchNames(BranchNum));
-
-                        TempLoop.Branch(BranchNum).IsBypass = false;
-
-                        CompTypes.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        CompNames.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        CompCtrls.dimension(TempLoop.Branch(BranchNum).TotalComponents, 0);
-                        InletNodeNames.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        InletNodeNumbers.dimension(TempLoop.Branch(BranchNum).TotalComponents, 0);
-                        OutletNodeNames.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        OutletNodeNumbers.dimension(TempLoop.Branch(BranchNum).TotalComponents, 0);
-
-                        GetBranchData(TempLoop.Name,
+                        GetBranchData(state.dataBranchInputManager,
+                                      plantLoop.Name,
                                       BranchNames(BranchNum),
-                                      TempLoop.Branch(BranchNum).PressureCurveType,
-                                      TempLoop.Branch(BranchNum).PressureCurveIndex,
-                                      TempLoop.Branch(BranchNum).TotalComponents,
+                                      branch.PressureCurveType,
+                                      branch.PressureCurveIndex,
+                                      branch.TotalComponents,
                                       CompTypes,
                                       CompNames,
                                       InletNodeNames,
@@ -848,59 +857,54 @@ namespace EnergyPlus {
                                       OutletNodeNumbers,
                                       ErrorsFound);
 
-                        TempLoop.Branch(BranchNum).Comp.allocate(TempLoop.Branch(BranchNum).TotalComponents);
+                        branch.Comp.allocate(branch.TotalComponents);
 
-                        for (CompNum = 1; CompNum <= TempLoop.Branch(BranchNum).TotalComponents; ++CompNum) {
+                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                             // set up some references
                             auto &this_comp_type(CompTypes(CompNum));
-                            auto &this_comp(TempLoop.Branch(BranchNum).Comp(CompNum));
+                            auto &this_comp(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
                             this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             this_comp.TypeOf = this_comp_type;
+                            this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
                             if (UtilityRoutines::SameString(this_comp_type, "Pipe:Adiabatic")) {
                                 this_comp.TypeOf_Num = TypeOf_Pipe;
-                                this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = Pipes::LocalPipeData::factory(TypeOf_Pipe, CompNames(CompNum));
+                                this_comp.compPtr = Pipes::LocalPipeData::factory(state.pipes, TypeOf_Pipe, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Adiabatic:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeSteam;
-                                this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = Pipes::LocalPipeData::factory(TypeOf_PipeSteam, CompNames(CompNum));
+                                this_comp.compPtr = Pipes::LocalPipeData::factory(state.pipes, TypeOf_PipeSteam, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Outdoor")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeExterior;
-                                this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(TypeOf_PipeExterior,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeExterior,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Indoor")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeInterior;
-                                this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(TypeOf_PipeInterior,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeInterior,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Underground")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeUnderground;
-                                this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(TypeOf_PipeUnderground,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeUnderground,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "PipingSystem:Underground:PipeCircuit")) {
                                 this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
-                                this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(
+                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state,
                                         TypeOf_PipingSystemPipeCircuit, CompNames(CompNum));
                             } else if (has_prefixi(this_comp_type, "Pump") ||
                                        has_prefixi(this_comp_type, "HeaderedPumps")) {
-                                if (has_prefixi(this_comp_type, "Pump:VariableSpeed")) {
-                                    this_comp.TypeOf_Num = TypeOf_PumpVariableSpeed;
+                                if (has_prefixi(this_comp_type, "Pump:VariableSpeed:Condensate")) {
+                                    this_comp.TypeOf_Num = TypeOf_PumpCondensate;
                                 } else if (has_prefixi(this_comp_type, "Pump:ConstantSpeed")) {
                                     this_comp.TypeOf_Num = TypeOf_PumpConstantSpeed;
-                                } else if (has_prefixi(this_comp_type, "Pump:VariableSpeed:Condensate")) {
-                                    this_comp.TypeOf_Num = TypeOf_PumpCondensate;
+                                } else if (has_prefixi(this_comp_type, "Pump:VariableSpeed")) {
+                                    this_comp.TypeOf_Num = TypeOf_PumpVariableSpeed;
                                 } else if (has_prefixi(this_comp_type, "HeaderedPumps:ConstantSpeed")) {
                                     this_comp.TypeOf_Num = TypeOf_PumpBankConstantSpeed;
                                 } else if (has_prefixi(this_comp_type, "HeaderedPumps:VariableSpeed")) {
@@ -911,220 +915,211 @@ namespace EnergyPlus {
                                             "GetPlantInput: trying to process a pump type that is not supported, dev note");
                                     ShowContinueError("Component Type =" + this_comp_type);
                                 }
-                                this_comp.GeneralEquipType = GenEquipTypes_Pump;
                                 this_comp.CurOpSchemeType = PumpOpSchemeType;
-                                if (BranchNum == 1 || BranchNum == TempLoop.TotalBranches) {
+                                if (BranchNum == 1 || BranchNum == PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches) {
                                     ASeriesBranchHasPump = true;
                                 } else {
                                     AParallelBranchHasPump = true;
                                 }
-                                StoreAPumpOnCurrentTempLoop(
-                                        LoopNum, LoopSideNum, BranchNum, CompNum, CompNames(CompNum),
-                                        OutletNodeNumbers(CompNum), AParallelBranchHasPump);
+                                LoopSidePumpInformation p;
+                                p.PumpName = CompNames(CompNum);
+                                p.BranchNum = BranchNum;
+                                p.CompNum = CompNum;
+                                p.PumpOutletNode = OutletNodeNumbers(CompNum);
+                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchPumpsExist = AParallelBranchHasPump;
+                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps.push_back(p);
+                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalPumps++;
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_WtrHeaterMixed;
-                                this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:Stratified")) {
                                 this_comp.TypeOf_Num = TypeOf_WtrHeaterStratified;
-                                this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:Directfired")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_DFAbsorption;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+                                this_comp.compPtr = ChillerGasAbsorption::GasAbsorberSpecs::factory(state.dataChillerGasAbsorption, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:DoubleEffect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+                                this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(state.dataChillerExhaustAbsorption, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankMixed;
-                                this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Stratified")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankStratified;
-                                this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterUse:Connections")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
-                                this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(state.dataWaterUse, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:Water:DetailedGeometry")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterDetailedFlatCooling;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterSimpleHeating;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Heating:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilSteamAirHeating;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type, "SolarCollector:FlatPlate:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_SolarCollectorFlatPlate;
-                                this_comp.GeneralEquipType = GenEquipTypes_SolarCollector;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 }
+                                this_comp.compPtr = SolarCollectors::CollectorData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:IntegralCollectorStorage")) {
                                 this_comp.TypeOf_Num = TypeOf_SolarCollectorICS;
-                                this_comp.GeneralEquipType = GenEquipTypes_SolarCollector;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 }
+                                this_comp.compPtr = SolarCollectors::CollectorData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "LoadProfile:Plant")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
-                                this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 this_comp.compPtr = PlantLoadProfile::PlantProfileData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:System")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSystem;
-                                this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(TypeOf_GrndHtExchgSystem,
+                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, TypeOf_GrndHtExchgSystem,
                                                                                             CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Surface")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSurface;
-                                this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr =
                                         SurfaceGroundHeatExchanger::SurfaceGroundHeatExchangerData::factory(
                                                 TypeOf_GrndHtExchgSurface, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Pond")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgPond;
-                                this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr =
-                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(
-                                                TypeOf_GrndHtExchgPond, CompNames(CompNum));
+                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Slinky")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
-                                this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
-                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(TypeOf_GrndHtExchgSlinky,
+                                this_comp.compPtr = GroundHeatExchangers::GLHEBase::factory(state, TypeOf_GrndHtExchgSlinky,
                                                                                             CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric:EIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricEIR;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerElectricEIR::ElectricEIRChillerSpecs::factory(state.dataChillerElectricEIR, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Chiller:Electric:ReformulatedEIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricReformEIR;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(state.dataChillerReformulatedEIR, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Electric;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:EngineDriven")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_EngineDriven;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::EngineDrivenChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:CombustionTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_CombTurbine;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:ConstantCOP")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ConstCOP;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(state.dataPlantChillers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:HotWater")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
-                                this_comp.GeneralEquipType = GenEquipTypes_Boiler;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = Boilers::BoilerSpecs::factory(CompNames(CompNum));
+                                this_comp.compPtr = Boilers::BoilerSpecs::factory(state.dataBoilers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
-                                this_comp.GeneralEquipType = GenEquipTypes_Boiler;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(state.dataSteamBoilers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption:Indirect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Indirect_Absorption;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(state.dataChillerIndirectAbsorption, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Absorption;
-                                this_comp.GeneralEquipType = GenEquipTypes_Chiller;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(state.dataChillerAbsorbers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
-                                this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_TwoSpd;
-                                this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:VariableSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpd;
-                                this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "CoolingTower:VariableSpeed:Merkel")) {
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:VariableSpeed:Merkel")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
-                                this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
+                                this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(state.dataCondenserLoopTowers, CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
-                                this_comp.GeneralEquipType = GenEquipTypes_Generator;
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory_exhaust(state.files, CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1133,19 +1128,18 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "WaterHeater:HeatPump:PumpedCondenser")) {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
-                                this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "WaterHeater:HeatPump:WrappedCondenser")) {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterWrapped;
-                                this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WatertoWater:EquationFit:Cooling")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(
                                         TypeOf_HPWaterEFCooling, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterEFCooling;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1156,7 +1150,6 @@ namespace EnergyPlus {
                                 this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(
                                         TypeOf_HPWaterEFHeating, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterEFHeating;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1166,7 +1159,6 @@ namespace EnergyPlus {
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Heating")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterHEATING::GshpPeHeatingSpecs::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPEHeating;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1176,29 +1168,26 @@ namespace EnergyPlus {
                                                                    "HeatPump:WaterToWater:ParameterEstimation:Cooling")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterCOOLING::GshpPeCoolingSpecs::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HPWaterPECooling;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Heating")) {
-                                this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(
+                                                                   "HeatPump:PlantLoop:EIR:Heating")) {
+                                this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRHeating;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Cooling")) {
-                                this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(
+                                                                   "HeatPump:PlantLoop:EIR:Cooling")) {
+                                this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRCooling;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1207,236 +1196,208 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "AirConditioner:VariableRefrigerantFlow")) {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpVRF;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictCooling")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
-                                this_comp.GeneralEquipType = GenEquipTypes_Purchased;
                                 this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchChilledWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictHeating")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchHotWater;
-                                this_comp.GeneralEquipType = GenEquipTypes_Purchased;
                                 this_comp.compPtr = OutsideEnergySources::OutsideEnergySourceSpecs::factory(TypeOf_PurchHotWater, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
-                                this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Detailed")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
-                                this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
                                 this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_ValveTempering;
-                                this_comp.GeneralEquipType = GenEquipTypes_Valve;
                             } else if (UtilityRoutines::SameString(this_comp_type, "HeatExchanger:FluidToFluid")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidToFluidPlantHtExchg;
-                                this_comp.GeneralEquipType = GenEquipTypes_HeatExchanger;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
-                                this_comp.GeneralEquipType = GenEquipTypes_Generator;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Generator:InternalCombustionEngine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_ICEngine;
-                                this_comp.GeneralEquipType = GenEquipTypes_Generator;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(CompNames(CompNum));
+
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:CombustionTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_CTurbine;
-                                this_comp.GeneralEquipType = GenEquipTypes_Generator;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(state.dataCTElectricGenerator, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
-                                this_comp.GeneralEquipType = GenEquipTypes_Generator;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(state.files, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:StackCooler")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
-                                this_comp.GeneralEquipType = GenEquipTypes_Generator;
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(state.files, CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                            } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:SingleSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
-                                this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
                                         TypeOf_FluidCooler_SingleSpd, CompNames(CompNum));
-                                //
-                            } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:TwoSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
-                                this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
                                         TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "EvaporativeFluidcooler:SingleSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
-                                this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
-                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidcooler:TwoSpeed")) {
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                        TypeOf_EvapFluidCooler_SingleSpd, CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
-                                this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                        TypeOf_EvapFluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:FlatPlate:PhotovoltaicThermal")) {
                                 this_comp.TypeOf_Num = TypeOf_PVTSolarCollectorFlatPlate;
-                                this_comp.GeneralEquipType = GenEquipTypes_SolarCollector;
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CentralHeatPumpSystem")) {
                                 this_comp.TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
-                                this_comp.GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
-
+                                this_comp.compPtr = PlantCentralGSHP::WrapperSpecs::factory(CompNames(CompNum));
                                 // now deal with demand components of the ZoneHVAC type served by ControlCompOutput
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:Baseboard:RadiantConvective:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Water;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:Baseboard:Convective:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_Baseboard_Conv_Water;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:Baseboard:RadiantConvective:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_Baseboard_Rad_Conv_Steam;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:CoolingPanel:RadiantConvective:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingPanel_Simple;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:LowTemperatureRadiant:VariableFlow")) {
                                 this_comp.TypeOf_Num = TypeOf_LowTempRadiant_VarFlow;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:LowTemperatureRadiant:ConstantFlow")) {
                                 this_comp.TypeOf_Num = TypeOf_LowTempRadiant_ConstFlow;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "AirTerminal:SingleDuct:ConstantVolume:CooledBeam")) {
                                 this_comp.TypeOf_Num = TypeOf_CooledBeamAirTerminal;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam")) {
                                 this_comp.TypeOf_Num = TypeOf_FourPipeBeamAirTerminal;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_MultiSpeedHeatPumpRecovery;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type, "AirLoopHVAC:UnitarySystem")) {
                                 this_comp.TypeOf_Num = TypeOf_UnitarySysRecovery;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Heating:WaterToAirHeatPump:EquationFit")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWAHPHeatingEquationFit;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:WaterToAirHeatPump:EquationFit")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWAHPCoolingEquationFit;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilVSWAHPHeatingEquationFit;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilVSWAHPCoolingEquationFit;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Heating:WaterToAirHeatPump:ParameterEstimation")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWAHPHeatingParamEst;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWAHPCoolingParamEst;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Refrigeration:Condenser:WaterCooled")) {
                                 this_comp.TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
-                                this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigCondenserData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Refrigeration:CompressorRack")) {
                                 this_comp.TypeOf_Num = TypeOf_RefrigerationWaterCoolRack;
-                                this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigRackData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
-                                this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
-                                this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type, "ZoneHVAC:ForcedAir:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_ZoneHVACAirUserDefined;
-                                this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "AirTerminal:SingleDuct:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_AirTerminalUserDefined;
-                                this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "PlantComponent:TemperatureSource")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type,"PlantComponent:TemperatureSource")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterSource;
-                                this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+                                this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "GroundHeatExchanger:HorizontalTrench")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
-                                this_comp.GeneralEquipType = GenEquipTypes_Pipe;
                                 this_comp.CurOpSchemeType = TypeOf_GrndHtExchgHorizTrench;
-                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(
+                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state,
                                         TypeOf_GrndHtExchgHorizTrench, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {
                                 this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
-                                this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type, "SwimmingPool:Indoor")) {
                                 this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
-                                this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else {
                                 // discover unsupported equipment on branches.
@@ -1453,27 +1414,11 @@ namespace EnergyPlus {
                             this_comp.NodeNameOut = OutletNodeNames(CompNum);
                             this_comp.NodeNumOut = OutletNodeNumbers(CompNum);
 
-                            // Increment pipe counter if component is a pipe
-                            if (this_comp.TypeOf_Num == TypeOf_Pipe || this_comp.TypeOf_Num == TypeOf_PipeInterior ||
-                                this_comp.TypeOf_Num == TypeOf_PipeExterior ||
-                                this_comp.TypeOf_Num == TypeOf_PipeUnderground ||
-                                this_comp.TypeOf_Num == TypeOf_PipeSteam) {
-                                ++NumOfPipesInLoop;
-                                if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
-                                    ++NumPlantPipes;
-                                } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) {
-                                    ++NumCondPipes;
-                                }
-                                ++NumPipes;
-                            }
-
-                            TempLoop.Branch(BranchNum).NodeNumIn = TempLoop.Branch(BranchNum).Comp(1).NodeNumIn;
-
-                            // find branch outlet node
-                            TempLoop.Branch(BranchNum).NodeNumOut =
-                                    TempLoop.Branch(BranchNum).Comp(
-                                            TempLoop.Branch(BranchNum).TotalComponents).NodeNumOut;
                         }
+
+                        // set branch inlet/outlet nodes
+                        branch.NodeNumIn = branch.Comp(1).NodeNumIn;
+                        branch.NodeNumOut = branch.Comp(branch.TotalComponents).NodeNumOut;
 
                         CompTypes.deallocate();
                         CompNames.deallocate();
@@ -1488,31 +1433,29 @@ namespace EnergyPlus {
 
                     if (ASeriesBranchHasPump && AParallelBranchHasPump) {
                         ShowSevereError("Current version does not support Loop pumps and branch pumps together");
-                        ShowContinueError("Occurs in loop " + TempLoop.Name);
+                        ShowContinueError("Occurs in loop " + PlantLoop(LoopNum).Name);
                         ErrorsFound = true;
                     }
 
                     // Obtain the Splitter and Mixer information
-                    if (TempLoop.ConnectList.empty()) {
+                    if (loopSide.ConnectList.empty()) {
                         NumofSplitters = 0;
                         NumofMixers = 0;
                     } else {
                         errFlag = false;
-                        GetNumSplitterMixerInConntrList(TempLoop.Name, TempLoop.ConnectList, NumofSplitters,
-                                                        NumofMixers, errFlag);
+                        GetNumSplitterMixerInConntrList(state.dataBranchInputManager, plantLoop.Name, loopSide.ConnectList, NumofSplitters, NumofMixers, errFlag);
                         if (errFlag) {
                             ErrorsFound = true;
                         }
                         if (NumofSplitters != NumofMixers) {
-                            ShowSevereError("GetPlantInput: Loop Name=" + TempLoop.Name + ", ConnectorList=" +
-                                            TempLoop.ConnectList +
-                                            ", unequal number of splitters and mixers");
+                            ShowSevereError("GetPlantInput: Loop Name=" + plantLoop.Name + ", ConnectorList=" +
+                                                loopSide.ConnectList + ", unequal number of splitters and mixers");
                             ErrorsFound = true;
                         }
                     }
 
-                    TempLoop.SplitterExists = NumofSplitters > 0;
-                    TempLoop.MixerExists = NumofMixers > 0;
+                    loopSide.Splitter.Exists = NumofSplitters > 0;
+                    loopSide.Mixer.Exists = NumofMixers > 0;
 
                     if (ErrorsFound) {
                         ShowFatalError("GetPlantInput: Previous Severe errors cause termination.");
@@ -1525,13 +1468,14 @@ namespace EnergyPlus {
                         if (SplitNum > NumofSplitters) break;
                         OutletNodeNames.allocate(MaxNumAlphas);
                         OutletNodeNumbers.allocate(MaxNumAlphas);
-                        GetLoopSplitter(TempLoop.Name,
-                                        TempLoop.ConnectList,
-                                        TempLoop.Splitter.Name,
-                                        TempLoop.Splitter.Exists,
-                                        TempLoop.Splitter.NodeNameIn,
-                                        TempLoop.Splitter.NodeNumIn,
-                                        TempLoop.Splitter.TotalOutletNodes,
+                        GetLoopSplitter(state.dataBranchInputManager,
+                                        plantLoop.Name,
+                                        loopSide.ConnectList,
+                                        loopSide.Splitter.Name,
+                                        loopSide.Splitter.Exists,
+                                        loopSide.Splitter.NodeNameIn,
+                                        loopSide.Splitter.NodeNumIn,
+                                        loopSide.Splitter.TotalOutletNodes,
                                         OutletNodeNames,
                                         OutletNodeNumbers,
                                         ErrorsFound,
@@ -1545,54 +1489,52 @@ namespace EnergyPlus {
                         }
 
                         // Map the inlet node to the splitter to a branch number
-                        if (TempLoop.Splitter.Exists) {
+                        if (loopSide.Splitter.Exists) {
                             // Map the inlet node to the splitter to a branch number
                             SplitInBranch = false;
-                            for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                CompNum = TempLoop.Branch(BranchNum).TotalComponents;
-                                if (TempLoop.Splitter.NodeNumIn ==
-                                    TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
-                                    TempLoop.Splitter.BranchNumIn = BranchNum;
+                            for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
+                                auto &branch = loopSide.Branch(BranchNum);
+                                CompNum = branch.TotalComponents;
+                                if (loopSide.Splitter.NodeNumIn == branch.Comp(CompNum).NodeNumOut) {
+                                    loopSide.Splitter.BranchNumIn = BranchNum;
                                     SplitInBranch = true;
                                     break; // BranchNum DO loop
                                 }
                             }
                             if (!SplitInBranch) {
-                                ShowSevereError("Splitter Inlet Branch not found, Splitter=" + TempLoop.Splitter.Name);
-                                ShowContinueError("Splitter Branch Inlet name=" + TempLoop.Splitter.NodeNameIn);
-                                ShowContinueError("In Loop=" + TempLoop.Name);
+                                ShowSevereError("Splitter Inlet Branch not found, Splitter=" + loopSide.Splitter.Name);
+                                ShowContinueError("Splitter Branch Inlet name=" + loopSide.Splitter.NodeNameIn);
+                                ShowContinueError("In Loop=" + plantLoop.Name);
                                 ErrorsFound = true;
                             }
 
-                            TempLoop.Splitter.NodeNameOut.allocate(TempLoop.Splitter.TotalOutletNodes);
-                            TempLoop.Splitter.NodeNumOut.dimension(TempLoop.Splitter.TotalOutletNodes, 0);
-                            TempLoop.Splitter.BranchNumOut.dimension(TempLoop.Splitter.TotalOutletNodes, 0);
+                            loopSide.Splitter.NodeNameOut.allocate(loopSide.Splitter.TotalOutletNodes);
+                            loopSide.Splitter.NodeNumOut.dimension(loopSide.Splitter.TotalOutletNodes, 0);
+                            loopSide.Splitter.BranchNumOut.dimension(loopSide.Splitter.TotalOutletNodes, 0);
 
-                            SplitOutBranch.allocate(TempLoop.Splitter.TotalOutletNodes);
+                            SplitOutBranch.allocate(loopSide.Splitter.TotalOutletNodes);
                             SplitOutBranch = false;
-                            for (NodeNum = 1; NodeNum <= TempLoop.Splitter.TotalOutletNodes; ++NodeNum) {
-                                TempLoop.Splitter.NodeNameOut(NodeNum) = OutletNodeNames(NodeNum);
-                                TempLoop.Splitter.NodeNumOut(NodeNum) = OutletNodeNumbers(NodeNum);
+                            for (NodeNum = 1; NodeNum <= loopSide.Splitter.TotalOutletNodes; ++NodeNum) {
+                                loopSide.Splitter.NodeNameOut(NodeNum) = OutletNodeNames(NodeNum);
+                                loopSide.Splitter.NodeNumOut(NodeNum) = OutletNodeNumbers(NodeNum);
                                 // The following DO loop series is intended to store the branch number for each outlet
                                 // branch of the splitter
-                                for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                    if (TempLoop.Splitter.NodeNumOut(NodeNum) ==
-                                        TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
-                                        TempLoop.Splitter.BranchNumOut(NodeNum) = BranchNum;
+                                for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
+                                    if (loopSide.Splitter.NodeNumOut(NodeNum) == loopSide.Branch(BranchNum).Comp(1).NodeNumIn) {
+                                        loopSide.Splitter.BranchNumOut(NodeNum) = BranchNum;
                                         SplitOutBranch(NodeNum) = true;
                                         break; // BranchNum DO loop
                                     }
                                 }
                             }
 
-                            for (Outlet = 1; Outlet <= TempLoop.Splitter.TotalOutletNodes; ++Outlet) {
+                            for (Outlet = 1; Outlet <= loopSide.Splitter.TotalOutletNodes; ++Outlet) {
                                 if (SplitOutBranch(Outlet)) continue;
-                                ShowSevereError("Splitter Outlet Branch not found, Splitter=" + TempLoop.Splitter.Name);
-                                ShowContinueError(
-                                        "Splitter Branch Outlet node name=" + TempLoop.Splitter.NodeNameOut(Outlet));
-                                ShowContinueError("In Loop=" + TempLoop.Name);
-                                ShowContinueError("Loop BranchList=" + TempLoop.BranchList);
-                                ShowContinueError("Loop ConnectorList=" + TempLoop.ConnectList);
+                                ShowSevereError("Splitter Outlet Branch not found, Splitter=" + loopSide.Splitter.Name);
+                                ShowContinueError("Splitter Branch Outlet node name=" + loopSide.Splitter.NodeNameOut(Outlet));
+                                ShowContinueError("In Loop=" + plantLoop.Name);
+                                ShowContinueError("Loop BranchList=" + loopSide.BranchList);
+                                ShowContinueError("Loop ConnectorList=" + loopSide.ConnectList);
                                 ErrorsFound = true;
                             }
 
@@ -1609,13 +1551,14 @@ namespace EnergyPlus {
                         if (MixNum > NumofMixers) break;
                         InletNodeNames.allocate(MaxNumAlphas);
                         InletNodeNumbers.allocate(MaxNumAlphas);
-                        GetLoopMixer(TempLoop.Name,
-                                     TempLoop.ConnectList,
-                                     TempLoop.Mixer.Name,
-                                     TempLoop.Mixer.Exists,
-                                     TempLoop.Mixer.NodeNameOut,
-                                     TempLoop.Mixer.NodeNumOut,
-                                     TempLoop.Mixer.TotalInletNodes,
+                        GetLoopMixer(state.dataBranchInputManager,
+                                     plantLoop.Name,
+                                     loopSide.ConnectList,
+                                     loopSide.Mixer.Name,
+                                     loopSide.Mixer.Exists,
+                                     loopSide.Mixer.NodeNameOut,
+                                     loopSide.Mixer.NodeNumOut,
+                                     loopSide.Mixer.TotalInletNodes,
                                      InletNodeNames,
                                      InletNodeNumbers,
                                      ErrorsFound,
@@ -1628,50 +1571,49 @@ namespace EnergyPlus {
                             continue;
                         }
                         // Map the outlet node of the mixer to a branch number
-                        if (TempLoop.Mixer.Exists) {
+                        if (loopSide.Mixer.Exists) {
                             // Map the outlet node of the mixer to a branch number
                             MixerOutBranch = false;
-                            for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                if (TempLoop.Mixer.NodeNumOut == TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
-                                    TempLoop.Mixer.BranchNumOut = BranchNum;
+                            for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
+                                if (loopSide.Mixer.NodeNumOut == loopSide.Branch(BranchNum).Comp(1).NodeNumIn) {
+                                    loopSide.Mixer.BranchNumOut = BranchNum;
                                     MixerOutBranch = true;
                                     break; // BranchNum DO loop
                                 }
                             }
                             if (!MixerOutBranch) {
-                                ShowSevereError("Mixer Outlet Branch not found, Mixer=" + TempLoop.Mixer.Name);
+                                ShowSevereError("Mixer Outlet Branch not found, Mixer=" + loopSide.Mixer.Name);
                                 ErrorsFound = true;
                             }
 
-                            TempLoop.Mixer.NodeNameIn.allocate(TempLoop.Mixer.TotalInletNodes);
-                            TempLoop.Mixer.NodeNumIn.dimension(TempLoop.Mixer.TotalInletNodes, 0);
-                            TempLoop.Mixer.BranchNumIn.dimension(TempLoop.Mixer.TotalInletNodes, 0);
+                            loopSide.Mixer.NodeNameIn.allocate(loopSide.Mixer.TotalInletNodes);
+                            loopSide.Mixer.NodeNumIn.dimension(loopSide.Mixer.TotalInletNodes, 0);
+                            loopSide.Mixer.BranchNumIn.dimension(loopSide.Mixer.TotalInletNodes, 0);
 
-                            MixerInBranch.allocate(TempLoop.Mixer.TotalInletNodes);
+                            MixerInBranch.allocate(loopSide.Mixer.TotalInletNodes);
                             MixerInBranch = false;
-                            for (NodeNum = 1; NodeNum <= TempLoop.Mixer.TotalInletNodes; ++NodeNum) {
-                                TempLoop.Mixer.NodeNameIn(NodeNum) = InletNodeNames(NodeNum);
-                                TempLoop.Mixer.NodeNumIn(NodeNum) = InletNodeNumbers(NodeNum);
-                                // The following DO loop series is intended to store the branch number for each inlet
-                                // branch of the mixer
-                                for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                    CompNum = TempLoop.Branch(BranchNum).TotalComponents;
-                                    if (TempLoop.Mixer.NodeNumIn(NodeNum) ==
-                                        TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
-                                        TempLoop.Mixer.BranchNumIn(NodeNum) = BranchNum;
+                            for (NodeNum = 1; NodeNum <= loopSide.Mixer.TotalInletNodes; ++NodeNum) {
+                                loopSide.Mixer.NodeNameIn(NodeNum) = InletNodeNames(NodeNum);
+                                loopSide.Mixer.NodeNumIn(NodeNum) = InletNodeNumbers(NodeNum);
+                                // The following DO loop series is intended to store the branch number for each inlet branch of the mixer
+                                for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
+                                    auto &branch = loopSide.Branch(BranchNum);
+                                    CompNum = branch.TotalComponents;
+                                    if (loopSide.Mixer.NodeNumIn(NodeNum) == branch.Comp(CompNum).NodeNumOut) {
+                                        loopSide.Mixer.BranchNumIn(NodeNum) = BranchNum;
                                         MixerInBranch(NodeNum) = true;
                                         break; // BranchNum DO loop
                                     }
                                 }
                             }
 
-                            for (Inlet = 1; Inlet <= TempLoop.Mixer.TotalInletNodes; ++Inlet) {
+                            for (Inlet = 1; Inlet <= loopSide.Mixer.TotalInletNodes; ++Inlet) {
                                 if (MixerInBranch(Inlet)) continue;
-                                ShowSevereError("Mixer Inlet Branch not found, Mixer=" + TempLoop.Mixer.Name);
-                                ShowContinueError("Mixer Branch Inlet name=" + TempLoop.Mixer.NodeNameIn(Inlet));
-                                ShowContinueError("In Loop=" + TempLoop.Name);
-                                ShowContinueError("Loop BranchList=" + TempLoop.BranchList);
-                                ShowContinueError("Loop ConnectorList=" + TempLoop.ConnectList);
+                                ShowSevereError("Mixer Inlet Branch not found, Mixer=" + loopSide.Mixer.Name);
+                                ShowContinueError("Mixer Branch Inlet name=" + loopSide.Mixer.NodeNameIn(Inlet));
+                                ShowContinueError("In Loop=" + plantLoop.Name);
+                                ShowContinueError("Loop BranchList=" + loopSide.BranchList);
+                                ShowContinueError("Loop ConnectorList=" + loopSide.ConnectList);
                                 ErrorsFound = true;
                             }
 
@@ -1681,156 +1623,47 @@ namespace EnergyPlus {
                         InletNodeNumbers.deallocate();
                     }
 
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SplitterExists = TempLoop.SplitterExists;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).MixerExists = TempLoop.MixerExists;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).BypassExists = TempLoop.BypassExists;
+                    loopSide.noLoadConstantSpeedBranchFlowRateSteps.allocate(loopSide.TotalBranches - 2);
 
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch.allocate(TempLoop.TotalBranches);
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches = TempLoop.TotalBranches;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch = TempLoop.Branch;
-
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter = TempLoop.Splitter;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer = TempLoop.Mixer;
-
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).noLoadConstantSpeedBranchFlowRateSteps.allocate(
-                            TempLoop.TotalBranches - 2);
-
-                    //   Add condenser CASE statement when required.
-
-                    TempLoop.Branch.deallocate();
+                    // TODO: this is just intended to be temporary
+                    loopSide.myLoopNum = LoopNum;
+                    loopSide.myLoopSideNum = LoopSideNum;
+                    loopSide.myOtherLoopSideNum = 3 - LoopSideNum;
 
                 } // ... end LoopSideNum=DemandSide,SupplySide
 
-                PlantLoop(LoopNum).LoopHasConnectionComp = TempLoop.LoopHasConnectionComp;
+                plantLoop.LoopSide(1).loopSideDescription = plantLoop.Name + " - Demand Side";
+                plantLoop.LoopSide(2).loopSideDescription = plantLoop.Name + " - Supply Side";
 
                 // a nice little spot to report out bad pump/common-pipe configurations
-                bool const ThisSideHasPumps = (PlantLoop(LoopNum).LoopSide(1).TotalPumps > 0);
-                bool const OtherSideHasPumps = (PlantLoop(LoopNum).LoopSide(2).TotalPumps > 0);
-                if ((PlantLoop(LoopNum).CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
+                bool const ThisSideHasPumps = (plantLoop.LoopSide(1).TotalPumps > 0);
+                bool const OtherSideHasPumps = (plantLoop.LoopSide(2).TotalPumps > 0);
+                if ((plantLoop.CommonPipeType != CommonPipe_No) && (!ThisSideHasPumps || !OtherSideHasPumps)) {
                     ShowSevereError("Input Error: Common Pipe configurations must have pumps on both sides of loop");
-                    ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
+                    ShowContinueError("Occurs on plant loop name =\"" + plantLoop.Name + "\"");
                     ShowContinueError("Make sure both demand and supply sides have a pump");
                     ErrorsFound = true;
-                } else if ((PlantLoop(LoopNum).CommonPipeType == CommonPipe_No) && ThisSideHasPumps &&
-                           OtherSideHasPumps) {
+                } else if ((plantLoop.CommonPipeType == CommonPipe_No) && ThisSideHasPumps && OtherSideHasPumps) {
                     ShowSevereError("Input Error: Pumps on both loop sides must utilize a common pipe");
-                    ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
+                    ShowContinueError("Occurs on plant loop name =\"" + plantLoop.Name + "\"");
                     ShowContinueError("Add common pipe or remove one loop side pump");
                     ErrorsFound = true;
                 } else if (!ThisSideHasPumps && !OtherSideHasPumps) {
                     ShowSevereError("SetupLoopFlowRequest: Problem in plant topology, no pumps specified on the loop");
-                    ShowContinueError("Occurs on plant loop name =\"" + PlantLoop(LoopNum).Name + "\"");
+                    ShowContinueError("Occurs on plant loop name =\"" + plantLoop.Name + "\"");
                     ShowContinueError("All plant loops require at least one pump");
                     ErrorsFound = true;
                 }
 
                 // set up some pump indexing for convenience later
                 for (int LoopSideCounter = 1; LoopSideCounter <= 2; ++LoopSideCounter) {
-                    for (int PumpCounter = 1; PumpCounter <= DataPlant::PlantLoop(LoopNum).LoopSide(
-                            LoopSideCounter).TotalPumps; ++PumpCounter) {
-                        int const PumpBranchNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Pumps(
-                                PumpCounter).BranchNum;
-                        int const PumpCompNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Pumps(
-                                PumpCounter).CompNum;
-                        DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Branch(PumpBranchNum).Comp(
-                                PumpCompNum).IndexInLoopSidePumps = PumpCounter;
+                    for (int PumpCounter = 1; PumpCounter <= plantLoop.LoopSide(LoopSideCounter).TotalPumps; ++PumpCounter) {
+                        int const PumpBranchNum = plantLoop.LoopSide(LoopSideCounter).Pumps(PumpCounter).BranchNum;
+                        int const PumpCompNum = plantLoop.LoopSide(LoopSideCounter).Pumps(PumpCounter).CompNum;
+                        plantLoop.LoopSide(LoopSideCounter).Branch(PumpBranchNum).Comp(PumpCompNum).IndexInLoopSidePumps = PumpCounter;
                     }
                 }
 
-            } // ...end of demand side loops DO loop
-
-            // DSU? can we clean this out this next do loop now? looks like bandaids.
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                auto &this_supply_side(PlantLoop(LoopNum).LoopSide(SupplySide));
-                for (BranchNum = 1; BranchNum <= this_supply_side.TotalBranches; ++BranchNum) {
-                    auto &this_branch(this_supply_side.Branch(BranchNum));
-                    for (CompNum = 1; CompNum <= this_branch.TotalComponents; ++CompNum) {
-                        auto &this_comp(this_branch.Comp(CompNum));
-                        Pos = index(this_comp.TypeOf, ':');
-                        if (Pos != std::string::npos) {
-                            GeneralEquipType = UtilityRoutines::FindItemInList(this_comp.TypeOf.substr(0, Pos),
-                                                                               GeneralEquipTypes, NumGeneralEquipTypes);
-                        } else {
-                            GeneralEquipType = 0;
-                        }
-                        if (GeneralEquipType == 0) {
-                            if (has_prefixi(this_comp.TypeOf, "HeaderedPumps")) {
-                                GeneralEquipType = GenEquipTypes_Pump;
-                            } else if (has_prefixi(this_comp.TypeOf, "WaterHeater:HeatPump")) {
-                                GeneralEquipType = GenEquipTypes_WaterThermalTank;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "TemperingValve")) {
-                                GeneralEquipType = GenEquipTypes_Valve;
-                            } else if (has_prefixi(this_comp.TypeOf, "Pipe:Adiabatic")) {
-                                GeneralEquipType = GenEquipTypes_Pipe;
-                            } else if (has_prefixi(this_comp.TypeOf, "PipingSystem")) {
-                                GeneralEquipType = GenEquipTypes_Pipe;
-                            } else if (has_prefixi(this_comp.TypeOf, "Thermalstorage:ChilledWater:Mixed")) {
-                                GeneralEquipType = GenEquipTypes_ThermalStorage;
-                            } else if (has_prefixi(this_comp.TypeOf, "Thermalstorage:ChilledWater:Stratified")) {
-                                GeneralEquipType = GenEquipTypes_ThermalStorage;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf,
-                                                                   "ChillerHeater:Absorption:DirectFired")) {
-                                GeneralEquipType = GenEquipTypes_Chiller;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf,
-                                                                   "ChillerHeater:Absorption:DoubleEffect")) {
-                                GeneralEquipType = GenEquipTypes_Chiller;
-                            } else if (has_prefixi(this_comp.TypeOf, "District")) {
-                                GeneralEquipType = GenEquipTypes_Purchased;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "GroundHeatExchanger:System")) {
-                                GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "GroundHeatExchanger:Surface")) {
-                                GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "GroundHeatExchanger:Pond")) {
-                                GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "GroundHeatExchanger:Slinky")) {
-                                GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf,
-                                                                   "PlantComponent:TemperatureSource")) {
-                                GeneralEquipType = GenEquipTypes_HeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "CENTRALHEATPUMPSYSTEM")) {
-                                GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
-                            } else {
-                                ShowSevereError("GetPlantInput: PlantLoop=\"" + PlantLoop(LoopNum).Name +
-                                                "\" invalid equipment type.");
-                                ShowContinueError("...on Branch=\"" +
-                                                  PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Name +
-                                                  "\".");
-                                ShowContinueError("...Equipment type=\"" + this_comp.TypeOf + "\".");
-                                ShowContinueError("...Equipment name=\"" + this_comp.Name + "\".");
-                                ErrorsFound = true;
-                            }
-                        }
-
-                        this_comp.GeneralEquipType = GeneralEquipType;
-
-                        // Set up "TypeOf" Num
-                        TypeOfNum = UtilityRoutines::FindItemInList(this_comp.TypeOf, SimPlantEquipTypes,
-                                                                    NumSimPlantEquipTypes);
-                        if (TypeOfNum == 0) {
-                            if (UtilityRoutines::SameString(this_comp.TypeOf, "WaterHeater:HeatPump:PumpedCondenser")) {
-                                this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf,
-                                                                   "WaterHeater:HeatPump:WrappedCondenser")) {
-                                this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterWrapped;
-                            } else if (!has_prefixi(this_comp.TypeOf, "Pump") &&
-                                       !has_prefixi(this_comp.TypeOf, "HeaderedPump")) {
-                                // Error.  May have already been flagged under General
-                                if (GeneralEquipType != 0) { // if GeneralEquipmentType == 0, then already flagged
-                                    ShowSevereError("GetPlantInput: PlantLoop=\"" + PlantLoop(LoopNum).Name +
-                                                    "\" invalid equipment type.");
-                                    ShowContinueError("...on Branch=\"" +
-                                                      PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Name +
-                                                      "\".");
-                                    ShowContinueError("...Equipment type=\"" + this_comp.TypeOf + "\".");
-                                    ShowContinueError("...Equipment name=\"" + this_comp.Name + "\".");
-                                    ErrorsFound = true;
-                                }
-                            }
-                        } else {
-                            this_comp.TypeOf_Num = TypeOfNum;
-                        }
-                    }
-                }
             }
 
             if (ErrorsFound) {
@@ -2044,34 +1877,12 @@ namespace EnergyPlus {
             // This subroutine initializes the plant supply side reports.
             // It was created during the splitting of supply and demand side functions.
 
-            // METHODOLOGY EMPLOYED:
-            // na
-
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS:
-            // na
             // Using/Aliasing
             using DataGlobals::DisplayAdvancedReportVariables;
             using DataPlant::DemandOpSchemeType;
             using DataPlant::DemandSide;
             using DataPlant::PlantLoop;
-            using DataPlant::PlantReport;
             using DataPlant::SupplySide;
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS
-            // na
-
-            // DERIVED TYPE DEFINITIONS
-            // na
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum; // DO loop counter (plant supply sides)
@@ -2084,27 +1895,23 @@ namespace EnergyPlus {
 
             // FLOW:
             MaxBranches = 0;
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                MaxBranches = max(MaxBranches, PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches);
-                MaxBranches = max(MaxBranches, PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches);
-                PlantLoop(LoopNum).MaxBranch = MaxBranches;
-            }
-
-            PlantReport.allocate(TotNumLoops);
-
-            for (auto &e : PlantReport) {
-                e.CoolingDemand = 0.0;
-                e.HeatingDemand = 0.0;
-                e.DemandNotDispatched = 0.0;
-                e.UnmetDemand = 0.0;
-                e.InletNodeTemperature = 0.0;
-                e.OutletNodeTemperature = 0.0;
-                e.InletNodeFlowrate = 0.0;
-                e.BypassFrac = 0.0;
-                e.OutletNodeFlowrate = 0.0;
+            for (auto &loop : PlantLoop) {
+                MaxBranches = max(MaxBranches, loop.LoopSide(DemandSide).TotalBranches);
+                MaxBranches = max(MaxBranches, loop.LoopSide(SupplySide).TotalBranches);
+                loop.MaxBranch = MaxBranches;
+                loop.CoolingDemand = 0.0;
+                loop.HeatingDemand = 0.0;
+                loop.DemandNotDispatched = 0.0;
+                loop.UnmetDemand = 0.0;
+                loop.InletNodeTemperature = 0.0;
+                loop.OutletNodeTemperature = 0.0;
+                loop.InletNodeFlowrate = 0.0;
+                loop.BypassFrac = 0.0;
+                loop.OutletNodeFlowrate = 0.0;
             }
 
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                auto &loop = PlantLoop(LoopNum);
                 if (LoopNum <= NumPlantLoops) {
                     CurrentModuleObject = "Plant Loop";
                 } else {
@@ -2113,67 +1920,57 @@ namespace EnergyPlus {
                 // CurrentModuleObject='Plant/Condenser Loop'
                 SetupOutputVariable("Plant Supply Side Cooling Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).CoolingDemand,
+                                    loop.CoolingDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Heating Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).HeatingDemand,
+                                    loop.HeatingDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Inlet Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    PlantReport(LoopNum).InletNodeFlowrate,
+                                    loop.InletNodeFlowrate,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
 
                 SetupOutputVariable("Plant Supply Side Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PlantReport(LoopNum).InletNodeTemperature,
+                                    loop.InletNodeTemperature,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PlantReport(LoopNum).OutletNodeTemperature,
+                                    loop.OutletNodeTemperature,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
 
                 SetupOutputVariable("Plant Supply Side Not Distributed Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).DemandNotDispatched,
+                                    loop.DemandNotDispatched,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Unmet Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).UnmetDemand,
+                                    loop.UnmetDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-
-                // Debug variables -- used by OSU developers
                 SetupOutputVariable("Debug Plant Loop Bypass Fraction",
                                     OutputProcessor::Unit::None,
-                                    PlantReport(LoopNum).BypassFrac,
+                                    loop.BypassFrac,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                //    CALL SetupOutputVariable('Debug SSInletNode Flowrate[kg/s]', &
-                //           PlantReport(LoopNum)%InletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
-                //    CALL SetupOutputVariable('Debug SSInletNode Temperature[C]', &
-                //           PlantReport(LoopNum)%InletNodeTemperature,'System','Average',PlantLoop(LoopNum)%Name)
-                //    CALL SetupOutputVariable('Debug SSOutletNode Flowrate [kg/s]', &
-                //           PlantReport(LoopNum)%OutletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
-                //    CALL SetupOutputVariable('Debug SSOutletNode Temperature[C]', &
-                //           PlantReport(LoopNum)%OutletNodeTemperature,'System','Average',PlantLoop(LoopNum)%Name)
                 SetupOutputVariable("Debug Plant Last Simulated Loop Side",
                                     OutputProcessor::Unit::None,
-                                    PlantReport(LoopNum).LastLoopSideSimulated,
+                                    loop.LastLoopSideSimulated,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
@@ -2275,7 +2072,7 @@ namespace EnergyPlus {
             } // plant loops
         }
 
-        void InitializeLoops(bool const FirstHVACIteration) // true if first iteration of the simulation
+        void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // true if first iteration of the simulation
         {
 
             // SUBROUTINE INFORMATION:
@@ -2302,7 +2099,6 @@ namespace EnergyPlus {
             using EMSManager::iTemperatureMinSetPoint;
             using EMSManager::iTemperatureSetPoint;
             using General::RoundSigDigits;
-            using PlantLoopEquip::SimPlantEquip;
             using PlantUtilities::SetAllFlowLocks;
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2409,8 +2205,7 @@ namespace EnergyPlus {
                              BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
-                                SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration,
-                                              InitLoopEquip, GetCompSizFac);
+                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                             } //-CompNum
                         }     //-BranchNum
                     }
@@ -2428,7 +2223,7 @@ namespace EnergyPlus {
                         LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                         CurLoopNum = LoopNum;
                         if (LoopSideNum == SupplySide) {
-                            SizePlantLoop(LoopNum, FinishSizingFlag);
+                            SizePlantLoop(state, LoopNum, FinishSizingFlag);
                         }
                     }
                     GetCompSizFac = false;
@@ -2451,16 +2246,15 @@ namespace EnergyPlus {
                     LoopSideNum = PlantCallingOrderInfo(HalfLoopNum).LoopSide;
                     CurLoopNum = LoopNum;
                     if (LoopSideNum == SupplySide) {
-                        SizePlantLoop(LoopNum, FinishSizingFlag);
+                        SizePlantLoop(state, LoopNum, FinishSizingFlag);
                     }
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).loopSolver.SimulateAllLoopSidePumps(LoopNum, LoopSideNum);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state.dataBranchInputManager);
                     for (BranchNum = 1;
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip,
-                                          GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     //				if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
@@ -2490,8 +2284,7 @@ namespace EnergyPlus {
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip,
-                                          GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                 }
@@ -2514,12 +2307,11 @@ namespace EnergyPlus {
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip,
-                                          GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(state, FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).loopSolver.SimulateAllLoopSidePumps(LoopNum, LoopSideNum);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state.dataBranchInputManager);
                 }
 
                 PlantReSizingCompleted = true;
@@ -2819,16 +2611,16 @@ namespace EnergyPlus {
                         }     // BRANCH LOOP
                     }         // LOOPSIDE
                 }             // PLANT LOOP
-                for (auto &e : PlantReport) {
-                    e.CoolingDemand = 0.0;
-                    e.HeatingDemand = 0.0;
-                    e.DemandNotDispatched = 0.0;
-                    e.UnmetDemand = 0.0;
-                    e.LastLoopSideSimulated = 0;
-                    e.InletNodeFlowrate = 0.0;
-                    e.InletNodeTemperature = 0.0;
-                    e.OutletNodeFlowrate = 0.0;
-                    e.OutletNodeTemperature = 0.0;
+                for (auto &loop : PlantLoop) {
+                    loop.CoolingDemand = 0.0;
+                    loop.HeatingDemand = 0.0;
+                    loop.DemandNotDispatched = 0.0;
+                    loop.UnmetDemand = 0.0;
+                    loop.LastLoopSideSimulated = 0;
+                    loop.InletNodeFlowrate = 0.0;
+                    loop.InletNodeTemperature = 0.0;
+                    loop.OutletNodeFlowrate = 0.0;
+                    loop.OutletNodeTemperature = 0.0;
                 }
 
                 MyEnvrnFlag = false;
@@ -3020,7 +2812,7 @@ namespace EnergyPlus {
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                 numLoopSides = 2;
                 for (SideNum = 1; SideNum <= numLoopSides; ++SideNum) {
-                    if (!(PlantLoop(LoopNum).LoopSide(SideNum).SplitterExists)) continue;
+                    if (!(PlantLoop(LoopNum).LoopSide(SideNum).Splitter.Exists)) continue;
 
                     for (ParalBranchNum = 1;
                          ParalBranchNum <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
@@ -3191,7 +2983,7 @@ namespace EnergyPlus {
             }
         }
 
-        void SizePlantLoop(int const LoopNum, // Supply side loop being simulated
+        void SizePlantLoop(EnergyPlusData &state, int const LoopNum, // Supply side loop being simulated
                            bool const OkayToFinish) {
 
             // SUBROUTINE INFORMATION:
@@ -3211,7 +3003,6 @@ namespace EnergyPlus {
             using namespace DataSizing;
             using FluidProperties::GetDensityGlycol;
             using General::RoundSigDigits;
-            using PlantLoopEquip::SimPlantEquip;
             using ReportSizingManager::ReportSizingOutput;
 
             // Locals
@@ -3262,7 +3053,7 @@ namespace EnergyPlus {
                             continue;
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SupplySide).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, SupplySide, BranchNum, CompNum, true, localInitLoopEquip, GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).simulate(state, true, localInitLoopEquip, GetCompSizFac);
                             BranchSizFac = max(BranchSizFac,
                                                PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(
                                                        CompNum).SizFac);
@@ -3640,8 +3431,6 @@ namespace EnergyPlus {
                 PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
             }
 
-            // legacy one-time calling control stuff moved here from manager routine, hopefully remove
-            if (!allocated(LoadChangeDownStream)) LoadChangeDownStream.allocate(TotNumLoops);
         }
 
         void RevisePlantCallingOrder() {
@@ -3794,44 +3583,6 @@ namespace EnergyPlus {
             return CallingIndex;
         }
 
-        void StoreAPumpOnCurrentTempLoop(int const LoopNum,
-                                         int const LoopSideNum,
-                                         int const BranchNum,
-                                         int const CompNum,
-                                         std::string const &PumpName,
-                                         int const PumpOutletNode,
-                                         bool const HasBranchPumps) {
-
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         Edwin Lee
-            //       DATE WRITTEN   April 2010
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
-
-            // PURPOSE OF THIS SUBROUTINE:
-            // This routine reallocates the pumps data structure in the LoopSide data structure
-            //  and adds the pump data passed in as the next pump
-
-            // METHODOLOGY EMPLOYED:
-            // Fills the following location items in the pump data structure which resides on the LoopSide
-            // TYPE LoopSidePumpInformation
-            //   CHARACTER(len=MaxNameLength)     :: PumpName              = ' '
-            //   INTEGER                          :: PumpTypeOf            = 0
-            //   INTEGER                          :: BranchNum             = 0
-            //   INTEGER                          :: CompNum               = 0
-            //   ...
-
-            auto &loop_side(PlantLoop(LoopNum).LoopSide(LoopSideNum));
-            auto &pumps(loop_side.Pumps);
-            int const nPumpsAfterIncrement = loop_side.TotalPumps = pumps.size() + 1;
-            pumps.redimension(nPumpsAfterIncrement);
-            pumps(nPumpsAfterIncrement).PumpName = PumpName;
-            pumps(nPumpsAfterIncrement).BranchNum = BranchNum;
-            pumps(nPumpsAfterIncrement).CompNum = CompNum;
-            pumps(nPumpsAfterIncrement).PumpOutletNode = PumpOutletNode;
-            loop_side.BranchPumpsExist = HasBranchPumps;
-        }
-
         void SetupBranchControlTypes() {
 
             // SUBROUTINE INFORMATION:
@@ -3870,27 +3621,22 @@ namespace EnergyPlus {
             } else {
                 NumCount = 0;
             }
-            for (LoopCtr = 1; LoopCtr <= NumCount; ++LoopCtr) { // SIZE(PlantLoop)
+            for (LoopCtr = 1; LoopCtr <= NumCount; ++LoopCtr) {
                 for (LoopSideCtr = DemandSide; LoopSideCtr <= SupplySide; ++LoopSideCtr) {
-                    for (BranchCtr = 1;
-                         BranchCtr <= PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches; ++BranchCtr) {
+                    for (BranchCtr = 1; BranchCtr <= PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches; ++BranchCtr) {
                         BranchIsInSplitterMixer = false;
                         // test if this branch is inside a splitter/mixer
-                        if (PlantLoop(LoopCtr).LoopSide(LoopSideCtr).SplitterExists) {
-                            if ((BranchCtr > 1) &&
-                                (BranchCtr < PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches)) {
+                        if (PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Splitter.Exists) {
+                            if ((BranchCtr > 1) && (BranchCtr < PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches)) {
                                 BranchIsInSplitterMixer = true;
                             }
                         }
 
-                        NumComponentsOnBranch = PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
-                                BranchCtr).TotalComponents;
+                        NumComponentsOnBranch = PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).TotalComponents;
 
-                        for (CompCtr = 1; CompCtr <= isize(PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(
-                                BranchCtr).Comp); ++CompCtr) {
+                        for (CompCtr = 1; CompCtr <= isize(PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp); ++CompCtr) {
 
-                            auto &this_component(
-                                    PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp(CompCtr));
+                            auto &this_component(PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Branch(BranchCtr).Comp(CompCtr));
 
                             {
                                 auto const SELECT_CASE_var(this_component.TypeOf_Num);
@@ -3907,8 +3653,7 @@ namespace EnergyPlus {
                                     this_component.FlowCtrl = ControlType_Active;
                                     this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                     this_component.HowLoadServed = HowMet_ByNominalCap;
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Absorption) { //                =  3  ! older BLAST absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Absorption) {  // = 3 ! older BLAST absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -3917,10 +3662,8 @@ namespace EnergyPlus {
                                         this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                         this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
                                     }
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Indirect_Absorption) { //       =  4  ! revised absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Indirect_Absorption) { // = 4 ! revised absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
-
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                         this_component.HowLoadServed = HowMet_NoneDemand;

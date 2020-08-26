@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,12 +53,14 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <OutputProcessor.hh>
-#include <UnitarySystem.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace DataZoneEquipment {
 
@@ -98,7 +100,6 @@ namespace DataZoneEquipment {
     extern int const ZoneHybridEvaporativeCooler_Num; // #14, last zone equipment type to use zone availability manager. The above list must not
                                                       // change or NumValidSysAvailZoneComponents(14) must also change.
     extern int const AirDistUnit_Num;
-    extern int const DirectAir_Num;
     extern int const BBWaterConvective_Num;
     extern int const BBElectricConvective_Num;
     extern int const HiTempRadiant_Num;
@@ -164,14 +165,14 @@ namespace DataZoneEquipment {
         int EndUse_CompMode;
         std::string Group;
         int ReportVarIndex;
-        int ReportVarIndexType;
+        OutputProcessor::TimeStepType ReportVarIndexType;
         int ReportVarType;
         Real64 CurMeterReading;
 
         // Default Constructor
         EquipMeterData()
-            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(0), EndUse_CompMode(0), ReportVarIndex(0), ReportVarIndexType(0),
-              ReportVarType(0), CurMeterReading(0.0)
+            : ReportVarUnits(OutputProcessor::Unit::None), ResourceType(0), EndUse_CompMode(0), ReportVarIndex(0),
+              ReportVarIndexType(OutputProcessor::TimeStepType::TimeStepZone), ReportVarType(0), CurMeterReading(0.0)
         {
         }
     };
@@ -297,7 +298,6 @@ namespace DataZoneEquipment {
         Array1D_int InletNode;            // zone supply air inlet nodes
         Array1D_int InletNodeAirLoopNum;  // air loop number connected to this inlet node (0 if not an airloop node)
         Array1D_int InletNodeADUNum;      // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
-        Array1D_int InletNodeSDUNum;      // Single duct uncontrolled connected to this inlet node (0 if none, could be zone equip or ADU)
         Array1D_int ExhaustNode;          // zone air exhaust nodes
         Array1D_int ReturnNode;           // zone return air nodes (node numbers)
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
@@ -396,7 +396,7 @@ namespace DataZoneEquipment {
         Array1D_int EquipType_Num;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
-        std::vector<UnitarySystems::UnitarySys *> compPointer;
+        std::vector<HVACSystemData *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
         Array1D_int SequentialCoolingFractionSchedPtr;
@@ -488,9 +488,9 @@ namespace DataZoneEquipment {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void GetZoneEquipmentData();
+    void GetZoneEquipmentData(EnergyPlusData &state);
 
-    void GetZoneEquipmentData1();
+    void GetZoneEquipmentData1(EnergyPlusData &state);
 
     void SetupZoneEquipmentForConvectionFlowRegime();
 
@@ -498,18 +498,18 @@ namespace DataZoneEquipment {
                                 std::string const &ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
-    int GetControlledZoneIndex(std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+    int GetControlledZoneIndex(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(EnergyPlusData &state, int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
 
-    int GetSystemNodeNumberForZone(std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+    int GetSystemNodeNumberForZone(EnergyPlusData &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int GetReturnAirNodeForZone(std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
+    int GetReturnAirNodeForZone(EnergyPlusData &state, std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
                                 std::string const &NodeName,             // Return air node name to match (may be blank)
                                 std::string const &calledFromDescription // String identifying the calling function and object
     );
 
-    int GetReturnNumForZone(std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(EnergyPlusData &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 

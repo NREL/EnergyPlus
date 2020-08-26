@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,26 +54,25 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportData.hh>
-#include <OutputReportTabular.hh>
-#include <OutputReportTabularAnnual.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportData.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -176,7 +175,7 @@ namespace OutputReportTabularAnnual {
         int keyCount = 0;
         int typeVar = 0;
         OutputProcessor::StoreType avgSumVar;
-        int stepTypeVar = 0;
+        OutputProcessor::TimeStepType stepTypeVar;
         OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
         Array1D_string namesOfKeys;   // keyNames
         Array1D_int indexesForKeyVar; // keyVarIndexes
@@ -304,7 +303,7 @@ namespace OutputReportTabularAnnual {
         return (missingHourAggError || missingMaxOrMinError);
     }
 
-    void GatherAnnualResultsForTimeStep(int kindOfTimeStep)
+    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
@@ -315,7 +314,7 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    void AnnualTable::gatherForTimestep(int kindOfTimeStep)
+    void AnnualTable::gatherForTimestep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         // Jason Glazer, August 2015
         // For each cell of the table, gather the value as indicated by the type of aggregation
@@ -337,7 +336,7 @@ namespace OutputReportTabularAnnual {
         for (unsigned int row = 0; row != m_objectNames.size(); row++) { // loop through by row.
             for (fldStIt = m_annualFields.begin(); fldStIt != m_annualFields.end(); ++fldStIt) {
                 int curTypeOfVar = fldStIt->m_typeOfVar;
-                int curStepType = fldStIt->m_varStepType;
+                OutputProcessor::TimeStepType curStepType = fldStIt->m_varStepType;
                 if (curStepType == kindOfTimeStep) // this is a much simpler conditional than the code in monthly gathering
                 {
                     int curVarNum = fldStIt->m_cell[row].indexesForKeyVar;
@@ -542,7 +541,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue > oldScanValue) {
+                                        if (scanValue < oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -550,7 +549,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue < oldScanValue) {
+                                        if (scanValue > oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -601,10 +600,10 @@ namespace OutputReportTabularAnnual {
         }
     }
 
-    Real64 AnnualTable::getElapsedTime(int kindOfTimeStep)
+    Real64 AnnualTable::getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 elapsedTime;
-        if (kindOfTimeStep == DataGlobals::HVACTSReporting) {
+        if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             elapsedTime = DataHVACGlobals::TimeStepSys;
         } else {
             elapsedTime = DataGlobals::TimeStepZone;
@@ -612,10 +611,10 @@ namespace OutputReportTabularAnnual {
         return elapsedTime;
     }
 
-    Real64 AnnualTable::getSecondsInTimeStep(int kindOfTimeStep)
+    Real64 AnnualTable::getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep)
     {
         Real64 secondsInTimeStep;
-        if (kindOfTimeStep == DataGlobals::HVACTSReporting) {
+        if (kindOfTimeStep == OutputProcessor::TimeStepType::TimeStepZone) {
             secondsInTimeStep = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         } else {
             secondsInTimeStep = DataGlobals::TimeStepZoneSec;
@@ -623,18 +622,18 @@ namespace OutputReportTabularAnnual {
         return secondsInTimeStep;
     }
 
-    void WriteAnnualTables()
+    void WriteAnnualTables(CostEstimateManagerData &dataCostEstimateManager)
     {
         // Jason Glazer, August 2015
         // This function is not part of the class but acts as an interface between procedural code and the class by
         // invoking the writeTable member function for each of the AnnualTable objects
         std::vector<AnnualTable>::iterator annualTableIt;
         for (annualTableIt = annualTables.begin(); annualTableIt != annualTables.end(); ++annualTableIt) {
-            annualTableIt->writeTable(OutputReportTabular::unitsStyle);
+            annualTableIt->writeTable(dataCostEstimateManager, OutputReportTabular::unitsStyle);
         }
     }
 
-    void AnnualTable::writeTable(int unitsStyle)
+    void AnnualTable::writeTable(CostEstimateManagerData &dataCostEstimateManager, int unitsStyle)
     {
         Array1D_string columnHead;
         Array1D_int columnWidth;
@@ -924,7 +923,7 @@ namespace OutputReportTabularAnnual {
         } // fldStIt
         OutputReportTabular::WriteReportHeaders(m_name, "Entire Facility", OutputProcessor::StoreType::Averaged);
         OutputReportTabular::WriteSubtitle("Custom Annual Report");
-        OutputReportTabular::WriteTable(tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
+        OutputReportTabular::WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth, true); // transpose annual XML tables.
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, m_name, "Entire Facility", "Custom Annual Report");
         }
@@ -970,7 +969,7 @@ namespace OutputReportTabularAnnual {
                             OutputReportTabular::RealToStr(binBottom + float(iBin + 1) * intervalSize, fldStIt->m_showDigits);
                     }
                     OutputReportTabular::WriteSubtitle("Bin Sizes for: " + fldStIt->m_colHead);
-                    OutputReportTabular::WriteTable(tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
+                    OutputReportTabular::WriteTable(dataCostEstimateManager, tableBodyRange, rowHeadRange, colHeadRange, colWidthRange, true); // transpose annual XML tables.
                     if (sqlite) {
                         sqlite->createSQLiteTabularDataRecords(tableBodyRange, rowHeadRange, colHeadRange, m_name, "Entire Facility", "Bin Sizes");
                     }
@@ -1399,7 +1398,7 @@ namespace OutputReportTabularAnnual {
         ret.push_back(outStr);
         outStr = std::to_string(static_cast<int>(fldSt.m_varAvgSum));
         ret.push_back(outStr);
-        outStr = std::to_string(fldSt.m_varStepType);
+        outStr = std::to_string(static_cast<int>(fldSt.m_varStepType));
         ret.push_back(outStr);
         outStr = std::to_string(fldSt.m_aggregate);
         ret.push_back(outStr);
@@ -1412,6 +1411,11 @@ namespace OutputReportTabularAnnual {
         ret.push_back(outStr);
         outStr = std::to_string(fldSt.m_timeBelowBottomBinTotal);
         ret.push_back(outStr);
+        // cell value
+        if (fldSt.m_cell.size() > 0) {
+            outStr = std::to_string(fldSt.m_cell[0].result);
+            ret.push_back(outStr);
+        }
         return ret;
     }
 

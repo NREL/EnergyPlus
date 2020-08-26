@@ -8,7 +8,7 @@
 ! Title5= VisualDOE 5.0.0
 ! \group Simulation Parameters
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Green Design Tools,      !- Name
@@ -29,8 +29,10 @@
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    20;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20,                      !- Shading Calculation Update Frequency
+    15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   Output:DebuggingData,0,0;
 

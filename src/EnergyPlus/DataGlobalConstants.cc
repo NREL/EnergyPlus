@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,9 +48,9 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -111,9 +111,6 @@ namespace DataGlobalConstants {
     std::string const cRT_Natural_Gas("NaturalGas");
     std::string const cRT_Natural_GasUC("NATURALGAS");
     int const iRT_Natural_Gas(1002);
-    std::string const cRT_Gas("Gas");
-    std::string const cRT_GasUC("GAS");
-    int const iRT_Gas(1002);
     std::string const cRT_Gasoline("Gasoline");
     std::string const cRT_GasolineUC("GASOLINE");
     int const iRT_Gasoline(1003);
@@ -123,24 +120,15 @@ namespace DataGlobalConstants {
     std::string const cRT_Coal("Coal");
     std::string const cRT_CoalUC("COAL");
     int const iRT_Coal(1005);
-    std::string const cRT_FuelOil_1("FuelOil#1");
-    std::string const cRT_FuelOil_1UC("FUELOIL#1");
+    std::string const cRT_FuelOil_1("FuelOilNo1");
+    std::string const cRT_FuelOil_1UC("FUELOILNO1");
     int const iRT_FuelOil_1(1006);
-    std::string const cRT_DistillateOil("DistillateOil");
-    std::string const cRT_DistillateOilUC("DISTILLATEOIL");
-    int const iRT_DistillateOil(1006);
-    std::string const cRT_FuelOil_2("FuelOil#2");
-    std::string const cRT_FuelOil_2UC("FUELOIL#2");
+    std::string const cRT_FuelOil_2("FuelOilNo2");
+    std::string const cRT_FuelOil_2UC("FUELOILNO2");
     int const iRT_FuelOil_2(1007);
-    std::string const cRT_ResidualOil("ResidualOil");
-    std::string const cRT_ResidualOilUC("RESIDUALOIL");
-    int const iRT_ResidualOil(1007);
     std::string const cRT_Propane("Propane");
     std::string const cRT_PropaneUC("PROPANE");
     int const iRT_Propane(1008);
-    std::string const cRT_LPG("LPG");
-    std::string const cRT_LPGUC("LPG");
-    int const iRT_LPG(1008);
     std::string const cRT_Water("Water");
     std::string const cRT_WaterUC("WATER");
     int const iRT_Water(1009);
@@ -260,7 +248,7 @@ namespace DataGlobalConstants {
     Array1D_string const cRT_ValidTypes({0, NumOfResourceTypes},
                                         {cRT_None,
                                          cRT_Electricity,
-                                         cRT_Gas,
+                                         cRT_Natural_Gas,
                                          cRT_Gasoline,
                                          cRT_Diesel,
                                          cRT_Coal,
@@ -351,11 +339,11 @@ namespace DataGlobalConstants {
         {
             auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(ResourceTypeChar));
 
-            if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC")) {
+            if (SELECT_CASE_var == "ELECTRICITY") {
                 ResourceTypeNum = iRT_Electricity;
 
             } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS")) {
-                ResourceTypeNum = iRT_Gas;
+                ResourceTypeNum = iRT_Natural_Gas;
 
             } else if (SELECT_CASE_var == "GASOLINE") {
                 ResourceTypeNum = iRT_Gasoline;
@@ -366,13 +354,13 @@ namespace DataGlobalConstants {
             } else if (SELECT_CASE_var == "COAL") {
                 ResourceTypeNum = iRT_Coal;
 
-            } else if ((SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "DISTILLATE OIL")) {
+            } else if ((SELECT_CASE_var == "FUELOILNO1") || (SELECT_CASE_var == "FuelOilNo1")) {
                 ResourceTypeNum = iRT_FuelOil_1;
 
-            } else if ((SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+            } else if ((SELECT_CASE_var == "FUELOILNO2") || (SELECT_CASE_var == "FuelOilNo2")) {
                 ResourceTypeNum = iRT_FuelOil_2;
 
-            } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG")) {
+            } else if (SELECT_CASE_var == "PROPANE") {
                 ResourceTypeNum = iRT_Propane;
 
             } else if (SELECT_CASE_var == "OTHERFUEL1") {
@@ -518,8 +506,8 @@ namespace DataGlobalConstants {
             if (SELECT_CASE_var == iRT_Electricity) {
                 ResourceTypeChar = "Electricity";
 
-            } else if (SELECT_CASE_var == iRT_Gas) {
-                ResourceTypeChar = "Gas";
+            } else if (SELECT_CASE_var == iRT_Natural_Gas) {
+                ResourceTypeChar = "NaturalGas";
 
             } else if (SELECT_CASE_var == iRT_Gasoline) {
                 ResourceTypeChar = "Gasoline";
@@ -531,10 +519,10 @@ namespace DataGlobalConstants {
                 ResourceTypeChar = "Coal";
 
             } else if (SELECT_CASE_var == iRT_FuelOil_1) {
-                ResourceTypeChar = "FuelOil#1";
+                ResourceTypeChar = "FuelOilNo1";
 
             } else if (SELECT_CASE_var == iRT_FuelOil_2) {
-                ResourceTypeChar = "FuelOil#2";
+                ResourceTypeChar = "FuelOilNo2";
 
             } else if (SELECT_CASE_var == iRT_Propane) {
                 ResourceTypeChar = "Propane";

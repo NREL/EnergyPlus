@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,52 +53,21 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
+    struct FansData;
 
 namespace Fans {
 
     // Using/Aliasing
     using DataHVACGlobals::MinFrac;
     using DataHVACGlobals::SystemAirflowSizing;
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    // parameters describing fan types are contained in DataHVACGlobals (see USE statement above)
-
-    extern int const ExhaustFanCoupledToAvailManagers;
-    extern int const ExhaustFanDecoupledFromAvailManagers;
-
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumFans;           // The Number of Fans found in the Input
-    extern int NumNightVentPerf;  // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-    extern bool GetFanInputFlag;  // Flag set to make sure you get input once
-    extern bool LocalTurnFansOn;  // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-    extern bool LocalTurnFansOff; // If True, overrides fan schedule and LocalTurnFansOn and forces ZoneHVAC comp fans off
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Utility routines for module
-
-    // Types
 
     struct FanEquipConditions
     {
@@ -274,7 +243,7 @@ namespace Fans {
     // Functions
     void clear_state();
 
-    void SimulateFanComponents(std::string const &CompName,
+    void SimulateFanComponents(EnergyPlusData &state, std::string const &CompName,
                                bool const FirstHVACIteration,
                                int &CompIndex,
                                Optional<Real64 const> SpeedRatio = _,
@@ -286,7 +255,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput();
+    void GetFanInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -294,11 +263,11 @@ namespace Fans {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitFan(int const FanNum,
+    void InitFan(EnergyPlusData &state, int const FanNum,
                  bool const FirstHVACIteration // unused1208
     );
 
-    void SizeFan(int const FanNum);
+    void SizeFan(EnergyPlusData &state, int const FanNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -306,17 +275,17 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(int const FanNum);
+    void SimSimpleFan(FansData &fans, int const FanNum);
 
-    void SimVariableVolumeFan(int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
-    void SimZoneExhaustFan(int const FanNum);
+    void SimZoneExhaustFan(FansData &fans, int const FanNum);
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(int const FanNum);
+    void SimComponentModelFan(FansData &fans, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -340,46 +309,58 @@ namespace Fans {
     // Beginning of Utility subroutines for the Fan Module
     // *****************************************************************************
 
-    void GetFanIndex(std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
+    void GetFanIndex(EnergyPlusData &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
 
     void GetFanVolFlow(int const FanIndex, Real64 &FanVolFlow);
 
     Real64 GetFanPower(int const FanIndex);
 
-    void GetFanType(std::string const &FanName,               // Fan name
+    void GetFanType(EnergyPlusData &state,
+                    std::string const &FanName,               // Fan name
                     int &FanType,                             // returned fantype number
                     bool &ErrorsFound,                        // error indicator
                     Optional_string_const ThisObjectType = _, // parent object type (for error message)
                     Optional_string_const ThisObjectName = _  // parent object name (for error message)
     );
 
-    Real64 GetFanDesignVolumeFlowRate(std::string const &FanType,     // must match fan types in this module
+    Real64 GetFanDesignVolumeFlowRate(EnergyPlusData &state,
+                                      std::string const &FanType,     // must match fan types in this module
                                       std::string const &FanName,     // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
     );
 
-    int GetFanInletNode(std::string const &FanType, // must match fan types in this module
+    int GetFanInletNode(EnergyPlusData &state,
+                        std::string const &FanType, // must match fan types in this module
                         std::string const &FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanOutletNode(std::string const &FanType, // must match fan types in this module
+    int getFanInNodeIndex(EnergyPlusData &state,
+                          int const &FanIndex, // fan index
+                          bool &ErrorsFound    // set to true if problem
+    );
+
+    int GetFanOutletNode(EnergyPlusData &state,
+                         std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanAvailSchPtr(std::string const &FanType, // must match fan types in this module
+    int GetFanAvailSchPtr(EnergyPlusData &state,
+                          std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanSpeedRatioCurveIndex(std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
+    int GetFanSpeedRatioCurveIndex(EnergyPlusData &state,
+                                   std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName,    // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
     );
 
-    void SetFanData(int const FanNum,                         // Index of fan
+    void SetFanData(EnergyPlusData &state,
+                    int const FanNum,                         // Index of fan
                     bool &ErrorsFound,                        // Set to true if certain errors found
                     std::string const &FanName,               // Name of fan
                     Optional<Real64 const> MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
@@ -397,7 +378,7 @@ namespace Fans {
                                         int const FanCurvePtr                // Fan Curve Pointer
     );
 
-    Real64 FanDesHeatGain(int const FanNum,       // index of fan in Fan array
+    Real64 FanDesHeatGain(EnergyPlusData &state, int const FanNum,       // index of fan in Fan array
                           Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     );
 
@@ -411,6 +392,30 @@ namespace Fans {
     // *****************************************************************************
 
 } // namespace Fans
+
+    struct FansData : BaseGlobalStruct {
+        // constants
+        static constexpr int ExhaustFanCoupledToAvailManagers = 150;
+        static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+
+        // members
+        int NumFans;
+        int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+        bool GetFanInputFlag;      // Flag set to make sure you get input once
+        bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
+        bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+
+        FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false),
+                     LocalTurnFansOff(false) {}
+
+        void clear_state() override {
+            NumFans = 0;
+            NumNightVentPerf = 0;
+            GetFanInputFlag = true;
+            LocalTurnFansOn = false;
+            LocalTurnFansOff = false;
+        }
+    };
 
 } // namespace EnergyPlus
 

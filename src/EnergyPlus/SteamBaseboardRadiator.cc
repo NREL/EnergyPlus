@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,35 +52,37 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SteamBaseboardRadiator.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -128,7 +130,7 @@ namespace SteamBaseboardRadiator {
     using DataZoneEquipment::ZoneEquipInputsFilled;
 
     // Use statements for access to subroutines in other modules
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Data
@@ -154,16 +156,35 @@ namespace SteamBaseboardRadiator {
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
+    bool GetInputFlag(true); // one time get input flag
+    bool MyOneTimeFlag(true);
+    bool ZoneEquipmentListChecked(false);
 
     // Object Data
     Array1D<SteamBaseboardParams> SteamBaseboard;
     Array1D<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
 
+    void clear_state() {
+        NumSteamBaseboards = 0;
+        SteamIndex = 0;
+        QBBSteamRadSource.clear();
+        QBBSteamRadSrcAvg.clear();
+        ZeroSourceSumHATsurf.clear();
+        LastQBBSteamRadSrc.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        MySizeFlag.clear();
+        CheckEquipName.clear();
+        SetLoopIndexFlag.clear();
+        GetInputFlag = true;
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+        SteamBaseboard.clear();
+        SteamBaseboardNumericFields.clear();
+    }
     // Functions
 
-    void SimSteamBaseboard(std::string const &EquipName,
+    void SimSteamBaseboard(EnergyPlusData &state, std::string const &EquipName,
                            int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
@@ -189,7 +210,6 @@ namespace SteamBaseboardRadiator {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int BaseboardNum;               // index of unit in baseboard array
-        static bool GetInputFlag(true); // one time get input flag
         Real64 QZnReq;                  // zone load not yet satisfied
         Real64 MaxSteamFlow;
         Real64 MinSteamFlow;
@@ -224,7 +244,7 @@ namespace SteamBaseboardRadiator {
 
         if (CompIndex > 0) {
 
-            InitSteamBaseboard(BaseboardNum, ControlledZoneNum, FirstHVACIteration);
+            InitSteamBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
             QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
@@ -245,7 +265,7 @@ namespace SteamBaseboardRadiator {
                     auto const SELECT_CASE_var(SteamBaseboard(BaseboardNum).EquipType);
 
                     if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
-                        ControlCompOutput(SteamBaseboard(BaseboardNum).EquipID,
+                        ControlCompOutput(state, SteamBaseboard(BaseboardNum).EquipID,
                                           cCMO_BBRadiator_Steam,
                                           BaseboardNum,
                                           FirstHVACIteration,
@@ -282,7 +302,7 @@ namespace SteamBaseboardRadiator {
                                      SteamBaseboard(BaseboardNum).LoopSideNum,
                                      SteamBaseboard(BaseboardNum).BranchNum,
                                      SteamBaseboard(BaseboardNum).CompNum);
-                CalcSteamBaseboard(BaseboardNum, PowerMet);
+                CalcSteamBaseboard(state, BaseboardNum, PowerMet);
             }
 
             UpdateSteamBaseboard(BaseboardNum);
@@ -348,7 +368,7 @@ namespace SteamBaseboardRadiator {
         int NumNumbers;        // Number of Numbers for each GetobjectItem call
         int SurfNum;           // Surface number Do loop counter
         int IOStat;
-        static bool ErrorsFound(false); // If errors detected in input
+        bool ErrorsFound(false); // If errors detected in input
         bool SteamMessageNeeded;
 
         SteamMessageNeeded = true;
@@ -555,16 +575,32 @@ namespace SteamBaseboardRadiator {
             SteamBaseboard(BaseboardNum).FracDistribToSurf.allocate(SteamBaseboard(BaseboardNum).TotSurfToDistrib);
             SteamBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
+            // search zone equipment list structure for zone index
+            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBSteam_Num &&
+                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == SteamBaseboard(BaseboardNum).EquipID) {
+                        SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
+                    }
+                }
+            }
+            if (SteamBaseboard(BaseboardNum).ZonePtr <= 0) {
+                ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + SteamBaseboard(BaseboardNum).EquipID +
+                                "\" is not on any ZoneHVAC:EquipmentList.");
+                ErrorsFound = true;
+                continue;
+            }
+
             AllFracsSummed = SteamBaseboard(BaseboardNum).FracDistribPerson;
             for (SurfNum = 1; SurfNum <= SteamBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 SteamBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 5);
-                SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 5), Surface);
+                SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCMO_BBRadiator_Steam,
+                                                                       SteamBaseboard(BaseboardNum).EquipID,
+                                                                       SteamBaseboard(BaseboardNum).ZonePtr,
+                                                                       SteamBaseboard(BaseboardNum).SurfaceName(SurfNum),
+                                                                       ErrorsFound);
                 SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 8);
-                if (SteamBaseboard(BaseboardNum).SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(SurfNum + 5) + "=\"" +
-                                    cAlphaArgs(SurfNum + 5) + "\" invalid - not found.");
-                    ErrorsFound = true;
-                }
                 if (SteamBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 8) +
                                      "was greater than the allowable maximum.");
@@ -608,16 +644,6 @@ namespace SteamBaseboardRadiator {
             }
 
             SteamBaseboard(BaseboardNum).FluidIndex = SteamIndex;
-
-            // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == SteamBaseboard(BaseboardNum).EquipID) {
-                        SteamBaseboard(BaseboardNum).ZonePtr = ctrlZone;
-                    }
-                }
-            }
         }
 
         if (ErrorsFound) {
@@ -707,7 +733,7 @@ namespace SteamBaseboardRadiator {
         }
     }
 
-    void InitSteamBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -748,8 +774,6 @@ namespace SteamBaseboardRadiator {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false);
         static Array1D_bool MyEnvrnFlag;
         int Loop;
         int SteamInletNode;
@@ -793,7 +817,8 @@ namespace SteamBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(SteamBaseboard(BaseboardNum).EquipID,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                        SteamBaseboard(BaseboardNum).EquipID,
                                         SteamBaseboard(BaseboardNum).EquipType,
                                         SteamBaseboard(BaseboardNum).LoopNum,
                                         SteamBaseboard(BaseboardNum).LoopSideNum,
@@ -814,7 +839,7 @@ namespace SteamBaseboardRadiator {
 
         if (!SysSizingCalc && MySizeFlag(BaseboardNum) && (!SetLoopIndexFlag(BaseboardNum))) {
             // For each coil, do the sizing once
-            SizeSteamBaseboard(BaseboardNum);
+            SizeSteamBaseboard(state, BaseboardNum);
             MySizeFlag(BaseboardNum) = false;
         }
 
@@ -882,7 +907,7 @@ namespace SteamBaseboardRadiator {
         SteamBaseboard(BaseboardNum).RadEnergy = 0.0;
     }
 
-    void SizeSteamBaseboard(int const BaseboardNum)
+    void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1009,7 +1034,7 @@ namespace SteamBaseboardRadiator {
                         } else {
                             TempSize = SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else {
@@ -1082,7 +1107,7 @@ namespace SteamBaseboardRadiator {
         }
     }
 
-    void CalcSteamBaseboard(int &BaseboardNum, Real64 &LoadMet)
+    void CalcSteamBaseboard(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang
@@ -1159,8 +1184,8 @@ namespace SteamBaseboardRadiator {
             // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
             DistributeBBSteamRadGains();
             // Now "simulate" the system by recalculating the heat balances
-            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(ZoneNum);
-            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+            HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             // Here an assumption is made regarding radiant heat transfer to people.
             // While the radiant heat transfer to people array will be used by the thermal comfort
@@ -1236,16 +1261,6 @@ namespace SteamBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SteamInletNode;
         int SteamOutletNode;
-        static int Iter(0);
-        static bool MyEnvrnFlag(true);
-
-        if (BeginEnvrnFlag && MyEnvrnFlag) {
-            Iter = 0;
-            MyEnvrnFlag = false;
-        }
-        if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
-        }
 
         // First, update the running average if necessary...
         if (LastSysTimeElapsed(BaseboardNum) == SysTimeElapsed) {

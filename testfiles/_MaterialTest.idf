@@ -13,7 +13,7 @@
 ! 7/27/00 -- Restored 4-pane cases (had been set to 3-pane)
 ! 8/21/01 -- Add new fields to Material:WindowShade (FW)
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -21,7 +21,7 @@
     BUILDING,                !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    1.0000000E-03,           !- Loads Convergence Tolerance Value
+    1.0000000E-03,           !- Loads Convergence Tolerance Value {W}
     9.9999998E-03,           !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days

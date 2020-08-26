@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,12 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace DemandManager {
 
@@ -181,7 +183,7 @@ namespace DemandManager {
 
     // Functions
 
-    void ManageDemand();
+    void ManageDemand(EnergyPlusData &state);
 
     void SimulateDemandManagerList(int const ListNum,
                                    bool &ResimExt, // Flag to resimulate the exterior energy use simulation
@@ -191,19 +193,19 @@ namespace DemandManager {
 
     void GetDemandManagerListInput();
 
-    void GetDemandManagerInput();
+    void GetDemandManagerInput(EnergyPlusData &state);
 
-    void SurveyDemandManagers();
+    void SurveyDemandManagers(EnergyPlusData &state);
 
-    void ActivateDemandManagers();
+    void ActivateDemandManagers(EnergyPlusData &state);
 
-    void UpdateDemandManagers();
+    void UpdateDemandManagers(EnergyPlusData &state);
 
     void ReportDemandManagerList(int const ListNum);
 
-    void LoadInterface(int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand);
+    void LoadInterface(EnergyPlusData &state, int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand);
 
-    void InitDemandManagers();
+    void InitDemandManagers(EnergyPlusData &state);
 
 } // namespace DemandManager
 

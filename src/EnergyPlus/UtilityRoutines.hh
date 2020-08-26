@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,19 +56,24 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+
+#include <functional>
 
 namespace EnergyPlus {
 
-int AbortEnergyPlus();
+    // Forward declarations
+    struct EnergyPlusData;
+    class InputOutputFile;
+    class IOFiles;
 
-void CloseMiscOpenFiles();
+int AbortEnergyPlus(EnergyPlusData &state);
+
+void CloseMiscOpenFiles(IOFiles &ioFiles);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus();
-
-int GetNewUnitNumber();
+int EndEnergyPlus(IOFiles &ioFiles);
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
@@ -130,21 +135,23 @@ public:
     {}
 };
 
-void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
-void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueError(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowMessage(std::string const &Message, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
-void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
+
+void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
 void ShowRecurringSevereErrorAtEnd(std::string const &Message,             // Message automatically written to "error file" at end of simulation
                                    int &MsgIndex,                          // Recurring message index, if zero, next available index is assigned
@@ -186,7 +193,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,             // 
                                 std::string const &ErrorReportSumUnits = ""  // Units for "sum" reporting
 );
 
-void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1 = _, Optional_int OutUnit2 = _);
+void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
 void SummarizeErrors();
 
@@ -194,6 +201,8 @@ void ShowRecurringErrors();
 
 namespace UtilityRoutines {
     extern bool outputErrorHeader;
+
+    void clear_state();
 
     template <class T> struct is_shared_ptr : std::false_type
     {
@@ -547,10 +556,6 @@ namespace UtilityRoutines {
 
     bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
 
-    std::string IPTrimSigDigits(int const IntegerValue);
-
-
-
     // Two structs for case insensitive containers.
     // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
     // (The default allocator for unordered_map is fine)
@@ -564,6 +569,14 @@ namespace UtilityRoutines {
     {
         bool operator()(const std::string& a, const std::string& b) const noexcept;
     };
+
+    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+
+    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 

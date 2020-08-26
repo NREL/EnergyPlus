@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,20 +53,22 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataZoneEquipment.hh>
-#include <Fans.hh>
-#include <Fixtures/EnergyPlusFixture.hh>
-#include <General.hh>
-#include <HVACManager.hh>
-#include <Psychrometrics.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace HVACManager;
@@ -114,7 +116,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVolume, DataHeatBalance::ZnAirRpt(2).MixVolume, 0.0001);
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVdotCurDensity, DataHeatBalance::ZnAirRpt(2).MixVdotCurDensity, 0.0001);
@@ -152,6 +154,9 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataHeatBalFanSys::MCPI.allocate(NumOfZones);
     DataHeatBalFanSys::MCPV.allocate(NumOfZones);
     DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+    DataHeatBalance::TotVentilation = 1;
+    DataHeatBalance::Ventilation.allocate(DataHeatBalance::TotVentilation);
+    DataZoneEquipment::VentMCP.allocate(1);
 
     DataGlobals::NumOfZones = NumOfZones;
     DataHVACGlobals::TimeStepSys = 1.0;
@@ -176,8 +181,11 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataZoneEquipment::ZoneEquipConfig(2).NumExhaustNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
+    DataHeatBalance::Ventilation(1).ZonePtr = 1;
+    DataHeatBalance::Ventilation(1).AirTemp = DataHeatBalance::Zone(1).OutDryBulbTemp;
+    DataZoneEquipment::VentMCP(1) = DataHeatBalFanSys::MCPV(1);
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(2.9971591, DataHeatBalance::ZnAirRpt(1).InfilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(5.9943183, DataHeatBalance::ZnAirRpt(1).VentilVolumeCurDensity, 0.0001);
@@ -187,6 +195,16 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     EXPECT_NEAR(7.5702731, DataHeatBalance::ZnAirRpt(2).VentilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(4.4741862, DataHeatBalance::ZnAirRpt(2).InfilVolumeStdDensity, 0.0001);
     EXPECT_NEAR(7.4569771, DataHeatBalance::ZnAirRpt(2).VentilVolumeStdDensity, 0.0001);
+
+    // #8068
+    Real64 deltah = DataHeatBalFanSys::MCPI(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+                     Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
+    EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).InfilTotalLoss, 0.0001);
+    deltah = DataHeatBalFanSys::MCPV(1) / (Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat)) * 3600.0 *
+                    (Psychrometrics::PsyHFnTdbW(DataHeatBalance::Zone(1).OutDryBulbTemp, DataEnvironment::OutHumRat) -
+                     Psychrometrics::PsyHFnTdbW(DataHeatBalFanSys::MAT(1), DataHeatBalFanSys::ZoneAirHumRat(1)));
+    EXPECT_NEAR(-deltah, DataHeatBalance::ZnAirRpt(1).VentilTotalLoss, 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
@@ -229,7 +247,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataZoneEquipment::ZoneEquipConfig(1).ExhaustNode(1) = 1;
 
     Fans::Fan.allocate(1);
-    Fans::NumFans = 1;
+    state.fans.NumFans = 1;
     Fans::Fan(1).FanType_Num = DataHVACGlobals::FanType_ZoneExhaust;
     Fans::Fan(1).OutletAirMassFlowRate = 1.0;
     Fans::Fan(1).OutletAirTemp = 22.0;
@@ -240,7 +258,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataLoopNode::Node(1).MassFlowRate = 0.0;
 
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(9.7853391, DataHeatBalance::ZnAirRpt(1).ExfilTotalLoss, 0.0001);
     EXPECT_NEAR(26.056543, DataHeatBalance::ZnAirRpt(2).ExfilTotalLoss, 0.0001);

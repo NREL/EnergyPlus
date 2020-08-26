@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,9 +49,9 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <DataRuntimeLanguage.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -108,7 +108,7 @@ namespace DataRuntimeLanguage {
     int const OperatorGreaterThan(12);    // >
     int const OperatorRaiseToPower(13);   // ^
     int const OperatorLogicalAND(14);     // &&
-    int const OperatiorLogicalOR(15);     // ||
+    int const OperatorLogicalOR(15);     // ||
     // note there is an important check "> 15" to distinguish operators from functions
     //  so becareful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
@@ -134,7 +134,7 @@ namespace DataRuntimeLanguage {
 
     // begin psychrometric routines
     int const FuncRhoAirFnPbTdbW(32);    // accessor for E+ psych routine
-    int const FuncCpAirFnWTdb(33);       // accessor for E+ psych routine
+    int const FuncCpAirFnW(33);       // accessor for E+ psych routine
     int const FuncHfgAirFnWTdb(34);      // accessor for E+ psych routine
     int const FuncHgAirFnWTdb(35);       // accessor for E+ psych routine
     int const FuncTdpFnTdbTwbPb(36);     // accessor for E+ psych routine
@@ -177,15 +177,39 @@ namespace DataRuntimeLanguage {
     // Curve and Table access function
     int const FuncCurveValue(68);
 
-    int const NumPossibleOperators(68); // total number of operators and built-in functions
+    // Weather data query functions
+    int const FuncTodayIsRain(69);          // Access TodayIsRain(hour, timestep)
+    int const FuncTodayIsSnow(70);          // Access TodayIsSnow(hour, timestep)
+    int const FuncTodayOutDryBulbTemp(71);  // Access TodayOutDryBulbTemp(hour, timestep)
+    int const FuncTodayOutDewPointTemp(72); // Access TodayOutDewPointTemp(hour, timestep)
+    int const FuncTodayOutBaroPress(73);    // Access TodayOutBaroPress(hour, timestep)
+    int const FuncTodayOutRelHum(74);       // Access TodayOutRelHum(hour, timestep)
+    int const FuncTodayWindSpeed(75);       // Access TodayWindSpeed(hour, timestep)
+    int const FuncTodayWindDir(76);         // Access TodayWindDir(hour, timestep)
+    int const FuncTodaySkyTemp(77);         // Access TodaySkyTemp(hour, timestep)
+    int const FuncTodayHorizIRSky(78);      // Access TodayHorizIRSky(hour, timestep)
+    int const FuncTodayBeamSolarRad(79);    // Access TodayBeamSolarRad(hour, timestep)
+    int const FuncTodayDifSolarRad(80);     // Access TodayDifSolarRad(hour, timestep)
+    int const FuncTodayAlbedo(81);          // Access TodayAlbedo(hour, timestep)
+    int const FuncTodayLiquidPrecip(82);    // Access TodayLiquidPrecip(hour, timestep)
 
-    // DERIVED TYPE DEFINITIONS:
+    int const FuncTomorrowIsRain(83);          // Access TomorrowIsRain(hour, timestep)
+    int const FuncTomorrowIsSnow(84);          // Access TomorrowIsSnow(hour, timestep)
+    int const FuncTomorrowOutDryBulbTemp(85);  // Access TomorrowOutDryBulbTemp(hour, timestep)
+    int const FuncTomorrowOutDewPointTemp(86); // Access TomorrowOutDewPointTemp(hour, timestep)
+    int const FuncTomorrowOutBaroPress(87);    // Access TomorrowOutBaroPress(hour, timestep)
+    int const FuncTomorrowOutRelHum(88);       // Access TomorrowOutRelHum(hour, timestep)
+    int const FuncTomorrowWindSpeed(89);       // Access TomorrowWindSpeed(hour, timestep)
+    int const FuncTomorrowWindDir(90);         // Access TomorrowWindDir(hour, timestep)
+    int const FuncTomorrowSkyTemp(91);         // Access TomorrowSkyTemp(hour, timestep)
+    int const FuncTomorrowHorizIRSky(92);      // Access TomorrowHorizIRSky(hour, timestep)
+    int const FuncTomorrowBeamSolarRad(93);    // Access TomorrowBeamSolarRad(hour, timestep)
+    int const FuncTomorrowDifSolarRad(94);     // Access TomorrowDifSolarRad(hour, timestep)
+    int const FuncTomorrowAlbedo(95);          // Access TomorrowAlbedo(hour, timestep)
+    int const FuncTomorrowLiquidPrecip(96);    // Access TomorrowLiquidPrecip(hour, timestep)
 
-    // MODULE VARIABLE TYPE DECLARATIONS:
+    int const NumPossibleOperators(96); // total number of operators and built-in functions
 
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
     Array1D_int EMSProgram;
 
     int NumProgramCallManagers(0);      // count of Erl program managers with calling points
@@ -223,7 +247,6 @@ namespace DataRuntimeLanguage {
 
     //######################################################################################################################################
 
-    int OutputEMSFileUnitNum(0);             // file lun handle for open EMS output file
     bool OutputEDDFile(false);               // set to true if user requests EDD output file be written
     bool OutputFullEMSTrace(false);          // how much to write out to trace, if true do verbose for each line
     bool OutputEMSErrors(false);             // how much to write out to trace, if true include Erl error messages
@@ -284,7 +307,6 @@ namespace DataRuntimeLanguage {
         NumExternalInterfaceActuatorsUsed = 0;
         NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed = 0;
         NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed = 0;
-        OutputEMSFileUnitNum = 0;
         OutputEDDFile = false;
         OutputFullEMSTrace = false;
         OutputEMSErrors = false;

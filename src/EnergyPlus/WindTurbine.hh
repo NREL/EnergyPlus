@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,43 +52,36 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
-// (ref: Object: Generator:WindTurbine)
+    // Forward declarations
+    struct EnergyPlusData;
+    struct WindTurbineData;
 
 namespace WindTurbine {
 
-    // Using/Aliasing
+    enum class RotorType {
+        HAWT = 1, // 'HorizontalAxisWindTurbine'
+        VAWT = 2, // 'VerticalAxisWindTurbine'
+    };
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern int const HAWT; // 'HorizontalAxisWindTurbine'
-    extern int const VAWT; // 'VerticalAxisWindTurbine'
-
-    extern int const FSFP; // 'FixedSpeedFixedPitch'
-    extern int const FSVP; // 'FixedSpeedVariablePitch'
-    extern int const VSFP; // 'VariableSpeedFixedPitch'
-    extern int const VSVP; // 'VariableSpeedVariablePitch'
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLES DECLARATIONS:
-    extern int NumWindTurbines; // Total wind turbine statements in inputs
-
-    // Subroutine Specifications for the Heat Balance Module
-
-    // Types
+    enum class ControlType {
+       FSFP = 1,  // 'FixedSpeedFixedPitch'
+       FSVP = 2,  // 'FixedSpeedVariablePitch'
+       VSFP = 3,  // 'VariableSpeedFixedPitch'
+       VSVP = 4 // 'VariableSpeedVariablePitch'
+     };
 
     struct WindTurbineParams
     {
         // Members
         std::string Name;        // The component name
         std::string Schedule;    // Available schedule
-        int RotorType;           // Rotor type (HAWT or VAWT)
-        int ControlType;         // Control type
+        RotorType rotorType;           // Rotor type (HAWT or VAWT)
+        ControlType controlType;         // Control type
         int SchedPtr;            // Schedule
         int NumOfBlade;          // Blade number
         Real64 RatedRotorSpeed;  // Rated rotor speed in m/s
@@ -134,7 +127,7 @@ namespace WindTurbine {
 
         // Default Constructor
         WindTurbineParams()
-            : RotorType(0), ControlType(0), SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0), RotorDiameter(0.0), RotorHeight(0.0), RatedPower(0.0),
+            : SchedPtr(0), NumOfBlade(0), RatedRotorSpeed(0.0), RotorDiameter(0.0), RotorHeight(0.0), RatedPower(0.0),
               RatedWindSpeed(0.0), CutInSpeed(0.0), CutOutSpeed(0.0), SysEfficiency(0.0), MaxTipSpeedRatio(0.0), MaxPowerCoeff(0.0),
               LocalAnnualAvgWS(0.0), AnnualTMYWS(0.0), HeightForLocalWS(0.0), ChordArea(0.0), DragCoeff(0.0), LiftCoeff(0.0), PowerCoeffC1(0.0),
               PowerCoeffC2(0.0), PowerCoeffC3(0.0), PowerCoeffC4(0.0), PowerCoeffC5(0.0), PowerCoeffC6(0.0), TotPower(0.0), Power(0.0),
@@ -145,38 +138,55 @@ namespace WindTurbine {
         }
     };
 
-    // Object Data
-    extern Array1D<WindTurbineParams> WindTurbineSys;
-
-    // Functions
-
-    void SimWindTurbine(int const GeneratorType,          // Type of Generator
+    void SimWindTurbine(EnergyPlusData &state,
+                        int const GeneratorType,          // Type of Generator
                         std::string const &GeneratorName, // User specified name of Generator
                         int &GeneratorIndex,              // Generator index
                         bool const RunFlag,               // ON or OFF
                         Real64 const WTLoad               // Electrical load on WT (not used)
     );
 
-    void GetWTGeneratorResults(int const GeneratorType,  // Type of Generator
+    void GetWTGeneratorResults(WindTurbineData &dataWindTurbine, int const GeneratorType,  // Type of Generator
                                int const GeneratorIndex, // Generator number
                                Real64 &GeneratorPower,   // Electrical power
                                Real64 &GeneratorEnergy,  // Electrical energy
                                Real64 &ThermalPower,
                                Real64 &ThermalEnergy);
 
-    void GetWindTurbineInput();
+    void GetWindTurbineInput(WindTurbineData &dataWindTurbine);
 
-    void InitWindTurbine(int const WindTurbineNum);
+    void InitWindTurbine(EnergyPlusData &state, int const WindTurbineNum);
 
-    void CalcWindTurbine(int const WindTurbineNum, // System is on
+    void CalcWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum, // System is on
                          bool const RunFlag        // System is on
     );
 
-    void ReportWindTurbine(int const WindTurbineNum);
+    void ReportWindTurbine(WindTurbineData &dataWindTurbine, int const WindTurbineNum);
 
     //*****************************************************************************************
 
 } // namespace WindTurbine
+
+    struct WindTurbineData : BaseGlobalStruct {
+
+        int NumWindTurbines; // Total wind turbine statements in inputs
+        bool GetInputFlag;
+        bool MyOneTimeFlag;
+        Array1D<WindTurbine::WindTurbineParams> WindTurbineSys;
+
+        void clear_state() override
+        {
+            NumWindTurbines = 0;
+            GetInputFlag = true;
+            MyOneTimeFlag = true;
+            WindTurbineSys.deallocate();
+        }
+
+        // Default Constructor
+        WindTurbineData() : NumWindTurbines(0), GetInputFlag(true), MyOneTimeFlag(true)
+        {
+        }
+    };
 
 } // namespace EnergyPlus
 

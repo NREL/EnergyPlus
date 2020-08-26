@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataSurfaces.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <PVWatts.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/PVWatts.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
                                                  "175,",
                                                  ",",
                                                  "0.5;",
-                                                 "Output:Variable,*,Generator Produced DC Electric Power,timestep;"});
+                                                 "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     process_idf(idfTxt);
     EXPECT_FALSE(has_err_output());
     PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator("PVWattsArray1");
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
     const std::string idfTxt = delimited_string({"Generator:PVWatts,", "PVWattsArray1,", "5,", "4000,",
                                                  "Primo,",          // misspelled
                                                  "FixedRoofMount,", // misspelled
-                                                 ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electric Power,timestep;"});
+                                                 ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     EXPECT_FALSE(process_idf(idfTxt, false));
     ASSERT_THROW(GetOrCreatePVWattsGenerator("PVWattsArray1"), std::runtime_error);
     std::string const error_string = delimited_string(
@@ -291,7 +291,7 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
                                                  ",",
                                                  ";"});
     ASSERT_TRUE(process_idf(idfTxt));
-    auto eplc(ElectPowerLoadCenter(1));
+    auto eplc(ElectPowerLoadCenter(state.files, 1));
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
     DataHVACGlobals::TimeStepSys = 1.0;

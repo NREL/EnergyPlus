@@ -68,7 +68,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,6;
 
@@ -110,8 +110,9 @@
     20;                      !- Maximum HVAC Iterations
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    7,                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    7,                       !- Shading Calculation Update Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   GlobalGeometryRules,
@@ -124,7 +125,7 @@
     Benchmark Small Office New V1.1_3.1,  !- Name
     0.0000,                  !- North Axis {deg}
     City,                    !- Terrain
-    0.0400,                  !- Loads Convergence Tolerance Value
+    0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -1553,7 +1554,7 @@
   InternalMass,
     Core_ZN_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_ZN,                 !- Zone Name
+    Core_ZN,                 !- Zone or ZoneList Name
     299.3148;                !- Surface Area {m2}
 
   People,
@@ -1675,7 +1676,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Core_ZN,         !- Name
@@ -1711,18 +1717,30 @@
   ZoneHVAC:EquipmentList,
     Core_ZN Equipment,       !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Core_ZN Direct Air,      !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Core_ZN Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Core_ZN Direct Air,      !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Core_ZN Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Core_ZN Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Core_ZN Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Core_ZN Direct Air ADU,  !- Name
+    Core_ZN Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Core_ZN Direct Air,      !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrCore_ZN,  !- Name
@@ -2008,7 +2026,7 @@
   InternalMass,
     Perimeter_ZN_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_1,          !- Zone Name
+    Perimeter_ZN_1,          !- Zone or ZoneList Name
     226.9000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2159,7 +2177,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_ZN_1,  !- Name
@@ -2195,18 +2218,30 @@
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_1 Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Perimeter_ZN_1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Perimeter_ZN_1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Perimeter_ZN_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Perimeter_ZN_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Perimeter_ZN_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Perimeter_ZN_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Perimeter_ZN_1 Direct Air ADU,  !- Name
+    Perimeter_ZN_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Perimeter_ZN_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrPerimeter_ZN_1,  !- Name
@@ -2392,7 +2427,7 @@
   InternalMass,
     Perimeter_ZN_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_2,          !- Zone Name
+    Perimeter_ZN_2,          !- Zone or ZoneList Name
     134.6000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2543,7 +2578,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_ZN_2,  !- Name
@@ -2579,18 +2619,30 @@
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_2 Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Perimeter_ZN_2 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Perimeter_ZN_2 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Perimeter_ZN_2 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Perimeter_ZN_2 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Perimeter_ZN_2 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Perimeter_ZN_2 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Perimeter_ZN_2 Direct Air ADU,  !- Name
+    Perimeter_ZN_2 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Perimeter_ZN_2 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrPerimeter_ZN_2,  !- Name
@@ -2806,7 +2858,7 @@
   InternalMass,
     Perimeter_ZN_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_3,          !- Zone Name
+    Perimeter_ZN_3,          !- Zone or ZoneList Name
     226.9000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -2957,7 +3009,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_ZN_3,  !- Name
@@ -2993,18 +3050,30 @@
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_3 Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Perimeter_ZN_3 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Perimeter_ZN_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Perimeter_ZN_3 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Perimeter_ZN_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Perimeter_ZN_3 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Perimeter_ZN_3 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Perimeter_ZN_3 Direct Air ADU,  !- Name
+    Perimeter_ZN_3 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Perimeter_ZN_3 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrPerimeter_ZN_3,  !- Name
@@ -3190,7 +3259,7 @@
   InternalMass,
     Perimeter_ZN_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Perimeter_ZN_4,          !- Zone Name
+    Perimeter_ZN_4,          !- Zone or ZoneList Name
     134.6000;                !- Surface Area {m2}
 
   ZoneInfiltration:DesignFlowRate,
@@ -3341,7 +3410,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Perimeter_ZN_4,  !- Name
@@ -3377,18 +3451,30 @@
   ZoneHVAC:EquipmentList,
     Perimeter_ZN_4 Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Perimeter_ZN_4 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Perimeter_ZN_4 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Perimeter_ZN_4 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Perimeter_ZN_4 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Perimeter_ZN_4 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Perimeter_ZN_4 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Perimeter_ZN_4 Direct Air ADU,  !- Name
+    Perimeter_ZN_4 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Perimeter_ZN_4 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   SetpointManager:SingleZone:Reheat,
     SupAirTemp MngrPerimeter_ZN_4,  !- Name
@@ -3935,7 +4021,7 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:1 Supply Air Splitter,  !- Name
     PSZ-AC:1 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Core_ZN Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Core_ZN Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     PSZ-AC:1 Return Air Path,!- Name
@@ -4233,7 +4319,7 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:2 Supply Air Splitter,  !- Name
     PSZ-AC:2 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Perimeter_ZN_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Perimeter_ZN_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     PSZ-AC:2 Return Air Path,!- Name
@@ -4531,7 +4617,7 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:3 Supply Air Splitter,  !- Name
     PSZ-AC:3 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Perimeter_ZN_2 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Perimeter_ZN_2 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     PSZ-AC:3 Return Air Path,!- Name
@@ -4829,7 +4915,7 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:4 Supply Air Splitter,  !- Name
     PSZ-AC:4 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Perimeter_ZN_3 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Perimeter_ZN_3 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     PSZ-AC:4 Return Air Path,!- Name
@@ -5127,7 +5213,7 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:5 Supply Air Splitter,  !- Name
     PSZ-AC:5 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Perimeter_ZN_4 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Perimeter_ZN_4 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     PSZ-AC:5 Return Air Path,!- Name
@@ -5691,7 +5777,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -5785,7 +5871,7 @@
     !
 
   FuelFactors,
-    FuelOil#1,               !- Existing Fuel Resource Name
+    FuelOilNo1,              !- Existing Fuel Resource Name
     m3,                      !- Units of Measure
     38.656E+09,              !- Energy per Unit Factor
     1.158,                   !- Source Energy Factor {J/J}
@@ -5971,7 +6057,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,             !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -6103,13 +6189,13 @@
   Output:Table:Monthly,
     Building Loads - Electric,  !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -6133,9 +6219,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,            !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,            !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -6173,17 +6259,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -6340,21 +6426,37 @@
     Curve_Quadratic_Ptr,     !- Name
     HPACCOOLPLFFPLR_curve;   !- Curve or Table Object Name
 
-  Table:OneIndependentVariable,
+  Table:IndependentVariable,
+    HPACCOOLPLFFPLR_IndependentVariable1,  !- Name
+    Linear,                  !- Interpolation Method
+    Constant,                !- Extrapolation Method
+    0.0,                     !- Minimum Value
+    1.0,                     !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Dimensionless,           !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.0,                     !- Value 1
+    1.0;                     !- Value 2
+
+  Table:IndependentVariableList,
+    HPACCOOLPLFFPLR_IndependentVariableList,  !- Name
+    HPACCOOLPLFFPLR_IndependentVariable1;  !- Independent Variable 1 Name
+
+  Table:Lookup,
     HPACCOOLPLFFPLR_table,   !- Name
-    Quadratic,               !- Curve Type
-    LinearInterpolationOfTable,  !- Interpolation Method
-    0.0,                     !- Minimum Value of X
-    1.0,                     !- Maximum Value of X
-    0.75,                    !- Minimum Table Output
-    1.0,                     !- Maximum Table Output
-    Dimensionless,           !- Input Unit Type for X
+    HPACCOOLPLFFPLR_IndependentVariableList,  !- Independent Variable List Name
+    ,                        !- Normalization Method
+    ,                        !- Normalization Divisor
+    0.75,                    !- Minimum Output
+    1.0,                     !- Maximum Output
     Dimensionless,           !- Output Unit Type
-    ,                        !- Normalization Reference
-    0.0,                     !- X Value #1
-    0.75,                    !- Output Value #1
-    1.0,                     !- X Value #2
-    1.0;                     !- Output Value #2
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    0.75,                    !- Output Value 1
+    1.0;                     !- Output Value 2
 
   EnergyManagementSystem:CurveOrTableIndexVariable,
     Table_Quadratic_Ptr,     !- Name
@@ -6394,7 +6496,7 @@
     Set Temp = 20.0,         !- Program Line 2
     Set Humrat = 0.009,      !- <none>
     Set rhoAir = @RhoAirFnPbTdbW Pressure Temp humrat,  !- <none>
-    Set cpAir = @CpAirFnWtdb Humrat Temp,  !- <none>
+    Set cpAir = @CpAirFnW Humrat,  !- <none>
     Set hfgAir = @HfgAirFnWTdb Humrat Temp,  !- <none>
     set hgAir = @HgAirFnWTdb humrat Temp,  !- <none>
     set wetbulb = @TwbFnTdbWPb temp humrat pressure,  !- <none>

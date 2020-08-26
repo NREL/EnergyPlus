@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,7 +50,7 @@
 
 #include <ObjexxFCL/Array1D.hh>
 
-#include <PlantComponent.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -141,13 +141,15 @@ namespace DataPlant {
         int ReferenceNodeNumber;        // DELTA CTRL ONLY--for calculation of delta Temp
         int ErlSimProgramMngr;          // EMS:ProgramManager to always run when this model is called
         int ErlInitProgramMngr;         // EMS:ProgramManager to run when this model is initialized and setup
+        int initPluginLocation;         // If Python Plugins are used to init this, this defines the location in the plugin structure
+        int simPluginLocation;          // If Python Plugins are used to simulate this, this defines the location in the plugin structure
         Real64 EMSIntVarLoopDemandRate; // EMS internal variable for loop-level demand rate, neg cooling [W]
         bool MyEnvrnFlag;
 
         // Default Constructor
         OperationData()
-            : OpSchemeType(0), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0), ErlSimProgramMngr(0),
-              ErlInitProgramMngr(0), EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
+            : OpSchemeType(0), SchedPtr(0), Available(false), NumEquipLists(0), CurListPtr(0), EquipListNumForLastStage(0), ReferenceNodeNumber(0),
+              ErlSimProgramMngr(0), ErlInitProgramMngr(0), initPluginLocation(-1), simPluginLocation(-1), EMSIntVarLoopDemandRate(0.0), MyEnvrnFlag(true)
         {
         }
     };

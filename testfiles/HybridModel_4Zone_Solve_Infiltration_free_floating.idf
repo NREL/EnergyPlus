@@ -1,12 +1,8 @@
 !-Generator IDFEditor 1.50
 !-Option SortedOrder
-
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-
-
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-
 ! HybridModel_4Zone_Solve_Infiltration_free_floating.idf
 ! Basic file description:  Small, 4 zone model to illustrate simple rectangular building using 4ZoneWithShading_Simple_1.idf
 !
@@ -84,61 +80,52 @@
 ! HTML Report:                    None
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
-Version,9.2;                 !- Version Identifier
 
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
-SimulationControl,
+  SimulationControl,
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
-Building,
+  Building,
     BUILDING #1,             !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
 
-SurfaceConvectionAlgorithm:Inside,
-    Simple;                  !- Algorithm
-
+  SurfaceConvectionAlgorithm:Inside,Simple;
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:OUTSIDE ===========
 
-SurfaceConvectionAlgorithm:Outside,
-    SimpleCombined;          !- Algorithm
-
+  SurfaceConvectionAlgorithm:Outside,SimpleCombined;
 
 !-   ===========  ALL OBJECTS IN CLASS: HEATBALANCEALGORITHM ===========
 
-HeatBalanceAlgorithm,
-    ConductionTransferFunction;  !- Algorithm
-
+  HeatBalanceAlgorithm,ConductionTransferFunction;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEAIRCONTAMINANTBALANCE ===========
 
-ZoneAirContaminantBalance,
+  ZoneAirContaminantBalance,
     Yes,                     !- Carbon Dioxide Concentration
     ZONE Out_DummyCO2Concentration,  !- Outdoor Carbon Dioxide Schedule Name
     No;                      !- Generic Contaminant Concentration
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONECAPACITANCEMULTIPLIER:RESEARCHSPECIAL ===========
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier1,             !- Name
     ZONE 1,                  !- Zone or ZoneList Name
     ,                        !- Temperature Capacity Multiplier
@@ -146,7 +133,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier2,             !- Name
     ZONE 2,                  !- Zone or ZoneList Name
     5,                       !- Temperature Capacity Multiplier
@@ -154,7 +141,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier3,             !- Name
     ZONE 3,                  !- Zone or ZoneList Name
     8,                       !- Temperature Capacity Multiplier
@@ -162,7 +149,7 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
 
-ZoneCapacitanceMultiplier:ResearchSpecial,
+  ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier4,             !- Name
     ZONE 4,                  !- Zone or ZoneList Name
     12,                      !- Temperature Capacity Multiplier
@@ -170,32 +157,28 @@ ZoneCapacitanceMultiplier:ResearchSpecial,
     ,                        !- Carbon Dioxide Capacity Multiplier
     ;                        !- Generic Contaminant Capacity Multiplier
 
-
 !-   ===========  ALL OBJECTS IN CLASS: TIMESTEP ===========
 
-Timestep,
-    6;                       !- Number of Timesteps per Hour
-
+  Timestep,6;
 
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
-Site:Location,
+  Site:Location,
     Chicago Ohare Intl Ap IL USA WMO=725300,  !- Name
     41.99,                   !- Latitude {deg}
     -87.91,                  !- Longitude {deg}
     -6.00,                   !- Time Zone {hr}
     205.00;                  !- Elevation {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SIZINGPERIOD:DESIGNDAY ===========
-
 ! Using Design Conditions from "Climate Design Data 2009 ASHRAE Handbook"
 ! Chicago Ohare Intl Ap IL USA Extreme Annual Wind Speeds, 1%=11.1m/s, 2.5%=9.4m/s, 5%=8.6m/s
 ! Chicago Ohare Intl Ap IL USA Extreme Annual Temperatures, Max Drybulb=-23.7°C Min Drybulb=35.9°C
 ! Chicago Ohare Intl Ap IL USA Annual Heating Design Conditions Wind Speed=4.9m/s Wind Dir=270
 ! Coldest Month=January
 ! Chicago Ohare Intl Ap IL USA Annual Heating 99%, MaxDB=-16.6°C
-SizingPeriod:DesignDay,
+
+  SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Htg 99% Condns DB,  !- Name
     1,                       !- Month
     21,                      !- Day of Month
@@ -224,7 +207,8 @@ SizingPeriod:DesignDay,
     0.00;                    !- Sky Clearness
 
 ! Chicago Ohare Intl Ap IL USA Annual Cooling (DB=>MWB) 1%, MaxDB=31.6°C MWB=23°C
-SizingPeriod:DesignDay,
+
+  SizingPeriod:DesignDay,
     Chicago Ohare Intl Ap Ann Clg 1% Condns DB=>MWB,  !- Name
     7,                       !- Month
     21,                      !- Day of Month
@@ -252,10 +236,9 @@ SizingPeriod:DesignDay,
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.00;                    !- Sky Clearness
 
-
 !-   ===========  ALL OBJECTS IN CLASS: RUNPERIOD ===========
 
-RunPeriod,
+  RunPeriod,
     Run Period 1,            !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
@@ -270,107 +253,91 @@ RunPeriod,
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SITE:GROUNDTEMPERATURE:BUILDINGSURFACE ===========
 
-Site:GroundTemperature:BuildingSurface,
-    20,                      !- January Ground Temperature {C}
-    20,                      !- February Ground Temperature {C}
-    20,                      !- March Ground Temperature {C}
-    20,                      !- April Ground Temperature {C}
-    20,                      !- May Ground Temperature {C}
-    20,                      !- June Ground Temperature {C}
-    20,                      !- July Ground Temperature {C}
-    20,                      !- August Ground Temperature {C}
-    20,                      !- September Ground Temperature {C}
-    20,                      !- October Ground Temperature {C}
-    20,                      !- November Ground Temperature {C}
-    20;                      !- December Ground Temperature {C}
-
+  Site:GroundTemperature:BuildingSurface,20,20,20,20,20,20,20,20,20,20,20,20;
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULETYPELIMITS ===========
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Any Number;              !- Name
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Fraction,                !- Name
     0.0,                     !- Lower Limit Value
     1.0,                     !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     Temperature,             !- Name
     -100,                    !- Lower Limit Value
     200,                     !- Upper Limit Value
     CONTINUOUS;              !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     ControlType,             !- Name
     0,                       !- Lower Limit Value
     4,                       !- Upper Limit Value
     DISCRETE;                !- Numeric Type
 
-ScheduleTypeLimits,
+  ScheduleTypeLimits,
     PeopleActivityLevel_limit,  !- Name
     0,                       !- Lower Limit Value
     ,                        !- Upper Limit Value
     Continuous,              !- Numeric Type
     activitylevel;           !- Unit Type
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:DAY:INTERVAL ===========
 
-Schedule:Day:Interval,
+  Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Default,  !- Name
     Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
-    24:00,                   !- Time 1 {hh:mm}
+    24:00,                   !- Time 1
     0;                       !- Value Until Time 1
 
-Schedule:Day:Interval,
+  Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Summer Design Day,  !- Name
     Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
-    24:00,                   !- Time 1 {hh:mm}
+    24:00,                   !- Time 1
     1;                       !- Value Until Time 1
 
-Schedule:Day:Interval,
+  Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Winter Design Day,  !- Name
     Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
-    24:00,                   !- Time 1 {hh:mm}
+    24:00,                   !- Time 1
     0;                       !- Value Until Time 1
 
-Schedule:Day:Interval,
+  Schedule:Day:Interval,
     OfficeSmall BLDG_OCC_SCH Wkdy Day,  !- Name
     Fraction,                !- Schedule Type Limits Name
     No,                      !- Interpolate to Timestep
-    06:00,                   !- Time 1 {hh:mm}
+    06:00,                   !- Time 1
     0,                       !- Value Until Time 1
-    07:00,                   !- Time 2 {hh:mm}
+    07:00,                   !- Time 2
     0.11,                    !- Value Until Time 2
-    08:00,                   !- Time 3 {hh:mm}
+    08:00,                   !- Time 3
     0.21,                    !- Value Until Time 3
-    12:00,                   !- Time 4 {hh:mm}
+    12:00,                   !- Time 4
     1,                       !- Value Until Time 4
-    13:00,                   !- Time 5 {hh:mm}
+    13:00,                   !- Time 5
     0.53,                    !- Value Until Time 5
-    17:00,                   !- Time 6 {hh:mm}
+    17:00,                   !- Time 6
     1,                       !- Value Until Time 6
-    18:00,                   !- Time 7 {hh:mm}
+    18:00,                   !- Time 7
     0.32,                    !- Value Until Time 7
-    22:00,                   !- Time 8 {hh:mm}
+    22:00,                   !- Time 8
     0.11,                    !- Value Until Time 8
-    23:00,                   !- Time 9 {hh:mm}
+    23:00,                   !- Time 9
     0.05,                    !- Value Until Time 9
-    24:00,                   !- Time 10 {hh:mm}
+    24:00,                   !- Time 10
     0;                       !- Value Until Time 10
-
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:WEEK:DAILY ===========
 
-Schedule:Week:Daily,
+  Schedule:Week:Daily,
     OfficeSmall BLDG_OCC_SCH Week Rule - Jan1-Dec31,  !- Name
     OfficeSmall BLDG_OCC_SCH Default,  !- Sunday Schedule:Day Name
     OfficeSmall BLDG_OCC_SCH Wkdy Day,  !- Monday Schedule:Day Name
@@ -385,10 +352,9 @@ Schedule:Week:Daily,
     OfficeSmall BLDG_OCC_SCH Default,  !- CustomDay1 Schedule:Day Name
     OfficeSmall BLDG_OCC_SCH Default;  !- CustomDay2 Schedule:Day Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:YEAR ===========
 
-Schedule:Year,
+  Schedule:Year,
     OfficeSmall BLDG_OCC_SCH,!- Name
     Fraction,                !- Schedule Type Limits Name
     OfficeSmall BLDG_OCC_SCH Week Rule - Jan1-Dec31,  !- Schedule:Week Name 1
@@ -397,75 +363,58 @@ Schedule:Year,
     12,                      !- End Month 1
     31;                      !- End Day 1
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:COMPACT ===========
 
-Schedule:Compact,
+  Schedule:Compact,
     INFIL-SCHED,             !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 06:00,            !- Field 3
-    1,                       !- Field 4
-    Until: 09:00,            !- Field 5
-    0.5,                     !- Field 6
-    Until: 19:00,            !- Field 7
-    0.25,                    !- Field 8
-    Until: 22:00,            !- Field 9
-    0.5,                     !- Field 10
-    Until: 24:00,            !- Field 11
-    1;                       !- Field 12
+    Until: 06:00,1,          !- Field 3
+    Until: 09:00,0.5,        !- Field 5
+    Until: 19:00,0.25,       !- Field 7
+    Until: 22:00,0.5,        !- Field 9
+    Until: 24:00,1;          !- Field 11
 
-Schedule:Compact,
+  Schedule:Compact,
     ZONE CONTROL TYPE SCHEDULE,  !- Name
     CONTROLTYPE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    4;                       !- Field 4
+    Until: 24:00,4;          !- Field 3
 
-Schedule:Compact,
+  Schedule:Compact,
     ZONE HEATING SETPOINTS,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays WinterDesignDay,  !- Field 2
-    Until: 7:00,             !- Field 3
-    -100.00,                 !- Field 4
-    Until: 17:00,            !- Field 5
-    -100.00,                 !- Field 6
-    Until: 24:00,            !- Field 7
-    -100.00,                 !- Field 8
+    For: Weekdays WinterDesignDay, !- Field 2
+    Until: 7:00,-100.00,     !- Field 3
+    Until: 17:00,-100.00,    !- Field 5
+    Until: 24:00,-100.00,    !- Field 7
     For: AllOtherDays,       !- Field 9
-    Until: 24:00,            !- Field 10
-    -100.00;                 !- Field 11
+    Until: 24:00,-100.00;    !- Field 10
 
-Schedule:Compact,
+  Schedule:Compact,
     ZONE COOLING SETPOINTS,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: Weekdays SummerDesignDay,  !- Field 2
-    Until: 7:00,             !- Field 3
-    100.00,                  !- Field 4
-    Until: 17:00,            !- Field 5
-    100.00,                  !- Field 6
-    Until: 24:00,            !- Field 7
-    100.00,                  !- Field 8
+    For: Weekdays SummerDesignDay, !- Field 2
+    Until: 7:00,100.00,      !- Field 3
+    Until: 17:00,100.00,     !- Field 5
+    Until: 24:00,100.00,     !- Field 7
     For: AllOtherDays,       !- Field 9
-    Until: 24:00,            !- Field 10
-    100.00;                  !- Field 11
+    Until: 24:00,100.00;     !- Field 10
 
-Schedule:Compact,
+  Schedule:Compact,
     OfficeSmall ACTIVITY_SCH,!- Name
     PeopleActivityLevel_limit,  !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
-    Until: 24:00,            !- Field 3
-    120;                       !- Field 4
-
+    Until: 24:00,120;        !- Field 3
 
 !-   ===========  ALL OBJECTS IN CLASS: SCHEDULE:FILE ===========
 
-Schedule:File,
+  Schedule:File,
     ZONE Out_DummyCO2Concentration,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridModel_Measurements_no_HVAC.csv,  !- File Name
@@ -476,7 +425,7 @@ Schedule:File,
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Schedule:File,
+  Schedule:File,
     obFMU_PeopleSch,         !- Name
     Fraction,                !- Schedule Type Limits Name
     HybridModel_Measurements_no_HVAC.csv,  !- File Name
@@ -487,7 +436,7 @@ Schedule:File,
     No,                      !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Schedule:File,
+  Schedule:File,
     ZONE 1_MeasuredTemperature,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridModel_Measurements_no_HVAC.csv,  !- File Name
@@ -498,18 +447,18 @@ Schedule:File,
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Schedule:File,
+  Schedule:File,
     ZONE 2_MeasuredHumidityRatio,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridModel_Measurements_no_HVAC.csv,  !- File Name
-    11,                       !- Column Number
+    11,                      !- Column Number
     1,                       !- Rows to Skip at Top
     8760,                    !- Number of Hours of Data
     Comma,                   !- Column Separator
     ,                        !- Interpolate to Timestep
     10;                      !- Minutes per Item
 
-Schedule:File,
+  Schedule:File,
     ZONE 3_MeasuredCO2Concentration,  !- Name
     Any Number,              !- Schedule Type Limits Name
     HybridModel_Measurements_no_HVAC.csv,  !- File Name
@@ -521,9 +470,9 @@ Schedule:File,
     10;                      !- Minutes per Item
 
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========
-
 ! No location information present in original BLAST file
-Material,
+
+  Material,
     A2 - 4 IN DENSE FACE BRICK,  !- Name
     Rough,                   !- Roughness
     0.1014984,               !- Thickness {m}
@@ -534,7 +483,7 @@ Material,
     0.9300000,               !- Solar Absorptance
     0.9300000;               !- Visible Absorptance
 
-Material,
+  Material,
     B3 - 2 IN INSULATION,    !- Name
     VeryRough,               !- Roughness
     5.0901599E-02,           !- Thickness {m}
@@ -545,7 +494,7 @@ Material,
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
-Material,
+  Material,
     C2 - 4 IN LW CONCRETE BLOCK,  !- Name
     MediumRough,             !- Roughness
     0.1014984,               !- Thickness {m}
@@ -556,7 +505,7 @@ Material,
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-Material,
+  Material,
     E1 - 3 / 4 IN PLASTER OR GYP BOARD,  !- Name
     Smooth,                  !- Roughness
     1.9050000E-02,           !- Thickness {m}
@@ -567,7 +516,7 @@ Material,
     0.9200000,               !- Solar Absorptance
     0.9200000;               !- Visible Absorptance
 
-Material,
+  Material,
     WOOD - HARDWOOD 1 / 8 IN,!- Name
     MediumSmooth,            !- Roughness
     3.1699201E-03,           !- Thickness {m}
@@ -578,7 +527,7 @@ Material,
     0.7800000,               !- Solar Absorptance
     0.7800000;               !- Visible Absorptance
 
-Material,
+  Material,
     C7 - 8 IN LW CONCRETE BLOCK,  !- Name
     Rough,                   !- Roughness
     0.2033016,               !- Thickness {m}
@@ -589,7 +538,7 @@ Material,
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-Material,
+  Material,
     E5 - ACOUSTIC TILE,      !- Name
     MediumSmooth,            !- Roughness
     1.9050000E-02,           !- Thickness {m}
@@ -600,7 +549,7 @@ Material,
     0.3200000,               !- Solar Absorptance
     0.3200000;               !- Visible Absorptance
 
-Material,
+  Material,
     C5 - 4 IN HW CONCRETE,   !- Name
     MediumRough,             !- Roughness
     0.1014984,               !- Thickness {m}
@@ -611,7 +560,7 @@ Material,
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-Material,
+  Material,
     C10 - 8 IN HW CONCRETE,  !- Name
     MediumRough,             !- Roughness
     0.2033016,               !- Thickness {m}
@@ -622,7 +571,7 @@ Material,
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-Material,
+  Material,
     E2 - 1 / 2 IN SLAG OR STONE,  !- Name
     Rough,                   !- Roughness
     1.2710161E-02,           !- Thickness {m}
@@ -633,7 +582,7 @@ Material,
     0.5500000,               !- Solar Absorptance
     0.5500000;               !- Visible Absorptance
 
-Material,
+  Material,
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Name
     Rough,                   !- Roughness
     9.5402403E-03,           !- Thickness {m}
@@ -644,7 +593,7 @@ Material,
     0.7500000,               !- Solar Absorptance
     0.7500000;               !- Visible Absorptance
 
-Material,
+  Material,
     B6 - 2 IN DENSE INSULATION,  !- Name
     VeryRough,               !- Roughness
     5.0901599E-02,           !- Thickness {m}
@@ -655,7 +604,7 @@ Material,
     0.5000000,               !- Solar Absorptance
     0.5000000;               !- Visible Absorptance
 
-Material,
+  Material,
     C12 - 2 IN HW CONCRETE,  !- Name
     MediumRough,             !- Roughness
     5.0901599E-02,           !- Thickness {m}
@@ -666,22 +615,20 @@ Material,
     0.6500000,               !- Solar Absorptance
     0.6500000;               !- Visible Absorptance
 
-
 !-   ===========  ALL OBJECTS IN CLASS: MATERIAL:AIRGAP ===========
 
-Material:AirGap,
+  Material:AirGap,
     B1 - AIRSPACE RESISTANCE,!- Name
     0.1603675;               !- Thermal Resistance {m2-K/W}
 
-Material:AirGap,
+  Material:AirGap,
     E4 - CEILING AIRSPACE,   !- Name
     0.1762280;               !- Thermal Resistance {m2-K/W}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WINDOWMATERIAL:GLAZING ===========
-
 ! (R=.0472,TRANS=.80,VERY SMOOTH,GLASS), from 6mm clear
-WindowMaterial:Glazing,
+
+  WindowMaterial:Glazing,
     GLASS - CLEAR PLATE 1 / 4 IN,  !- Name
     SpectralAverage,         !- Optical Data Type
     ,                        !- Window Glass Spectral Data Set Name
@@ -697,51 +644,49 @@ WindowMaterial:Glazing,
     0.8400000,               !- Back Side Infrared Hemispherical Emissivity
     0.9000000;               !- Conductivity {W/m-K}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
-Construction,
+  Construction,
     EXTERIOR,                !- Name
     A2 - 4 IN DENSE FACE BRICK,  !- Outside Layer
     B3 - 2 IN INSULATION,    !- Layer 2
     C2 - 4 IN LW CONCRETE BLOCK,  !- Layer 3
     E1 - 3 / 4 IN PLASTER OR GYP BOARD;  !- Layer 4
 
-Construction,
+  Construction,
     SINGLE PANE HW WINDOW,   !- Name
     GLASS - CLEAR PLATE 1 / 4 IN;  !- Outside Layer
 
-Construction,
+  Construction,
     HOLLOW WOOD DOOR,        !- Name
     WOOD - HARDWOOD 1 / 8 IN,!- Outside Layer
     B1 - AIRSPACE RESISTANCE,!- Layer 2
     WOOD - HARDWOOD 1 / 8 IN;!- Layer 3
 
-Construction,
+  Construction,
     INTERIOR,                !- Name
     C7 - 8 IN LW CONCRETE BLOCK;  !- Outside Layer
 
-Construction,
+  Construction,
     FLOOR,                   !- Name
     E5 - ACOUSTIC TILE,      !- Outside Layer
     E4 - CEILING AIRSPACE,   !- Layer 2
     C5 - 4 IN HW CONCRETE;   !- Layer 3
 
-Construction,
+  Construction,
     CEILING34,               !- Name
     C10 - 8 IN HW CONCRETE;  !- Outside Layer
 
-Construction,
+  Construction,
     FLOOR34,                 !- Name
     C10 - 8 IN HW CONCRETE;  !- Outside Layer
 
-Construction,
+  Construction,
     ROOF31,                  !- Name
     E2 - 1 / 2 IN SLAG OR STONE,  !- Outside Layer
     E3 - 3 / 8 IN FELT AND MEMBRANE,  !- Layer 2
     B6 - 2 IN DENSE INSULATION,  !- Layer 3
     C12 - 2 IN HW CONCRETE;  !- Layer 4
-
 
 !-   ===========  ALL OBJECTS IN CLASS: GLOBALGEOMETRYRULES ===========
 
@@ -751,7 +696,6 @@ Construction,
     Relative,                !- Coordinate System
     Relative,                !- Daylighting Reference Point Coordinate System
     Relative;                !- Rectangular Surface Coordinate System
-
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE ===========
 
@@ -799,10 +743,9 @@ Construction,
     AutoCalculate,           !- Ceiling Height {m}
     AutoCalculate;           !- Volume {m3}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WALL:EXTERIOR ===========
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn001:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
@@ -814,7 +757,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn001:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
@@ -826,7 +769,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn001:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
@@ -838,7 +781,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn002:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
@@ -850,7 +793,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn002:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
@@ -862,7 +805,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn002:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
@@ -874,7 +817,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn003:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
@@ -886,7 +829,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn003:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
@@ -898,7 +841,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn003:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
@@ -910,7 +853,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn004:Wall001,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 4,                  !- Zone Name
@@ -922,7 +865,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn004:Wall002,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 4,                  !- Zone Name
@@ -934,7 +877,7 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Exterior,
+  Wall:Exterior,
     Zn004:Wall003,           !- Name
     EXTERIOR,                !- Construction Name
     ZONE 4,                  !- Zone Name
@@ -946,10 +889,9 @@ Wall:Exterior,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WALL:ADIABATIC ===========
 
-Wall:Adiabatic,
+  Wall:Adiabatic,
     Zn001:Wall004,           !- Name
     INTERIOR,                !- Construction Name
     ZONE 1,                  !- Zone Name
@@ -961,7 +903,7 @@ Wall:Adiabatic,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Adiabatic,
+  Wall:Adiabatic,
     Zn002:Wall004,           !- Name
     INTERIOR,                !- Construction Name
     ZONE 2,                  !- Zone Name
@@ -973,10 +915,9 @@ Wall:Adiabatic,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WALL:INTERZONE ===========
 
-Wall:Interzone,
+  Wall:Interzone,
     Zn003:Wall004,           !- Name
     INTERIOR,                !- Construction Name
     ZONE 3,                  !- Zone Name
@@ -989,7 +930,7 @@ Wall:Interzone,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-Wall:Interzone,
+  Wall:Interzone,
     Zn004:Wall004,           !- Name
     INTERIOR,                !- Construction Name
     ZONE 4,                  !- Zone Name
@@ -1002,10 +943,9 @@ Wall:Interzone,
     20,                      !- Length {m}
     10;                      !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ROOF ===========
 
-Roof,
+  Roof,
     Zn003:Roof001,           !- Name
     ROOF31,                  !- Construction Name
     ZONE 3,                  !- Zone Name
@@ -1017,7 +957,7 @@ Roof,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-Roof,
+  Roof,
     Zn004:Roof001,           !- Name
     ROOF31,                  !- Construction Name
     ZONE 4,                  !- Zone Name
@@ -1029,10 +969,9 @@ Roof,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: CEILING:INTERZONE ===========
 
-Ceiling:Interzone,
+  Ceiling:Interzone,
     Zn001:Roof001,           !- Name
     CEILING34,               !- Construction Name
     ZONE 1,                  !- Zone Name
@@ -1045,7 +984,7 @@ Ceiling:Interzone,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-Ceiling:Interzone,
+  Ceiling:Interzone,
     Zn002:Roof001,           !- Name
     CEILING34,               !- Construction Name
     ZONE 2,                  !- Zone Name
@@ -1058,10 +997,9 @@ Ceiling:Interzone,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: FLOOR:ADIABATIC ===========
 
-Floor:Adiabatic,
+  Floor:Adiabatic,
     Zn001:Flr001,            !- Name
     FLOOR,                   !- Construction Name
     ZONE 1,                  !- Zone Name
@@ -1073,7 +1011,7 @@ Floor:Adiabatic,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-Floor:Adiabatic,
+  Floor:Adiabatic,
     Zn002:Flr001,            !- Name
     FLOOR,                   !- Construction Name
     ZONE 2,                  !- Zone Name
@@ -1085,10 +1023,9 @@ Floor:Adiabatic,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: FLOOR:INTERZONE ===========
 
-Floor:Interzone,
+  Floor:Interzone,
     Zn003:Flr001,            !- Name
     FLOOR34,                 !- Construction Name
     ZONE 3,                  !- Zone Name
@@ -1101,7 +1038,7 @@ Floor:Interzone,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-Floor:Interzone,
+  Floor:Interzone,
     Zn004:Flr001,            !- Name
     FLOOR34,                 !- Construction Name
     ZONE 4,                  !- Zone Name
@@ -1114,10 +1051,9 @@ Floor:Interzone,
     20,                      !- Length {m}
     20;                      !- Width {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WINDOW ===========
 
-Window,
+  Window,
     Zn001:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
@@ -1128,7 +1064,7 @@ Window,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-Window,
+  Window,
     Zn002:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
@@ -1139,7 +1075,7 @@ Window,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-Window,
+  Window,
     Zn002:Wall001:Win002,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall001,           !- Building Surface Name
@@ -1150,7 +1086,7 @@ Window,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-Window,
+  Window,
     Zn002:Wall002:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn002:Wall002,           !- Building Surface Name
@@ -1161,7 +1097,7 @@ Window,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-Window,
+  Window,
     Zn003:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn003:Wall001,           !- Building Surface Name
@@ -1172,7 +1108,7 @@ Window,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-Window,
+  Window,
     Zn004:Wall001:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn004:Wall001,           !- Building Surface Name
@@ -1183,10 +1119,9 @@ Window,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: DOOR ===========
 
-Door,
+  Door,
     Zn001:Wall001:Door001,   !- Name
     HOLLOW WOOD DOOR,        !- Construction Name
     Zn001:Wall001,           !- Building Surface Name
@@ -1196,10 +1131,9 @@ Door,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: WINDOW:INTERZONE ===========
 
-Window:Interzone,
+  Window:Interzone,
     Zn003:Wall004:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn003:Wall004,           !- Building Surface Name
@@ -1210,7 +1144,7 @@ Window:Interzone,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-Window:Interzone,
+  Window:Interzone,
     Zn004:Wall004:Win001,    !- Name
     SINGLE PANE HW WINDOW,   !- Construction Name
     Zn004:Wall004,           !- Building Surface Name
@@ -1221,10 +1155,9 @@ Window:Interzone,
     3,                       !- Length {m}
     5;                       !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SHADING:SITE ===========
 
-Shading:Site,
+  Shading:Site,
     Bushes-South,            !- Name
     180,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
@@ -1234,7 +1167,7 @@ Shading:Site,
     50,                      !- Length {m}
     1;                       !- Height {m}
 
-Shading:Site,
+  Shading:Site,
     Bushes-North,            !- Name
     0,                       !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
@@ -1244,7 +1177,7 @@ Shading:Site,
     50,                      !- Length {m}
     1;                       !- Height {m}
 
-Shading:Site,
+  Shading:Site,
     Bushes-West,             !- Name
     270,                     !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
@@ -1254,10 +1187,9 @@ Shading:Site,
     50,                      !- Length {m}
     1;                       !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SHADING:BUILDING ===========
 
-Shading:Building,
+  Shading:Building,
     Bushes-East,             !- Name
     90,                      !- Azimuth Angle {deg}
     90,                      !- Tilt Angle {deg}
@@ -1267,10 +1199,9 @@ Shading:Building,
     50,                      !- Length {m}
     1;                       !- Height {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SHADING:OVERHANG ===========
 
-Shading:Overhang,
+  Shading:Overhang,
     Zn001:Wall001:Win001:Shade001,  !- Name
     Zn001:Wall001:Win001,    !- Window or Door Name
     0.7,                     !- Height above Window or Door {m}
@@ -1279,7 +1210,7 @@ Shading:Overhang,
     0.2,                     !- Right extension from Window/Door Width {m}
     3;                       !- Depth {m}
 
-Shading:Overhang,
+  Shading:Overhang,
     Zn001:Wall001:Door001:Shade001,  !- Name
     Zn001:Wall001:Door001,   !- Window or Door Name
     0.6,                     !- Height above Window or Door {m}
@@ -1288,7 +1219,7 @@ Shading:Overhang,
     0,                       !- Right extension from Window/Door Width {m}
     3;                       !- Depth {m}
 
-Shading:Overhang,
+  Shading:Overhang,
     Zn002:Wall001:Win001:Shade001,  !- Name
     Zn002:Wall001:Win001,    !- Window or Door Name
     0.7,                     !- Height above Window or Door {m}
@@ -1297,7 +1228,7 @@ Shading:Overhang,
     0,                       !- Right extension from Window/Door Width {m}
     3;                       !- Depth {m}
 
-Shading:Overhang,
+  Shading:Overhang,
     Zn002:Wall002:Win001:Shade001,  !- Name
     Zn002:Wall002:Win001,    !- Window or Door Name
     0.7,                     !- Height above Window or Door {m}
@@ -1306,10 +1237,9 @@ Shading:Overhang,
     0,                       !- Right extension from Window/Door Width {m}
     3;                       !- Depth {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: SHADING:FIN ===========
 
-Shading:Fin,
+  Shading:Fin,
     Zn001:Wall001:Shade003,  !- Name
     Zn001:Wall001:Win001,    !- Window or Door Name
     0.1,                     !- Left Extension from Window/Door {m}
@@ -1323,7 +1253,7 @@ Shading:Fin,
     90,                      !- Right Tilt Angle from Window/Door {deg}
     3;                       !- Right Depth {m}
 
-Shading:Fin,
+  Shading:Fin,
     Zn002:Wall002:Shade002,  !- Name
     Zn002:Wall002:Win001,    !- Window or Door Name
     0.1,                     !- Left Extension from Window/Door {m}
@@ -1337,10 +1267,9 @@ Shading:Fin,
     90,                      !- Right Tilt Angle from Window/Door {deg}
     3;                       !- Right Depth {m}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
 
-People,
+  People,
     Zone 1 People,           !- Name
     ZONE 1,                  !- Zone or ZoneList Name
     OfficeSmall BLDG_OCC_SCH,!- Number of People Schedule Name
@@ -1349,7 +1278,7 @@ People,
     0.1,                     !- People per Zone Floor Area {person/m2}
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
-    0.6,           !- Sensible Heat Fraction
+    0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
@@ -1358,7 +1287,7 @@ People,
     ,                        !- Work Efficiency Schedule Name
     ClothingInsulationSchedule;  !- Clothing Insulation Calculation Method
 
-People,
+  People,
     Zone 2 People,           !- Name
     ZONE 2,                  !- Zone or ZoneList Name
     OfficeSmall BLDG_OCC_SCH,!- Number of People Schedule Name
@@ -1367,7 +1296,7 @@ People,
     0.1,                     !- People per Zone Floor Area {person/m2}
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
-    0.6,           !- Sensible Heat Fraction
+    0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
@@ -1376,7 +1305,7 @@ People,
     ,                        !- Work Efficiency Schedule Name
     ClothingInsulationSchedule;  !- Clothing Insulation Calculation Method
 
-People,
+  People,
     Zone 3 People,           !- Name
     ZONE 3,                  !- Zone or ZoneList Name
     obFMU_PeopleSch,         !- Number of People Schedule Name
@@ -1385,7 +1314,7 @@ People,
     0.1,                     !- People per Zone Floor Area {person/m2}
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
-    0.6,           !- Sensible Heat Fraction
+    0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
@@ -1394,7 +1323,7 @@ People,
     ,                        !- Work Efficiency Schedule Name
     ClothingInsulationSchedule;  !- Clothing Insulation Calculation Method
 
-People,
+  People,
     Zone 4 People,           !- Name
     ZONE 4,                  !- Zone or ZoneList Name
     obFMU_PeopleSch,         !- Number of People Schedule Name
@@ -1403,7 +1332,7 @@ People,
     0.1,                     !- People per Zone Floor Area {person/m2}
     ,                        !- Zone Floor Area per Person {m2/person}
     0.3,                     !- Fraction Radiant
-    0.6,           !- Sensible Heat Fraction
+    0.6,                     !- Sensible Heat Fraction
     OfficeSmall ACTIVITY_SCH,!- Activity Level Schedule Name
     0.0000000382,            !- Carbon Dioxide Generation Rate {m3/s-W}
     No,                      !- Enable ASHRAE 55 Comfort Warnings
@@ -1412,10 +1341,9 @@ People,
     ,                        !- Work Efficiency Schedule Name
     ClothingInsulationSchedule;  !- Clothing Insulation Calculation Method
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEINFILTRATION:DESIGNFLOWRATE ===========
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     ZONE 1 Infil,            !- Name
     ZONE 1,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -1429,7 +1357,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     ZONE 2 Infil,            !- Name
     ZONE 2,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -1443,7 +1371,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     ZONE 3 Infil,            !- Name
     ZONE 3,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -1457,7 +1385,7 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-ZoneInfiltration:DesignFlowRate,
+  ZoneInfiltration:DesignFlowRate,
     ZONE 4 Infil,            !- Name
     ZONE 4,                  !- Zone or ZoneList Name
     INFIL-SCHED,             !- Schedule Name
@@ -1471,64 +1399,61 @@ ZoneInfiltration:DesignFlowRate,
     0.0000,                  !- Velocity Term Coefficient
     0.0000;                  !- Velocity Squared Term Coefficient
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONECONTROL:THERMOSTAT ===========
 
-ZoneControl:Thermostat,
+  ZoneControl:Thermostat,
     ZONE 1 CONTROLS,         !- Name
     ZONE 1,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     ZONE 1 SETPOINTS;        !- Control 1 Name
 
-ZoneControl:Thermostat,
+  ZoneControl:Thermostat,
     ZONE 2 CONTROLS,         !- Name
     ZONE 2,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     ZONE 2 SETPOINTS;        !- Control 1 Name
 
-ZoneControl:Thermostat,
+  ZoneControl:Thermostat,
     ZONE 3 CONTROLS,         !- Name
     ZONE 3,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     ZONE 3 SETPOINTS;        !- Control 1 Name
 
-ZoneControl:Thermostat,
+  ZoneControl:Thermostat,
     ZONE 4 CONTROLS,         !- Name
     ZONE 4,                  !- Zone or ZoneList Name
     Zone Control Type Schedule,  !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     ZONE 4 SETPOINTS;        !- Control 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: THERMOSTATSETPOINT:DUALSETPOINT ===========
 
-ThermostatSetpoint:DualSetpoint,
+  ThermostatSetpoint:DualSetpoint,
     ZONE 1 SETPOINTS,        !- Name
     ZONE Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name
     ZONE Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name
 
-ThermostatSetpoint:DualSetpoint,
+  ThermostatSetpoint:DualSetpoint,
     ZONE 2 SETPOINTS,        !- Name
     ZONE Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name
     ZONE Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name
 
-ThermostatSetpoint:DualSetpoint,
+  ThermostatSetpoint:DualSetpoint,
     ZONE 3 SETPOINTS,        !- Name
     ZONE Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name
     ZONE Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name
 
-ThermostatSetpoint:DualSetpoint,
+  ThermostatSetpoint:DualSetpoint,
     ZONE 4 SETPOINTS,        !- Name
     ZONE Heating Setpoints,  !- Heating Setpoint Temperature Schedule Name
     ZONE Cooling Setpoints;  !- Cooling Setpoint Temperature Schedule Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:IDEALLOADSAIRSYSTEM ===========
 
-ZoneHVAC:IdealLoadsAirSystem,
+  ZoneHVAC:IdealLoadsAirSystem,
     ZONE 1 Ideal Loads,      !- Name
     ,                        !- Availability Schedule Name
     ZONE 1 INLETS,           !- Zone Supply Air Node Name
@@ -1557,7 +1482,7 @@ ZoneHVAC:IdealLoadsAirSystem,
     ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
     ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
 
-ZoneHVAC:IdealLoadsAirSystem,
+  ZoneHVAC:IdealLoadsAirSystem,
     ZONE 2 Ideal Loads,      !- Name
     ,                        !- Availability Schedule Name
     ZONE 2 INLETS,           !- Zone Supply Air Node Name
@@ -1586,7 +1511,7 @@ ZoneHVAC:IdealLoadsAirSystem,
     ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
     ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
 
-ZoneHVAC:IdealLoadsAirSystem,
+  ZoneHVAC:IdealLoadsAirSystem,
     ZONE 3 Ideal Loads,      !- Name
     ,                        !- Availability Schedule Name
     ZONE 3 INLETS,           !- Zone Supply Air Node Name
@@ -1615,7 +1540,7 @@ ZoneHVAC:IdealLoadsAirSystem,
     ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
     ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
 
-ZoneHVAC:IdealLoadsAirSystem,
+  ZoneHVAC:IdealLoadsAirSystem,
     ZONE 4 Ideal Loads,      !- Name
     ,                        !- Availability Schedule Name
     ZONE 4 INLETS,           !- Zone Supply Air Node Name
@@ -1644,45 +1569,51 @@ ZoneHVAC:IdealLoadsAirSystem,
     ,                        !- Sensible Heat Recovery Effectiveness {dimensionless}
     ;                        !- Latent Heat Recovery Effectiveness {dimensionless}
 
-
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
-ZoneHVAC:EquipmentList,
+  ZoneHVAC:EquipmentList,
     ZONE 1 EQUIPMENT,        !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 1 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-ZoneHVAC:EquipmentList,
+  ZoneHVAC:EquipmentList,
     ZONE 2 EQUIPMENT,        !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 2 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-ZoneHVAC:EquipmentList,
+  ZoneHVAC:EquipmentList,
     ZONE 3 EQUIPMENT,        !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 3 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
-ZoneHVAC:EquipmentList,
+  ZoneHVAC:EquipmentList,
     ZONE 4 EQUIPMENT,        !- Name
     SequentialLoad,          !- Load Distribution Scheme
     ZoneHVAC:IdealLoadsAirSystem,  !- Zone Equipment 1 Object Type
     ZONE 4 Ideal Loads,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
-
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
-ZoneHVAC:EquipmentConnections,
+  ZoneHVAC:EquipmentConnections,
     ZONE 1,                  !- Zone Name
     ZONE 1 EQUIPMENT,        !- Zone Conditioning Equipment List Name
     ZONE 1 INLETS,           !- Zone Air Inlet Node or NodeList Name
@@ -1690,7 +1621,7 @@ ZoneHVAC:EquipmentConnections,
     ZONE 1 NODE,             !- Zone Air Node Name
     ZONE 1 OUTLET;           !- Zone Return Air Node or NodeList Name
 
-ZoneHVAC:EquipmentConnections,
+  ZoneHVAC:EquipmentConnections,
     ZONE 2,                  !- Zone Name
     ZONE 2 EQUIPMENT,        !- Zone Conditioning Equipment List Name
     ZONE 2 INLETS,           !- Zone Air Inlet Node or NodeList Name
@@ -1698,7 +1629,7 @@ ZoneHVAC:EquipmentConnections,
     ZONE 2 NODE,             !- Zone Air Node Name
     ZONE 2 OUTLET;           !- Zone Return Air Node or NodeList Name
 
-ZoneHVAC:EquipmentConnections,
+  ZoneHVAC:EquipmentConnections,
     ZONE 3,                  !- Zone Name
     ZONE 3 EQUIPMENT,        !- Zone Conditioning Equipment List Name
     ZONE 3 INLETS,           !- Zone Air Inlet Node or NodeList Name
@@ -1706,7 +1637,7 @@ ZoneHVAC:EquipmentConnections,
     ZONE 3 NODE,             !- Zone Air Node Name
     ZONE 3 OUTLET;           !- Zone Return Air Node or NodeList Name
 
-ZoneHVAC:EquipmentConnections,
+  ZoneHVAC:EquipmentConnections,
     ZONE 4,                  !- Zone Name
     ZONE 4 EQUIPMENT,        !- Zone Conditioning Equipment List Name
     ZONE 4 INLETS,           !- Zone Air Inlet Node or NodeList Name
@@ -1714,29 +1645,27 @@ ZoneHVAC:EquipmentConnections,
     ZONE 4 NODE,             !- Zone Air Node Name
     ZONE 4 OUTLET;           !- Zone Return Air Node or NodeList Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: NODELIST ===========
 
-NodeList,
+  NodeList,
     ZONE 1 INLETS,           !- Name
     ZONE 1 INLET;            !- Node 1 Name
 
-NodeList,
+  NodeList,
     ZONE 2 INLETS,           !- Name
     ZONE 2 INLET;            !- Node 1 Name
 
-NodeList,
+  NodeList,
     ZONE 3 INLETS,           !- Name
     ZONE 3 INLET;            !- Node 1 Name
 
-NodeList,
+  NodeList,
     ZONE 4 INLETS,           !- Name
     ZONE 4 INLET;            !- Node 1 Name
 
-
 !-   ===========  ALL OBJECTS IN CLASS: HYBRIDMODEL:ZONE ===========
 
-HybridModel:Zone,
+  HybridModel:Zone,
     ZONE 1 HybridModel,      !- Name
     ZONE 1,                  !- Zone Name
     No,                      !- Calculate Zone Internal Thermal Mass
@@ -1746,7 +1675,7 @@ HybridModel:Zone,
     ,                        !- Zone Measured Air Humidity Ratio Schedule Name
     ,                        !- Zone Measured Air CO2 Concentration Schedule Name
     ,                        !- Zone Input People Activity Schedule Name
-    ,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
+    ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
     ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
     ,                        !- Zone Input People CO2 Generation Rate Schedule Name
     ,                        !- Zone Input Supply Air Temperature Schedule Name
@@ -1758,17 +1687,17 @@ HybridModel:Zone,
     12,                      !- End Month
     31;                      !- End Day of Month
 
-HybridModel:Zone,
+  HybridModel:Zone,
     ZONE 2 HybridModel,      !- Name
     ZONE 2,                  !- Zone Name
     No,                      !- Calculate Zone Internal Thermal Mass
     Yes,                     !- Calculate Zone Air Infiltration Rate
     No,                      !- Calculate Zone People Count
-    ,  !- Zone Measured Air Temperature Schedule Name
-    ZONE 2_MeasuredHumidityRatio,                        !- Zone Measured Air Humidity Ratio Schedule Name
+    ,                        !- Zone Measured Air Temperature Schedule Name
+    ZONE 2_MeasuredHumidityRatio,  !- Zone Measured Air Humidity Ratio Schedule Name
     ,                        !- Zone Measured Air CO2 Concentration Schedule Name
     ,                        !- Zone Input People Activity Schedule Name
-    ,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
+    ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
     ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
     ,                        !- Zone Input People CO2 Generation Rate Schedule Name
     ,                        !- Zone Input Supply Air Temperature Schedule Name
@@ -1780,7 +1709,7 @@ HybridModel:Zone,
     12,                      !- End Month
     31;                      !- End Day of Month
 
-HybridModel:Zone,
+  HybridModel:Zone,
     ZONE 3 HybridModel,      !- Name
     ZONE 3,                  !- Zone Name
     No,                      !- Calculate Zone Internal Thermal Mass
@@ -1790,7 +1719,7 @@ HybridModel:Zone,
     ,                        !- Zone Measured Air Humidity Ratio Schedule Name
     ZONE 3_MeasuredCO2Concentration,  !- Zone Measured Air CO2 Concentration Schedule Name
     ,                        !- Zone Input People Activity Schedule Name
-    ,                        !- Zone Input People Sensivle Heat Fraction Schedule Name
+    ,                        !- Zone Input People Sensible Heat Fraction Schedule Name
     ,                        !- Zone Input People Radiant Heat Fraction Schedule Name
     ,                        !- Zone Input People CO2 Generation Rate Schedule Name
     ,                        !- Zone Input Supply Air Temperature Schedule Name
@@ -1802,31 +1731,33 @@ HybridModel:Zone,
     12,                      !- End Month
     31;                      !- End Day of Month
 
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLEDICTIONARY ===========
 
-Output:VariableDictionary,
-    IDF;                     !- Key Field
-
+  Output:VariableDictionary,IDF;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:TABLE:SUMMARYREPORTS ===========
 
-Output:Table:SummaryReports,
+  Output:Table:SummaryReports,
     AllSummaryAndMonthly;    !- Report 1 Name
-
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUTCONTROL:TABLE:STYLE ===========
 
-OutputControl:Table:Style,
+  OutputControl:Table:Style,
     Comma;                   !- Column Separator
 
-
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
-Output:Variable,*,Zone Mean Air Temperature,Timestep;
-Output:Variable,*,Zone Air CO2 Concentration,Timestep;
-Output:Variable,*,Zone Mean Air Humidity Ratio,Timestep;
 
-Output:Variable,*,Zone Infiltration Air Change Rate,Timestep;
-Output:Variable,ZONE 1,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
-Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
-Output:Variable,ZONE 3,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
+  Output:Variable,*,Zone Mean Air Temperature,Timestep;
+
+  Output:Variable,*,Zone Air CO2 Concentration,Timestep;
+
+  Output:Variable,*,Zone Mean Air Humidity Ratio,Timestep;
+
+  Output:Variable,*,Zone Infiltration Air Change Rate,Timestep;
+
+  Output:Variable,ZONE 1,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
+
+  Output:Variable,ZONE 2,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
+
+  Output:Variable,ZONE 3,Zone Infiltration Hybrid Model Air Change Rate,Timestep;
+

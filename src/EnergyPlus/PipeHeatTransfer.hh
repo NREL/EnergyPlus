@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,12 +57,16 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace PipeHeatTransfer {
 
@@ -237,15 +241,13 @@ namespace PipeHeatTransfer {
         {
         }
 
-        static PlantComponent *factory(int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
-        void clear_state();
-
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(bool const FirstHVACIteration // component number
+        void InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
         );
 
         Real64 TBND(Real64 const z,       // Current Depth
@@ -280,7 +282,9 @@ namespace PipeHeatTransfer {
     // Object Data
     extern Array1D<PipeHTData> PipeHT;
 
-    void GetPipesHeatTransfer();
+    void clear_state();
+
+    void GetPipesHeatTransfer(EnergyPlusData &state);
 
 } // namespace PipeHeatTransfer
 

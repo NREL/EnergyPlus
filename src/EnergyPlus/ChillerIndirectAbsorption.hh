@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,52 +52,55 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+struct ChillerIndirectAbsoprtionData;
+
 namespace ChillerIndirectAbsorption {
 
-    // Using/Aliasing
+    struct ReportVars
+    {
+        // Members
+        Real64 PumpingPower;         // reporting: W - electric pumping power
+        Real64 QGenerator;           // reporting: W - steam heat transfer rate
+        Real64 QEvap;                // reporting: W - evaporator heat transfer rate
+        Real64 QCond;                // reporting: W - condenser heat transfer rate
+        Real64 PumpingEnergy;        // reporting: J - electric pumping power
+        Real64 GeneratorEnergy;      // reporting: J - steam heat transfer rate
+        Real64 EvapEnergy;           // reporting: J - evaporator heat transfer rate
+        Real64 CondEnergy;           // reporting: J - condenser heat transfer rate
+        Real64 CondInletTemp;        // reporting: C - condenser inlet temperature
+        Real64 EvapInletTemp;        // reporting: C - evaporator inlet temperature
+        Real64 CondOutletTemp;       // reporting: C - condenser outlet temperature
+        Real64 EvapOutletTemp;       // reporting: C - evaporator outlet temperature
+        Real64 Evapmdot;             // reporting: kg/ - evaporator mass flow rate
+        Real64 Condmdot;             // reporting: kg/ - condenser mass flow rate
+        Real64 Genmdot;              // reporting: generators mass flow rate when connected to plant
+        Real64 SteamMdot;            // reporting: kg/s - steam mass flow rate
+        Real64 ActualCOP;            // reporting: coefficient of performance = QEvap/QGenerator
+        Real64 ChillerPartLoadRatio; // reporting: part-load ratio
+        Real64 ChillerCyclingFrac;   // reporting: chiller on/off cycling fraction
+        Real64 LoopLoss;             // reporting: W - loop loss from absorber outlet to condensate pump inlet
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // chiller flow modes
-    extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
+        // Default Constructor
+        ReportVars()
+            : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
+              CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
+              SteamMdot(0.0), ActualCOP(0.0), ChillerPartLoadRatio(0.0), ChillerCyclingFrac(0.0), LoopLoss(0.0)
+        {
+        }
+    };
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumIndirectAbsorbers;       // number of Absorption Chillers specified in input
-    extern Real64 CondMassFlowRate;        // Kg/s - condenser mass flow rate, water side
-    extern Real64 EvapMassFlowRate;        // Kg/s - evaporator mass flow rate, water side
-    extern Real64 GenMassFlowRate;         // Kg/s - steam mass flow rate, water side
-    extern Real64 CondOutletTemp;          // C - condenser outlet temperature, water side
-    extern Real64 EvapOutletTemp;          // C - evaporator outlet temperature, water side
-    extern Real64 GenOutletTemp;           // C - generator fluid outlet temperature
-    extern Real64 SteamOutletEnthalpy;     // J/kg - generator fluid outlet enthalpy
-    extern Real64 PumpingPower;            // W - rate of Absorber energy use
-    extern Real64 PumpingEnergy;           // J - Absorber energy use
-    extern Real64 QGenerator;              // W - rate of Absorber steam use
-    extern Real64 GeneratorEnergy;         // J - Absorber steam use
-    extern Real64 QEvaporator;             // W - rate of heat transfer to the evaporator coil
-    extern Real64 EvaporatorEnergy;        // J - heat transfer to the evaporator coil
-    extern Real64 QCondenser;              // W - rate of heat transfer to the condenser coil
-    extern Real64 CondenserEnergy;         // J - heat transfer to the condenser coil
-    extern Real64 EnergyLossToEnvironment; // J - piping energy loss from generator outlet to pump inlet
-    extern Real64 ChillerONOFFCyclingFrac; // fraction of time chiller is on
-
-    extern bool GetInput; // When TRUE, calls subroutine to read input file
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE:
-
-    // Types
-
-    struct IndirectAbsorberSpecs
+    struct IndirectAbsorberSpecs : PlantComponent
     {
         // Members
         std::string Name;                 // user identifier
@@ -110,7 +113,7 @@ namespace ChillerIndirectAbsorption {
         Real64 CondVolFlowRate;           // m3/s - design nominal water volumetric flow rate through the condenser
         bool CondVolFlowRateWasAutoSized; // true if condenser flow rate was autosize on input
         Real64 EvapMassFlowRateMax;       // kg/s - Max Design Evaporator Mass Flow Rate converted from Volume Flow Rate
-        Real64 CondMassFlowRateMax;       // Max Design Condeneser Mass Flow Rate [kg/s]
+        Real64 CondMassFlowRateMax;       // Max Design Condenser Mass Flow Rate [kg/s]
         Real64 GenMassFlowRateMax;        // kg/s - Max Design Generator Mass Flow Rate converted from Volume Flow Rate
         Real64 MinPartLoadRat;            // (BLAST MIN) min allowed operating frac full load
         Real64 MaxPartLoadRat;            // (BLAST MAX) max allowed operating frac full load
@@ -145,7 +148,7 @@ namespace ChillerIndirectAbsorption {
         int SteamFluidIndex;                   // index to generator fluid type
         bool Available;                        // need an array of logicals--load identifiers of available equipment
         bool ON;                               // simulate the machine at it's operating part load ratio
-        int FlowMode;                          // one of 3 modes for componet flow during operation
+        DataPlant::FlowMode FlowMode;          // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;           // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;             // true if setpoint warning issued
         int MinCondInletTempCtr;               // Low condenser temp warning message counter
@@ -168,6 +171,28 @@ namespace ChillerIndirectAbsorption {
         int FaultyChillerSWTIndex;             // Index of the fault object corresponding to the chiller
         Real64 FaultyChillerSWTOffset;         // Chiller SWT sensor offset
         bool PossibleSubcooling;               // flag to indicate chiller is doing less cooling that requested
+        Real64 CondMassFlowRate;               // Kg/s - condenser mass flow rate, water side
+        Real64 EvapMassFlowRate;               // Kg/s - evaporator mass flow rate, water side
+        Real64 GenMassFlowRate;                // Kg/s - steam mass flow rate, water side
+        Real64 CondOutletTemp;                 // C - condenser outlet temperature, water side
+        Real64 EvapOutletTemp;                 // C - evaporator outlet temperature, water side
+        Real64 GenOutletTemp;                  // C - generator fluid outlet temperature
+        Real64 SteamOutletEnthalpy;            // J/kg - generator fluid outlet enthalpy
+        Real64 PumpingPower;                   // W - rate of Absorber energy use
+        Real64 PumpingEnergy;                  // J - Absorber energy use
+        Real64 QGenerator;                     // W - rate of Absorber steam use
+        Real64 GeneratorEnergy;                // J - Absorber steam use
+        Real64 QEvaporator;                    // W - rate of heat transfer to the evaporator coil
+        Real64 EvaporatorEnergy;               // J - heat transfer to the evaporator coil
+        Real64 QCondenser;                     // W - rate of heat transfer to the condenser coil
+        Real64 CondenserEnergy;                // J - heat transfer to the condenser coil
+        Real64 ChillerONOFFCyclingFrac;        // fraction of time chiller is on
+        Real64 EnergyLossToEnvironment;        // J - piping energy loss from generator outlet to pump inlet
+        bool GenInputOutputNodesUsed;
+        bool MyOneTimeFlag;
+        bool MyEnvrnFlag;
+        ReportVars Report;
+        int EquipFlowCtrl;
 
         // Default Constructor
         IndirectAbsorberSpecs()
@@ -179,116 +204,54 @@ namespace ChillerIndirectAbsorption {
               GeneratorDeltaTempWasAutoSized(true), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), GeneratorInputCurvePtr(0), PumpPowerCurvePtr(0), CapFCondenserTempPtr(0),
               CapFEvaporatorTempPtr(0), CapFGeneratorTempPtr(0), HeatInputFCondTempPtr(0), HeatInputFEvapTempPtr(0), ErrCount2(0),
-              GenHeatSourceType(0), SteamFluidIndex(0), Available(false), ON(false), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+              GenHeatSourceType(0), SteamFluidIndex(0), Available(false), ON(false), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), MinCondInletTempCtr(0), MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0),
               CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
               GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0),
-              FaultyChillerSWTOffset(0.0), PossibleSubcooling(false)
+              FaultyChillerSWTOffset(0.0), PossibleSubcooling(false), CondMassFlowRate(0.0), EvapMassFlowRate(0.0), GenMassFlowRate(0.0),
+              CondOutletTemp(0.0), EvapOutletTemp(0.0), GenOutletTemp(0.0), SteamOutletEnthalpy(0.0), PumpingPower(0.0), PumpingEnergy(0.0),
+              QGenerator(0.0), GeneratorEnergy(0.0), QEvaporator(0.0), EvaporatorEnergy(0.0), QCondenser(0.0), CondenserEnergy(0.0),
+              ChillerONOFFCyclingFrac(0.0), EnergyLossToEnvironment(0.0), GenInputOutputNodesUsed(false), MyOneTimeFlag(true), MyEnvrnFlag(true),
+              EquipFlowCtrl(0)
         {
         }
+
+        static PlantComponent *factory(ChillerIndirectAbsoprtionData &chillers, std::string const &objectName);
+
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &sizFac) override;
+
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
+
+        void setupOutputVars();
+
+        void sizeChiller();
+
+        void updateRecords(Real64 MyLoad, bool RunFlag);
+
+        void calculate(Real64 MyLoad, bool RunFlag);
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 PumpingPower;         // reporting: W - electric pumping power
-        Real64 QGenerator;           // reporting: W - steam heat transfer rate
-        Real64 QEvap;                // reporting: W - evaporator heat transfer rate
-        Real64 QCond;                // reporting: W - condensor heat transfer rate
-        Real64 PumpingEnergy;        // reporting: J - electric pumping power
-        Real64 GeneratorEnergy;      // reporting: J - steam heat transfer rate
-        Real64 EvapEnergy;           // reporting: J - evaporator heat transfer rate
-        Real64 CondEnergy;           // reporting: J - condensor heat transfer rate
-        Real64 CondInletTemp;        // reporting: C - condenser inlet temperature
-        Real64 EvapInletTemp;        // reporting: C - evaporator inlet temperature
-        Real64 CondOutletTemp;       // reporting: C - condenser outlet temperature
-        Real64 EvapOutletTemp;       // reporting: C - evaporator outlet temperature
-        Real64 Evapmdot;             // reporting: kg/ - evaporator mass flow rate
-        Real64 Condmdot;             // reporting: kg/ - condenser mass flow rate
-        Real64 Genmdot;              // reporting: generatore mass flow rate when connected to plant
-        Real64 SteamMdot;            // reporting: kg/s - steam mass flow rate
-        Real64 ActualCOP;            // reporting: coefficient of performance = QEvap/QGenerator
-        Real64 ChillerPartLoadRatio; // reporting: part-load ratio
-        Real64 ChillerCyclingFrac;   // reporting: chiller on/off cycling fraction
-        Real64 LoopLoss;             // reporting: W - loop loss from absorber outlet to condensate pump inlet
-
-        // Default Constructor
-        ReportVars()
-            : PumpingPower(0.0), QGenerator(0.0), QEvap(0.0), QCond(0.0), PumpingEnergy(0.0), GeneratorEnergy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
-              CondInletTemp(0.0), EvapInletTemp(0.0), CondOutletTemp(0.0), EvapOutletTemp(0.0), Evapmdot(0.0), Condmdot(0.0), Genmdot(0.0),
-              SteamMdot(0.0), ActualCOP(0.0), ChillerPartLoadRatio(0.0), ChillerCyclingFrac(0.0), LoopLoss(0.0)
-        {
-        }
-    };
-
-    // Object Data
-    extern Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> IndirectAbsorberReport;
-
-    // Functions
-
-    void SimIndirectAbsorber(std::string const &AbsorberType, // type of Absorber
-                             std::string const &AbsorberName, // user specified name of Absorber
-                             int const EquipFlowCtrl,         // Flow control mode for the equipment
-                             int const LoopNum,               // Plant loop index for where called from
-                             int const LoopSide,              // Plant loop side index for where called from
-                             int &CompIndex,                  // Chiller number pointer
-                             bool const RunFlag,              // simulate Absorber when TRUE
-                             bool const FirstIteration,       // initialize variables when TRUE
-                             bool &InitLoopEquip,             // If not zero, calculate the max load for operating conditions
-                             Real64 &MyLoad,                  // loop demand component will meet
-                             Real64 &MaxCap,                  // W - maximum operating capacity of Absorber
-                             Real64 &MinCap,                  // W - minimum operating capacity of Absorber
-                             Real64 &OptCap,                  // W - optimal operating capacity of Absorber
-                             bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
-                             Real64 &SizingFactor,            // sizing factor
-                             Real64 &TempCondInDesign);
-
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
-    void GetIndirectAbsorberInput();
-
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
-
-    void InitIndirectAbsorpChiller(int const ChillNum, // number of the current electric chiller being simulated
-                                   bool const RunFlag, // TRUE when chiller operating
-                                   Real64 const MyLoad // requested load
-    );
-
-    void SizeIndirectAbsorpChiller(int const ChillNum);
-
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
-    void CalcIndirectAbsorberModel(int const ChillNum,        // Absorber number
-                                   Real64 const MyLoad,       // operating load
-                                   bool const RunFlag,        // TRUE when Absorber operating
-                                   bool const FirstIteration, // TRUE when first iteration of timestep !unused1208
-                                   int const EquipFlowCtrl    // Flow control mode for the equipment
-    );
-
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
-    void UpdateIndirectAbsorberRecords(Real64 const MyLoad, // current load
-                                       bool const RunFlag,  // TRUE if Absorber operating
-                                       int const Num        // Absorber number
-    );
-
-    // End of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
-    void clear_state();
+    void GetIndirectAbsorberInput(ChillerIndirectAbsoprtionData &chillers);
 
 } // namespace ChillerIndirectAbsorption
+
+    struct ChillerIndirectAbsoprtionData :BaseGlobalStruct {
+        int NumIndirectAbsorbers = 0;
+        bool GetInput = true;
+        Array1D<ChillerIndirectAbsorption::IndirectAbsorberSpecs> IndirectAbsorber;
+        void clear_state() override
+        {
+            NumIndirectAbsorbers = 0;
+            GetInput = true;
+            IndirectAbsorber.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

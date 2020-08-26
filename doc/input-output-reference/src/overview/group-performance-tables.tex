@@ -1,819 +1,626 @@
 \section{Group Performance Tables}\label{group-performance-tables}
 
-This group of objects consists of tabular data which are used to characterize the performance of HVAC equipment. The use of performance tables eliminate the need to perform a regression analysis to calculate the performance curve equation coefficients. Two performance tables are available to represent any performance curve having one or two independent variables. The tabular data is entered as data pairs and represent each independent variable followed by the table output at that condition. When using these two performance table objects, a regression analysis may be performed during the simulation to create the associated performance curve. The regression analysis is performed when the user requests to evaluate the curve to the limits specified (see Interpolation Method input field). The performance curve that is created is used throughout the simulation and is also written to the eio file when the user sets the diagnostics output flag DisplayAdvancedVariables (ref. \hyperref[outputdiagnostics]{Output:Diagnostics}, DisplayAdvancedVariables) This performance curve object may be directly used in future input files. The following descriptions define the input requirements for the performance table objects.
+This group of objects consists of tabular data which are used to characterize the performance of HVAC equipment. The use of performance tables eliminate the need to perform a regression analysis to calculate the performance curve equation coefficients. The following descriptions define the input requirements for the performance table objects.
 
-\subsection{Table:OneIndependentVariable}\label{tableoneindependentvariable}
+\subsection{Table:Lookup}\label{tablelookup}
 
-Input for the data table consists of a table name, the curve type, the interpolation method, and the data pairs representing the polynomial equation. Optional inputs for minimum and maximum values for the independent variable and curve minimum and maximum may be used to limit the output of the table when evaluating the regression curve (e.g., limit extrapolation). The existing performance curves represented by this table object are:
+Input for tables representing data with one or more independent
+variables.
 
-\begin{equation}
-Linear\,\,Curve:\,\,\,Output = {C_1} + {C_2}x
-\end{equation}
+\subsubsection{Inputs}
 
-\begin{equation}
-Quadratic\,\,Curve:\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2}
-\end{equation}
+\paragraph{Field: Name}\label{field-name}
 
-\begin{equation}
-Cubic\,\,Curve:\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2} + {C_4}{x^3}
-\end{equation}
+A unique user-assigned name for an instance of a lookup table. When a
+table is used, it is referenced by this name. The name of this table
+object may be used anywhere a valid performance curve object is allowed.
 
-\begin{equation}
-Quartic\,\,Curve:\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2} + {C_4}{x^3} + {C_5}{x^4}
-\end{equation}
+\paragraph{Field: Independent Variable List
+Name}\label{field-independent-variable-list-name}
 
-\begin{equation}
-Exponent\,\,Curve:\,\,\,Output = {C_1} + {C_2}{x^{{C_3}}}
-\end{equation}
+The name of a Table:IndependentVariableList object that defines the
+independent variables that comprise the dimensions of the tabular data.
 
-\subsubsection{Inputs}\label{inputs-032}
+\paragraph{Field: Normalization Method}\label{field-normalization-method}
 
-\paragraph{Field: Name}\label{field-name-031}
+Determines if and how this output will be normalized. Choices are:
 
-A unique user assigned name for an instance of a performance table. When a table is used, it is referenced by this name. The name of this table object may be used anywhere a valid performance curve object is allowed.
+\begin{enumerate}
+  \item \emph{No}: Do not normalize output.
+  \item \emph{DivisorOnly}: Normalize the output using only the value entered into the Normalization Divisor field, below.
+  \item \emph{AutomaticWithDivisor}: Normalize the output by dividing the output data by the value of the table at each of the independent variable normalization reference values in the associated independent variable list AND dividing by the value entered into the Normalization Divisor field, below.
+\end{enumerate}
 
-\paragraph{Field: Curve Type}\label{field-curve-type}
+Normalization applies to the Output Value fields as well as the Minimum
+and Maximum Output fields.
 
-The form of the polynomial equation used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, and \emph{Quartic}. This field is required when the next field, Interpolation Method, is set to \emph{EvaluateCurveToLimits}, where this input infers the polynomial order (or degree) used for curve fitting. If the next field is set to \emph{LagrangeInterpolationLinearExtrapolation}, this field determines the number of interpolation points. For Linear, Quadratic, Cubic, and Quartic the number of interpolation points is set at 2, 3, 4 and 5, respectively. If left blank, the number of interpolation points is set to 4. In a few cases, this field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects).
+\paragraph{Field: Normalization Divisor}\label{field-normalization-divisor}
 
-\paragraph{Field: Interpolation Method}\label{field-interpolation-method}
+Defines a value by which output values are normalized if the Normalization Method
+field is set to \emph{DivisorOnly} or \emph{AutomaticWithDivisor}. Default is 1.0.
 
-The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the tabular data is interpolated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid one independent variable equations above, the polynomial order is up to 5\(^{th}\) order. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If these fields are not entered, the limits of the tabular data are used. The minimum number of data pairs required for this choice are 2, 3, 4 and 5 data pairs for Linear, Quadratic, Cubic and Quartic curves, respectively. If insufficient data is provided, the regression analysis is not performed and the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. \hyperref[outputdiagnostics]{Output:Diagnostics}, DisplayAdvancedVariables).
+\paragraph{Field: Minimum Output}\label{field-minimum-output}
 
-\paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-000}
+The (non-normalized) minimum allowable value of the evaluated table after interpolation
+and extrapolation. Values less than the minimum will be replaced by the
+minimum. If this field is left blank, no limit is imposed.
 
-The minimum allowable value of X. Values of X less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+\paragraph{Field: Maximum Output}\label{field-maximum-output}
 
-\paragraph{Field: Maximum Value of X}\label{field-maximum-value-of-x-000}
+The (non-normalized) maximum allowable value of the evaluated table after interpolation
+and extrapolation. Values greater than the maximum will be replaced by
+the maximum. If this field is left blank, no limit is imposed.
 
-The maximum allowable value of X. Values of X greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
+\paragraph{Field: Output Unit Type}
 
-\paragraph{Field: Minimum Table Output}\label{field-minimum-table-output}
-
-The minimum allowable value of the table output. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X} and \emph{Maximum Value of X} determines the limit.
-
-\paragraph{Field: Maximum Table Output}\label{field-maximum-table-output}
-
-The maximum allowable value of the table output. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X} and \emph{Maximum Value of X} determines the limit.
-
-\paragraph{Field: Input Unit Type for X1}\label{field-input-unit-type-for-x1}
-
-This field is used to indicate the kind of units that may be associated with the x values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of X. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\end{itemize}
-
-\paragraph{Field: Output Unit Type}\label{field-output-unit-type-000}
-
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
+This field is used to indicate the kind of units that may be associated
+with the output values. It is used by interfaces or input editors (e.g., IDF Editor) to display the
+appropriate SI and IP units for the Minimum Output and Maximum Output.
+If none of these options are appropriate, select \emph{Dimensionless}
+which will have no unit conversion. Options are:
 
 \begin{itemize}
-\item
-  Dimensionless
-\item
-  Capacity
-\item
-  Power
+  \tightlist
+  \item
+  \emph{Dimensionless}
+  \item
+  \emph{Capacity}
+  \item
+  \emph{Power}
 \end{itemize}
 
-\paragraph{Field: Normalization Reference}\label{field-normalization-reference}
+\paragraph{Field: External File
+Name}\label{field-external-file-name}
 
-The normalization point for the data set. This field provides a method for automatically normalizing a set of data. Equipment performance data is typically normalized based on a specific operating condition. Both the output values and minimum/maximum curve limits are normalized. This normalization can be performed simply by entering the data at the reference point. If this field is left blank or a 1 is entered, the data set is assumed to be in the correct format.
+The name of an external CSV file that represents the tabular data. This
+file should be formatted such that the data for this particular output
+is ordered according to the order of the corresponding independent
+variables. For example, for three independent variables (\texttt{iv1},
+\texttt{iv2}, \texttt{iv3}) with 3, 2, and 4 values respectively. The
+output values (\texttt{out{[}iv1{]}{[}iv2{]}{[}iv3{]}}) should be
+ordered as:
 
-\paragraph{Data Pairs}\label{data-pairs}
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\texttt{iv1} & \texttt{iv2} & \texttt{iv3} &
+\texttt{output}\tabularnewline
+\midrule
+\endhead
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}4{]}}\tabularnewline
+\bottomrule
+\end{longtable}
 
-The following inputs describe the data set. Data pairs are entered as X and Output pairs where X is the independent variable (i.e., x in the equation above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. Linear (1\(^{st}\) order), Quadratic (2\(^{nd}\) order), Cubic (3\(^{rd}\) order), Quartic (4\(^{th}\) order), BiQuadratic and QuadraticLinear polynomials require a minimum of 2, 3, 4, 5, 6 and 6 data pairs, respectively. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
+Alternatively, the output may be defined using the \emph{Output Value
+\textless{}x\textgreater{}} fields below.
 
-\paragraph{Field: X Value \#n}\label{field-x-value-n}
+\paragraph{Field: External File Column
+Number}\label{field-external-file-column-number}
 
-The value of the independent variable n (i.e., independent variable values for data 1 to number of data pairs).
+The column number (starting at 1) in the CSV file corresponding to this
+output.
 
-\paragraph{Field: Output Value \#n}\label{field-output-value-n}
+\paragraph{Field: External File Starting Row
+Number}\label{field-external-file-starting-row-number}
 
-The value of the dependent variable n (i.e., dependent variable values for data 1 to number of data pairs).
+The row number (starting at 1) in the CSV file where the data for this
+output begins. If there are not enough rows of data to fill out the full
+grid of data an error will be presented to the user.
 
-Following is an example input for a Table:OneIndependentVariable object:
+\paragraph{Output Value
+\textless{}x\textgreater{}}\label{output-value-x}
+
+If not reading from an external file, this field is repeated to capture
+the full set of output data in the table (if not otherwise defined in an
+external file). The data for this particular output is ordered according
+to the order of the corresponding independent variables. For example,
+for three independent variables (\texttt{iv1}, \texttt{iv2},
+\texttt{iv3}) with 3, 2, and 4 values respectively. The output values
+(\texttt{out{[}iv1{]}{[}iv2{]}{[}iv3{]}}) should be ordered as:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\texttt{iv1} & \texttt{iv2} & \texttt{iv3} &
+\texttt{output}\tabularnewline
+\midrule
+\endhead
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}4{]}}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\subsubsection{Example IDF}
 
 \begin{lstlisting}
-
-Table:OneIndependentVariable,
-  WindACCoolCapFFF,            !- Name
-  Linear,                      !- Curve Type
-  EvaluateCurveToLimits,       !- Interpolation Type
-  0,                           !- Minimum Value of X1,
-  1.5,                         !- Maximum Value of X1,
-  0.8,                         !- Minimum Table Output
-  1.1,                         !- Maximum Table Output
-  Dimensionless,               !- Input Unit Type for X1
-  Dimensionless,               !- Output Unit Type
-  ,                            !- Normalization Point
-  0,0.8,                       !- X Value #1, Output Value #1
-  1.5,1.1;                     !- X Value #2, Output Value #2
+Table:Lookup,
+  HPACCoolCapFT,           !- Name
+  HPACCoolCapFT_IndependentVariableList,  !- Independent Variable List Name
+  AutomaticWithDivisor,    !- Normalization Method
+  ,                        !- Normalization Divisor
+  0,                       !- Minimum Output
+  40000,                   !- Maximum Output
+  Dimensionless,           !- Output Unit Type
+  ,                        !- External File Name
+  ,                        !- External File Column Number
+  ,                        !- External File Starting Row Number
+  24421.69383, 22779.73113, 21147.21662, 19794.00525, 19524.15032, 18178.81244, 16810.36004,
+  25997.3589,  24352.1562,  22716.4017,  21360.49033, 21090.0954,  19742.05753, 18370.84513,
+  28392.31868, 26742.74198, 25102.61348, 23743.0571,  23471.93318, 22120.2503,  20745.3119,
+  29655.22876, 28003.546,   26361.31143, 25000,       24728.52506, 23375.08713, 21998.35468,
+  31094.97495, 29441.02425, 27796.52175, 26433.32038, 26161.46745, 24806.13958, 23427.47518,
+  33988.3473,  32330.1846,  30681.4701,  29314.75872, 29042.2038,  27683.36592, 26301.11353;
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-022}
+\subsubsection{Outputs}
 
-\paragraph{Performance Curve Output Value {[]}}\label{performance-curve-output-value-000}
+\paragraph{Performance Curve Output Value
+{[}{]}}
 
-The current value of the performance table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
+The current value of the performance table. Performance curves and
+tables use the same output variable. This value is averaged over the
+time step being reported. Inactive or unused performance curves will
+show a value of -999 (e.g., equipment is off, a specific performance
+curve is not required for this aspect of the equipment model at this
+time step, etc.). This value means that the performance curve was not
+called during the simulation and, therefore, not evaluated. This
+inactive state value is only set at the beginning of each environment.
+When averaging over long periods of time, this inactive state value may
+skew results. In this case, use a detailed reporting frequency (ref.
+Output:Variable object) to view results at each HVAC time step.
 
-\paragraph{Performance Curve Input Variable 1 Value {[]}}\label{performance-curve-input-variable-1-value}
+\paragraph{Performance Curve Input Variable
+\textless{}x\textgreater{} Value
+{[}{]}}\label{performance-curve-input-variable-x-value}
 
-The current value of the independent variable passed to the performance curve. This value is averaged over the time step being reported.
+\subsection{Table:IndependentVariableList}\label{tableindependentvariablelist}
 
-HVAC,Average,Performance Curve Output Value {[]}
+A list of Table:IndependentVariable references that define the size and
+dimensions of the data for one or more Table:Lookup objects. The order
+of this list defines the order that the tabular data must be defined.
+The output values in the Table:Lookup associated with this list will
+list the output in an order cycling through the last item in the list
+first, and then the second to last, and so on with the the first item
+cycling last. For example, for three independent variables
+(\texttt{iv1}, \texttt{iv2}, \texttt{iv3}) with 3, 2, and 4 values
+respectively. The output values
+(\texttt{out{[}iv1{]}{[}iv2{]}{[}iv3{]}}) should be ordered as:
 
-HVAC,Average,Performance Curve Input Variable 1 Value {[]}
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\texttt{iv1} & \texttt{iv2} & \texttt{iv3} &
+\texttt{output}\tabularnewline
+\midrule
+\endhead
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}4{]}}\tabularnewline
+\bottomrule
+\end{longtable}
 
-\subsection{Table:TwoIndependentVariables}\label{tabletwoindependentvariables}
+\subsubsection{Inputs}\label{inputs-1}
 
-Input for the data table consists of a table name, the curve type, the interpolation method, and the data pairs representing the polynomial equation. Optional inputs for minimum and maximum values for the independent variable, and curve minimum and maximum may be used to limit the output of the table (e.g., limit extrapolation) when evaluating the regression curve instead of the tabular data. The polynomial equations currently represented by this table object are:
+\paragraph{Field: Name}
 
-\begin{equation}
-BiQuadratic\,\,Curve:\,\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2} + {C_4}y + {C_5}{y^2} + {C_6}xy
-\end{equation}
+A unique user-assigned name for a list of independent variables. This
+name is referenced by Table:Lookup objects. The name of this list object
+may be referenced by any number of Table:Lookup objects.
 
-\begin{equation}
-QuadraticLinear\,\,Curve:\,\,\,\,Output = {C_1} + {C_2}x + {C_3}{x^2} + {C_4}y + {C_5}xy + {C_6}{x^2}y
-\end{equation}
+\paragraph{Field: Independent Variable \textless{}x\textgreater{}
+Name}\label{field-independent-variable-x-name}
 
-\subsubsection{Inputs}\label{inputs-1-029}
+This field is repeated for the number of independent variables that
+define the dimensions of any corresponding Table:Lookup objects that
+refer to this list. Each instance provides the name of a
+Table:IndependentVariable object that defines the values and properties
+of an independent variable.
 
-\paragraph{Field: Name}\label{field-name-1-028}
-
-A unique user assigned name for an instance of a performance table. When a table is used, it is referenced by this name. The name of this table object may be used anywhere a valid performance curve object is allowed.
-
-\paragraph{Field: Curve Type}\label{field-curve-type-1}
-
-The form of the polynomial equation used to represent the tabular data. Choices are \emph{BiQuadratic} and \emph{QuadraticLinear}. This field is required when the next field, Interpolation Method, is set to \emph{EvaluateCurveToLimits}, where this input infers the polynomial order (or degree) used for curve fitting (a minimum of 6 data pairs are required). If the next field is set to \emph{LagrangeInterpolationLinearExtrapolation}, this field determines the number of interpolation points. If left blank, the number of interpolation points is set to 4. In a few cases, this field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects).
-
-\paragraph{Field: Interpolation Method}\label{field-interpolation-method-1}
-
-The method used to evaluate the tabular data. Choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation,} and \emph{EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the following fields are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When Lagrange\emph{InterpolationLinearExtrapolation} is selected, a polynomial interpolation routine is used within the table boundaries along with linear extrapolation. Given the valid equations above, the polynomial order is fixed at 2 which infers that 3 data points will be used for interpolation. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equations above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If the following fields are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. \hyperref[outputdiagnostics]{Output:Diagnostics}, DisplayAdvancedVariables).
-
-When the input data are optical properties, the LinearInterpolationOfTable choice is forced.
-
-\paragraph{Field: Minimum Value of X}\label{field-minimum-value-of-x-1-000}
-
-The minimum allowable value of X. Values of X less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Maximum Value of X}\label{field-maximum-value-of-x-1-000}
-
-The maximum allowable value of X. Values of X greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Minimum Value of Y}\label{field-minimum-value-of-y-000}
-
-The minimum allowable value of Y. Values of Y less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Maximum Value of Y}\label{field-maximum-value-of-y-000}
-
-The maximum allowable value of Y. Values of Y greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Minimum Table Output}\label{field-minimum-table-output-1}
-
-The minimum allowable value of the table output. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X and Y} and \emph{Maximum Value of X and Y} determines the limit.
-
-\paragraph{Field: Maximum Table Output}\label{field-maximum-table-output-1}
-
-The maximum allowable value of the table output. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method}. If this field is left blank, the \emph{Minimum Value of X and Y} and \emph{Maximum Value of X and Y} determines the limit.
-
-\paragraph{Field: Input Unit Type for X}\label{field-input-unit-type-for-x-000}
-
-This field is used to indicate the kind of units that may be associated with the X values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X and Maximum Value of X. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\item
-  Angle
-\end{itemize}
-
-\paragraph{Field: Input Unit Type for Y}\label{field-input-unit-type-for-y-000}
-
-This field is used to indicate the kind of units that may be associated with the Y values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of Y and Maximum Value of Y. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\item
-  Wavelength
-\end{itemize}
-
-\paragraph{Field: Output Unit Type}\label{field-output-unit-type-1-000}
-
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Capacity
-\item
-  Power
-\end{itemize}
-
-\paragraph{Field: Normalization Reference}\label{field-normalization-reference-1}
-
-The normalization point for the data set. This field provides a method for automatically normalizing a set of data. Equipment performance data is typically normalized based on a specific operating condition. Both the output values and minimum/maximum curve limits are normalized as applicable. This normalization can be performed simply by entering the data at the reference point. If this field is left blank or a 1 is entered, the data set is assumed to be in the correct format.
-
-\paragraph{Field: External File Name}\label{field-external-file-name}
-
-The name of an external file that represents the tabular data. This file would include all data after the Output Unit Type field below starting with the same format as idf: X1, Y1, Z1, X2, Y2, Z2, ..., Xn, Yn, Zn, and continuing until all input and output values have been entered. The tabular data may use either comma, space or tab delimited format. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
-
-When the External File Name is entered, the following input fields are ignored.
-
-\paragraph{Data Pairs}\label{data-pairs-1}
-
-The following inputs describe the data set. Data pairs are entered as X, Y and Output pairs where X and Y are the independent variables (i.e., x and y in the equations above) and Output is the dependent variable (i.e., Output in the equation above). Any number of data pairs may be entered, however, a minimum number of data pairs must be entered and depends on the polynomial equation. BiQuadratic and QuadraticLinear (2\(^{nd}\) order with 2 independent variables) require a minimum of 6 data pairs. This minimum requirement is for performing a regression analysis, not interpolating the tabular data. If a regression analysis is not performed (i.e., only table interpolation is used), these minimum requirements are not enforced. If a regression analysis is performed and these minimum requirements are not met, the simulation will revert to table interpolation. These fields may be repeated as many times as necessary to define the tabular data.
-
-\paragraph{Field: X Value \#n}\label{field-x-value-n-1}
-
-The value of the first independent variable n (i.e., first independent variable values for data pair 1 to number of data pairs).
-
-\paragraph{Field: Y Value \#n}\label{field-y-value-n}
-
-The value of the second independent variable n (i.e., second independent variable values for data pair 1 to number of data pairs).
-
-\paragraph{Field: Output Value \#n}\label{field-output-value-n-1}
-
-The value of the dependent variable n (i.e., dependent variable values for data pair 1 to number of data pairs).
-
-Following is an example input for a Table:TwoIndependentVariable object:
+\subsubsection{Example IDF}\label{example-idf-1}
 
 \begin{lstlisting}
-
-Table:TwoIndependentVariables,
-  CCOOLEIRFT,                        !- Name
-  BiQuadratic,                       !- Curve Type
-  EvaluateCurveToLimits,             !- Interpolation Type
-  5.0,                               !- Minimum Value of x,
-  60.0,                              !- Maximum Value of x,
-  5.0,                               !- Minimum Value of y,
-  70.0,                              !- Maximum Value of y,
-  0.01,                              !- Minimum Table Output
-  0.5,                               !- Maximum Table Output
-  Temperature,                       !- Input Unit Type for x
-  Temperature,                       !- Input Unit Type for y
-  Dimensionless,                     !- Output Unit Type
-  0.258266502,                       !- Normalization Point
-  17.2222222,18.3333333,0.18275919,  !-X Value #1,Y Value #1,Output #1
-  17.2222222,23.8888889,0.207383768, !-X Value #2,Y Value #2,Output #2
-  17.2222222,29.4444444,0.237525541, !-X Value #3,Y Value #3,Output #3
-  17.2222222,35,0.274217751,         !-X Value #4,Y Value #4,Output #4
-  17.2222222,40.5555556,0.318548624, !-X Value #5,Y Value #5,Output #5
-  17.2222222,46.1111111,0.374560389, !-X Value #6,Y Value #6,Output #6
-  19.4444444,18.3333333,0.172982816, !-X Value #7,Y Value #7,Output #7
-  19.4444444,23.8888889,0.19637691,  !-X Value #8,Y Value #8,Output #8
-  19.4444444,29.4444444,0.224789822, !-X Value #9,Y Value #9,Output #9
-  19.4444444,35,0.258266502,         !-X Value #10,Y Value #10,Output #10
-  19.4444444,40.5555556,0.299896794, !-X Value #11,Y Value #11,Output #11
-  19.4444444,46.1111111,0.351242021, !-X Value #12,Y Value #12,Output #12
-  21.6666667,18.3333333,0.164081122, !-X Value #13,Y Value #13,Output #13
-  21.6666667,23.8888889,0.185603303, !-X Value #14,Y Value #14,Output #14
-  21.6666667,29.4444444,0.211709812, !-X Value #15,Y Value #15,Output #15
-  21.6666667,35,0.243492052,         !-X Value #16,Y Value #16,Output #16
-  21.6666667,40.5555556,0.281757875, !-X Value #17,Y Value #17,Output #17
-  21.6666667,46.1111111,0.331185659; !-X Value #18,Y Value #18,Output #18
+Table:IndependentVariableList,
+  HPACCoolCapFT_IndependentVariableList,  !- Name
+  HPACCoolCapFT_Tewb,                     !- Independent Variable 1 Name
+  HPACCoolCapFT_Todb;                     !- Independent Variable 2 Name
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-1-017}
+\subsection{Table:IndependentVariable}\label{tableindependentvariable}
 
-\paragraph{Performance Curve Output Value {[]}}\label{performance-curve-output-value-1}
+Independent variables are used to define the size and dimensions of a
+Table:Lookup object.
 
-The current value of the performance table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detaled reporting frequency (ref. Output:Variable object) to view results at each HVAC time step.
+\subsubsection{Inputs}\label{inputs-2}
 
-\paragraph{Performance Curve Input Variable 1 Value {[]}}\label{performance-curve-input-variable-1-value-1}
+\paragraph{Field: Name}
 
-\paragraph{Performance Curve Input Variable 2 Value {[]}}\label{performance-curve-input-variable-2-value}
+A unique user-assigned name for an independent variables. This name is
+referenced by Table:IndependentVariableList objects. The name of this
+object may be referenced by any number of Table:IndependentVariableList
+objects.
 
-The current value of the first and second independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
+\paragraph{Field: Interpolation
+Method}\label{field-interpolation-method}
 
-\begin{itemize}
-\item
-  HVAC,Average,Performance Curve Output Value {[]}
-\item
-  HVAC,Average,Performance Curve Input Variable 1 Value {[]}
-\item
-  HVAC,Average,Performance Curve Input Variable 2 Value {[]}
-\end{itemize}
-
-\subsection{Lookup Tables}\label{lookup-tables}
-
-Lookup tables are useful for determining the results of a nth order polynomial without the need to calculate the polynomial coefficients. The Lagrange method for interpolation is currently the only method available for polynomial interpolation. LinearInterpolationOfTable and EvaluateCurveToLimits may also be used. The multi-variable lookup table can represent from 1 to 5 independent variables and can interpolate these independent variables up to a 4\(^{th}\) order polynomial. The polynomial order is assumed to be the number of interpolation points (n) minus 1. Polynomial interpolation of tabular data takes place when the values of the independent variables are within the upper table boundary and at least n data points are available when approaching the lower table boundary for any independent variable. When any independent variable value is outside the table limits, linear extrapolation is used to predict the table result and is based on the two nearest data points in the table for that particular independent variable.
-
-\subsection{Table:MultiVariableLookup}\label{tablemultivariablelookup}
-
-Input for the multi-variable data table consists of a table name, the interpolation method, the number of points to be used for interpolation, an optional external file name, and, if an external file name is not entered, the tabular data. Optional inputs for minimum and maximum values for the independent variable, and curve minimum and maximum may be used to limit the output of the table (e.g., limit extrapolation).
-
-\subsubsection{Inputs}\label{inputs-2-027}
-
-\paragraph{Field: Name}\label{field-name-2-026}
-
-A unique user assigned name for an instance of a lookup table. When a table is used, it is referenced by this name. The name of this table object may be used anywhere a valid performance curve object is allowed.
-
-\paragraph{Field: Interpolation Method}\label{field-interpolation-method-2}
-
-The method used to evaluate the lookup table. The choices are \emph{LinearInterpolationOfTable, LagrangeInterpolationLinearExtrapolation, and EvaluateCurveToLimits}. When \emph{LinearInterpolationOfTable} is selected, the data entered is evaluated within the limits of the data set and the minimum/maximum value of x and output inputs are used only within the boundary of the table limits (i.e., are only used to limit interpolation). A complete data set is required. For each X variable, entries must include all Y variables and associated curve output (i.e., a complete table, no gaps or missing data). Extrapolation of the data set is not allowed. When \emph{LagrangeInterpolationLinearExtrapolation} is selected, the lookup table is evaluated using Lagrange's form of the interpolating polynomial. The order of the polynomial is inferred to be one less than the input in the Number of Interpolation Points field below. When \emph{EvaluateCurveToLimits} is selected, the coefficients (i.e., C in the equation above) of the polynomial equation are calculated and used to determine the table output within the limits specified in the following fields. If the minimum/maximum fields below are not entered, the limits of the data set are used. A complete table is not required when using this method, however, a minimum number of data is required to perform the regression analysis. The minimum number of data pairs required for this choice is 6 data pairs for both bi-quadratic and quadratic-linear curve types. If insufficient data is provided, the simulation reverts to interpolating the tabular data. The performance curve is written to the eio file when the output diagnostics flag DisplayAdvancedVariables is used (ref. \hyperref[outputdiagnostics]{Output:Diagnostics}, DisplayAdvancedVariables). A regression analysis may only be performed on lookup tables with one or two independent variables.
-
-\paragraph{Field: Number of Interpolation Points}\label{field-number-of-interpolation-points}
-
-This field specifies the number of data points to be used in the lookup table interpolation. The value specified in this field should be 1 greater than the order (or degree) of the polynomial used for interpolation. For example, if 2 is entered here, the polynomial is assumed to be first order where only 2 data points are required to calculate the table solution. If 3 is entered here, the polynomial is assumed to be second order and 3 data points would be required to calculate the table solution. Linear extrapolation is always used when the independent variable values are near the lower edge or outside the range of the table. The interpolation points selected are always the nearest data point greater than the independent variable with 1 or more values less than the independent variable. For example, if 3 interpolation points are used, the data point greater than the independent variable and 2 data points less than the independent variable are used to determine the table solution. If the independent variable exactly equals a table reference point, that value is used as the table solution.
-
-\paragraph{Field: Curve Type}\label{field-curve-type-2}
-
-The order of the polynomial used to represent the tabular data. Choices are \emph{Linear}, \emph{Quadratic}, \emph{Cubic}, \emph{Quartic, BiQuadratic, QuadraticLinear}. This field is used to determine if this table object is representative of the type of performance table (curve) allowed for a particular application (i.e., if this type of polynomial is allowed to be used as the curve type for other objects). This input also infers the polynomial order (or degree).
-
-
-\paragraph{Field: Table Data Format}\label{field-table-data-format}
-
-The format specifier which determines the method used to read the lookup table. The only valid choice at this time is \emph{SingleLineIndependentVariableWithMatrix}. When \emph{SingleLineIndependentVariableWithMatrix} is selected, a free format is used as shown below. The format shown below assumes the output values are in ascending order for both independent variables 1 and 2. Tabular data are entered in 3 groups of data, the header, the independent variable values, and the tabular data matrix. A summary of the external file format is shown below.
-
-Key:
+Method used to determine the value of the table within the bounds of its
+independent variables. The choices are:
 
 \begin{itemize}
+\tightlist
 \item
-  IV = independent variable (i.e., the X1, or X2, etc)
+\emph{Linear}
 \item
-  NIV = number of independent variables (i.e., number of values for X1, or X2, etc.)
-\item
-  IVV = independent variable value (i.e., the value for X1, or X2, etc.)
-\item
-  NIV1 = number of values for independent variable \#1 (i.e., X1)
-\item
-  NIV2 = number of values for independent variable \#2 (i.e., X2)
-\item
-  NIV3 = number of values for independent variable \#3 (i.e., X3)
-\item
-  NIV4 = number of values for independent variable \#4 (i.e., X4)
-\item
-  NIV5 = number of values for independent variable \#5 (i.e., X5)
-\item
-  OV = output value
+\emph{Cubic}
 \end{itemize}
+
+\paragraph{Field: Extrapolation
+Method}\label{field-extrapolation-method}
+
+Method used to determine the value of the table beyond the bounds of its
+independent variables. The choices are:
+
+\begin{itemize}
+\tightlist
+\item
+\emph{Constant}: Value is the same as the interpolated value at the
+closest point along the table's boundary.
+\item
+\emph{Linear}: Value is linearly extrapolated in all dimensions from
+the interpolated value at the closest point along the table's
+boundary.
+%\item
+%\emph{Unavailable}: The object using this curve is assumed to be not
+%operable outside of the provided range of values. This will override
+%any corresponding availability schedules of applicable equipment.
+\end{itemize}
+
+\paragraph{Field: Minimum Value}\label{field-minimum-value}
+
+The minimum allowable value. Table:Lookup output for values between this
+value and the lowest value provided for this independent variable will
+be extrapolated according to the extrapolation method. Below this value,
+extrapolation is held constant and a warning will be issued. If
+extrapolation method is ``Unavailable'', the corresponding equipment
+will be disabled for all values less than the lowest independent
+variable value, regardless of the minimum value set here.
+
+\paragraph{Field: Maximum Value}\label{field-maximum-value}
+
+The maximum allowable value. Table:Lookup output for values between this
+value and the highest value provided for this independent variable will
+be extrapolated according to the extrapolation method. Above this value,
+extrapolation is held constant and a warning will be issued. If
+extrapolation method is ``Unavailable'', the corresponding equipment
+will be disabled for all values greater than the highest independent
+variable value, regardless of the maximum value set here.
+
+\paragraph{Field: Normalization Reference Value}\label{field-normalization--reference-value}
+
+The value of this independent variable where nominal or rated output is
+defined. This will be used to normalize the data so that the outputs of
+any Table:Lookup at this value (and the corresponding Normalization
+Reference Values of the other independent variables described in the same
+Table:IndependentVariableList object) are equal to 1.0. If left blank, no
+normalization will be calculated. If this field is left blank the Normalization
+Reference Value of all other Table:IndependentVariable objects within the same
+Table:IndependentVariableList must also be left blank.
+
+\paragraph{Field: Unit Type}
+
+This field is used to indicate the kind of units that may be associated
+with this independent variable. It is used by interfaces or input editors (e.g., IDF Editor) to display the
+appropriate SI and IP units for the Minimum Value and Maximum Value. The
+available options are shown below. If none of these options are
+appropriate, select \emph{Dimensionless} which will have no unit
+conversion.
+
+\begin{itemize}
+\tightlist
+\item
+Dimensionless
+\item
+Temperature
+\item
+VolumetricFlow
+\item
+MassFlow
+\item
+Distance
+\item
+Power
+\end{itemize}
+
+\paragraph{Field: External File
+Name}\label{field-external-file-name-1}
+
+The name of an external CSV file that represents the tabular data. This
+file should be formatted such that the data for any output is ordered
+according to the order of the corresponding independent variables. For
+example, for three independent variables (\texttt{iv1}, \texttt{iv2},
+\texttt{iv3}) with 3, 2, and 4 values respectively. The output values
+(\texttt{out{[}iv1{]}{[}iv2{]}{[}iv3{]}}) should be ordered as:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\texttt{iv1} & \texttt{iv2} & \texttt{iv3} &
+\texttt{output}\tabularnewline
+\midrule
+\endhead
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}2{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}1{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}1{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}2{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}2{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}3{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}3{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & \texttt{iv2{[}2{]}} & \texttt{iv3{[}4{]}} &
+\texttt{out{[}3{]}{[}2{]}{[}4{]}}\tabularnewline
+\bottomrule
+\end{longtable}
+
+Independent variable values must appear in \textbf{ascending} order (an
+error will be issued if this is not the case).
+
+Alternatively, the independent variables may be defined using the
+\emph{Value \textless{}x\textgreater{}} fields below.
+
+\paragraph{Field: External File Column
+Number}\label{field-external-file-column-number-1}
+
+The column number (starting at 1) in the CSV file corresponding to this
+independent variable. As the values of the independent variables each
+repeat over a defined cycle, EnergyPlus will only read unique values
+from this column. EnergyPlus does not validate that the cycles are
+repeating correctly. In fact, the same data can be read by only defining
+each value once as it is first encountered:
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule
+\texttt{iv1} & \texttt{iv2} & \texttt{iv3} &
+\texttt{output}\tabularnewline
+\midrule
+\endhead
+\texttt{iv1{[}1{]}} & \texttt{iv2{[}1{]}} & \texttt{iv3{[}1{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}1{]}}\tabularnewline
+& & \texttt{iv3{[}2{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}2{]}}\tabularnewline
+& & \texttt{iv3{[}3{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}3{]}}\tabularnewline
+& & \texttt{iv3{[}4{]}} &
+\texttt{out{[}1{]}{[}1{]}{[}4{]}}\tabularnewline
+& \texttt{iv2{[}2{]}} & &
+\texttt{out{[}1{]}{[}2{]}{[}1{]}}\tabularnewline
+& & & \texttt{out{[}1{]}{[}2{]}{[}2{]}}\tabularnewline
+& & & \texttt{out{[}1{]}{[}2{]}{[}3{]}}\tabularnewline
+& & & \texttt{out{[}1{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}2{]}} & & &
+\texttt{out{[}2{]}{[}1{]}{[}1{]}}\tabularnewline
+& & & \texttt{out{[}2{]}{[}1{]}{[}2{]}}\tabularnewline
+& & & \texttt{out{[}2{]}{[}1{]}{[}3{]}}\tabularnewline
+& & & \texttt{out{[}2{]}{[}1{]}{[}4{]}}\tabularnewline
+& & & \texttt{out{[}2{]}{[}2{]}{[}1{]}}\tabularnewline
+& & & \texttt{out{[}2{]}{[}2{]}{[}2{]}}\tabularnewline
+& & & \texttt{out{[}2{]}{[}2{]}{[}3{]}}\tabularnewline
+& & & \texttt{out{[}2{]}{[}2{]}{[}4{]}}\tabularnewline
+\texttt{iv1{[}3{]}} & & &
+\texttt{out{[}3{]}{[}1{]}{[}1{]}}\tabularnewline
+& & & \texttt{out{[}3{]}{[}1{]}{[}2{]}}\tabularnewline
+& & & \texttt{out{[}3{]}{[}1{]}{[}3{]}}\tabularnewline
+& & & \texttt{out{[}3{]}{[}1{]}{[}4{]}}\tabularnewline
+& & & \texttt{out{[}3{]}{[}2{]}{[}1{]}}\tabularnewline
+& & & \texttt{out{[}3{]}{[}2{]}{[}2{]}}\tabularnewline
+& & & \texttt{out{[}3{]}{[}2{]}{[}3{]}}\tabularnewline
+& & & \texttt{out{[}3{]}{[}2{]}{[}4{]}}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\paragraph{Field: External File Starting Row
+Number}\label{field-external-file-starting-row-number-1}
+
+The row number (starting at 1) in the CSV file where the data for this
+independent variable begins. Any values in the same column below this
+row are considered part of the range.
+
+\paragraph{Field: Value
+\textless{}x\textgreater{}}\label{field-value-x}
+
+If not reading from an external file, this field is repeated to capture
+the full set of values for this independent variable. These values must
+be defined in \textbf{ascending} order (an error will be issued if this
+is not the case).
+
+\subsubsection{Example IDF}\label{example-idf-2}
 
 \begin{lstlisting}
-Header: Row 1: <NIV>, <NIV1>, <NIV2> (only used if NIV>1), <NIV3> (only used if NIV>2), <NIV4> (only used if NIV>3), <NIV5> (only used if NIV>4)
+Table:IndependentVariable,
+  HPACCoolCapFT_Tewb,      !- Name
+  Cubic,                   !- Interpolation Method
+  Constant,                !- Extrapolation Method
+  12.77778,                !- Minimum Value
+  23.88889,                !- Maximum Value
+  19.44449,                !- Normalization Reference Value
+  Temperature,             !- Unit Type
+  ,                        !- External File Name
+  ,                        !- External File Column Number
+  ,                        !- External File Starting Row Number
+  12.77778,                !- Value 1
+  15.00000,                !- Value 2
+  18.00000,                !- Value 3
+  19.44449,                !- Value 4
+  21.00000,                !- Value 5
+  23.88889;                !- Value 6
 \end{lstlisting}
-
-\begin{lstlisting}
-Independent Variable Values: Row 2: <IVV1 to IVVn for IV1> where n = NIV1 (max = 10) Row 2a (row included only when NIV > 1): IVV1 to IVVn for IV2 where n = NIV2 (max = 10) Row 2b (row included only when NIV > 2): IVV1 to IVVn for IV3 where n = NIV3 (max = 10) Row 2c (row included only when NIV > 3): IVV1 to IVVn for IV4 where n = NIV4 (max = 10) Row 2d (row included only when NIV > 4): IVV1 to IVVn for IV5 where n = NIV5 (max = 10)
-\end{lstlisting}
-
-\begin{lstlisting}
-Tabular Data Matrix Format (repeat rows 3 and 4(1) 4(m) for each occurrence of a unique data pair for independent variable \#3, \#4, and \#5):
-\end{lstlisting}
-
-\begin{lstlisting}
-Row 3 (row included only when NIV > 2): IVVn for IV3, IVVn for IV4 (included only when NIV > 3), IVVn for IV5 (included only when NIV > 4), (where n = a unique value for the independent variable)
-\end{lstlisting}
-
-\begin{lstlisting}
-Row 4(1): OV1/1 to OVn/1 for each value of IV1 where n = NIV1 representing IV2(1) Row 4(2): OV1/2 to OVn/2 for each value of IV1 where n = NIV1 representing IV2(2) Row 4(3): OV1/3 to OVn/3 for each value of IV1 where n = NIV1 representing IV2(3) ... Row 4(m): OV1/m to OVn/m for each value of IV1 where n = NIV1 representing IV2(m) where m = NIV2
-\end{lstlisting}
-
-\paragraph{Field: External File Name}\label{field-external-file-name}
-
-The name of an external file that represents the tabular data. This file would include all data after the Output Unit Type field below starting with the number of independent variables and continuing until all input and output values have been entered. The tabular data may use either comma, space or tab delimited format. The field should include a full path with file name, for best results. The field must be \textless{} = 100 characters. The file name must not include commas or an exclamation point. A relative path or a simple file name should work with version 7.0 or later when using EP-Launch even though EP-Launch uses temporary directories as part of the execution of EnergyPlus. If using RunEPlus.bat to run EnergyPlus from the command line, a relative path or a simple file name may work if RunEPlus.bat is run from the folder that contains EnergyPlus.exe.
-
-\paragraph{Field: X1 Sort Order}\label{field-x1-sort-order}
-
-The choice field specifies the order of the lookup table data for the 1\(^{st}\) independent variable. Valid choices are \emph{Increasing} or \emph{Decreasing}. If increasing is selected, then the order of the data is from lowest value of the 1\(^{st}\) independent variable to highest. If decreasing is selected, then the order of the data is from highest value of the 1\(^{st}\) independent variable to lowest.
-
-\paragraph{Field: X2 Sort Order}\label{field-x2-sort-order}
-
-The choice field specifies the order of the lookup table data for the 2\(^{nd}\) independent variable. Valid choices are \emph{Ascending} or \emph{Descending}. If increasing is selected, then the order of the data is from lowest value of the 2\(^{nd}\) independent variable to highest. If decreasing is selected, then the order of the data is from highest value of the 2\(^{nd}\) independent variable to lowest.
-
-\paragraph{Normalization Reference}\label{field-normalization-reference-2}
-
-The normalization point for the data set. This field provides a method for automatically normalizing a set of data. Equipment performance data is typically normalized based on a specific operating condition. Both the output values and minimum/maximum curve limits are normalized as applicable. This normalization can be performed simply by entering the data at the reference point. If this field is left blank or a 1 is entered, the data set is assumed to be in the correct format.
-
-\paragraph{Field: Minimum Value of X1}\label{field-minimum-value-of-x1}
-
-The minimum allowable value of X1. Values of X1 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Maximum Value of X1}\label{field-maximum-value-of-x1}
-
-The maximum allowable value of X1. Values of X1 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Minimum Value of X2}\label{field-minimum-value-of-x2}
-
-The minimum allowable value of X2. Values of X2 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 1.
-
-\paragraph{Field: Maximum Value of X2}\label{field-maximum-value-of-x2}
-
-The maximum allowable value of X2. Values of X2 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 1.
-
-\paragraph{Field: Minimum Value of X3}\label{field-minimum-value-of-x3}
-
-The minimum allowable value of X3. Values of X3 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 2.
-
-\paragraph{Field: Maximum Value of X3}\label{field-maximum-value-of-x3}
-
-The maximum allowable value of X3. Values of X3 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 2.
-
-\paragraph{Field: Minimum Value of X4}\label{field-minimum-value-of-x4}
-
-The minimum allowable value of X4. Values of X4 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 3.
-
-\paragraph{Field: Maximum Value of X4}\label{field-maximum-value-of-x4}
-
-The maximum allowable value of X4. Values of X4 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 3.
-
-\paragraph{Field: Minimum Value of X5}\label{field-minimum-value-of-x5}
-
-The minimum allowable value of X5. Values of X5 less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 4.
-
-\paragraph{Field: Maximum Value of X5}\label{field-maximum-value-of-x5}
-
-The maximum allowable value of X5. Values of X5 greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit. This field is only used when the number of independent variables is greater than 4.
-
-\paragraph{Field: Minimum Curve Output}\label{field-minimum-curve-output-000}
-
-The minimum allowable value of the evaluated curve. Values less than the minimum will be replaced by the minimum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Maximum Curve Output}\label{field-maximum-curve-output-000}
-
-The maximum allowable value of the evaluated curve. Values greater than the maximum will be replaced by the maximum. This field can only limit extrapolation when the \emph{Interpolation Method} is selected as \emph{EvaluateCurveToLimits or LagrangeInterpolationLinearExtrapolation}. This field can be used to limit interpolation using any \emph{Interpolation Method.} If this field is left blank, the data set determines the limit.
-
-\paragraph{Field: Input Unit Type for X1}\label{field-input-unit-type-for-x1-1}
-
-This field is used to indicate the kind of units that may be associated with the X1 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X1 and Maximum Value of X1. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\end{itemize}
-
-\paragraph{Field: Input Unit Type for X2}\label{field-input-unit-type-for-x2}
-
-This field is used to indicate the kind of units that may be associated with the X2 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X2 and Maximum Value of X2. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\end{itemize}
-
-\paragraph{Field: Input Unit Type for X3}\label{field-input-unit-type-for-x3}
-
-This field is used to indicate the kind of units that may be associated with the X3 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X3 and Maximum Value of X3. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\end{itemize}
-
-\paragraph{Field: Input Unit Type for X4}\label{field-input-unit-type-for-x4}
-
-This field is used to indicate the kind of units that may be associated with the X4 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X4 and Maximum Value of X4. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\end{itemize}
-
-\paragraph{Field: Input Unit Type for X5}\label{field-input-unit-type-for-x5}
-
-This field is used to indicate the kind of units that may be associated with the X5 values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Value of X5 and Maximum Value of X5. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Temperature
-\item
-  VolumetricFlow
-\item
-  MassFlow
-\item
-  Distance
-\item
-  Power
-\end{itemize}
-
-\paragraph{Field: Output Unit Type}\label{field-output-unit-type-2-000}
-
-This field is used to indicate the kind of units that may be associated with the output values. It is used by IDF Editor to display the appropriate SI and IP units for the Minimum Curve Output and Maximum Curve Output. The unit conversion is not applied to the coefficients. The available options are shown below. If none of these options are appropriate, select \textbf{Dimensionless} which will have no unit conversion.
-
-\begin{itemize}
-\item
-  Dimensionless
-\item
-  Capacity
-\item
-  Power
-\end{itemize}
-
-\subsection{Data Input Format}\label{data-input-format}
-
-The following inputs describe the data set. These values may also be placed in an external file starting with Field \#1. If an external file name is entered above, the following fields are not used. Data are entered in a specific order according to the number and quantity of independent variables. The data input format is described here in 3 groups as Header, Independent Variable Values, and the Tabular Data. The header is always the first line in the data set and represents the number of independent variables followed by the number of values for each independent variable. The independent variable values are listed next and represent the values of each independent variable on a separate line. These values are only listed once at the top of the data set and are listed in ascending order. The number of independent variables, the first number in the header, specifies how many lines, or rows, make up this section of tabular data. The remaining lines are repeated as many times as necessary to completely describe the tabular data. The values of independent variables 3 n are listed on a single line followed by a matrix of data that represent the table output corresponding to independent variables 1 and 2.
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Header:}
-\end{itemize}
-
-Line 1: The first number specified is the number of independent variables followed by the number of variables for each independent variable.
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Independent Variable Values:}
-\end{itemize}
-
-Line 1: the n values for the first independent variable as specified in the header.
-
-Line 2: the n values for the second independent variable as specified in the header if the number of independent variables is greater than 1. This line is not required if the number of independent variables is less than 2.
-
-Line 3: the n values for the third independent variable as specified in the header if the number of independent variables is greater than 2. This line is not required if the number of independent variables is less than 3.
-
-Line 4: the n values for the fourth independent variable as specified in the header if the number of independent variables is greater than 3. This line is not required if the number of independent variables is less than 4.
-
-Line 5: the n values for the fifth independent variable as specified in the header if the number of independent variables is greater than 4. This line is not required if the number of independent variables is less than 5.
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Tabular Data:}
-\end{itemize}
-
-Line 1: the values of the 3\(^{rd}\) through nth independent variables
-
-Line 2 m (where m-1 equals the number of variables for the second independent variable): the tabular data corresponding to the 1\(^{st}\) independent variable (the number of inputs on this line equals the number of values for 1\(^{st}\) independent variable), the m\(^{th})\) values for the 2\(^{nd}\) independent variable and corresponding to the values for the 3\(^{rd}\) nth independent variables (see Line 1 above for Tabular Data).
-
-Three examples are provided here as this can be difficult to describe in text. This example assumes that the table data are listed in ascending order from lowest to highest.
-
-\begin{itemize}
-\item
-  \textbf{One Independent Variable:}
-\item
-  \textbf{Header:}
-\end{itemize}
-
-1, 5, (1 independent variable with 5 values for the single independent variable)
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Independent Variable Values:}
-\end{itemize}
-
-70, 72, 74, 76, 78, (the five values for the single independent variable, these values are always listed in ascending order)
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Tabular Data:}
-\end{itemize}
-
-0.1, 0.3, 0.5, 0.7, 0.9; (the table values associated with the independent variable values listed previously Note: these values may be read in ascending or descending order based on the input in the X1 Sort Order field above). Example: If X1 Sort Order is ascending, 0.1 corresponds to the value of 70 for the first independent variable. If X1 Sort Order is descending, then 0.1 corresponds to the value of 78 for the first independent variable. The use of ascending order provides a direct correlation to inputs for the Independent Variable Values group above.
-
-\begin{itemize}
-\item
-  \textbf{Two Independent Variables:}
-\item
-  \textbf{Header:}
-\end{itemize}
-
-2, 5, 6, (2 independent variables with 5 and 6 values for the 1\(^{st}\) and 2\(^{nd}\) independent variables, respectively)
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Independent Variable Values:}
-\end{itemize}
-
-70, 72, 74, 76, 78, (the five values for the 1st independent variable, these values are always listed in ascending order)
-
-32, 45, 68, 81, 94, 107, (the six values for the 2nd independent variable, these values are always listed in ascending order)
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Tabular Data:}
-\end{itemize}
-
-0.1, 0.3, 0.5, 0.7, 0.9, (the first five table values associated with each value of the 1\(^{st}\) independent variable and the first value (32) of the second independent variable listed previously Note: these values may be listed in ascending or descending order based on the input in the X1 Sort Order field above. Each of these rows may also be listed in ascending or descending order based on the input in the X2 Sort Order field above).
-
-0.2, 0.4, 0.6, 0.8, 1.0, (the second five table values associated with each value of the 1\(^{st}\) independent variable and the second value (45) of the second independent variable listed previously).
-
-0.3, 0.5, 0.7, 0.9, 1.1, (the third five table values associated with each value of the 1\(^{st}\) independent variable and the third value (68) of the second independent variable listed previously).
-
-0.4, 0.6, 0.8, 1.0, 1.2, (the fourth five table values associated with each value of the 1\(^{st}\) independent variable and the fourth value (81) of the second independent variable listed previously).
-
-0.5, 0.7, 0.9, 1.1, 1.3, (the fifth five table values associated with each value of the 1\(^{st}\) independent variable and the fifth value (94) of the second independent variable listed previously).
-
-0.6, 0.8, 1.0, 1.2, 1.4; (the sixth five table values associated with each value of the 1\(^{st}\) independent variable and the sixth value (107) of the second independent variable listed previously).
-
-\begin{itemize}
-\item
-  \textbf{Three Independent Variables:}
-\item
-  \textbf{Header:}
-\end{itemize}
-
-3, 5, 6, 2, (3 independent variables with 5, 6 and 2 values for the 1\(^{st}\) , 2\(^{nd}\), and 3\(^{rd}\) independent variables)
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Independent Variable Values:}
-\end{itemize}
-
-70, 72, 74, 76, 78, (the five values for the 1st independent variable, these values are always listed in ascending order)
-
-32, 45, 68, 81, 94, 107, (the six values for the 2nd independent variable, these values are always listed in ascending order)
-
-15.5, 45.5, (the two values for the 3\(^{rd}\) independent variable, these values are always listed in ascending order)
-
-\begin{itemize}
-\tightlist
-\item
-  \textbf{Tabular Data:}
-\end{itemize}
-
-15.5, (the first value for the 3\(^{rd}\) independent variable values for the 4\(^{th}\) and 5\(^{th}\) independent variable are also listed on this line if they are used)
-
-0.1, 0.3, 0.5, 0.7, 0.9, (the table values associated with each value of the 1\(^{st}\) independent variable, the first value (32) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable). Note: these values may be listed in ascending or descending order based on the input in the X1 Sort Order field above).
-
-0.2, 0.4, 0.6, 0.8, 1.0, (the table values associated with each value of the 1\(^{st}\) independent variable, the second value (45) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
-
-0.3, 0.5, 0.7, 0.9, 1.1, (the table values associated with each value of the 1\(^{st}\) independent variable, the third value (68) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
-
-0.4, 0.6, 0.8, 1.0, 1.2, (the table values associated with each value of the 1\(^{st}\) independent variable, the fourth value (81) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
-
-0.5, 0.7, 0.9, 1.1, 1.3, (the table values associated with each value of the 1\(^{st}\) independent variable, the fifth value (94) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
-
-0.6, 0.8, 1.0, 1.2, 1.4. (the table values associated with each value of the 1\(^{st}\) independent variable, the sixth value (107) of the second independent variable, and the first value (15.5) of the 3\(^{rd}\) independent variable).
-
-45.5, (the second value for the 3\(^{rd}\) independent variable values for the 4\(^{th}\) and 5\(^{th}\) independent variable are also listed on this line if they are used)
-
-1.1, 1.3, 1.5, 1.7, 1.9, (the table values associated with each value of the 1\(^{st}\) independent variable, the first value (32) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
-
-1.2, 1.4, 1.6, 1.8, 2.0, (the table values associated with each value of the 1\(^{st}\) independent variable, the second value (45) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
-
-1.3, 1.5, 1.7, 1.9, 2.1, (the table values associated with each value of the 1\(^{st}\) independent variable, the third value (68) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
-
-1.4, 1.6, 1.8, 2.0, 2.2, (the table values associated with each value of the 1\(^{st}\) independent variable, the fourth value (81) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
-
-1.5, 1.7, 1.9, 2.1, 2.3, (the table values associated with each value of the 1\(^{st}\) independent variable, the fifth value (94) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
-
-1.6, 1.8, 2.0, 2.2, 2.4. (the table values associated with each value of the 1\(^{st}\) independent variable, the sixth value (107) of the second independent variable, and the second value (45.5) of the 3\(^{rd}\) independent variable).
-
-Note: The following fields define the tabular data as described in the previous examples. These field values depend on the number and quantity of independent variables used in the table. The tabular data can be entered in the following fields or entered using an external file. These fields are echoed to the eio file as a check when the output diganostics flag DisplayAdvancedVariables is used (ref. \hyperref[outputdiagnostics]{Output:Diagnostics}, DisplayAdvancedVariables). The normalization value is not included in the echoed values.
-
-\subsubsection{Field: Field \#1 (NumberOfIndependentVariables)}\label{field-field-1-numberofindependentvariables}
-
-The number of independent variables used in the lookup table. This number (n) can range from 1 to 5. The number entered here will define the following n fields as the number of values for these n independent variables. This is the first number in the external file as shown in the previous examples.
-
-\subsubsection{Field: Field \#2 (NumberOfValuesForIndependentVariable1)}\label{field-field-2-numberofvaluesforindependentvariable1}
-
-The number of values for the first independent variable. This is the second number in the tabular data and resides on the same line as Field \#1.
-
-\subsubsection{Field: Field \#3 (DeterminedByPreviousFields)}\label{field-field-3-determinedbypreviousfields}
-
-The value specified in this field is dependent on the number entered in Field \#1. If a 1 is entered in Field \#1, this field represents the first value of the single independent variable. The number of values entered in Field \#3-\#n will be equal to the number entered in Field \#2. Values entered in fields \#3-\#n are always entered in increasing value (ascending order). If a number greater than 1 is entered in Field \#1, this field represents the number of values for the second independent variable.
-
-\subsubsection{Field: Field \#4}\label{field-field-4}
-
-The value specified in this field is dependent on the number entered in Field \#1. If a 1 is entered in Field \#1, this field represents the second value of the single independent variable. The number of values entered in Field \#3-\#n will be equal to the number entered in Field \#2. Values entered in fields \#3-\#n are always entered in increasing value (ascending order). If a 2 is entered in Field \#1, this field represents the first value of the first independent variable. If a number greater than 2 is entered in Field \#1, this field represents the number of values for the third independent variable.
-
-\textless{}reduced for brevity\textgreater{}
-
-Following is an example input for a \hyperref[tablemultivariablelookup]{Table:MultiVariableLookup} object:
-
-\begin{lstlisting}
-
-Table:MultiVariableLookup,
-  HPACCoolCapFT,                   !- Name
-  LagrangeinterpolationLinearExtrapolation,   !- Interpolation Method
-  3,                               !- Number of Interpolation Points
-  BiQuadratic,                     !- Interpolation Type
-  SingleLineIndependentVariableWithMatrix, !- Table Data Format
-  ,                                !- External File Name
-  ASCENDING,                       !- X1 Sort Order
-  ASCENDING,                       !- X2 Sort Order
-  24999.9597049817,                !- Normalization reference
-  12.77778,                        !- Minimum Value of X1,
-  23.88889,                        !- Maximum Value of X1,
-  18.0,                            !- Minimum Value of X2,
-  46.11111,                        !- Maximum Value of X2,
-  ,                                !- Minimum Value of X3
-  ,                                !- Maximum Value of X3
-  ,                                !- Minimum Value of X4
-  ,                                !- Maximum Value of X4
-  ,                                !- Minimum Value of X5
-  ,                                !- Maximum Value of X5
-  ,                                !- Minimum Table Output
-  ,                                !- Maximum Table Output
-  Temperature,                     !- Input Unit Type for X1
-  Temperature,                     !- Input Unit Type for X2
-  ,                                !- Input Unit Type for X3
-  ,                                !- Input Unit Type for X4
-  ,                                !- Input Unit Type for X5
-  Dimensionless,                   !- Output Unit Type
-  2, 6, 7,
-  12.77778, 15, 18, 19.44448943, 21, 23.88889,
-  18, 24, 30, 35, 36, 41, 46.11111,
-  24421.69383, 25997.3589, 28392.31868, 29655.22876, 31094.97495, 33988.3473,
-  22779.73113, 24352.1562, 26742.74198, 28003.546, 29441.02425, 32330.1846,
-  21147.21662, 22716.4017, 25102.61348, 26361.31143, 27796.52175, 30681.4701,
-  19794.00525, 21360.49033, 23743.0571, 25000, 26433.32038, 29314.75872,
-  19524.15032, 21090.0954, 23471.93318, 24728.52506, 26161.46745, 29042.2038,
-  18178.81244, 19742.05753, 22120.2503, 23375.08713, 24806.13958, 27683.36592,
-  16810.36004, 18370.84513, 20745.3119, 21998.35468, 23427.47518, 26301.11353;
-\end{lstlisting}
-
-\subsection{Lookup Table Outputs}\label{lookup-table-outputs}
-
-\subsubsection{Performance Curve Output Value {[]}}\label{performance-curve-output-value-2}
-
-The current value of the lookup table. Performance curves and tables use the same output variable. This value is averaged over the time step being reported. Inactive or unused performance curves will show a value of -999 (e.g., equipment is off, a specific performance curve is not required for this aspect of the equipment model at this time step, etc.). This value means that the performance curve was not called during the simulation and, therefore, not evaluated. This inactive state value is only set at the beginning of each environment. When averaging over long periods of time, this inactive state value may skew results. In this case, use a detailed reporting frequency (ref. \hyperref[outputvariable]{Output:Variable} object) to view results at each HVAC time step.
-
-\subsubsection{Performance Curve Input Variable 1(-N) Value {[]}}\label{performance-curve-input-variable-1-n-value-000}
-
-The current value of the nth independent variable passed to the performance curve. The order of the independent variables is in the same order as the model equation represented by this performance curve object. This value is averaged over the time step being reported.
-
-HVAC,Average,Performance Curve Output Value {[]}
-
-HVAC,Average,Performance Curve Input Variable 1 Value {[]}
-
-HVAC,Average,Performance Curve Input Variable 2 Value {[]}
-
-HVAC,Average,Performance Curve Input Variable 3 Value {[]}
-
-HVAC,Average,Performance Curve Input Variable 4 Value {[]}
-
-HVAC,Average,Performance Curve Input Variable 5 Value {[]}

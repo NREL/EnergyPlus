@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,22 +49,23 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Pipes.hh>
-#include <Plant/PlantLocation.hh>
-#include <PlantComponent.hh>
-#include <PlantUtilities.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -107,9 +108,6 @@ namespace Pipes {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    int NumLocalPipes(0);
-    bool GetPipeInputFlag(true);
-
     // SUBROUTINE SPECIFICATIONS FOR MODULE Pipe
 
     // Object Data
@@ -119,18 +117,16 @@ namespace Pipes {
     // Functions
     void clear_state()
     {
-        NumLocalPipes = 0;
-        GetPipeInputFlag = true;
         LocalPipe.deallocate();
         LocalPipeUniqueNames.clear();
     }
 
-    PlantComponent *LocalPipeData::factory(int objectType, std::string objectName)
+    PlantComponent *LocalPipeData::factory(PipesData &pipes, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
-        if (GetPipeInputFlag) {
-            GetPipeInput();
-            GetPipeInputFlag = false;
+        if (pipes.GetPipeInputFlag) {
+            GetPipeInput(pipes);
+            pipes.GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
         for (auto &pipe : LocalPipe) {
@@ -144,7 +140,7 @@ namespace Pipes {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void LocalPipeData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void LocalPipeData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
@@ -152,7 +148,7 @@ namespace Pipes {
         if (this->OneTimeInit) {
             int FoundOnLoop = 0;
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSide, this->BranchIndex, this->CompIndex, errFlag, _, _, FoundOnLoop, _, _);
             if (FoundOnLoop == 0) {
                 ShowFatalError("SimPipes: Pipe=\"" + this->Name + "\" not found on a Plant Loop."); // LCOV_EXCL_LINE
@@ -180,7 +176,7 @@ namespace Pipes {
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
-    void GetPipeInput()
+    void GetPipeInput(PipesData &pipes)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -208,14 +204,14 @@ namespace Pipes {
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
         int IOStat;    // IO Status when calling get input subroutine
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
         NumWaterPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic");
         NumSteamPipes = inputProcessor->getNumObjectsFound("Pipe:Adiabatic:Steam");
-        NumLocalPipes = NumWaterPipes + NumSteamPipes;
-        LocalPipe.allocate(NumLocalPipes);
-        LocalPipeUniqueNames.reserve(static_cast<unsigned>(NumLocalPipes));
+        pipes.NumLocalPipes = NumWaterPipes + NumSteamPipes;
+        LocalPipe.allocate(pipes.NumLocalPipes);
+        LocalPipeUniqueNames.reserve(static_cast<unsigned>(pipes.NumLocalPipes));
 
         cCurrentModuleObject = "Pipe:Adiabatic";
         for (PipeWaterNum = 1; PipeWaterNum <= NumWaterPipes; ++PipeWaterNum) {

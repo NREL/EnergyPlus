@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,15 +48,14 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/Material.hh>
 #include "SQLiteProcedures.hh"
-#include "CommandLineInterface.hh"
 #include "DataEnvironment.hh"
 #include "DataGlobals.hh"
 #include "DataHeatBalance.hh"
-#include "DataPrecisionGlobals.hh"
 #include "DataRoomAirModel.hh"
 #include "DataStringGlobals.hh"
-#include "DataSystemVariables.hh"
 #include "General.hh"
 #include "InputProcessing/InputProcessor.hh"
 #include "ScheduleManager.hh"
@@ -83,8 +82,11 @@ const int SQLite::UnitsId = 6;
 
 std::unique_ptr<SQLite> sqlite;
 
-std::unique_ptr<SQLite> CreateSQLiteDatabase()
+std::unique_ptr<SQLite> CreateSQLiteDatabase(IOFiles & ioFiles)
 {
+    if (!ioFiles.outputControl.sqlite) {
+        return nullptr;
+    }
     try {
         int numberOfSQLiteObjects = inputProcessor->getNumObjectsFound("Output:SQLite");
         bool writeOutputToSQLite = false;
@@ -146,10 +148,10 @@ void CreateSQLiteZoneExtendedOutput()
             sqlite->addSurfaceData(surfaceNumber, surface, DataSurfaces::cSurfaceClass(surface.Class));
         }
         for (int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
-            sqlite->addMaterialData(materialNum, DataHeatBalance::Material(materialNum));
+            sqlite->addMaterialData(materialNum, dataMaterial.Material(materialNum));
         }
         for (int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
-            auto const &construction = DataHeatBalance::Construct(constructNum);
+            auto const &construction = dataConstruction.Construct(constructNum);
             if (construction.TotGlassLayers == 0) {
                 sqlite->addConstructionData(constructNum, construction, construction.UValue);
             } else {
@@ -1258,10 +1260,10 @@ std::string SQLite::storageType(const int storageTypeIndex)
     std::string result;
 
     switch (storageTypeIndex) {
-    case 1:
+    case 1: // static_cast<int>(OutputProcessor::StoreType::Averaged)
         result = "Avg";
         break;
-    case 2:
+    case 2: // static_cast<int>(OutputProcessor::StoreType::Summed)
         result = "Sum";
         break;
     default:
@@ -1276,11 +1278,11 @@ std::string SQLite::timestepTypeName(const int timestepType)
     std::string result;
 
     switch (timestepType) {
-    case 1:
-        result = "HVAC System";
-        break;
-    case 2:
+    case 1: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepZone)
         result = "Zone";
+        break;
+    case 2: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepSystem)
+        result = "HVAC System";
         break;
     default:
         result = "Unknown!!!";
@@ -1810,9 +1812,9 @@ void SQLite::createSQLiteDaylightMap(int const mapNum,
                                      int const dayOfMonth,
                                      int const hourOfDay,
                                      int const nX,
-                                     Array1<Real64> const &x,
+                                     Array1D<Real64> const &x,
                                      int const nY,
-                                     Array1<Real64> const &y,
+                                     Array1D<Real64> const &y,
                                      Array2<Real64> const &illuminance)
 {
     if (m_writeOutputToSQLite) {
@@ -2098,11 +2100,11 @@ void SQLite::addZoneGroupData(int const number, DataHeatBalance::ZoneGroupData c
     zoneGroups.push_back(std::unique_ptr<ZoneGroup>(new ZoneGroup(m_errorStream, m_db, number, zoneGroupData)));
 }
 
-void SQLite::addMaterialData(int const number, DataHeatBalance::MaterialProperties const &materialData)
+void SQLite::addMaterialData(int const number, EnergyPlus::Material::MaterialProperties const &materialData)
 {
     materials.push_back(std::unique_ptr<Material>(new Material(m_errorStream, m_db, number, materialData)));
 }
-void SQLite::addConstructionData(int const number, DataHeatBalance::ConstructionData const &constructionData, double const &constructionUValue)
+void SQLite::addConstructionData(int const number, EnergyPlus::Construction::ConstructionProps const &constructionData, double const &constructionUValue)
 {
     constructions.push_back(std::unique_ptr<Construction>(new Construction(m_errorStream, m_db, number, constructionData, constructionUValue)));
 }

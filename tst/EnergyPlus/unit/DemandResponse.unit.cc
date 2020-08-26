@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,9 +51,9 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataGlobals.hh>
-#include <DemandManager.hh>
-#include <MixedAir.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DemandManager.hh>
+#include <EnergyPlus/MixedAir.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -77,7 +77,7 @@ TEST_F(EnergyPlusFixture, DemandManagerGetInput)
     OAController.allocate(NumOAControllers);
     OAController(1).Name = "OA CONTROLLER 1";
 
-    GetDemandManagerInput();
+    GetDemandManagerInput(state);
 
     EXPECT_EQ(DataGlobals::ScheduleAlwaysOn, DemandMgr(1).AvailSchedule);
     EXPECT_EQ(ManagerLimitFixed, DemandMgr(1).LimitControl);

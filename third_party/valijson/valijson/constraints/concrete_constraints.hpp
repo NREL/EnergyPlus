@@ -13,8 +13,6 @@
  */
 
 #pragma once
-#ifndef __VALIJSON_CONSTRAINTS_CONCRETE_CONSTRAINTS_HPP
-#define __VALIJSON_CONSTRAINTS_CONCRETE_CONSTRAINTS_HPP
 
 #include <limits>
 #include <map>
@@ -559,7 +557,7 @@ public:
     }
 
 private:
-    size_t minItems;
+    uint64_t minItems;
 };
 
 /**
@@ -613,7 +611,7 @@ public:
     }
 
 private:
-    size_t minProperties;
+    uint64_t minProperties;
 };
 
 /**
@@ -1093,5 +1091,3 @@ public:
 
 } // namespace constraints
 } // namespace valijson
-
-#endif

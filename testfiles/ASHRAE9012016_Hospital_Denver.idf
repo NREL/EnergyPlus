@@ -182,7 +182,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.2;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -190,7 +190,7 @@
     Hospital,                !- Name
     -90,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.0400,                  !- Loads Convergence Tolerance Value
+    0.0400,                  !- Loads Convergence Tolerance Value {W}
     0.2000,                  !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -221,8 +221,9 @@
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWING CALCULATIONS ===========
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    30;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    30;                      !- Shading Calculation Update Frequency
 
 !-   ===========  ALL OBJECTS IN CLASS: RUN CONTROL ===========
 
@@ -3668,8 +3669,8 @@
 !-   ===========  ALL OBJECTS IN CLASS: SURFACEGEOMETRY ===========
 
   GlobalGeometryRules,
-    ULC,                     !- Starting Vertex Position
-    CCW,                     !- Vertex Entry Direction
+    UpperLeftCorner,         !- Starting Vertex Position
+    Counterclockwise,        !- Vertex Entry Direction
     Relative;                !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER ===========
@@ -11080,331 +11081,331 @@
   InternalMass,
     Basement_InternalMass_1, !- Name
     InteriorFurnishings,     !- Construction Name
-    Basement,                !- Zone Name
+    Basement,                !- Zone or ZoneList Name
     7478.6947;               !- Surface Area {m2}
 
   InternalMass,
     ER_Exam1_Mult4_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ER_Exam1_Mult4_Flr_1,    !- Zone Name
+    ER_Exam1_Mult4_Flr_1,    !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_Trauma1_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ER_Trauma1_Flr_1,        !- Zone Name
+    ER_Trauma1_Flr_1,        !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_Exam3_Mult4_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ER_Exam3_Mult4_Flr_1,    !- Zone Name
+    ER_Exam3_Mult4_Flr_1,    !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_Trauma2_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ER_Trauma2_Flr_1,        !- Zone Name
+    ER_Trauma2_Flr_1,        !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     ER_Triage_Mult4_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ER_Triage_Mult4_Flr_1,   !- Zone Name
+    ER_Triage_Mult4_Flr_1,   !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     Office1_Mult4_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Office1_Mult4_Flr_1,     !- Zone Name
+    Office1_Mult4_Flr_1,     !- Zone or ZoneList Name
     27.8709;                 !- Surface Area {m2}
 
   InternalMass,
     Lobby_Records_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Lobby_Records_Flr_1,     !- Zone Name
+    Lobby_Records_Flr_1,     !- Zone or ZoneList Name
     2949.6212;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Flr_1,          !- Zone Name
+    Corridor_Flr_1,          !- Zone or ZoneList Name
     1138.0622;               !- Surface Area {m2}
 
   InternalMass,
     ER_NurseStn_Lobby_Flr_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ER_NurseStn_Lobby_Flr_1, !- Zone Name
+    ER_NurseStn_Lobby_Flr_1, !- Zone or ZoneList Name
     2471.2209;               !- Surface Area {m2}
 
   InternalMass,
     OR1_Flr_2_InternalMass_1,!- Name
     InteriorFurnishings,     !- Construction Name
-    OR1_Flr_2,               !- Zone Name
+    OR1_Flr_2,               !- Zone or ZoneList Name
     111.4836;                !- Surface Area {m2}
 
   InternalMass,
     OR2_Mult5_Flr_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    OR2_Mult5_Flr_2,         !- Zone Name
+    OR2_Mult5_Flr_2,         !- Zone or ZoneList Name
     111.4836;                !- Surface Area {m2}
 
   InternalMass,
     OR3_Flr_2_InternalMass_1,!- Name
     InteriorFurnishings,     !- Construction Name
-    OR3_Flr_2,               !- Zone Name
+    OR3_Flr_2,               !- Zone or ZoneList Name
     111.4836;                !- Surface Area {m2}
 
   InternalMass,
     OR4_Flr_2_InternalMass_1,!- Name
     InteriorFurnishings,     !- Construction Name
-    OR4_Flr_2,               !- Zone Name
+    OR4_Flr_2,               !- Zone or ZoneList Name
     445.9346;                !- Surface Area {m2}
 
   InternalMass,
     IC_PatRoom1_Mult5_Flr_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    IC_PatRoom1_Mult5_Flr_2, !- Zone Name
+    IC_PatRoom1_Mult5_Flr_2, !- Zone or ZoneList Name
     41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     IC_PatRoom2_Flr_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    IC_PatRoom2_Flr_2,       !- Zone Name
+    IC_PatRoom2_Flr_2,       !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     IC_PatRoom3_Mult6_Flr_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    IC_PatRoom3_Mult6_Flr_2, !- Zone Name
+    IC_PatRoom3_Mult6_Flr_2, !- Zone or ZoneList Name
     41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     ICU_Flr_2_InternalMass_1,!- Name
     InteriorFurnishings,     !- Construction Name
-    ICU_Flr_2,               !- Zone Name
+    ICU_Flr_2,               !- Zone or ZoneList Name
     1235.9289;               !- Surface Area {m2}
 
   InternalMass,
     ICU_NurseStn_Lobby_Flr_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    ICU_NurseStn_Lobby_Flr_2,!- Zone Name
+    ICU_NurseStn_Lobby_Flr_2,!- Zone or ZoneList Name
     1337.5356;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_Flr_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Flr_2,          !- Zone Name
+    Corridor_Flr_2,          !- Zone or ZoneList Name
     1138.0622;               !- Surface Area {m2}
 
   InternalMass,
     OR_NurseStn_Lobby_Flr_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    OR_NurseStn_Lobby_Flr_2, !- Zone Name
+    OR_NurseStn_Lobby_Flr_2, !- Zone or ZoneList Name
     2025.2863;               !- Surface Area {m2}
 
   InternalMass,
     PatRoom1_Mult10_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom1_Mult10_Flr_3,   !- Zone Name
+    PatRoom1_Mult10_Flr_3,   !- Zone or ZoneList Name
     41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom2_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom2_Flr_3,          !- Zone Name
+    PatRoom2_Flr_3,          !- Zone or ZoneList Name
     69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom3_Mult10_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom3_Mult10_Flr_3,   !- Zone Name
+    PatRoom3_Mult10_Flr_3,   !- Zone or ZoneList Name
     40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom4_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom4_Flr_3,          !- Zone Name
+    PatRoom4_Flr_3,          !- Zone or ZoneList Name
     69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom5_Mult10_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom5_Mult10_Flr_3,   !- Zone Name
+    PatRoom5_Mult10_Flr_3,   !- Zone or ZoneList Name
     41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     PhysTherapy_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PhysTherapy_Flr_3,       !- Zone Name
+    PhysTherapy_Flr_3,       !- Zone or ZoneList Name
     975.4819;                !- Surface Area {m2}
 
   InternalMass,
     PatRoom6_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom6_Flr_3,          !- Zone Name
+    PatRoom6_Flr_3,          !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom7_Mult10_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom7_Mult10_Flr_3,   !- Zone Name
+    PatRoom7_Mult10_Flr_3,   !- Zone or ZoneList Name
     40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom8_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom8_Flr_3,          !- Zone Name
+    PatRoom8_Flr_3,          !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     NurseStn_Lobby_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    NurseStn_Lobby_Flr_3,    !- Zone Name
+    NurseStn_Lobby_Flr_3,    !- Zone or ZoneList Name
     1811.6093;               !- Surface Area {m2}
 
   InternalMass,
     Lab_Flr_3_InternalMass_1,!- Name
     InteriorFurnishings,     !- Construction Name
-    Lab_Flr_3,               !- Zone Name
+    Lab_Flr_3,               !- Zone or ZoneList Name
     529.5473;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_SE_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_SE_Flr_3,       !- Zone Name
+    Corridor_SE_Flr_3,       !- Zone or ZoneList Name
     1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_NW_Flr_3_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_NW_Flr_3,       !- Zone Name
+    Corridor_NW_Flr_3,       !- Zone or ZoneList Name
     1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     PatRoom1_Mult10_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom1_Mult10_Flr_4,   !- Zone Name
+    PatRoom1_Mult10_Flr_4,   !- Zone or ZoneList Name
     41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom2_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom2_Flr_4,          !- Zone Name
+    PatRoom2_Flr_4,          !- Zone or ZoneList Name
     69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom3_Mult10_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom3_Mult10_Flr_4,   !- Zone Name
+    PatRoom3_Mult10_Flr_4,   !- Zone or ZoneList Name
     40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom4_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom4_Flr_4,          !- Zone Name
+    PatRoom4_Flr_4,          !- Zone or ZoneList Name
     69.6773;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom5_Mult10_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom5_Mult10_Flr_4,   !- Zone Name
+    PatRoom5_Mult10_Flr_4,   !- Zone or ZoneList Name
     41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     Radiology_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Radiology_Flr_4,         !- Zone Name
+    Radiology_Flr_4,         !- Zone or ZoneList Name
     975.4819;                !- Surface Area {m2}
 
   InternalMass,
     PatRoom6_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom6_Flr_4,          !- Zone Name
+    PatRoom6_Flr_4,          !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom7_Mult10_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom7_Mult10_Flr_4,   !- Zone Name
+    PatRoom7_Mult10_Flr_4,   !- Zone or ZoneList Name
     40.4165;                 !- Surface Area {m2}
 
   InternalMass,
     PatRoom8_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    PatRoom8_Flr_4,          !- Zone Name
+    PatRoom8_Flr_4,          !- Zone or ZoneList Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     NurseStn_Lobby_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    NurseStn_Lobby_Flr_4,    !- Zone Name
+    NurseStn_Lobby_Flr_4,    !- Zone or ZoneList Name
     1811.6093;               !- Surface Area {m2}
 
   InternalMass,
     Lab_Flr_4_InternalMass_1,!- Name
     InteriorFurnishings,     !- Construction Name
-    Lab_Flr_4,               !- Zone Name
+    Lab_Flr_4,               !- Zone or ZoneList Name
     529.5473;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_SE_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_SE_Flr_4,       !- Zone Name
+    Corridor_SE_Flr_4,       !- Zone or ZoneList Name
     1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     Corridor_NW_Flr_4_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_NW_Flr_4,       !- Zone Name
+    Corridor_NW_Flr_4,       !- Zone or ZoneList Name
     1133.4171;               !- Surface Area {m2}
 
   InternalMass,
     Dining_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Dining_Flr_5,            !- Zone Name
+    Dining_Flr_5,            !- Zone or ZoneList Name
     1393.5456;               !- Surface Area {m2}
 
   InternalMass,
     NurseStn_Lobby_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    NurseStn_Lobby_Flr_5,    !- Zone Name
+    NurseStn_Lobby_Flr_5,    !- Zone or ZoneList Name
     2081.0281;               !- Surface Area {m2}
 
   InternalMass,
     Kitchen_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Kitchen_Flr_5,           !- Zone Name
+    Kitchen_Flr_5,           !- Zone or ZoneList Name
     1858.0608;               !- Surface Area {m2}
 
   InternalMass,
     Office1_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Office1_Flr_5,           !- Zone Name
+    Office1_Flr_5,           !- Zone or ZoneList Name
     139.3911;                !- Surface Area {m2}
 
   InternalMass,
     Office2_Mult5_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Office2_Mult5_Flr_5,     !- Zone Name
+    Office2_Mult5_Flr_5,     !- Zone or ZoneList Name
     139.3546;                !- Surface Area {m2}
 
   InternalMass,
     Office3_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Office3_Flr_5,           !- Zone Name
+    Office3_Flr_5,           !- Zone or ZoneList Name
     139.3546;                !- Surface Area {m2}
 
   InternalMass,
     Office4_Mult6_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Office4_Mult6_Flr_5,     !- Zone Name
+    Office4_Mult6_Flr_5,     !- Zone or ZoneList Name
     27.8709;                 !- Surface Area {m2}
 
   InternalMass,
     Corridor_Flr_5_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Flr_5,          !- Zone Name
+    Corridor_Flr_5,          !- Zone or ZoneList Name
     1003.3528;               !- Surface Area {m2}
 
   ScheduleTypeLimits,
@@ -17072,7 +17073,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Basement,        !- Name
@@ -17105,7 +17111,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ER_Exam1_Mult4_Flr_1,  !- Name
@@ -17138,7 +17149,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ER_Trauma1_Flr_1,!- Name
@@ -17171,7 +17187,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ER_Exam3_Mult4_Flr_1,  !- Name
@@ -17204,7 +17225,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ER_Trauma2_Flr_1,!- Name
@@ -17237,7 +17263,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ER_Triage_Mult4_Flr_1,  !- Name
@@ -17270,7 +17301,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Office1_Mult4_Flr_1,  !- Name
@@ -17303,7 +17339,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Lobby_Records_Flr_1,  !- Name
@@ -17336,7 +17377,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_Flr_1,  !- Name
@@ -17369,7 +17415,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ER_NurseStn_Lobby_Flr_1,  !- Name
@@ -17402,7 +17453,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA OR1_Flr_2,       !- Name
@@ -17435,7 +17491,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA OR2_Mult5_Flr_2, !- Name
@@ -17468,7 +17529,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA OR3_Flr_2,       !- Name
@@ -17501,7 +17567,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA OR4_Flr_2,       !- Name
@@ -17534,7 +17605,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA IC_PatRoom1_Mult5_Flr_2,  !- Name
@@ -17567,7 +17643,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA IC_PatRoom2_Flr_2,  !- Name
@@ -17600,7 +17681,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA IC_PatRoom3_Mult6_Flr_2,  !- Name
@@ -17633,7 +17719,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ICU_Flr_2,       !- Name
@@ -17666,7 +17757,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA ICU_NurseStn_Lobby_Flr_2,  !- Name
@@ -17699,7 +17795,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_Flr_2,  !- Name
@@ -17732,7 +17833,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA OR_NurseStn_Lobby_Flr_2,  !- Name
@@ -17765,7 +17871,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom1_Mult10_Flr_3,  !- Name
@@ -17798,7 +17909,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom2_Flr_3,  !- Name
@@ -17831,7 +17947,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom3_Mult10_Flr_3,  !- Name
@@ -17864,7 +17985,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom4_Flr_3,  !- Name
@@ -17897,7 +18023,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom5_Mult10_Flr_3,  !- Name
@@ -17930,7 +18061,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PhysTherapy_Flr_3,  !- Name
@@ -17963,7 +18099,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom6_Flr_3,  !- Name
@@ -17996,7 +18137,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom7_Mult10_Flr_3,  !- Name
@@ -18029,7 +18175,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom8_Flr_3,  !- Name
@@ -18062,7 +18213,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA NurseStn_Lobby_Flr_3,  !- Name
@@ -18095,7 +18251,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Lab_Flr_3,       !- Name
@@ -18128,7 +18289,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_SE_Flr_3,  !- Name
@@ -18161,7 +18327,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_NW_Flr_3,  !- Name
@@ -18194,7 +18365,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom1_Mult10_Flr_4,  !- Name
@@ -18227,7 +18403,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom2_Flr_4,  !- Name
@@ -18260,7 +18441,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom3_Mult10_Flr_4,  !- Name
@@ -18293,7 +18479,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom4_Flr_4,  !- Name
@@ -18326,7 +18517,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom5_Mult10_Flr_4,  !- Name
@@ -18359,7 +18555,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Radiology_Flr_4, !- Name
@@ -18392,7 +18593,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom6_Flr_4,  !- Name
@@ -18425,7 +18631,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom7_Mult10_Flr_4,  !- Name
@@ -18458,7 +18669,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA PatRoom8_Flr_4,  !- Name
@@ -18491,7 +18707,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA NurseStn_Lobby_Flr_4,  !- Name
@@ -18524,7 +18745,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Lab_Flr_4,       !- Name
@@ -18557,7 +18783,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_SE_Flr_4,  !- Name
@@ -18590,7 +18821,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_NW_Flr_4,  !- Name
@@ -18623,7 +18859,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Dining_Flr_5,    !- Name
@@ -18656,7 +18897,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA NurseStn_Lobby_Flr_5,  !- Name
@@ -18689,7 +18935,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Kitchen_Flr_5,   !- Name
@@ -18722,7 +18973,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Office1_Flr_5,   !- Name
@@ -18755,7 +19011,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Office2_Mult5_Flr_5,  !- Name
@@ -18788,7 +19049,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Office3_Flr_5,   !- Name
@@ -18821,7 +19087,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Office4_Mult6_Flr_5,  !- Name
@@ -18854,7 +19125,12 @@
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA Corridor_Flr_5,  !- Name
@@ -24334,8 +24610,8 @@
     Basement VAV Box,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ER_Exam1_Mult4_Flr_1 Equipment,  !- Name
@@ -24344,8 +24620,8 @@
     ER_Exam1_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ER_Trauma1_Flr_1 Equipment,  !- Name
@@ -24354,8 +24630,8 @@
     ER_Trauma1_Flr_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ER_Exam3_Mult4_Flr_1 Equipment,  !- Name
@@ -24364,8 +24640,8 @@
     ER_Exam3_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ER_Trauma2_Flr_1 Equipment,  !- Name
@@ -24374,8 +24650,8 @@
     ER_Trauma2_Flr_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ER_Triage_Mult4_Flr_1 Equipment,  !- Name
@@ -24384,8 +24660,8 @@
     ER_Triage_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Office1_Mult4_Flr_1 Equipment,  !- Name
@@ -24394,8 +24670,8 @@
     Office1_Mult4_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Lobby_Records_Flr_1 Equipment,  !- Name
@@ -24404,8 +24680,8 @@
     Lobby_Records_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Flr_1 Equipment,!- Name
@@ -24414,8 +24690,8 @@
     Corridor_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ER_NurseStn_Lobby_Flr_1 Equipment,  !- Name
@@ -24424,8 +24700,8 @@
     ER_NurseStn_Lobby_Flr_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     OR1_Flr_2 Equipment,     !- Name
@@ -24434,8 +24710,8 @@
     OR1_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     OR2_Mult5_Flr_2 Equipment,  !- Name
@@ -24444,8 +24720,8 @@
     OR2_Mult5_Flr_2 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     OR3_Flr_2 Equipment,     !- Name
@@ -24454,8 +24730,8 @@
     OR3_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential $1 Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     OR4_Flr_2 Equipment,     !- Name
@@ -24464,8 +24740,8 @@
     OR4_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     IC_PatRoom1_Mult5_Flr_2 Equipment,  !- Name
@@ -24474,8 +24750,8 @@
     IC_PatRoom1_Mult5_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     IC_PatRoom2_Flr_2 Equipment,  !- Name
@@ -24484,8 +24760,8 @@
     IC_PatRoom2_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     IC_PatRoom3_Mult6_Flr_2 Equipment,  !- Name
@@ -24494,8 +24770,8 @@
     IC_PatRoom3_Mult6_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ICU_Flr_2 Equipment,     !- Name
@@ -24504,8 +24780,8 @@
     ICU_Flr_2 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     ICU_NurseStn_Lobby_Flr_2 Equipment,  !- Name
@@ -24514,8 +24790,8 @@
     ICU_NurseStn_Lobby_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Flr_2 Equipment,!- Name
@@ -24524,8 +24800,8 @@
     Corridor_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     OR_NurseStn_Lobby_Flr_2 Equipment,  !- Name
@@ -24534,8 +24810,8 @@
     OR_NurseStn_Lobby_Flr_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom1_Mult10_Flr_3 Equipment,  !- Name
@@ -24544,8 +24820,8 @@
     PatRoom1_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom2_Flr_3 Equipment,!- Name
@@ -24554,8 +24830,8 @@
     PatRoom2_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom3_Mult10_Flr_3 Equipment,  !- Name
@@ -24564,8 +24840,8 @@
     PatRoom3_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom4_Flr_3 Equipment,!- Name
@@ -24574,8 +24850,8 @@
     PatRoom4_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom5_Mult10_Flr_3 Equipment,  !- Name
@@ -24584,8 +24860,8 @@
     PatRoom5_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PhysTherapy_Flr_3 Equipment,  !- Name
@@ -24594,8 +24870,8 @@
     PhysTherapy_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom6_Flr_3 Equipment,!- Name
@@ -24604,8 +24880,8 @@
     PatRoom6_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom7_Mult10_Flr_3 Equipment,  !- Name
@@ -24614,8 +24890,8 @@
     PatRoom7_Mult10_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom8_Flr_3 Equipment,!- Name
@@ -24624,8 +24900,8 @@
     PatRoom8_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     NurseStn_Lobby_Flr_3 Equipment,  !- Name
@@ -24634,8 +24910,8 @@
     NurseStn_Lobby_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Lab_Flr_3 Equipment,     !- Name
@@ -24644,8 +24920,8 @@
     Lab_Flr_3 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_SE_Flr_3 Equipment,  !- Name
@@ -24654,8 +24930,8 @@
     Corridor_SE_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_NW_Flr_3 Equipment,  !- Name
@@ -24664,8 +24940,8 @@
     Corridor_NW_Flr_3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom1_Mult10_Flr_4 Equipment,  !- Name
@@ -24674,8 +24950,8 @@
     PatRoom1_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom2_Flr_4 Equipment,!- Name
@@ -24684,8 +24960,8 @@
     PatRoom2_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom3_Mult10_Flr_4 Equipment,  !- Name
@@ -24694,8 +24970,8 @@
     PatRoom3_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom4_Flr_4 Equipment,!- Name
@@ -24704,8 +24980,8 @@
     PatRoom4_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom5_Mult10_Flr_4 Equipment,  !- Name
@@ -24714,8 +24990,8 @@
     PatRoom5_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Radiology_Flr_4 Equipment,  !- Name
@@ -24724,8 +25000,8 @@
     Radiology_Flr_4 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom6_Flr_4 Equipment,!- Name
@@ -24734,8 +25010,8 @@
     PatRoom6_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom7_Mult10_Flr_4 Equipment,  !- Name
@@ -24744,8 +25020,8 @@
     PatRoom7_Mult10_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     PatRoom8_Flr_4 Equipment,!- Name
@@ -24754,8 +25030,8 @@
     PatRoom8_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     NurseStn_Lobby_Flr_4 Equipment,  !- Name
@@ -24764,8 +25040,8 @@
     NurseStn_Lobby_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Lab_Flr_4 Equipment,     !- Name
@@ -24774,8 +25050,8 @@
     Lab_Flr_4 VAV Box,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_SE_Flr_4 Equipment,  !- Name
@@ -24784,8 +25060,8 @@
     Corridor_SE_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_NW_Flr_4 Equipment,  !- Name
@@ -24794,8 +25070,8 @@
     Corridor_NW_Flr_4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Dining_Flr_5 Equipment,  !- Name
@@ -24804,14 +25080,14 @@
     Dining_Flr_5 Dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Dining_Flr_5 VAV Box,    !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     NurseStn_Lobby_Flr_5 Equipment,  !- Name
@@ -24820,14 +25096,14 @@
     NurseStn_Lobby_Flr_5 Dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     NurseStn_Lobby_Flr_5 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Kitchen_Flr_5 Equipment, !- Name
@@ -24836,14 +25112,14 @@
     Kitchen_Flr_5 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Kitchen_Flr_5 CAV Box,   !- Zone Equipment 2 Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Kitchen_Flr_5 CAV Box ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Office1_Flr_5 Equipment, !- Name
@@ -24852,14 +25128,14 @@
     Office1_Flr_5 Dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Office1_Flr_5 VAV Box,   !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Office2_Mult5_Flr_5 Equipment,  !- Name
@@ -24868,14 +25144,14 @@
     Office2_Mult5_Flr_5 Dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Office2_Mult5_Flr_5 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Office3_Flr_5 Equipment, !- Name
@@ -24884,14 +25160,14 @@
     Office3_Flr_5 Dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Office3_Flr_5 VAV Box,   !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Office4_Mult6_Flr_5 Equipment,  !- Name
@@ -24900,14 +25176,14 @@
     Office4_Mult6_Flr_5 Dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Office4_Mult6_Flr_5 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Flr_5 Equipment,!- Name
@@ -24916,14 +25192,14 @@
     Corridor_Flr_5 Dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Corridor_Flr_5 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIR DISTRIBUTION UNIT ===========
 
@@ -25388,11 +25664,23 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: SINGLE DUCT:UNCONTROLLED ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Kitchen_Flr_5 CAV Box,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Kitchen_Flr_5 Inlet Node,!- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Kitchen_Flr_5 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Kitchen_Flr_5 Inlet Node,!- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Kitchen_Flr_5 CAV Box ADU,  !- Name
+    Kitchen_Flr_5 Inlet Node,!- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Kitchen_Flr_5 CAV Box,   !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SINGLE DUCT:VAV:REHEAT ===========
 
@@ -27378,10 +27666,14 @@
     Lab_Flr_3 VAV Box Inlet Node,  !- Outlet 1 Node Name
     Lab_Flr_4 VAV Box Inlet Node;  !- Outlet 2 Node Name
 
+  NodeList,
+    Kitchen_Flr_5 Inlet Nodes ATInlet,  !- Name
+    Kitchen_Flr_5 Inlet Node ATInlet;  !- Node 1 Name
+
   AirLoopHVAC:ZoneSplitter,
     CAV_KITCHEN Supply Air Splitter,  !- Name
     CAV_KITCHEN Zone Equipment Inlet Node,  !- Inlet Node Name
-    Kitchen_Flr_5 Inlet Nodes;  !- Outlet 1 Node Name
+    Kitchen_Flr_5 Inlet Nodes ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONEMIXER ===========
 
@@ -31113,7 +31405,7 @@
     3,                       !- Digits After Decimal
     Electricity:HVAC,        !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Heating:Gas,             !- Variable or Meter 2 Name
+    Heating:NaturalGas,             !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -31261,13 +31553,13 @@
   Output:Table:Monthly,
     Building Loads - Electric,  !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -31291,9 +31583,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Building,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Building,            !- Variable or Meter 3 Name
+    NaturalGas:Building,            !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Building,            !- Variable or Meter 4 Name
+    NaturalGas:Building,            !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -31331,17 +31623,17 @@
   Output:Table:Monthly,
     Building Energy Performance - Natural Gas,  !- Name
     2,                       !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -31417,23 +31709,23 @@
   Output:Table:Monthly,
     Peak Gas Demand,         !- Name
     3,                       !- Digits After Decimal
-    Gas:Facility,            !- Variable or Meter 1 Name
+    NaturalGas:Facility,            !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Gas:Facility,            !- Variable or Meter 2 Name
+    NaturalGas:Facility,            !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:HVAC,                !- Variable or Meter 3 Name
+    NaturalGas:HVAC,                !- Variable or Meter 3 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 3
-    InteriorEquipment:Gas,   !- Variable or Meter 4 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
-    MiscPlugGas:InteriorEquipment:Gas,  !- Variable or Meter 5 Name
+    MiscPlugGas:InteriorEquipment:NaturalGas,  !- Variable or Meter 5 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 5
-    Gas:Plant,               !- Variable or Meter 6 Name
+    NaturalGas:Plant,               !- Variable or Meter 6 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 6
-    WaterSystems:Gas,        !- Variable or Meter 7 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 7 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
-    Water Heater:WaterSystems:Gas,  !- Variable or Meter 8 Name
+    Water Heater:WaterSystems:NaturalGas,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Heating:Gas,             !- Variable or Meter 9 Name
+    Heating:NaturalGas,             !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:MECHANICALVENTILATION ===========
@@ -31444,28 +31736,28 @@
     Yes,                     !- Demand Controlled Ventilation
     VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    Basement,                !- Zone 1 Name
+    Basement,                !- Zone or ZoneList 1 Name
     CM DSOA Basement,        !- Design Specification Outdoor Air Object Name 1
     CM DSZAD Basement,       !- Design Specification Zone Air Distribution Object Name 1
-    Office1_Mult4_Flr_1,     !- Zone 2 Name
+    Office1_Mult4_Flr_1,     !- Zone or ZoneList 2 Name
     CM DSOA Office1_Mult4_Flr_1,  !- Design Specification Outdoor Air Object Name 2
     CM DSZAD Office1_Mult4_Flr_1,  !- Design Specification Zone Air Distribution Object Name 2
-    Lobby_Records_Flr_1,     !- Zone 3 Name
+    Lobby_Records_Flr_1,     !- Zone or ZoneList 3 Name
     CM DSOA Lobby_Records_Flr_1,  !- Design Specification Outdoor Air Object Name 3
     CM DSZAD Lobby_Records_Flr_1,  !- Design Specification Zone Air Distribution Object Name 3
-    Corridor_Flr_1,          !- Zone 4 Name
+    Corridor_Flr_1,          !- Zone or ZoneList 4 Name
     CM DSOA Corridor_Flr_1,  !- Design Specification Outdoor Air Object Name 4
     CM DSZAD Corridor_Flr_1, !- Design Specification Zone Air Distribution Object Name 4
-    Er_Nursestn_Lobby_Flr_1, !- Zone 5 Name
+    Er_Nursestn_Lobby_Flr_1, !- Zone or ZoneList 5 Name
     CM DSOA Er_Nursestn_Lobby_Flr_1,  !- Design Specification Outdoor Air Object Name 5
     CM DSZAD Er_Nursestn_Lobby_Flr_1,  !- Design Specification Zone Air Distribution Object Name 5
-    Icu_Nursestn_Lobby_Flr_2,!- Zone 6 Name
+    Icu_Nursestn_Lobby_Flr_2,!- Zone or ZoneList 6 Name
     CM DSOA Icu_Nursestn_Lobby_Flr_2,  !- Design Specification Outdoor Air Object Name 6
     CM DSZAD Icu_Nursestn_Lobby_Flr_2,  !- Design Specification Zone Air Distribution Object Name 6
-    Corridor_Flr_2,          !- Zone 7 Name
+    Corridor_Flr_2,          !- Zone or ZoneList 7 Name
     CM DSOA Corridor_Flr_2,  !- Design Specification Outdoor Air Object Name 7
     CM DSZAD Corridor_Flr_2, !- Design Specification Zone Air Distribution Object Name 7
-    Or_Nursestn_Lobby_Flr_2, !- Zone 8 Name
+    Or_Nursestn_Lobby_Flr_2, !- Zone or ZoneList 8 Name
     CM DSOA Or_Nursestn_Lobby_Flr_2,  !- Design Specification Outdoor Air Object Name 8
     CM DSZAD Or_Nursestn_Lobby_Flr_2;  !- Design Specification Zone Air Distribution Object Name 8
 
@@ -31571,49 +31863,49 @@
     Yes,                     !- Demand Controlled Ventilation
     VentilationRateProcedure,!- System Outdoor Air Method
     ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    Phystherapy_Flr_3,       !- Zone 1 Name
+    Phystherapy_Flr_3,       !- Zone or ZoneList 1 Name
     CM DSOA Phystherapy_Flr_3,  !- Design Specification Outdoor Air Object Name 1
     CM DSZAD Phystherapy_Flr_3,  !- Design Specification Zone Air Distribution Object Name 1
-    Nursestn_Lobby_Flr_3,    !- Zone 2 Name
+    Nursestn_Lobby_Flr_3,    !- Zone or ZoneList 2 Name
     CM DSOA Nursestn_Lobby_Flr_3,  !- Design Specification Outdoor Air Object Name 2
     CM DSZAD Nursestn_Lobby_Flr_3,  !- Design Specification Zone Air Distribution Object Name 2
-    Corridor_Se_Flr_3,       !- Zone 3 Name
+    Corridor_Se_Flr_3,       !- Zone or ZoneList 3 Name
     CM DSOA Corridor_Se_Flr_3,  !- Design Specification Outdoor Air Object Name 3
     CM DSZAD Corridor_Se_Flr_3,  !- Design Specification Zone Air Distribution Object Name 3
-    Corridor_Nw_Flr_3,       !- Zone 4 Name
+    Corridor_Nw_Flr_3,       !- Zone or ZoneList 4 Name
     CM DSOA Corridor_Nw_Flr_3,  !- Design Specification Outdoor Air Object Name 4
     CM DSZAD Corridor_Nw_Flr_3,  !- Design Specification Zone Air Distribution Object Name 4
-    Radiology_Flr_4,         !- Zone 5 Name
+    Radiology_Flr_4,         !- Zone or ZoneList 5 Name
     CM DSOA Radiology_Flr_4, !- Design Specification Outdoor Air Object Name 5
     CM DSZAD Radiology_Flr_4,!- Design Specification Zone Air Distribution Object Name 5
-    Nursestn_Lobby_Flr_4,    !- Zone 6 Name
+    Nursestn_Lobby_Flr_4,    !- Zone or ZoneList 6 Name
     CM DSOA Nursestn_Lobby_Flr_4,  !- Design Specification Outdoor Air Object Name 6
     CM DSZAD Nursestn_Lobby_Flr_4,  !- Design Specification Zone Air Distribution Object Name 6
-    Corridor_Se_Flr_4,       !- Zone 7 Name
+    Corridor_Se_Flr_4,       !- Zone or ZoneList 7 Name
     CM DSOA Corridor_Se_Flr_4,  !- Design Specification Outdoor Air Object Name 7
     CM DSZAD Corridor_Se_Flr_4,  !- Design Specification Zone Air Distribution Object Name 7
-    Corridor_Nw_Flr_4,       !- Zone 8 Name
+    Corridor_Nw_Flr_4,       !- Zone or ZoneList 8 Name
     CM DSOA Corridor_Nw_Flr_4,  !- Design Specification Outdoor Air Object Name 8
     CM DSZAD Corridor_Nw_Flr_4,  !- Design Specification Zone Air Distribution Object Name 8
-    Dining_Flr_5,            !- Zone 9 Name
+    Dining_Flr_5,            !- Zone or ZoneList 9 Name
     CM DSOA Dining_Flr_5,    !- Design Specification Outdoor Air Object Name 9
     CM DSZAD Dining_Flr_5,   !- Design Specification Zone Air Distribution Object Name 9
-    Nursestn_Lobby_Flr_5,    !- Zone 10 Name
+    Nursestn_Lobby_Flr_5,    !- Zone or ZoneList 10 Name
     CM DSOA Nursestn_Lobby_Flr_5,  !- Design Specification Outdoor Air Object Name 10
     CM DSZAD Nursestn_Lobby_Flr_5,  !- Design Specification Zone Air Distribution Object Name 10
-    Office1_Flr_5,           !- Zone 11 Name
+    Office1_Flr_5,           !- Zone or ZoneList 11 Name
     CM DSOA Office1_Flr_5,   !- Design Specification Outdoor Air Object Name 11
     CM DSZAD Office1_Flr_5,  !- Design Specification Zone Air Distribution Object Name 11
-    Office2_Mult5_Flr_5,     !- Zone 12 Name
+    Office2_Mult5_Flr_5,     !- Zone or ZoneList 12 Name
     CM DSOA Office2_Mult5_Flr_5,  !- Design Specification Outdoor Air Object Name 12
     CM DSZAD Office2_Mult5_Flr_5,  !- Design Specification Zone Air Distribution Object Name 12
-    Office3_Flr_5,           !- Zone 13 Name
+    Office3_Flr_5,           !- Zone or ZoneList 13 Name
     CM DSOA Office3_Flr_5,   !- Design Specification Outdoor Air Object Name 13
     CM DSZAD Office3_Flr_5,  !- Design Specification Zone Air Distribution Object Name 13
-    Office4_Mult6_Flr_5,     !- Zone 14 Name
+    Office4_Mult6_Flr_5,     !- Zone or ZoneList 14 Name
     CM DSOA Office4_Mult6_Flr_5,  !- Design Specification Outdoor Air Object Name 14
     CM DSZAD Office4_Mult6_Flr_5,  !- Design Specification Zone Air Distribution Object Name 14
-    Corridor_Flr_5,          !- Zone 15 Name
+    Corridor_Flr_5,          !- Zone or ZoneList 15 Name
     CM DSOA Corridor_Flr_5,  !- Design Specification Outdoor Air Object Name 15
     CM DSZAD Corridor_Flr_5; !- Design Specification Zone Air Distribution Object Name 15
 
@@ -31829,7 +32121,7 @@
 
   Meter:Custom,
     Wired_LTG_Electricity,   !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     ,                        !- Key Name 1
     Wired_LTG;               !- Output Variable or Meter Name 1
 
@@ -31865,12 +32157,12 @@
   EnergyManagementSystem:Sensor,
     Chiller1_Status,         !- Name
     CoolSys1 Chiller1,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electric Power;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     Chiller2_Status,         !- Name
     CoolSys1 Chiller2,       !- Output:Variable or Output:Meter Index Key Name
-    Chiller Electric Power;  !- Output:Variable or Output:Meter Name
+    Chiller Electricity Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
     SensedCurveInput,        !- Name

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,14 +49,15 @@
 #define ThermalComfort_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    //forward declarations
+    struct ZoneTempPredictorCorrectorData;
 
 namespace ThermalComfort {
 
@@ -184,6 +185,7 @@ namespace ThermalComfort {
         Real64 PiercePMVSET;
         Real64 PierceDISC;
         Real64 PierceTSENS;
+        Real64 PierceSET;
         Real64 KsuTSV;
         Real64 ThermalComfortMRT;
         Real64 ThermalComfortOpTemp;
@@ -200,11 +202,11 @@ namespace ThermalComfort {
 
         // Default Constructor
         ThermalComfortDataType()
-            : FangerPMV(0.0), FangerPPD(0.0), CloSurfTemp(0.0), PiercePMVET(0.0), PiercePMVSET(0.0), PierceDISC(0.0), PierceTSENS(0.0), KsuTSV(0.0),
-              ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0), ThermalComfortAdaptiveASH5590(0),
-              ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0), ThermalComfortAdaptiveCEN15251CatII(0),
-              ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0), ASHRAE55RunningMeanOutdoorTemp(0.0),
-              CEN15251RunningMeanOutdoorTemp(0.0)
+            : FangerPMV(0.0), FangerPPD(0.0), CloSurfTemp(0.0), PiercePMVET(0.0), PiercePMVSET(0.0), PierceDISC(0.0), PierceTSENS(0.0),
+              PierceSET(0.0), KsuTSV(0.0), ThermalComfortMRT(0.0), ThermalComfortOpTemp(0.0), ClothingValue(0.0),
+              ThermalComfortAdaptiveASH5590(0), ThermalComfortAdaptiveASH5580(0), ThermalComfortAdaptiveCEN15251CatI(0),
+              ThermalComfortAdaptiveCEN15251CatII(0), ThermalComfortAdaptiveCEN15251CatIII(0), TComfASH55(0.0), TComfCEN15251(0.0),
+              ASHRAE55RunningMeanOutdoorTemp(0.0), CEN15251RunningMeanOutdoorTemp(0.0)
         {
         }
     };
@@ -283,7 +285,9 @@ namespace ThermalComfort {
 
     void clear_state();
 
-    void ManageThermalComfort(bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
+    void ManageThermalComfort(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector,
+                              IOFiles &ioFiles,
+                              bool const InitializeOnly); // when called from ZTPC and calculations aren't needed
 
     void InitThermalComfort();
 
@@ -296,12 +300,12 @@ namespace ThermalComfort {
 
     void CalcThermalComfortKSU();
 
-    void DERIV(int &TempIndiceNum,        // Number of temperature indices  unused1208
-               Array1A<Real64> Temp,      // Temperature unused1208
-               Array1A<Real64> TempChange // Change of temperature
+    void DERIV(int &TempIndiceNum,         // Number of temperature indices  unused1208
+               Array1D<Real64> &Temp,      // Temperature unused1208
+               Array1D<Real64> &TempChange // Change of temperature
     );
 
-    void RKG(int &NEQ, Real64 &H, Real64 &X, Array1A<Real64> Y, Array1A<Real64> DY, Array1A<Real64> C);
+    void RKG(int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C);
 
     void GetAngleFactorList();
 
@@ -317,17 +321,19 @@ namespace ThermalComfort {
 
     void ResetThermalComfortSimpleASH55();
 
-    void CalcIfSetPointMet();
+    void CalcIfSetPointMet(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
 
     void ResetSetPointMet();
 
     void CalcThermalComfortAdaptiveASH55(
+        IOFiles &ioFiles,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day
     );
 
     void CalcThermalComfortAdaptiveCEN15251(
+        IOFiles &ioFiles,
         bool const initiate,                  // true if supposed to initiate
         Optional_bool_const wthrsim = _,      // true if this is a weather simulation
         Optional<Real64 const> avgdrybulb = _ // approximate avg drybulb for design day.  will be used as previous period in design day

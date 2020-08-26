@@ -6,7 +6,7 @@
 ! Basic file description: A 186 m^2 (2000 ft^2) residential house with slab-on-grade (no ground contact).
 !
 ! Highlights:             This file does the basic test of an air distribution system in a residential home.
-!                         It provides forced ventilation during system on period and natural ventilation. Fan:SystemModel 
+!                         It provides forced ventilation during system on period and natural ventilation. Fan:SystemModel
 !                         is used.
 !
 !
@@ -69,7 +69,7 @@
 ! Solair Distribution:            None
 !
 ! HVAC:                           A unitary system of AirLoopHVAC:UnitarySystem provides space cooling and heating.
-!                                 The system has a supplemental heating coil as Coil:Heating:Fuel. Fan:SystemModel 
+!                                 The system has a supplemental heating coil as Coil:Heating:Fuel. Fan:SystemModel
 !                                 is used to simulate fan performance
 !                                 Thermostat setting at 22C for space heating and 26.6C for space cooling.
 !
@@ -97,13 +97,13 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     House with AirflowNetwork simulation,  !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.001,                   !- Loads Convergence Tolerance Value
+    0.001,                   !- Loads Convergence Tolerance Value {W}
     0.0050000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -117,22 +117,24 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
-    No;                      !- Run Simulation for Weather File Run Periods
+    Yes;                     !- Run Simulation for Weather File Run Periods
 
   RunPeriod,
     Run Period 1,            !- Name
     1,                       !- Begin Month
-    14,                      !- Begin Day of Month
+    1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                       !- End Month
-    14,                      !- End Day of Month
+    12,                      !- End Month
+    31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -140,21 +142,6 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-
-  RunPeriod,
-    Run Period 2,            !- Name
-    7,                       !- Begin Month
-    7,                       !- Begin Day of Month
-    ,                        !- Begin Year
-    7,                       !- End Month
-    7,                       !- End Day of Month
-    ,                        !- End Year
-    Tuesday,                 !- Day of Week for Start Day
-    Yes,                     !- Use Weather File Holidays and Special Days
-    Yes,                     !- Use Weather File Daylight Saving Period
-    No,                      !- Apply Weekend Holiday Rule
-    Yes,                     !- Use Weather File Rain Indicators
-    No;                      !- Use Weather File Snow Indicators
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -1281,9 +1268,10 @@
     Zone Equipment Inlet Node,  !- Demand Side Inlet Node Names
     Air Loop Outlet Node;    !- Supply Side Outlet Node Names
 
+!    NoMultizoneOrDistribution,  !- AirflowNetwork Control
+
   AirflowNetwork:SimulationControl,
     House AirflowNetwork,    !- Name
-!    NoMultizoneOrDistribution,  !- AirflowNetwork Control
     MultizoneWithDistribution,  !- AirflowNetwork Control
     INPUT,                   !- Wind Pressure Coefficient Type
     ExternalNode,            !- Height Selection for Local Wind Pressure Calculation
@@ -1511,6 +1499,12 @@
     3.0;                     !- Node Height {m}
 
   AirflowNetwork:Distribution:Node,
+    ZoneSupplyRegisterNode ATInlet,  !- Name
+    Zone Inlet Node ATInlet, !- Component Name or Node Name
+    Other,                   !- Component Object Type or Node Type
+    3.0;                     !- Node Height {m}
+
+  AirflowNetwork:Distribution:Node,
     ZoneSupplyRegisterNode,  !- Name
     Zone Inlet Node,         !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
@@ -1542,7 +1536,7 @@
 
   AirflowNetwork:Distribution:Node,
     MainInletNode,           !- Name
-    Air Loop Inlet Node,     !- Component Name or Node Name
+    ,                        !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
     3.0;                     !- Node Height {m}
 
@@ -1711,9 +1705,28 @@
     Attic Zone;              !- Thermal Zone Name
 
   AirflowNetwork:Distribution:Linkage,
+    ZoneSupply1Link2 ATInlet,!- Name
+    ZoneSupplyRegisterNode ATInlet,  !- Node 1 Name
+    ZoneSupplyRegisterNode,  !- Node 2 Name
+    ZoneSupply1Link2 ATInlet Duct,  !- Component Name
+    Attic Zone;              !- Thermal Zone Name
+
+  AirflowNetwork:Distribution:Component:Duct,
+    ZoneSupply1Link2 ATInlet Duct,  !- Name
+    0.0001,                  !- Duct Length {m}
+    0.4064,                  !- Hydraulic Diameter {m}
+    0.1297,                  !- Cross Section Area {m2}
+    0.0009,                  !- Surface Roughness {m}
+    0.0,                     !- Coefficient for Local Dynamic Loss Due to Fitting {dimensionless}
+    0.0000001,               !- Heat Transmittance Coefficient (U-Factor) for Duct Wall Construction {W/m2-K}
+    0.0000001,               !- Overall Moisture Transmittance Coefficient from Air to Air {kg/m2}
+    5.018000,                !- Outside Convection Coefficient {W/m2-K}
+    25.090000;               !- Inside Convection Coefficient {W/m2-K}
+
+  AirflowNetwork:Distribution:Linkage,
     ZoneSupply1Link2,        !- Name
     ZoneSupplyNode,          !- Node 1 Name
-    ZoneSupplyRegisterNode,  !- Node 2 Name
+    ZoneSupplyRegisterNode ATInlet,  !- Node 2 Name
     ZoneSupply,              !- Component Name
     Attic Zone;              !- Thermal Zone Name
 
@@ -1825,53 +1838,65 @@
   ZoneHVAC:EquipmentList,
     ZoneEquipment,           !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZoneDirectAir,           !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZoneDirectAir ADU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:UnitarySystem,
-    DXAC Heat Pump 1,      !- Name
-    Load,                !- Control Type
+    DXAC Heat Pump 1,        !- Name
+    Load,                    !- Control Type
     LIVING ZONE,             !- Controlling Zone or Thermostat Location
     ,                        !- Dehumidification Control Type
-    HVACAvailSched,    !- Availability Schedule Name
+    HVACAvailSched,          !- Availability Schedule Name
     Air Loop Inlet Node,     !- Air Inlet Node Name
     Air Loop Outlet Node,    !- Air Outlet Node Name
-    Fan:SystemModel,               !- Supply Fan Object Type
+    Fan:SystemModel,         !- Supply Fan Object Type
     Supply Fan 1,            !- Supply Fan Name
     BlowThrough,             !- Fan Placement
     CyclingFanSchedule,      !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
-    1.0,                        !- DX Heating Coil Sizing Ratio
-    Coil:Cooling:DX:SingleSpeed,   !- Cooling Coil Object Type
-    ACDXCoil 1,                        !- Cooling Coil Name
+    1.0,                     !- DX Heating Coil Sizing Ratio
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
+    ACDXCoil 1,              !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
-    ,                        !- Minimum Supply Air Temperature
+    ,                        !- Minimum Supply Air Temperature {C}
     ,                        !- Latent Load Control
     Coil:Heating:Fuel,       !- Supplemental Heating Coil Object Type
     Supp Heating Coil 1,     !- Supplemental Heating Coil Name
     SupplyAirFlowRate,       !- Cooling Supply Air Flow Rate Method
-    1.18,                    !- Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Floor Area
+    1.18,                    !- Cooling Supply Air Flow Rate {m3/s}
+    ,                        !- Cooling Supply Air Flow Rate Per Floor Area {m3/s-m2}
     ,                        !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity
+    ,                        !- Cooling Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
     SupplyAirFlowRate,       !- Heating Supply Air Flow Rate Method
-    1.18,                    !- Heating Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Floor Area
-    ,                        !- Heating Fraction of Autosized Cooling Supply Air Flow Rate
-    ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity
+    1.18,                    !- Heating Supply Air Flow Rate {m3/s}
+    ,                        !- Heating Supply Air Flow Rate Per Floor Area {m3/s-m2}
+    ,                        !- Heating Fraction of Autosized Heating Supply Air Flow Rate
+    ,                        !- Heating Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
     SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method
     0;                       !- No Load Supply Air Flow Rate {m3/s}
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZoneDirectAir,           !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    Zone Inlet Node,         !- Zone Supply Air Node Name
-    1.18;                    !- Maximum Air Flow Rate {m3/s}
+    Zone Inlet Node ATInlet, !- Air Inlet Node Name
+    Zone Inlet Node,         !- Air Outlet Node Name
+    1.18,                    !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZoneDirectAir ADU,       !- Name
+    Zone Inlet Node,         !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZoneDirectAir,           !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   ZoneControl:Thermostat,
     Zone Thermostat,         !- Name
@@ -1900,7 +1925,7 @@
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter,!- Name
     Zone Equipment Inlet Node,  !- Inlet Node Name
-    Zone Inlet Node;         !- Outlet 1 Node Name
+    Zone Inlet Node ATInlet; !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneMixer,
     Zone Return Air Mixer,   !- Name
@@ -1966,13 +1991,13 @@
     Discrete,                !- Speed Control Method
     0.0,                     !- Electric Power Minimum Flow Rate Fraction
     400.0,                   !- Design Pressure Rise {Pa}
-    0.9,                   !- Motor Efficiency
+    0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Air Stream Fraction
-    674.29,                !- Design Electric Power Consumption {W}
+    674.29,                  !- Design Electric Power Consumption {W}
     TotalEfficiencyAndPressure,  !- Design Power Sizing Method
     ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}
     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}
-    0.7,                 !- Fan Total Efficiency
+    0.7,                     !- Fan Total Efficiency
     ,                        !- Electric Power Function of Flow Fraction Curve Name
     ,                        !- Night Ventilation Mode Pressure Rise {Pa}
     ,                        !- Night Ventilation Mode Flow Fraction
@@ -2014,9 +2039,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2026,9 +2051,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

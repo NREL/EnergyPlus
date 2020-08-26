@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,8 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 // EnergyPlus Headers
-#include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -68,6 +69,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -129,7 +131,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     NonAirSystemResponse(1) = 0.0;
     SysDepZoneLoadsLagged.allocate(1);
     SysDepZoneLoadsLagged(1) = 0.0;
-    AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
+    dataAirflowNetworkBalanceManager.exchangeData.allocate(1);
     Node.allocate(1);
     TempTstatAir.allocate(1);
     LoadCorrectionFactor.allocate(1);
@@ -173,7 +175,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadCoolRate.allocate(1);
     SNLoadHeatEnergy.allocate(1);
     SNLoadCoolEnergy.allocate(1);
-    ZoneAirRelHum.allocate(1);
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.allocate(1);
     IsZoneDV.dimension(1, false);
     IsZoneCV.dimension(1, false);
     IsZoneUI.dimension(1, false);
@@ -242,8 +244,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     // Parameter setup
     NumOfZones = 1;
     CurZoneEqNum = 1;
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
     Zone(1).IsControlled = true;
     Zone(1).ZoneEqNum = 1;
@@ -283,7 +285,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTV(1) = -3335.10; // Assign TempIndCoef
     OutBaroPress = 99166.67;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(15.13, Zone(1).ZoneVolCapMultpSensHM, 0.01);
 
     // Case 2: Hybrid model infiltration with measured temperature (free-floating)
@@ -308,7 +310,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTV(1) = 270.10; // Assign TempIndCoef
     OutBaroPress = 99250;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0.2444, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 3: Hybrid model infiltration with measured humidity ratio (free-floating)
@@ -337,7 +339,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTV(1) = 270.10;
     OutBaroPress = 99500;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 4: Hybrid model people count with measured temperature (free-floating)
@@ -365,7 +367,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredTemperatureSchedulePtr).CurrentValue = -2.923892218;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
 
     // Case 5: Hybrid model people count with measured humidity ratio (free-floating)
@@ -395,7 +397,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Case 6: Hybrid model infiltration with measured temperature (with HVAC)
@@ -428,7 +430,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirTemperatureSchedulePtr).CurrentValue = 50;
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.7974274;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0.49, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 7: Hybrid model infiltration with measured humidity ratio (with HVAC)
@@ -460,7 +462,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.8345;
     OutBaroPress = 99500;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 8: Hybrid model people count with measured temperature (with HVAC)
@@ -498,7 +500,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZonePeopleSensibleFractionSchedulePtr).CurrentValue = 0.6;
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
 
-    CorrectZoneAirTemp(ZoneTempChange, false, true, 10 / 60);
+    CorrectZoneAirTemp(state, ZoneTempChange, false, true, 10 / 60);
     EXPECT_NEAR(0, Zone(1).NumOccHM, 0.1); // Need to initialize SumIntGain
 
     // Case 9: Hybrid model people count with measured humidity ratio (with HVAC)
@@ -535,7 +537,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
     OutBaroPress = 99500;
 
-    CorrectZoneHumRat(1);
+    CorrectZoneHumRat(state.dataZonePlenum, 1);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything
@@ -564,7 +566,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoadsLagged.deallocate();
-    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
+    dataAirflowNetworkBalanceManager.exchangeData.deallocate();
     Node.deallocate();
     TempTstatAir.deallocate();
     LoadCorrectionFactor.deallocate();
@@ -592,7 +594,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     SNLoadCoolRate.deallocate();
     SNLoadHeatEnergy.deallocate();
     SNLoadCoolEnergy.deallocate();
-    ZoneAirRelHum.deallocate();
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.deallocate();
     IsZoneDV.deallocate();
     IsZoneCV.deallocate();
     IsZoneUI.deallocate();
@@ -636,7 +638,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     NonAirSystemResponse(1) = 0.0;
     SysDepZoneLoadsLagged.allocate(1);
     SysDepZoneLoadsLagged(1) = 0.0;
-    AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
+    dataAirflowNetworkBalanceManager.exchangeData.allocate(1);
     Node.allocate(1);
     TempTstatAir.allocate(1);
     LoadCorrectionFactor.allocate(1);
@@ -679,7 +681,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     SurfaceWindow.allocate(1);
     Surface.allocate(2);
     HConvIn.allocate(1);
-    ZoneAirRelHum.allocate(1);
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.allocate(1);
     IsZoneDV.dimension(1, false);
     IsZoneCV.dimension(1, false);
     IsZoneUI.dimension(1, false);
@@ -736,8 +738,8 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     // Parameter setup
     NumOfZones = 1;
     CurZoneEqNum = 1;
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
     AirflowNetwork::SimulateAirflowNetwork = 0;
     Zone(1).IsControlled = true;
     Zone(1).ZoneEqNum = 1;
@@ -778,7 +780,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.238646;
 
-    CorrectZoneContaminants(false, true, 10 / 60);
+    CorrectZoneContaminants(state.dataZonePlenum, false, true, 10 / 60);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 2: Hybrid model people count with measured CO2 concentration (free-floating)
@@ -807,7 +809,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     CO2ZoneTimeMinus3(1) = 387.2385685;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.8511796;
-    CorrectZoneContaminants(false, true, 10 / 60);
+    CorrectZoneContaminants(state.dataZonePlenum, false, true, 10 / 60);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Case 3: Hybrid model infiltration with measured CO2 concentration (with HVAC)
@@ -838,7 +840,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr).CurrentValue = 388.54049;
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.898375186;
 
-    CorrectZoneContaminants(false, true, 10 / 60);
+    CorrectZoneContaminants(state.dataZonePlenum, false, true, 10 / 60);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 4: Hybrid model people count with measured CO2 concentration (with HVAC)
@@ -878,7 +880,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
     Schedule(HybridModelZone(1).ZonePeopleCO2GenRateSchedulePtr).CurrentValue = 0.0000000382;
 
-    CorrectZoneContaminants(false, true, 10 / 60);
+    CorrectZoneContaminants(state.dataZonePlenum, false, true, 10 / 60);
     EXPECT_NEAR(7.27, Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything
@@ -896,7 +898,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoadsLagged.deallocate();
-    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
+    dataAirflowNetworkBalanceManager.exchangeData.deallocate();
     Node.deallocate();
     TempTstatAir.deallocate();
     LoadCorrectionFactor.deallocate();
@@ -920,7 +922,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     SurfaceWindow.deallocate();
     Surface.deallocate();
     HConvIn.deallocate();
-    ZoneAirRelHum.deallocate();
+    state.dataZoneTempPredictorCorrector.ZoneAirRelHum.deallocate();
     IsZoneDV.deallocate();
     IsZoneCV.deallocate();
     IsZoneUI.deallocate();

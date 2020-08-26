@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SystemAvailabilityManager {
 
@@ -553,17 +555,18 @@ namespace SystemAvailabilityManager {
 
     int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName); // name to validate
 
-    void ManageHybridVentilation();
+    void ManageHybridVentilation(EnergyPlusData &state);
 
     void GetHybridVentilationInputs();
 
     void InitHybridVentSysAvailMgr();
 
-    void CalcHybridVentSysAvailMgr(int const SysAvailNum,              // number of the current scheduled system availability manager
+    void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
+                                   int const SysAvailNum,              // number of the current scheduled system availability manager
                                    Optional_int_const PriAirSysNum = _ // number of the primary air system affected by this Avail. Manager
     );
 
-    bool GetHybridVentilationControlStatus(int const ZoneNum); // Index of zone
+    bool GetHybridVentilationControlStatus(EnergyPlusData &EP_UNUSED(state), int const ZoneNum); // Index of zone
 
 } // namespace SystemAvailabilityManager
 

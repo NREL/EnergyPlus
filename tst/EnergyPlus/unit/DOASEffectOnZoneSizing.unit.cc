@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,18 +54,19 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <DataEnvironment.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <HeatBalanceManager.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ZoneEquipmentManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace ZoneEquipmentManager;
@@ -288,8 +289,8 @@ TEST_F(EnergyPlusFixture, DOASEffectOnZoneSizing_SizeZoneEquipment)
     Zone(1).ListMultiplier = 1;
     Zone(2).ListMultiplier = 1;
 
-    SizeZoneEquipmentOneTimeFlag = false;
-    SizeZoneEquipment();
+    state.dataZoneEquipmentManager.SizeZoneEquipmentOneTimeFlag = false;
+    SizeZoneEquipment(state);
 
     EXPECT_DOUBLE_EQ(12.2, CalcZoneSizing(1, 1).DOASSupTemp);
     EXPECT_NEAR(.00795195, CalcZoneSizing(1, 1).DOASSupHumRat, .00000001);
@@ -349,66 +350,66 @@ TEST_F(EnergyPlusFixture, TestAutoCalcDOASControlStrategy)
     ZoneSizingInput(2).DOASControlStrategy = DOANeutralSup;
     ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(21.1, ZoneSizingInput(2).DOASLowSetpoint);
     EXPECT_DOUBLE_EQ(23.9, ZoneSizingInput(2).DOASHighSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     ZoneSizingInput(2).DOASHighSetpoint = 23.7;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_NEAR(20.9, ZoneSizingInput(2).DOASLowSetpoint, .000001);
     EXPECT_DOUBLE_EQ(23.7, ZoneSizingInput(2).DOASHighSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = 21.2;
     ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_NEAR(24.0, ZoneSizingInput(2).DOASHighSetpoint, .000001);
     EXPECT_DOUBLE_EQ(21.2, ZoneSizingInput(2).DOASLowSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = 21.5;
     ZoneSizingInput(2).DOASHighSetpoint = 22.6;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(22.6, ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(21.5, ZoneSizingInput(2).DOASLowSetpoint);
 
     ZoneSizingInput(2).DOASControlStrategy = DOANeutralDehumSup;
     ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(14.4, ZoneSizingInput(2).DOASLowSetpoint);
     EXPECT_DOUBLE_EQ(22.2, ZoneSizingInput(2).DOASHighSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     ZoneSizingInput(2).DOASHighSetpoint = 22.4;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(14.4, ZoneSizingInput(2).DOASLowSetpoint);
     EXPECT_DOUBLE_EQ(22.4, ZoneSizingInput(2).DOASHighSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = 13.8;
     ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(22.2, ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(13.8, ZoneSizingInput(2).DOASLowSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = 13.9;
     ZoneSizingInput(2).DOASHighSetpoint = 22.6;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(22.6, ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(13.9, ZoneSizingInput(2).DOASLowSetpoint);
 
     ZoneSizingInput(2).DOASControlStrategy = DOACoolSup;
     ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(12.2, ZoneSizingInput(2).DOASLowSetpoint);
     EXPECT_DOUBLE_EQ(14.4, ZoneSizingInput(2).DOASHighSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = AutoSize;
     ZoneSizingInput(2).DOASHighSetpoint = 14.6;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_NEAR(12.4, ZoneSizingInput(2).DOASLowSetpoint, .000001);
     EXPECT_DOUBLE_EQ(14.6, ZoneSizingInput(2).DOASHighSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = 12.3;
     ZoneSizingInput(2).DOASHighSetpoint = AutoSize;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_NEAR(14.5, ZoneSizingInput(2).DOASHighSetpoint, .000001);
     EXPECT_DOUBLE_EQ(12.3, ZoneSizingInput(2).DOASLowSetpoint);
     ZoneSizingInput(2).DOASLowSetpoint = 12.6;
     ZoneSizingInput(2).DOASHighSetpoint = 13.8;
-    AutoCalcDOASControlStrategy();
+    AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
     EXPECT_DOUBLE_EQ(13.8, ZoneSizingInput(2).DOASHighSetpoint);
     EXPECT_DOUBLE_EQ(12.6, ZoneSizingInput(2).DOASLowSetpoint);
 

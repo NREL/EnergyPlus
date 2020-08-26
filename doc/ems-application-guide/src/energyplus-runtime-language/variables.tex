@@ -89,6 +89,8 @@ DaylightSavings & 0 or 1, 0 if not daylight savings time, 1 if daylight savings 
 CurrentTime & 0.0--24.0, (fractional hours) \tabularnewline
 Hour & 0--23 (whole hours only) \tabularnewline
 Minute & 1.0--60.0 (fractional minutes) \tabularnewline
+TimeStepsPerHour & Number of zone timesteps per hour (user input) \tabularnewline
+TimeStepNum & Current zone timestep number, 1--TimeStepsPerHour \tabularnewline
 True & 1.0 \tabularnewline
 False & 0.0 \tabularnewline
 On & 1.0 \tabularnewline
@@ -98,13 +100,15 @@ SunIsUp & 0 (= no) or 1 (= yes) \tabularnewline
 IsRaining & 0 (= no) or 1 (= yes) \tabularnewline
 ZoneTimeStep & Durating of the zone timestep in hours \tabularnewline
 SystemTimeStep & Current duration of the system timestep in hours \tabularnewline
-CurrentEnvironment & Integer index for the current environment period (sizing periods and run periods accumulate throughout the run) \tabularnewline
+CurrentEnvironment & Integer index for the current environment period (sizing periods and run periods accumulate throughout the run). \tabularnewline
 Null & Special structure that stops an actuator from overriding control \tabularnewline
 ActualDateAndTime & A simple sum of the values of the date/time function. Could be used in random seeding. \tabularnewline
 ActualTime & A simple sum of the values of the time part of the date/time function. Could be used in random seeding. \tabularnewline
 WarmupFlag & 0 (= not during warmup) or 1 (= during warmup) \tabularnewline
 \bottomrule
 \end{longtable}
+
+For the built-in variable CurrentEnvironment, it depends on how many SizingPeriod modules and RunPeriod modules are activated in the idf file. For example, if there are two SizingPeriod:DesignDay objects (winter, then summer), plus one each of SizingPeriod:WeatherFileDays, SizingPeriod:WeatherFileConditionType, and RunPeriod are all specified, then the index for each one is: 1 for heating design day, 2 for cooling design day, 3 for SizingPeriod:WeatherFileDays, 4 for SizingPeriod:WeatherFileConditionType, and 5 for RunPeriod. For accurate index values, please check in the eplusout.sql file (the table of EnvironmentPeriods) or refer to the order of the Environment reports in the eio output. 
 
 \subsection{Trend Variables}\label{trend-variables}
 

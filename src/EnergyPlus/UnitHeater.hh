@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace UnitHeater {
 
@@ -175,30 +177,30 @@ namespace UnitHeater {
 
     void clear_state();
 
-    void SimUnitHeater(std::string const &CompName,   // name of the fan coil unit
+    void SimUnitHeater(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        Real64 &PowerMet,              // Sensible power supplied (W)
                        Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                        int &CompIndex);
 
-    void GetUnitHeaterInput();
+    void GetUnitHeaterInput(EnergyPlusData &state);
 
-    void InitUnitHeater(int const UnitHeatNum,        // index for the current unit heater
+    void InitUnitHeater(EnergyPlusData &state, int const UnitHeatNum,        // index for the current unit heater
                         int const ZoneNum,            // number of zone being served
                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeUnitHeater(int const UnitHeatNum);
+    void SizeUnitHeater(EnergyPlusData &state, int const UnitHeatNum);
 
-    void CalcUnitHeater(int &UnitHeatNum,              // number of the current fan coil unit being simulated
+    void CalcUnitHeater(EnergyPlusData &state, int &UnitHeatNum,              // number of the current fan coil unit being simulated
                         int const ZoneNum,             // number of zone being served
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                         Real64 &PowerMet,              // Sensible power supplied (W)
                         Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void CalcUnitHeaterComponents(int const UnitHeatNum,                   // Unit index in unit heater array
+    void CalcUnitHeaterComponents(EnergyPlusData &state, int const UnitHeatNum,                   // Unit index in unit heater array
                                   bool const FirstHVACIteration,           // flag for 1st HVAV iteration in the time step
                                   Real64 &LoadMet,                         // load met by unit (watts)
                                   Optional_int_const OpMode = _,           // fan operating mode
@@ -214,8 +216,8 @@ namespace UnitHeater {
 
     void ReportUnitHeater(int const UnitHeatNum); // Unit index in unit heater array
 
-    Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio
-                                  Array1<Real64> const &Par   // Function parameters
+    Real64 CalcUnitHeaterResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // heating coil part load ratio
+                                  Array1D<Real64> const &Par  // Function parameters
     );
 
 } // namespace UnitHeater

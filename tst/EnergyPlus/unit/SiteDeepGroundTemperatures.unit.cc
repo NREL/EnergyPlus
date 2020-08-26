@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
 #include "EnergyPlus/GroundTemperatureModeling/SiteDeepGroundTemperatures.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -81,7 +82,7 @@ TEST_F(EnergyPlusFixture, SiteDeepGroundTempTest)
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_SiteDeepGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
     EXPECT_NEAR(21.0, thisModel->getGroundTempAtTimeInMonths(0.0, 1), 0.1);  // January
     EXPECT_NEAR(32.0, thisModel->getGroundTempAtTimeInMonths(0.0, 12), 0.1); // December

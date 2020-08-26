@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -87,7 +88,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceAirManager_RoomAirModelType_Test)
 
     bool ErrorsFound(false);
 
-    HeatBalanceAirManager::GetRoomAirModelParameters(ErrorsFound);
+    HeatBalanceAirManager::GetRoomAirModelParameters(state.files, ErrorsFound);
 
     EXPECT_TRUE(ErrorsFound);
 

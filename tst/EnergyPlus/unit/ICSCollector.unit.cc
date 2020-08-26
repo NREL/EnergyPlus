@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,10 +50,8 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -61,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -79,7 +78,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 {
     // ICS collector un-allocated collector data bug fix test.  This unit test
     // does not test ICS collector performance but it does test a bug fix for
-    // issue #4723 (crash) occured due to unallocated ICS collector data.
+    // issue #4723 (crash) occurred due to unallocated ICS collector data.
     // ! Collector.allocated()
 
     int const NumOfSurf(1);
@@ -111,11 +110,11 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Surface(SurfNum).ExtConvCoeff = 0;
     Surface(SurfNum).ExtWind = false;
     // allocate construction variable data
-    Construct.allocate(ConstrNum);
-    Construct(ConstrNum).LayerPoint.allocate(MatNum);
-    Construct(ConstrNum).LayerPoint(MatNum) = 1;
-    Material.allocate(MatNum);
-    Material(MatNum).AbsorpThermal = 0.8;
+    dataConstruction.Construct.allocate(ConstrNum);
+    dataConstruction.Construct(ConstrNum).LayerPoint.allocate(MatNum);
+    dataConstruction.Construct(ConstrNum).LayerPoint(MatNum) = 1;
+    dataMaterial.Material.allocate(MatNum);
+    dataMaterial.Material(MatNum).AbsorpThermal = 0.8;
     // allocate exterior vented cavaity variable data
     ExtVentedCavity.allocate(1);
     ExtVentedCavity(NumOfSurf).SurfPtrs.allocate(NumOfSurf);
@@ -130,7 +129,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     QRadSWOutIncident.allocate(1);
     QRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
-    GetUserSuppliedConvectionCoeffs = false;
+    state.dataConvectionCoefficients.GetUserSuppliedConvectionCoeffs = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]
@@ -154,8 +153,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     Real64 VdotBouyRpt;          // gap bouyancy driven volume flow rate [m3/s]
 
     // call to test fix to resolve crash
-    CalcPassiveExteriorBaffleGap(ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs, AbsExt, Tilt, AspRat, GapThick, Roughness,
-                                 QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt, MdotVentRpt, VdotWindRpt, VdotBouyRpt);
+    CalcPassiveExteriorBaffleGap(state.dataConvectionCoefficients, state.files, ExtVentedCavity(1).SurfPtrs, VentArea, Cv, Cd, HdeltaNPL, SolAbs,
+                                 AbsExt, Tilt, AspRat, GapThick, Roughness, QdotSource, TsBaffle, TaGap, HcGapRpt, HrGapRpt, IscRpt,
+                                 MdotVentRpt, VdotWindRpt, VdotBouyRpt);
 
     EXPECT_NEAR(21.862, TsBaffle, 0.001);
     EXPECT_NEAR(1.692, HcGapRpt, 0.001);
@@ -164,9 +164,9 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
 
     // deallocated variables
     Surface.deallocate();
-    Construct(ConstrNum).LayerPoint.deallocate();
-    Construct.deallocate();
-    Material.deallocate();
+    dataConstruction.Construct(ConstrNum).LayerPoint.deallocate();
+    dataConstruction.Construct.deallocate();
+    dataMaterial.Material.deallocate();
     ExtVentedCavity(NumOfSurf).SurfPtrs.deallocate();
     ExtVentedCavity.deallocate();
     Zone.deallocate();

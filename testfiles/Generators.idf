@@ -110,13 +110,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     NONE,                    !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    3.9999999E-02,           !- Loads Convergence Tolerance Value
+    3.9999999E-02,           !- Loads Convergence Tolerance Value {W}
     0.4000000,               !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -2076,8 +2076,8 @@
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2086,8 +2086,8 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2096,8 +2096,8 @@
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Zone1TermReheat,         !- Name
@@ -2289,9 +2289,9 @@
     16.0,                    !- Design Air Flow Rate {m3/s}
     1000,                    !- Design Fan Power {W}
     1750.0,                  !- Design U-Factor Times Area Value {W/K}
-    0.0,                     !- Free Convection Air Flow Rate {m3/s}
-    ,                        !- Free Convection Air Flow Rate Sizing Factor
-    0.0,                     !- Free Convection U-Factor Times Area Value {W/K}
+    0.0,                     !- Free Convection Regime Air Flow Rate {m3/s}
+    ,                        !- Free Convection Regime Air Flow Rate Sizing Factor
+    0.0,                     !- Free Convection Regime U-Factor Times Area Value {W/K}
     ,                        !- Free Convection U-Factor Times Area Value Sizing Factor
     UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
     ,                        !- Heat Rejection Capacity and Nominal Capacity Sizing Ratio
@@ -2527,7 +2527,7 @@
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,Cat Diesel,Generator Produced Electric Power,timestep;
+  Output:Variable,Cat Diesel,Generator Produced AC Electricity Rate,timestep;
 
   Output:Variable,Cat Diesel,Generator Diesel Rate,timestep;
 
@@ -2537,39 +2537,39 @@
 
   Output:Variable,Cat Diesel,Generator Exhaust Air Temperature,timestep;
 
-  Output:Variable,Solar Turbine,Generator Produced Electric Power,timestep;
+  Output:Variable,Solar Turbine,Generator Produced AC Electricity Rate,timestep;
 
-  Output:Variable,Solar Turbine,Generator Gas Rate,timestep;
+  Output:Variable,Solar Turbine,Generator NaturalGas Rate,timestep;
 
-  Output:Variable,Solar Turbine,Generator Gas Energy,timestep;
+  Output:Variable,Solar Turbine,Generator NaturalGas Energy,timestep;
 
-  Output:Variable,Solar Turbine,Generator Gas Mass Flow Rate,timestep;
+  Output:Variable,Solar Turbine,Generator NaturalGas Mass Flow Rate,timestep;
 
   Output:Variable,Solar Turbine,Generator Exhaust Air Temperature,timestep;
 
-  Output:Variable,Capstone C65,Generator Produced Electric Power,timestep;
+  Output:Variable,Capstone C65,Generator Produced AC Electricity Rate,timestep;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Rate,timestep;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Rate,timestep;
 
-  Output:Variable,Capstone C65,Generator Gas HHV Basis Energy,timestep;
+  Output:Variable,Capstone C65,Generator NaturalGas HHV Basis Energy,timestep;
 
-  Output:Variable,Capstone C65,Generator Gas Mass Flow Rate,timestep;
+  Output:Variable,Capstone C65,Generator NaturalGas Mass Flow Rate,timestep;
 
   Output:Variable,Capstone C65,Generator LHV Basis Electric Efficiency,timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Power,Timestep;
+  Output:Variable,*,Facility Total Produced Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Total Produced Electric Energy,hourly;
+  Output:Variable,*,Facility Total Produced Electricity Energy,hourly;
 
-  Output:Variable,*,Facility Total Purchased Electric Power,Timestep;
+  Output:Variable,*,Facility Total Purchased Electricity Rate,Timestep;
 
-  Output:Variable,*,Facility Total Purchased Electric Energy,hourly;
+  Output:Variable,*,Facility Total Purchased Electricity Energy,hourly;
 
-  Output:Variable,*,Facility Total Building Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total Building Electricity Demand Rate,Timestep;
 
-  Output:Variable,*,Facility Total HVAC Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total HVAC Electricity Demand Rate,Timestep;
 
-  Output:Variable,*,Facility Total Electric Demand Power,Timestep;
+  Output:Variable,*,Facility Total Electricity Demand Rate,Timestep;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -2581,9 +2581,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2595,9 +2595,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   Output:VariableDictionary,Regular;
 

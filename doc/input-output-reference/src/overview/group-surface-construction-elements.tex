@@ -1200,7 +1200,7 @@ If Optical Data Type = SpectralAverage, the values you enter for solar transmitt
 
 If Optical Data Type = Spectral, then, in the following field, you must enter the name of a spectral data set defined with the WindowGlassSpectralData object. In this case, the values of~ solar and visible transmittance and reflectance in the fields below should be blank.
 
-If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with the \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
+If Optical Data Type = SpectralAndAngle, then, in the last 3 fields, you must enter the name of a spectral and angle data set defined with a curve or table object with two independent variables. In this case, the Window Glass Spectral Data Set Name should be blank, and the values of solar and visible transmittance and reflectance in the fields below should be blank.
 
 If Optical Data Type = BSDF, the \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object must be used to define the window construction layers. The \hyperref[constructioncomplexfenestrationstate]{Construction:ComplexFenestrationState} object contains references to the BSDF files which contain the optical properties of the Complex Fenestration layers. In this case,
 
@@ -1312,15 +1312,15 @@ The ratio, when a sample object is stretched, of the contraction or transverse s
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Transmittance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-transmittance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of transmittance defined with a curve or table object with two independent variables. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Front Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-front-reflectance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of front reflectance defined with a curve or table object with two independent variables. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 \paragraph{Field: Window Glass Spectral and Incident Angle Back Reflectance Data Set Table Name}\label{field-window-glass-spectral-and-incident-angle-back-reflectance-data}
 
-If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a \hyperref[tabletwoindependentvariables]{Table:TwoIndependentVariables} object. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
+If Optical Data Type = SpectralAndAngle, this is the name of a spectral and angle data set of back reflectance defined with a curve or table object with two independent variables. The first and second independent variables must be Angle, and Wavelength, respectively. The restriction is based on internal dataset use. Each dataset is divided into subsets for each incident angle internally.
 
 It should be pointed out that when Optical Data Type = SpectralAndAngle for a glass layer in a construction, the table input data are converted into polynomial curve fits with 6 coefficients, so that all outputs of optical properties for the same construction will be curve values for a given incident angle. Therefore, the values may be slightly different from input values.
 
@@ -2570,11 +2570,11 @@ The IR transmittance of the shading layer. Minimum value: 0. Maximum value: 1. D
 
 \paragraph{Field: Front Emissivity}\label{field-front-emissivity}
 
-The front emissivity of the shading layer. Minimum value: 0. Maximum value: 1. Default: 0.90.
+The front emissivity of the shading layer. Minimum value: > 0. Maximum value: 1. Default: 0.90.
 
 \paragraph{Field: Back Emissivity}\label{field-back-emissivity}
 
-The back emissivity of the shading layer. Minimum value: 0. Maximum value: 1. Default: 0.90.
+The back emissivity of the shading layer. Minimum value: > 0. Maximum value: 1. Default: 0.90.
 
 \paragraph{Field: Top Opening Multiplier}\label{field-top-opening-multiplier-1}
 
@@ -3052,7 +3052,7 @@ WindowMaterial:Drape:EquivalentLayer,
 
 \subsection{WindowMaterial:Blind:EquivalentLayer}\label{windowmaterialblindequivalentlayer}
 
-This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The the model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crwon. Slats are assumed to transmit and reflect diffusely. The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown in Figure~\ref{fig:geometry-and-properties-used-for-venetian}. Likewise, effective longwave properties are obtained for the layer knowing longwave properties of the slats.
+This object specifies the properties of an Equivalent Layer window blind consisting of thin and equally-spaced slats. The model assumes that slats are flat and thin, and applies correction for the slat curvature effect based on the user specified slat crown. Slats are assumed to transmit and reflect diffusely. The effective shortwave optical and longwave optical properties of venetian blind layer is estimated analytically. The Equivalent Layer blind model requires optical properties and geometry of the slats shown in Figure~\ref{fig:geometry-and-properties-used-for-venetian}. Likewise, effective longwave properties are obtained for the layer knowing longwave properties of the slats.
 
 \begin{figure}[hbtp] % fig 22
 \centering
@@ -3280,7 +3280,7 @@ The name of the glass layer. It corresponds to a layer in an equivalent layer wi
 
 \paragraph{Field: Optical Data Type}\label{field-optical-data-type-1}
 
-Valid values for this field are SpectralAverage, or Spectral. If Optical Data Type = SpectralAverage, the values you enter for solar transmittance and reflectance are assumed to be averaged over the solar spectrum, and the values you enter for visible transmittance and reflectance are assumed to be averaged over the solar spectrum and weighted by the response of~ the human eye. The spectral data input is not supported now.
+Valid values for this field are SpectralAverage, or Spectral. If Optical Data Type = SpectralAverage, the values you enter for solar transmittance and reflectance are assumed to be averaged over the solar spectrum, and the values you enter for visible transmittance and reflectance are assumed to be averaged over the solar spectrum and weighted by the response of~ the human eye. SpectralAverage is the default. Spectral data input is not supported now.
 
 \paragraph{Field: Window Glass Spectral Data Set Name}\label{field-window-glass-spectral-data-set-name-0}
 
@@ -3386,6 +3386,10 @@ This value is the front side long-wave hemispherical emissivity of the glazing. 
 
 This value is the back side long-wave hemispherical emissivity of the glazing. The minimum value is 0.0, the maximum value is less than 1.0.~ The default value is 0.84.
 
+\paragraph{Field: Thermal Resistance}\label{field-thermal-resistance-equivglazing}
+
+This field is used to enter the thermal resistance (R-value) of the material layer. Units for this parameter are (m\(^{2}\)-K)/W. Thermal resistance must be greater than zero. The default value is 0.158 which is roughly equivalent to a single layer of 1/4" glass. This field is only used if this equivalent layer of glazing is being referenced for movable insulation.
+
 An IDF example for this object, is shown below:
 
 \begin{lstlisting}
@@ -3418,7 +3422,8 @@ WindowMaterial:Glazing:EquivalentLayer,
     0.0,                     !- Back Side Diffuse-Diffuse Visible Reflectance
     0.0,                     !- Infrared Transmittance
     0.84,                    !- Front Side Infrared Emissivity
-    0.84;                    !- Back Side Infrared Emissivity
+    0.84,                    !- Back Side Infrared Emissivity
+    0.158;                   !- Thermal Resistance (used for movable insulation only)
 \end{lstlisting}
 
 \subsection{WindowMaterial:Gap:EquivalentLayer}\label{windowmaterialgapequivalentlayer}
@@ -4012,7 +4017,7 @@ Construction:FfactorGroundFloor,
 
 \subsection{Construction:InternalSource}\label{constructioninternalsource}
 
-In some cases such as radiant systems, a construction will actually have resistance wires or hydronic tubing embedded within the construction. Heat is then either added or removed from this building element to provide heating or cooling to the zone in question. In the case of building-integrated photovoltaics, the energy removed in the form of electricity will form a sink. It is possible to enter such constructions into EnergyPlus with the syntax described below. The definition is similar to the Construction definition with a few additions related to radiant or other systems that will lead to source/sink terms. The internal source capability is available with both the \textbf{ConductionTransferFunction} and \textbf{ConductionFiniteDifference} solution algorithms.~ The only difference is that the two dimensional pipe arrangements are not available to ConductionFiniteDifference. Those fields are ignored in that implementation.
+In some cases, such as radiant systems, a construction will actually have resistance wires or hydronic tubing embedded within the construction. Heat is then either added or removed from this building element to provide heating or cooling to the zone in question. In the case of building-integrated photovoltaics, the energy removed in the form of electricity will form a sink. It is possible to enter such constructions into EnergyPlus with the syntax described below. The definition is similar to the Construction definition with a few additions related to radiant or other systems that will lead to source/sink terms. The internal source capability is available with both the \textbf{ConductionTransferFunction} and \textbf{ConductionFiniteDifference} solution algorithms.~ The only difference is that the two dimensional pipe arrangements are not available to ConductionFiniteDifference. Those fields are ignored in that implementation.
 
 \subsubsection{Inputs}\label{inputs-38}
 
@@ -4022,21 +4027,29 @@ This field is a user specified name that will be used as a reference by other in
 
 \paragraph{Field: Source Present After Layer Number}\label{field-source-present-after-layer-number}
 
-This field is an integer that relates the location of the heat source or sink. The integer refers to the list of material layers that follow later in the syntax and determines the layer after which the source is present. If a source is embedded within a single homogenous layer (such as concrete), that layer should be split into two layers and the source added between them. For example, a value of ``2'' in this field tells EnergyPlus that the source is located between the second and third material layers listed later in the construction description (see layer fields below).
+This field is an integer that relates the location of the heat source or sink. The integer refers to the list of material layers that follow later in the syntax and determines the layer after which the source is present. If a source is embedded within a single homogenous layer (such as concrete), that layer should be split into two layers and the source added between them. For example, a value of ``2'' in this field tells EnergyPlus that the source is located between the second and third material layers listed later in the construction description (see layer fields below). This field must be between 1 and the number of material layers in the construction (maximum of 10 layers).
 
 \paragraph{Field: Temperature Calculation Requested After Layer Number}\label{field-temperature-calculation-requested-after-layer-number}
 
-The nature of this field is similar to the source interface parameter (see previous field) in that it is an integer, refers to the list of material layers that follow, and defines a location after the layer number identified by the user-defined number. In this case, the user is specifying the location for a separate temperature calculation rather than the location of the heat source/sink. This feature is intended to allow users to calculate a temperature within the construction. This might be important in a radiant cooling system where condensation could be a problem. This temperature calculation can assist users in making that determination in absence of a full heat and mass balance calculation.
+The nature of this field is similar to the source interface parameter (see previous field) in that it is an integer, refers to the list of material layers that follow, and defines a location after the layer number identified by the user-defined number. In this case, the user is specifying the location for a separate temperature calculation rather than the location of the heat source/sink. This feature is intended to allow users to calculate a temperature within the construction. This might be important in a radiant cooling system where condensation could be a problem. This temperature calculation can assist users in making that determination in absence of a full heat and mass balance calculation. This field must be between 1 and the number of material layers in the construction (maximum of 10 layers).
+
+It should also be noted that when using this construction in conjunction with a low temperature radiant system such as the \textbf{\hyperref[zonehvaclowtemperatureradiantvariableflow]{variable flow}}, \textbf{\hyperref[zonehvaclowtemperatureradiantconstantflow]{constant flow}}, or \textbf{\hyperref[zonehvaclowtemperatureradiantelectric]{electric}} radiant system that this parameter also defines the location for the temperature that is used with the Surface Interior Temperature control.  In other words, when using the Surface Interior Temperature control with a low temperature radiant system, the location for this temperature that is interior to the radiant surface is also defined in part by this input field.  Note that two fields below (\textbf{\hyperref[field-dimensions-for-the-ctf-calculation]{Dimensions for the CTF Calculation}} and \textbf{\hyperref[field-two-dimensional-temperature-calculation-position]{Two-Dimensional Temperature Calculation Position}}) will also have an impact on this location if the user elects to perform a 2-D solution for the surfaces using this construction.
 
 \paragraph{Field: Dimensions for the CTF Calculation}\label{field-dimensions-for-the-ctf-calculation}
 
 This field is also an integer and refers to the detail level of the calculation. A value of ``1'' states that the user is only interested in a one-dimensional calculation. This is appropriate for electric resistance heating and for hydronic heating (when boiler/hot water heater performance is not affected by return and supply water temperatures). A value of ``2'' will trigger a two-dimensional solution for this surface only. This may be necessary for hydronic radiant cooling situations since chiller performance is affected by the water temperatures provided.
 
-A few things should be noted about requesting two-dimensional solutions. First, the calculation of the conduction transfer functions (CTF) is fairly intensive and will require a significant amount of computing time. Second, the solution regime is two-dimensional internally but it has a one-dimensional boundary condition imposed at the inside and outside surface (i.e., surface temperatures are still isothermal is if the surface was one-dimensional).
+A few things should be noted about requesting two-dimensional solutions. First, the calculation of the conduction transfer functions (CTF) is fairly intensive and will require a significant amount of computing time. Second, the solution regime is two-dimensional internally but it has a one-dimensional boundary condition imposed at the inside and outside surface (i.e., surface temperatures are still isothermal as if the surface was one-dimensional).
 
 \paragraph{Field: Tube Spacing}\label{field-tube-spacing}
 
-This field defines how far apart in meters the hydronic tubing or electrical resistance wires are spaced in the direction perpendicular to the main direction of heat transfer. Note that this parameter is only used for two-dimensional solutions (see previous field).
+This field defines the distance between adjacent hydronic tubes spaced in the direction perpendicular to the main direction of heat transfer. The value for this parameter must be greater than 0.01m (or a tube spacing of 1 cm) and less than 1.0m (or a tube spacing of 1m). Note that this parameter is only used for two-dimensional solutions (see previous field).
+
+\paragraph{Field: Two-Dimensional Temperature Calculation Position}\label{field-two-dimensional-temperature-calculation-position}
+
+This field only has a meaning when the user opts to have a two-dimensional solution in \textbf{\hyperref[field-dimensions-for-the-ctf-calculation]{Dimensions for the CTF Calculation}} above.  It is used in conjunction with the information in \textbf{\hyperref[field-temperature-calculation-requested-after-layer-number]{Temperature Calculation Requested After Layer Number}} above to specify a location for where the simulation will calculate a temperature at the interior of a surface.  The \textbf{\hyperref[field-temperature-calculation-requested-after-layer-number]{Temperature Calculation Requested After Layer Number}} field sets where the position is in the main direction of heat transfer.  This field determines the position of this point in the direction \textbf{perpendicular} to the main direction of heat transfer.  Note that this parameter is a dimensionless value that is allowed to range from 0.0 to 1.0.  A value of 0.0 is used for a position that is in line with the tubing in the construction.  A value of 1.0 is used for a position that is at the mid-point between adjacent tubes.  The user is also given the flexibility to select a point in between those two extremes.
+
+It should also be noted that for values between 0.0 and 1.0 will not allow for exact positioning of the point at which this temperature is calculated.  Instead, it will be used to calculate which node in the state space representation will be used to calculate the temperature.  Currently, EnergyPlus uses seven nodes in the direction perpendicular to the main direction of heat transfer.  In this case, 0.0 represents the first node and 1.0 represents the seventh or last node in the perpendicular direction.  So, this field will be used to determine which node in the direction pendicular to the main direction of heat transfer to use and there are five other nodes (second, third, fourth, fifth, and sixth) that are possible locations.  For example, if the user enters a value of 0.167, the second node will be used.  Likewise, if the user enters a value of 0.1, because this will be closest to the second node, the second node will be used to calculate the internal temperature.  For more information on two-dimensional heat transfer within surfaces using Construction:InternalSource, please refer to the EnergyPlus Engineering Reference.
 
 \paragraph{Field: Outside Layer}\label{field-outside-layer-1}
 
@@ -4061,6 +4074,64 @@ This output is the temperature within the surface at the location of the source/
 
 This output is the temperature within the surface at the location requested by the user.
 
+\subsection{Construction:AirBoundary}\label{constructionairboundary}
+
+Construction:AirBoundary indicates an open boundary between two zones. It may be used for base surfaces and fenestration surfaces.
+When this construction type is used, the Outside Boundary Condition of the surface (or the base surface of a fenestration surface)
+must be either \textit{Surface} or \textit{Zone}. A base surface with Construction:AirBoundary cannot hold any fenestration surfaces.
+
+\subsubsection{Inputs}\label{inputs-38-01}
+
+\paragraph{Field: Name}\label{field-name-31-0001}
+
+The name of the construction.
+
+\paragraph{Field: Solar and Daylighting Method}\label{field-solar and-daylighting-method}
+
+This field controls how the surface is modeled for solar distribution and daylighting calculations. There are two
+choices:
+\begin{description}
+  \item[GroupedZones] The two zones separated by this air boundary will be grouped together into a combined zone for solar distribution and daylighting. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air  boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone.
+  \item[InteriorWindow] The air boundary will be modeled as a perfectly transmitting interior window. As with other interior windows, all direct solar passing through the interior window will be diffuse in the adjacent zone.
+\end{description}
+
+\paragraph{Field: Radiant Exchange Method}\label{field-radiant-exchange-method}
+
+This field controls how the surface is modeled for radiant exchange calculations. There are two choices:
+
+\begin{description}
+  \item[GroupedZones] The two zones separated by this air boundary will be grouped together into a combined zone for radiant exchange between surfaces and distribution of radiant internal gains. If a given zone has an air boundary with more than one zone, then all of the connected zones will be grouped together. For example, if there is an air boundary between zones A and B, and another air boundary between zones B and C, all three zones (A, B, and C) will be grouped into a single zone. Normal default simplified view factors will apply unless detailed view factors are specified using \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:BySurfaceName}.
+  \item[IRTSurface] The air boundary will be modeled as blackbody surface between the adjacent zones (similar to, but not exactly the same as, \hyperref[materialinfraredtransparent]{Material:InfraredTransparent}. The surface participates in the radiant exchange within each zone and receives long-wave radiant energy from internal sources. The surface does not absorb any visible or solar radiation, has no thermal resistance, and has zero convective heat transfer coefficients on both sides.
+\end{description}
+
+\paragraph{Field: Air Exchange Method}\label{field-air-exchange-method}
+
+This field controls how the surface is modeled for radiant exchange calculations. There are two choices:
+
+\begin{description}
+  \item[None] There will be no air exchange modeled across this surface. Other objects, such as \hyperref[zonemixing]{ZoneMixing} and \hyperref[zonecrossmixing]{ZoneCrossMixing} or AirflowNetwork openings may be specified if desired.
+  \item[SimpleMixing] For each pair of zones connected by Construction:AirBoundary, a pair of ZoneMixing objects will created automatically. These mixing objects may be automatically adjusted to balance HVAC system flows using the \hyperref[zoneairmassflowconservation]{ZoneAirMassFlowConservation} object.
+\end{description}
+
+\paragraph{Field: Simple Mixing Air Changes per Hour}\label{field-simple-mixing-air-changes-per-hour}
+
+If the Air Exchange Method is \textit{SimpleMixing}* then this field specifies the air change rate [1/hr] using the volume of the smaller zone as the basis. The default is 0.5. If an AirflowNetwork simulation is active this field is ignored.
+
+\paragraph{Field:Simple Mixing Schedule Name}\label{field-Simple-mixing-schedule-name}
+
+If the Air Exchange Method is \textit{SimpleMixing} then this field specifies the schedule name for the air mixing across this boundary. If this field is blank, then the schedule defaults to always 1.0. If an AirflowNetwork simulation is active this field is ignored.
+
+IDF Example:
+
+\begin{lstlisting}
+  Construction:AirBoundary,
+    Air Wall,                !- Name
+    GroupedZones,            !- Solar and Daylighting Method
+    GroupedZones,            !- Radiant Exchange Method
+    SimpleMixing,            !- Air Exchange Method
+    0.5,                     !- Simple Mixing Air Changes per Hour {1/hr}
+    ;                        !- Simple Mixing Schedule Name
+\end{lstlisting}
 
 \subsection{Composite Wall Constructions}\label{composite-wall-constructions}
 

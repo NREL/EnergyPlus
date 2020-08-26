@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,10 +54,13 @@
 #include <libkiva/Instance.hpp>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <DataSurfaces.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
+    struct ZoneTempPredictorCorrectorData;
+
 namespace HeatBalanceKivaManager {
 
     const int KIVAZONE_UNCONTROLLED = 0;
@@ -88,21 +91,23 @@ namespace HeatBalanceKivaManager {
         std::string name;
         std::vector<int> surfaces;
         int wallConstructionIndex;
+        Real64 assumedIndoorTemperature;
     };
 
     class KivaInstanceMap
     {
     public:
         KivaInstanceMap(
-            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
+            Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 zoneAssumedTemperature, Real64 floorWeight, int constructionNum, class KivaManager* kmPtr = nullptr);
         Kiva::Instance instance;
         int floorSurface;
         std::vector<int> wallSurfaces;
         int zoneNum;
         int zoneControlType; // Uncontrolled=0, Temperature=1, Operative=2, Comfort=3, HumidityAndTemperature=4
         int zoneControlNum;
-        void initGround(const KivaWeatherData &kivaWeather);
-        void setInitialBoundaryConditions(const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
+        Real64 zoneAssumedTemperature;
+        void initGround(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather);
+        void setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();
         void plotDomain();
         Real64 floorWeight;
@@ -122,9 +127,9 @@ namespace HeatBalanceKivaManager {
     public:
         KivaManager();
         virtual ~KivaManager();
-        void readWeatherData();
-        bool setupKivaInstances();
-        void initKivaInstances();
+        void readWeatherData(IOFiles &ioFiles);
+        bool setupKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles);
+        void initKivaInstances(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector);
         void calcKivaInstances();
         void defineDefaultFoundation();
         void addDefaultFoundation();

@@ -72,7 +72,7 @@ This field defines the fraction of load losses resulting from the eddy currents.
 
 \paragraph{Field: Performance Input Method}\label{field-performance-input-method-000}
 
-This alpha field contains the method by which the user will specify the transformer performance: RatedLosses or NominalEfficiency. If this field is left blank in the input data file, the default input method is assumed to be RatedLosses. If the method NominalEfficiency is selected, the user must enter the fields for the nameplate efficiency and the corresponding reference coditions as described below. If the method RatedLosses is selected, then the fields for rated no load loss and load loss must be entered as described below.
+This alpha field contains the method by which the user will specify the transformer performance: RatedLosses or NominalEfficiency. If this field is left blank in the input data file, the default input method is assumed to be RatedLosses. If the method NominalEfficiency is selected, the user must enter the fields for the nameplate efficiency and the corresponding reference conditions as described below. If the method RatedLosses is selected, then the fields for rated no load loss and load loss must be entered as described below.
 
 \paragraph{Field: Rated No Load Loss}\label{field-rated-no-load-loss}
 
@@ -692,7 +692,7 @@ This field contains a maximum bound on the inverter efficiency. This value will 
 
 \paragraph{Field: Minimum Power Output}\label{field-minimum-power-output}
 
-This field contains a lower limit on the AC power produced by the inverter. If the resulting power output would be below this level, then the inverter is assumed to not produce any power and is in stand by mode. All DC power input is lost (unless it is going into storage).
+This field contains a lower limit on the AC power produced by the inverter. If the resulting power output would be below this level, then the inverter is assumed to not produce any power and is in standby mode. All DC power input is lost (unless it is going into storage).
 
 \paragraph{Field: Maximum Power}\label{field-maximum-power}
 
@@ -942,11 +942,11 @@ This numeric field is used to set a constant efficiency for conversion of AC to 
 
 \subsubsection{Field: Design Maximum Continuous Input Power}\label{field-design-maximum-continuous-input-power}
 
-This numeric field describes the size of the power converter in terms of its design input power level, in Watts. This is the AC power going into the converter. This field is only used, and is required, when the the Power Conversion Efficiency Method is set to FunctionOfPower. This input serves as an upper limit for the AC power input and is used to normalize power for use in the performance curve or table. The AC power being converted at any given time is divided by the value in this field.
+This numeric field describes the size of the power converter in terms of its design input power level, in Watts. This is the AC power going into the converter. This field is only used, and is required, when the Power Conversion Efficiency Method is set to FunctionOfPower. This input serves as an upper limit for the AC power input and is used to normalize power for use in the performance curve or table. The AC power being converted at any given time is divided by the value in this field.
 
 \subsubsection{Field: Efficiency Function of Power Curve Name}\label{field-efficiency-function-of-power-curve-name-1}
 
-This field is the name of a performance curve or table object that describes how efficiency varies as a function of normalized power. The single independent ``x'' variable input for the curve or table is the ratio of AC input power at a given time divided by design power in the previous field. The result of the curve should be the power conversion efficiency for that normalized power so that DC power output is the product of efficiency multiplied by the AC power input. Any of the single-variable performance curves or lookup table objects can be used to describe performance. This field is only used, and is required, when the the Power Conversion Efficiency Method is set to FunctionOfPower.
+This field is the name of a performance curve or table object that describes how efficiency varies as a function of normalized power. The single independent ``x'' variable input for the curve or table is the ratio of AC input power at a given time divided by design power in the previous field. The result of the curve should be the power conversion efficiency for that normalized power so that DC power output is the product of efficiency multiplied by the AC power input. Any of the single-variable performance curves or lookup table objects can be used to describe performance. This field is only used, and is required, when the Power Conversion Efficiency Method is set to FunctionOfPower.
 
 \subsubsection{Field: Ancillary Power Consumed In Standby}\label{field-ancillary-power-consumed-in-standby-1}
 
@@ -1536,7 +1536,7 @@ This alpha field contains the identifying name for the generator's heat recovery
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type}
 
-This alpha field determines the type of fuel that the generator uses. The default is Diesel. Valid values are: \textbf{NaturalGas}, \textbf{PropaneGas}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOil\#1}, \textbf{FuelOil\#2, OtherFuel1,} and \textbf{OtherFuel2}.
+This alpha field determines the type of fuel that the generator uses. The default is Diesel. Valid values are: \textbf{NaturalGas}, \textbf{Propane}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOilNo1}, \textbf{FuelOilNo2, OtherFuel1,} and \textbf{OtherFuel2}.
 
 \paragraph{Field: Heat Recovery Maximum Temperature}\label{field-heat-recovery-maximum-temperature}
 
@@ -1714,9 +1714,9 @@ If the fuel type is Propane, then Propane is shown as the fuel type. They are th
 
 If the fuel type is Gasoline, then Gasoline is shown as the fuel type. They are the gasoline fuel input to the electric generator. Consumption is metered on Cogeneration:Gasoline, Gasoline:Plant, and Gasoline:Facility.
 
-If the fuel type is FuelOil\#1, then FuelOil\#1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#1, FuelOil\#1:Plant, and FuelOil\#1:Facility.
+If the fuel type is FuelOilNo1, then FuelOilNo1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOilNo1, FuelOilNo1:Plant, and FuelOilNo1:Facility.
 
-If the fuel type is FuelOil\#2, then FuelOil\#2 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOil\#2, FuelOil\#2:Plant, and FuelOil\#2:Facility.
+If the fuel type is FuelOilNo2, then FuelOilNo2 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:FuelOilNo2, FuelOilNo2:Plant, and FuelOilNo2:Facility.
 
 If the fuel type is OtherFuel1, then OtherFuel1 is shown as the fuel type. They are the fuel oil input to the electric generator. Consumption is metered on Cogeneration:OtherFuel1, OtherFuel1:Plant, and OtherFuel1:Facility.
 
@@ -1840,7 +1840,7 @@ This alpha field contains the identifying name for the combustion turbine genera
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-1}
 
-This alpha field determines the type of fuel that the generator uses. Valid choices are: \textbf{NaturalGas, PropaneGas, Diesel, Gasoline, FuelOil\#1, FuelOil\#2, OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{NaturalGas}.
+This alpha field determines the type of fuel that the generator uses. Valid choices are: \textbf{NaturalGas, Propane, Diesel, Gasoline, FuelOilNo1, FuelOilNo2, OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{NaturalGas}.
 
 \paragraph{Field: Heat Recovery Maximum Temperature}\label{field-heat-recovery-maximum-temperature-1}
 
@@ -2040,7 +2040,7 @@ This alpha field specifies the name of a quadratic or cubic performance curve (r
 
 \paragraph{Field: Fuel Type}\label{field-fuel-type-2}
 
-This choice field specifies the type of fuel used by the generator. Valid fueld types are PropaneGas and NaturalGas. If the field is left blank, the fuel type will be assumed to be NaturalGas.
+This choice field specifies the type of fuel used by the generator. Valid field types are Propane and NaturalGas. If the field is left blank, the fuel type will be assumed to be NaturalGas.
 
 \paragraph{Field: Fuel Higher Heating Value}\label{field-fuel-higher-heating-value-2}
 
@@ -2322,7 +2322,7 @@ This output variable is the average electric efficiency of the generator (lower 
 
 \paragraph{Generator \textless{}Fuel Type\textgreater{} HHV Basis Rate {[}W{]}}\label{generator-fuel-type-hhv-basis-rate-w}
 
-This output variable is the average fuel-specific energy consumption rate of the electric generator in Watts (higher heating value basis) for the timestep being reported. \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or PropaneGas ( = \textgreater{} Propane ).
+This output variable is the average fuel-specific energy consumption rate of the electric generator in Watts (higher heating value basis) for the timestep being reported. \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or Propane.
 
 \paragraph{Generator Fuel HHV Basis Rate {[}W{]}}\label{generator-fuel-hhv-basis-rate-w-1}
 
@@ -2330,7 +2330,7 @@ This output variable is the average fuel energy consumption rate of the electric
 
 \paragraph{Generator \textless{}Fuel Type\textgreater{} HHV Basis Energy {[}J{]}}\label{generator-fuel-type-hhv-basis-energy-j}
 
-This output variable is the fuel-specific energy consumption of the electric generator in Joules (higher heating value basis) for the timestep being reported. This output is also added to a meter with Resource Type = \textless{}Fuel Type\textgreater{}, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or PropaneGas ( = \textgreater{} Propane ).
+This output variable is the fuel-specific energy consumption of the electric generator in Joules (higher heating value basis) for the timestep being reported. This output is also added to a meter with Resource Type = \textless{}Fuel Type\textgreater{}, End Use Key = Cogeneration, Group Key = Plant (Ref. Output:Meter objects). \textless{}Fuel Type\textgreater{} is the name of the fuel used by this electric generator. \textless{}Fuel Type\textgreater{} can be one of the following: NaturalGas ( = \textgreater{} Gas ) or Propane.
 
 \paragraph{Generator Fuel HHV Basis Energy {[}J{]}}\label{generator-fuel-hhv-basis-energy-j-1}
 
@@ -2691,7 +2691,7 @@ This report is the amount of time the generator spent in Off mode in seconds.
 
 \paragraph{Generator Standby Mode Time {[}s{]}}\label{generator-standby-mode-time-s}
 
-This report is the amount of time the generator spent in Stand By mode in seconds.
+This report is the amount of time the generator spent in Standby mode in seconds.
 
 \paragraph{Generator Warm Up Mode Time {[}s{]}}\label{generator-warm-up-mode-time-s}
 
@@ -4203,11 +4203,11 @@ Convective heat gains to zone from gas compressor, if any, that provides fuel at
 
 EnergyPlus offers different options for predicting the electricity produced by solar electric photovoltaic (PV) panels. The three different options are Simple , Equivalent One-Diode and Sandia and the choice will determine the mathematical models used to determine energy production. The first allows the user to input an arbitrary efficiency. The other two models use empirical relationships to predict PV operating performance based on many environmental variables such as cell temperature. The PV models can be used with either normal PV modules or as part of a hybrid photovoltaic/thermal (PVT) flat plat collector.
 
-The generator is connected to an Electric Load Center. The PV models refer to surface input objects defined elsewhere in the input file. This object describes an array that is attached to a surface object in order to describe its orientation and to access results of the solar insolation calculations. These can be either Heat Transfer or Shading objects (see Surfaces). This will define the orientation of the solar panel for the detailed models and also the area for the simple model. The exposure of that surface to incident solar radiation is calculated using the full set of models in EnergyPlus that are used to account for solar thermal loads arising from building windows and walls. Therefore the incident solar radiation is calculated to include the effects of shading and reflections from other surfaces declared in the input file. In addition to the output variables associated with PV models, there are numerous related output variables available for the surfaces including: `Surface Outside Face Sunlit Area', `Surface Outside Face Sunlit Fraction', `Surface Outside Face Incident Solar Radiation Rate per Area', `Surface Outside Face Incident Beam Solar Radiation Rate per Area', `Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area', `Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area', `Surface Outside Face Beam Solar Incident Angle Cosine Value', `Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area', `Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area', `Surface Outside Face Incident Beam To Beam Reflected From Surfaces Solar Radiation Rate per Area', `Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area', and 'Surface Outside Face Incident Beam To Diffuse Ground Reflected Solar Radiation Rate per Area. Note that it is possible to define a PV array area that doesn t conform to the surface area (i.e.~model a PV array area that is larger or smaller than what is available on the surface) so it is the users responsibility to not over-specify area when determining how many modules will fit onto a surface. However this type of input is allowed.
+The generator is connected to an Electric Load Center. The PV models refer to surface input objects defined elsewhere in the input file. This object describes an array that is attached to a surface object in order to describe its orientation and to access results of the solar insolation calculations. These can be either Heat Transfer or Shading objects (see Surfaces). This will define the orientation of the solar panel for the detailed models and also the area for the simple model. The exposure of that surface to incident solar radiation is calculated using the full set of models in EnergyPlus that are used to account for solar thermal loads arising from building windows and walls. Therefore the incident solar radiation is calculated to include the effects of shading and reflections from other surfaces declared in the input file. In addition to the output variables associated with PV models, there are numerous related output variables available for the surfaces including: `Surface Outside Face Sunlit Area', `Surface Outside Face Sunlit Fraction', `Surface Outside Face Incident Solar Radiation Rate per Area', `Surface Outside Face Incident Beam Solar Radiation Rate per Area', `Surface Outside Face Incident Sky Diffuse Solar Radiation Rate per Area', `Surface Outside Face Incident Ground Diffuse Solar Radiation Rate per Area', `Surface Outside Face Beam Solar Incident Angle Cosine Value', `Surface Outside Face Incident Sky Diffuse Ground Reflected Solar Radiation Rate per Area', `Surface Outside Face Incident Sky Diffuse Surface Reflected Solar Radiation Rate per Area', `Surface Outside Face Incident Beam To Beam Reflected From Surfaces Solar Radiation Rate per Area', `Surface Outside Face Incident Beam To Diffuse Surface Reflected Solar Radiation Rate per Area', and 'Surface Outside Face Incident Beam To Diffuse Ground Reflected Solar Radiation Rate per Area. Note that it is possible to define a PV array area that doesn't conform to the surface area (i.e. model a PV array area that is larger or smaller than what is available on the surface) so it is the users responsibility to not over-specify area when determining how many modules will fit onto a surface. However this type of input is allowed.
 
 EnergyPlus does not include models for ancillary equipment for a PV array including charge controllers or power-point trackers. The operation of the entire electrical system that must go along with a PV array is not currently modeled in EnergyPlus and is therefore assumed to operate in ideal ways. The PV production models do not resolve voltage and current, only power (and energy). Electricity production is metered based on the output of the inverter. Output results are available before and after the inverter. One assumption is that the array is assumed to be always operating at the maximum power point. Energy production is based on the assumption that the quasi-steady power prediction is constant and continuous over the simulation timestep.
 
-For a variety of reasons, actual installations of photovoltaics are often observed to exhibit system-level problems that significantly reduce electricity production. Therefore this modeling should be considered a method of bracketing the upper end of electricity production rather than an accurate prediction of what the panels will produce. Also note that the model predictions are closely related to the solar radiation data (typically of of TMY2 origin) in the EnergyPlus weather file, that the solar data in these is usually from a model rather than direct measurements, and that solar resources encountered by a real installation in a given year are likely to differ from the weather data file.
+For a variety of reasons, actual installations of photovoltaics are often observed to exhibit system-level problems that significantly reduce electricity production. Therefore this modeling should be considered a method of bracketing the upper end of electricity production rather than an accurate prediction of what the panels will produce. Also note that the model predictions are closely related to the solar radiation data (typically of TMY2 origin) in the EnergyPlus weather file, that the solar data in these is usually from a model rather than direct measurements, and that solar resources encountered by a real installation in a given year are likely to differ from the weather data file.
 
 \subsection{Generator:Photovoltaic}\label{generatorphotovoltaic-000}
 
@@ -4425,7 +4425,7 @@ Where:
 
 \subsubsection{Field: Name}\label{field-name-25}
 
-This field contains the uniqe name for the photovoltaic module performance data. The name is only used as an identifier.
+This field contains the unique name for the photovoltaic module performance data. The name is only used as an identifier.
 
 \subsubsection{Field: Cell Type}\label{field-cell-type}
 
@@ -4540,7 +4540,7 @@ The Sandia model itself can aggregate multiple PV modules. Therefore, an instanc
 
 The many empirical coefficients for the model are listed below and are described in more more detail in the EnergyPlus engineering documentation EngineeringDoc.pdf.
 
-The field descriptions below focus on providing the parameter's variable name as identified in the Sandia database. See the the EngineeringDoc.pdf for details on how the input fields are used in the correlations. The user generally would not need to worry about the details of the fields since he/she is not likely to generate the data on their own.
+The field descriptions below focus on providing the parameter's variable name as identified in the Sandia database. See the EngineeringDoc.pdf for details on how the input fields are used in the correlations. The user generally would not need to worry about the details of the fields since he/she is not likely to generate the data on their own.
 
 \subsubsection{Inputs}\label{inputs-22}
 
@@ -4756,7 +4756,7 @@ PhotovoltaicPerformance:Sandia,
   1.00; ! fd {Unitless}
 \end{lstlisting}
 
-When using EpMacro with an typical installation of EnergyPlus, the above entry can be included in an input file by adding the following two lines to an input macro file (*.imf).
+When using EpMacro with a typical installation of EnergyPlus, the above entry can be included in an input file by adding the following two lines to an input macro file (*.imf).
 
 \#\#include C:\textbackslash{}EnergyPlus\textbackslash{}MacroDataSets\textbackslash{}SandiaPVdata.imf ASE-50-ATF-17\_45{[]}
 
@@ -5164,7 +5164,7 @@ This report is the local relative flow velocity that represents actual direction
 
 This report is the azimuth angle between the relative flow velocity and the plane of chord. It varies as the wind speed increases, so that the lift and drag forces change.
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 \protect\hyperlink{ux5fftnref1}{{[}1{]}} Ulleberg Ø . (1997) Simulation of autonomous PV-H2 systems: analysis of the PHOEBUS plant design, operation and energy management. In \emph{Proceedings of ISES 1997 Solar World Congress}, August 24-30, Taejon, Korea.
 

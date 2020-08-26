@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,11 +51,13 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -142,9 +144,6 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(LatOutputProvided < 0.0);
     EXPECT_TRUE(PowerMet < 0.0);
 
-    // Deallocate everything
-    VentSlab.deallocate();
-    Node.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
@@ -760,6 +759,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    CLN-INS,                 !- Outside Layer",
         "    GYP1,                    !- Layer 2",
         "    GYP2,                    !- Layer 3",
@@ -771,6 +771,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    MAT-CLNG-1,              !- Outside Layer",
         "    GYP2,                    !- Layer 2",
         "    GYP1,                    !- Layer 3",
@@ -782,6 +783,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
         "    2,                       !- Temperature Calculation Requested After Layer Number",
         "    1,                       !- Dimensions for the CTF Calculation",
         "    0.1524,                  !- Tube Spacing {m}",
+        "    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request",
         "    INS - EXPANDED EXT POLYSTYRENE R12,  !- Outside Layer",
         "    CONC,                    !- Layer 2",
         "    CONC,                    !- Layer 3",
@@ -2297,10 +2299,10 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedule data
+    ProcessScheduleInput(state.files);  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -2308,27 +2310,27 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(ErrorsFound); // read construction material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    HeatBalanceManager::GetConstructData(ErrorsFound); // read construction data
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SetupZoneGeometry(ErrorsFound); // read zone geometry data
+    SetupZoneGeometry(state, ErrorsFound); // read zone geometry data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
     GetSurfaceListsInputs(); // read surface data
     EXPECT_FALSE(ErrorsFound);
 
-    GetVentilatedSlabInput(); // read ventilated slab data
+    GetVentilatedSlabInput(state); // read ventilated slab data
     EXPECT_EQ(2, NumOfVentSlabs);
     EXPECT_EQ("ZONE1VENTSLAB", VentSlab(1).Name);
     EXPECT_EQ("ZONE4VENTSLAB", VentSlab(2).Name);
 
-    InitVentilatedSlab(Item, VentSlabZoneNum, FirstHVACIteration);
+    InitVentilatedSlab(state, Item, VentSlabZoneNum, FirstHVACIteration);
     EXPECT_EQ(324.38499999999999, VentSlab(1).TotalSurfaceArea);
     EXPECT_EQ(139.21499999999997, VentSlab(2).TotalSurfaceArea);
 }

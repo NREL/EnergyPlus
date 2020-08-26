@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,111 +52,218 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace MicroCHPElectricGenerator {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
+    extern int NumMicroCHPs;
+    extern int NumMicroCHPParams; // number of parameter sets for micro chp
 
-    // DERIVED TYPE DEFINITIONS
-    extern bool GetMicroCHPInput; // When TRUE, calls subroutine to read input file.
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool MySizeFlag;
+    struct MicroCHPParamsNonNormalized
+    {
+        std::string Name;         // name of this PowerModule data
+        Real64 MaxElecPower;      // net electric power [W]
+        Real64 MinElecPower;      // net electric power [W]
+        Real64 MinWaterMdot;      // minimum cooling water flow [kg/s]
+        Real64 MaxWaterTemp;      // limit temp for inlet cooling water [C]
+        int ElecEffCurveID;       // index for TriQuadratic for electrical efficiency
+        int ThermalEffCurveID;    // index for TriQuadric for thermal efficiency
+        bool InternalFlowControl; // Plant or Internal Flow rate control?
+        bool PlantFlowControl;    // default is plant control
+        int WaterFlowCurveID;     // index for BiQuadratic for water flow rate internal control
+        int AirFlowCurveID;       // index for Quadratic for generator air flow
+        Real64 DeltaPelMax;       // max rate of change in net electric power [W/s}
+        Real64 DeltaFuelMdotMax;  // Maximum Rate of change in fuel flow rate [kmol/s2]
+        Real64 UAhx;              // heat exchanger UA [W/K]
+        Real64 UAskin;            // skin loss UA [W/K]
+        Real64 RadiativeFraction; // skin loss fraction to radiant energy []
+        Real64 MCeng;             // aggregated thermal mass of engine [J/K]
+        Real64 MCcw;              // aggregated thermal mass of heat recovery [J/k]
+        Real64 Pstandby;          // standby power [w]
+        bool WarmUpByTimeDelay;   // Warm up mode control
+        bool WarmUpByEngineTemp;  // Warm up mode control
+        Real64 kf;                // coefficient k_f for warmup fuel flow rate
+        Real64 TnomEngOp;         // nominal engine operating temperature [C]
+        Real64 kp;                // coefficient k_p for warmup power
+        Real64 Rfuelwarmup;       // Warm Up Fuel Flow Rate Limit Ratio
+        Real64 WarmUpDelay;       // time for warm up delay [s]
+        Real64 PcoolDown;         // power during cool down
+        Real64 CoolDownDelay;     // time for cool down delay [s]
+        bool MandatoryFullCoolDown;
+        bool WarmRestartOkay;
+        // calculated and from elsewhere
+        Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
+        // Saved in order to identify the beginning of a new system time
+        int OpMode;
+        Real64 OffModeTime;      // amount of time generator spent in Off mode
+        Real64 StandyByModeTime; // amount of time generator spent in standby mode
+        Real64 WarmUpModeTime;   // amount of time generator spent in warm up mode
+        Real64 NormalModeTime;   // amount of time generator spent in normal mode
+        Real64 CoolDownModeTime; // amount of time generator spent in Cool down mode
+        Real64 TengLast;         // last timestep's value for engine temperature
+        Real64 TempCWOutLast;    // last timestep's value for cooling water outlet temperature
+        Real64 Pnet;
+        Real64 ElecEff;
+        Real64 Qgross;
+        Real64 ThermEff;
+        Real64 Qgenss;
+        Real64 NdotFuel;
+        Real64 MdotFuel;
+        Real64 Teng;
+        Real64 TcwIn;
+        Real64 TcwOut;
+        Real64 MdotAir;
+        Real64 QdotSkin; // rate of heat loss to zone
+        Real64 QdotConvZone;
+        Real64 QdotRadZone;
+        Real64 ACPowerGen;           // reporting: power (W)
+        Real64 ACEnergyGen;          // reporting: energy (J)
+        Real64 QdotHX;               // reporting: rate of heat exchange from engine to coolant (W)
+        Real64 QdotHR;               // reporting: rate of heat recovered (W)
+        Real64 TotalHeatEnergyRec;   // reporting: total heat recovered (J)
+        Real64 FuelEnergyLHV;        // reporting: Fuel Energy used in Lower Heating Value(J)
+        Real64 FuelEnergyUseRateLHV; // reporting: Fuel Energy used in Lower Heating Value(W)
+        Real64 FuelEnergyHHV;        // reporting: Fuel Energy used in Higher Heating Value(J)
+        Real64 FuelEnergyUseRateHHV; // reporting: Fuel Energy used in Higher Heating Value(W)
+        Real64 HeatRecInletTemp;     // reporting: Heat Recovery Loop Inlet Temperature (C)
+        Real64 HeatRecOutletTemp;    // reporting: Heat Recovery Loop Outlet Temperature (C)
+        Real64 FuelCompressPower;    // electrical power used by fuel supply compressor [W]
+        Real64 FuelCompressEnergy;   // electrical energy used by fuel supply compressor [J]
+        Real64 FuelCompressSkinLoss; // heat rate of losses.by fuel supply compressor [W]
+        Real64 SkinLossPower;        // heat loss to surrounding zone [W]
+        Real64 SkinLossEnergy;       // heat loss to surround zone [J]
+        Real64 SkinLossConvect;      // convective heat loss to zone [W]
+        Real64 SkinLossRadiat;       // radiative heat loss to zone [W]
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE Combustion ElectricGenerator
+        // Default Constructor
+        MicroCHPParamsNonNormalized()
+            : MaxElecPower(0.0), MinElecPower(0.0), MinWaterMdot(0.0), MaxWaterTemp(0.0), ElecEffCurveID(0), ThermalEffCurveID(0),
+              InternalFlowControl(false), PlantFlowControl(true), WaterFlowCurveID(0), AirFlowCurveID(0), DeltaPelMax(0.0), DeltaFuelMdotMax(0.0),
+              UAhx(0.0), UAskin(0.0), RadiativeFraction(0.0), MCeng(0.0), MCcw(0.0), Pstandby(0.0), WarmUpByTimeDelay(false),
+              WarmUpByEngineTemp(true), kf(0.0), TnomEngOp(0.0), kp(0.0), Rfuelwarmup(0.0), WarmUpDelay(0.0), PcoolDown(0.0), CoolDownDelay(0.0),
+              MandatoryFullCoolDown(false), WarmRestartOkay(true), TimeElapsed(0.0), OpMode(0), OffModeTime(0.0), StandyByModeTime(0.0),
+              WarmUpModeTime(0.0), NormalModeTime(0.0), CoolDownModeTime(0.0), TengLast(20.0), TempCWOutLast(20.0), Pnet(0.0), ElecEff(0.0),
+              Qgross(0.0), ThermEff(0.0), Qgenss(0.0), NdotFuel(0.0), MdotFuel(0.0), Teng(20.0), TcwIn(20.0), TcwOut(20.0), MdotAir(0.0),
+              QdotSkin(0.0), QdotConvZone(0.0), QdotRadZone(0.0), ACPowerGen(0.0), ACEnergyGen(0.0), QdotHX(0.0), QdotHR(0.0),
+              TotalHeatEnergyRec(0.0), FuelEnergyLHV(0.0), FuelEnergyUseRateLHV(0.0), FuelEnergyHHV(0.0), FuelEnergyUseRateHHV(0.0),
+              HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), FuelCompressPower(0.0), FuelCompressEnergy(0.0), FuelCompressSkinLoss(0.0),
+              SkinLossPower(0.0), SkinLossEnergy(0.0), SkinLossConvect(0.0), SkinLossRadiat(0.0)
+        {
+        }
+    };
 
-    // Functions
+    struct MicroCHPDataStruct : PlantComponent
+    {
+        std::string Name;                     // name of this Micro CHP Generator
+        std::string ParamObjName;             // name of parameter object
+        MicroCHPParamsNonNormalized A42Model; // Nested parameter data structure
+        bool ModelTypeAnnex42;                // normalized =  non-normalized?
+        Real64 NomEff;                        // nominal efficiency
+        std::string ZoneName;
+        int ZoneID;
+        std::string PlantInletNodeName;
+        int PlantInletNodeID;
+        std::string PlantOutletNodeName;
+        int PlantOutletNodeID;
+        Real64 PlantMassFlowRate;              // only if internal control
+        Real64 PlantMassFlowRateMax;           // hardware limit for node%massflowrateMax
+        bool PlantMassFlowRateMaxWasAutoSized; // true if mass flow rate was autosized on input
+        std::string AirInletNodeName;
+        int AirInletNodeID;
+        std::string AirOutletNodeName;
+        int AirOutletNodeID;
+        int FuelSupplyID;        // index for fuel supply data structure
+        int DynamicsControlID;   // index in GeneratorDynamics data where control issues are handled
+        int AvailabilitySchedID; // index for availability schedule
+        int CWLoopNum;           // cooling water plant loop index number
+        int CWLoopSideNum;       // cooling water plant loop side index
+        int CWBranchNum;         // cooling water plant loop branch index
+        int CWCompNum;           // cooling water plant loop component index
+        bool CheckEquipName;
+        bool MySizeFlag;
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
+        bool myFlag;
 
-    void SimMicroCHPGenerator(int const GeneratorType,          // type of Generator
-                              std::string const &GeneratorName, // user specified name of Generator
-                              int &GeneratorIndex,
-                              bool const RunFlagElectCenter, // simulate Generator when TRUE
-                              bool const RunFlagPlant,       // simulate generator when true.
-                              Real64 const MyElectricLoad,   // demand on electric generator
-                              Real64 const MyThermalLoad,    // thermal demand on cogenerator
-                              bool const FirstHVACIteration);
+        // Default Constructor
+        MicroCHPDataStruct()
+            : ModelTypeAnnex42(true), NomEff(0.0), ZoneID(0), PlantInletNodeID(0), PlantOutletNodeID(0), PlantMassFlowRate(0.0),
+              PlantMassFlowRateMax(0.0), PlantMassFlowRateMaxWasAutoSized(false), AirInletNodeID(0), AirOutletNodeID(0), FuelSupplyID(0),
+              DynamicsControlID(0), AvailabilitySchedID(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CheckEquipName(true),
+              MySizeFlag(true), MyEnvrnFlag(true), MyPlantScanFlag(true), myFlag(true)
+        {
+        }
 
-    // End MicroCHPNoNormalize Generator Module Driver Subroutines
-    //******************************************************************************
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-    // Beginning of Combustion Generator Module Get Input subroutines
-    //******************************************************************************
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-    void GetMicroCHPGeneratorInput();
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-    // PARAMETERS
+        void setupOutputVars();
 
-    void InitMicroCHPNoNormalizeGenerators(int const GeneratorNum, // Generator number
-                                           bool const FirstHVACIteration);
+        void InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &dataBranchInputManager);
 
-    void CalcMicroCHPNoNormalizeGeneratorModel(int const GeneratorNum,        // Generator number
-                                               bool const RunFlagElectCenter, // TRUE when Generator operating
-                                               bool const RunFlagPlant,
-                                               Real64 const MyElectricLoad, // Generator demand
-                                               Real64 const MyThermalLoad,
-                                               bool const FirstHVACIteration);
+        void CalcUpdateHeatRecovery();
 
-    Real64 FuncDetermineEngineTemp(Real64 const TcwOut,   // hot water leaving temp
-                                   Real64 const MCeng,    // Fictitious mass and heat capacity of engine
-                                   Real64 const UAHX,     // Heat exchanger UA
-                                   Real64 const UAskin,   // Skin losses UA
-                                   Real64 const Troom,    // surrounding zone temperature C
-                                   Real64 const Qgenss,   // steady state generator heat generation
-                                   Real64 const TengLast, // engine temp at previous time step
-                                   Real64 const time      // elapsed time since previous evaluation
+        void CalcMicroCHPNoNormalizeGeneratorModel(bool RunFlagElectCenter, // TRUE when Generator operating
+                                                   bool RunFlagPlant,
+                                                   Real64 MyElectricLoad, // Generator demand
+                                                   Real64 MyThermalLoad,
+                                                   bool FirstHVACIteration);
+
+        void UpdateMicroCHPGeneratorRecords();
+
+        static PlantComponent *factory(IOFiles &ioFiles, std::string const &objectName);
+    };
+
+    void GetMicroCHPGeneratorInput(IOFiles &ioFiles);
+
+    Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
+                                   Real64 MCeng,    // Fictitious mass and heat capacity of engine
+                                   Real64 UAHX,     // Heat exchanger UA
+                                   Real64 UAskin,   // Skin losses UA
+                                   Real64 Troom,    // surrounding zone temperature C
+                                   Real64 Qgenss,   // steady state generator heat generation
+                                   Real64 TengLast, // engine temp at previous time step
+                                   Real64 time      // elapsed time since previous evaluation
     );
 
-    Real64 FuncDetermineCoolantWaterExitTemp(Real64 const TcwIn,      // hot water inlet temp
-                                             Real64 const MCcw,       // Fictitious mass and heat capacity of coolant hx
-                                             Real64 const UAHX,       // Heat exchanger UA
-                                             Real64 const MdotCpcw,   // mass flow and specific heat of coolant water
-                                             Real64 const Teng,       // engine mass temperature C
-                                             Real64 const TcwoutLast, // coolant water leaving temp at previous time step
-                                             Real64 const time        // elapsed time since previous evaluation
+    Real64 FuncDetermineCoolantWaterExitTemp(Real64 TcwIn,      // hot water inlet temp
+                                             Real64 MCcw,       // Fictitious mass and heat capacity of coolant hx
+                                             Real64 UAHX,       // Heat exchanger UA
+                                             Real64 MdotCpcw,   // mass flow and specific heat of coolant water
+                                             Real64 Teng,       // engine mass temperature C
+                                             Real64 TcwoutLast, // coolant water leaving temp at previous time step
+                                             Real64 time        // elapsed time since previous evaluation
     );
 
-    bool CheckMicroCHPThermalBalance(Real64 const NomHeatGen, // nominal heat generation rate for scaling
-                                     Real64 const TcwIn,      // hot water inlet temp
-                                     Real64 const TcwOut,     // hot water leaving temp
-                                     Real64 const Teng,       // engine mass temperature C
-                                     Real64 const Troom,      // surrounding zone temperature C
-                                     Real64 const UAHX,       // Heat exchanger UA
-                                     Real64 const UAskin,     // Skin losses UA
-                                     Real64 const Qgenss,     // steady state generator heat generation
-                                     Real64 const MCeng,      // Fictitious mass and heat capacity of engine
-                                     Real64 const MCcw,       // Fictitious mass and heat capacity of coolant hx
-                                     Real64 const MdotCpcw    // mass flow and specific heat of coolant water
+    bool CheckMicroCHPThermalBalance(Real64 NomHeatGen, // nominal heat generation rate for scaling
+                                     Real64 TcwIn,      // hot water inlet temp
+                                     Real64 TcwOut,     // hot water leaving temp
+                                     Real64 Teng,       // engine mass temperature C
+                                     Real64 Troom,      // surrounding zone temperature C
+                                     Real64 UAHX,       // Heat exchanger UA
+                                     Real64 UAskin,     // Skin losses UA
+                                     Real64 Qgenss,     // steady state generator heat generation
+                                     Real64 MCeng,      // Fictitious mass and heat capacity of engine
+                                     Real64 MCcw,       // Fictitious mass and heat capacity of coolant hx
+                                     Real64 MdotCpcw    // mass flow and specific heat of coolant water
     );
 
     void FigureMicroCHPZoneGains();
 
-    void CalcUpdateHeatRecovery(int const Num, // Generator number
-                                bool const FirstHVACIteration);
+    void clear_state();
 
-    void SimMicroCHPPlantHeatRecovery(std::string const &CompType,
-                                      std::string const &CompName,
-                                      int &CompNum,
-                                      bool const RunFlag,
-                                      bool &InitLoopEquip,
-                                      Real64 &MyThermalLoad,
-                                      Real64 &MaxCap,
-                                      Real64 &MinCap,
-                                      Real64 &OptCap,
-                                      bool const FirstHVACIteration // TRUE if First iteration of simulation
-    );
-
-    void UpdateMicroCHPGeneratorRecords(int const Num); // Generator number
-
-    void GetMicroCHPGeneratorResults(int const GeneratorType, // type of Generator
-                                     int const GeneratorIndex,
-                                     Real64 &GeneratorPower,  // electrical power
-                                     Real64 &GeneratorEnergy, // electrical energy
-                                     Real64 &ThermalPower,    // heat power
-                                     Real64 &ThermalEnergy    // heat energy
-    );
+    extern Array1D<MicroCHPDataStruct> MicroCHP;
+    extern Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput;
 
 } // namespace MicroCHPElectricGenerator
 

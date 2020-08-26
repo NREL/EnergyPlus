@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,11 +49,10 @@
 #define TARCOGGasses90_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -65,11 +64,11 @@ namespace TARCOGGasses90 {
     // Functions
 
     void GASSES90(Real64 const tmean,
-                  Array1_int const &iprop,
-                  Array1<Real64> const &frct,
+                  const Array1D_int &iprop,
+                  const Array1D<Real64> &frct,
                   Real64 const pres,
                   int const nmix,
-                  Array1<Real64> const &xwght,
+                  const Array1D<Real64> &xwght,
                   Array2<Real64> const &xgcon,
                   Array2<Real64> const &xgvis,
                   Array2<Real64> const &xgcp,

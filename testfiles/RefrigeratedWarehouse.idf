@@ -193,7 +193,7 @@
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.2;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -201,7 +201,7 @@
     Refridgerated Warehouse, !- Name
     90.0,                    !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -632,55 +632,55 @@
   InternalMass,
     Freezer_1_Load,          !- Name
     Fish Frozen,             !- Construction Name
-    Freezer_1,               !- Zone Name
+    Freezer_1,               !- Zone or ZoneList Name
     36200.;                  !- Surface Area {m2}
 
   InternalMass,
     Freezer_2_Load,          !- Name
     Meat,                    !- Construction Name
-    Freezer_2,               !- Zone Name
+    Freezer_2,               !- Zone or ZoneList Name
     8440.;                   !- Surface Area {m2}
 
   InternalMass,
     Freezer_3_Load,          !- Name
     Vegetable Frozen,        !- Construction Name
-    Freezer_3,               !- Zone Name
+    Freezer_3,               !- Zone or ZoneList Name
     9540.;                   !- Surface Area {m2}
 
   InternalMass,
     Freezer_4_Load,          !- Name
     Fruit Frozen,            !- Construction Name
-    Freezer_4,               !- Zone Name
+    Freezer_4,               !- Zone or ZoneList Name
     8000.;                   !- Surface Area {m2}
 
   InternalMass,
     Freezer_5_Load,          !- Name
     Fruit Frozen,            !- Construction Name
-    Freezer_5,               !- Zone Name
+    Freezer_5,               !- Zone or ZoneList Name
     25440.;                  !- Surface Area {m2}
 
   InternalMass,
     Sub Freezer_Load,        !- Name
     Ice Cream,               !- Construction Name
-    SubFreezer,              !- Zone Name
+    SubFreezer,              !- Zone or ZoneList Name
     7000.;                   !- Surface Area {m2}
 
   InternalMass,
     Cooler_1_Load,           !- Name
     Fruit Fresh,             !- Construction Name
-    Cooler_1,                !- Zone Name
+    Cooler_1,                !- Zone or ZoneList Name
     18600.;                  !- Surface Area {m2}
 
   InternalMass,
     Cooler_2_Load,           !- Name
     Vegetable Fresh,         !- Construction Name
-    Cooler_2,                !- Zone Name
+    Cooler_2,                !- Zone or ZoneList Name
     4760.;                   !- Surface Area {m2}
 
   InternalMass,
     Cooler_3_Load,           !- Name
     Dairy Milk,              !- Construction Name
-    Cooler_3,                !- Zone Name
+    Cooler_3,                !- Zone or ZoneList Name
     4000.;                   !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: CONSTRUCTION ===========
@@ -5301,8 +5301,8 @@
     SubFreezerChillerSet,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:RefrigerationChillerSet,
     SubFreezerChillerSet,    !- Name
@@ -5338,8 +5338,8 @@
     Freezer_1ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:RefrigerationChillerSet,
     Freezer_1ChillerSet,     !- Name
@@ -5384,8 +5384,8 @@
     Freezer_2ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:RefrigerationChillerSet,
     Freezer_2ChillerSet,     !- Name
@@ -5421,8 +5421,8 @@
     Freezer_3ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:RefrigerationChillerSet,
     Freezer_3ChillerSet,     !- Name
@@ -5458,8 +5458,8 @@
     Freezer_4ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:RefrigerationChillerSet,
     Freezer_4ChillerSet,     !- Name
@@ -5495,8 +5495,8 @@
     Freezer_5ChillerSet,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:RefrigerationChillerSet,
     Freezer_5ChillerSet,     !- Name
@@ -5538,14 +5538,14 @@
     Cooler_1ChillerSet,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:UnitHeater,     !- Zone Equipment 2 Object Type
     Cooler_1UnitHeat,        !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:UnitHeater,
     Cooler_1UnitHeat,        !- Name
@@ -5619,14 +5619,14 @@
     Cooler_2ChillerSet,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:UnitHeater,     !- Zone Equipment 2 Object Type
     Cooler_2UnitHeat,        !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:UnitHeater,
     Cooler_2UnitHeat,        !- Name
@@ -5696,14 +5696,14 @@
     Cooler_3ChillerSet,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:UnitHeater,     !- Zone Equipment 2 Object Type
     Cooler_3UnitHeat,        !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:UnitHeater,
     Cooler_3UnitHeat,        !- Name
@@ -5775,14 +5775,14 @@
     DockChillerSet,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:UnitHeater,     !- Zone Equipment 2 Object Type
     DockUnitHeat,            !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:UnitHeater,
     DockUnitHeat,            !- Name
@@ -5892,8 +5892,8 @@
     Office1_LowerAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Office1_LowerAir,        !- Name
@@ -5952,8 +5952,8 @@
     Office1_UpperAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Office1_UpperAir,        !- Name
@@ -6012,8 +6012,8 @@
     Office2_LowerAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Office2_LowerAir,        !- Name
@@ -6072,8 +6072,8 @@
     Office2_UpperAir,        !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Office2_UpperAir,        !- Name
@@ -6247,43 +6247,19 @@
     ,                        !- Vertical Location
     ;                        !- Average Refrigerant Charge Inventory {kg}
 
-  Table:MultiVariableLookup,
-    ColmacCoilInc,           !- Name
-    LagrangeInterpolationLinearExtrapolation,  !- Interpolation Method
-    3,                       !- Number of Interpolation Points
-    Quadratic,               !- Curve Type
-    SingleLineIndependentVariableWithMatrix,  !- Table Data Format
+  Table:IndependentVariable,
+    ColmacCoilInc_IndependentVariable1,  !- Name
+    Cubic,                   !- Interpolation Method
+    Linear,                  !- Extrapolation Method
+    -34.5,                   !- Minimum Value
+    10.,                     !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Temperature,             !- Unit Type
     ,                        !- External File Name
-    Ascending,               !- X1 Sort Order
-    Ascending,               !- X2 Sort Order
-    1.,                      !- Normalization Reference
-    -34.5,                   !- Minimum Value of X1
-    10.,                     !- Maximum Value of X1
-    4.,                      !- Minimum Value of X2
-    12.,                     !- Maximum Value of X2
-    0.65,                    !- Minimum Value of X3
-    0.95,                    !- Maximum Value of X3
-    ,                        !- Minimum Value of X4
-    ,                        !- Maximum Value of X4
-    ,                        !- Minimum Value of X5
-    ,                        !- Maximum Value of X5
-    ,                        !- Minimum Value of X6
-    ,                        !- Maximum Value of X6
-    0.35,                    !- Minimum Table Output
-    1.5,                     !- Maximum Table Output
-    Temperature,             !- Input Unit Type for X1
-    Temperature,             !- Input Unit Type for X2
-    Dimensionless,           !- Input Unit Type for X3
-    ,                        !- Input Unit Type for X4
-    ,                        !- Input Unit Type for X5
-    ,                        !- Input Unit Type for X6
-    Dimensionless,           !- Output Unit Type
-    3,                       !- Number of Independent Variables
-    18,                      !- Number of Values for Independent Variable X1
-    9,                       !- Field 1 Determined by the Number of Independent Variables
-    4,                       !- Field 2 Determined by the Number of Independent Variables
-    -34.444,                 !- Field 3 Determined by the Number of Independent Variables
-    -31.666,                 !- <none>
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    -34.444,                 !- Value 1
+    -31.666,                 !- Value 2
     -28.888,                 !- <none>
     -26.111,                 !- <none>
     -23.333,                 !- <none>
@@ -6297,673 +6273,711 @@
     -1.111,                  !- <none>
     -1.110,                  !- <none>
     1.666,                   !- <none>
-    4.44,                    !- <none>
-    7.222,                   !- <none>
-    10.,                     !- <none>
-    4.,                      !- <none>
-    5.,                      !- <none>
+    4.44,                    !- Extended Field
+    7.222,                   !- Extended Field
+    10.;                     !- Extended Field
+
+  Table:IndependentVariable,
+    ColmacCoilInc_IndependentVariable2,  !- Name
+    Cubic,                   !- Interpolation Method
+    Linear,                  !- Extrapolation Method
+    4.,                      !- Minimum Value
+    12.,                     !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Temperature,             !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    4.,                      !- Value 1
+    5.,                      !- Value 2
     6.,                      !- <none>
     7.,                      !- <none>
     8.,                      !- <none>
     9.,                      !- <none>
     10.,                     !- <none>
     11.,                     !- <none>
-    12.,                     !- <none>
-    .65,                     !- <none>
-    .75,                     !- <none>
+    12.;                     !- <none>
+
+  Table:IndependentVariable,
+    ColmacCoilInc_IndependentVariable3,  !- Name
+    Cubic,                   !- Interpolation Method
+    Linear,                  !- Extrapolation Method
+    0.65,                    !- Minimum Value
+    0.95,                    !- Maximum Value
+    ,                        !- Normalization Reference Value
+    Dimensionless,           !- Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    .65,                     !- Value 1
+    .75,                     !- Value 2
     .85,                     !- <none>
-    .95,                     !- <none>
-    .65,                     !- <none>
-    1.466,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.468,                   !- <none>
-    1.893,                   !- <none>
-    1.468,                   !- <none>
-    1.893,                   !- <none>
-    1.893,                   !- <none>
-    1.893,                   !- <none>
-    1.893,                   !- <none>
+    .95;                     !- <none>
+
+  Table:IndependentVariableList,
+    ColmacCoilInc_IndependentVariableList,  !- Name
+    ColmacCoilInc_IndependentVariable1,  !- Independent Variable 1 Name
+    ColmacCoilInc_IndependentVariable2,  !- Independent Variable 2 Name
+    ColmacCoilInc_IndependentVariable3;  !- <none>
+
+  Table:Lookup,
+    ColmacCoilInc,           !- Name
+    ColmacCoilInc_IndependentVariableList,  !- Independent Variable List Name
+    DivisorOnly,             !- Normalization Method
+    1.,                      !- Normalization Divisor
+    0.35,                    !- Minimum Output
+    1.5,                     !- Maximum Output
+    Dimensionless,           !- Output Unit Type
+    ,                        !- External File Name
+    ,                        !- External File Column Number
+    ,                        !- External File Starting Row Number
+    1.466,                   !- Output Value 1
+    1.452,                   !- Output Value 2
+    1.439,                   !- <none>
+    1.427,                   !- <none>
     1.166,                   !- <none>
-    1.167,                   !- <none>
-    1.167,                   !- <none>
-    1.165,                   !- <none>
-    1.162,                   !- <none>
     1.158,                   !- <none>
-    1.155,                   !- <none>
-    1.152,                   !- <none>
-    1.151,                   !- <none>
-    1.153,                   !- <none>
-    1.16,                    !- <none>
-    1.174,                   !- <none>
-    1.515,                   !- <none>
-    1.174,                   !- <none>
-    1.515,                   !- <none>
-    1.515,                   !- <none>
-    1.515,                   !- <none>
-    1.515,                   !- <none>
+    1.149,                   !- <none>
+    1.141,                   !- <none>
     0.969,                   !- <none>
-    0.968,                   !- <none>
-    0.967,                   !- <none>
-    0.964,                   !- <none>
-    0.96,                    !- <none>
-    0.954,                   !- <none>
-    0.947,                   !- <none>
-    0.94,                    !- <none>
-    0.934,                   !- <none>
-    0.927,                   !- <none>
-    0.923,                   !- <none>
-    0.921,                   !- <none>
-    1.19,                    !- <none>
-    0.922,                   !- <none>
-    1.197,                   !- <none>
-    1.212,                   !- <none>
-    1.238,                   !- <none>
-    1.262,                   !- <none>
-    0.828,                   !- <none>
-    0.828,                   !- <none>
-    0.826,                   !- <none>
-    0.823,                   !- <none>
-    0.818,                   !- <none>
-    0.812,                   !- <none>
-    0.805,                   !- <none>
-    0.796,                   !- <none>
-    0.787,                   !- <none>
-    0.778,                   !- <none>
-    0.769,                   !- <none>
-    0.761,                   !- <none>
-    0.973,                   !- <none>
-    0.754,                   !- <none>
-    0.967,                   !- <none>
     0.963,                   !- <none>
-    0.964,                   !- <none>
-    0.971,                   !- <none>
+    0.957,                   !- <none>
+    0.951,                   !- <none>
+    0.828,                   !- <none>
+    0.824,                   !- <none>
+    0.82,                    !- <none>
+    0.816,                   !- <none>
     0.724,                   !- <none>
-    0.723,                   !- <none>
-    0.721,                   !- <none>
-    0.718,                   !- <none>
-    0.713,                   !- <none>
-    0.707,                   !- <none>
-    0.7,                     !- <none>
-    0.691,                   !- <none>
-    0.682,                   !- <none>
-    0.671,                   !- <none>
-    0.661,                   !- <none>
-    0.65,                    !- <none>
-    0.826,                   !- <none>
-    0.64,                    !- <none>
-    0.814,                   !- <none>
-    0.804,                   !- <none>
-    0.795,                   !- <none>
-    0.789,                   !- <none>
-    0.642,                   !- <none>
+    0.72,                    !- <none>
+    0.717,                   !- <none>
+    0.714,                   !- <none>
     0.642,                   !- <none>
     0.64,                    !- <none>
     0.637,                   !- <none>
-    0.633,                   !- <none>
-    0.627,                   !- <none>
-    0.62,                    !- <none>
-    0.611,                   !- <none>
-    0.602,                   !- <none>
-    0.591,                   !- <none>
-    0.58,                    !- <none>
-    0.569,                   !- <none>
-    0.72,                    !- <none>
-    0.558,                   !- <none>
-    0.706,                   !- <none>
-    0.692,                   !- <none>
-    0.68,                    !- <none>
-    0.669,                   !- <none>
+    0.635,                   !- <none>
     0.578,                   !- <none>
-    0.577,                   !- <none>
-    0.576,                   !- <none>
-    0.573,                   !- <none>
-    0.569,                   !- <none>
-    0.563,                   !- <none>
-    0.557,                   !- <none>
-    0.549,                   !- <none>
-    0.539,                   !- <none>
-    0.529,                   !- <none>
-    0.518,                   !- <none>
-    0.507,                   !- <none>
-    0.64,                    !- <none>
-    0.495,                   !- <none>
-    0.625,                   !- <none>
-    0.61,                    !- <none>
-    0.596,                   !- <none>
-    0.583,                   !- <none>
-    0.525,                   !- <none>
-    0.524,                   !- <none>
-    0.523,                   !- <none>
-    0.52,                    !- <none>
-    0.517,                   !- <none>
-    0.512,                   !- <none>
-    0.506,                   !- <none>
-    0.498,                   !- <none>
-    0.489,                   !- <none>
-    0.48,                    !- <none>
-    0.469,                   !- <none>
-    0.458,                   !- <none>
-    0.576,                   !- <none>
-    0.446,                   !- <none>
-    0.561,                   !- <none>
-    0.546,                   !- <none>
-    0.532,                   !- <none>
-    0.518,                   !- <none>
-    0.481,                   !- <none>
-    0.48,                    !- <none>
-    0.479,                   !- <none>
-    0.477,                   !- <none>
-    0.474,                   !- <none>
-    0.469,                   !- <none>
-    0.463,                   !- <none>
-    0.456,                   !- <none>
-    0.448,                   !- <none>
-    0.439,                   !- <none>
-    0.429,                   !- <none>
-    0.418,                   !- <none>
-    0.525,                   !- <none>
-    0.407,                   !- <none>
-    0.511,                   !- <none>
-    0.496,                   !- <none>
-    0.481,                   !- <none>
-    0.467,                   !- <none>
-    .75,                     !- <none>
-    1.452,                   !- <none>
-    1.451,                   !- <none>
-    1.448,                   !- <none>
-    1.443,                   !- <none>
-    1.435,                   !- <none>
-    1.425,                   !- <none>
-    1.414,                   !- <none>
-    1.403,                   !- <none>
-    1.392,                   !- <none>
-    1.383,                   !- <none>
-    1.377,                   !- <none>
-    1.375,                   !- <none>
-    1.781,                   !- <none>
-    1.38,                    !- <none>
-    1.797,                   !- <none>
-    1.828,                   !- <none>
-    1.879,                   !- <none>
-    1.893,                   !- <none>
-    1.158,                   !- <none>
-    1.156,                   !- <none>
-    1.152,                   !- <none>
-    1.146,                   !- <none>
-    1.137,                   !- <none>
-    1.126,                   !- <none>
-    1.113,                   !- <none>
-    1.099,                   !- <none>
-    1.083,                   !- <none>
-    1.067,                   !- <none>
-    1.052,                   !- <none>
-    1.037,                   !- <none>
-    1.322,                   !- <none>
-    1.024,                   !- <none>
-    1.308,                   !- <none>
-    1.298,                   !- <none>
-    1.293,                   !- <none>
-    1.295,                   !- <none>
-    0.963,                   !- <none>
-    0.961,                   !- <none>
-    0.957,                   !- <none>
-    0.951,                   !- <none>
-    0.943,                   !- <none>
-    0.932,                   !- <none>
-    0.919,                   !- <none>
-    0.905,                   !- <none>
-    0.889,                   !- <none>
-    0.872,                   !- <none>
-    0.854,                   !- <none>
-    0.836,                   !- <none>
-    1.057,                   !- <none>
-    0.818,                   !- <none>
-    1.035,                   !- <none>
-    1.015,                   !- <none>
-    0.997,                   !- <none>
-    0.981,                   !- <none>
-    0.824,                   !- <none>
-    0.822,                   !- <none>
-    0.819,                   !- <none>
-    0.813,                   !- <none>
-    0.806,                   !- <none>
-    0.796,                   !- <none>
-    0.784,                   !- <none>
-    0.771,                   !- <none>
-    0.755,                   !- <none>
-    0.739,                   !- <none>
-    0.721,                   !- <none>
-    0.703,                   !- <none>
-    0.884,                   !- <none>
-    0.684,                   !- <none>
-    0.861,                   !- <none>
-    0.838,                   !- <none>
-    0.816,                   !- <none>
-    0.796,                   !- <none>
-    0.72,                    !- <none>
-    0.719,                   !- <none>
-    0.716,                   !- <none>
-    0.711,                   !- <none>
-    0.704,                   !- <none>
-    0.695,                   !- <none>
-    0.685,                   !- <none>
-    0.672,                   !- <none>
-    0.658,                   !- <none>
-    0.642,                   !- <none>
-    0.625,                   !- <none>
-    0.608,                   !- <none>
-    0.762,                   !- <none>
-    0.59,                    !- <none>
-    0.739,                   !- <none>
-    0.716,                   !- <none>
-    0.694,                   !- <none>
-    0.673,                   !- <none>
-    0.64,                    !- <none>
-    0.638,                   !- <none>
-    0.636,                   !- <none>
-    0.631,                   !- <none>
-    0.625,                   !- <none>
-    0.618,                   !- <none>
-    0.608,                   !- <none>
-    0.596,                   !- <none>
-    0.583,                   !- <none>
-    0.569,                   !- <none>
-    0.553,                   !- <none>
-    0.536,                   !- <none>
-    0.671,                   !- <none>
-    0.52,                    !- <none>
-    0.649,                   !- <none>
-    0.627,                   !- <none>
-    0.606,                   !- <none>
-    0.585,                   !- <none>
     0.576,                   !- <none>
     0.574,                   !- <none>
     0.572,                   !- <none>
-    0.568,                   !- <none>
-    0.563,                   !- <none>
-    0.556,                   !- <none>
-    0.547,                   !- <none>
-    0.537,                   !- <none>
-    0.524,                   !- <none>
-    0.511,                   !- <none>
-    0.496,                   !- <none>
-    0.481,                   !- <none>
-    0.601,                   !- <none>
-    0.465,                   !- <none>
-    0.58,                    !- <none>
-    0.559,                   !- <none>
-    0.539,                   !- <none>
-    0.518,                   !- <none>
-    0.523,                   !- <none>
-    0.522,                   !- <none>
-    0.52,                    !- <none>
-    0.517,                   !- <none>
-    0.512,                   !- <none>
-    0.505,                   !- <none>
-    0.498,                   !- <none>
-    0.488,                   !- <none>
-    0.477,                   !- <none>
-    0.464,                   !- <none>
-    0.451,                   !- <none>
-    0.437,                   !- <none>
-    0.545,                   !- <none>
-    0.422,                   !- <none>
     0.525,                   !- <none>
-    0.505,                   !- <none>
-    0.486,                   !- <none>
-    0.467,                   !- <none>
+    0.523,                   !- <none>
+    0.521,                   !- <none>
+    0.52,                    !- <none>
+    0.481,                   !- <none>
     0.479,                   !- <none>
     0.478,                   !- <none>
     0.477,                   !- <none>
-    0.474,                   !- <none>
-    0.469,                   !- <none>
-    0.464,                   !- <none>
-    0.456,                   !- <none>
-    0.448,                   !- <none>
-    0.438,                   !- <none>
-    0.426,                   !- <none>
-    0.414,                   !- <none>
-    0.4,                     !- <none>
-    0.499,                   !- <none>
-    0.386,                   !- <none>
-    0.481,                   !- <none>
-    0.462,                   !- <none>
-    0.444,                   !- <none>
-    0.425,                   !- <none>
-    .85,                     !- <none>
-    1.439,                   !- <none>
+    1.468,                   !- <none>
+    1.451,                   !- <none>
     1.434,                   !- <none>
-    1.426,                   !- <none>
-    1.414,                   !- <none>
-    1.397,                   !- <none>
-    1.377,                   !- <none>
-    1.353,                   !- <none>
-    1.326,                   !- <none>
-    1.296,                   !- <none>
-    1.264,                   !- <none>
-    1.231,                   !- <none>
-    1.197,                   !- <none>
-    1.503,                   !- <none>
-    1.164,                   !- <none>
-    1.461,                   !- <none>
-    1.42,                    !- <none>
-    1.382,                   !- <none>
-    1.346,                   !- <none>
-    1.149,                   !- <none>
+    1.418,                   !- <none>
+    1.167,                   !- <none>
+    1.156,                   !- <none>
     1.145,                   !- <none>
-    1.138,                   !- <none>
-    1.128,                   !- <none>
-    1.114,                   !- <none>
-    1.096,                   !- <none>
-    1.075,                   !- <none>
-    1.051,                   !- <none>
-    1.024,                   !- <none>
-    0.996,                   !- <none>
-    0.965,                   !- <none>
-    0.934,                   !- <none>
-    1.166,                   !- <none>
-    0.903,                   !- <none>
-    1.126,                   !- <none>
-    1.086,                   !- <none>
-    1.048,                   !- <none>
-    1.011,                   !- <none>
-    0.957,                   !- <none>
+    1.135,                   !- <none>
+    0.968,                   !- <none>
+    0.961,                   !- <none>
     0.953,                   !- <none>
-    0.947,                   !- <none>
-    0.938,                   !- <none>
-    0.927,                   !- <none>
-    0.912,                   !- <none>
-    0.894,                   !- <none>
-    0.873,                   !- <none>
-    0.849,                   !- <none>
-    0.824,                   !- <none>
-    0.797,                   !- <none>
-    0.769,                   !- <none>
-    0.956,                   !- <none>
-    0.74,                    !- <none>
-    0.92,                    !- <none>
-    0.884,                   !- <none>
-    0.848,                   !- <none>
-    0.814,                   !- <none>
-    0.82,                    !- <none>
+    0.946,                   !- <none>
+    0.828,                   !- <none>
+    0.822,                   !- <none>
     0.817,                   !- <none>
-    0.812,                   !- <none>
-    0.804,                   !- <none>
-    0.794,                   !- <none>
-    0.781,                   !- <none>
-    0.765,                   !- <none>
-    0.747,                   !- <none>
-    0.726,                   !- <none>
-    0.704,                   !- <none>
-    0.68,                    !- <none>
-    0.655,                   !- <none>
-    0.813,                   !- <none>
-    0.629,                   !- <none>
-    0.78,                    !- <none>
-    0.747,                   !- <none>
-    0.715,                   !- <none>
-    0.684,                   !- <none>
-    0.717,                   !- <none>
+    0.811,                   !- <none>
+    0.723,                   !- <none>
+    0.719,                   !- <none>
     0.715,                   !- <none>
     0.71,                    !- <none>
-    0.704,                   !- <none>
-    0.695,                   !- <none>
-    0.684,                   !- <none>
-    0.67,                    !- <none>
-    0.654,                   !- <none>
-    0.636,                   !- <none>
-    0.616,                   !- <none>
-    0.594,                   !- <none>
-    0.572,                   !- <none>
-    0.709,                   !- <none>
-    0.549,                   !- <none>
-    0.679,                   !- <none>
-    0.65,                    !- <none>
-    0.62,                    !- <none>
-    0.592,                   !- <none>
-    0.637,                   !- <none>
+    0.642,                   !- <none>
+    0.638,                   !- <none>
     0.635,                   !- <none>
-    0.631,                   !- <none>
-    0.626,                   !- <none>
-    0.618,                   !- <none>
-    0.609,                   !- <none>
-    0.596,                   !- <none>
-    0.582,                   !- <none>
-    0.566,                   !- <none>
-    0.548,                   !- <none>
-    0.529,                   !- <none>
-    0.508,                   !- <none>
-    0.63,                    !- <none>
-    0.487,                   !- <none>
-    0.603,                   !- <none>
-    0.576,                   !- <none>
-    0.549,                   !- <none>
-    0.523,                   !- <none>
+    0.632,                   !- <none>
+    0.577,                   !- <none>
     0.574,                   !- <none>
     0.572,                   !- <none>
+    0.569,                   !- <none>
+    0.524,                   !- <none>
+    0.522,                   !- <none>
+    0.52,                    !- <none>
+    0.518,                   !- <none>
+    0.48,                    !- <none>
+    0.478,                   !- <none>
+    0.477,                   !- <none>
+    0.475,                   !- <none>
+    1.468,                   !- <none>
+    1.448,                   !- <none>
+    1.426,                   !- <none>
+    1.404,                   !- <none>
+    1.167,                   !- <none>
+    1.152,                   !- <none>
+    1.138,                   !- <none>
+    1.124,                   !- <none>
+    0.967,                   !- <none>
+    0.957,                   !- <none>
+    0.947,                   !- <none>
+    0.938,                   !- <none>
+    0.826,                   !- <none>
+    0.819,                   !- <none>
+    0.812,                   !- <none>
+    0.805,                   !- <none>
+    0.721,                   !- <none>
+    0.716,                   !- <none>
+    0.71,                    !- <none>
+    0.705,                   !- <none>
+    0.64,                    !- <none>
+    0.636,                   !- <none>
+    0.631,                   !- <none>
+    0.627,                   !- <none>
+    0.576,                   !- <none>
+    0.572,                   !- <none>
+    0.568,                   !- <none>
+    0.565,                   !- <none>
+    0.523,                   !- <none>
+    0.52,                    !- <none>
+    0.517,                   !- <none>
+    0.514,                   !- <none>
+    0.479,                   !- <none>
+    0.477,                   !- <none>
+    0.474,                   !- <none>
+    0.472,                   !- <none>
+    1.468,                   !- <none>
+    1.443,                   !- <none>
+    1.414,                   !- <none>
+    1.386,                   !- <none>
+    1.165,                   !- <none>
+    1.146,                   !- <none>
+    1.128,                   !- <none>
+    1.11,                    !- <none>
+    0.964,                   !- <none>
+    0.951,                   !- <none>
+    0.938,                   !- <none>
+    0.926,                   !- <none>
+    0.823,                   !- <none>
+    0.813,                   !- <none>
+    0.804,                   !- <none>
+    0.795,                   !- <none>
+    0.718,                   !- <none>
+    0.711,                   !- <none>
+    0.704,                   !- <none>
+    0.697,                   !- <none>
+    0.637,                   !- <none>
+    0.631,                   !- <none>
+    0.626,                   !- <none>
+    0.62,                    !- <none>
+    0.573,                   !- <none>
     0.568,                   !- <none>
     0.564,                   !- <none>
-    0.557,                   !- <none>
-    0.548,                   !- <none>
-    0.538,                   !- <none>
-    0.525,                   !- <none>
-    0.51,                    !- <none>
-    0.494,                   !- <none>
-    0.477,                   !- <none>
-    0.458,                   !- <none>
-    0.568,                   !- <none>
-    0.439,                   !- <none>
-    0.543,                   !- <none>
-    0.518,                   !- <none>
-    0.494,                   !- <none>
-    0.47,                    !- <none>
-    0.521,                   !- <none>
+    0.559,                   !- <none>
     0.52,                    !- <none>
     0.517,                   !- <none>
     0.513,                   !- <none>
-    0.507,                   !- <none>
-    0.499,                   !- <none>
-    0.49,                    !- <none>
-    0.478,                   !- <none>
-    0.465,                   !- <none>
-    0.451,                   !- <none>
-    0.435,                   !- <none>
-    0.418,                   !- <none>
-    0.517,                   !- <none>
-    0.4,                     !- <none>
-    0.494,                   !- <none>
-    0.472,                   !- <none>
-    0.449,                   !- <none>
-    0.427,                   !- <none>
-    0.478,                   !- <none>
+    0.509,                   !- <none>
     0.477,                   !- <none>
     0.474,                   !- <none>
     0.47,                    !- <none>
-    0.465,                   !- <none>
-    0.459,                   !- <none>
-    0.45,                    !- <none>
-    0.44,                    !- <none>
-    0.428,                   !- <none>
-    0.414,                   !- <none>
-    0.4,                     !- <none>
-    0.384,                   !- <none>
-    0.476,                   !- <none>
-    0.368,                   !- <none>
-    0.455,                   !- <none>
-    0.434,                   !- <none>
-    0.413,                   !- <none>
-    0.392,                   !- <none>
-    .95,                     !- <none>
-    1.427,                   !- <none>
-    1.418,                   !- <none>
-    1.404,                   !- <none>
-    1.386,                   !- <none>
+    0.467,                   !- <none>
+    1.468,                   !- <none>
+    1.435,                   !- <none>
+    1.397,                   !- <none>
     1.362,                   !- <none>
-    1.333,                   !- <none>
-    1.298,                   !- <none>
-    1.259,                   !- <none>
-    1.215,                   !- <none>
-    1.168,                   !- <none>
-    1.118,                   !- <none>
-    1.068,                   !- <none>
-    1.315,                   !- <none>
-    1.017,                   !- <none>
-    1.25,                    !- <none>
-    1.187,                   !- <none>
-    1.125,                   !- <none>
-    1.067,                   !- <none>
-    1.141,                   !- <none>
-    1.135,                   !- <none>
-    1.124,                   !- <none>
-    1.11,                    !- <none>
+    1.162,                   !- <none>
+    1.137,                   !- <none>
+    1.114,                   !- <none>
     1.091,                   !- <none>
-    1.068,                   !- <none>
-    1.04,                    !- <none>
-    1.009,                   !- <none>
-    0.973,                   !- <none>
-    0.935,                   !- <none>
-    0.895,                   !- <none>
-    0.854,                   !- <none>
-    1.05,                    !- <none>
-    0.813,                   !- <none>
-    0.997,                   !- <none>
-    0.946,                   !- <none>
-    0.896,                   !- <none>
-    0.848,                   !- <none>
-    0.951,                   !- <none>
-    0.946,                   !- <none>
-    0.938,                   !- <none>
-    0.926,                   !- <none>
+    0.96,                    !- <none>
+    0.943,                   !- <none>
+    0.927,                   !- <none>
     0.911,                   !- <none>
-    0.892,                   !- <none>
-    0.869,                   !- <none>
-    0.843,                   !- <none>
-    0.814,                   !- <none>
-    0.782,                   !- <none>
-    0.748,                   !- <none>
-    0.714,                   !- <none>
-    0.877,                   !- <none>
-    0.679,                   !- <none>
-    0.833,                   !- <none>
-    0.789,                   !- <none>
-    0.747,                   !- <none>
-    0.706,                   !- <none>
-    0.816,                   !- <none>
-    0.811,                   !- <none>
-    0.805,                   !- <none>
-    0.795,                   !- <none>
+    0.818,                   !- <none>
+    0.806,                   !- <none>
+    0.794,                   !- <none>
     0.783,                   !- <none>
-    0.767,                   !- <none>
-    0.748,                   !- <none>
-    0.725,                   !- <none>
-    0.7,                     !- <none>
-    0.673,                   !- <none>
-    0.644,                   !- <none>
-    0.615,                   !- <none>
-    0.755,                   !- <none>
-    0.584,                   !- <none>
-    0.717,                   !- <none>
-    0.679,                   !- <none>
-    0.642,                   !- <none>
-    0.607,                   !- <none>
-    0.714,                   !- <none>
-    0.71,                    !- <none>
-    0.705,                   !- <none>
-    0.697,                   !- <none>
+    0.713,                   !- <none>
+    0.704,                   !- <none>
+    0.695,                   !- <none>
     0.686,                   !- <none>
+    0.633,                   !- <none>
+    0.625,                   !- <none>
+    0.618,                   !- <none>
+    0.611,                   !- <none>
+    0.569,                   !- <none>
+    0.563,                   !- <none>
+    0.557,                   !- <none>
+    0.551,                   !- <none>
+    0.517,                   !- <none>
+    0.512,                   !- <none>
+    0.507,                   !- <none>
+    0.502,                   !- <none>
+    0.474,                   !- <none>
+    0.469,                   !- <none>
+    0.465,                   !- <none>
+    0.461,                   !- <none>
+    1.468,                   !- <none>
+    1.425,                   !- <none>
+    1.377,                   !- <none>
+    1.333,                   !- <none>
+    1.158,                   !- <none>
+    1.126,                   !- <none>
+    1.096,                   !- <none>
+    1.068,                   !- <none>
+    0.954,                   !- <none>
+    0.932,                   !- <none>
+    0.912,                   !- <none>
+    0.892,                   !- <none>
+    0.812,                   !- <none>
+    0.796,                   !- <none>
+    0.781,                   !- <none>
+    0.767,                   !- <none>
+    0.707,                   !- <none>
+    0.695,                   !- <none>
+    0.684,                   !- <none>
     0.673,                   !- <none>
+    0.627,                   !- <none>
+    0.618,                   !- <none>
+    0.609,                   !- <none>
+    0.6,                     !- <none>
+    0.563,                   !- <none>
+    0.556,                   !- <none>
+    0.548,                   !- <none>
+    0.541,                   !- <none>
+    0.512,                   !- <none>
+    0.505,                   !- <none>
+    0.499,                   !- <none>
+    0.493,                   !- <none>
+    0.469,                   !- <none>
+    0.464,                   !- <none>
+    0.459,                   !- <none>
+    0.454,                   !- <none>
+    1.468,                   !- <none>
+    1.414,                   !- <none>
+    1.353,                   !- <none>
+    1.298,                   !- <none>
+    1.155,                   !- <none>
+    1.113,                   !- <none>
+    1.075,                   !- <none>
+    1.04,                    !- <none>
+    0.947,                   !- <none>
+    0.919,                   !- <none>
+    0.894,                   !- <none>
+    0.869,                   !- <none>
+    0.805,                   !- <none>
+    0.784,                   !- <none>
+    0.765,                   !- <none>
+    0.748,                   !- <none>
+    0.7,                     !- <none>
+    0.685,                   !- <none>
+    0.67,                    !- <none>
     0.656,                   !- <none>
+    0.62,                    !- <none>
+    0.608,                   !- <none>
+    0.596,                   !- <none>
+    0.586,                   !- <none>
+    0.557,                   !- <none>
+    0.547,                   !- <none>
+    0.538,                   !- <none>
+    0.529,                   !- <none>
+    0.506,                   !- <none>
+    0.498,                   !- <none>
+    0.49,                    !- <none>
+    0.482,                   !- <none>
+    0.463,                   !- <none>
+    0.456,                   !- <none>
+    0.45,                    !- <none>
+    0.444,                   !- <none>
+    1.468,                   !- <none>
+    1.403,                   !- <none>
+    1.326,                   !- <none>
+    1.259,                   !- <none>
+    1.152,                   !- <none>
+    1.099,                   !- <none>
+    1.051,                   !- <none>
+    1.009,                   !- <none>
+    0.94,                    !- <none>
+    0.905,                   !- <none>
+    0.873,                   !- <none>
+    0.843,                   !- <none>
+    0.796,                   !- <none>
+    0.771,                   !- <none>
+    0.747,                   !- <none>
+    0.725,                   !- <none>
+    0.691,                   !- <none>
+    0.672,                   !- <none>
+    0.654,                   !- <none>
     0.637,                   !- <none>
+    0.611,                   !- <none>
+    0.596,                   !- <none>
+    0.582,                   !- <none>
+    0.569,                   !- <none>
+    0.549,                   !- <none>
+    0.537,                   !- <none>
+    0.525,                   !- <none>
+    0.514,                   !- <none>
+    0.498,                   !- <none>
+    0.488,                   !- <none>
+    0.478,                   !- <none>
+    0.469,                   !- <none>
+    0.456,                   !- <none>
+    0.448,                   !- <none>
+    0.44,                    !- <none>
+    0.432,                   !- <none>
+    1.468,                   !- <none>
+    1.392,                   !- <none>
+    1.296,                   !- <none>
+    1.215,                   !- <none>
+    1.151,                   !- <none>
+    1.083,                   !- <none>
+    1.024,                   !- <none>
+    0.973,                   !- <none>
+    0.934,                   !- <none>
+    0.889,                   !- <none>
+    0.849,                   !- <none>
+    0.814,                   !- <none>
+    0.787,                   !- <none>
+    0.755,                   !- <none>
+    0.726,                   !- <none>
+    0.7,                     !- <none>
+    0.682,                   !- <none>
+    0.658,                   !- <none>
+    0.636,                   !- <none>
+    0.616,                   !- <none>
+    0.602,                   !- <none>
+    0.583,                   !- <none>
+    0.566,                   !- <none>
+    0.55,                    !- <none>
+    0.539,                   !- <none>
+    0.524,                   !- <none>
+    0.51,                    !- <none>
+    0.497,                   !- <none>
+    0.489,                   !- <none>
+    0.477,                   !- <none>
+    0.465,                   !- <none>
+    0.454,                   !- <none>
+    0.448,                   !- <none>
+    0.438,                   !- <none>
+    0.428,                   !- <none>
+    0.418,                   !- <none>
+    1.468,                   !- <none>
+    1.383,                   !- <none>
+    1.264,                   !- <none>
+    1.168,                   !- <none>
+    1.153,                   !- <none>
+    1.067,                   !- <none>
+    0.996,                   !- <none>
+    0.935,                   !- <none>
+    0.927,                   !- <none>
+    0.872,                   !- <none>
+    0.824,                   !- <none>
+    0.782,                   !- <none>
+    0.778,                   !- <none>
+    0.739,                   !- <none>
+    0.704,                   !- <none>
+    0.673,                   !- <none>
+    0.671,                   !- <none>
+    0.642,                   !- <none>
     0.616,                   !- <none>
     0.592,                   !- <none>
-    0.567,                   !- <none>
-    0.541,                   !- <none>
-    0.665,                   !- <none>
-    0.514,                   !- <none>
-    0.631,                   !- <none>
-    0.597,                   !- <none>
-    0.564,                   !- <none>
-    0.533,                   !- <none>
-    0.635,                   !- <none>
-    0.632,                   !- <none>
-    0.627,                   !- <none>
-    0.62,                    !- <none>
-    0.611,                   !- <none>
-    0.6,                     !- <none>
-    0.586,                   !- <none>
+    0.591,                   !- <none>
     0.569,                   !- <none>
-    0.55,                    !- <none>
+    0.548,                   !- <none>
+    0.529,                   !- <none>
+    0.529,                   !- <none>
+    0.511,                   !- <none>
+    0.494,                   !- <none>
+    0.479,                   !- <none>
+    0.48,                    !- <none>
+    0.464,                   !- <none>
+    0.451,                   !- <none>
+    0.438,                   !- <none>
+    0.439,                   !- <none>
+    0.426,                   !- <none>
+    0.414,                   !- <none>
+    0.403,                   !- <none>
+    1.468,                   !- <none>
+    1.377,                   !- <none>
+    1.231,                   !- <none>
+    1.118,                   !- <none>
+    1.16,                    !- <none>
+    1.052,                   !- <none>
+    0.965,                   !- <none>
+    0.895,                   !- <none>
+    0.923,                   !- <none>
+    0.854,                   !- <none>
+    0.797,                   !- <none>
+    0.748,                   !- <none>
+    0.769,                   !- <none>
+    0.721,                   !- <none>
+    0.68,                    !- <none>
+    0.644,                   !- <none>
+    0.661,                   !- <none>
+    0.625,                   !- <none>
+    0.594,                   !- <none>
+    0.567,                   !- <none>
+    0.58,                    !- <none>
+    0.553,                   !- <none>
     0.529,                   !- <none>
     0.507,                   !- <none>
-    0.484,                   !- <none>
-    0.595,                   !- <none>
-    0.46,                    !- <none>
-    0.564,                   !- <none>
-    0.534,                   !- <none>
-    0.505,                   !- <none>
-    0.477,                   !- <none>
-    0.572,                   !- <none>
-    0.569,                   !- <none>
-    0.565,                   !- <none>
-    0.559,                   !- <none>
-    0.551,                   !- <none>
-    0.541,                   !- <none>
-    0.529,                   !- <none>
-    0.514,                   !- <none>
-    0.497,                   !- <none>
-    0.479,                   !- <none>
-    0.459,                   !- <none>
-    0.438,                   !- <none>
-    0.539,                   !- <none>
-    0.417,                   !- <none>
-    0.511,                   !- <none>
-    0.484,                   !- <none>
-    0.457,                   !- <none>
-    0.432,                   !- <none>
-    0.52,                    !- <none>
     0.518,                   !- <none>
-    0.514,                   !- <none>
-    0.509,                   !- <none>
-    0.502,                   !- <none>
-    0.493,                   !- <none>
-    0.482,                   !- <none>
-    0.469,                   !- <none>
-    0.454,                   !- <none>
-    0.438,                   !- <none>
-    0.42,                    !- <none>
-    0.401,                   !- <none>
-    0.493,                   !- <none>
-    0.382,                   !- <none>
-    0.468,                   !- <none>
-    0.443,                   !- <none>
-    0.419,                   !- <none>
-    0.396,                   !- <none>
+    0.496,                   !- <none>
     0.477,                   !- <none>
-    0.475,                   !- <none>
-    0.472,                   !- <none>
-    0.467,                   !- <none>
-    0.461,                   !- <none>
-    0.454,                   !- <none>
-    0.444,                   !- <none>
-    0.432,                   !- <none>
+    0.459,                   !- <none>
+    0.469,                   !- <none>
+    0.451,                   !- <none>
+    0.435,                   !- <none>
+    0.42,                    !- <none>
+    0.429,                   !- <none>
+    0.414,                   !- <none>
+    0.4,                     !- <none>
+    0.387,                   !- <none>
+    1.468,                   !- <none>
+    1.375,                   !- <none>
+    1.197,                   !- <none>
+    1.068,                   !- <none>
+    1.174,                   !- <none>
+    1.037,                   !- <none>
+    0.934,                   !- <none>
+    0.854,                   !- <none>
+    0.921,                   !- <none>
+    0.836,                   !- <none>
+    0.769,                   !- <none>
+    0.714,                   !- <none>
+    0.761,                   !- <none>
+    0.703,                   !- <none>
+    0.655,                   !- <none>
+    0.615,                   !- <none>
+    0.65,                    !- <none>
+    0.608,                   !- <none>
+    0.572,                   !- <none>
+    0.541,                   !- <none>
+    0.569,                   !- <none>
+    0.536,                   !- <none>
+    0.508,                   !- <none>
+    0.484,                   !- <none>
+    0.507,                   !- <none>
+    0.481,                   !- <none>
+    0.458,                   !- <none>
+    0.438,                   !- <none>
+    0.458,                   !- <none>
+    0.437,                   !- <none>
     0.418,                   !- <none>
-    0.403,                   !- <none>
-    0.387,                   !- <none>
+    0.401,                   !- <none>
+    0.418,                   !- <none>
+    0.4,                     !- <none>
+    0.384,                   !- <none>
     0.37,                    !- <none>
+    1.893,                   !- <none>
+    1.781,                   !- <none>
+    1.503,                   !- <none>
+    1.315,                   !- <none>
+    1.515,                   !- <none>
+    1.322,                   !- <none>
+    1.166,                   !- <none>
+    1.05,                    !- <none>
+    1.19,                    !- <none>
+    1.057,                   !- <none>
+    0.956,                   !- <none>
+    0.877,                   !- <none>
+    0.973,                   !- <none>
+    0.884,                   !- <none>
+    0.813,                   !- <none>
+    0.755,                   !- <none>
+    0.826,                   !- <none>
+    0.762,                   !- <none>
+    0.709,                   !- <none>
+    0.665,                   !- <none>
+    0.72,                    !- <none>
+    0.671,                   !- <none>
+    0.63,                    !- <none>
+    0.595,                   !- <none>
+    0.64,                    !- <none>
+    0.601,                   !- <none>
+    0.568,                   !- <none>
+    0.539,                   !- <none>
+    0.576,                   !- <none>
+    0.545,                   !- <none>
+    0.517,                   !- <none>
+    0.493,                   !- <none>
+    0.525,                   !- <none>
+    0.499,                   !- <none>
+    0.476,                   !- <none>
     0.455,                   !- <none>
+    1.468,                   !- <none>
+    1.38,                    !- <none>
+    1.164,                   !- <none>
+    1.017,                   !- <none>
+    1.174,                   !- <none>
+    1.024,                   !- <none>
+    0.903,                   !- <none>
+    0.813,                   !- <none>
+    0.922,                   !- <none>
+    0.818,                   !- <none>
+    0.74,                    !- <none>
+    0.679,                   !- <none>
+    0.754,                   !- <none>
+    0.684,                   !- <none>
+    0.629,                   !- <none>
+    0.584,                   !- <none>
+    0.64,                    !- <none>
+    0.59,                    !- <none>
+    0.549,                   !- <none>
+    0.514,                   !- <none>
+    0.558,                   !- <none>
+    0.52,                    !- <none>
+    0.487,                   !- <none>
+    0.46,                    !- <none>
+    0.495,                   !- <none>
+    0.465,                   !- <none>
+    0.439,                   !- <none>
+    0.417,                   !- <none>
+    0.446,                   !- <none>
+    0.422,                   !- <none>
+    0.4,                     !- <none>
+    0.382,                   !- <none>
+    0.407,                   !- <none>
+    0.386,                   !- <none>
+    0.368,                   !- <none>
     0.352,                   !- <none>
+    1.893,                   !- <none>
+    1.797,                   !- <none>
+    1.461,                   !- <none>
+    1.25,                    !- <none>
+    1.515,                   !- <none>
+    1.308,                   !- <none>
+    1.126,                   !- <none>
+    0.997,                   !- <none>
+    1.197,                   !- <none>
+    1.035,                   !- <none>
+    0.92,                    !- <none>
+    0.833,                   !- <none>
+    0.967,                   !- <none>
+    0.861,                   !- <none>
+    0.78,                    !- <none>
+    0.717,                   !- <none>
+    0.814,                   !- <none>
+    0.739,                   !- <none>
+    0.679,                   !- <none>
+    0.631,                   !- <none>
+    0.706,                   !- <none>
+    0.649,                   !- <none>
+    0.603,                   !- <none>
+    0.564,                   !- <none>
+    0.625,                   !- <none>
+    0.58,                    !- <none>
+    0.543,                   !- <none>
+    0.511,                   !- <none>
+    0.561,                   !- <none>
+    0.525,                   !- <none>
+    0.494,                   !- <none>
+    0.468,                   !- <none>
+    0.511,                   !- <none>
+    0.481,                   !- <none>
+    0.455,                   !- <none>
     0.432,                   !- <none>
+    1.893,                   !- <none>
+    1.828,                   !- <none>
+    1.42,                    !- <none>
+    1.187,                   !- <none>
+    1.515,                   !- <none>
+    1.298,                   !- <none>
+    1.086,                   !- <none>
+    0.946,                   !- <none>
+    1.212,                   !- <none>
+    1.015,                   !- <none>
+    0.884,                   !- <none>
+    0.789,                   !- <none>
+    0.963,                   !- <none>
+    0.838,                   !- <none>
+    0.747,                   !- <none>
+    0.679,                   !- <none>
+    0.804,                   !- <none>
+    0.716,                   !- <none>
+    0.65,                    !- <none>
+    0.597,                   !- <none>
+    0.692,                   !- <none>
+    0.627,                   !- <none>
+    0.576,                   !- <none>
+    0.534,                   !- <none>
+    0.61,                    !- <none>
+    0.559,                   !- <none>
+    0.518,                   !- <none>
+    0.484,                   !- <none>
+    0.546,                   !- <none>
+    0.505,                   !- <none>
+    0.472,                   !- <none>
+    0.443,                   !- <none>
+    0.496,                   !- <none>
+    0.462,                   !- <none>
+    0.434,                   !- <none>
     0.409,                   !- <none>
+    1.893,                   !- <none>
+    1.879,                   !- <none>
+    1.382,                   !- <none>
+    1.125,                   !- <none>
+    1.515,                   !- <none>
+    1.293,                   !- <none>
+    1.048,                   !- <none>
+    0.896,                   !- <none>
+    1.238,                   !- <none>
+    0.997,                   !- <none>
+    0.848,                   !- <none>
+    0.747,                   !- <none>
+    0.964,                   !- <none>
+    0.816,                   !- <none>
+    0.715,                   !- <none>
+    0.642,                   !- <none>
+    0.795,                   !- <none>
+    0.694,                   !- <none>
+    0.62,                    !- <none>
+    0.564,                   !- <none>
+    0.68,                    !- <none>
+    0.606,                   !- <none>
+    0.549,                   !- <none>
+    0.505,                   !- <none>
+    0.596,                   !- <none>
+    0.539,                   !- <none>
+    0.494,                   !- <none>
+    0.457,                   !- <none>
+    0.532,                   !- <none>
+    0.486,                   !- <none>
+    0.449,                   !- <none>
+    0.419,                   !- <none>
+    0.481,                   !- <none>
+    0.444,                   !- <none>
+    0.413,                   !- <none>
     0.387,                   !- <none>
+    1.893,                   !- <none>
+    1.893,                   !- <none>
+    1.346,                   !- <none>
+    1.067,                   !- <none>
+    1.515,                   !- <none>
+    1.295,                   !- <none>
+    1.011,                   !- <none>
+    0.848,                   !- <none>
+    1.262,                   !- <none>
+    0.981,                   !- <none>
+    0.814,                   !- <none>
+    0.706,                   !- <none>
+    0.971,                   !- <none>
+    0.796,                   !- <none>
+    0.684,                   !- <none>
+    0.607,                   !- <none>
+    0.789,                   !- <none>
+    0.673,                   !- <none>
+    0.592,                   !- <none>
+    0.533,                   !- <none>
+    0.669,                   !- <none>
+    0.585,                   !- <none>
+    0.523,                   !- <none>
+    0.477,                   !- <none>
+    0.583,                   !- <none>
+    0.518,                   !- <none>
+    0.47,                    !- <none>
+    0.432,                   !- <none>
+    0.518,                   !- <none>
+    0.467,                   !- <none>
+    0.427,                   !- <none>
+    0.396,                   !- <none>
+    0.467,                   !- <none>
+    0.425,                   !- <none>
+    0.392,                   !- <none>
     0.365;                   !- <none>
 
 ! Freezer-1AirChiller_2 is an example of a European rating
@@ -13325,7 +13339,7 @@
 
   Output:Variable,*,Zone Unit Heater Heating Rate,hourly;
 
-  Output:Variable,*,Zone Unit Heater Fan Electric Power,hourly;
+  Output:Variable,*,Zone Unit Heater Fan Electricity Rate,hourly;
 
   Output:Variable,*,Zone Mixing Volume,hourly;
 
@@ -13357,13 +13371,13 @@
 
   Output:Variable,*,Refrigeration Zone Air Chiller Zone Heating Rate,hourly;
 
-  Output:Variable,*,Refrigeration Zone Air Chiller Total Electric Power,detailed;
+  Output:Variable,*,Refrigeration Zone Air Chiller Total Electricity Rate,detailed;
 
-  Output:Variable,*,Refrigeration Zone Air Chiller Fan Electric Power,hourly;
+  Output:Variable,*,Refrigeration Zone Air Chiller Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Refrigeration Zone Air Chiller Heater Electric Power,hourly;
+  Output:Variable,*,Refrigeration Zone Air Chiller Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Refrigeration Zone Air Chiller Defrost Electric Power,hourly;
+  Output:Variable,*,Refrigeration Zone Air Chiller Defrost Electricity Rate,hourly;
 
   Output:Variable,*,Refrigeration Zone Air Chiller Total Cooling Rate,hourly;
 
@@ -13381,17 +13395,17 @@
 
   Output:Variable,*,Refrigeration Zone Air Chiller Heating Rate,hourly;
 
-  Output:Variable,*,Refrigeration Air Chiller System Compressor Electric Power,detailed;
+  Output:Variable,*,Refrigeration Air Chiller System Compressor Electricity Rate,detailed;
 
   Output:Variable,*,Refrigeration Air Chiller System Compressor Heat Transfer Rate,hourly;
 
   Output:Variable,*,Refrigeration Air Chiller System Compressor Runtime Fraction,hourly;
 
-  Output:Variable,*,Refrigeration Air Chiller System Condenser Fan Electric Power,hourly;
+  Output:Variable,*,Refrigeration Air Chiller System Condenser Fan Electricity Rate,hourly;
 
   Output:Variable,*,Refrigeration Air Chiller System Condenser Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Refrigeration Air Chiller System Total Compressor Electric Power,detailed;
+  Output:Variable,*,Refrigeration Air Chiller System Total Compressor Electricity Rate,detailed;
 
   Output:Variable,*,Refrigeration Air Chiller System Total Compressor Heat Transfer Rate,hourly;
 
@@ -13483,13 +13497,13 @@
   Output:Table:Monthly,
     Zone Electric Summary,   !- Name
     ,                        !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -13579,13 +13593,13 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Diesel:Facility,         !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    FuelOil#1:Facility,      !- Variable or Meter 3 Name
+    FuelOilNo1:Facility,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    FuelOil#1:Facility,      !- Variable or Meter 4 Name
+    FuelOilNo1:Facility,      !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    FuelOil#2:Facility,      !- Variable or Meter 5 Name
+    FuelOilNo2:Facility,      !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    FuelOil#2:Facility,      !- Variable or Meter 6 Name
+    FuelOilNo2:Facility,      !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -13645,17 +13659,17 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -13675,25 +13689,25 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Fuel Oil,  !- Name
     ,                        !- Digits After Decimal
-    ExteriorEquipment:FuelOil#1,  !- Variable or Meter 1 Name
+    ExteriorEquipment:FuelOilNo1,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling:FuelOil#1,       !- Variable or Meter 2 Name
+    Cooling:FuelOilNo1,       !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:FuelOil#1,       !- Variable or Meter 3 Name
+    Heating:FuelOilNo1,       !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    WaterSystems:FuelOil#1,  !- Variable or Meter 4 Name
+    WaterSystems:FuelOilNo1,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Cogeneration:FuelOil#1,  !- Variable or Meter 5 Name
+    Cogeneration:FuelOilNo1,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    ExteriorEquipment:FuelOil#2,  !- Variable or Meter 6 Name
+    ExteriorEquipment:FuelOilNo2,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Cooling:FuelOil#2,       !- Variable or Meter 7 Name
+    Cooling:FuelOilNo2,       !- Variable or Meter 7 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 7
-    Heating:FuelOil#2,       !- Variable or Meter 8 Name
+    Heating:FuelOilNo2,       !- Variable or Meter 8 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 8
-    WaterSystems:FuelOil#2,  !- Variable or Meter 9 Name
+    WaterSystems:FuelOilNo2,  !- Variable or Meter 9 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 9
-    Cogeneration:FuelOil#2,  !- Variable or Meter 10 Name
+    Cogeneration:FuelOilNo2,  !- Variable or Meter 10 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 10
 
   Output:Table:Monthly,
@@ -13795,17 +13809,17 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -13825,25 +13839,25 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Fuel Oil,  !- Name
     ,                        !- Digits After Decimal
-    ExteriorEquipment:FuelOil#1,  !- Variable or Meter 1 Name
+    ExteriorEquipment:FuelOilNo1,  !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    Cooling:FuelOil#1,       !- Variable or Meter 2 Name
+    Cooling:FuelOilNo1,       !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Heating:FuelOil#1,       !- Variable or Meter 3 Name
+    Heating:FuelOilNo1,       !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
-    WaterSystems:FuelOil#1,  !- Variable or Meter 4 Name
+    WaterSystems:FuelOilNo1,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Cogeneration:FuelOil#1,  !- Variable or Meter 5 Name
+    Cogeneration:FuelOilNo1,  !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
-    ExteriorEquipment:FuelOil#2,  !- Variable or Meter 6 Name
+    ExteriorEquipment:FuelOilNo2,  !- Variable or Meter 6 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 6
-    Cooling:FuelOil#2,       !- Variable or Meter 7 Name
+    Cooling:FuelOilNo2,       !- Variable or Meter 7 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 7
-    Heating:FuelOil#2,       !- Variable or Meter 8 Name
+    Heating:FuelOilNo2,       !- Variable or Meter 8 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 8
-    WaterSystems:FuelOil#2,  !- Variable or Meter 9 Name
+    WaterSystems:FuelOilNo2,  !- Variable or Meter 9 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 9
-    Cogeneration:FuelOil#2,  !- Variable or Meter 10 Name
+    Cogeneration:FuelOilNo2,  !- Variable or Meter 10 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 10
 
   Output:Table:Monthly,
@@ -13949,11 +13963,11 @@
   Output:Table:Monthly,
     Chiller Report,          !- Name
     ,                        !- Digits After Decimal
-    Chiller Electric Energy, !- Variable or Meter 1 Name
+    Chiller Electricity Energy, !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Chiller Electric Power,  !- Variable or Meter 2 Name
+    Chiller Electricity Rate,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Chiller Electric Energy, !- Variable or Meter 3 Name
+    Chiller Electricity Energy, !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
     Chiller Evaporator Cooling Energy,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
@@ -13969,11 +13983,11 @@
   Output:Table:Monthly,
     Tower Report,            !- Name
     ,                        !- Digits After Decimal
-    Cooling Tower Fan Electric Energy,  !- Variable or Meter 1 Name
+    Cooling Tower Fan Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling Tower Fan Electric Energy,  !- Variable or Meter 2 Name
+    Cooling Tower Fan Electricity Energy,  !- Variable or Meter 2 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 2
-    Cooling Tower Fan Electric Power,  !- Variable or Meter 3 Name
+    Cooling Tower Fan Electricity Rate,  !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Cooling Tower Heat Transfer Rate,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
@@ -13989,13 +14003,13 @@
     ,                        !- Digits After Decimal
     Boiler Heating Energy,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Boiler Gas Energy,       !- Variable or Meter 2 Name
+    Boiler NaturalGas Energy,       !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Boiler Heating Energy,   !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
     Boiler Heating Rate,     !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Boiler Gas Rate,         !- Variable or Meter 5 Name
+    Boiler NaturalGas Rate,         !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
     Boiler Inlet Temperature,!- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
@@ -14003,7 +14017,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 7
     Boiler Mass Flow Rate,   !- Variable or Meter 8 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 8
-    Boiler Ancillary Electric Power,  !- Variable or Meter 9 Name
+    Boiler Ancillary Electricity Rate,  !- Variable or Meter 9 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 9
 
   Output:Table:Monthly,
@@ -14011,7 +14025,7 @@
     ,                        !- Digits After Decimal
     Cooling Coil Total Cooling Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling Coil Electric Energy,  !- Variable or Meter 2 Name
+    Cooling Coil Electricity Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Cooling Coil Total Cooling Energy,  !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
@@ -14019,7 +14033,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Cooling Coil Latent Cooling Energy,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cooling Coil Crankcase Heater Electric Energy,  !- Variable or Meter 6 Name
+    Cooling Coil Crankcase Heater Electricity Energy,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
     Cooling Coil Runtime Fraction,  !- Variable or Meter 7 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 7
@@ -14031,9 +14045,9 @@
     Maximum,                 !- Aggregation Type for Variable or Meter 10
     Cooling Coil Latent Cooling Rate,  !- Variable or Meter 11 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 11
-    Cooling Coil Electric Power,  !- Variable or Meter 12 Name
+    Cooling Coil Electricity Rate,  !- Variable or Meter 12 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 12
-    Cooling Coil Crankcase Heater Electric Power,  !- Variable or Meter 13 Name
+    Cooling Coil Crankcase Heater Electricity Rate,  !- Variable or Meter 13 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 13
 
   Output:Table:Monthly,
@@ -14219,7 +14233,7 @@
     ,                        !- Digits After Decimal
     Zone Window Air Conditioner Total Cooling Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Window Air Conditioner Electric Energy,  !- Variable or Meter 2 Name
+    Zone Window Air Conditioner Electricity Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Zone Window Air Conditioner Total Cooling Energy,  !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
@@ -14233,7 +14247,7 @@
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
     Zone Window Air Conditioner Latent Cooling Rate,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Zone Window Air Conditioner Electric Power,  !- Variable or Meter 9 Name
+    Zone Window Air Conditioner Electricity Rate,  !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
   Output:Table:Monthly,
@@ -14245,7 +14259,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Water Heater Burner Heating Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Water Heater Gas Energy, !- Variable or Meter 4 Name
+    Water Heater NaturalGas Energy, !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 5 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 5
@@ -14263,13 +14277,13 @@
   Output:Table:Monthly,
     Generator Report,        !- Name
     ,                        !- Digits After Decimal
-    Generator Produced Electric Energy,  !- Variable or Meter 1 Name
+    Generator Produced AC Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Generator Diesel Energy, !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Generator Gas Energy,    !- Variable or Meter 3 Name
+    Generator NaturalGas Energy,    !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Generator Produced Electric Energy,  !- Variable or Meter 4 Name
+    Generator Produced AC Electricity Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4
     Generator Total Heat Recovery,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
@@ -14333,11 +14347,11 @@
   Output:Table:Monthly,
     Fan Report,              !- Name
     ,                        !- Digits After Decimal
-    Fan Electric Energy,     !- Variable or Meter 1 Name
+    Fan Electricity Energy,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Fan Rise in Air Temperature,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Fan Electric Power,      !- Variable or Meter 3 Name
+    Fan Electricity Rate,      !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Fan Rise in Air Temperature,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 4
@@ -14345,11 +14359,11 @@
   Output:Table:Monthly,
     Pump Report,             !- Name
     ,                        !- Digits After Decimal
-    Pump Electric Energy,    !- Variable or Meter 1 Name
+    Pump Electricity Energy,    !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Pump Fluid Heat Gain Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Pump Electric Power,     !- Variable or Meter 3 Name
+    Pump Electricity Rate,     !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Pump Shaft Power,        !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
@@ -14392,13 +14406,9 @@
     AllSummary;              !- Report 1 Name
 
   Output:Diagnostics,
-    DisplayUnusedSchedules;  !- Key 1
-
-  Output:Diagnostics,
-    DisplayZoneAirHeatBalanceOffBalance;  !- Key 1
-
-  Output:Diagnostics,
-    DisplayAdvancedReportVariables;  !- Key 1
+    DisplayUnusedSchedules,  !- Key 1
+    DisplayZoneAirHeatBalanceOffBalance,  !- Key 2
+    DisplayAdvancedReportVariables;  !- Key 3
 
   Output:SQLite,
     Simple;                  !- Option Type

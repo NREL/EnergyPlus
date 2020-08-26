@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@ extern "C" {
 }
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <ExternalInterface.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExternalInterface.hh>
 
 // C++ Standard Library Headers
 #include <string>
@@ -64,6 +64,8 @@ extern "C" {
 #include <ObjexxFCL/Array1D.hh>
 
 namespace EnergyPlus {
+
+    struct EnergyPlusData;
 
 namespace ExternalInterface {
 
@@ -91,6 +93,8 @@ namespace ExternalInterface {
     extern int const fmiPending;           // fmiPending
     extern std::string const socCfgFilNam; // socket configuration file
     extern std::string const BlankString;
+
+    void clear_state();
 
     struct fmuInputVariableType
     {
@@ -320,7 +324,7 @@ namespace ExternalInterface {
 
     // Functions
 
-    void ExternalInterfaceExchangeVariables();
+    void ExternalInterfaceExchangeVariables(EnergyPlusData &state);
 
     void CloseSocket(int const FlagToWriteToSocket);
 
@@ -328,12 +332,12 @@ namespace ExternalInterface {
 
     void GetExternalInterfaceInput();
 
-    void CalcExternalInterface();
+    void CalcExternalInterface(EnergyPlusData &state);
 
-    void ParseString(std::string const &str, Array1S_string ele, int const nEle);
+    void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
 
     void GetReportVariableKey(
-        Array1S_string const varKeys, int const numberOfKeys, Array1S_string const varNames, Array1S_int keyVarIndexes, Array1S_int varTypes);
+        const Array1D_string &varKeys, int const numberOfKeys, const Array1D_string &varNames, Array1D_int &keyVarIndexes, Array1D_int &varTypes);
 
     std::vector<char> getCharArrayFromString(std::string const &originalString);
 
@@ -345,15 +349,15 @@ namespace ExternalInterface {
 
     void WarnIfExternalInterfaceObjectsAreUsed(std::string const &ObjectWord);
 
-    void CalcExternalInterfaceFMUImport();
+    void CalcExternalInterfaceFMUImport(EnergyPlusData &state);
 
-    void InitExternalInterfaceFMUImport();
+    void InitExternalInterfaceFMUImport(IOFiles &ioFiles);
 
     void InstantiateInitializeFMUImport();
 
     void TerminateResetFreeFMUImport(int fmiEndSimulation);
 
-    void GetSetVariablesAndDoStepFMUImport();
+    void GetSetVariablesAndDoStepFMUImport(EnergyPlusData &state);
 
     void VerifyExternalInterfaceObject();
 

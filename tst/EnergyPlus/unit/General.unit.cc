@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -317,11 +317,9 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
 
 }
 
-TEST(General, nthDayOfWeekOfMonth_test)
+TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
 {
     // J.Glazer - August 2017
-    ShowMessage("Begin Test: General, nthDayOfWeekOfMonth_test");
-
     //		nthDayOfWeekOfMonth(
     //			int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
     //			int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)
@@ -367,6 +365,31 @@ TEST(General, nthDayOfWeekOfMonth_test)
 
     EXPECT_EQ(34, nthDayOfWeekOfMonth(4, 1, 2)); // first wednesday of february
     EXPECT_EQ(62, nthDayOfWeekOfMonth(4, 1, 3)); // first wednesday of march
+}
+
+TEST_F(EnergyPlusFixture, General_EpexpTest)
+{
+    //Global exp function test
+    Real64 x;
+    Real64 y;
+
+    // Negative value
+    x = -69.0;
+    y = epexp(x);
+    EXPECT_NEAR(0.0, y, 1.0E-20);
+
+    x = -700.0;
+    y = epexp(x);
+    EXPECT_NEAR(0.0, y, 1.0E-20);
+
+    // Positive values
+    x = 10.0;
+    y = epexp(x, 700.0);
+    EXPECT_NEAR(22026.46579480, y, 0.00001);
+
+    x = 800.0;
+    y = epexp(x, 700.0);
+    EXPECT_NEAR(1.0142320547350045e+304, y, 1.0E2);
 }
 
 } // namespace EnergyPlus

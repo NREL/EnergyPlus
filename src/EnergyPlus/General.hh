@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,9 +60,21 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    class IOFiles;
+    struct EnergyPlusData;
+
+// Forward declaration
+namespace OutputProcessor {
+    enum class TimeStepType;
+}
+
+namespace WeatherManager {
+    enum class DateType;
+}
 
 namespace General {
 
@@ -88,6 +100,8 @@ namespace General {
 
     // Functions
 
+    void clear_state();
+
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
@@ -102,20 +116,20 @@ namespace General {
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
-                   std::function<Real64(Real64 const, Array1<Real64> const &)> f,
+                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
                    Real64 const X_0,         // 1st bound of interval that contains the solution
                    Real64 const X_1,         // 2nd bound of interval that contains the solution
-                   Array1<Real64> const &Par // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par // array with additional parameters used for function evaluation
     );
 
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
                    int &Flag,        // integer storing exit status
                    Real64 &XRes,     // value of x that solves f(x [,Par]) = 0
-                   std::function<Real64(Real64 const, Array1<Real64> const &)> f,
+                   std::function<Real64(Real64 const, Array1D<Real64> const &)> f,
                    Real64 const X_0,           // 1st bound of interval that contains the solution
                    Real64 const X_1,           // 2nd bound of interval that contains the solution
-                   Array1<Real64> const &Par,  // array with additional parameters used for function evaluation
+                   Array1D<Real64> const &Par, // array with additional parameters used for function evaluation
                    int const AlgorithmTypeNum, // ALgorithm selection
                    Real64 &XX_0,               // Low bound obtained with maximum number of allowed iterations
                    Real64 &XX_1                // Hign bound obtained with maximum number of allowed iterations
@@ -228,7 +242,7 @@ namespace General {
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           int &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            Optional_int PYear = _);
 
@@ -237,7 +251,7 @@ namespace General {
                              int &TokenDay,             // Value of numeric field found
                              int &TokenMonth,           // Value of Month field found (1=Jan, 2=Feb, etc)
                              int &TokenWeekday,         // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             int &DateType,             // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             WeatherManager::DateType &DateType,             // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,         // Set to true if cannot process this string as a date
                              Optional_int TokenYear = _ // Value of Year if one appears to be present and this argument is present
     );
@@ -268,7 +282,8 @@ namespace General {
 
     Real64 SafeDivide(Real64 const a, Real64 const b);
 
-    void Invert3By3Matrix(Array2A<Real64> const A, // Input 3X3 Matrix
+    void Invert3By3Matrix(IOFiles &ioFiles,
+                          Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     );
 
@@ -312,7 +327,8 @@ namespace General {
                            int &Minute     // minute in integer format (0:59)
     );
 
-    int DetermineMinuteForReporting(int const IndexTypeKey); // kind of reporting, Zone Timestep or System
+    // TODO: this probably shouldn't be here
+    int DetermineMinuteForReporting(OutputProcessor::TimeStepType t_timeStepType); // kind of reporting, Zone Timestep or System
 
     void EncodeMonDayHrMin(int &Item,       // word containing encoded month, day, hour, minute
                            int const Month, // month in integer format (1:12)
@@ -383,6 +399,9 @@ namespace General {
 
     std::vector<std::string> splitString(const std::string &string, char delimiter);
 
+    Real64 epexp(Real64 x);
+
+    Real64 epexp(Real64 x, Real64 defaultHigh);
 } // namespace General
 
 } // namespace EnergyPlus

@@ -1860,7 +1860,7 @@ For \emph{NominalCapacity}:
 
 \(T_{in,water}\) = 35\(^{\circ}\)C (95\(^{\circ}\)F design inlet water temperature).
 
-We now have all the data needed to obtain UA. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function. In this case it finds the UA that will zero the residual function - the difference between the design tower load and the tower output divided by the design tower load. The residual is calculated in the function \emph{SimpleTowerUAResidual.}
+We now have all the data needed to obtain UA. The numerical inversion is carried out by calling subroutine \emph{SolveRegulaFalsi}. This is a general utility routine for finding the zero of a function. In this case it finds the UA that will zero the residual function - the difference between the design tower load and the tower output divided by the design tower load. The residual is calculated in the function \emph{residualUA.}
 
 \subsubsection{Air Flow Rate at Low Fan Speed}\label{air-flow-rate-at-low-fan-speed}
 
@@ -2734,7 +2734,7 @@ c\(_{p,c}\) is specific heat of chilled water at reference condition (5\(^{\circ
 TubeLength = \frac{{TotalSurfaceArea}}{{TubeSpacing}}
 \end{equation}
 
-Note that tube spacing is assumed to be 0.15m.
+Note that tube spacing is determined by the Tube Spacing field of the Construction:InternalSource input used to define the radiant surface(s) of this system.  If the user has entered a spacing that is less than 0.01m or more than 1.0m, the sizing calculation will assume that the spacing is equal to 0.15m.
 
 \subsubsection{ZoneHVAC:LowTemperatureRadiant:ConstantFlow}\label{zonehvaclowtemperatureradiantconstantflow}
 

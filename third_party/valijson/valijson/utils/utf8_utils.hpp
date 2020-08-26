@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_UTILS_UTF8_UTILS_HPP
-#define __VALIJSON_UTILS_UTF8_UTILS_HPP
 
 #include <stdexcept>
 
@@ -60,5 +58,3 @@ inline uint64_t u8_strlen(const char *s)
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,8 +56,9 @@
 #include <ObjexxFCL/string.functions.hh>
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -81,7 +82,7 @@ namespace PlantManager {
         PlantLoop(1).CirculationTime = 2;
         PlantLoop(1).FluidType = NodeType_Water;
         PlantLoop(1).FluidIndex = 1;
-        SizePlantLoop(1, true);
+        SizePlantLoop(state, 1, true);
         int TestVolume = 600;
         EXPECT_EQ(TestVolume, PlantLoop(1).Volume);
     }
@@ -92,8 +93,6 @@ namespace PlantManager {
         bool ErrorsFound = false;
 
         std::string const idf_objects = delimited_string({
-
-            "  Version,9.2;",
 
             "  PlantLoop,",
             "    Chilled Water Loop,      !- Name",
@@ -210,7 +209,7 @@ namespace PlantManager {
         // get input and checks if there are two setpointmanagers
         // for a TwoWayCommonPipe and one of them setpoints can be
         // a SetpointManager:OutdoorAirReset type.
-        GetPlantLoopData();
+        GetPlantLoopData(state);
         ASSERT_FALSE(ErrorsFound);
         // there two setpoint amanegrs in the loop
         EXPECT_EQ(1, NumSchSetPtMgrs);    // SetpointManager:Scheduled

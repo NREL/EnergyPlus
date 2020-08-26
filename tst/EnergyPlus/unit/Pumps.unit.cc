@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,10 +51,10 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataPlant.hh>
-#include <DataSizing.hh>
-#include <Pumps.hh>
-#include <SizingManager.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Pumps.hh>
+#include <EnergyPlus/SizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -613,8 +613,6 @@ TEST_F(EnergyPlusFixture, CondensatePumpSizingPowerTest)
 TEST_F(EnergyPlusFixture, VariableSpeedPump_MinFlowGreaterThanMax)
 {
     std::string const idf_objects = delimited_string({
-        "Version,9.0;",
-
         "Pump:VariableSpeed,",
         "  supply inlet pump,       !- Name",
         "  Node supply inlet in,    !- Inlet Node Name",

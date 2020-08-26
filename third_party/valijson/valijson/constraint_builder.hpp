@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_CONSTRAINT_BUILDER_HPP
-#define __VALIJSON_CONSTRAINT_BUILDER_HPP
 
 namespace valijson {
 
@@ -21,5 +19,3 @@ public:
 };
 
 }  // namespace valijson
-
-#endif

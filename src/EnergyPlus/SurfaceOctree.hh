@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -99,7 +99,7 @@ public: // Creation
     }
 
     // Surfaces Outer Cube Constructor
-    SurfaceOctreeCube(ObjexxFCL::Array1<Surface> &surfaces) : d_(0u), n_(0u), l_(Vertex(0.0)), u_(Vertex(0.0)), c_(Vertex(0.0)), w_(0.0), r_(0.0)
+    SurfaceOctreeCube(Array1D<Surface> &surfaces) : d_(0u), n_(0u), l_(Vertex(0.0)), u_(Vertex(0.0)), c_(Vertex(0.0)), w_(0.0), r_(0.0)
     {
         for (std::uint8_t i = 0; i < 8; ++i)
             cubes_[i] = nullptr; // VC++ 2013 compatible initialization
@@ -423,7 +423,7 @@ public: // Methods
     }
 
     // Surfaces Outer Cube Initilization
-    void init(ObjexxFCL::Array1<Surface> &surfaces);
+    void init(Array1D<Surface> &surfaces);
 
     // Surfaces that Line Segment Intersects Cube's Enclosing Sphere
     void surfacesSegmentIntersectsSphere(Vertex const &a, Vertex const &b, Surfaces &surfaces) const

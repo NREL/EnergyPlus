@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,26 +55,28 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <ConvectionCoefficients.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <TranspiredCollector.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Construction.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Material.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -114,8 +116,6 @@ namespace TranspiredCollector {
     using DataGlobals::DegToRadians;
     using DataGlobals::KelvinConv;
     using DataGlobals::SecInHour;
-    using DataHeatBalance::Construct;
-    using DataHeatBalance::Material;
     using DataHeatBalance::QRadSWOutIncident;
     using DataVectorTypes::Vector;
 
@@ -139,6 +139,8 @@ namespace TranspiredCollector {
 
     // Object Data
     Array1D<UTSCDataStruct> UTSC;
+    bool MyOneTimeFlag(true);
+    bool MySetPointCheckFlag(true);
 
     // Functions
     void clear_state()
@@ -146,9 +148,13 @@ namespace TranspiredCollector {
         NumUTSC = 0;
         GetInputFlag = true;
         UTSC.deallocate();
+        MyOneTimeFlag = true;
+        MySetPointCheckFlag = true;
     }
 
-    void SimTranspiredCollector(std::string const &CompName, // component name
+    void SimTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients,
+                                IOFiles &ioFiles,
+                                std::string const &CompName, // component name
                                 int &CompIndex               // component index (to reduce string compares during simulation)
     )
     {
@@ -227,9 +233,9 @@ namespace TranspiredCollector {
         }
 
         if (UTSC(UTSCNum).IsOn) {
-            CalcActiveTranspiredCollector(UTSCNum);
+            CalcActiveTranspiredCollector(dataConvectionCoefficients, ioFiles, UTSCNum);
         } else {
-            CalcPassiveTranspiredCollector(UTSCNum);
+            CalcPassiveTranspiredCollector(dataConvectionCoefficients, ioFiles, UTSCNum);
         }
 
         UpdateTranspiredCollector(UTSCNum);
@@ -288,7 +294,7 @@ namespace TranspiredCollector {
         int MaxNumNumbers;              // argumenet for call to GetObjectDefMaxArgs
         int Dummy;                      // argumenet for call to GetObjectDefMaxArgs
         int IOStatus;                   // Used in GetObjectItem
-        static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int Found;
         int AlphaOffset; // local temp var
         std::string Roughness;
@@ -769,9 +775,7 @@ namespace TranspiredCollector {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool MyOneTimeFlag(true);
         int UTSCUnitNum;
-        static bool MySetPointCheckFlag(true);
         static Array1D_bool MyEnvrnFlag;
         int ControlNode;
         // unused  INTEGER             :: InletNode
@@ -870,7 +874,7 @@ namespace TranspiredCollector {
         UTSC(UTSCNum).UTSCCollEff = 0.0;
     }
 
-    void CalcActiveTranspiredCollector(int const UTSCNum)
+    void CalcActiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -899,7 +903,7 @@ namespace TranspiredCollector {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceData;
         using General::RoundSigDigits;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using namespace DataHeatBalance; // , ONLY: QRadSWOutIncident, Construct, Material
@@ -1004,7 +1008,7 @@ namespace TranspiredCollector {
 
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, Tamb, OutHumRat);
 
-        CpAir = PsyCpAirFnWTdb(OutHumRat, Tamb);
+        CpAir = PsyCpAirFnW(OutHumRat);
 
         holeArea = UTSC(UTSCNum).ActualArea * UTSC(UTSCNum).Porosity;
 
@@ -1075,10 +1079,10 @@ namespace TranspiredCollector {
             HMovInsul = 0.0;
             HExt = 0.0;
             LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-            InitExteriorConvectionCoeff(
+            InitExteriorConvectionCoeff(dataConvectionCoefficients, ioFiles,
                 SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
             ConstrNum = Surface(SurfPtr).Construction;
-            AbsThermSurf = Material(Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
+            AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
             TsoK = TH(1, 1, SurfPtr) + KelvinConv;
             TscollK = UTSC(UTSCNum).TcollLast + KelvinConv;
             HPlenARR(ThisSurf) = Sigma * AbsExt * AbsThermSurf * (pow_4(TscollK) - pow_4(TsoK)) / (TscollK - TsoK);
@@ -1216,7 +1220,7 @@ namespace TranspiredCollector {
         }
     }
 
-    void CalcPassiveTranspiredCollector(int const UTSCNum)
+    void CalcPassiveTranspiredCollector(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const UTSCNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1290,7 +1294,9 @@ namespace TranspiredCollector {
 
         // all the work is done in this routine located in GeneralRoutines.cc
 
-        CalcPassiveExteriorBaffleGap(UTSC(UTSCNum).SurfPtrs,
+        CalcPassiveExteriorBaffleGap(dataConvectionCoefficients,
+                                     ioFiles,
+                                     UTSC(UTSCNum).SurfPtrs,
                                      holeArea,
                                      UTSC(UTSCNum).Cv,
                                      UTSC(UTSCNum).Cd,
@@ -1555,6 +1561,76 @@ namespace TranspiredCollector {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         TsColl = UTSC(UTSCNum).Tcoll;
+    }
+
+    int GetAirInletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given UTSC and returns the air inlet node number.
+        // If incorrect UTSC name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichUTSC;
+
+        if (GetInputFlag) {
+            GetTranspiredCollectorInput();
+            GetInputFlag = false;
+        }
+
+        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, UTSC);
+        if (WhichUTSC != 0) {
+            NodeNum = UTSC(WhichUTSC).InletNode(1);
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find TranspiredCollector = \"" + UTSCName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetAirOutletNodeNum(std::string const &UTSCName, bool &ErrorsFound)
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given UTSC and returns the air outlet node number.
+        // If incorrect UTSC name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichUTSC;
+
+        if (GetInputFlag) {
+            GetTranspiredCollectorInput();
+            GetInputFlag = false;
+        }
+
+        WhichUTSC = UtilityRoutines::FindItemInList(UTSCName, UTSC);
+        if (WhichUTSC != 0) {
+            NodeNum = UTSC(WhichUTSC).OutletNode(1);
+        } else {
+            ShowSevereError("GetAirOutletNodeNum: Could not find TranspiredCollector = \"" + UTSCName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
     }
 
 } // namespace TranspiredCollector

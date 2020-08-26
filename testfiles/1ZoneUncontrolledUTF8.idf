@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -96,7 +96,7 @@
     Simple One Zone (Wireframe DXF),  !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.004,                   !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     30,                      !- Maximum Number of Warmup Days
@@ -220,7 +220,7 @@
     0.7500000;               !- Visible Absorptance
 
   Material,
-    试验,   !- Name
+    试验,                  !- Name
     MediumRough,             !- Roughness
     0.1014984,               !- Thickness {m}
     1.729577,                !- Conductivity {W/m-K}
@@ -236,14 +236,14 @@
 
   Construction,
     FLOOR,                   !- Name
-    试验;   !- Outside Layer
+    试验;                  !- Outside Layer
 
   Construction,
     ROOF31,                  !- Name
     R31LAYER;                !- Outside Layer
 
   Zone,
-    试验,                !- Name
+    试验,                  !- Name
     0,                       !- Direction of Relative North {deg}
     0,                       !- X Origin {m}
     0,                       !- Y Origin {m}
@@ -268,7 +268,7 @@
     Zn001:Wall001,           !- Name
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
-    试验,                !- Zone Name
+    试验,                  !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -284,7 +284,7 @@
     Zn001:Wall002,           !- Name
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
-    试验,                !- Zone Name
+    试验,                  !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -300,7 +300,7 @@
     Zn001:Wall003,           !- Name
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
-    试验,                !- Zone Name
+    试验,                  !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -316,7 +316,7 @@
     Zn001:Wall004,           !- Name
     Wall,                    !- Surface Type
     R13WALL,                 !- Construction Name
-    试验,                !- Zone Name
+    试验,                  !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -332,7 +332,7 @@
     Zn001:Flr001,            !- Name
     Floor,                   !- Surface Type
     FLOOR,                   !- Construction Name
-    试验,                !- Zone Name
+    试验,                  !- Zone Name
     Adiabatic,               !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     NoSun,                   !- Sun Exposure
@@ -348,7 +348,7 @@
     Zn001:Roof001,           !- Name
     Roof,                    !- Surface Type
     ROOF31,                  !- Construction Name
-    试验,                !- Zone Name
+    试验,                  !- Zone Name
     Outdoors,                !- Outside Boundary Condition
     ,                        !- Outside Boundary Condition Object
     SunExposed,              !- Sun Exposure
@@ -425,7 +425,7 @@
   OtherEquipment,
     Test 352a,               !- Name
     None,                    !- Fuel Type
-    试验,                !- Zone or ZoneList Name
+    试验,                  !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     352,                     !- Design Level {W}
@@ -438,7 +438,7 @@
   OtherEquipment,
     Test 352 minus,          !- Name
     None,                    !- Fuel Type
-    试验,                !- Zone or ZoneList Name
+    试验,                  !- Zone or ZoneList Name
     AlwaysOn,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     -352,                    !- Design Level {W}

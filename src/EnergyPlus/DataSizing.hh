@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,8 +54,8 @@
 #include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -92,7 +92,7 @@ namespace DataSizing {
     extern int const CondenserLoop;
     extern int const SteamLoop;
 
-    // paramters for sizing
+    // parameters for sizing
     extern int const NonCoincident;
     extern int const Coincident;
 
@@ -130,7 +130,7 @@ namespace DataSizing {
     extern Real64 const AutoSize;
 
     // parameter for (time-of-peak) sizing format
-    extern ObjexxFCL::gio::Fmt PeakHrMinFmt;
+    static constexpr auto PeakHrMinFmt("{:02}:{:02}:00");
 
     // Zone Outdoor Air Method
     extern int const ZOAM_FlowPerPerson; // set the outdoor air flow rate based on number of people in the zone
@@ -338,8 +338,8 @@ namespace DataSizing {
         Real64 HeatDesTemp;              // zone design heating supply air temperature [C]
         Real64 CoolDesTempDiff;          // zone design cooling supply air temperature difference [deltaC]
         Real64 HeatDesTempDiff;          // zone design heating supply air temperature difference [deltaC]
-        Real64 CoolDesHumRat;            // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
-        Real64 HeatDesHumRat;            // zone design heating supply air humidity ratio [kg-H2O/kg-air]
+        Real64 CoolDesHumRat;            // zone design cooling supply air humidity ratio [kgWater/kgDryAir]
+        Real64 HeatDesHumRat;            // zone design heating supply air humidity ratio [kgWater/kgDryAir]
         std::string DesignSpecOAObjName; // name of the design specification outdoor air object
         int OADesMethod;                 // choice of how to calculate minimum outside air;
         //  1 = m3/s per person; 2 = m3/s per zone; 3 = m3/s per zone area;
@@ -409,8 +409,8 @@ namespace DataSizing {
         Real64 HeatDesTemp;        // zone design heating supply air temperature [C]
         Real64 CoolDesTempDiff;    // zone design cooling supply air temperature difference [deltaC]
         Real64 HeatDesTempDiff;    // zone design heating supply air temperature difference [deltaC]
-        Real64 CoolDesHumRat;      // zone design cooling supply air humidity ratio [kg-H2O/kg-air]
-        Real64 HeatDesHumRat;      // zone design heating supply air humidity ratio [kg-H2O/kg-air]
+        Real64 CoolDesHumRat;      // zone design cooling supply air humidity ratio [kgWater/kgDryAir]
+        Real64 HeatDesHumRat;      // zone design heating supply air humidity ratio [kgWater/kgDryAir]
         int ZoneDesignSpecOAIndex; // index to DesignSpecification:OutdoorAir object
         int OADesMethod;           // choice of how to calculate minimum outside air;
         //  1 = m3/s per person; 2 = m3/s per zone; 3 = m3/s per zone area;
@@ -569,7 +569,7 @@ namespace DataSizing {
         Real64 DOASLatAdd;      // current latent heat addition rate from DOAS supply air [W]
         Real64 DOASSupMassFlow; // current mass flow rate of DOAS supply air [kg/s]
         Real64 DOASSupTemp;     // current DOAS supply air temperature [C]
-        Real64 DOASSupHumRat;   // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+        Real64 DOASSupHumRat;   // current DOAS supply air humidity ratio [kgWater/kgDryAir]
         Real64 DOASTotCoolLoad; // current total cooling load imposed by DOAS supply air [W]
         Array1D<Real64> DOASHeatLoadSeq;    // daily sequence of zone DOAS heating load (zone time step) [W]
         Array1D<Real64> DOASCoolLoadSeq;    // daily sequence of zone DOAS cooling load (zone time step) [W]
@@ -577,7 +577,7 @@ namespace DataSizing {
         Array1D<Real64> DOASLatAddSeq;      // daily sequence of zone DOAS latent heat addition rate (zone time step) [W]
         Array1D<Real64> DOASSupMassFlowSeq; // daily sequence of zone DOAS supply mass flow rate (zone time step) [Kg/s]
         Array1D<Real64> DOASSupTempSeq;     // daily sequence of zone DOAS supply temperature (zone time step) [C]
-        Array1D<Real64> DOASSupHumRatSeq;   // daily sequence of zone DOAS supply humidity ratio (zone time step) [kg H2O / kg dry air]
+        Array1D<Real64> DOASSupHumRatSeq;   // daily sequence of zone DOAS supply humidity ratio (zone time step) [kgWater/kgDryAir]
         Array1D<Real64> DOASTotCoolLoadSeq; // daily sequence of zone DOAS total cooling load (zone time step) [W]
 
         // Default Constructor
@@ -614,6 +614,8 @@ namespace DataSizing {
         );
         void scaleZoneHeating(Real64 const ratio // Scaling ratio
         );
+        void zeroMemberData();
+        void allocateMemberArrays(int const numOfTimeStepInDay);
     };
 
     struct TermUnitSizingData
@@ -664,9 +666,9 @@ namespace DataSizing {
         Real64 OAVolFlow;             // design outside air flow for zone equipment unit [m3/s]
         Real64 ATMixerVolFlow;        // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s]
         Real64 ATMixerCoolPriDryBulb; // design ventilation drybulb temperature from air terminal mixer during cooling (central DOAS) [C]
-        Real64 ATMixerCoolPriHumRat;  // design ventilation humidity ratio from air terminal mixer during cooling (central DOAS) [kgH20/kgDryAir]
+        Real64 ATMixerCoolPriHumRat;  // design ventilation humidity ratio from air terminal mixer during cooling (central DOAS) [kgWater/kgDryAir]
         Real64 ATMixerHeatPriDryBulb; // design ventilation drybulb temperature from air terminal mixer during heating (central DOAS) [C]
-        Real64 ATMixerHeatPriHumRat;  // design ventilation humidity ratio from air terminal mixer during heating (central DOAS) [kgH20/kgDryAir]
+        Real64 ATMixerHeatPriHumRat;  // design ventilation humidity ratio from air terminal mixer during heating (central DOAS) [kgWater/kgDryAir]
         Real64 DesCoolingLoad;        // design cooling load used for zone equipment [W]
         Real64 DesHeatingLoad;        // design heating load used for zone equipment [W]
         Real64 CoolingAirVolFlow;     // design cooling air vol flow rate for equipment[m3/s]
@@ -691,9 +693,9 @@ namespace DataSizing {
             : AirVolFlow(0.0), MaxHWVolFlow(0.0), MaxCWVolFlow(0.0), OAVolFlow(0.0),
               ATMixerVolFlow(0.0),        // design ventilation air flow rate from air terminal mixer (central DOAS) [m3/s]
               ATMixerCoolPriDryBulb(0.0), // design air terminal mixer cooling outlet temperature [C]
-              ATMixerCoolPriHumRat(0.0),  // design air terminal mixer cooling outlet humidity ratio [kgH20/kgDryAir]
+              ATMixerCoolPriHumRat(0.0),  // design air terminal mixer cooling outlet humidity ratio [kgWater/kgDryAir]
               ATMixerHeatPriDryBulb(0.0), // design air terminal mixer heating outlet temperature [C]
-              ATMixerHeatPriHumRat(0.0),  // design air terminal mixer heating outlet humidity ratio [kgH20/kgDryAir]
+              ATMixerHeatPriHumRat(0.0),  // design air terminal mixer heating outlet humidity ratio [kgWater/kgDryAir]
               DesCoolingLoad(0.0),        // design cooling load used for zone equipment [W]
               DesHeatingLoad(0.0),        // design heating load used for zone equipment [W]
               CoolingAirVolFlow(0.0),     // design cooling air vol flow rate for equipment[m3/s]
@@ -742,7 +744,7 @@ namespace DataSizing {
         }
     };
 
-    // Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit and AirTerminal:SingleDuct:Uncontrolled
+    // Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit
     struct AirTerminalSizingSpecData
     {
         // Members

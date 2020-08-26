@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,7 +54,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -108,27 +108,29 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetConstCOPChillerInput();
+    ConstCOPChillerSpecs::getInput(state.dataPlantChillers);
+
+    auto &thisChiller = state.dataPlantChillers.ConstCOPChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
     DataPlant::PlantLoop(1).FluidIndex = 1;
     DataPlant::PlantLoop(1).PlantSizNum = 1;
     DataPlant::PlantLoop(1).FluidName = "WATER";
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = ConstCOPChiller(1).Base.Name;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = thisChiller.Name;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_ConstCOP;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = ConstCOPChiller(1).Base.EvapInletNodeNum;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = ConstCOPChiller(1).Base.EvapOutletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisChiller.EvapInletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisChiller.EvapOutletNodeNum;
 
     DataPlant::PlantLoop(2).Name = "CondenserWaterLoop";
     DataPlant::PlantLoop(2).FluidName = "CondenserWater";
     DataPlant::PlantLoop(2).FluidIndex = 1;
     DataPlant::PlantLoop(2).PlantSizNum = 2;
     DataPlant::PlantLoop(2).FluidName = "WATER";
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = ConstCOPChiller(1).Base.Name;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = thisChiller.Name;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_Chiller_ConstCOP;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = ConstCOPChiller(1).Base.CondInletNodeNum;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = ConstCOPChiller(1).Base.CondOutletNodeNum;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = thisChiller.CondInletNodeNum;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumOut = thisChiller.CondOutletNodeNum;
 
     DataSizing::PlantSizData.allocate(2);
     DataSizing::PlantSizData(1).DesVolFlowRate = 0.001;
@@ -145,19 +147,19 @@ TEST_F(EnergyPlusFixture, ChillerConstantCOP_WaterCooled_Autosize)
     Real64 MyLoad(-20000.0);
 
     Psychrometrics::InitializePsychRoutines();
-    InitConstCOPChiller(1, RunFlag, MyLoad);
-    SizeConstCOPChiller(1);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisChiller.size();
 
     // run init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    InitConstCOPChiller(1, RunFlag, MyLoad);
+    thisChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
 
     // check autocalculate chiller nominal capacity
-    EXPECT_NEAR(ConstCOPChiller(1).Base.NomCap, 20987.5090557, 0.000001);
+    EXPECT_NEAR(thisChiller.NomCap, 20987.5090557, 0.000001);
     // check autocalculate chiller side evap water flow rate
-    EXPECT_NEAR(ConstCOPChiller(1).Base.EvapVolFlowRate, 0.001, 0.000001);
-    EXPECT_NEAR(ConstCOPChiller(1).Base.EvapMassFlowRateMax, 0.999898, 0.0000001);
+    EXPECT_NEAR(thisChiller.EvapVolFlowRate, 0.001, 0.000001);
+    EXPECT_NEAR(thisChiller.EvapMassFlowRateMax, 0.999898, 0.0000001);
     // check autocalculate chiller side cond water flow rate
-    EXPECT_NEAR(ConstCOPChiller(1).Base.CondVolFlowRate, 0.0012606164769923673, 0.0000001);
-    EXPECT_NEAR(ConstCOPChiller(1).Base.CondMassFlowRateMax, 1.2604878941117141, 0.0000001);
+    EXPECT_NEAR(thisChiller.CondVolFlowRate, 0.0012606164769923673, 0.0000001);
+    EXPECT_NEAR(thisChiller.CondMassFlowRateMax, 1.2604878941117141, 0.0000001);
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,13 +49,13 @@
 #include <cmath>
 
 // EnergyPlus Headers
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaceLists.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaceLists.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -215,6 +215,7 @@ namespace DataSurfaceLists {
                 }
 
                 SumOfAllFractions = 0.0;
+                bool showSameZoneWarning = true;
                 for (SurfNum = 1; SurfNum <= SurfList(Item).NumOfSurfaces; ++SurfNum) {
                     SurfList(Item).SurfName(SurfNum) = Alphas(SurfNum + 1);
                     SurfList(Item).SurfPtr(SurfNum) = UtilityRoutines::FindItemInList(Alphas(SurfNum + 1), Surface);
@@ -223,14 +224,18 @@ namespace DataSurfaceLists {
                                         " statement not found = " + SurfList(Item).SurfName(SurfNum));
                         ErrorsFound = true;
                     } else { // Make sure that all of the surfaces are located in the same zone
-                        Surface(SurfList(Item).SurfPtr(SurfNum)).PartOfVentSlabOrRadiantSurface = true;
+                        Surface(SurfList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
                         if (SurfNum == 1) {
                             ZoneForSurface = Surface(SurfList(Item).SurfPtr(SurfNum)).Zone;
                         }
                         if (SurfNum > 1) {
-                            if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone) {
-                                ShowSevereError("Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
-                                ErrorsFound = true;
+                            if (ZoneForSurface != Surface(SurfList(Item).SurfPtr(SurfNum)).Zone && showSameZoneWarning) {
+                                ShowWarningError("Not all surfaces in same zone for " + CurrentModuleObject1 + " = " + SurfList(Item).Name);
+                                if (!DataGlobals::DisplayExtraWarnings) {
+                                    ShowContinueError("If this is intentionally a radiant system with surfaces in more than one thermal zone,");
+                                    ShowContinueError("then ignore this warning message.  Use Output:Diagnostics,DisplayExtraWarnings for more details.");
+                                }
+                                showSameZoneWarning = false;
                             }
                         }
                     }
@@ -340,7 +345,7 @@ namespace DataSurfaceLists {
                             ErrorsFound = true;
                         }
                     }
-                    Surface(SlabList(Item).SurfPtr(SurfNum)).PartOfVentSlabOrRadiantSurface = true;
+                    Surface(SlabList(Item).SurfPtr(SurfNum)).IsRadSurfOrVentSlabOrPool = true;
 
                     SlabList(Item).CoreDiameter(SurfNum) = Numbers(NumArray);
                     SlabList(Item).CoreLength(SurfNum) = Numbers(NumArray + 1);

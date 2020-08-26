@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <DataWater.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataWater.hh>
 
 namespace EnergyPlus {
 
@@ -117,10 +117,25 @@ namespace DataWater {
     int NumRainCollectors(0);    // number of rainfall collectors in model
     int NumGroundWaterWells(0);  // number of
     int NumSiteRainFall(0);
-    int NumIrrigation(0);                  // DJS PSU Dec 2006 number of irrigation descriptions (1 allowed)
     bool AnyWaterSystemsInModel(false);    // control flag set true if any water systems
     bool WaterSystemGetInputCalled(false); // set true once input data gotten.
     bool AnyIrrigationInModel(false);      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
+
+    void clear_state()
+    {
+        NumWaterStorageTanks = 0;
+        NumRainCollectors = 0;
+        NumGroundWaterWells = 0;
+        NumSiteRainFall = 0;
+        AnyWaterSystemsInModel = false;
+        WaterSystemGetInputCalled = false;
+        AnyIrrigationInModel = false;
+        RainFall = {};
+        Irrigation = {};
+        WaterStorage.deallocate();
+        RainCollector.deallocate();
+        GroundwaterWell.deallocate();
+    }
 
     // Object Data
     SiteRainFallDataStruct

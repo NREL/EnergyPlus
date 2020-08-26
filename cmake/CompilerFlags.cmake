@@ -3,10 +3,20 @@
 ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
 
+if (NOT OPENGL_FOUND)
+  add_definitions("-DEP_NO_OPENGL")
+endif()
+
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
 IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
+
+    # COMPILER FLAGS
+    ADD_COMPILE_OPTIONS("/nologo")
+    ADD_COMPILE_OPTIONS("/EHsc")
+    ADD_COMPILE_OPTIONS("/MP") # Enables multi-processor compilation of source within a single project
+    STRING (REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
 
     # Disabled Warnings: Enable some of these as more serious warnings are addressed
     #  4068 Unknown pragma
@@ -17,16 +27,10 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     #  4355 Passing this pointer in class initializer (object is incomplete so bases/members can only use this in limited ways)
     #  4996 Deprecated functions (/D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS)
     #  4503 The decorated name was longer than the compiler limit (4096), and was truncated.
+    ADD_COMPILE_OPTIONS(/wd4068 /wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996 /wd4503) # Disables warning messages listed above
 
-    # COMPILER FLAGS
-    ADD_CXX_DEFINITIONS("/nologo")
-    ADD_CXX_DEFINITIONS("/EHsc")
-    ADD_CXX_DEFINITIONS("/MP") # Enables multi-processor compilation of source within a single project
-    STRING (REGEX REPLACE "/W3" "/W1" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}") # Increase to /W2 then /W3 as more serious warnings are addressed (using regex to avoid VC override warnings)
-
-    ADD_CXX_DEFINITIONS("/wd4068 /wd4101 /wd4102 /wd4244 /wd4258 /wd4355 /wd4996 /wd4503") # Disables warning messages listed above
-    ADD_CXX_DEFINITIONS("/DNOMINMAX") # Avoid build errors due to STL/Windows min-max conflicts
-    ADD_CXX_DEFINITIONS("/DWIN32_LEAN_AND_MEAN") # Excludes rarely used services and headers from compilation
+    ADD_DEFINITIONS(/DNOMINMAX) # Avoid build errors due to STL/Windows min-max conflicts
+    ADD_DEFINITIONS(/DWIN32_LEAN_AND_MEAN) # Excludes rarely used services and headers from compilation
     #    ADD_CXX_DEFINITIONS("-d2SSAOptimizer-") # this disables this optimizer which has known major issues
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
@@ -38,7 +42,7 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     ADD_CXX_DEBUG_DEFINITIONS("/fp:strict") # Floating point model
     ADD_CXX_DEBUG_DEFINITIONS("/DMSVC_DEBUG") # Triggers code in main.cc to catch floating point NaNs
 
-ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
+ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
     if (ENABLE_THREAD_SANITIZER)
@@ -91,9 +95,11 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
     ADD_CXX_DEFINITIONS("-pipe") # Faster compiler processing
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
     ADD_CXX_DEFINITIONS("-pedantic") # Turn on warnings about constructs/situations that may be non-portable or outside of the standard
-    ADD_CXX_DEFINITIONS("-ffor-scope")
     ADD_CXX_DEFINITIONS("-Wall -Wextra") # Turn on warnings
     ADD_CXX_DEFINITIONS("-Wno-unknown-pragmas")
+    if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
+      ADD_CXX_DEFINITIONS("-Wno-deprecated-copy")
+    endif()
     ADD_CXX_DEFINITIONS("-Wno-attributes") # Don't warn on attributes Clang doesn't know
     ADD_CXX_DEFINITIONS("-Wno-delete-non-virtual-dtor")
     ADD_CXX_DEFINITIONS("-Wno-missing-braces")
@@ -101,7 +107,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
       ADD_CXX_DEFINITIONS("-Wno-aggressive-loop-optimizations")
-    elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+    elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
       ADD_CXX_DEFINITIONS("-Wno-vexing-parse")
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
@@ -225,7 +231,7 @@ macro(AddFlagIfSupported flag test)
   if( ${${test}} )
     message(STATUS "Adding ${flag}")
     # On Mac with Ninja (kitware binary for fortran support) and brew gfortran, I get build errors due to this flag.
-    if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND BUILD_FORTRAN)
+    if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND BUILD_FORTRAN)
       add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${flag}>)
     else()
       add_compile_options("${flag}")
@@ -238,7 +244,7 @@ endmacro()
 if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   include(CheckCXXCompilerFlag)
   # Clang
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
   endif()
 
@@ -255,3 +261,9 @@ if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   endif()
 endif()
 
+# Xcode/Ninja generators undefined MAKE
+if(CMAKE_GENERATOR MATCHES "Make")
+  set(MAKE "$(MAKE)")
+else()
+  set(MAKE make)
+endif()

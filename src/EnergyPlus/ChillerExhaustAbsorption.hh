@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,31 +52,22 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/Data/BaseData.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+struct ChillerExhaustAbsorptionData;
+
 namespace ChillerExhaustAbsorption {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumExhaustAbsorbers; // number of Absorption Chillers specified in input
-
-    // This type holds the output from the algorithm i.e., the Report Variables
-
-    extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-
-    // Types
-
-    struct ExhaustAbsorberSpecs
+    struct ExhaustAbsorberSpecs : PlantComponent
     {
         // Members
         // Parts of Type that do not correspond with IDD definition
@@ -156,28 +147,12 @@ namespace ChillerExhaustAbsorption {
         int ExhTempLTAbsLeavingHeatingTempIndex; // index for exhaust potentail less than thermal energy needed during heating
         std::string TypeOf;                      // Generator type
         std::string ExhuastSourceName;           // Generator type Name
+        bool oneTimeInit;
+        bool envrnInit;
+        bool plantScanInit;
+        Real64 oldCondSupplyTemp; // save the last iteration value of leaving condenser water temperature
 
-        // Default Constructor
-        ExhaustAbsorberSpecs()
-            : Available(false), ON(false), InCoolingMode(false), InHeatingMode(false), NomCoolingCap(0.0), NomCoolingCapWasAutoSized(false),
-              NomHeatCoolRatio(0.0), ThermalEnergyCoolRatio(0.0), ThermalEnergyHeatRatio(0.0), ElecCoolRatio(0.0), ElecHeatRatio(0.0),
-              ChillReturnNodeNum(0), ChillSupplyNodeNum(0), ChillSetPointErrDone(false), ChillSetPointSetToLoop(false), CondReturnNodeNum(0),
-              CondSupplyNodeNum(0), HeatReturnNodeNum(0), HeatSupplyNodeNum(0), HeatSetPointErrDone(false), HeatSetPointSetToLoop(false),
-              MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondReturn(0.0), TempDesCHWSupply(0.0), EvapVolFlowRate(0.0),
-              EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), HeatVolFlowRate(0.0),
-              HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), ThermalEnergyCoolFTCurve(0), ThermalEnergyCoolFPLRCurve(0),
-              ElecCoolFTCurve(0), ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), ThermalEnergyHeatFHPLRCurve(0), isEnterCondensTemp(false),
-              isWaterCooled(false), CHWLowLimitTemp(0.0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0), DesEvapMassFlowRate(0.0),
-              DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0), CWLoopSideNum(0),
-              CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0), HWLoopSideNum(0),
-              HWBranchNum(0), HWCompNum(0), CompType_Num(0), ExhTempLTAbsLeavingTempIndex(0), ExhTempLTAbsLeavingHeatingTempIndex(0)
-        {
-        }
-    };
-
-    struct ReportVars
-    {
-        // Members
+        // Members from old report struct
         Real64 CoolingLoad;              // cooling load on the chiller (previously called QEvap)
         Real64 CoolingEnergy;            // variable to track total cooling load for period (was EvapEnergy)
         Real64 HeatingLoad;              // heating load on the chiller
@@ -217,8 +192,21 @@ namespace ChillerExhaustAbsorption {
         Real64 ExhHeatRecPotentialCool;  // reporting: Heat Recovery Potential during cooling
 
         // Default Constructor
-        ReportVars()
-            : CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
+        ExhaustAbsorberSpecs()
+            : Available(false), ON(false), InCoolingMode(false), InHeatingMode(false), NomCoolingCap(0.0), NomCoolingCapWasAutoSized(false),
+              NomHeatCoolRatio(0.0), ThermalEnergyCoolRatio(0.0), ThermalEnergyHeatRatio(0.0), ElecCoolRatio(0.0), ElecHeatRatio(0.0),
+              ChillReturnNodeNum(0), ChillSupplyNodeNum(0), ChillSetPointErrDone(false), ChillSetPointSetToLoop(false), CondReturnNodeNum(0),
+              CondSupplyNodeNum(0), HeatReturnNodeNum(0), HeatSupplyNodeNum(0), HeatSetPointErrDone(false), HeatSetPointSetToLoop(false),
+              MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), TempDesCondReturn(0.0), TempDesCHWSupply(0.0), EvapVolFlowRate(0.0),
+              EvapVolFlowRateWasAutoSized(false), CondVolFlowRate(0.0), CondVolFlowRateWasAutoSized(false), HeatVolFlowRate(0.0),
+              HeatVolFlowRateWasAutoSized(false), SizFac(0.0), CoolCapFTCurve(0), ThermalEnergyCoolFTCurve(0), ThermalEnergyCoolFPLRCurve(0),
+              ElecCoolFTCurve(0), ElecCoolFPLRCurve(0), HeatCapFCoolCurve(0), ThermalEnergyHeatFHPLRCurve(0), isEnterCondensTemp(false),
+              isWaterCooled(false), CHWLowLimitTemp(0.0), ExhaustAirInletNodeNum(0), DesCondMassFlowRate(0.0), DesHeatMassFlowRate(0.0),
+              DesEvapMassFlowRate(0.0), DeltaTempCoolErrCount(0), DeltaTempHeatErrCount(0), CondErrCount(0), PossibleSubcooling(false), CWLoopNum(0),
+              CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0), HWLoopNum(0),
+              HWLoopSideNum(0), HWBranchNum(0), HWCompNum(0), CompType_Num(0), ExhTempLTAbsLeavingTempIndex(0),
+              ExhTempLTAbsLeavingHeatingTempIndex(0), oneTimeInit(true), envrnInit(true), plantScanInit(true), oldCondSupplyTemp(0.0),
+              CoolingLoad(0.0), CoolingEnergy(0.0), HeatingLoad(0.0), HeatingEnergy(0.0), TowerLoad(0.0), TowerEnergy(0.0), ThermalEnergyUseRate(0.0),
               ThermalEnergy(0.0), CoolThermalEnergyUseRate(0.0), CoolThermalEnergy(0.0), HeatThermalEnergyUseRate(0.0), HeatThermalEnergy(0.0),
               ElectricPower(0.0), ElectricEnergy(0.0), CoolElectricPower(0.0), CoolElectricEnergy(0.0), HeatElectricPower(0.0),
               HeatElectricEnergy(0.0), ChillReturnTemp(0.0), ChillSupplyTemp(0.0), ChillWaterFlowRate(0.0), CondReturnTemp(0.0), CondSupplyTemp(0.0),
@@ -227,101 +215,47 @@ namespace ChillerExhaustAbsorption {
               ExhaustInTemp(0.0), ExhaustInFlow(0.0), ExhHeatRecPotentialHeat(0.0), ExhHeatRecPotentialCool(0.0)
         {
         }
+
+        static PlantComponent *factory(ChillerExhaustAbsorptionData &chillers, std::string const &objectName);
+
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        void getSizingFactor(Real64 &SizFac) override;
+
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
+
+        void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
+
+        void initialize(BranchInputManagerData &dataBranchInputManager);
+
+        void setupOutputVariables();
+
+        void size();
+
+        void calcChiller(Real64 &MyLoad);
+
+        void calcHeater(Real64 &MyLoad, bool RunFlag);
+
+        void updateCoolRecords(Real64 MyLoad, bool RunFlag);
+
+        void updateHeatRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    // Object Data
-    extern Array1D<ExhaustAbsorberSpecs> ExhaustAbsorber; // dimension to number of machines
-    extern Array1D<ReportVars> ExhaustAbsorberReport;
-
-    // Functions
-
-    void SimExhaustAbsorber(std::string const &AbsorberType, // type of Absorber
-                            std::string const &AbsorberName, // user specified name of Absorber
-                            int const EquipFlowCtrl,         // Flow control mode for the equipment
-                            int &CompIndex,                  // Absorber number counter
-                            bool const RunFlag,              // simulate Absorber when TRUE
-                            bool const FirstIteration,       // initialize variables when TRUE
-                            bool &InitLoopEquip,             // If not false, calculate the max load for operating conditions
-                            Real64 &MyLoad,                  // loop demand component will meet
-                            int const BranchInletNodeNum,    // node number of inlet to calling branch,
-                            Real64 &MaxCap,                  // W - maximum operating capacity of Absorber
-                            Real64 &MinCap,                  // W - minimum operating capacity of Absorber
-                            Real64 &OptCap,                  // W - optimal operating capacity of Absorber
-                            bool const GetSizingFactor,      // TRUE when just the sizing factor is requested
-                            Real64 &SizingFactor             // sizing factor
-    );
-
-    // End Absorption Chiller Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of Absorption Chiller Module Get Input subroutines
-    //******************************************************************************
-
-    void GetExhaustAbsorberInput();
-
-    // End of Get Input subroutines for the Absorption Chiller Module
-    //******************************************************************************
-
-    void InitExhaustAbsorber(int const ChillNum, // number of the current engine driven chiller being simulated
-                             bool const RunFlag  // TRUE when chiller operating
-    );
-
-    void SizeExhaustAbsorber(int const ChillNum);
-
-    // Beginning of Absorber model Subroutines
-    // *****************************************************************************
-
-    void CalcExhaustAbsorberChillerModel(int &ChillNum,     // Absorber number
-                                         Real64 &MyLoad,    // operating load
-                                         bool const RunFlag // TRUE when Absorber operating
-    );
-
-    void CalcExhaustAbsorberHeaterModel(int &ChillNum,     // Absorber number
-                                        Real64 &MyLoad,    // operating load
-                                        bool const RunFlag // TRUE when Absorber operating
-    );
-
-    // End of Absorption Chiller Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the Absorption Chiller Module
-    // *****************************************************************************
-
-    void UpdateExhaustAbsorberCoolRecords(Real64 const MyLoad, // current load
-                                          bool const RunFlag,  // TRUE if Absorber operating
-                                          int const ChillNum   // Absorber number
-    );
-
-    void UpdateExhaustAbsorberHeatRecords(Real64 const MyLoad, // current load
-                                          bool const RunFlag,  // TRUE if Absorber operating
-                                          int const ChillNum   // Absorber number
-    );
-
-    // End of Record Keeping subroutines for the Exhasut Fired Absorption Chiller Module
-    // *****************************************************************************
-
-    void clear_state();
-
-    //                                 COPYRIGHT NOTICE
-
-    //     Portions Copyright (c) Gas Research Institute 2001.  All rights reserved.
-
-    //     GRI LEGAL NOTICE
-    //     Neither GRI, members of GRI nor any person or organization acting on behalf
-    //     of either:
-
-    //     A. Makes any warranty of representation, express or implied with respect to
-    //        the accuracy, completness, or usefulness of the information contained in
-    //        in this program, including any warranty of merchantability or fitness of
-    //        any purpose with respoect to the program, or that the use of any
-    //        information disclosed in this program may not infringe privately-owned
-    //        rights, or
-
-    //     B.  Assumes any liability with respoct to the use of, or for any and all
-    //         damages resulting from the use of the program or any portion thereof or
-    //         any information disclosed therein.
+    void GetExhaustAbsorberInput(ChillerExhaustAbsorptionData &chillers);
 
 } // namespace ChillerExhaustAbsorption
+
+    struct ChillerExhaustAbsorptionData : BaseGlobalStruct {
+        bool Sim_GetInput = true;
+        Array1D<ChillerExhaustAbsorption::ExhaustAbsorberSpecs> ExhaustAbsorber;
+        void clear_state() override
+        {
+            Sim_GetInput = true;
+            ExhaustAbsorber.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

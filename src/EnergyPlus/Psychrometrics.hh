@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,18 +58,21 @@
 #include <ObjexxFCL/bit.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
 #ifdef EP_nocache_Psychrometrics
 #undef EP_cache_PsyTwbFnTdbWPb
 #undef EP_cache_PsyPsatFnTemp
+#undef EP_cache_PsyTsatFnPb
 #else
 #define EP_cache_PsyTwbFnTdbWPb
 #define EP_cache_PsyPsatFnTemp
+#define EP_cache_PsyTsatFnPb
+#define EP_cache_PsyTsatFnHPb
 #endif
 #define EP_psych_errors
 
@@ -128,6 +131,15 @@ namespace Psychrometrics {
     extern int const psatprecision_bits; // 28  //24  //32
     extern Int64 const psatcache_mask;
 #endif
+#ifdef EP_cache_PsyTsatFnPb
+    extern int const tsatcache_size;
+    extern int const tsatprecision_bits;
+    extern Int64 const tsatcache_mask;
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+    extern int const tsat_hbp_cache_size;
+    extern int const tsat_hbp_precision_bits;
+#endif
 
     // MODULE VARIABLE DECLARATIONS:
     // na
@@ -160,7 +172,20 @@ namespace Psychrometrics {
         }
     };
 #endif
+#ifdef EP_cache_PsyTsatFnHPb
+    struct cached_tsat_h_pb
+    {
+        // Members
+        Int64 iH;
+        Int64 iPb;
+        Real64 Tsat;
 
+        // Default Constructor
+        cached_tsat_h_pb() : iH(0), iPb(0), Tsat(0.0)
+        {
+        }
+    };
+#endif
 #ifdef EP_cache_PsyPsatFnTemp
     struct cached_psat_t
     {
@@ -174,7 +199,19 @@ namespace Psychrometrics {
         }
     };
 #endif
+#ifdef EP_cache_PsyTsatFnPb
+    struct cached_tsat_pb
+    {
+        // Members
+        Int64 iPb;
+        Real64 Tsat;
 
+        // Default Constructor
+        cached_tsat_pb() : iPb(-1000), Tsat(0.0)
+        {
+        }
+    };
+#endif
     // Object Data
 #ifdef EP_cache_PsyTwbFnTdbWPb
     extern Array1D<cached_twb_t> cached_Twb; // DIMENSION(0:twbcache_size)
@@ -182,7 +219,12 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyPsatFnTemp
     extern Array1D<cached_psat_t> cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
-
+#ifdef EP_cache_PsyTsatFnPb
+    extern Array1D<cached_tsat_pb> cached_Tsat; // DIMENSION(0:tsatcache_size)
+#endif
+#ifdef EP_cache_PsyTsatFnHPb
+    extern Array1D<cached_tsat_h_pb> cached_Tsat_HPb; // DIMENSION(0:tsat_hbp_cache_size)
+#endif
     // Subroutine Specifications for the Module
 
     // Functions
@@ -191,7 +233,7 @@ namespace Psychrometrics {
 
     void InitializePsychRoutines();
 
-    void ShowPsychrometricSummary();
+    void ShowPsychrometricSummary(InputOutputFile &auditFile);
 
 #ifdef EP_psych_errors
     void PsyRhoAirFnPbTdbW_error(Real64 const pb,                             // barometric pressure (Pascals)
@@ -334,8 +376,7 @@ namespace Psychrometrics {
         return 1.00484e3 * TDB + dW * (2.50094e6 + 1.85895e3 * TDB); // enthalpy {J/kg}
     }
 
-    inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAir}
-                                 Real64 const T   // input temperature {Celsius}
+    inline Real64 PsyCpAirFnW(Real64 const dw // humidity ratio {kgWater/kgDryAir}
     )
     {
         // FUNCTION INFORMATION:
@@ -352,30 +393,27 @@ namespace Psychrometrics {
 
         // REFERENCES:
         // see PsyHFnTdbW ref. to ASHRAE Fundamentals
-        // USAGE:  cpa = PsyCpAirFnWTdb(w,T)
+        // USAGE:  cpa = PsyCpAirFnW(w)
 
         // Static locals
         static Real64 dwSave(-100.0);
-        static Real64 Tsave(-100.0);
         static Real64 cpaSave(-100.0);
 
         // check if last call had the same input and if it did just use the saved output
-        if ((Tsave == T) && (dwSave == dw)) return cpaSave;
+        if (dwSave == dw) return cpaSave;
 
         // compute heat capacity of air
         Real64 const w(max(dw, 1.0e-5));
-        Real64 const cpa((PsyHFnTdbW(T + 0.1, w) - PsyHFnTdbW(T, w)) * 10.0); // result => heat capacity of air {J/kg-C}
+        Real64 const cpa((1.00484e3 + w * 1.85895e3)); // result => heat capacity of moist air {J/kg-C}
 
         // save values for next call
         dwSave = dw;
-        Tsave = T;
         cpaSave = cpa;
 
         return cpa;
     }
 
-    inline Real64 PsyCpAirFnWTdb_fast(Real64 const dw, // humidity ratio {kgWater/kgDryAir}
-                                      Real64 const T   // input temperature {Celsius}
+    inline Real64 PsyCpAirFnW_fast(Real64 const dw // humidity ratio {kgWater/kgDryAir}
     )
     {
         // Faster version with humidity ratio already adjusted
@@ -383,18 +421,16 @@ namespace Psychrometrics {
 
         // Static locals
         static Real64 dwSave(-100.0);
-        static Real64 Tsave(-100.0);
         static Real64 cpaSave(-100.0);
 
         // check if last call had the same input and if it did just use the saved output
-        if ((Tsave == T) && (dwSave == dw)) return cpaSave;
+        if (dwSave == dw) return cpaSave;
 
         // compute heat capacity of air
-        Real64 const cpa((PsyHFnTdbW_fast(T + 0.1, dw) - PsyHFnTdbW_fast(T, dw)) * 10.0); // result => heat capacity of air {J/kg-C}
+        Real64 const cpa((1.00484e3 + dw * 1.85895e3)); // result => heat capacity of moist air {J/kg-C}
 
         // save values for next call
         dwSave = dw;
-        Tsave = T;
         cpaSave = cpa;
 
         return cpa;
@@ -680,8 +716,7 @@ namespace Psychrometrics {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-        Int64 const Tdb_tag(
-            bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
+        Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
         //		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(cached_Psat(hash));
@@ -704,10 +739,60 @@ namespace Psychrometrics {
 
 #endif
 
+#ifdef EP_cache_PsyTsatFnHPb
+    Real64 PsyTsatFnHPb_raw(Real64 const H,                              // enthalpy {J/kg}
+                            Real64 const PB,                             // barometric pressure {Pascals}
+                            std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    );
+    inline Real64 PsyTsatFnHPb(Real64 const H,
+                               Real64 const Pb,                             // barometric pressure {Pascals}
+                               std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    )
+    {
+
+        Real64 Tsat_result; // result=> Sat-Temp {C}
+
+        Int64 const Grid_Shift(64 - 12 - tsat_hbp_precision_bits);
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Int64 H_tag;
+        Int64 Pb_tag;
+        Int64 hash;
+
+#ifdef EP_psych_stats
+        ++NumTimesCalled(iPsyTwbFnTdbWPb_cache);
+#endif
+
+        H_tag = bit_transfer(H, H_tag);
+        H_tag = bit_shift(H_tag, -Grid_Shift);
+        Pb_tag = bit_transfer(Pb, Pb_tag);
+        Pb_tag = bit_shift(Pb_tag, -Grid_Shift);
+        hash = bit_and(bit_xor(H_tag, Pb_tag), Int64(tsat_hbp_cache_size - 1));
+        if (cached_Tsat_HPb(hash).iH != H_tag || cached_Tsat_HPb(hash).iPb != Pb_tag) {
+            cached_Tsat_HPb(hash).iH = H_tag;
+            cached_Tsat_HPb(hash).iPb = Pb_tag;
+            cached_Tsat_HPb(hash).Tsat = PsyTsatFnHPb_raw(H, Pb, CalledFrom);
+        }
+
+        Tsat_result = cached_Tsat_HPb(hash).Tsat;
+
+        return Tsat_result;
+    }
+
+#else
+
     Real64 PsyTsatFnHPb(Real64 const H,                              // enthalpy {J/kg}
                         Real64 const PB,                             // barometric pressure {Pascals}
                         std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
+
+#endif
 
     inline Real64 PsyRhovFnTdbRh(Real64 const Tdb,                            // dry-bulb temperature {C}
                                  Real64 const RH,                             // relative humidity value (0.0-1.0)
@@ -851,6 +936,7 @@ namespace Psychrometrics {
     void PsyWFnTdpPb_error(Real64 const TDP,             // dew-point temperature {C}
                            Real64 const PB,              // barometric pressure {Pascals}
                            Real64 const W,               // humidity ratio
+                           Real64 const DeltaT,          // Reduced temperature difference of dew point
                            std::string const &CalledFrom // routine this function was called from (error messages)
     );
 #endif
@@ -886,10 +972,20 @@ namespace Psychrometrics {
 
         // Validity test
         if (W < 0.0) {
+            Real64 DeltaT = 0.0;
+            Real64 PDEW1 = PDEW;
+            while (PDEW1 >= PB) {
+                DeltaT++;
+                PDEW1 = PsyPsatFnTemp(TDP - DeltaT,
+                                      (CalledFrom.empty() ? RoutineName : CalledFrom)); // saturation pressure at dew-point temperature {Pascals}
+            }
+            Real64 W1 = PDEW1 * 0.62198 / (PB - PDEW1);
 #ifdef EP_psych_errors
-            if (W <= -0.0001) PsyWFnTdpPb_error(TDP, PB, W, CalledFrom);
+            if (W <= -0.0001) {
+                PsyWFnTdpPb_error(TDP, PB, W1, DeltaT, CalledFrom);
+            }
 #endif
-            return 1.0e-5;
+            return W1;
         } else {
             return W;
         }
@@ -1043,9 +1139,36 @@ namespace Psychrometrics {
         return PsyHFnTdbW(TDB, max(PsyWFnTdbRhPb(TDB, RH, PB, CalledFrom), 1.0e-5)); // enthalpy {J/kg}
     }
 
+#ifdef EP_cache_PsyTsatFnPb
+
+    Real64 PsyTsatFnPb_raw(Real64 const Press,                          // barometric pressure {Pascals}
+                           std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    );
+
+    inline Real64 PsyTsatFnPb(Real64 const Press,                          // barometric pressure {Pascals}
+                              std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
+    )
+    {
+
+        Int64 const Grid_Shift(28);                         // Tuned This is a hot spot
+        assert(Grid_Shift == 64 - 12 - tsatprecision_bits); // Force Grid_Shift updates when precision bits changes
+        Int64 const Pb_tag(bit_shift(bit_transfer(Press, Grid_Shift), -Grid_Shift));
+
+        Int64 const hash(Pb_tag & tsatcache_mask);
+        auto &cTsat(cached_Tsat(hash));
+        if (cTsat.iPb != Pb_tag) {
+            cTsat.iPb = Pb_tag;
+            cTsat.Tsat = PsyTsatFnPb_raw(Press, CalledFrom);
+        }
+
+        return cTsat.Tsat; // saturation temperature
+    }
+
+#else
     Real64 PsyTsatFnPb(Real64 const Press,                          // barometric pressure {Pascals}
                        std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
+#endif
 
     inline Real64 PsyTdpFnWPb(Real64 const W,                              // humidity ratio
                               Real64 const PB,                             // barometric pressure (N/M**2) {Pascals}
@@ -1168,6 +1291,24 @@ namespace Psychrometrics {
         return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2(TB) + 8.4791863e-06 * pow_3(TB);
     }
 
+    inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
+                                             Real64 const dW2,  // humidity ratio at  at state 2
+                                             Real64 const TDB1, // dry-bulb temperature at  at state 1 {C}
+                                             Real64 const dW1   // humidity ratio  at state 1
+    )
+    {
+        // returns sensible enthalpy difference of moist air going from state 1 to state 2
+        Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
+        return (1.00484e3 + dWavg * 1.85895e3) * (TDB2 - TDB1);
+    }
+
+    inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
+                                      Real64 const TDB1  // dry-bulb temperature at  at state 1 {C}
+    )
+    {
+        // calculate average latent heat of vaporization of water vapor in moist air
+        return (2.50094e6 + 0.5 * (TDB2 + TDB1) * 1.85895e3);
+    }
 } // namespace Psychrometrics
 
 } // namespace EnergyPlus

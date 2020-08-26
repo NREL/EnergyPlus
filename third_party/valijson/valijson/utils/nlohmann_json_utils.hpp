@@ -1,6 +1,4 @@
 #pragma once
-#ifndef VALIJSON_NLOHMANN_JSON_UTILS_HPP
-#define VALIJSON_NLOHMANN_JSON_UTILS_HPP
 
 #include <iostream>
 
@@ -10,7 +8,8 @@
 namespace valijson {
 namespace utils {
 
-inline bool loadDocument(const std::string &path, nlohmann::json &document) {
+inline bool loadDocument(const std::string &path, nlohmann::json &document)
+{
     // Load schema JSON from file
     std::string file;
     if (!loadFile(path, file)) {
@@ -33,5 +32,3 @@ inline bool loadDocument(const std::string &path, nlohmann::json &document) {
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif //VALIJSON_NLOHMANN_JSON_UTILS_HPP

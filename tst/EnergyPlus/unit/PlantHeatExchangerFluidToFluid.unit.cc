@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,24 +51,22 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataLoopNode.hh>
-#include <NodeInputManager.hh>
-#include <PlantHeatExchangerFluidToFluid.hh>
-//#include <EMSManager.hh>
-#include <BranchInputManager.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <General.hh>
-#include <HeatBalanceManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantUtilities.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SimulationManager.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -76,7 +74,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 {
     // this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be
     // met this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks
-    // that the HX will attempt to meet setpoint of 19 when the conditioniong fluid is 20 and cannot really make it to 19.  The HX still cools to down
+    // that the HX will attempt to meet setpoint of 19 when the conditioning fluid is 20 and cannot really make it to 19.  The HX still cools to down
     // to 20.
 
     std::string const idf_objects = delimited_string({
@@ -1064,21 +1062,21 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -1087,7 +1085,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1099,7 +1097,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        state.dataGlobals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -1137,9 +1135,9 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         }
                     }
 
-                    WeatherManager::ManageWeather();
+                    WeatherManager::ManageWeather(state);
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(state);
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -1167,7 +1165,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     // this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be
     // met this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.
-    // This test checks that the HX will attempt to meet setpoint of 21 when the conditioniong fluid is 20 and cannot really make it to 21.  The HX
+    // This test checks that the HX will attempt to meet setpoint of 21 when the conditioning fluid is 20 and cannot really make it to 21.  The HX
     // still heats up to 20.
 
     std::string const idf_objects = delimited_string({
@@ -2155,21 +2153,21 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -2178,7 +2176,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2190,7 +2188,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        state.dataGlobals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -2228,9 +2226,9 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         }
                     }
 
-                    WeatherManager::ManageWeather();
+                    WeatherManager::ManageWeather(state);
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(state);
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2269,7 +2267,7 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2284,8 +2282,8 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
 
     // setup four plant nodes for HX
     DataLoopNode::Node.allocate(4);
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.InletNodeNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.OutletNodeNum = 3;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.outletNodeNum = 3;
     DataLoopNode::Node(1).Temp = 18.0;
     DataLoopNode::Node(1).MassFlowRateMaxAvail = 2.0;
     DataLoopNode::Node(1).MassFlowRateMax = 2.0;
@@ -2294,8 +2292,8 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
 
     PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.InletTemp = 18.0;
 
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.InletNodeNum = 2;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.OutletNodeNum = 4;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum = 2;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.outletNodeNum = 4;
     DataLoopNode::Node(2).Temp = 19.0;
     DataLoopNode::Node(2).MassFlowRateMaxAvail = 2.0;
     DataLoopNode::Node(2).MassFlowRateMax = 2.0;
@@ -2328,33 +2326,33 @@ TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
     DataPlant::PlantLoop(1).FluidName = "WATER";
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
     DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.InletNodeNum;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.LoopNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.LoopSideNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.BranchNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.CompNum = 1;
+    DataPlant::PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.loopNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.loopSideNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.branchNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.compNum = 1;
 
     DataPlant::PlantLoop(2).Name = "HX demand side loop ";
     DataPlant::PlantLoop(2).FluidIndex = 1;
     DataPlant::PlantLoop(2).FluidName = "WATER";
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.InletNodeNum;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.LoopNum = 2;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.LoopSideNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.BranchNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.CompNum = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.loopNum = 2;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.loopSideNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.branchNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.compNum = 1;
     PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax = 2.0;
 
     // when FirstHVACIteration is true, mass flow should match design max
     bool testFirstHVACIteration = true;
-    PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger(1, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
 
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax, 0.001);
 
     // when FirstHVACIteration is false, mass flow should be zero
     testFirstHVACIteration = false;
-    PlantHeatExchangerFluidToFluid::ControlFluidHeatExchanger(1, 1, -1000.0, testFirstHVACIteration);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).control(1, -1000.0, testFirstHVACIteration);
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.0, 0.001);
 }
 
@@ -2368,7 +2366,7 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2383,8 +2381,8 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
 
     // setup four plant nodes for HX
     DataLoopNode::Node.allocate(6);
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.InletNodeNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.OutletNodeNum = 3;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.outletNodeNum = 3;
     PlantHeatExchangerFluidToFluid::FluidHX(1).SetPointNodeNum = 3;
     PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.MassFlowRateMax = 2.0;
 
@@ -2396,8 +2394,8 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
 
     PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.InletTemp = 18.0;
 
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.InletNodeNum = 2;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.OutletNodeNum = 4;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum = 2;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.outletNodeNum = 4;
     DataLoopNode::Node(2).Temp = 19.0;
     DataLoopNode::Node(2).MassFlowRateMaxAvail = 2.0;
     DataLoopNode::Node(2).MassFlowRateMax = 2.0;
@@ -2446,22 +2444,22 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataPlant::PlantLoop(1).FluidName = "WATER";
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
     DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.InletNodeNum;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).SupplySideLoop.inletNodeNum;
 
     DataPlant::PlantLoop(2).Name = "HX demand side loop ";
     DataPlant::PlantLoop(2).FluidIndex = 1;
     DataPlant::PlantLoop(2).FluidName = "WATER";
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).Name = PlantHeatExchangerFluidToFluid::FluidHX(1).Name;
     DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = DataPlant::TypeOf_FluidToFluidPlantHtExchg;
-    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.InletNodeNum;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1).NodeNumIn = PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.inletNodeNum;
 
     PlantHeatExchangerFluidToFluid::FluidHX(1).DemandSideLoop.MassFlowRateMax = 2.0;
     PlantHeatExchangerFluidToFluid::FluidHX(1).ControlSignalTemp = PlantHeatExchangerFluidToFluid::DryBulbTemperature;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.InletNodeNum = 5;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.LoopNum = 1;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.LoopSideNum = 2;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.BranchNum = 2;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.CompNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.inletNodeNum = 5;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.loopNum = 1;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.loopSideNum = 2;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.branchNum = 2;
+    PlantHeatExchangerFluidToFluid::FluidHX(1).OtherCompSupplySideLoop.compNum = 1;
 
     PlantHeatExchangerFluidToFluid::NumberOfPlantFluidHXs = 1;
 
@@ -2471,24 +2469,14 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataLoopNode::Node(3).TempSetPoint = 11.0;
 
     // now call the init routine
-    PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger(1, 1);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state.dataBranchInputManager);
 
     // check value in FreeCoolCntrlMinCntrlTemp
     EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001);
 
     // change the tolerance and check the result, issue 5626 fix subtracts tolerance
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 1.5;
-    PlantHeatExchangerFluidToFluid::InitFluidHeatExchanger(1, 1);
-
-//    EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 9.5, 0.001);
-//
-//    // Force Effectiveness = 1 when -NTU < EXP_LowerLimit #6516
-//    PlantHeatExchangerFluidToFluid::FluidHX(1).HeatExchangeModelType = PlantHeatExchangerFluidToFluid::CrossFlowBothMixed;
-//    PlantHeatExchangerFluidToFluid::FluidHX(1).UA = 9000.0;
-//
-//    PlantHeatExchangerFluidToFluid::CalcFluidHeatExchanger(1, 0.1, 0.1);
-//    EXPECT_NEAR(PlantHeatExchangerFluidToFluid::FluidHX(1).Effectiveness, 1.0, 0.001);
-
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state.dataBranchInputManager);
 }
 
 } // namespace EnergyPlus

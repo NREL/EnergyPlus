@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,7 +100,7 @@ TEST_F(EnergyPlusFixture, OutAirNodeManager_OATdbTwbOverrideTest)
 
     InitOutAirNodes();
 
-    EXPECT_NEAR(14.62572687, DataLoopNode::Node(1).OutAirWetBulb, 0.0001);
+    EXPECT_NEAR(14.6467, DataLoopNode::Node(1).OutAirWetBulb, 0.0001);
     EXPECT_NEAR(0.007253013, DataLoopNode::Node(2).HumRat, 0.000001);
     EXPECT_NEAR(0.006543816, DataLoopNode::Node(3).HumRat, 0.000001);
 

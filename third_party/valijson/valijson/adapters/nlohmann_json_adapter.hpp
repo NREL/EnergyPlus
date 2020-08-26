@@ -24,8 +24,6 @@
  */
 
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_NLOHMANN_JSON_ADAPTER_HPP
-#define __VALIJSON_ADAPTERS_NLOHMANN_JSON_ADAPTER_HPP
 
 #include <string>
 #include <json.hpp>
@@ -707,6 +705,3 @@ inline NlohmannJsonObjectMemberIterator NlohmannJsonObject::find(
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif
-

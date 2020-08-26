@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,13 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct CostEstimateManagerData;
 
 namespace EconomicLifeCycleCost {
 
@@ -106,9 +109,9 @@ namespace EconomicLifeCycleCost {
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
-    //   Distillate oil
-    //   Liquified petroleum gas
-    //   Residual oil
+    //   Distillate oil - FuelOilNo1
+    //   Liquified petroleum gas - Propane
+    //   Residual oil - FuelOilNo2
     //   Coal
 
     extern int const startServicePeriod;
@@ -170,6 +173,10 @@ namespace EconomicLifeCycleCost {
 
     extern Array1D_string const MonthNames;
 
+    // arrays related to escalated energy costs
+    extern Array1D<Real64> EscalatedTotEnergy;
+    extern Array2D<Real64> EscalatedEnergy;
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Types
@@ -192,7 +199,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         RecurringCostsType()
-            : category(costCatMaintenance), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0),
+            : category(costCatMaintenance), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0),
               repeatPeriodYears(0), repeatPeriodMonths(0), totalRepeatPeriodMonths(0), annualEscalationRate(0.0)
         {
         }
@@ -212,7 +219,7 @@ namespace EconomicLifeCycleCost {
 
         // Default Constructor
         NonrecurringCostType()
-            : category(costCatConstruction), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0)
+            : category(costCatConstruction), cost(0.0), startOfCosts(startServicePeriod), yearsFromStart(0), monthsFromStart(0), totalMonthsFromStart(0)
         {
         }
     };
@@ -228,7 +235,7 @@ namespace EconomicLifeCycleCost {
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UsePriceEscalationType() : escalationStartYear(0), escalationStartMonth(0)
+        UsePriceEscalationType() : resource(0), escalationStartYear(0), escalationStartMonth(0)
         {
         }
     };
@@ -242,7 +249,7 @@ namespace EconomicLifeCycleCost {
         // last year is baseDateYear + lengthStudyYears - 1
 
         // Default Constructor
-        UseAdjustmentType()
+        UseAdjustmentType() : resource(0)
         {
         }
     };
@@ -263,7 +270,7 @@ namespace EconomicLifeCycleCost {
         Array1D<Real64> yrPresVal; // present value by year, first year is baseDateYear
 
         // Default Constructor
-        CashFlowType() : pvKind(0)
+        CashFlowType() : SourceKind(0), Resource(0), Category(0), pvKind(0), presentValue(0.), orginalCost(0.)
         {
         }
     };
@@ -279,7 +286,7 @@ namespace EconomicLifeCycleCost {
 
     void GetInputForLifeCycleCost();
 
-    void ComputeLifeCycleCostAndReport();
+    void ComputeLifeCycleCostAndReport(CostEstimateManagerData &dataCostEstimateManager);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -309,7 +316,9 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows();
+    void ExpressAsCashFlows(CostEstimateManagerData &dataCostEstimateManager);
+
+    void ComputeEscalatedEnergyCosts();
 
     void ComputePresentValue();
 
@@ -323,7 +332,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularLifeCycleCostReport();
+    void WriteTabularLifeCycleCostReport(CostEstimateManagerData &dataCostEstimateManager);
 
     void clear_state();
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,19 +52,20 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataPlant.hh>
-#include <EnergyPlus.hh>
-#include <UnitarySystem.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace DataAirSystems {
 
     // Using/Aliasing
     using DataPlant::MeterData;
     using DataPlant::SubcomponentData;
-    using UnitarySystems::UnitarySys;
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -84,21 +85,21 @@ namespace DataAirSystems {
     // Temporary arrays
 
     // Types
-     struct AirLoopCompData // data for an individual component
+    struct AirLoopCompData // data for an individual component
     {
         // Members
-        std::string TypeOf;       // The 'keyWord' identifying  component type
-        std::string Name;         // Component name
-        int CompType_Num;         // Numeric designator for CompType (TypeOf)
-        int CompIndex;            // Component Index in whatever is using this component
-        UnitarySys *compPointer;  // pointer to UnitarySystem
-        int FlowCtrl;             // Component flow control (ACTIVE/PASSIVE)
-        bool ON;                  // When true, the designated component or operation scheme is available
-        bool Parent;              // When true, the designated component is made up of sub-components
-        std::string NodeNameIn;   // Component inlet node name
-        std::string NodeNameOut;  // Component outlet node name
-        int NodeNumIn;            // Component inlet node number
-        int NodeNumOut;           // Component outlet node number
+        std::string TypeOf;      // The 'keyWord' identifying  component type
+        std::string Name;        // Component name
+        int CompType_Num;        // Numeric designator for CompType (TypeOf)
+        int CompIndex;           // Component Index in whatever is using this component
+        HVACSystemData *compPointer; // pointer to HVAC system
+        int FlowCtrl;            // Component flow control (ACTIVE/PASSIVE)
+        bool ON;                 // When true, the designated component or operation scheme is available
+        bool Parent;             // When true, the designated component is made up of sub-components
+        std::string NodeNameIn;  // Component inlet node name
+        std::string NodeNameOut; // Component outlet node name
+        int NodeNumIn;           // Component inlet node number
+        int NodeNumOut;          // Component outlet node number
         bool MeteredVarsFound;
         int NumMeteredVars;
         int NumSubComps;
@@ -423,7 +424,7 @@ namespace DataAirSystems {
     // Functions
     void clear_state();
 
-    Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
+    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
 
 } // namespace DataAirSystems
 

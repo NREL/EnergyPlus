@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,26 +55,27 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutsideEnergySources.hh>
-#include <PlantUtilities.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include "OutsideEnergySources.hh"
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
 
 
 namespace EnergyPlus {
@@ -134,14 +135,14 @@ namespace OutsideEnergySources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void OutsideEnergySourceSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
                                             Real64 &CurLoad, bool RunFlag) {
-        this->initialize(CurLoad);
+        this->initialize(state.dataBranchInputManager, CurLoad);
         this->calculate(RunFlag, CurLoad);
     }
 
-    void OutsideEnergySourceSpecs::onInitLoopEquip(const PlantLocation &) {
-        this->initialize(0.0);
+    void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &) {
+        this->initialize(state.dataBranchInputManager, 0.0);
         this->size();
     }
 
@@ -245,7 +246,7 @@ namespace OutsideEnergySources {
 
     }
 
-    void OutsideEnergySourceSpecs::initialize(Real64 MyLoad)
+    void OutsideEnergySourceSpecs::initialize(BranchInputManagerData &dataBranchInputManager, Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -268,7 +269,7 @@ namespace OutsideEnergySources {
         if (this->OneTimeInitFlag) {
             // Locate the unit on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager, this->Name,
                                                     this->EnergyType,
                                     this->LoopNum,
                                     this->LoopSideNum,

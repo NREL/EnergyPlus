@@ -2,15 +2,16 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# Old enough to support Ubuntu Trusty.
-cmake_minimum_required(VERSION 2.8.12)
+# Old enough to support Ubuntu Xenial.
+cmake_minimum_required(VERSION 3.5.1)
 
 if(POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
 
 project(RE2 CXX)
-include(CTest)
+#include(CTest)
+include(GNUInstallDirs)
 
 option(BUILD_SHARED_LIBS "build shared libraries" OFF)
 option(USEPCRE "use PCRE in tests and benchmarks" OFF)
@@ -27,7 +28,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   endif()
   if(BUILD_SHARED_LIBS)
     # See http://www.kitware.com/blog/home/post/939 for details.
-    cmake_minimum_required(VERSION 3.4)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
   endif()
   # CMake defaults to /W3, but some users like /W4 (or /Wall) and /WX,
@@ -95,6 +95,7 @@ set(RE2_SOURCES
     )
 
 add_library(re2 ${RE2_SOURCES})
+add_library(re2::re2 ALIAS re2)
 
 if(RE2_BUILD_TESTING)
   set(TESTING_SOURCES
@@ -157,5 +158,12 @@ set(RE2_HEADERS
     re2/stringpiece.h
     )
 
-# install(FILES ${RE2_HEADERS} DESTINATION include/re2)
-# install(TARGETS re2 ARCHIVE DESTINATION lib LIBRARY DESTINATION lib RUNTIME DESTINATION bin)
+# install(FILES ${RE2_HEADERS}
+#         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/re2)
+# install(TARGETS re2 EXPORT re2Config
+#         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# install(EXPORT re2Config
+#         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/re2 NAMESPACE re2::)

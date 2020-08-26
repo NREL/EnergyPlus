@@ -71,7 +71,7 @@ where:
 
 \emph{W} is the humidity ratio (kg of water/kg of dry air).
 
-For a mixer unit connected to the inlet side of a ZoneHVAC equipment, the outlet air mass flow rate has been set by the zone HVAC equipment. The air mass flow rate of one of the inlets - the primary air from the central system - is also known. So the air mass balance equation is used to obtain the secondary air mass flow rate. 
+For a mixer unit connected to the inlet side of a ZoneHVAC equipment, the outlet air mass flow rate has been set by the zone HVAC equipment. The air mass flow rate of one of the inlets - the primary air from the central system - is also known. So the air mass balance equation is used to obtain the secondary air mass flow rate.
 
 The inlet conditions - specific enthalpy and humidity ratio - for both inlet air streams are known. Now that both inlet air streams' mass flow rate is known, the enthalpy and water mass balance equations are used to get the outlet conditions.
 
@@ -367,7 +367,7 @@ The ASHRAE90.1 control method uses a simple technique to adjust fan speed based 
 \begin{lstlisting}
 Section 6.4.3.10 (“Single Zone Variable-Air-Volume Controls”) of ASHRAE Standard 90.1-2010.
 HVAC systems shall have variable airflow controls as follows:
-(a) Air-handling and fan-coil units with chilled-water cooling coils and supply fans with motors 
+(a) Air-handling and fan-coil units with chilled-water cooling coils and supply fans with motors
     greater than or equal to 5 hp shall have their supply fans controlled by two-speed motors or
     variable-speed drives. At cooling demands less than or equal to 50%, the supply fan controls
     shall be able to reduce the airflow to no greater than the larger of the following:
@@ -569,7 +569,7 @@ Iterative calculations (successive modeling of the individual PTAC component mod
 
 \subsubsection{Single Zone VAV load based control:}\label{single-zone-vav-load-based-control}
 
-The packaged terminal air conditioner can also be used to simulate a system capable of maintaining a low fan speed through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the fan speed is maintained at a minimum level and the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. As the outlet air temperature limit is reached and loads increase, the fan speed increases to maintain thermostat control. When the fan speed reaches the maximum flow limit, the system outlet air temperature may exceed the user specified limit, if the coil is capable of providing more capacity, to meet increased load. This model is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for cooling or heating operation. Additionally, only specific coil types are allowed for the Single Zone VAV capacity control method. 
+The packaged terminal air conditioner can also be used to simulate a system capable of maintaining a low fan speed through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the fan speed is maintained at a minimum level and the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. As the outlet air temperature limit is reached and loads increase, the fan speed increases to maintain thermostat control. When the fan speed reaches the maximum flow limit, the system outlet air temperature may exceed the user specified limit, if the coil is capable of providing more capacity, to meet increased load. This model is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for cooling or heating operation. Additionally, only specific coil types are allowed for the Single Zone VAV capacity control method.
 
 Allowed coil types are:
 
@@ -806,7 +806,7 @@ Iterative calculations (successive modeling of the individual PTHP component mod
 
 \subsubsection{Single Zone VAV Load Based Control}\label{single-zone-vav-load-based-control-2}
 
-The packaged terminal heat pump can also be used to simulate a system capable of maintaining a low fan speed 
+The packaged terminal heat pump can also be used to simulate a system capable of maintaining a low fan speed
 through a range of low to moderate loads. This control scheme is similar to single zone variable-air-volume (VAV) control where the fan speed is maintained at a minimum level and the coil is modulated to a point where the system outlet air temperature reaches a user specified limit. This model is active only for constant fan operating mode. Cycling fan operating may be used, however, during time of cycling fan operating mode, the model reverts to control specified above for cooling or heating operation. See the description for Packaged Terminal Air Conditioner.
 
 \subsubsection{Average Air Flow Calculations}\label{average-air-flow-calculations-1}
@@ -1442,7 +1442,7 @@ If \(\left[ {{T_{zone}} > \left( {{T_{set}} + 0.5*\Delta {T_{throttle}}} \right)
 
 If zone air temperature is within the throttling range, $\PB{T_{set}-0.5\Delta T_{throttle}} < T_{zone} < \PB{T_{set}+0.5\Delta T_{throttle}}$, then continue to operate the cooler if it was running during the previous timestep and do not operate the cooler if it was not running during the previous timestep.
 
-Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
+Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed but the unit cycles to meet the current cooling load.
 
 \textbf{ZoneCoolingLoadOnOffCycling.} This control method operates the cooler similar to how a thermostat would behave, but instead of using temperatures it uses the predicted zone load to cooling setpoint.~ The control uses input for the threshold value for a load that is considered a significant, \({\dot Q_{thresh}}\), and the result from the Predictor for the zone's load to cooling setpoint, \({\dot Q_{CoolLoad}}\). The following algorithm is used to determine if the unit will operate.
 
@@ -1450,7 +1450,7 @@ If \(\left[ {{{\dot Q}_{CoolLoad}} \le {{\dot Q}_{thresh}}} \right]\) is true, t
 
 If \(\left[ {{{\dot Q}_{CoolLoad}} > {{\dot Q}_{thresh}}} \right]\) is true, then operate the cooler unit (at full speed).
 
-Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed.
+Whenever the unit is operating, it runs at the full design air mass flow rate regardless if the fan is constant or variable speed but the unit cycles to meet the current cooling load.
 
 \textbf{ZoneCoolingLoadVariableSpeedFan.} This control method also operates the cooler using the predicted zone load to cooling setpoint but instead of on/off cycling, it modulates the fan speed to meet the cooling load.~ This control method is only applicable to cooler units with variable speed supply fans. The control uses input for the threshold value for a load that is considered a significant, \({\dot Q_{thresh}}\), and the result from the Predictor for the zone's cooling load to setpoint, \({\dot Q_{CoolLoad}}\). The following algorithm is used to determine if the unit will operate.
 
@@ -1465,18 +1465,18 @@ When the unit operates, the model first operates the unit at the highest fan spe
 \subsubsection{Overview}
 The input object ZoneHVAC:HybridUnitaryHVAC provides a model for hybrid unitary HVAC systems – packaged forced air equipment with multiple discrete operating modes. Equipment in this category may utilize a wide variety technologies including, but not limited to: indirect evaporative cooling, desiccant dehumidification, heat recovery, vapor compression, adsorption, or ventilation cooling. Each hybrid system packages multiple technologies into a single integrated system. There are a multitude of unique hybrid system architectures, and each unique system may have numerous unique operating modes.
 
-ZoneHVAC:HybridUnitaryHVAC is a black-box model designed to allow empirical representation of a wide variety of hybrid unitary systems. The model does not require information about internal system architecture, however it requires extensive data to describe the performance of a product in every operating mode. The model is intended for forced air equipment and can represent unitary systems that consume electricity, water, and up to two additional fuel types. 
+ZoneHVAC:HybridUnitaryHVAC is a black-box model designed to allow empirical representation of a wide variety of hybrid unitary systems. The model does not require information about internal system architecture, however it requires extensive data to describe the performance of a product in every operating mode. The model is intended for forced air equipment and can represent unitary systems that consume electricity, water, and up to two additional fuel types.
 
 \subsubsection{Model}
 ZoneHVAC:HybridUnitaryHVAC will operate to provide cooling, heating, ventilation, humidification, or dehumidification for a zone. A ZoneHVAC:HybridUnitaryHVAC object is assigned to a zone using ZoneHVAC:EquipmentList and ZoneHVAC:EquipmentConnections. The object must be assigned a supply air node (which must be a zone inlet node), a return air node (which must be a zone outlet node), and an outdoor air node. In the case when the hybrid system modeled does not utilize either return air or outdoor air, a return air node and an outdoor air node must still be assigned. The resulting mass flow rate on those nodes will be zero.
 
 The zone sensible cooling or heating load is determined in each time step according to temperature set points specified in a ZoneControl:Thermostat object. The zone humidification or dehumidifaction load is determined in each time step according to relative humidity set points specified in a ZoneControl:Humidistat object (Ref: Zone Controls). The intended zone ventilation rate is specified in a DesignSpecification:OutdoorAir object (Ref: Design Outdoor Air Calculation).
 
-The performance of a hybrid system is not directly given as a result of the loads and the environmental conditions. A hybrid system may have numerous discrete operating modes, within which other variables may be adjusted in fine intervals. There may be many settings in which a hybrid system could feasibly operate at a given time. Therefore, ZoneHVAC:HybridUnitaryHVAC is structured as a constrained optimization problem that is solved in each time step. The feasible settings are the unique combinations of operating mode, outdoor air fraction, and supply air mass flow rate that satisfy constraints. In each time step the hybrid model will choose to operate at one or more settings so as to best satisfy the sensible load, latent load, and scheduled ventilation rate while minimizing resource consumption. 
+The performance of a hybrid system is not directly given as a result of the loads and the environmental conditions. A hybrid system may have numerous discrete operating modes, within which other variables may be adjusted in fine intervals. There may be many settings in which a hybrid system could feasibly operate at a given time. Therefore, ZoneHVAC:HybridUnitaryHVAC is structured as a constrained optimization problem that is solved in each time step. The feasible settings are the unique combinations of operating mode, outdoor air fraction, and supply air mass flow rate that satisfy constraints. In each time step the hybrid model will choose to operate at one or more settings so as to best satisfy the sensible load, latent load, and scheduled ventilation rate while minimizing resource consumption.
 
-Inequality constraints for the optimization include the ranges of indoor and outdoor psychrometric conditions within which each mode is allowed to operate, and the allowable ranges for supply air temperature and absolute humidity generated by the system. These inequality constraints are specified directly as inputs to each ZoneHVAC:HybridUnitaryHVAC object. The scheduled ventilation rate, the zone sensible load, and the zone latent load act as soft inequality constraints. 
+Inequality constraints for the optimization include the ranges of indoor and outdoor psychrometric conditions within which each mode is allowed to operate, and the allowable ranges for supply air temperature and absolute humidity generated by the system. These inequality constraints are specified directly as inputs to each ZoneHVAC:HybridUnitaryHVAC object. The scheduled ventilation rate, the zone sensible load, and the zone latent load act as soft inequality constraints.
 
-EnergyPlus simulations occur on user defined time steps, accordingly, the hybrid system may operate in multiple settings within each time step. The portion of each time step spent in a setting is described as the part runtime fraction for that setting. If no combination of settings and part runtime fractions will satisfy all of  the soft constraints the system will choose the combination of settings and part runtime fractions that most nearly satisfies all soft constraints. 
+EnergyPlus simulations occur on user defined time steps, accordingly, the hybrid system may operate in multiple settings within each time step. The portion of each time step spent in a setting is described as the part runtime fraction for that setting. If no combination of settings and part runtime fractions will satisfy all of  the soft constraints the system will choose the combination of settings and part runtime fractions that most nearly satisfies all soft constraints.
 
 During any time step that the combination of settings can satisfy all of the soft constraints with part runtime fractions that sum to less than one, the system will operate in a standby mode (Mode 0) for the remainder of the timestep. If the indoor and outdoor psychrometric conditions are beyond the constraints that limit each operating mode, or if no setting will satisfy the constraints on supply air temperature and absolute humidity, the system will operate in standby mode (Mode 0).
 
@@ -1504,7 +1504,7 @@ Dependent variables (yi) for the model include:
  \item y8 = external static pressure (Pa) = PESP
 \end{itemize}
 
-The relationship between the independent variables and each dependent variable must be specified as lookup tables using Table:MultiVariable Lookup objects. A table must be created for each relevant dependent variable in each operating mode. Every operating mode must have a table for supply air temperature and a table for supply air humidity ratio. If tables are omitted for other dependent variables the model will assume that they are not relevant for the associated operating mode. The model can accommodate up to 26 discrete operating modes, including a standby mode.
+The relationship between the independent variables and each dependent variable must be specified as lookup tables using \hyperref[table-lookup]{Table:Lookup} objects. A table must be created for each relevant dependent variable in each operating mode. Every operating mode must have a table for supply air temperature and a table for supply air humidity ratio. If tables are omitted for other dependent variables the model will assume that they are not relevant for the associated operating mode. The model can accommodate up to 26 discrete operating modes, including a standby mode.
 
 To permit scaling of performance data, all extensive dependent variables are normalized by the system maximum supply air mass flow rate.  To rescale performance data, extensive parameters are multiplied by a desired maximum supply air flow rate, which is specified as an input to each ZoneHVAC:HybridUnitaryHVAC object.
 
@@ -1532,7 +1532,7 @@ constraints on supply air temperature and humidity ratio:
 	T_{SA}^{min}(t)      & \leq T_{SA}(\check{t})      \leq T_{SA}^{max}(t) \\
 	\omega_{SA}^{min}(t) & \leq \omega_{SA}(\check{t}) \leq \omega_{SA}^{max}(t)
 \end{align}
-	
+
 limits for each operating mode $j$:
 \begin{align}
 	T_{OSA}^{min,j} & \leq T_{OSA}(t) \leq T_{OSA}^{max,j} \\
@@ -1673,13 +1673,13 @@ Overall, control of the unit must consider the outdoor air for continuously runn
 
 \textbf{HEATING/WITH COIL/FIXED AMOUNT:} The unit is on, there is a heating load, a heating coil is present and is scheduled on, and fixed amount control has been specified. The unit ventilator fixes the outdoor air flow rate as defined by the user and sets the maximum and minimum outdoor air flow rate to be equal in order to avoid the variation of outdoor air flow rate between the maximum and minimum values. The heating coil then attempts to meet any remaining zone heating load.
 
-\textbf{COOLING/NO COIL/VARIABLE PERCENT:} The unit is on, there is a cooling load, no coil is present or it has been scheduled off, and variable percent outdoor air control type has been specified. In this case, the variable percent outdoor air controls what happens with the outdoor air. If the outside temperature is greater than the return temperature, then the outdoor air is set to the minimum as defined by the user input. If the outdoor air temperature is less than the return temperature from the zone, then the outdoor air is set to the maximum outdoor air flow rate as defined by the user. This may be somewhat simplistic in that it could result in overcooling of the space. However, since a temperature goal was not established, this is the best that can be done by the simulation. Since a coil is not present to further condition the supply air, the zone simply receives whatever temperature air results from the outdoor air controls.
+\textbf{COOLING/NO COIL/VARIABLE PERCENT:} The unit is on, there is a cooling load, no coil is present or it has been scheduled off, and variable percent outdoor air control type has been specified. In this case, the variable percent outdoor air controls what happens with the outdoor air. If the outside temperature is greater than the return temperature, then the outdoor air is set to the minimum as defined by the user input. If the outdoor air temperature is less than the return temperature from the zone, then the outdoor air is varied up to the maximum flow rate to try to meet whatever cooling load is present. Since a coil is not present to further condition the supply air, the zone simply receives whatever temperature air results from the outdoor air controls.
 
 \textbf{COOLING/NO COIL/FIXED TEMPERATURE:} The unit is on, there is a cooling load, no cooling coil is present or it has been scheduled off, and fixed temperature has been specified. The unit ventilator tries to use outdoor air as best as possible to meet the temperature goal. If it cannot meet this goal because the temperature goal is not between the zone return temperature and the outdoor air temperature, then the unit ventilator will either use the maximum or minimum outdoor air flow rate in the same fashion as the variable percent outdoor air control.
 
 \textbf{COOLING/NO COIL/FIXED AMOUNT:} The unit is on, there is a cooling load, no cooling coil is present or it has been scheduled off, and fixed amount control has been specified. The unit ventilator fixes the outdoor air flow rate as defined by the user and sets the maximum and minimum outdoor air flow rate to be equal in order to avoid the variation of outdoor air flow rate between the maximum and minimum values. Since a coil is not present to further condition the supply air, the zone simply receives whatever temperature air results from the outdoor air controls.
 
-\textbf{COOLING/WITH COIL/VARIABLE PERCENT:} The unit is on, there is a cooling load, a coil is present and is scheduled on, and variable percent outdoor air control type has been specified. In this case, the percentage of outdoor air is set to the minimum flow outdoor air flow rate. The coil then attempts to meet any remaining zone load.
+\textbf{COOLING/WITH COIL/VARIABLE PERCENT:} The unit is on, there is a cooling load, a coil is present and is scheduled on, and variable percent outdoor air control type has been specified. In this case, the variable percent outdoor air controls what happens with the outdoor air. If the outside temperature is greater than the return temperature, then the outdoor air is set to the minimum as defined by the user input. If the outdoor air temperature is less than the return temperature from the zone, then the outdoor air is varied up to the maximum flow rate to try to meet whatever cooling load is present. The coil then attempts to meet any remaining zone load.
 
 \textbf{COOLING/WITH COIL/FIXED TEMPERATURE:} The unit is on, there is a cooling load, a cooling coil is present and is scheduled on, and fixed temperature has been specified. The unit ventilator tries to use outdoor air as best as possible to meet the temperature goal. If it cannot meet this goal because the temperature goal is not between the zone return temperature and the outdoor air temperature, then the unit ventilator will either use the maximum or minimum outdoor air flow rate in the same fashion as the fixed temperature outdoor air control for the ``no coil'' conditions. The cooling coil then attempts to meet any remaining zone load.
 
@@ -1980,7 +1980,7 @@ Therefore, the humidity ratio of exit air, \({\omega_{out}}\), is:
 Once the humidity ratio at the exit is determined, the model can obtain the actual density (\({\rho_{air}}\)), specific heat (\({c_p}_{,air}\)), and mass flow rate (\({\dot m_{cooltower}}\)) of the air leaving cooltower by using EnergyPlus psychrometric function and following equation:
 
 \begin{equation}
-{c_{p,air}} = PsyCpAirFnWtdb({\omega_{out}},{T_{out}})
+{c_{p,air}} = PsyCpAirFnW({\omega_{out}})
 \end{equation}
 
 \begin{equation}
@@ -2066,13 +2066,13 @@ The soil thermal diffusivity (m\(^{2}\)/s), \({\alpha_{s}}\), and conductivity (
 
 {\scriptsize
 \begin{longtable}[c]{>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}>{\raggedright}p{0.55in}}
-\toprule 
+\toprule
  & Moisture Content & 5\% & 5\% & 10\% & 10\% & 15\% & 15\% & 20\% & 20\% \tabularnewline
 Soil Type & Dry Density  [kg/m\(^3\)] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
  & Moisture Content & 5\% & 5\% & 10\% & 10\% & 15\% & 15\% & 20\% & 20\% \tabularnewline
 Soil Type & Dry Density  [kg/m\(^3\)] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] \tabularnewline
 \midrule
@@ -2091,12 +2091,12 @@ Grain & 1602 & 0.95 & 5.70E-07 & 0.95 & 4.73E-07 & 1.12 & 4.73E-07 & 1.21 & 5.16
 The following information is also available for reference from Table 3.3, pg. 34.6 of the ASHRAE Applications Handbook, 2015.
 
 \begin{longtable}[c]{>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}>{\raggedright}p{1.2in}}
-\toprule 
+\toprule
 Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] \tabularnewline
 \midrule
 \endfirsthead
 
-\toprule 
+\toprule
 Soils & Moisture  Content & Density  [kg/m3] & k  [W/m-K] & \({\alpha}\)   [m\(^2\)/s] \tabularnewline
 \midrule
 \endhead
@@ -2154,7 +2154,7 @@ The symbols \textbar{}\textbar{}~ \textbar{}\textbar{} and Arg denote the modulu
 
 \begin{equation}
   \begin{array}{rl}
-    \frac{h_r T_{va} - \beta S_v e^{i \phi_I}}{h_e + \delta k_s} 
+    \frac{h_r T_{va} - \beta S_v e^{i \phi_I}}{h_e + \delta k_s}
            =&  \frac{ \PB{h_e + \frac{k_s}{D}} \PB{ h_r T_{va} - \beta S_v \cos \phi_I} + \frac{k_s}{D} \PB{-\beta S_v \sin \phi_I}}{\PB{h_e + \frac{k_s}{D}}^2 + \PB{\frac{k_s}{D}}^2} \\
            &+ i\frac{ \PB{h_e + \frac{k_s}{D}} \PB{-\beta S_v \sin \phi_I} - \frac{k_s}{D} \PB{h_r T_{va} - \beta S_v \cos \phi_I}}{\PB{h_e + \frac{k_s}{D}}^2 + \PB{\frac{k_s}{D}}^2}
   \end{array}
@@ -2258,13 +2258,13 @@ Initial condition of inlet air temperature is equal to the ambient air temperatu
 % table 87
 \begin{longtable}[c]{p{1.5in}p{3.0in}p{1.5in}}
 \caption{Nomenclature for Earthtube Model \label{table:nomenclature-for-earthtube-model}} \tabularnewline
-\toprule 
+\toprule
 Variable & Description & Units \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature for Earthtube Model} \tabularnewline
-\toprule 
+\toprule
 Variable & Description & Units \tabularnewline
 \midrule
 \endhead
@@ -2426,13 +2426,13 @@ The discharged amount of interior air from each zone caused by the presence of t
 % table 88
 \begin{longtable}[l]{p{1.5in}p{4.5in}}
 \caption{Nomenclature of Thermal Chimney Model \label{table:nomenclature-of-thermal-chimney-model}} \tabularnewline
-\toprule 
+\toprule
 Model Nomenclature \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Nomenclature of Thermal Chimney Model} \tabularnewline
-\toprule 
+\toprule
 Model Nomenclature \tabularnewline
 \midrule
 \endhead

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -207,8 +207,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     EXPECT_NEAR(1.041692180, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(76.89754831, DataContaminantBalance::GCPredictedRate(1), 0.00001);
 
-    CorrectZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(state.dataZonePlenum, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(489.931000, Node(5).CO2, 0.00001);
     EXPECT_NEAR(0.09093100, Node(5).GenContam, 0.00001);
 
@@ -364,8 +364,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     HybridModelZone(1).InfiltrationCalc_C = false;
     HybridModelZone(1).PeopleCountCalc_C = false;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(1);
     VAMFL.allocate(1);
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZT(1) = 24.0;
     MixingMassFlowZone(1) = 0.0;
 
-    CorrectZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(state.dataZonePlenum, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(490.0, Node(5).CO2, 0.00001);
     EXPECT_NEAR(90.000999, Node(5).GenContam, 0.00001);
 
@@ -548,8 +548,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
 
     OutBaroPress = 101325.0;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);
@@ -756,8 +756,8 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
 
     OutBaroPress = 101325.0;
 
-    NumZoneReturnPlenums = 0;
-    NumZoneSupplyPlenums = 0;
+    state.dataZonePlenum.NumZoneReturnPlenums = 0;
+    state.dataZonePlenum.NumZoneSupplyPlenums = 0;
 
     OAMFL.allocate(3);
     VAMFL.allocate(3);

@@ -3,13 +3,13 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     anyplace Load Calc,      !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.03,                    !- Loads Convergence Tolerance Value
+    0.03,                    !- Loads Convergence Tolerance Value {W}
     0.3,                     !- Temperature Convergence Tolerance Value {deltaC}
     MinimalShadowing,        !- Solar Distribution
     ,                        !- Maximum Number of Warmup Days
@@ -397,7 +397,7 @@
   InternalMass,
     OSCTest:PartitionIntMass,!- Name
     InteriorWall,            !- Construction Name
-    OSCTest,                 !- Zone Name
+    OSCTest,                 !- Zone or ZoneList Name
     92.9;                    !- Surface Area {m2}
 
   SurfaceProperty:OtherSideCoefficients,
@@ -631,8 +631,8 @@
     OSCTest-Air,             !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     OSCTest-Air,             !- Name

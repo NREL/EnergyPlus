@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,11 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <DataGlobals.hh>
-#include <DataHVACControllers.hh>
-#include <DataRootFinder.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACControllers.hh>
+#include <EnergyPlus/DataRootFinder.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -132,6 +132,7 @@ namespace HVACControllers {
     // Misc routines
 
     // Types
+
 
     struct SolutionTrackerType
     {
@@ -222,7 +223,7 @@ namespace HVACControllers {
         // --------------------
         // Trace mechanism
         // --------------------
-        int TraceFileUnit;     // File unit for individual controller trace file to use if > 0
+        SharedFileHandle TraceFile;
         bool FirstTraceFlag;   // To detect first individual write operation to individual controller trace file
         int BadActionErrCount; // Counts number of incorrect action errors
         int BadActionErrIndex; // index to recurring error structure for bad action error
@@ -243,7 +244,7 @@ namespace HVACControllers {
               MinVolFlowActuated(0.0), MaxActuated(0.0), MinActuated(0.0), ActuatedNode(0), ActuatedValue(0.0), NextActuatedValue(0.0),
               ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0), ActuatedNodePlantLoopBranchNum(0), SensedNode(0),
               IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(0), Range(0.0),
-              Limit(0.0), TraceFileUnit(0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false),
+              Limit(0.0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false),
               FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
         {
         }
@@ -266,7 +267,10 @@ namespace HVACControllers {
     struct AirLoopStatsType
     {
         // Members
-        int TraceFileUnit; // File unit for trace file for all controllers on each air loop.
+
+        // Shared_ptr because we need to put this into an Array1D which is not
+        // friendly with move-only types
+        SharedFileHandle TraceFile;
         // Used only if > 0. Same size as NumPrimaryAirSys
         bool FirstTraceFlag;                          // To detect first trace to air loop trace file
         int NumCalls;                                 // Number of times air loop is simulated (number of calls to SimAirLoop)
@@ -297,7 +301,7 @@ namespace HVACControllers {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageControllers(std::string const &ControllerName,
+    void ManageControllers(EnergyPlusData &state, std::string const &ControllerName,
                            int &ControllerIndex,
                            bool const FirstHVACIteration,
                            int const AirLoopNum, // unused1208
@@ -310,7 +314,7 @@ namespace HVACControllers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetControllerInput();
+    void GetControllerInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -320,7 +324,7 @@ namespace HVACControllers {
 
     void ResetController(int const ControlNum, bool const DoWarmRestartFlag, bool &IsConvergedFlag);
 
-    void InitController(int const ControlNum,
+    void InitController(EnergyPlusData &state, int const ControlNum,
                         bool &IsConvergedFlag);
 
     void SizeController(int const ControlNum);
@@ -380,7 +384,7 @@ namespace HVACControllers {
 
     void DumpAirLoopStatistics();
 
-    void WriteAirLoopStatistics(int const FileUnit, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
+    void WriteAirLoopStatistics(InputOutputFile &statisticsFile, DefinePrimaryAirSystem const &ThisPrimaryAirSystem, AirLoopStatsType const &ThisAirLoopStats);
 
     // Beginning of Tracing subroutines for the Controller Module
     // *****************************************************************************
@@ -391,9 +395,9 @@ namespace HVACControllers {
         bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
 
     void TraceIterationStamp(
-        int const TraceFileUnit, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
+        InputOutputFile &TraceFile, bool const FirstHVACIteration, int const AirLoopPass, bool const AirLoopConverged, int const AirLoopNumCalls);
 
-    void TraceAirLoopController(int const TraceFileUnit, int const ControlNum);
+    void TraceAirLoopController(InputOutputFile &TraceFile, int const ControlNum);
 
     void SetupIndividualControllerTracer(int const ControlNum);
 
@@ -413,22 +417,22 @@ namespace HVACControllers {
 
     void CheckControllerListOrder();
 
-    void CheckCoilWaterInletNode(int const WaterInletNodeNum, // input actuator node number
+    void CheckCoilWaterInletNode(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                  bool &NodeNotFound           // true if matching actuator node not found, false if found
     );
 
-    void GetControllerNameAndIndex(int const WaterInletNodeNum, // input actuator node number
+    void GetControllerNameAndIndex(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                    std::string &ControllerName, // controller name used by water coil
                                    int &ControllerIndex,        // controller index used by water coil
                                    bool &ErrorsFound            // true if matching actuator node not found
     );
 
-    void GetControllerActuatorNodeNum(std::string const &ControllerName, // name of coil controller
+    void GetControllerActuatorNodeNum(EnergyPlusData &state, std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
                                       bool &NodeNotFound                 // true if matching actuator node not found, false if found
     );
 
-    int GetControllerIndex(std::string const &ControllerName // name of coil controller
+    int GetControllerIndex(EnergyPlusData &state, std::string const &ControllerName // name of coil controller
     );
 
 } // namespace HVACControllers

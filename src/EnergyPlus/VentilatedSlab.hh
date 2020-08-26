@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,13 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace VentilatedSlab {
 
@@ -302,7 +305,7 @@ namespace VentilatedSlab {
         // Default Constructor
         VentilatedSlabData()
             : SchedPtr(0), ZonePtr(0), NumOfSurfaces(0), TotalSurfaceArea(0.0), CoreDiameter(0.0), CoreLength(0.0), CoreNumbers(0.0), ControlType(0),
-              ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0),
+              ReturnAirNode(0), RadInNode(0), ZoneAirInNode(0), FanOutletNode(0), MSlabInNode(0), MSlabOutNode(0), Fan_Index(0), FanType_Num(0),
               ControlCompTypeNum(0), CompErrIndex(0), MaxAirVolFlow(0.0), MaxAirMassFlow(0.0), OAControlType(0), MinOASchedPtr(0), MaxOASchedPtr(0),
               TempSchedPtr(0), OutsideAirNode(0), AirReliefNode(0), OAMixerOutNode(0), OutAirVolFlow(0.0), OutAirMassFlow(0.0), MinOutAirVolFlow(0.0),
               MinOutAirMassFlow(0.0), SysConfg(0), CoilOption(0), HCoilPresent(false), HCoilType(0), HCoil_Index(0), HCoil_PlantTypeNum(0),
@@ -342,30 +345,30 @@ namespace VentilatedSlab {
 
     void clear_state();
 
-    void SimVentilatedSlab(std::string const &CompName,   // name of the fan coil unit
+    void SimVentilatedSlab(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
-    void GetVentilatedSlabInput();
+    void GetVentilatedSlabInput(EnergyPlusData &state);
 
-    void InitVentilatedSlab(int const Item,               // index for the current ventilated slab
+    void InitVentilatedSlab(EnergyPlusData &state, int const Item,               // index for the current ventilated slab
                             int const VentSlabZoneNum,    // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeVentilatedSlab(int const Item);
+    void SizeVentilatedSlab(EnergyPlusData &state, int const Item);
 
-    void CalcVentilatedSlab(int &Item,                     // number of the current ventilated slab being simulated
+    void CalcVentilatedSlab(EnergyPlusData &state, int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied (W)
                             Real64 &LatOutputProvided      // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabComps(int const Item,                // system index in ventilated slab array
+    void CalcVentilatedSlabComps(EnergyPlusData &state, int const Item,                // system index in ventilated slab array
                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                  Real64 &LoadMet                // load met by the system (watts)
     );
@@ -375,7 +378,7 @@ namespace VentilatedSlab {
                                       Real64 &LatOutputProvided // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabRadComps(int const Item,               // System index in ventilated slab array
+    void CalcVentilatedSlabRadComps(EnergyPlusData &state, int const Item,               // System index in ventilated slab array
                                     bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
     );
 

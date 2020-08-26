@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,8 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -101,12 +101,11 @@ namespace DataWater {
     extern int NumRainCollectors;    // number of rainfall collectors in model
     extern int NumGroundWaterWells;  // number of
     extern int NumSiteRainFall;
-    extern int NumIrrigation;              // DJS PSU Dec 2006 number of irrigation descriptions (1 allowed)
     extern bool AnyWaterSystemsInModel;    // control flag set true if any water systems
     extern bool WaterSystemGetInputCalled; // set true once input data gotten.
     extern bool AnyIrrigationInModel;      // control flag set true if irrigation input for ecoroof DJS PSU Dec 2006
 
-    // Types
+    void clear_state();
 
     struct StorageTankDataStruct
     {

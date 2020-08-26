@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,10 +54,16 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
+
 
 using namespace EnergyPlus;
+using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::SizingManager;
 using namespace EnergyPlus::DataSizing;
 using namespace ObjexxFCL;
@@ -220,10 +226,8 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     cNumericFields.deallocate();
 }
 
-TEST(SizingManagerTest, TimeIndexToHrMinString_test)
+TEST_F(EnergyPlusFixture, SizingManagerTest_TimeIndexToHrMinString_test)
 {
-    ShowMessage("Begin Test: SizingManagerTest, TimeIndexToHrMinString_test");
-
     DataGlobals::MinutesPerTimeStep = 15;
 
     EXPECT_EQ("00:00:00", TimeIndexToHrMinString(0));
@@ -243,4 +247,239 @@ TEST(SizingManagerTest, TimeIndexToHrMinString_test)
     EXPECT_EQ("04:48:00", TimeIndexToHrMinString(96));
     EXPECT_EQ("16:39:00", TimeIndexToHrMinString(333));
     EXPECT_EQ("24:00:00", TimeIndexToHrMinString(480));
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest)
+{
+    // checks DOAS Control Strategy default setpoint values test
+    std::string const idf_objects = delimited_string({
+
+        " Zone,",
+        "	SPACE1-1,      !- Name",
+        "	0,             !- Direction of Relative North { deg }",
+        "	0,             !- X Origin { m }",
+        "	0,             !- Y Origin { m }",
+        "	0,             !- Z Origin { m }",
+        "	1,             !- Type",
+        "	1,             !- Multiplier",
+        "	3.0,           !- Ceiling Height {m}",
+        "	240.0;         !- Volume {m3}",
+
+        " Sizing:Zone,",
+        "	SPACE1-1,             !- Zone or ZoneList Name",
+        "	SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method",
+        "	14.,                  !- Zone Cooling Design Supply Air Temperature { C }",
+        "	,                     !- Zone Cooling Design Supply Air Temperature Difference { deltaC }",
+        "	SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method",
+        "	50.,                  !- Zone Heating Design Supply Air Temperature { C }",
+        "	,                     !- Zone Heating Design Supply Air Temperature Difference { deltaC }",
+        "	0.009,                !- Zone Cooling Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	0.004,                !- Zone Heating Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	SZ DSOA SPACE1-1,     !- Design Specification Outdoor Air Object Name",
+        "	0.0,                  !- Zone Heating Sizing Factor",
+        "	0.0,                  !- Zone Cooling Sizing Factor",
+        "	DesignDayWithLimit,   !- Cooling Design Air Flow Method",
+        "	,                     !- Cooling Design Air Flow Rate { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Cooling Minimum Air Flow { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow Fraction",
+        "	DesignDay,            !- Heating Design Air Flow Method",
+        "	,                     !- Heating Design Air Flow Rate { m3/s }",
+        "	,                     !- Heating Maximum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Heating Maximum Air Flow { m3/s }",
+        "	,                     !- Heating Maximum Air Flow Fraction",
+        "	,                     !- Design Specification Zone Air Distribution Object Name",
+        "   Yes,                  !- Account for Dedicated Outside Air System",
+        "   NeutralSupplyAir,     !- Dedicated Outside Air System Control Strategy",
+        "   ,                     !- Dedicated Outside Air Low Setpoint for Design",
+        "   ;                     !- Dedicated Outside Air High Setpoint for Design",
+
+        " DesignSpecification:OutdoorAir,",
+        "	SZ DSOA SPACE1-1,     !- Name",
+        "	sum,                  !- Outdoor Air Method",
+        "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
+        "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    SizingManager::GetOARequirements();
+    SizingManager::GetZoneSizingInput();
+    ASSERT_EQ(1, NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
+    // set default DOAS control strategy setpoint values
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
+    // check default low and high set point values
+    ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationTest2)
+{
+    // checks DOAS Control Strategy default setpoint values test
+    std::string const idf_objects = delimited_string({
+
+        " Zone,",
+        "	SPACE1-1,      !- Name",
+        "	0,             !- Direction of Relative North { deg }",
+        "	0,             !- X Origin { m }",
+        "	0,             !- Y Origin { m }",
+        "	0,             !- Z Origin { m }",
+        "	1,             !- Type",
+        "	1,             !- Multiplier",
+        "	3.0,           !- Ceiling Height {m}",
+        "	240.0;         !- Volume {m3}",
+
+        " Sizing:Zone,",
+        "	SPACE1-1,             !- Zone or ZoneList Name",
+        "	SupplyAirTemperature, !- Zone Cooling Design Supply Air Temperature Input Method",
+        "	14.,                  !- Zone Cooling Design Supply Air Temperature { C }",
+        "	,                     !- Zone Cooling Design Supply Air Temperature Difference { deltaC }",
+        "	SupplyAirTemperature, !- Zone Heating Design Supply Air Temperature Input Method",
+        "	50.,                  !- Zone Heating Design Supply Air Temperature { C }",
+        "	,                     !- Zone Heating Design Supply Air Temperature Difference { deltaC }",
+        "	0.009,                !- Zone Cooling Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	0.004,                !- Zone Heating Design Supply Air Humidity Ratio { kgWater/kgDryAir }",
+        "	SZ DSOA SPACE1-1,     !- Design Specification Outdoor Air Object Name",
+        "	0.0,                  !- Zone Heating Sizing Factor",
+        "	0.0,                  !- Zone Cooling Sizing Factor",
+        "	DesignDayWithLimit,   !- Cooling Design Air Flow Method",
+        "	,                     !- Cooling Design Air Flow Rate { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Cooling Minimum Air Flow { m3/s }",
+        "	,                     !- Cooling Minimum Air Flow Fraction",
+        "	DesignDay,            !- Heating Design Air Flow Method",
+        "	,                     !- Heating Design Air Flow Rate { m3/s }",
+        "	,                     !- Heating Maximum Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	,                     !- Heating Maximum Air Flow { m3/s }",
+        "	,                     !- Heating Maximum Air Flow Fraction",
+        "	,                     !- Design Specification Zone Air Distribution Object Name",
+        "   Yes,                  !- Account for Dedicated Outside Air System",
+        "   NeutralSupplyAir;     !- Dedicated Outside Air System Control Strategy",
+
+        " DesignSpecification:OutdoorAir,",
+        "	SZ DSOA SPACE1-1,     !- Name",
+        "	sum,                  !- Outdoor Air Method",
+        "	0.00236,              !- Outdoor Air Flow per Person { m3/s-person }",
+        "	0.000305,             !- Outdoor Air Flow per Zone Floor Area { m3/s-m2 }",
+        "	0.0;                  !- Outdoor Air Flow per Zone { m3/s }",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    SizingManager::GetOARequirements();
+    SizingManager::GetZoneSizingInput();
+    ASSERT_EQ(1, NumZoneSizingInput);
+    ASSERT_EQ(DOANeutralSup, ZoneSizingInput(1).DOASControlStrategy);
+    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
+    // set default DOAS control strategy setpoint values
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(state.dataZoneEquipmentManager, state.files);
+    // check default low and high set point values
+    ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
+    ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
+}
+
+TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
+{
+
+    bool Answer;
+    bool PulseSizing;
+    bool Warmup;
+    int HourNum;
+    int TimeStepNum;
+    int KindSim;
+    int DaySim;
+
+    //Tests for when to do a pulse test for the Load Component Output Report
+
+    //Test 1a: Everything as it should be to set this to true-->result should be true
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    DaySim = 2;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_TRUE(Answer);
+
+    //Test 16: Everything as it should be to set this to true-->result should be true
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    KindSim = EnergyPlus::DataGlobals::ksDesignDay;
+    DaySim = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_TRUE(Answer);
+
+    //Test 2: PulseSizing is false-->result should be false
+    PulseSizing = false;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    DaySim = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_FALSE(Answer);
+
+    //Test 3: Warmup is true-->result should be false
+    PulseSizing = false;
+    Warmup = true;
+    HourNum = 10;
+    TimeStepNum = 1;
+    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    DaySim = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_FALSE(Answer);
+
+    //Test 4: HourNum not 10-->result should be false
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 7;
+    TimeStepNum = 1;
+    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    DaySim = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_FALSE(Answer);
+
+    //Test 5: TimeStepNum not 1-->result should be false
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 2;
+    KindSim = EnergyPlus::DataGlobals::ksRunPeriodDesign;
+    DaySim = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_FALSE(Answer);
+
+    //Test 6: DaySim not 1 and KindSim not weather file period --> result should be false
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    KindSim = EnergyPlus::DataGlobals::ksDesignDay;
+    DaySim = 2;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_FALSE(Answer);
+
+    //Test 7: everything set to make the answer false
+    PulseSizing = false;
+    Warmup = true;
+    HourNum = 2;
+    TimeStepNum = 7;
+    KindSim = EnergyPlus::DataGlobals::ksDesignDay;
+    DaySim = 2;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum,KindSim,DaySim);
+    ASSERT_FALSE(Answer);
+    
 }

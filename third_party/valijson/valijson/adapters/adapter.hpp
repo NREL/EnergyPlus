@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_ADAPTER_HPP
-#define __VALIJSON_ADAPTERS_ADAPTER_HPP
 
 #include <functional>
 
@@ -472,5 +470,3 @@ struct AdapterTraits
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,31 +55,31 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
-#include <CurveManager.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <AirflowNetwork/Elements.hpp>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataZoneControls.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SystemAvailabilityManager.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -534,7 +534,7 @@ namespace SystemAvailabilityManager {
         int ZoneListNum;
         int ZoneNumInList;
 
-        // Get the number of occurences of each type of manager and read in data
+        // Get the number of occurrences of each type of manager and read in data
         cCurrentModuleObject = "AvailabilityManager:Scheduled";
         inputProcessor->getObjectDefMaxArgs(cCurrentModuleObject, numArgs, NumAlphas, NumNumbers);
         maxNumbers = NumNumbers;
@@ -2633,8 +2633,6 @@ namespace SystemAvailabilityManager {
         Real64 PreStartTime;
         Real64 PreStartTimeTmr;
         Real64 DeltaTime;
-        int I;
-        int J;
         Real64 TempDiff;
         Real64 TempDiffHi;
         Real64 TempDiffLo;
@@ -2719,12 +2717,14 @@ namespace SystemAvailabilityManager {
             }
             if (!allocated(OptStartData.ActualZoneNum)) OptStartData.ActualZoneNum.allocate(NumOfZones);
 
+            // OptStartFlag needs to be reset each timestep to not stay set to true post-occupancy
+            OptStartData.OptStartFlag = false;
+
             // reset OptStartData once per beginning of day
             if (BeginDayFlag) {
                 NumHoursBeforeOccupancy = 0.0; // Initialize the hours of optimum start period. This variable is for reporting purpose.
                 if (BeginOfDayResetFlag) {
                     OptStartData.OccStartTime = 22.99; // initialize the zone occupancy start time
-                    OptStartData.OptStartFlag = false;
                     BeginOfDayResetFlag = false;
                 }
             }
@@ -2736,10 +2736,10 @@ namespace SystemAvailabilityManager {
             FanStartTime = 0.0;
             FanStartTimeTmr = 0.0;
             exitLoop = false;
-            for (I = 1; I <= 24; ++I) {
-                for (J = 1; J <= NumOfTimeStepInHour; ++J) {
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValues(J, I) <= 0.0) continue;
-                    FanStartTime = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTime = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }
@@ -2747,10 +2747,10 @@ namespace SystemAvailabilityManager {
             }
 
             exitLoop = false;
-            for (I = 1; I <= 24; ++I) {
-                for (J = 1; J <= NumOfTimeStepInHour; ++J) {
+            for (int I = 1; I <= 24; ++I) {
+                for (int J = 1; J <= NumOfTimeStepInHour; ++J) {
                     if (DayValuesTmr(J, I) <= 0.0) continue;
-                    FanStartTimeTmr = I - 1 + 1 / NumOfTimeStepInHour * J;
+                    FanStartTimeTmr = I - 1 + 1.0 / NumOfTimeStepInHour * J - 0.01;
                     exitLoop = true;
                     break;
                 }
@@ -4043,9 +4043,8 @@ namespace SystemAvailabilityManager {
         return ValidType;
     }
 
-    void ManageHybridVentilation()
+    void ManageHybridVentilation(EnergyPlusData &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2007
@@ -4095,12 +4094,12 @@ namespace SystemAvailabilityManager {
         for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             if (HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
                 for (PriAirSysNum = 1; PriAirSysNum <= NumPrimaryAirSys; ++PriAirSysNum) {
-                    if (HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum) CalcHybridVentSysAvailMgr(SysAvailNum, PriAirSysNum);
+                    if (HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum) CalcHybridVentSysAvailMgr(state, SysAvailNum, PriAirSysNum);
                 }
             } else {
                 // Hybrid ventilation manager is applied to zone component
                 if (HybridVentSysAvailMgrData(SysAvailNum).SimHybridVentSysAvailMgr) {
-                    CalcHybridVentSysAvailMgr(SysAvailNum);
+                    CalcHybridVentSysAvailMgr(state, SysAvailNum);
                 }
             }
         }
@@ -4151,7 +4150,7 @@ namespace SystemAvailabilityManager {
         Real64 CurveMax;                // Maximum value specified in a curve
         Real64 CurveVal;                // Curve value
 
-        // Get the number of occurences of each type of System Availability Manager
+        // Get the number of occurrences of each type of System Availability Manager
         cCurrentModuleObject = "AvailabilityManager:HybridVentilation";
         NumHybridVentSysAvailMgrs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
@@ -4852,7 +4851,8 @@ namespace SystemAvailabilityManager {
         CurrentEndTimeLast = CurrentEndTime;
     }
 
-    void CalcHybridVentSysAvailMgr(int const SysAvailNum,          // number of the current scheduled system availability manager
+    void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
+                                   int const SysAvailNum,          // number of the current scheduled system availability manager
                                    Optional_int_const PriAirSysNum // number of the primary air system affected by this Avail. Manager
     )
     {
@@ -5017,7 +5017,7 @@ namespace SystemAvailabilityManager {
                     }
 
                     if (HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
-                        ManageAirflowNetworkBalance(true);
+                        ManageAirflowNetworkBalance(state, true);
                         ACH = GetZoneInfilAirChangeRate(ZoneNum);
                     }
                     if (ACH > OASetPoint) {
@@ -5305,7 +5305,7 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    bool GetHybridVentilationControlStatus(int const ZoneNum) // Index of zone
+    bool GetHybridVentilationControlStatus(EnergyPlusData &EP_UNUSED(state), int const ZoneNum) // Index of zone
     {
 
         // SUBROUTINE INFORMATION:

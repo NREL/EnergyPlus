@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,10 +67,11 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -294,15 +295,15 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
     RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
     HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
-                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)));
+                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
     HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
-                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)));
+                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(RAFN(ZoneNum));
     thisRAFN.ZoneNum = ZoneNum;
 
-    thisRAFN.InitRoomAirModelAirflowNetwork(RoomAirNode);
+    thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
 
     EXPECT_NEAR(120.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain, 0.00001);
     EXPECT_NEAR(80.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain, 0.00001);
@@ -328,7 +329,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(9.770445, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RelHumidity, 0.00001);
 
     RoomAirNode = 2;
-    thisRAFN.InitRoomAirModelAirflowNetwork(RoomAirNode);
+    thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
 
     EXPECT_NEAR(180.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntSensibleGain, 0.00001);
     EXPECT_NEAR(120.0, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).SumIntLatentGain, 0.00001);
@@ -353,7 +354,7 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     EXPECT_NEAR(0.0028697086, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).HumRat, 0.00001);
     EXPECT_NEAR(15.53486185, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode).RelHumidity, 0.00001);
 
-    thisRAFN.UpdateRoomAirModelAirflowNetwork();
+    thisRAFN.UpdateRoomAirModelAirflowNetwork(state.dataZoneDehumidifier);
 
     EXPECT_NEAR(24.397538, Node(2).Temp, 0.00001);
     EXPECT_NEAR(0.0024802305, Node(2).HumRat, 0.000001);

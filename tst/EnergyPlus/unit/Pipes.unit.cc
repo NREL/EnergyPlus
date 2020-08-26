@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,8 +51,9 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataPlant.hh>
-#include <Pipes.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/Pipes.hh>
 
 namespace EnergyPlus {
 
@@ -71,7 +72,7 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    Pipes::GetPipeInput();
+    Pipes::GetPipeInput(state.pipes);
     EXPECT_EQ(2u, Pipes::LocalPipe.size());
     EXPECT_EQ(DataPlant::TypeOf_Pipe, Pipes::LocalPipe(1).TypeOf);
     EXPECT_EQ(DataPlant::TypeOf_PipeSteam, Pipes::LocalPipe(2).TypeOf);

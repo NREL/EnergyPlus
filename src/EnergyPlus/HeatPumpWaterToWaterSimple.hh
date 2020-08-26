@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,15 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
 
 namespace HeatPumpWaterToWaterSimple {
 
@@ -166,6 +170,9 @@ namespace HeatPumpWaterToWaterSimple {
         bool MyPlantScanFlag;
         bool MyEnvrnFlag;
 
+        bool myCoolingSizesReported;
+        bool myHeatingSizesReported;
+
         // Default Constructor
         GshpSpecs()
             : checkEquipName(true), WWHPPlantTypeOfNum(0), Available(false), ON(false), IsOn(false), MustRun(false), SourceSideDesignMassFlow(0.0),
@@ -183,7 +190,7 @@ namespace HeatPumpWaterToWaterSimple {
               companionIdentified(false), reportPower(0.0), reportEnergy(0.0), reportQLoad(0.0), reportQLoadEnergy(0.0), reportQSource(0.0),
               reportQSourceEnergy(0.0), reportLoadSideMassFlowRate(0.0), reportLoadSideInletTemp(0.0), reportLoadSideOutletTemp(0.0),
               reportSourceSideMassFlowRate(0.0), reportSourceSideInletTemp(0.0), reportSourceSideOutletTemp(0.0), MyPlantScanFlag(true),
-              MyEnvrnFlag(true)
+              MyEnvrnFlag(true), myCoolingSizesReported(false), myHeatingSizesReported(false)
         {
         }
 
@@ -195,13 +202,14 @@ namespace HeatPumpWaterToWaterSimple {
 
         static void GetWatertoWaterHPInput();
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizingFactor) override;
 
-        void InitWatertoWaterHP(int const GSHPTypeNum,       // Type of GSHP
+        void InitWatertoWaterHP(BranchInputManagerData &dataBranchInputManager,
+                                int const GSHPTypeNum,       // Type of GSHP
                                 std::string const &GSHPName, // User Specified Name of GSHP
                                 bool const FirstHVACIteration,
                                 Real64 const MyLoad // Demand Load
@@ -216,6 +224,8 @@ namespace HeatPumpWaterToWaterSimple {
         void CalcWatertoWaterHPHeating(Real64 const MyLoad); // Operating Load
 
         void UpdateGSHPRecords();
+
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
     };
 
     // Object Data

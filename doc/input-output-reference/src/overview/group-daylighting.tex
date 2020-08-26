@@ -34,7 +34,7 @@ The type of overhead electric lighting control. All reference points specified a
 
 For Lighting Control Type set to Continuous, the overhead lights dim continuously and linearly from (maximum electric power, maximum light output) to (minimum electric power, minimum light output) as the daylight illuminance increases. The lights stay on at the minimum point with further increase in the daylight illuminance.
 
-For Lighting Control Type set to Stepped, the electric power input and light output vary in discrete, equally spaced steps. The number of steps is given by Number of Steps (Excluding Off) of Stepped Control. For example, if Number of Steps = 3 and Illuminance Setpoint = 600, then the following table shows the fraction of the lights that are on vs.~daylight illuminance.
+For Lighting Control Type set to Stepped, the electric power input and light output vary in discrete, equally spaced steps. The number of steps is given by Number of Steps (Excluding Off) of Stepped Control. For example, if Number of Steps = 3 and Illuminance Setpoint = 600, then the following table shows the fraction of the lights that are on vs. daylight illuminance.
 
 % table 18
 \begin{longtable}[c]{@{}ll@{}}
@@ -348,7 +348,7 @@ The DElight method of analyzing daylighting in buildings is very similar to that
 
 There are two primary differences between the SplitFlux and DElight methods of calculating interior illuminance levels. The first is that DElight includes the capability of analyzing complex fenestration systems that include geometrically complicated shading systems (e.g., roof monitors) and/or optically complicated glazings (e.g., prismatic or holographic glass). The second key difference is that DElight uses a radiosity method to calculate the effects of light reflection inside a zone. These methods are discussed in more detail in the engineering documentation.
 
-There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the SplitFlux method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles).  A second is the current lack of visual quality (e.g., glare) calculations performed by DElight. Third, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the intial direct illuminance. In the SplitFlux method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fourth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
+There are other important differences between the two methods. One is the inability of DElight to perform the type of dynamic shading controls possible using the SplitFlux method at each point in time during the thermal simulation (e.g., changes in electrochromic glazing transmittances and blind slat angles).  A second is the current lack of visual quality (e.g., glare) calculations performed by DElight. Third, the modeling of interior obstructions is different in the two methods. In the DElight method interior obstructions block interreflections but do not block the initial direct illuminance. In the SplitFlux method, interior obstructions block the initial direct illuminance but do not block interreflections. See the engineering documentation for more details. Fourth, when using DElight daylighting the presence of exterior shading surfaces such as overhangs is ignored.
 
 Input for invoking the DElight method involves three object types: \textbf{\hyperref[daylightingcontrols-000]{Daylighting:Controls}}, \textbf{\hyperref[daylightingreferencepoint-000]{Daylighting:ReferencePoint}}, and \textbf{\hyperref[daylightingdelightcomplexfenestration]{Daylighting:DELight:ComplexFenestration}}.
 
@@ -678,7 +678,7 @@ The total length {[}m{]} of the TDD pipe between the dome and the diffuser, incl
 
 \paragraph{Field: Effective Thermal Resistance}\label{field-effective-thermal-resistance}
 
-The effective thermal resistance {[}m\(^{2}\)-K/W{]}, i.e.~R-value, of the TDD between the exterior dome surface and the interior diffuser surface.
+The effective thermal resistance {[}m\(^{2}\)-K/W{]}, i.e. R-value, of the TDD between the exterior dome surface and the interior diffuser surface.
 
 \paragraph{Field: Transition Zone\textless{}\#\textgreater{}~ Name}\label{field-transition-zone-name}
 
@@ -851,7 +851,7 @@ The inside shelf is defined as a regular heat transfer surface in the zone. Howe
 The outside shelf is defined as a \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} object. The visible and solar absorptance of the outside material layer determines the reflectivity of the shelf.
 
 \begin{callout}
-  NOTE: Unlike a regular \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} object, the vertices of the outside shelf surface must be ordered so that the outward normal vector points \emph{upward}, i.e.~toward the upper window. This is necessary in order for the outside shelf to properly receive sunlight and shading from other surfaces. A mirror shading surface with the outward normal vector pointing in the opposite direction is automatically created by the program to shade the lower window.
+  NOTE: Unlike a regular \hyperref[shadingzonedetailed-000]{Shading:Zone:Detailed} object, the vertices of the outside shelf surface must be ordered so that the outward normal vector points \emph{upward}, i.e. toward the upper window. This is necessary in order for the outside shelf to properly receive sunlight and shading from other surfaces. A mirror shading surface with the outward normal vector pointing in the opposite direction is automatically created by the program to shade the lower window.
 \end{callout}
 
 The inside shelf and outside shelf are both optional. However, if neither shelf is specified, the daylighting shelf object has no effect on the simulation.
@@ -1081,6 +1081,6 @@ Find visible transmittance effect of dirt on window & WindowMaterial:Glazing/Dir
 
 *Used only with \hyperref[daylightingcontrols-000]{Daylighting:Controls} with the SplitFlux Daylighting Method.
 
-\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+\begin{center}\rule{0.5\linewidth}{0.4pt}\end{center}
 
 \protect\hyperlink{ux5fftnref1}{{[}1{]}} Formerly, only the exterior windows in a zone could provide daylight to that zone.

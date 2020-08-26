@@ -139,9 +139,9 @@ static int checkEnumValue(const char* enu);
 // and the corresponding default is returned.
 // Returns -1 or a globally unique id for the value such that
 // enuNames[id] is the string representation of the enum value.
-Enu getEnumValue(void* element, Att a, ValueStatus* vs) {
+int getEnumValue(void* element, Att a, ValueStatus* vs) {
     const char* value = getString(element, a);
-    Enu id /*= valueDefined*/;
+    int id /*= valueDefined*/;
     if (!value) {
         *vs = valueMissing;
         switch (a) {
@@ -370,7 +370,7 @@ static int checkElementType(void* element, Elm e) {
 // Returns 0 to indicate error
 // Verify that the next stack element exists and is of the given type
 // If e==ANY_TYPE, the type check is ommited
-static int checkPeek(Elm e) {
+static int checkPeek(int e) {
     if (stackIsEmpty(stack)){
         printf("Illegal document structure, expected %s\n", elmNames[e]);
         XML_StopParser(parser, XML_FALSE);
@@ -383,7 +383,7 @@ static int checkPeek(Elm e) {
 // Get the next stack element, it is of the given type.
 // If e==ANY_TYPE, the type check is ommited
 static void* checkPop(Elm e){
-    return checkPeek(e) ? stackPop(stack) : NULL;
+    return checkPeek(e) ? stackPopFMI(stack) : NULL;
 }
 
 // -------------------------------------------------------------------------
@@ -456,7 +456,8 @@ Element* newElement(Elm type, int size, const char** attr) {
 
 // Create and push a new element node
 static void XMLCALL startElement(void *context, const char *elm, const char **attr) {
-    Elm el;
+    (void)context;
+    int el;
     void* e;
     int size;
     el = checkElement(elm);
@@ -473,7 +474,7 @@ default: assert(0);
     }
     e = newElement(el, size, attr);
     checkPointer(e);
-    stackPush(stack, e);
+    stackPushFMI(stack, e);
 }
 
 // Pop all elements of the given type from stack and
@@ -482,12 +483,12 @@ default: assert(0);
 static void popList(Elm e) {
     int n = 0;
     Element** array;
-    Element* elm = stackPop(stack);
+    Element* elm = stackPopFMI(stack);
     while (elm->type == e) {
-        elm = stackPop(stack);
+        elm = stackPopFMI(stack);
         n++;
     }
-    stackPush(stack, elm); // push ListElement back to stack
+    stackPushFMI(stack, elm); // push ListElement back to stack
     array = (Element**)stackLastPopedAsArray0(stack, n); // NULL terminated list
     if (getAstNodeType(elm->type)!=astListElement) return; // failure
     ((ListElement*)elm)->list = array;
@@ -497,7 +498,8 @@ static void popList(Elm e) {
 // Pop the children from the stack and
 // check for correct type and sequence of children
 static void XMLCALL endElement(void *context, const char *elm) {
-    Elm el;
+    (void)context;
+    int el;
     el = checkElement(elm);
     switch(el) {
         case elm_fmiModelDescription:
@@ -560,7 +562,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  md->typeDefinitions = td;
                  md->unitDefinitions = ud;
                  md->cosimulation = cs;
-                 stackPush(stack, md);
+                stackPushFMI(stack, md);
                  break;
             }
         case elm_Implementation:
@@ -568,7 +570,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  // replace Implementation element
                  void* cs = checkPop(ANY_TYPE);
                  void* im = checkPop(elm_Implementation);
-                 stackPush(stack, cs);
+                stackPushFMI(stack, cs);
                  free(im);
                  el = ((Element*)cs)->type;
                  break;
@@ -579,7 +581,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  CoSimulation* cs = checkPop(elm_CoSimulation_StandAlone);
                  if (!ca || !cs) return;
                  cs->capabilities = ca;
-                 stackPush(stack, cs);
+                stackPushFMI(stack, cs);
                  break;
             }
         case elm_CoSimulation_Tool:
@@ -590,7 +592,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  if (!ca || !mo || !cs) return;
                  cs->capabilities = ca;
                  cs->model = mo;
-                 stackPush(stack, cs);
+                stackPushFMI(stack, cs);
                  break;
             }
         case elm_Type:
@@ -664,7 +666,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  name->attributes[1] = data;
                  data = NULL;
                  skipData = 1; // stop recording element content
-                 stackPush(stack, name);
+                stackPushFMI(stack, name);
                  break;
             }
         case -1: return; // illegal element error
@@ -684,7 +686,8 @@ static void XMLCALL endElement(void *context, const char *elm) {
 // instead of an empty string with len == 0 we get "\n". The workaround is
 // to replace this with the empty string whenever we encounter "\n".
 void XMLCALL handleData(void *context, const XML_Char *s, int len) {
-    int n;
+    (void)context;
+    size_t n;
     if (skipData) return;
     if (!data) {
         // start a new data string
@@ -777,11 +780,8 @@ void printidf(const char* fmuFilNam, ModelDescription* md)
 {
 	FILE *fp;
 
-	char type[12];
 	int i, j, varname, vardes=-1;
 	void **list;
-	ScalarVariable* se;
-	Element* ee;
 
 	fp = fopen("tmp.idf", "w");
 
@@ -874,7 +874,7 @@ void freeElement(void* element){
     // free attributes
     for (i=0; i<e->n; i+=2)
         free((void*)e->attributes[i+1]);
-    if (e->attributes) free(e->attributes);
+    if (e->attributes) free((void*)e->attributes);
     // free child nodes
     switch (getAstNodeType(e->type)) {
         case astElement:
@@ -974,20 +974,20 @@ if (file == NULL) {
         return NULL; // failure
     }
     while (!done) {
-        int n = fread(text, sizeof(char), XMLBUFSIZE, file);
+        size_t n = fread(text, sizeof(char), XMLBUFSIZE, file);
 if (n != XMLBUFSIZE) done = 1;
-        if (!XML_Parse(parser, text, n, done)){
+        if (!XML_Parse(parser, text, (int)n, done)){
              printf("Parse error in file %s at line %d:\n%s\n",
                      xmlPath,
                      (int)XML_GetCurrentLineNumber(parser),
                      XML_ErrorString(XML_GetErrorCode(parser)));
-             while (! stackIsEmpty(stack)) md = stackPop(stack);
+             while (! stackIsEmpty(stack)) md = stackPopFMI(stack);
              if (md) freeElement(md);
              cleanup(file);
              return NULL; // failure
         }
     }
-    md = stackPop(stack);
+    md = stackPopFMI(stack);
     assert(stackIsEmpty(stack));
     cleanup(file);
     //printElement(1, md); // debug

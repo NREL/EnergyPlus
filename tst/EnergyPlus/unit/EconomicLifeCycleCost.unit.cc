@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,13 +57,18 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EconomicLifeCycleCost.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EconomicLifeCycleCost;
+
+using namespace EnergyPlus::DataGlobalConstants;
+using namespace EnergyPlus::EconomicTariff;
 
 TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_GetInput)
 {
@@ -415,3 +420,173 @@ TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ProcessMaxInput)
     EXPECT_EQ(1.099, UseAdjustment(1).Adjustment(99));
     EXPECT_EQ(1.100, UseAdjustment(1).Adjustment(100));
 }
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ComputeEscalatedEnergyCosts)
+{
+    lengthStudyYears = 5;
+
+    numCashFlow = 1;
+    CashFlow.allocate(numCashFlow);
+    CashFlow(1).pvKind = pvkEnergy;
+    CashFlow(1).Resource = 1001;
+    CashFlow(1).yrAmount.allocate(lengthStudyYears);
+    CashFlow(1).yrAmount(1) = 100;
+    CashFlow(1).yrAmount(2) = 110;
+    CashFlow(1).yrAmount(3) = 120;
+    CashFlow(1).yrAmount(4) = 130;
+    CashFlow(1).yrAmount(5) = 140;
+
+    numResourcesUsed = 1;
+
+    EscalatedEnergy.allocate(lengthStudyYears, NumOfResourceTypes);
+    EscalatedEnergy = 0.0;
+    EscalatedTotEnergy.allocate(lengthStudyYears);
+    EscalatedTotEnergy = 0.0;
+
+    ComputeEscalatedEnergyCosts();
+    EXPECT_NEAR(EscalatedEnergy(1, 1), 100., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(2, 1), 110., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(3, 1), 120., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(4, 1), 130., 0.001);
+    EXPECT_NEAR(EscalatedEnergy(5, 1), 140., 0.001);
+
+    EXPECT_NEAR(EscalatedTotEnergy(1), 100., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(2), 110., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(3), 120., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(4), 130., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(5), 140., 0.001);
+
+    numUsePriceEscalation = 1;
+    UsePriceEscalation.allocate(numUsePriceEscalation);
+    UsePriceEscalation(1).resource = 1001;
+    UsePriceEscalation(1).Escalation.allocate(lengthStudyYears);
+    UsePriceEscalation(1).Escalation(1) = 1.03;
+    UsePriceEscalation(1).Escalation(2) = 1.05;
+    UsePriceEscalation(1).Escalation(3) = 1.07;
+    UsePriceEscalation(1).Escalation(4) = 1.11;
+    UsePriceEscalation(1).Escalation(5) = 1.15;
+
+    //reset this variable to zero
+    EscalatedTotEnergy = 0.0;
+
+    ComputeEscalatedEnergyCosts();
+    EXPECT_NEAR(EscalatedEnergy(1, 1), 103.0, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(2, 1), 115.5, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(3, 1), 128.4, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(4, 1), 144.3, 0.001);
+    EXPECT_NEAR(EscalatedEnergy(5, 1), 161.0, 0.001);
+
+    EXPECT_NEAR(EscalatedTotEnergy(1), 103., 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(2), 115.5, 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(3), 128.4, 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(4), 144.3, 0.001);
+    EXPECT_NEAR(EscalatedTotEnergy(5), 161.0, 0.001);
+
+}
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_MonthToMonthNumber)
+{
+    EXPECT_EQ(1, MonthToMonthNumber("January",1));
+    EXPECT_EQ(2, MonthToMonthNumber("February",1));
+    EXPECT_EQ(3, MonthToMonthNumber("March",1));
+    EXPECT_EQ(4, MonthToMonthNumber("April",1));
+    EXPECT_EQ(5, MonthToMonthNumber("May",1));
+    EXPECT_EQ(6, MonthToMonthNumber("June",1));
+    EXPECT_EQ(7, MonthToMonthNumber("July",1));
+    EXPECT_EQ(8, MonthToMonthNumber("August",1));
+    EXPECT_EQ(9, MonthToMonthNumber("September",1));
+    EXPECT_EQ(10, MonthToMonthNumber("October",1));
+    EXPECT_EQ(11, MonthToMonthNumber("November",1));
+    EXPECT_EQ(12, MonthToMonthNumber("December",1));
+    EXPECT_EQ(99, MonthToMonthNumber("Hexember",99));
+}
+
+
+TEST_F(EnergyPlusFixture, EconomicLifeCycleCost_ExpressAsCashFlows)
+{
+    baseDateYear = 2020;
+    baseDateMonth = 1;
+
+    serviceDateYear = 2023;
+    serviceDateMonth = 1;
+
+    lengthStudyYears = 5;
+    lengthStudyTotalMonths = lengthStudyYears * 12;
+
+
+    numTariff = 1;
+    tariff.allocate(1);
+    tariff(1).isSelected = true;
+    tariff(1).resourceNum = 1001;
+    tariff(1).ptTotal = 1;
+    econVar.allocate(1);
+    econVar(1).values.allocate(12);
+    econVar(1).values(1) = 101.;
+    econVar(1).values(2) = 102.;
+    econVar(1).values(3) = 103.;
+    econVar(1).values(4) = 104.;
+    econVar(1).values(5) = 105.;
+    econVar(1).values(6) = 106.;
+    econVar(1).values(7) = 107.;
+    econVar(1).values(8) = 108.;
+    econVar(1).values(9) = 109.;
+    econVar(1).values(10) = 110.;
+    econVar(1).values(11) = 111.;
+    econVar(1).values(12) = 112.;
+
+    numNonrecurringCost = 1;
+    NonrecurringCost.allocate(1);
+    NonrecurringCost(1).name = "MiscConstruction";
+    NonrecurringCost(1).name = "MiscConstruction";
+    NonrecurringCost(1).category = costCatConstruction;
+    NonrecurringCost(1).cost = 123456.;
+    NonrecurringCost(1).startOfCosts = startServicePeriod;
+    NonrecurringCost(1).totalMonthsFromStart = 10;
+
+    ExpressAsCashFlows(state.dataCostEstimateManager);
+
+    EXPECT_NEAR(CashFlow(17).mnAmount(47), 123456., 0.001);  // 36 months plus 10 months plus one month
+
+    // first year
+    EXPECT_NEAR(CashFlow(18).mnAmount(37), 101., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(38), 102., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(39), 103., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(40), 104., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(41), 105., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(42), 106., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(43), 107., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(44), 108., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(45), 109., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(46), 110., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(47), 111., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(48), 112., 0.001);
+    // second  year
+    EXPECT_NEAR(CashFlow(18).mnAmount(49), 101., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(50), 102., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(51), 103., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(52), 104., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(53), 105., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(54), 106., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(55), 107., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(56), 108., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(57), 109., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(58), 110., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(59), 111., 0.001);
+    EXPECT_NEAR(CashFlow(18).mnAmount(60), 112., 0.001);
+
+    EXPECT_NEAR(CashFlow(18).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(CashFlow(18).yrAmount(5), 1278., 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatEnergy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(CashFlow(costCatEnergy).yrAmount(5), 1278., 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatTotEnergy).yrAmount(4), 1278., 0.001);
+    EXPECT_NEAR(CashFlow(costCatTotEnergy).yrAmount(5), 1278., 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatConstruction).yrAmount(4), 123456, 0.001);
+    EXPECT_NEAR(CashFlow(costCatTotCaptl).yrAmount(4), 123456, 0.001);
+
+    EXPECT_NEAR(CashFlow(costCatTotGrand).yrAmount(4), 1278. + 123456., 0.001);
+    EXPECT_NEAR(CashFlow(costCatTotGrand).yrAmount(5), 1278., 0.001);
+}
+

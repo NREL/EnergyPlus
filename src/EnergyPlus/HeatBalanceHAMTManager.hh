@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,13 +49,13 @@
 #define HeatBalanceHAMTManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class IOFiles;
 
 namespace HeatBalanceHAMTManager {
 
@@ -156,18 +156,18 @@ namespace HeatBalanceHAMTManager {
 
     // Functions
 
-    void ManageHeatBalHAMT(int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
+    void ManageHeatBalHAMT(IOFiles &ioFiles, int const SurfNum, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
     void GetHeatBalHAMTInput();
 
-    void InitHeatBalHAMT();
+    void InitHeatBalHAMT(EnergyPlus::IOFiles &ioFiles);
 
     void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
     void UpdateHeatBalHAMT(int const sid);
 
     void
-    interp(int const ndata, Array1A<Real64> const xx, Array1A<Real64> const yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
+    interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
 
     Real64 RHtoVP(Real64 const RH, Real64 const Temperature);
 

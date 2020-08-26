@@ -81,7 +81,7 @@ This field is selects the type of surfaces that are all assigned to use the heat
 \item
   AllInteriorCeilings---all ceilings that are internal surfaces
 \item
-  AllInteriorFloors---all floors that are are internal surfaces
+  AllInteriorFloors---all floors that are internal surfaces
 \end{itemize}
 
 \paragraph{Field: Algorithm}\label{field-algorithm-1}
@@ -123,7 +123,7 @@ This object can be used to control the surface heat transfer model used for a li
 
 \subsubsection{Inputs}\label{inputs-2-000}
 
-\paragraph{Field: Name}\label{field-name-1}
+\paragraph{Field: Name}
 
 This is a unique, user-defined name for the object.
 
@@ -176,7 +176,7 @@ This object can be used to control the surface heat transfer model used for surf
 
 \subsubsection{Inputs}\label{inputs-3}
 
-\paragraph{Field: Name}\label{field-name-2}
+\paragraph{Field: Name}
 
 This is a unique, user-defined name for the object.
 
@@ -215,7 +215,7 @@ Movable insulation can be used/scheduled on any surface regular surface (such as
 
 Exterior and interior movable insulation have undergone some testing and appears to producing expected results. The underlying principle has been implemented in EnergyPlus for both interior and exterior movable insulation with the possibility for exterior movable insulation to be transparent (transparent insulation material or TIM).
 
-TIM exterior layers can be used with the ConductionFiniteDifference (CondFD) solution algorithm. With this addition, TIM layers can be used in conjunction with wall layers that have phase change materials (PCM) included, or any other advanced capability of the CondFD algorithm such as variable conductivity. The input requirements are exactly the same as when used with the CTF algorithm. The Solution Algorithm needs to be changed to CondFD, and as with CTF, the ``SurfaceControl:MovableInsulation'' object must be completed to specify the insulated surface and the ``\hyperref[windowmaterialglazing]{WindowMaterial:Glazing}'' object is needed to provide the TIM layer properties.
+TIM exterior layers can be used with the ConductionFiniteDifference (CondFD) solution algorithm. With this addition, TIM layers can be used in conjunction with wall layers that have phase change materials (PCM) included, or any other advanced capability of the CondFD algorithm such as variable conductivity. The input requirements are exactly the same as when used with the CTF algorithm. The Solution Algorithm needs to be changed to CondFD, and as with CTF, the ``SurfaceControl:MovableInsulation'' object must be completed to specify the insulated surface and the ``\hyperref[windowmaterialglazing]{WindowMaterial:Glazing}'' or ``\hyperref[windowmaterialglazingequivalentlayer]{WindowMaterial:Glazing:EquivalentLayer}'' object is needed to provide the TIM layer properties.
 
 Basically, the addition of movable insulation allows the user to schedule an extra amount of insulation on either the inside or outside surface of a wall (or both). The insulation must be a simple, homogenous material layer (linked to a material definition within the input data file). Note that EnergyPlus allows the exterior movable insulation layer to be transparent to short wavelength radiation (solar). In this case, incident solar is split between the plane between the movable insulation and the surface and the plane between the movable insulation and the surrounding air. This calculation is fairly basic and based on the solar transmittance of the insulation layer (material properties). Using transparent layers for exterior movable insulation allows solar energy to penetrate deeper into a construction where it can be stored for later use in the building (similar in concept to a Trombe Wall).
 
@@ -229,7 +229,7 @@ This field refers the movable insulation back to a particular surface (ref: Buil
 
 \subsubsection{Field: Material Name}\label{field-material-name}
 
-This field refers to a material layer (e.g., \hyperref[material]{Material}, \hyperref[materialnomass]{Material:NoMass}, or \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
+This field refers to a material layer (e.g., \hyperref[material]{Material}, \hyperref[materialnomass]{Material:NoMass}, \hyperref[windowmaterialglazing]{WindowMaterial:Glazing}, or \hyperref[windowmaterialglazingequivalentlayer]{WindowMaterial:Glazing:EquivalentLayer}; transparent layers are only valid for outside movable insulation) via its user assigned name. This provides the program with a full complement of material properties so that the effect of the insulation (R-value and solar transmittance) can be correctly taken into account by EnergyPlus.  Note that for non-glazing materials the solar absorptivity of the layer will be used directly in the calculations.  For glazing material layers, the solar absorptivity will be calculated by subtracting both the transmissivity and the front side reflectivity from unity for the material.
 
 \subsubsection{Field: Schedule Name}\label{field-schedule-name}
 
@@ -296,7 +296,7 @@ This field is used to supply a schedule name. That schedule will supply the ``co
 
 \paragraph{Field: Sinusoidal Variation of Constant Temperature Coefficient}\label{field-sinusoidal-variation-of-constant-temperature-coefficient}
 
-This field is optional and can be used to define an alternate method of prescribing the coefficient that is applied to the constant temperature (see the fields Constant Temperature and Constant Temperature Coefficient). This parameter is shown as ``C2'' in the equation below. If this field is omitted, left blank, or set to ``No,'' then C2 is a constant (defined in the field Constant Temperature Coefficient). However if this is set to ``Yes,'' then the value of C2 varies with a unitary sine wave in the following way:
+This field is optional and can be used to define an alternate method of prescribing the coefficient that is applied to the constant temperature (see the fields Constant Temperature and Constant Temperature Coefficient). This parameter is shown as ``C2'' in the equation below. If this field is omitted, left blank, or set to ``No,'' then C2 is a constant (defined in the field Constant Temperature Coefficient). However, if this is set to ``Yes,'' then the value of C2 varies with a unitary sine wave in the following way:
 
 \begin{equation}
 C2 = Sin\left( {2\pi \frac{{\left( {time\,of\,day} \right)}}{{\left( {period} \right)}}} \right)
@@ -306,7 +306,7 @@ The value for ``period'' is controlled in the following field. The value for ``t
 
 \paragraph{Field: Period of Sinusoidal Variation}\label{field-period-of-sinusoidal-variation}
 
-This field is used to define the period of the sine wave when using the Sinusodial Variation of Constant Temperature Coefficient capability selected in the previous field. This field is the time period of the sine wave in units of hours. The default is 24 hours and provides a diurnal sine wave. The value entered here is ``period'' in the equation in the previous field.
+This field is used to define the period of the sine wave when using the Sinusoidal Variation of Constant Temperature Coefficient capability selected in the previous field. This field is the time period of the sine wave in units of hours. The default is 24 hours and provides a diurnal sine wave. The value entered here is ``period'' in the equation in the previous field.
 
 \paragraph{Field: Previous Other Side Temperature Coefficient}\label{field-previous-other-side-temperature-coefficient}
 
@@ -381,7 +381,7 @@ SurfaceProperty:OtherSideCoefficients,
       ;                        !- Maximum Other Side Temperature Limit {C}
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs}
+\subsubsection{Outputs}
 
 \begin{lstlisting}
 Zone,Average,Surface Other Side Coefficients Exterior Air Drybulb Temperature
@@ -397,11 +397,11 @@ By referencing the Other Side Conditions Model statement in the surface statemen
 
 The boundary condition values are determined dynamically by the program using internal component models. If you want to define other side surface temperatures or convection conditions, then use \hyperref[surfacepropertyothersidecoefficients]{SurfaceProperty:OtherSideCoefficients} instead of this object.
 
-It should be noted that when other side conditions models are used, solar effects are removed from the surface's outside face heat balance, but are used in modeling the component adjacent to that surface.
+It should be noted that when other side conditions models are used, solar effects are removed from the surface's outside face heat balance but are used in modeling the component adjacent to that surface.
 
 The other side conditions model also includes underground piping system interaction. The \hyperref[pipingsystemundergrounddomain]{PipingSystem:Underground:Domain} object represents a mass of ground which may include interaction with, for example, basement surfaces. In this case, the ground model will internally use the other side condition model hook to update boundary conditions for those surfaces which use that other side condition model name reference.
 
-The other side conditions model also includes an underwater boundary condition connection.  By specifying ``ConvectiveUnderwater'' as the boundary type, and including any number of ``\hyperref[surfacepropertyunderwater]{SurfaceProperty:Underwater}'' objects in the input, the user can connect sufaces to water such as for a moving vessel.
+The other side conditions model also includes an underwater boundary condition connection.  By specifying ``ConvectiveUnderwater'' as the boundary type, and including any number of ``\hyperref[surfacepropertyunderwater]{SurfaceProperty:Underwater}'' objects in the input, the user can connect surfaces to water such as for a moving vessel.
 
 \subsubsection{Inputs}\label{inputs-5}
 
@@ -519,9 +519,9 @@ Limitations when using Foundation:Kiva objects include:
   Only floors and walls may use Foundation:Kiva objects as Outside
   Boundary Conditions.
 \item
-  Exactly one floor surface must reference each Foundation:Kiva object.
-  However, multiple floors may exist in the same thermal zone so long as
-  they reference separate Foundation:Kiva objects.
+  For a given zone, each floor surface must reference a different Foundation:Kiva object. In other words, multiple foundation floor surfaces may exist in the same thermal zone so long as they reference separate Foundation:Kiva objects. The same Foundation:Kiva object may be referenced by multiple floors so long as they are in different zones.
+\item
+  Any number of wall surfaces may reference a single Foundation:Kiva object so long as that object is referenced by exactly one floor surface in the same thermal zone.
 \item
   Foundation wall surfaces that are not triangular or quadrilateral may not
   translate well into the two-dimensional finite difference context.
@@ -662,6 +662,7 @@ BuildingSurface:Detailed,
 
 Foundation:Kiva,
   Slab Details,              !- Name
+  ,                          !- Initial Indoor Air Temperature
   XPS,                       !- Interior Horizontal Insulation Material Name
   0.2,                       !- Interior Horizontal Insulation Depth
   0.6,                       !- Interior Horizontal Insulation Width
@@ -710,6 +711,11 @@ Construction,
 The unique identifier of the Foundation:Kiva object. Referenced by a the
 ``Outside Boundary Condition Object'' field in a surface object.
 
+\paragraph{Field: Initial Indoor Air Temperature}
+
+Indoor air temperature used for Kiva initialization (prior to warmup period).
+If left blank, indoor air temperature during initialization will be estimated based on zone setpoints.
+
 \paragraph{Field: Interior Horizontal Insulation Material
 Name}
 
@@ -730,8 +736,9 @@ Kiva's two-dimensional context and are illustrated in Figure
 \paragraph{Field: Interior Horizontal Insulation
 Depth}
 
-Distance from the wall top to the top of interior horizontal insulation,
-in m. Required if Interior Horizontal Insulation Material Name is
+Distance from the bottom of the slab to the top of interior horizontal insulation,
+in m. Generally, interior horizontal insulation is placed directly below the slab, and therefore, this value will generally be set to zero (as indicated in Figure \ref{fig:ihi}).
+Required if Interior Horizontal Insulation Material Name is
 defined.
 
 \paragraph{Field: Interior Horizontal Insulation
@@ -784,7 +791,7 @@ Kiva's two-dimensional context and are illustrated in Figure
 \paragraph{Field: Exterior Horizontal Insulation
 Depth}
 
-Distance from the wall top to the top of exterior horizontal insulation,
+Distance from the exterior grade to the top of exterior horizontal insulation,
 in m. Required if Exterior Horizontal Insulation Material Name is
 defined.
 
@@ -824,7 +831,7 @@ Grade}
 Distance from the exterior grade to the wall top, in m. Default: 0.2 m
 
 Figures \ref{fig:2d-w} and \ref{fig:2d-w-slab} illustrate the definition of both the ``Wall
-Height Above Grade'' and the following field, ``Wall Depth Below Slab''.
+Height Above Grade'' and the following field, ``Wall Depth Below Slab''. If the top of foundation wall is flush with the ground then the ``Wall Height Above Grade'' is zero.
 
 \begin{figure}
 \centering
@@ -847,7 +854,7 @@ Distance from the slab bottom to the bottom of the foundation wall, in
 m. Default: 0.0 m
 
 Extending the wall below the slab provides a coarse approximation of the
-foundation footing. Alternatively, one may use the the fields ``Footing
+foundation footing. Alternatively, one may use the fields ``Footing
 Material Name'' and ``Footing Depth'' to explicitly model the footing.
 Note, that explicit modeling of the footing requires a higher spatial
 discretization and, therefore, longer computation times.
@@ -1122,7 +1129,7 @@ interior foundation wall using an Adiabatic Outside Boundary Condition.
 
 \paragraph{Field: Surface Name}\label{surfaceproperty-exposedfoundationperimeter-surface-name}
 
-Name of foundation floor surface.
+Name of foundation floor surface object.
 
 \paragraph{Field: Exposed Perimeter Calculation Method}\label{field-exposed-perimeter-calculation-method}
 
@@ -1131,15 +1138,15 @@ Required key/choice field that tells which method to use to calculate the expose
 \begin{itemize}
 \item TotalExposedPerimeter: Exposed perimeter is defined as an absolute distance in m. (The Total Exposed Perimeter field should be filled.)
 
-\item ExposedPerimeterFraction: Exposed perimeter is defined as a fraction of the total floor perimeter. (The Exposed Perimeter Fraction field should be filled.)
+\item ExposedPerimeterFraction: Exposed perimeter is defined as a fraction of the total floor perimeter. (The Exposed Perimeter Fraction field should be filled.) Note: This option works best when you are confident that the floor surface is completely exposed.
 
-\item BySegment: Each segment of the floor polygon (corresponding to distance between each set of vertices) is defined as exposed (``Yes'') or not exposed (``No'') in an extensible list corresponding to the number of vertices in the floor polygon. Exposed perimeter is defined as the sum of all exposed segement lengths. (The Surface Segment \textless{}x\textgreater{}
-Exposed fields should be filled.)
+\item BySegment: Each segment of the floor polygon (corresponding to distance between each set of vertices) is defined as exposed (``Yes'') or not exposed (``No'') in an extensible list corresponding to the number of vertices in the floor polygon. Exposed perimeter is defined as the sum of all exposed segment lengths. (The Surface Segment \textless{}x\textgreater{}
+Exposed fields should be filled.) Note: The number of segments identified in this object must match the number of vertices in the corresponding surface object.
 \end{itemize}
 
 \paragraph{Field: Total Exposed Perimeter}\label{surfaceproperty-exposedfoundationperimeter-total-exposed-perimeter}
 
-Total perimeter that is is exposed in m.
+Total perimeter that is exposed in m.
 
 \paragraph{Field: Exposed Perimeter Fraction}\label{surfaceproperty-exposedfoundationperimeter-exposed-perimeter-fraction}
 
@@ -1581,7 +1588,7 @@ The SurfaceConvectionAlgorithm:UserCurve named in this field is used when the pr
 
 \subsection{SurfaceConvectionAlgorithm:Inside:UserCurve}\label{surfaceconvectionalgorithminsideusercurve}
 
-This object is used to describe a custom model equation for surface convection heat transfer coefficients. If more than one curve is referenced, or non-blank, then they are all used and the result is the simple addition of all the curve results.
+This object is used to describe a custom model equation for surface convection heat transfer coefficients. If more than one curve is referenced, or non-blank, then they are all used, and the result is the simple addition of all the curve results.
 
 \subsubsection{Inputs}\label{inputs-8}
 
@@ -2411,15 +2418,15 @@ The building construction associated with this object (ref \hyperref[constructio
 
 \paragraph{Field: Layer 1 Solar Radiation Absorbed Schedule Name}\label{field-layer-1-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains the absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the first (outside) layer .
+Specifies the name of a schedule that contains the absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the first (outside) layer.
 
 \paragraph{Field: Layer 2 Solar Radiation Absorbed Schedule Name}\label{field-layer-2-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the second layer .
+Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the second layer.
 
 \paragraph{Field: Layer 3 Solar Radiation Absorbed Schedule Name}\label{field-layer-3-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation for the third layer .
+Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation for the third layer.
 
 \paragraph{Field: Layer 4 Solar Radiation Absorbed Schedule Name}\label{field-layer-4-solar-radiation-absorbed-schedule-name}
 
@@ -2427,7 +2434,7 @@ Specifies the name of a schedule that contains absorbed solar radiation values i
 
 \paragraph{Field: Layer 5 Solar Radiation Absorbed Schedule Name}\label{field-layer-5-solar-radiation-absorbed-schedule-name}
 
-Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the fifth layer .
+Specifies the name of a schedule that contains absorbed solar radiation values in units of W/m\(^{2}\). Values from the schedule are used for the absorbed solar radiation of the fifth layer.
 
 Example for ComplexFenestrationProperty:SolarAbsorbedLayers with compact schedules:
 
@@ -2474,7 +2481,7 @@ Example for ComplexFenestrationProperty:SolarAbsorbedLayers with compact schedul
 
 \subsection{GeometryTransform}\label{geometrytransform}
 
-This object provides a simple method of altering the footprint geometry of a model. The intent is to provide a single parameter that can be used to reshape the building description contained in the rest of the input file. This object was implemented for use in parametric massing studies and with the optimization program GenOpt. Although building footprint is often constrained in practice, analysts may find this object useful for investigating how building form impacts daylighting and solar gains on the east and west facades with out having to change all of the surface geometry input.
+This object provides a simple method of altering the footprint geometry of a model. The intent is to provide a single parameter that can be used to reshape the building description contained in the rest of the input file. This object was implemented for use in parametric massing studies and with the optimization program GenOpt. Although building footprint is often constrained in practice, analysts may find this object useful for investigating how building form impacts daylighting and solar gains on the east and west facades without having to change all of the surface geometry input.
 
 Aspect Ratio is defined as the overall length in the East-West direction divided by the overall length in the North-South direction.
 
@@ -2685,17 +2692,20 @@ If geometry is correct, conditions 1, 3, and 7 should take care of all surfaces,
 
 \subsubsection{User Input View Factors}\label{user-input-view-factors}
 
-The second option for specifying view factors requires user input values. These should be used with care in research or special situations. The object available for this is \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:bySurfaceName}.
+The second option for specifying view factors requires user input values. These should be used with care in research or special situations. The object available for this is \hyperref[zonepropertyuserviewfactorsbysurfacename]{ZoneProperty:UserViewFactors:BySurfaceName}.
 
-\subsection{ZoneProperty:UserViewFactors:bySurfaceName}\label{zonepropertyuserviewfactorsbysurfacename}
+\subsection{ZoneProperty:UserViewFactors:BySurfaceName}\label{zonepropertyuserviewfactorsbysurfacename}
 
-The method of entering user view factors is to entere each surface name and its view factor value to other surfaces in the zone
+The method of entering user view factors is to enter each surface name and its view factor value to other
+surfaces in a zone or group of zones connected by air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}'').
 
 \subsubsection{Inputs}\label{inputs-17}
 
-\paragraph{Field: Zone Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
+\paragraph{Field: Zone or ZoneList Name}\label{zonepropertyuserviewfactorsbysurfacename-field-zone-name}
 
-This field is the zone name for the view factors.
+An enclosure for radiant exchange may be a single zone, or a group of zones connected by one or more air boundaries (see ``\hyperref[constructionairboundary]{Construction:AirBoundary}''). If a ZoneList name is specified, the referenced ``\hyperref[zonelist]{ZoneList}'') must match a group of zones connected with Construction:AirBoundary using the \textit{GroupedZones} option for Radiant Exchange Method.
+
+Enter the applicable surface pairs with non-zero view factors. Any omitted surface pair is assumed to have a zero view factor.
 
 \paragraph{Field: From Surface 1}\label{field-from-surface-1}
 
@@ -2712,7 +2722,7 @@ This value is the view factor for ``from Surface'' to ``to Surface''.
 An IDF Example:
 
 \begin{lstlisting}
-ZoneProperty:UserViewFactors:bySurfaceName,Lshaped Zone,
+ZoneProperty:UserViewFactors:BySurfaceName,Lshaped Zone,
     Lshaped Zone:South Wall,Lshaped Zone:South Wall,0.000000,
     Lshaped Zone:South Wall,Lshaped Zone:East Wall,0.101310,
   <snip>

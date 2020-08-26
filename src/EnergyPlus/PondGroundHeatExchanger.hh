@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,60 +52,22 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <Plant/PlantLocation.hh>
-#include <PlantComponent.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace PondGroundHeatExchanger {
 
-    // Using/Aliasing
-
-    // Data
-    // MODULE PARAMETER DEFINITIONS
-    extern Real64 const SmallNum;      // Very small number to avoid div0 errors
-    extern Real64 const StefBoltzmann; // Stefan-Boltzmann constant
-
-    // MODULE VARIABLE DECLARATIONS:
-    // utility variables initialized once
     extern int NumOfPondGHEs; // Number of pond ground heat exchangers
-    // Utility variables - initialized for each instance of a pond
-    // extern Real64 nsvInletTemp; // water inlet temperature
-    // extern Real64 nsvOutletTemp; // water outlet temperature
-    // extern Real64 FlowRate; // water mass flow rate
-    // extern Real64 HeatTransRate; // total heat transfer rate, Watts
-    // extern Real64 PondTemp; // pond temperature
-    // extern Real64 PastPondTemp; // past pond temperature
-    // extern Real64 PondArea; // pond surface area
-    // extern Real64 PondDepth; // pond depth
-    // extern Real64 TubeInDiameter; // hydronic tube inside diameter
-    // extern Real64 TubeOutDiameter; // hydronic tube outside diameter
-    // extern Real64 TubeConductivity; // hydronic tube thermal conductivity
-    // extern Real64 GrndConductivity; // ground thermal conductivity
-    // extern Real64 Concentration; // fluid/glycol concentration 0.0-1.0 proportion.
-    // extern Real64 CircLength; // length of each circuit
-    // extern int NumCircuits; // number of circuits in total
-    // extern int InletNodeNum; // inlet node number
-    // extern int OutletNodeNum; // oulet node number
-    // extern int WaterIndex; // Fluid index for pond water
-    // extern bool NoDeepGroundTempObjWarning; // This will cause a warning to be issued if no "deep" ground
-    //// temperature object was input.
-    // extern Array1D_bool CheckEquipName;
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PlantPondGroundHeatExchangers
-
-    // Types
 
     struct PondGroundHeatExchangerData : PlantComponent
     {
-        virtual ~PondGroundHeatExchangerData()
-        {
-        }
-
         // Members
-        // Input data
         std::string Name;           // name of pond GHE
         std::string InletNode;      // pond inlet fluid node
         std::string OutletNode;     // pond outlet fluid node
@@ -141,48 +103,54 @@ namespace PondGroundHeatExchanger {
 
         bool OneTimeFlag;
         bool MyFlag;
+        bool setupOutputVarsFlag;
 
         int WaterIndex;
+
+        bool firstTimeThrough;
 
         // Default Constructor
         PondGroundHeatExchangerData()
             : DesignMassFlowRate(0.0), DesignCapacity(0.0), Depth(0.0), Area(0.0), TubeInDiameter(0.0), TubeOutDiameter(0.0), TubeConductivity(0.0),
               GrndConductivity(0.0), CircuitLength(0.0), BulkTemperature(0.0), PastBulkTemperature(0.0), NumCircuits(0), InletNodeNum(0),
-              OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), OneTimeFlag(true),
-              MyFlag(true), WaterIndex(0)
+              OutletNodeNum(0), FrozenErrIndex(0), ConsecutiveFrozen(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0), InletTemp(0.0),
+              OutletTemp(0.0), MassFlowRate(0.0), PondTemp(0.0), HeatTransferRate(0.0), Energy(0.0), OneTimeFlag(true), MyFlag(true),
+              setupOutputVarsFlag(true), WaterIndex(0), firstTimeThrough(true)
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(int const objectType, std::string objectName);
+        static PlantComponent *factory(std::string const &objectName);
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void InitPondGroundHeatExchanger(bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-        );
+        void InitPondGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration);
+
+        void setupOutputVars();
 
         void CalcPondGroundHeatExchanger();
 
-        Real64 CalcTotalFLux(Real64 const PondBulkTemp // pond temp for this flux calculation
+        Real64 CalcTotalFLux(Real64 PondBulkTemp // pond temp for this flux calculation
         );
 
-        Real64 CalcEffectiveness(Real64 const InsideTemperature, // Temperature of fluid in pipe circuit, in C
-                                 Real64 const PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
-                                 Real64 const MassFlowRate       // Mass flow rate, in kg/s
+        Real64 CalcEffectiveness(Real64 InsideTemperature, // Temperature of fluid in pipe circuit, in C
+                                 Real64 PondTemperature,   // Temperature of pond water (i.e. outside the pipe), in C
+                                 Real64 massFlowRate       // Mass flow rate, in kg/s
         );
 
-        Real64 CalcSolarFlux();
+        Real64 CalcSolarFlux() const;
 
         void UpdatePondGroundHeatExchanger();
 
-        //==============================================================================
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        void ReportPondGroundHeatExchanger();
     };
 
     // Object Data
     extern Array1D<PondGroundHeatExchangerData> PondGHE;
+
+    void clear_state();
 
     void GetPondGroundHeatExchanger();
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,18 +54,18 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <OutputProcessor.hh>
-#include <PlantPressureSystem.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantPressureSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -678,7 +678,6 @@ namespace PlantPressureSystem {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::DemandSide;
-        using DataPlant::GenEquipTypes_Pump;
         using DataPlant::PlantLoop;
         using DataPlant::SupplySide;
 
@@ -698,7 +697,7 @@ namespace PlantPressureSystem {
         }
 
         // If the last component on the branch is the pump, then check if a pressure drop is detected and set the flag and leave
-        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).GeneralEquipType == GenEquipTypes_Pump) {
+        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(NumCompsOnBranch).isPump()) {
             PumpFound = true;
             if (TempBranchPressureDrop != 0.0) {
                 ShowSevereError("Error in plant pressure simulation for plant loop: " + PlantLoop(LoopNum).Name);
@@ -730,7 +729,7 @@ namespace PlantPressureSystem {
             for (CompNum = NumCompsOnBranch - 1; CompNum >= 1; --CompNum) {
 
                 // If this component is a pump, stop passing pressure upstream, and set flag to true for calling routine
-                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).GeneralEquipType == GenEquipTypes_Pump) {
+                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).isPump()) {
                     PumpFound = true;
                     break;
                 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,18 +53,17 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <DataCostEstimate.hh>
-#include <DataGlobalConstants.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DisplayRoutines.hh>
-#include <EconomicLifeCycleCost.hh>
-#include <EconomicTariff.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputReportTabular.hh>
-#include <ResultsSchema.hh>
-#include <SQLiteProcedures.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/ResultsFramework.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -102,8 +101,6 @@ namespace EconomicLifeCycleCost {
 
     // Using/Aliasing
     using namespace DataGlobalConstants;
-    using namespace DataPrecisionGlobals;
-    using namespace DataCostEstimate;
     using namespace DataIPShortCuts;
 
     // Data
@@ -150,9 +147,9 @@ namespace EconomicLifeCycleCost {
     // The NIST supplement includes UPV* factors for
     //   Electricity
     //   Natural gas
-    //   Distillate oil
-    //   Liquified petroleum gas
-    //   Residual oil
+    //   Distillate oil - FuelOilNo1
+    //   Liquified petroleum gas - Propane
+    //   Residual oil - FuelOilNo2
     //   Coal
 
     int const startServicePeriod(1);
@@ -214,6 +211,10 @@ namespace EconomicLifeCycleCost {
 
     Array1D_string const
         MonthNames(12, {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"});
+
+    // arrays related to escalated energy costs
+    Array1D<Real64> EscalatedTotEnergy;
+    Array2D<Real64> EscalatedEnergy;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -293,7 +294,7 @@ namespace EconomicLifeCycleCost {
         }
     }
 
-    void ComputeLifeCycleCostAndReport()
+    void ComputeLifeCycleCostAndReport(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -328,10 +329,11 @@ namespace EconomicLifeCycleCost {
 
         if (LCCparamPresent) {
             DisplayString("Computing Life Cycle Costs and Reporting");
-            ExpressAsCashFlows();
+            ExpressAsCashFlows(dataCostEstimateManager);
             ComputePresentValue();
+            ComputeEscalatedEnergyCosts();
             ComputeTaxAndDepreciation();
-            WriteTabularLifeCycleCostReport();
+            WriteTabularLifeCycleCostReport(dataCostEstimateManager);
         }
     }
 
@@ -354,7 +356,7 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int jFld;   // loop counter
+        int jFld;                        // loop counter
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
@@ -604,8 +606,8 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int iInObj; // loop index variable for reading in objects
-        int jFld;   // loop counter
+        int iInObj;                      // loop index variable for reading in objects
+        int jFld;                        // loop counter
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
@@ -728,12 +730,12 @@ namespace EconomicLifeCycleCost {
             RecurringCosts(iInObj).repeatPeriodYears = int(NumArray(4));
             if (RecurringCosts(iInObj).repeatPeriodYears > 100) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
-                                 ".  This value is the number of years between occurances of the cost so a value greater than 100 is not reasonable "
+                                 ".  This value is the number of years between occurrences of the cost so a value greater than 100 is not reasonable "
                                  "for an economic evaluation. ");
             }
             if (RecurringCosts(iInObj).repeatPeriodYears < 1) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(4) +
-                                 ".  This value is the number of years between occurances of the cost so a value less than 1 is not reasonable for "
+                                 ".  This value is the number of years between occurrences of the cost so a value less than 1 is not reasonable for "
                                  "an economic evaluation. ");
             }
             //   N5,  \field Repeat Period Months
@@ -743,12 +745,12 @@ namespace EconomicLifeCycleCost {
             RecurringCosts(iInObj).repeatPeriodMonths = int(NumArray(5));
             if (RecurringCosts(iInObj).repeatPeriodMonths > 1200) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
-                                 ".  This value is the number of months between occurances of the cost so a value greater than 1200 is not "
+                                 ".  This value is the number of months between occurrences of the cost so a value greater than 1200 is not "
                                  "reasonable for an economic evaluation. ");
             }
             if (RecurringCosts(iInObj).repeatPeriodMonths < 0) {
                 ShowWarningError(CurrentModuleObject + ": Invalid value in field " + cNumericFieldNames(5) +
-                                 ".  This value is the number of months between occurances of the cost so a value less than 0 is not reasonable for "
+                                 ".  This value is the number of months between occurrences of the cost so a value less than 0 is not reasonable for "
                                  "an economic evaluation. ");
             }
             if ((RecurringCosts(iInObj).repeatPeriodMonths == 0) && (RecurringCosts(iInObj).repeatPeriodYears == 0)) {
@@ -784,8 +786,8 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int iInObj; // loop index variable for reading in objects
-        int jFld;   // loop counter
+        int iInObj;                      // loop index variable for reading in objects
+        int jFld;                        // loop counter
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
@@ -911,9 +913,9 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int iInObj; // loop index variable for reading in objects
-        int jFld;   // loop counter
-        int jYear;  // loop counter
+        int iInObj;                      // loop index variable for reading in objects
+        int jFld;                        // loop counter
+        int jYear;                       // loop counter
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
@@ -966,8 +968,8 @@ namespace EconomicLifeCycleCost {
                 //       \key Gasoline
                 //       \key Diesel
                 //       \key Coal
-                //       \key FuelOil#1
-                //       \key FuelOil#2
+                //       \key FuelOilNo1
+                //       \key FuelOilNo2
                 //       \key Propane
                 //       \key Water
                 //       \key OtherFuel1
@@ -1045,9 +1047,9 @@ namespace EconomicLifeCycleCost {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        int iInObj; // loop index variable for reading in objects
-        int jFld;   // loop counter
-        int jYear;  // loop counter
+        int iInObj;                      // loop index variable for reading in objects
+        int jFld;                        // loop counter
+        int jYear;                       // loop counter
         int NumFields;                   // Total number of elements
         int NumAlphas;                   // Number of elements in the alpha array
         int NumNums;                     // Number of elements in the numeric array
@@ -1101,8 +1103,8 @@ namespace EconomicLifeCycleCost {
                 //       \key Gasoline
                 //       \key Diesel
                 //       \key Coal
-                //       \key FuelOil#1
-                //       \key FuelOil#2
+                //       \key FuelOilNo1
+                //       \key FuelOilNo2
                 //       \key Propane
                 //       \key Water
                 //       \key OtherFuel1
@@ -1202,7 +1204,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ExpressAsCashFlows()
+    void ExpressAsCashFlows(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1265,12 +1267,12 @@ namespace EconomicLifeCycleCost {
         ExpressAsCashFlows_serviceMonths1900 = (serviceDateYear - 1900) * 12 + serviceDateMonth;
         monthsBaseToService = ExpressAsCashFlows_serviceMonths1900 - ExpressAsCashFlows_baseMonths1900;
         // if ComponentCost:LineItem exist, the grand total of all costs are another non-recurring cost
-        if (CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
+        if (dataCostEstimateManager.CurntBldg.GrandTotal > 0.0) { // from DataCostEstimate and computed in WriteCompCostTable within OutputReportTabular
             ++numNonrecurringCost;
             NonrecurringCost(numNonrecurringCost).name = "Total of ComponentCost:*";
             NonrecurringCost(numNonrecurringCost).lineItem = "";
             NonrecurringCost(numNonrecurringCost).category = costCatConstruction;
-            NonrecurringCost(numNonrecurringCost).cost = CurntBldg.GrandTotal;
+            NonrecurringCost(numNonrecurringCost).cost = dataCostEstimateManager.CurntBldg.GrandTotal;
             NonrecurringCost(numNonrecurringCost).startOfCosts = startBasePeriod;
             NonrecurringCost(numNonrecurringCost).yearsFromStart = 0;
             NonrecurringCost(numNonrecurringCost).monthsFromStart = 0;
@@ -1296,6 +1298,12 @@ namespace EconomicLifeCycleCost {
             }
             resourceCostAnnual(iResource) = annualCost;
         }
+        // allocate the escalated energy cost arrays
+        EscalatedEnergy.allocate(lengthStudyYears, NumOfResourceTypes);
+        EscalatedEnergy = 0.0;
+        EscalatedTotEnergy.allocate(lengthStudyYears);
+        EscalatedTotEnergy = 0.0;
+
         // pre-compute the inflation factors for each year
         monthlyInflationFactor.allocate(lengthStudyTotalMonths);
         if (inflationApproach == inflAppConstantDollar) {
@@ -1473,6 +1481,48 @@ namespace EconomicLifeCycleCost {
                 ShowWarningError("The resource referenced by LifeCycleCost:UsePriceEscalation= \"" + UsePriceEscalation(nUsePriceEsc).name +
                                  "\" has no energy cost. ");
                 ShowContinueError("... It is likely that the wrong resource is used. The resource should match the meter used in Utility:Tariff.");
+            }
+        }
+    }
+
+    void ComputeEscalatedEnergyCosts()
+    {
+        // J. Glazer - August 2019
+        int curResource;
+        int nUsePriceEsc;
+
+         for (int iCashFlow = 1; iCashFlow <= numCashFlow; ++iCashFlow) {
+            if (CashFlow(iCashFlow).pvKind == pvkEnergy) {
+                // make sure this is not water
+                int curResource_iRT = CashFlow(iCashFlow).Resource;
+                if (CashFlow(iCashFlow).Resource == iRT_Water ||
+                    (CashFlow(iCashFlow).Resource >= iRT_OnSiteWater && CashFlow(iCashFlow).Resource <= iRT_Condensate)) {
+                    continue;
+                }
+                curResource = curResource_iRT - ResourceTypeInitialOffset;
+                if ((curResource >= 1) && (curResource < NumOfResourceTypes)) {
+                    int found = 0;
+                    for (nUsePriceEsc = 1; nUsePriceEsc <= numUsePriceEscalation; ++nUsePriceEsc) {
+                        if (UsePriceEscalation(nUsePriceEsc).resource - ResourceTypeInitialOffset == curResource) {
+                            found = nUsePriceEsc;
+                            break;
+                        }
+                    }
+                    if (found > 0) {
+                        for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                            EscalatedEnergy(jYear, curResource) = CashFlow(iCashFlow).yrAmount(jYear) * UsePriceEscalation(found).Escalation(jYear);
+                        }
+                    } else { // if no escalation than just store the original energy cost
+                        for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                            EscalatedEnergy(jYear, curResource) = CashFlow(iCashFlow).yrAmount(jYear);
+                        }
+                    }
+                }
+            }
+        }
+        for (int kResource = 1; kResource <= NumOfResourceTypes; ++kResource) {
+            for (int jYear = 1; jYear <= lengthStudyYears; ++jYear) {
+                EscalatedTotEnergy(jYear) += EscalatedEnergy(jYear, kResource);
             }
         }
     }
@@ -1968,7 +2018,7 @@ namespace EconomicLifeCycleCost {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularLifeCycleCostReport()
+    void WriteTabularLifeCycleCostReport(CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
@@ -1986,12 +2036,11 @@ namespace EconomicLifeCycleCost {
         // na
 
         // Using/Aliasing
-        using OutputReportTabular::displayLifeCycleCostReport;
-        using OutputReportTabular::IntToStr;
         using OutputReportTabular::RealToStr;
         using OutputReportTabular::WriteReportHeaders;
         using OutputReportTabular::WriteSubtitle;
         using OutputReportTabular::WriteTable;
+        using OutputReportTabular::displayLifeCycleCostReport;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2075,9 +2124,9 @@ namespace EconomicLifeCycleCost {
             } else {
                 tableBody(1, 6) = "-- N/A --";
             }
-            tableBody(1, 7) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear);
-            tableBody(1, 8) = MonthNames(serviceDateMonth) + ' ' + IntToStr(serviceDateYear);
-            tableBody(1, 9) = IntToStr(lengthStudyYears);
+            tableBody(1, 7) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear);
+            tableBody(1, 8) = MonthNames(serviceDateMonth) + ' ' + std::to_string(serviceDateYear);
+            tableBody(1, 9) = std::to_string(lengthStudyYears);
             tableBody(1, 10) = RealToStr(taxRate, 4);
             {
                 auto const SELECT_CASE_var(depreciationMethod);
@@ -2107,14 +2156,14 @@ namespace EconomicLifeCycleCost {
             }
             columnWidth = 14; // array assignment - same for all columns
             WriteSubtitle("Life-Cycle Cost Parameters");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                        "Entire Facility", "Life-Cycle Cost Parameters");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters");
             }
 
             columnHead.deallocate();
@@ -2132,13 +2181,13 @@ namespace EconomicLifeCycleCost {
             rowHead(1) = "Resource";
             rowHead(2) = "Start Date";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear + 2) = IntToStr(iYear);
+                rowHead(iYear + 2) = std::to_string(iYear);
             }
             for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) { // loop through objects not columns to add names
                 columnHead(jObj) = UsePriceEscalation(jObj).name;
                 tableBody(jObj, 1) = GetResourceTypeChar(UsePriceEscalation(jObj).resource);
                 tableBody(jObj, 2) =
-                    MonthNames(UsePriceEscalation(jObj).escalationStartMonth) + ' ' + IntToStr(UsePriceEscalation(jObj).escalationStartYear);
+                    MonthNames(UsePriceEscalation(jObj).escalationStartMonth) + ' ' + std::to_string(UsePriceEscalation(jObj).escalationStartYear);
             }
             for (jObj = 1; jObj <= numUsePriceEscalation; ++jObj) {
                 for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
@@ -2146,14 +2195,14 @@ namespace EconomicLifeCycleCost {
                 }
             }
             WriteSubtitle("Use Price Escalation");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                        "Entire Facility", "Use Price Escalation");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2171,7 +2220,7 @@ namespace EconomicLifeCycleCost {
                 columnHead = "none";
                 rowHead(1) = "";
                 for (iYear = 1; iYear <= numYears; ++iYear) {
-                    rowHead(iYear + 1) = MonthNames(serviceDateMonth) + ' ' + IntToStr(serviceDateYear + iYear - 1);
+                    rowHead(iYear + 1) = MonthNames(serviceDateMonth) + ' ' + std::to_string(serviceDateYear + iYear - 1);
                 }
                 for (jObj = 1; jObj <= numUseAdjustment; ++jObj) { // loop through objects not columns to add names
                     columnHead(jObj) = UseAdjustment(jObj).name;
@@ -2183,14 +2232,14 @@ namespace EconomicLifeCycleCost {
                     }
                 }
                 WriteSubtitle("Use Adjustment");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                            "Entire Facility", "Use Adjustment");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -2206,7 +2255,7 @@ namespace EconomicLifeCycleCost {
             tableBody = "";
             rowHead(1) = "";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear + 1) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear + 1) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= (numRecurringCosts + numNonrecurringCost); ++jObj) {
                 curCashFlow = countOfCostCat + jObj;
@@ -2224,7 +2273,7 @@ namespace EconomicLifeCycleCost {
                 }
             }
             WriteSubtitle("Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2233,24 +2282,28 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBody,
+                    rowHead,
+                    columnHead,
+                    "Life-Cycle Cost Report",
+                    "Entire Facility",
                     "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
             columnWidth.deallocate();
             tableBody.deallocate();
-            //---- Energy and Water Cost Cash Flows
-            numColumns = max(1, numResourcesUsed);
+            //---- Energy and Water Cost Cash Flows (Without Escalation)
+            numColumns = max(1, numResourcesUsed + 1);
             rowHead.allocate(lengthStudyYears);
             columnHead.allocate(numColumns);
             columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
             tableBody.allocate(numColumns, lengthStudyYears);
             tableBody = "";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
             }
             for (jObj = 1; jObj <= numResourcesUsed; ++jObj) {
                 curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
@@ -2259,8 +2312,12 @@ namespace EconomicLifeCycleCost {
                     tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
                 }
             }
+            columnHead(numColumns) = "Total";
+            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                tableBody(jObj, iYear) = RealToStr(CashFlow(costCatTotEnergy).yrAmount(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
+            }
             WriteSubtitle("Energy and Water Cost Cash Flows (Without Escalation)");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2269,15 +2326,69 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Energy and Water Cost Cash Flows (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Energy and Water Cost Cash Flows (Without Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Energy and Water Cost Cash Flows (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
             columnWidth.deallocate();
             tableBody.deallocate();
+            //---- Energy and Water Cost Cash Flows (With Escalation)
+            numColumns = max(1, numResourcesUsed + 1);
+            rowHead.allocate(lengthStudyYears);
+            columnHead.allocate(numColumns);
+            columnWidth.dimension(numColumns, 14); // array assignment - same for all columns
+            tableBody.allocate(numColumns, lengthStudyYears);
+            tableBody = "";
+            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
+            }
+            for (int jObj = 1; jObj <= numResourcesUsed; ++jObj) {
+                curCashFlow = countOfCostCat + numRecurringCosts + numNonrecurringCost + jObj;
+                columnHead(jObj) = CashFlow(curCashFlow).name;
+                int curResource = CashFlow(curCashFlow).Resource - ResourceTypeInitialOffset;
+                if (CashFlow(curCashFlow).Resource != iRT_Water) {
+                    for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                        tableBody(jObj, iYear) = RealToStr(EscalatedEnergy(iYear, curResource), 2);
+                    }
+                } else { // for water just use the original cashflow since not involved in escalation
+                    for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                        tableBody(jObj, iYear) = RealToStr(CashFlow(curCashFlow).yrAmount(iYear), 2);
+                    }
+                }
+            }
+            columnHead(numColumns) = "Total";
+            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                tableBody(jObj, iYear) = RealToStr(EscalatedTotEnergy(iYear) + CashFlow(costCatWater).yrAmount(iYear), 2);
+            }
+            WriteSubtitle("Energy and Water Cost Cash Flows (With Escalation)");
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            if (sqlite) {
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
+                                                       "Energy and Water Cost Cash Flows (With Escalation)");
+            }
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Energy and Water Cost Cash Flows (With Escalation)");
+            }
+            columnHead.deallocate();
+            rowHead.deallocate();
+            columnWidth.deallocate();
+            tableBody.deallocate();
+
             //---- Capital Cash Flow by Category
             rowHead.allocate(lengthStudyYears);
             columnHead.allocate(4);
@@ -2290,14 +2401,14 @@ namespace EconomicLifeCycleCost {
             columnHead(3) = "OtherCapital";
             columnHead(4) = "Total";
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatConstruction).yrAmount(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatSalvage).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatOtherCapital).yrAmount(iYear), 2);
                 tableBody(4, iYear) = RealToStr(CashFlow(costCatTotCaptl).yrAmount(iYear), 2);
             }
             WriteSubtitle("Capital Cash Flow by Category (Without Escalation)");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2306,16 +2417,19 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Capital Cash Flow by Category (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Capital Cash Flow by Category (Without Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Capital Cash Flow by Category (Without Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
             columnWidth.deallocate();
             tableBody.deallocate();
-            //---- Operating Cash Flow by Category
+            //---- Operating Cash Flow by Category (Without Escalation)
             rowHead.allocate(lengthStudyYears);
             columnHead.allocate(10);
             columnWidth.allocate(10);
@@ -2334,7 +2448,7 @@ namespace EconomicLifeCycleCost {
             columnHead(10) = "Total";
 
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatEnergy).yrAmount(iYear), 2);
                 tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
                 tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
@@ -2347,7 +2461,7 @@ namespace EconomicLifeCycleCost {
                 tableBody(10, iYear) = RealToStr(CashFlow(costCatTotOper).yrAmount(iYear), 2);
             }
             WriteSubtitle("Operating Cash Flow by Category (Without Escalation)");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2356,10 +2470,68 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Operating Cash Flow by Category (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                        "Entire Facility",
-                                                                                        "Operating Cash Flow by Category (Without Escalation)");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Operating Cash Flow by Category (Without Escalation)");
+            }
+            columnHead.deallocate();
+            rowHead.deallocate();
+            columnWidth.deallocate();
+            tableBody.deallocate();
+            //---- Operating Cash Flow by Category (With Escalation)
+            rowHead.allocate(lengthStudyYears);
+            columnHead.allocate(10);
+            columnWidth.allocate(10);
+            columnWidth = 14; // array assignment - same for all columns
+            tableBody.allocate(10, lengthStudyYears);
+            tableBody = "";
+            columnHead(1) = "Energy";
+            columnHead(2) = "Water";
+            columnHead(3) = "Maintenance";
+            columnHead(4) = "Repair";
+            columnHead(5) = "Operation";
+            columnHead(6) = "Replacement";
+            columnHead(7) = "MinorOverhaul";
+            columnHead(8) = "MajorOverhaul";
+            columnHead(9) = "OtherOperational";
+            columnHead(10) = "Total";
+
+            for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
+                tableBody(1, iYear) = RealToStr(EscalatedTotEnergy(iYear), 2);
+                tableBody(2, iYear) = RealToStr(CashFlow(costCatWater).yrAmount(iYear), 2);
+                tableBody(3, iYear) = RealToStr(CashFlow(costCatMaintenance).yrAmount(iYear), 2);
+                tableBody(4, iYear) = RealToStr(CashFlow(costCatRepair).yrAmount(iYear), 2);
+                tableBody(5, iYear) = RealToStr(CashFlow(costCatOperation).yrAmount(iYear), 2);
+                tableBody(6, iYear) = RealToStr(CashFlow(costCatReplacement).yrAmount(iYear), 2);
+                tableBody(7, iYear) = RealToStr(CashFlow(costCatMinorOverhaul).yrAmount(iYear), 2);
+                tableBody(8, iYear) = RealToStr(CashFlow(costCatMajorOverhaul).yrAmount(iYear), 2);
+                tableBody(9, iYear) = RealToStr(CashFlow(costCatOtherOperational).yrAmount(iYear), 2);
+                Real64 yearly_total_cost =
+                    CashFlow(costCatTotOper).yrAmount(iYear) + EscalatedTotEnergy(iYear) - CashFlow(costCatTotEnergy).yrAmount(iYear);
+                tableBody(10, iYear) = RealToStr(yearly_total_cost, 2);
+            }
+            WriteSubtitle("Operating Cash Flow by Category (With Escalation)");
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
+            if (sqlite) {
+                sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                       rowHead,
+                                                       columnHead,
+                                                       "Life-Cycle Cost Report",
+                                                       "Entire Facility",
+                                                       "Operating Cash Flow by Category (With Escalation)");
+            }
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Life-Cycle Cost Report",
+                                                                                            "Entire Facility",
+                                                                                            "Operating Cash Flow by Category (With Escalation)");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2383,7 +2555,7 @@ namespace EconomicLifeCycleCost {
                 columnHead(8) = "cons";
                 columnHead(9) = "slvg";
                 columnHead(10) = "oCap";
-                columnHead(11) = "H20";
+                columnHead(11) = "H2O";
                 columnHead(12) = "ene";
                 columnHead(13) = "tEne";
                 columnHead(14) = "tOpr";
@@ -2393,7 +2565,7 @@ namespace EconomicLifeCycleCost {
                     columnHead(jObj) = CashFlow(jObj).name;
                 }
                 for (kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth) {
-                    rowHead(kMonth) = MonthNames(1 + (kMonth + baseDateMonth - 2) % 12) + ' ' + IntToStr(baseDateYear + int((kMonth - 1) / 12));
+                    rowHead(kMonth) = MonthNames(1 + (kMonth + baseDateMonth - 2) % 12) + ' ' + std::to_string(baseDateYear + int((kMonth - 1) / 12));
                 }
                 for (kMonth = 1; kMonth <= lengthStudyTotalMonths; ++kMonth) {
                     for (jObj = 1; jObj <= numCashFlow; ++jObj) {
@@ -2401,14 +2573,14 @@ namespace EconomicLifeCycleCost {
                     }
                 }
                 WriteSubtitle("DEBUG ONLY - Monthly Cash Flows");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                            "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "DEBUG ONLY - Monthly Cash Flows");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();
@@ -2426,7 +2598,7 @@ namespace EconomicLifeCycleCost {
                 columnHead(kMonth) = MonthNames(kMonth);
             }
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = std::to_string(baseDateYear + iYear - 1);
             }
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
                 for (kMonth = 1; kMonth <= 12; ++kMonth) {
@@ -2434,13 +2606,13 @@ namespace EconomicLifeCycleCost {
                 }
             }
             WriteSubtitle("Monthly Total Cash Flow (Without Escalation)");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)");
             }
             columnHead.deallocate();
@@ -2522,7 +2694,7 @@ namespace EconomicLifeCycleCost {
             }
             tableBody(4, numRows + 1) = RealToStr(totalPV, 2);
             WriteSubtitle("Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(tableBody,
                                                        rowHead,
@@ -2531,9 +2703,13 @@ namespace EconomicLifeCycleCost {
                                                        "Entire Facility",
                                                        "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility",
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBody,
+                    rowHead,
+                    columnHead,
+                    "Life-Cycle Cost Report",
+                    "Entire Facility",
                     "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)");
             }
             columnHead.deallocate();
@@ -2583,14 +2759,14 @@ namespace EconomicLifeCycleCost {
             tableBody(1, 16) = RealToStr(CashFlow(costCatTotGrand).presentValue, 2);
 
             WriteSubtitle("Present Value by Category");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                        "Entire Facility", "Present Value by Category");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2598,34 +2774,39 @@ namespace EconomicLifeCycleCost {
             tableBody.deallocate();
             //---- Present Value by Year
             rowHead.allocate(lengthStudyYears + 1);
-            columnHead.allocate(2);
-            columnWidth.allocate(2);
+            columnHead.allocate(3);
+            columnWidth.allocate(3);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(2, lengthStudyYears + 1);
+            tableBody.allocate(3, lengthStudyYears + 1);
             tableBody = "";
-            columnHead(1) = "Total Cost";
-            columnHead(2) = "Present Value of Costs";
+            columnHead(1) = "Total Cost (Without Escalation)";
+            columnHead(2) = "Total Cost (With Escalation)";
+            columnHead(3) = "Present Value of Costs";
 
             totalPV = 0.0;
             for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                 tableBody(1, iYear) = RealToStr(CashFlow(costCatTotGrand).yrAmount(iYear), 2);
-                tableBody(2, iYear) = RealToStr(CashFlow(costCatTotGrand).yrPresVal(iYear), 2);
+                // adjust for escalated energy costs
+                Real64 yearly_total_cost =
+                    CashFlow(costCatTotGrand).yrAmount(iYear) + EscalatedTotEnergy(iYear) - CashFlow(costCatTotEnergy).yrAmount(iYear);
+                tableBody(2, iYear) = RealToStr(yearly_total_cost, 2);
+                tableBody(3, iYear) = RealToStr(CashFlow(costCatTotGrand).yrPresVal(iYear), 2);
                 totalPV += CashFlow(costCatTotGrand).yrPresVal(iYear);
             }
 
             rowHead(lengthStudyYears + 1) = "TOTAL";
-            tableBody(2, lengthStudyYears + 1) = RealToStr(totalPV, 2);
+            tableBody(3, lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
             WriteSubtitle("Present Value by Year");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
+            WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
                     tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                        "Entire Facility", "Present Value by Year");
+            if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                    tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year");
             }
             columnHead.deallocate();
             rowHead.deallocate();
@@ -2647,7 +2828,7 @@ namespace EconomicLifeCycleCost {
 
                 totalPV = 0.0;
                 for (iYear = 1; iYear <= lengthStudyYears; ++iYear) {
-                    rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + IntToStr(baseDateYear + iYear - 1);
+                    rowHead(iYear) = MonthNames(baseDateMonth) + ' ' + std::to_string(baseDateYear + iYear - 1);
                     tableBody(1, iYear) = RealToStr(DepreciatedCapital(iYear), 2);
                     tableBody(2, iYear) = RealToStr(TaxableIncome(iYear), 2);
                     tableBody(3, iYear) = RealToStr(Taxes(iYear), 2);
@@ -2660,14 +2841,14 @@ namespace EconomicLifeCycleCost {
                 tableBody(5, lengthStudyYears + 1) = RealToStr(totalPV, 2);
 
                 WriteSubtitle("After Tax Estimate");
-                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                WriteTable(dataCostEstimateManager, tableBody, rowHead, columnHead, columnWidth);
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Life-Cycle Cost Report",
-                                                                                            "Entire Facility", "After Tax Estimate");
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
+                        tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate");
                 }
                 columnHead.deallocate();
                 rowHead.deallocate();

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,15 +53,20 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SetPointManager {
 
-    // Using/Aliasing
+    enum class CtrlNodeType: int {
+        control,
+        reference
+    };
 
     // Data
     // MODULE PARAMETER DEFINITIONS:
@@ -183,14 +188,16 @@ namespace SetPointManager {
         // Members
         std::string Name;        // name of setpoint manager
         int SPMType;             // integer representing type of setpoint manager
+        int SPMIndex;            // index to specific set point manager
         int CtrlTypeMode;        // set to iCtrlVarType_xxxx
         int NumCtrlNodes;        // number of control nodes
         Array1D_int CtrlNodes;   // index to control node
         int AirLoopNum;          // index to air loop
         std::string AirLoopName; // name of air loop
+        int RefNode;             // index to reference node
 
         // Default Constructor
-        DataSetPointManager() : SPMType(0), CtrlTypeMode(0), NumCtrlNodes(0), AirLoopNum(0)
+        DataSetPointManager() : SPMType(0), SPMIndex(0), CtrlTypeMode(0), NumCtrlNodes(0), AirLoopNum(0), RefNode(0)
         {
         }
     };
@@ -1031,11 +1038,11 @@ namespace SetPointManager {
 
     void clear_state();
 
-    void ManageSetPoints();
+    void ManageSetPoints(EnergyPlusData &state);
 
-    void GetSetPointManagerInputs(); // wrapper for GetInput to accomodate unit testing
+    void GetSetPointManagerInputs(EnergyPlusData &state); // wrapper for GetInput to accomodate unit testing
 
-    void GetSetPointManagerInputData(bool &ErrorsFound);
+    void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound);
 
     void VerifySetPointManagers(bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 
@@ -1049,22 +1056,24 @@ namespace SetPointManager {
 
     void UpdateOAPretreatSetPoints();
 
-    bool IsNodeOnSetPtManager(int const NodeNum, int const SetPtType);
+    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, int const SetPtType, int const SMPType, CtrlNodeType ctrlOrRefNode);
 
-    bool NodeHasSPMCtrlVarType(int const NodeNum, int const iCtrlVarType);
+    bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, int const SetPtType);
 
-    void ResetHumidityRatioCtrlVarType(int const NodeNum);
+    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, int const iCtrlVarType);
+
+    void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum);
 
     void CheckIfAnyIdealCondEntSetPoint();
 
-    int GetHumidityRatioVariableType(int const CntrlNodeNum);
+    int GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum);
 
     void SetUpNewScheduledTESSetPtMgr(
         int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum);
 
-    bool GetCoilFreezingCheckFlag(int const MixedAirSPMNum);
+    bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const MixedAirSPMNum);
 
-    int GetMixedAirNumWithCoilFreezingCheck(int const MixedAirNode);
+    int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAirNode);
 
 } // namespace SetPointManager
 

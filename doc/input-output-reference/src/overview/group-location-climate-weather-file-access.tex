@@ -309,6 +309,15 @@ ASHRAETau model Taub and Taud values are used from the 2009 ASHRAE HOF and ASHRA
 
 If the choice in the Solar Model Indicator field is ASHRAEClearSky or ZhangHuang, then this numeric field should be entered. This value represents the ``clearness'' value for the day. This value, along with the solar position as defined by the Location information and the date entered for the design day, help define the solar radiation values for each hour of the day. Clearness may range from 0.0 to 1.2, where 1.0 represents a clear sky at sea level. Values greater than 1.0 may be used for high altitude locations. Traditionally, one uses 0.0 clearness for Winter Design Days. Note that this ``sky clearness'' does not have the same meaning as output variable ``Site Daylighting Model Sky Clearness''.
 
+\paragraph{Field: Maximum Number Warmup Days}\label{field-max-num-warm-days}
+
+Optional integer number of days for an upper limit on the number of warmup days when running this sizing period.  This overrides the global maximum set in the Building object for this particular design day.
+
+\paragraph{Field: Begin Environment Reset Mode}\label{field-beg-env-reset-mode}
+
+Optional choice field to control if zone heat balance history terms should be reset when beginning to run this sizing period.  This can reduce the number of warmup days needed to reach zone convergence.  The options are \textbf{FullResetAtBeginEnvironment} or \textbf{SuppressThermalResetAtBeginEnvironment}.  \textbf{FullResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are set to 23 degrees C, which is the usual starting point for each environment.  \textbf{SuppressThermalResetAtBeginEnvironment} means that at the beginning of the design day warmup the building model's surfaces are not reset and will just retain whatever thermal history results they had at the end of the previous design day.  The warmup days still proceed as usual but because the initial condition is closer it needs fewer warmup days to reach convergence.  This is available to reduce simulation run time when using many design days that are similiar to each other.
+
+
 IDF Examples:
 
 \begin{lstlisting}
@@ -830,7 +839,11 @@ Of course, these could not all appear in the same IDF as only one DaylightSaving
 
 \subsection{WeatherProperty:SkyTemperature}\label{weatherpropertyskytemperature}
 
-Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using horizontal infrared radiation from sky, cloudiness factors and current temperature. The algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to override the internal calculations. Much of the literature describes the sky temperature as relative to either drybulb or dewpoint temperature.
+Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus with an empirical model using sky cloudiness factors and current clear sky emissivity. For flexibility, the following object can be entered to override the entire internal sky temperature calculation from schedule import.
+
+In particular, during Weather File Run Periods, the sky temperature is derived by the horizontal infrared radiation if presented in the weather file input by default. For flexibility, the field \textbf{Use Weather File Horizontal IR} can be set to "No" to ignore horizontal IR values from the weather file and always use the specified sky model for horizontal infrared radiation and sky temperature calculations.
+
+By default, EnergyPlus calculates clear sky emissivity using Clark-Allen model. The following object can also be entered to adopt alternative sky emissivity calculation methods. Alternative methods of sky emissivity calculation include the calibrated forms of Berdahl \& Martin, Brunt, and Idso model. Their algorithms are all described in the Engineering Reference document. Much of the literature describes the sky temperature as relative to water vapor pressure, drybulb or dewpoint temperature.
 
 \subsubsection{Inputs}\label{inputs-8-011}
 
@@ -840,8 +853,17 @@ This name references an existing design period (i.e., \hyperref[sizingperioddesi
 
 \paragraph{Field: Calculation Type}\label{field-calculation-type}
 
-Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}.
-In each case the following field must specify a valid schedule name.
+Allowable entries here are: \textbf{ClarkAllen}, \textbf{Brunt}, \textbf{Idso}, \textbf{BerdahlMartin}, \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}.
+
+In the case of \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue} and \textbf{DifferenceScheduleDewPointValue} the following field must specify a valid schedule name.
+
+\textbf{ClarkAllen} -- the clear sky emissivity are calculated using Clark and Allen model. This is the default model to calculate clear sky emissivity.
+
+\textbf{Brunt} -- the clear sky emissivity are calculated using Brunt model.
+
+\textbf{Idso} -- the clear sky emissivity are calculated using Idso model.
+
+\textbf{BerdahlMartin} -- the clear sky emissivity are calculated using Berdahl \& Martin model.
 
 \textbf{ScheduleValue} -- the values in the schedule are used as the sky temperature.
 
@@ -852,6 +874,10 @@ In each case the following field must specify a valid schedule name.
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
 This field specifies a schedule name to accomplish the sky temperature calculation from the previous field. A Schedule:Day:* (i.e., \hyperref[scheduledayhourly]{Schedule:Day:Hourly}, \hyperref[scheduledayinterval]{Schedule:Day:Interval}, \hyperref[scheduledaylist]{Schedule:Day:List}) should be specified if the name in the name field matches a \hyperref[sizingperioddesignday]{SizingPeriod:DesignDay} object. If the name is one of the weather file period specifications (i.e. matches a \hyperref[sizingperiodweatherfiledays]{SizingPeriod:WeatherFileDays}, \hyperref[sizingperiodweatherfileconditiontype]{SizingPeriod:WeatherFileConditionType} or \hyperref[runperiod]{RunPeriod}), then the schedule name must match a full year schedule (i.e. \hyperref[scheduleyear]{Schedule:Year}, \hyperref[schedulecompact]{Schedule:Compact}, \hyperref[schedulefile]{Schedule:File}, or \hyperref[scheduleconstant]{Schedule:Constant}).
+
+\paragraph{Field: Use Weather File Horizontal IR}\label{field-use-weather-file-hori-ir}
+
+This field specifies whether or not to use the horizontal infrared radiation values from weather files if presented. The field is default to be true. If yes or blank, and the values are presented in weather file, EnergyPlus uses the values from weather file for weather calculations, otherwise it uses the specified sky model to calculate the values. If no, it always uses the specified sky model and ignores the horizontal IR values from the weather file. For \textbf{Calculation Type} = \textbf{ScheduleValue}, \textbf{ScheduleValue} or \textbf{DifferenceScheduleDewPointValue,} this field is ignored and the scheduled values are used. If this field is set to \textbf{No} but no specific sky model is declared in the field \textbf{Calculation Type}, the default sky model \textbf{ClarkAllen} is used.
 
 An example of IDF usage (with DesignDay):
 
@@ -888,6 +914,17 @@ Schedule:Day:Interval,
   until: 24:00,      !- Time 1
   5;                 !- Value Until Time 1
 \end{lstlisting}
+
+Another example of IDF usage:
+
+\begin{lstlisting}
+WeatherProperty:SkyTemperature,
+  ,
+  UseBerdahlMartinModel,     !- Calculation Type
+  ,
+  No;                        !- Use Weather File Horizontal IR
+\end{lstlisting}
+
 
 \subsection{Site:WeatherStation}\label{siteweatherstation}
 
@@ -1258,7 +1295,7 @@ Numeric field used to determine the depth of the simulation domain, in meters.
 
 \paragraph{Field: Aspect Ratio}\label{field-aspect-ratio}
 
-Numeric field used to define the height to width ratio of the slab.
+Numeric field, which is the ratio of slab length to width and is used to determine the aspect ratio of the slab. This field along with the total slab floor area, which is taken as the combination of all surfaces connected to the floor OtherSideConditionsModel, are used to determine the size and shape of the ground domain. Any given aspect ratio and its inverse should produce identical results. i.e. AR = 2 equals AR = 0.5. This field has units of meters/meters.
 
 \paragraph{Field: Perimeter Offset}\label{field-perimeter-offset}
 
@@ -1314,7 +1351,7 @@ Alpha field indicates whether horizontal insulation is present. Options include 
 
 \paragraph{Field: Horizontal Insulation Material Name}\label{field-horizontal-insulation-material-name}
 
-Name of material object representing the horizontal slab insulation. Optional argument only required if horizontal insulation is present.
+This alpha field is the name of a material object representing the horizontal slab insulation. It should be noted that the material listed here cannot be a "no mass" material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if horizontal insulation is present.
 
 \paragraph{Field: Horizontal Insulation Extents}\label{field-horizontal-insulation-extents}
 
@@ -1330,7 +1367,7 @@ Alpha field indicates whether vertical insulation is present. Options include ``
 
 \paragraph{Field: Vertical Insulation Name}\label{field-vertical-insulation-name}
 
-Name of material object representing the vertical slab insulation. Optional argument only required if vertical insulation is present.
+This alpha field is the name of a material object representing the vertical slab insulation. It should be noted that the material listed here cannot be a "no mass" material  (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if vertical insulation is present.
 
 \paragraph{Field: Vertical Insulation Depth}\label{field-vertical-insulation-depth}
 
@@ -1524,7 +1561,7 @@ Alpha field indicates whether horizontal insulation is present. Options include 
 
 \paragraph{Field: Horizontal Insulation Name}\label{field-horizontal-insulation-name}
 
-Name of material object representing the horizontal underfloor basement insulation. Optional argument only required if horizontal insulation is present.
+This alpha field is the name of a material object representing the horizontal underfloor basement insulation. It should be noted that the material listed here cannot be a "no mass" material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if horizontal insulation is present.
 
 \paragraph{Field: Horizontal Insulation Extents}\label{field-horizontal-insulation-extents-1}
 
@@ -1548,7 +1585,7 @@ Alpha field indicates whether vertical insulation is present. Options include ``
 
 \paragraph{Field: Vertical Insulation Name}\label{field-vertical-insulation-name-1}
 
-Name of material object representing the vertical slab insulation. Optional argument only required if vertical insulation is present.
+This alpha field is the name of a material object representing the vertical basement insulation. It should be noted that the material listed here cannot be a "no mass" material (\hyperref[materialnomass]{Material:NoMass}) that is defined by R-Value only but should be defined as a regular material with an actual thickness. This optional argument is only required if vertical insulation is present.
 
 \paragraph{Field: Vertical Insulation Depth}\label{field-vertical-insulation-depth-1}
 
@@ -1691,7 +1728,7 @@ Water mains temperatures are a function of outdoor climate conditions and vary w
   maximum difference in monthly average outdoor air temperatures
 \end{itemize}
 
-These values can be easily calculated from annual weather data using a spreadsheet or from the ``.stat'' file available with the EnergyPlus weather files at \href{https://energyplus.net/weather}{www.energyplus.net}. Monthly statistics for dry-bulb temperatures are shown with daily averages. The daily averages are averaged to obtain the annual average. The maximum and minimum daily average are subtracted to obtain the maximum difference. If the calculation method selected is "\textbf{CorrelationFromWeatherFile}", energyplus calculates these two values internally from either ``.stat'' or weather file. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
+These values can be calculated from annual weather data using the auxillary program CalcSoilSurfTemp preprocessor. For more information on the water mains temperatures correlation, see the \emph{EnergyPlus Engineering Document}.
 
 Alternatively, the Site:WaterMainsTemperature object can read values from a schedule. This is useful for measured data or when water comes from a source other than buried pipes, e.g., a river or lake.
 

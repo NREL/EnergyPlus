@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,13 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace HeatRecovery {
 
@@ -214,6 +217,9 @@ namespace HeatRecovery {
         int UnBalancedErrCount;   // Counter for recurring warning message
         int UnBalancedErrIndex;   // Index to recurring warning message
         bool myEnvrnFlag;         // one-time-init flag
+        bool SensEffectivenessFlag; // flag for error message when sensible effectiveness is negative
+        bool LatEffectivenessFlag; // flag for error message when latent effectiveness is negative
+
 
         // Default Constructor
         HeatExchCond()
@@ -229,7 +235,8 @@ namespace HeatRecovery {
               SensHeatingEnergy(0.0), LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0), SensCoolingRate(0.0),
               SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), ElecUseEnergy(0.0),
               ElecUseRate(0.0), SensEffectiveness(0.0), LatEffectiveness(0.0), SupBypassMassFlow(0.0), SecBypassMassFlow(0.0), LowFlowErrCount(0),
-              LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true)
+              LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true), SensEffectivenessFlag(false),
+              LatEffectivenessFlag(false)
         {
         }
     };
@@ -519,7 +526,7 @@ namespace HeatRecovery {
 
     void clear_state();
 
-    void SimHeatRecovery(std::string const &CompName,                 // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode
@@ -534,11 +541,11 @@ namespace HeatRecovery {
 
     void GetHeatRecoveryInput();
 
-    void InitHeatRecovery(int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num);
 
-    void SizeHeatRecovery(int const ExchNum);
+    void SizeHeatRecovery(EnergyPlusData &state, int const ExchNum);
 
     void CalcAirToAirPlateHeatExch(int const ExNum,                        // number of the current heat exchanger being simulated
                                    bool const HXUnitOn,                    // flag to simulate heat exchager heat recovery
@@ -591,8 +598,8 @@ namespace HeatRecovery {
                                          Real64 const Z    // capacity rate ratio
     );
 
-    Real64 GetResidCrossFlowBothUnmixed(Real64 const NTU,         // number of transfer units
-                                        Array1<Real64> const &Par // par(1) = Eps, par(2) = Z
+    Real64 GetResidCrossFlowBothUnmixed(Real64 const NTU,          // number of transfer units
+                                        Array1D<Real64> const &Par // par(1) = Eps, par(2) = Z
     );
 
     void CheckModelBoundsTempEq(int const ExchNum,            // number of the current heat exchanger being simulated

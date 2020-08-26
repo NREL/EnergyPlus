@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,34 +52,29 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace ICEngineElectricGenerator {
 
-    // Using/Aliasing
     using DataGlobalConstants::iGeneratorICEngine;
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS
     extern Real64 const ReferenceTemp; // Reference temperature by which lower heating
     // value is reported.  This should be subtracted
     // off of when calculated exhaust energies.
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
     extern int NumICEngineGenerators; // number of IC ENGINE Generators specified in input
-    extern bool GetICEInput;          // When TRUE, calls subroutine to read input file.
-    extern Array1D_bool CheckEquipName;
-    // SUBROUTINE SPECIFICATIONS FOR MODULE IC ENGINEElectricGenerator
+    extern bool getICEInput;          // When TRUE, calls subroutine to read input file.
 
-    // Types
-
-    struct ICEngineGeneratorSpecs
+    struct ICEngineGeneratorSpecs : PlantComponent
     {
         // Members
         std::string Name;   // user identifier
@@ -138,6 +133,11 @@ namespace ICEngineElectricGenerator {
         int HRLoopSideNum;          // cooling water plant loop side index, for heat recovery
         int HRBranchNum;            // cooling water plant loop branch index, for heat recovery
         int HRCompNum;              // cooling water plant loop component index, for heat recovery
+        bool MyEnvrnFlag;
+        bool MyPlantScanFlag;
+        bool MySizeAndNodeInitFlag;
+        bool CheckEquipName;
+        bool myFlag;
 
         // Default Constructor
         ICEngineGeneratorSpecs()
@@ -150,123 +150,31 @@ namespace ICEngineElectricGenerator {
               HeatRecMdotActual(0.0), QTotalHeatRecovered(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0),
               FuelEnergyUseRate(0.0), TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0),
               FuelMdot(0.0), ExhaustStackTemp(0.0), ElecPowerGenerated(0.0), ElecEnergyGenerated(0.0), HeatRecMaxTemp(0.0), HRLoopNum(0),
-              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0)
+              HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), MyEnvrnFlag(true), MyPlantScanFlag(true), MySizeAndNodeInitFlag(true),
+              CheckEquipName(true), myFlag(true)
         {
         }
+
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+
+        void InitICEngineGenerators(BranchInputManagerData &dataBranchInputManager, bool RunFlag, bool FirstHVACIteration);
+
+        void CalcICEngineGeneratorModel(bool RunFlag, Real64 MyLoad);
+
+        void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
+
+        void update();
+
+        void setupOutputVars();
+
+        void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
+
+        static PlantComponent *factory(std::string const &objectName);
     };
 
-    struct ReportVars
-    {
-        // Members
-        Real64 PowerGen;            // reporting: power (W)
-        Real64 EnergyGen;           // reporting: energy (J)
-        Real64 QJacketRecovered;    // reporting: Heat Recovered from Jacket (W)
-        Real64 QLubeOilRecovered;   // reporting: Heat Recovered from Lubricant (W)
-        Real64 QExhaustRecovered;   // reporting: exhaust gas heat recovered (W)
-        Real64 QTotalHeatRecovered; // reporting: Total Heat Recovered (W)
-        Real64 TotalHeatEnergyRec;  // reporting: total heat recovered (J)
-        Real64 JacketEnergyRec;     // reporting: heat recovered from jacket (J)
-        Real64 LubeOilEnergyRec;    // reporting: heat recovered from lube (J)
-        Real64 ExhaustEnergyRec;    // reporting: exhaust gas heat recovered (J)
-        Real64 FuelEnergy;          // reporting: Fuel Energy used (J)
-        Real64 FuelEnergyUseRate;   // reporting: Fuel Energy used (W)
-        Real64 FuelMdot;            // reporting: Fuel used (Kg/s)
-        Real64 ExhaustStackTemp;    // reporting: Exhaust Stack Temperature (C)
-        Real64 HeatRecInletTemp;    // reporting: Heat Recovery Loop Inlet Temperature (C)
-        Real64 HeatRecOutletTemp;   // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;         // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-
-        // Default Constructor
-        ReportVars()
-            : PowerGen(0.0), EnergyGen(0.0), QJacketRecovered(0.0), QLubeOilRecovered(0.0), QExhaustRecovered(0.0), QTotalHeatRecovered(0.0),
-              TotalHeatEnergyRec(0.0), JacketEnergyRec(0.0), LubeOilEnergyRec(0.0), ExhaustEnergyRec(0.0), FuelEnergy(0.0), FuelEnergyUseRate(0.0),
-              FuelMdot(0.0), ExhaustStackTemp(0.0), HeatRecInletTemp(0.0), HeatRecOutletTemp(0.0), HeatRecMdot(0.0)
-        {
-        }
-    };
-
-    // Object Data
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
-    extern Array1D<ReportVars> ICEngineGeneratorReport;
-
-    // Functions
-
-    void SimICEngineGenerator(int const GeneratorType,          // type of Generator
-                              std::string const &GeneratorName, // user specified name of Generator
-                              int &GeneratorIndex,
-                              bool const RunFlag,  // simulate Generator when TRUE
-                              Real64 const MyLoad, // demand on electric generator
-                              bool const FirstHVACIteration);
-
-    void GetICEGeneratorResults(int const GeneratorType, // type of Generator
-                                int const GeneratorIndex,
-                                Real64 &GeneratorPower,  // electrical power
-                                Real64 &GeneratorEnergy, // electrical energy
-                                Real64 &ThermalPower,    // heat power
-                                Real64 &ThermalEnergy    // heat energy
-    );
-
-    void SimICEPlantHeatRecovery(std::string const &CompType,
-                                 std::string const &CompName,
-                                 int const CompTypeNum,
-                                 int &CompNum,
-                                 bool const RunFlag,
-                                 bool &InitLoopEquip,
-                                 Real64 &MyLoad,
-                                 Real64 &MaxCap,
-                                 Real64 &MinCap,
-                                 Real64 &OptCap,
-                                 bool const FirstHVACIteration // TRUE if First iteration of simulation
-    );
-
-    // End IC ENGINE Generator Module Driver Subroutines
-    //******************************************************************************
-
-    // Beginning of IC ENGINE Generator Module Get Input subroutines
-    //******************************************************************************
 
     void GetICEngineGeneratorInput();
-
-    // End of Get Input subroutines for the IC ENGINE Generator Module
-    //******************************************************************************
-
-    // Beginning of Generator model Subroutines
-    // *****************************************************************************
-
-    void CalcICEngineGeneratorModel(int const GeneratorNum, // Generator number
-                                    bool const RunFlag,     // TRUE when Generator operating
-                                    Real64 const MyLoad,    // Generator demand
-                                    bool const FirstHVACIteration);
-
-    void CalcICEngineGenHeatRecovery(int const Num,                // HR Component number
-                                     Real64 const EnergyRecovered, // Amount of heat recovered
-                                     Real64 const HeatRecMdot,
-                                     Real64 &HRecRatio // Max Heat recovery ratio
-    );
-
-    // End IC ENGINE Generator Module Model Subroutines
-    // *****************************************************************************
-
-    // Begin IC ENGINE Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    void InitICEngineGenerators(int const GeneratorNum, // Generator number
-                                bool const RunFlag,     // TRUE when Generator operating
-                                Real64 const MyLoad,    // Generator demand
-                                bool const FirstHVACIteration);
-
-    // End IC ENGINE Generator Module Utility Subroutines
-    // *****************************************************************************
-
-    // Beginning of Record Keeping subroutines for the IC ENGINE Generator Module
-    // *****************************************************************************
-
-    void UpdateICEngineGeneratorRecords(bool const RunFlag, // TRUE if Generator operating
-                                        int const Num       // Generator number
-    );
-
-    // End of Record Keeping subroutines for the IC ENGINE Generator Module
-    // *****************************************************************************
 
 } // namespace ICEngineElectricGenerator
 

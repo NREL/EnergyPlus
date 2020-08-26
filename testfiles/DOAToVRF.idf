@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.4;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -529,7 +529,13 @@
     COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
     TU1 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU2,                     !- Zone Terminal Unit Name
@@ -554,7 +560,13 @@
     COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
     TU2 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU4,                     !- Zone Terminal Unit Name
@@ -579,7 +591,13 @@
     COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
     TU4 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU3,                     !- Zone Terminal Unit Name
@@ -604,7 +622,13 @@
     COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
     TU3 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     TU5,                     !- Zone Terminal Unit Name
@@ -629,7 +653,13 @@
     COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
     TU5 VRF DX Heating Coil, !- Heating Coil Object Name
     30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
-    20;                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
   Fan:ConstantVolume,
     TU1 VRF Supply Fan,      !- Name
@@ -879,7 +909,7 @@
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -899,7 +929,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -3104,14 +3134,14 @@
     SPACE1-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type
     TU1,                     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
@@ -3120,14 +3150,14 @@
     SPACE2-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type
     TU2,                     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -3136,14 +3166,14 @@
     SPACE3-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type
     TU3,                     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
@@ -3152,14 +3182,14 @@
     SPACE4-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type
     TU4,                     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
@@ -3168,14 +3198,14 @@
     SPACE5-1 DOAS ATU,       !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
     ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 2 Object Type
     TU5,                     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
 
 ! ************** DOAS System providing OA to the inlet side of VRF terminal units *********
 ! ***** Central OA is Fed Directly to VRF terminal unit inlet and mixed with re-cir air ***
@@ -3403,13 +3433,13 @@
 
   Output:Variable,TU1 VRF DX HEATING COIL,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Total Cooling Rate,timestep;
 
@@ -3423,25 +3453,25 @@
 
   Output:Variable,*,VRF Heat Pump Operating Mode,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Maximum Capacity Cooling Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Maximum Capacity Heating Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electric Power,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electricity Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Heating Electric Power,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Heating Electricity Rate,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electric Energy,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Cooling Electricity Energy,timestep;
 
-  Output:Variable,TU1,Zone VRF Air Terminal Heating Electric Energy,timestep;
+  Output:Variable,TU1,Zone VRF Air Terminal Heating Electricity Energy,timestep;
 
   Output:Variable,TU1,Zone VRF Air Terminal Total Cooling Rate,timestep;
 
@@ -3455,7 +3485,7 @@
 
   Output:Variable,TU1,Zone VRF Air Terminal Latent Heating Rate,timestep;
 
-  Output:Variable,TU1 VRF SUPPLY FAN,Fan Electric Power,timestep;
+  Output:Variable,TU1 VRF SUPPLY FAN,Fan Electricity Rate,timestep;
 
   Output:Meter,Cooling:Electricity,monthly;
 

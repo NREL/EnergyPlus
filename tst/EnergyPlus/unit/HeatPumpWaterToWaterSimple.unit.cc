@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,20 +49,22 @@
 #include <gtest/gtest.h>
 
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <BranchInputManager.hh>
-#include <DataEnvironment.hh>
-#include <DataLoopNode.hh>
-#include <ElectricPowerServiceManager.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <HeatBalanceManager.hh>
-#include <HeatPumpWaterToWaterSimple.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantUtilities.hh>
-#include <SimulationManager.hh>
-#include <SizingManager.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -708,24 +710,24 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput();
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -734,7 +736,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -746,7 +748,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
         DataEnvironment::EndMonthFlag = false;
         DataGlobals::WarmupFlag = true;
         DataGlobals::DayOfSim = 0;
-        DataGlobals::DayOfSimChr = "0";
+        state.dataGlobals.DayOfSimChr = "0";
 
         while ((DataGlobals::DayOfSim < DataGlobals::NumOfDayInEnvrn) || (DataGlobals::WarmupFlag)) { // Begin day loop ...
 
@@ -784,9 +786,9 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
                         }
                     }
 
-                    WeatherManager::ManageWeather();
+                    WeatherManager::ManageWeather(state);
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(state);
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -1458,24 +1460,24 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput();
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(); // just gets input and
-    SizingManager::ManageSizing();
+    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and
+    SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     // should be sized now
@@ -1489,5 +1491,18 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedSourceVolFlowHeat, 0.00025, 0.0000001);
     EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedCapHeat, 7200.71, 0.1);
     EXPECT_NEAR(HeatPumpWaterToWaterSimple::GSHP(1).RatedPowerHeat, 2151.07, 0.1);
+
+    // Check that we are outputing the correct values
+    EXPECT_EQ("HeatPump:WaterToWater:EquationFit:Heating",
+              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechType,
+                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+
+    EXPECT_EQ("3.35",
+              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomEff,
+                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
+
+    EXPECT_EQ("7200.71",
+              OutputReportPredefined::RetrievePreDefTableEntry(OutputReportPredefined::pdchMechNomCap,
+                                                               HeatPumpWaterToWaterSimple::GSHP(1).Name));
 }
 } // namespace EnergyPlus

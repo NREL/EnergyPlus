@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataGenerators.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataGenerators.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -144,38 +144,22 @@ namespace DataGenerators {
 
     Real64 const ImBalanceTol(0.00001); // used as fraction of electrical power at power module
 
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-
     int NumFuelConstit(0);
     int NumGeneratorFuelSups(0);
-    int NumFuelCellGenerators(0); // number of SOFC Generators specified in input
-    int NumMicroCHPs(0);
-    int NumMicroCHPParams(0); // number of parameter sets for micro chp
     int NumGensWDynamics(0);  // number of dynamics controls for generators
 
     // Object Data
-    Array1D<FCDataStruct> FuelCell; // dimension to number of machines
     Array1D<GasPropertyDataStruct> GasPhaseThermoChemistryData;
     Array1D<GeneratorFuelSupplyDataStruct> FuelSupply; // fuel supply (reused across various)
-    Array1D<MicroCHPDataStruct> MicroCHP;
-    Array1D<MicroCHPParamsNonNormalized> MicroCHPParamInput; // Used during get input then put into nested
     Array1D<GeneratorDynamicsManagerStruct> GeneratorDynamics;
 
     void clear_state()
     {
         NumFuelConstit = 0;
         NumGeneratorFuelSups = 0;
-        NumFuelCellGenerators = 0;
-        NumMicroCHPs = 0;
-        NumMicroCHPParams = 0;
         NumGensWDynamics = 0;
-        FuelCell.deallocate();
         GasPhaseThermoChemistryData.deallocate();
         FuelSupply.deallocate();
-        MicroCHP.deallocate();
-        MicroCHPParamInput.deallocate();
         GeneratorDynamics.deallocate();
     }
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,12 +51,14 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <FileSystem.hh>
-#include <UtilityRoutines.hh>
+#include "IOFiles.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -82,7 +84,6 @@ namespace DataSystemVariables {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataStringGlobals::altpathChar;
     using DataStringGlobals::CurrentWorkingFolder;
     using DataStringGlobals::pathChar;
@@ -97,8 +98,6 @@ namespace DataSystemVariables {
     int const iASCII_CR(13);   // endline value when just CR instead of CR/LF
     int const iUnicode_end(0); // endline value when Unicode file
     char const tabchar('\t');
-    int const GoodIOStatValue(0);         // good value for IOStat during reads/writes
-    int const MaxTimingStringLength(250); // string length for timing string array
 
     std::string const DDOnlyEnvVar("DDONLY");       // Only run design days
     std::string const ReverseDDEnvVar("REVERSEDD"); // Reverse DD during run
@@ -118,6 +117,7 @@ namespace DataSystemVariables {
     std::string const cIgnoreBeamRadiation("IgnoreBeamRadiation");
     std::string const cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
     std::string const cSutherlandHodgman("SutherlandHodgman");
+    std::string const cSlaterBarsky("SlaterBarsky");
     std::string const cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
     std::string const cMinimalShadowing("MinimalShadowing");
     std::string const cNumActiveSims("cntActv");
@@ -149,9 +149,17 @@ namespace DataSystemVariables {
     bool FullAnnualRun(false);                    // TRUE if full annual simulation is to be run.
     bool DeveloperFlag(false);                    // TRUE if developer flag is turned on. (turns on more displays to console)
     bool TimingFlag(false);                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
+
+    // Shading methods
+    ShadingMethod shadingMethod(ShadingMethod::PolygonClipping);
     bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    bool SlaterBarsky(false);                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
+    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+
+
     bool TrackAirLoopEnvFlag(false);              // If TRUE generates a file with runtime statistics for each HVAC
     //  controller on each air loop
     bool TraceAirLoopEnvFlag(false); // If TRUE generates a trace file with the converged solutions of all
@@ -162,12 +170,7 @@ namespace DataSystemVariables {
     bool ReportDuringHVACSizingSimulation(false);        // true when reporting outputs during HVAC sizing Simulation
     bool ReportDetailedWarmupConvergence(false);         // True when the detailed warmup convergence is requested
     bool UpdateDataDuringWarmupExternalInterface(false); // variable sets in the external interface.
-    bool UseScheduledSunlitFrac(false);                  // when true, the sunlit fraction for all surfaces are imported from schedule inputs
     bool ReportExtShadingSunlitFrac(false);              // when true, the sunlit fraction for all surfaces are exported as a csv format output
-    bool UseImportedSunlitFrac(false);                   // when true, the sunlit fraction for all surfaces are imported altogether as a CSV/JSON file
-
-    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
-    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
     // This update the value during the warmup added for FMI
     Real64 Elapsed_Time(0.0);       // For showing elapsed time at end of run
@@ -176,7 +179,6 @@ namespace DataSystemVariables {
     std::string MinReportFrequency; // String for minimum reporting frequency
     bool SortedIDD(true);           // after processing, use sorted IDD to obtain Defs, etc.
     bool lMinimalShadowing(false);  // TRUE if MinimalShadowing is to override Solar Distribution flag
-    std::string TempFullFileName;
     std::string envinputpath1;
     std::string envinputpath2;
     std::string envprogrampath;
@@ -193,10 +195,12 @@ namespace DataSystemVariables {
     int NumberIntRadThreads(1);
     int iNominalTotSurfaces(0);
     bool Threading(false);
+    bool firstTime(true);
 
     // Functions
 
-    void CheckForActualFileName(std::string const &originalInputFileName, // name as input for object
+    void CheckForActualFileName(IOFiles &ioFiles,
+                                std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
                                 std::string &CheckedFileName              // Blank if not found.
     )
@@ -236,14 +240,11 @@ namespace DataSystemVariables {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        bool FileExist(false);    // initialize to false, then override to true if present
-        static int EchoInputFile; // found unit number for "eplusout.audit"
-        static bool firstTime(true);
         std::string InputFileName; // save for changing out path characters
         std::string::size_type pos;
 
         if (firstTime) {
-            EchoInputFile = FindUnitNumber(DataStringGlobals::outputAuditFileName);
+            ioFiles.audit.ensure_open("CheckForActualFileName", ioFiles.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
             if (envinputpath1 != blank) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
@@ -254,115 +255,81 @@ namespace DataSystemVariables {
             firstTime = false;
         }
 
+
         FileFound = false;
         CheckedFileName = blank;
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(InputFileName)) {
             FileFound = true;
             CheckedFileName = InputFileName;
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (user input)=" + getAbsolutePath(CheckedFileName);
+            print(ioFiles.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (user input)=" + getAbsolutePath(InputFileName);
+            print(ioFiles.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
         }
 
         // Look relative to input file path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inputDirPathName + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(DataStringGlobals::inputDirPathName + InputFileName)) {
             FileFound = true;
             CheckedFileName = DataStringGlobals::inputDirPathName + InputFileName;
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (input file)=" + getAbsolutePath(CheckedFileName);
+            print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (input file)=" + getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName);
+            print(ioFiles.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
         }
 
         // Look relative to input path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envinputpath1 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envinputpath1 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath1 + InputFileName;
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (epin)=" + getAbsolutePath(CheckedFileName);
+            print(ioFiles.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (epin)=" + getAbsolutePath(envinputpath1 + InputFileName);
+            print(ioFiles.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
         }
 
         // Look relative to input path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envinputpath2 + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envinputpath2 + InputFileName)) {
             FileFound = true;
             CheckedFileName = envinputpath2 + InputFileName;
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (input_path)=" + getAbsolutePath(CheckedFileName);
+            print(ioFiles.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (input_path)=" + getAbsolutePath(envinputpath2 + InputFileName);
+            print(ioFiles.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
         }
 
         // Look relative to program path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(envprogrampath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(envprogrampath + InputFileName)) {
             FileFound = true;
             CheckedFileName = envprogrampath + InputFileName;
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (program_path)=" + getAbsolutePath(CheckedFileName);
+            print(ioFiles.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (program_path)=" + getAbsolutePath(envprogrampath + InputFileName);
+            print(ioFiles.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
         }
 
         if (!TestAllPaths) return;
 
         // Look relative to current working folder
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(CurrentWorkingFolder + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(CurrentWorkingFolder + InputFileName)) {
             FileFound = true;
             CheckedFileName = CurrentWorkingFolder + InputFileName;
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (CWF)=" + getAbsolutePath(CheckedFileName);
+            print(ioFiles.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (CWF)=" + getAbsolutePath(CurrentWorkingFolder + InputFileName);
+            print(ioFiles.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
         }
 
         // Look relative to program path
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(ProgramPath + InputFileName, flags);
-            FileExist = flags.exists();
-        }
-        if (FileExist) {
+        if (FileSystem::fileExists(ProgramPath + InputFileName)) {
             FileFound = true;
             CheckedFileName = ProgramPath + InputFileName;
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "found (program path - ini)=" + getAbsolutePath(CheckedFileName);
+            print(ioFiles.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
             return;
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
+            print(ioFiles.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
         }
     }
 
@@ -374,7 +341,9 @@ namespace DataSystemVariables {
         FullAnnualRun = false;
         DeveloperFlag = false;
         TimingFlag = false;
+        shadingMethod = ShadingMethod::PolygonClipping;
         SutherlandHodgman = true;
+        SlaterBarsky = false;
         DetailedSkyDiffuseAlgorithm = false;
         DetailedSolarTimestepIntegration = false;
         TrackAirLoopEnvFlag = false;
@@ -384,9 +353,7 @@ namespace DataSystemVariables {
         ReportDuringHVACSizingSimulation = false;
         ReportDetailedWarmupConvergence = false;
         UpdateDataDuringWarmupExternalInterface = false;
-        UseScheduledSunlitFrac = false;
         ReportExtShadingSunlitFrac = false;
-        UseImportedSunlitFrac = false;
         DisableGroupSelfShading = false;
         DisableAllSelfShading = false;
         Elapsed_Time = 0.0;
@@ -407,6 +374,108 @@ namespace DataSystemVariables {
         NumberIntRadThreads = 1;
         iNominalTotSurfaces = 0;
         Threading = false;
+        firstTime = true;
+    }
+
+    void processEnvironmentVariables(DataGlobal const &dataGlobals) {
+
+        static std::string cEnvValue;
+
+        get_environment_variable(DDOnlyEnvVar, cEnvValue);
+        DDOnly = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::DDOnlySimulation) DDOnly = true;
+
+        get_environment_variable(ReverseDDEnvVar, cEnvValue);
+        ReverseDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(DisableGLHECachingEnvVar, cEnvValue);
+        DisableGLHECaching = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(FullAnnualSimulation, cEnvValue);
+        FullAnnualRun = env_var_on(cEnvValue); // Yes or True
+        if (dataGlobals.AnnualSimulation) FullAnnualRun = true;
+
+        get_environment_variable(cDisplayAllWarnings, cEnvValue);
+        DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::DisplayAllWarnings) {
+            DataGlobals::DisplayAllWarnings = true;
+            DataGlobals::DisplayExtraWarnings = true;
+            DataGlobals::DisplayUnusedSchedules = true;
+            DataGlobals::DisplayUnusedObjects = true;
+        }
+
+        get_environment_variable(cDisplayExtraWarnings, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedObjects, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedSchedules, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedSchedules = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayZoneAirHeatBalanceOffBalance, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayZoneAirHeatBalanceOffBalance = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayAdvancedReportVariables, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (ReverseDD) ReportDuringWarmup = false;                          // force to false for ReverseDD runs
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (DisableGLHECaching) ReportDuringWarmup = true;                  // force to true for standard runs runs
+
+        get_environment_variable(cReportDuringHVACSizingSimulation, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalSurfaceVariables, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSortIDD, cEnvValue);
+        if (!cEnvValue.empty()) SortedIDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(MinReportFrequencyEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) MinReportFrequency = cEnvValue; // turned into value later
+
+        get_environment_variable(cDeveloperFlag, cEnvValue);
+        if (!cEnvValue.empty()) DeveloperFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSutherlandHodgman, cEnvValue);
+        if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSlaterBarsky, cEnvValue);
+        if (!cEnvValue.empty()) SlaterBarsky = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalShadowing, cEnvValue);
+        if (!cEnvValue.empty()) lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cTimingFlag, cEnvValue);
+        if (!cEnvValue.empty()) TimingFlag = env_var_on(cEnvValue); // Yes or True
+
+        // Initialize env flags for air loop simulation debugging
+        get_environment_variable(TrackAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TrackAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TraceAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceHVACControllerEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
+
     }
 
 } // namespace DataSystemVariables

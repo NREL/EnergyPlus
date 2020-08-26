@@ -24,8 +24,6 @@
  */
 
 #pragma once
-#ifndef __VALIJSON_ADAPTERS_PROPERTY_TREE_ADAPTER_HPP
-#define __VALIJSON_ADAPTERS_PROPERTY_TREE_ADAPTER_HPP
 
 #include <string>
 
@@ -753,5 +751,3 @@ inline PropertyTreeObjectMemberIterator PropertyTreeObject::find(
 
 }  // namespace adapters
 }  // namespace valijson
-
-#endif

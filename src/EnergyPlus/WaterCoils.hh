@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,15 +49,16 @@
 #define WaterCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace WaterCoils {
 
@@ -259,7 +260,15 @@ namespace WaterCoils {
         // end variables for water system interactions
         // COIL:Water:SimpleHeating Coil Performance Input Method
         int CoilPerfInpMeth;            // 1 = UA and Design Water Flow Rate; 2 = Nominal Capacity
-        Real64 FoulingFactor;           // Coil fouling factor [m2K/W]
+
+        // Operational fault parameters
+        bool FaultyCoilFoulingFlag;     // True if the coil has fouling fault
+        int FaultyCoilFoulingIndex;     // Index of the fault object corresponding to the coil
+        Real64 FaultyCoilFoulingFactor; // Coil fouling factor [m2K/W]
+        Real64 OriginalUACoilVariable;
+        Real64 OriginalUACoilExternal;
+        Real64 OriginalUACoilInternal;
+
         bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
         int DesiccantDehumNum;          // index to desiccant dehumidifier object
         Real64 DesignWaterDeltaTemp;    // water deltaT for coil sizing [K]
@@ -267,6 +276,7 @@ namespace WaterCoils {
         std::string ControllerName;     // controller name used by water coil
         int ControllerIndex;            // controller index used by water coil
         bool reportCoilFinalSizes;      // one time report of sizes to coil summary report
+        bool AirLoopDOASFlag;           // True when this coil is used AirLoopDOAS
 
         // Default Constructor
         WaterCoilEquipConditions()
@@ -289,9 +299,10 @@ namespace WaterCoils {
               SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0), RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0),
               LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(CondensateDiscarded),
-              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0), FoulingFactor(0.0),
+              CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0),
+              FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
-              ControllerIndex(0), reportCoilFinalSizes(true)
+              ControllerIndex(0), reportCoilFinalSizes(true), AirLoopDOASFlag(false)
         {
         }
     };
@@ -314,7 +325,7 @@ namespace WaterCoils {
     // Functions
     void clear_state();
 
-    void SimulateWaterCoilComponents(std::string const &CompName,
+    void SimulateWaterCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64> QActual = _,
@@ -332,14 +343,12 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(int const CoilNum,
-                       bool const FirstHVACIteration // unused1208
-    );
+    void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
     void                                   // refactor for coil report
     CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
 
-    void SizeWaterCoil(int const CoilNum);
+    void SizeWaterCoil(EnergyPlusData &state, int const CoilNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -471,20 +480,20 @@ namespace WaterCoils {
     // Beginning of Coil Utility subroutines for the Detailed Model
     // *****************************************************************************
 
-    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1<Real64> &PolynomCoef);
+    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef);
 
     void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode);
 
     void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KBessFunc, int &ErrorCode);
 
-    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1<Real64> &PolynomCoef);
+    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
 
-    Real64 SimpleHeatingCoilUAResidual(Real64 const UA,          // UA of coil
-                                       Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 SimpleHeatingCoilUAResidual(Real64 const UA,           // UA of coil
+                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
-    Real64 SimpleCoolingCoilUAResidual(Real64 const UA,          // UA of coil
-                                       Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 SimpleCoolingCoilUAResidual(Real64 const UA,           // UA of coil
+                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
     // Iterate Routine for Cooling Coil
@@ -510,12 +519,12 @@ namespace WaterCoils {
                                    bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
@@ -546,7 +555,7 @@ namespace WaterCoils {
                            bool &NodeNotFound         // true if matching water inlet node not found
     );
 
-    void CheckForSensorAndSetPointNode(int const SensorNodeNum, // controller sensor node number
+    void CheckForSensorAndSetPointNode(EnergyPlusData &state, int const SensorNodeNum, // controller sensor node number
                                        int const ControlledVar, // controlled variable type
                                        bool &NodeNotFound       // true if matching air outlet node not found
     );
@@ -556,8 +565,8 @@ namespace WaterCoils {
                       Real64 const PB  // barometric pressure {Pascals}
     );
 
-    Real64 EnthalpyResidual(Real64 const Tprov,       // test value of Tdb [C]
-                            Array1<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
+    Real64 EnthalpyResidual(Real64 const Tprov,        // test value of Tdb [C]
+                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     );
 
     Real64 EstimateHEXSurfaceArea(int const CoilNum); // coil number, [-]

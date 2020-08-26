@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,8 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <EnergyPlus/General.hh>
@@ -67,26 +67,26 @@ using namespace EnergyPlus::General;
 
 TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
 {
-    
+
     IceThermalStorage::clear_state();
     CurveManager::clear_state();
-    
+
     int TotDetailedIce = 4;
     int TotCurves = 4;
-    int IceStorageCurveType;
+    enum CurveVars IceStorageCurveType;
     int TestNum;
     Real64 CurveAnswer = 0.0;
     Real64 ExpectedValue = 0.0;
     Real64 Tolerance = 0.001;
-        
-    IceThermalStorage::DetIceStor.allocate(TotDetailedIce);
+
+    IceThermalStorage::DetailedIceStorage.allocate(TotDetailedIce);
     CurveManager::PerfCurve.allocate(TotCurves);
     CurveManager::NumCurves = TotCurves;
     BeginEnvrnFlag = false;
-    
-    //Test 1: CurveVarsFracChargedLMTD Curve is QuadraticLinear
+
+    // Test 1: CurveVarsFracChargedLMTD Curve is QuadraticLinear
     TestNum = 1;
-    IceStorageCurveType = IceThermalStorage::CurveVarsFracChargedLMTD;
+    IceStorageCurveType = IceThermalStorage::CurveVars::FracChargedLMTD;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::QuadraticLinear;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 1.0;
@@ -103,9 +103,9 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     ExpectedValue = 1.475;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
-    //Test 2: CurveVarsFracDischargedLMTD Curve is BiQuadratic
+    // Test 2: CurveVarsFracDischargedLMTD Curve is BiQuadratic
     TestNum = 2;
-    IceStorageCurveType = IceThermalStorage::CurveVarsFracDischargedLMTD;
+    IceStorageCurveType = IceThermalStorage::CurveVars::FracDischargedLMTD;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::BiQuadratic;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 1.0;
@@ -121,10 +121,10 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     CurveAnswer = IceThermalStorage::CalcQstar(TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.960;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
-    
-    //Test 3: CurveVarsLMTDMassFlow Curve is CubicLinear
+
+    // Test 3: CurveVarsLMTDMassFlow Curve is CubicLinear
     TestNum = 3;
-    IceStorageCurveType = IceThermalStorage::CurveVarsLMTDMassFlow;
+    IceStorageCurveType = IceThermalStorage::CurveVars::LMTDMassFlow;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::CubicLinear;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 10.0;
@@ -141,9 +141,9 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     ExpectedValue = 1.768;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
 
-    //Test 4: CurveVarsFracLMTDFracCharged Curve is CubicLinear
+    // Test 4: CurveVarsFracLMTDFracCharged Curve is CubicLinear
     TestNum = 4;
-    IceStorageCurveType = IceThermalStorage::CurveVarsLMTDFracCharged;
+    IceStorageCurveType = IceThermalStorage::CurveVars::LMTDFracCharged;
     CurveManager::PerfCurve(TestNum).CurveType = CurveManager::CubicLinear;
     CurveManager::PerfCurve(TestNum).InterpolationType = CurveManager::EvaluateCurveToLimits;
     CurveManager::PerfCurve(TestNum).Var1Max = 10.0;
@@ -159,5 +159,4 @@ TEST_F(EnergyPlusFixture, IceThermalStorage_CalcQstarTest)
     CurveAnswer = IceThermalStorage::CalcQstar(TestNum, IceStorageCurveType, 0.4, 1.2, 0.25);
     ExpectedValue = 1.951;
     EXPECT_NEAR(ExpectedValue, CurveAnswer, Tolerance);
-
 }

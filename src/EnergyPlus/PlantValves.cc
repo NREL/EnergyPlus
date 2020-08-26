@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,21 +52,22 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <PlantValves.hh>
-#include <UtilityRoutines.hh>
-#include "PlantValves.hh"
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PlantValves.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/PlantValves.hh>
 
 
 namespace EnergyPlus {
@@ -122,9 +123,9 @@ namespace PlantValves {
         TemperValve.deallocate();
     }
 
-    void TemperValveData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad),
+    void TemperValveData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad),
                                    bool EP_UNUSED(RunFlag)) {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
         this->calculate();
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
@@ -174,7 +175,7 @@ namespace PlantValves {
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "TemperingValve";
@@ -225,7 +226,7 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::initialize()
+    void TemperValveData::initialize(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -263,7 +264,8 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                        this->Name,
                                                         DataPlant::TypeOf_ValveTempering,
                                                         this->LoopNum,
                                                         this->LoopSideNum,
@@ -303,7 +305,7 @@ namespace PlantValves {
                                     if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlType_Active) IsBranchActive = true;
 
                                     // is Valve inlet node an outlet node of a splitter
-                                    if (thisLoopSide.SplitterExists) {
+                                    if (thisLoopSide.Splitter.Exists) {
                                         if (allocated(thisLoopSide.Splitter.NodeNumOut)) {
                                             if (any_eq(thisLoopSide.Splitter.NodeNumOut, this->PltInletNodeNum)) {
                                                 InNodeOnSplitter = true;
@@ -317,7 +319,7 @@ namespace PlantValves {
                                     }  // has splitter
 
                                     // is stream 2 node an inlet to the mixer ?
-                                    if (thisLoopSide.MixerExists) {
+                                    if (thisLoopSide.Mixer.Exists) {
                                         if (any_eq(thisLoopSide.Mixer.NodeNumIn, this->PltStream2NodeNum)) {
                                             int thisInnerBranchCtr = 0;
                                             for (auto & thisInnerBranch : thisLoopSide.Branch) {
@@ -336,7 +338,7 @@ namespace PlantValves {
                                     for (auto & thisInnerBranch : thisLoopSide.Branch) {
                                         if (thisInnerBranch.NodeNumOut == this->PltPumpOutletNodeNum) {
                                             for (auto & thisInnerComp : thisInnerBranch.Comp) {
-                                                if (thisInnerComp.GeneralEquipType == DataPlant::GenEquipTypes_Pump) {
+                                                if (thisInnerComp.isPump()) {
                                                     PumpOutNodeOkay = true;
                                                 }
                                             }

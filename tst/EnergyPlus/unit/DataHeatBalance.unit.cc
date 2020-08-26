@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -58,6 +59,8 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -87,8 +90,6 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
-
         "  Timestep,6;",
 
         "  Building,",
@@ -798,16 +799,16 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    OutputProcessor::TimeValue.allocate(2);
+    // OutputProcessor::TimeValue.allocate(2);
 
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // read project control data
+    GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
@@ -817,7 +818,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     SetPreConstructionInputParameters();
 
     ErrorsFound = false;
-    GetConstructData(ErrorsFound); // read construction data
+    GetConstructData(state.files, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
@@ -825,62 +826,65 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
+    SurfaceGeometry::SetupZoneGeometry(state,
+                                       ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
     EXPECT_FALSE(ErrorsFound);
 
-    EXPECT_EQ(Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass
-    EXPECT_EQ(Construct(4).TotLayers, 3);               //  outer glass, air gap, inner glass
-    EXPECT_EQ(Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
-    EXPECT_EQ(Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotLayers, 3);               //  outer glass, air gap, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotGlassLayers, 2);          // outer glass, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotSolidLayers, 2);          // outer glass, inner glass
 
-    EXPECT_EQ(Material(4).Name, "SINGLEPANE"); // single pane glass
-    EXPECT_EQ(Material(5).Name, "WINGAS");     // air gap
-    EXPECT_EQ(Material(6).Name, "BLIND");      // window blind
+    EXPECT_EQ(dataMaterial.Material(4).Name, "SINGLEPANE"); // single pane glass
+    EXPECT_EQ(dataMaterial.Material(5).Name, "WINGAS");     // air gap
+    EXPECT_EQ(dataMaterial.Material(6).Name, "BLIND");      // window blind
 
     // construction layer material pointers. this construction has no blind
-    EXPECT_EQ(Construct(4).LayerPoint(1), 4); // glass, outer layer
-    EXPECT_EQ(Construct(4).LayerPoint(2), 5); // air gap
-    EXPECT_EQ(Construct(4).LayerPoint(3), 4); // glass, inner layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(1), 4); // glass, outer layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(2), 5); // air gap
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(3), 4); // glass, inner layer
 
-    EXPECT_FALSE(SurfaceWindow(2).HasShadeOrBlindLayer); // the window construction has no blind
+    int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
+
+    EXPECT_FALSE(SurfaceWindow(windowSurfNum).HasShadeOrBlindLayer); // the window construction has no blind
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer();
-    EXPECT_FALSE(SurfaceWindow(2).HasShadeOrBlindLayer); // the window construction has no blind
+    EXPECT_FALSE(SurfaceWindow(windowSurfNum).HasShadeOrBlindLayer); // the window construction has no blind
 
-    GetEMSInput();
+    GetEMSInput(state.files);
     // check if EMS actuator is not setup because there is no blind/shade layer
     SetupWindowShadingControlActuators();
     EXPECT_EQ(numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
 
     // add a blind layer in between glass
-    Construct(4).TotLayers = 5;
-    Construct(4).TotGlassLayers = 2;
-    Construct(4).TotSolidLayers = 3;
-    Construct(4).LayerPoint(1) = 4; // glass
-    Construct(4).LayerPoint(2) = 5; // air gap
-    Construct(4).LayerPoint(3) = 6; // window blind
-    Construct(4).LayerPoint(4) = 5; // air gap
-    Construct(4).LayerPoint(5) = 4; // glass
+    dataConstruction.Construct(4).TotLayers = 5;
+    dataConstruction.Construct(4).TotGlassLayers = 2;
+    dataConstruction.Construct(4).TotSolidLayers = 3;
+    dataConstruction.Construct(4).LayerPoint(1) = 4; // glass
+    dataConstruction.Construct(4).LayerPoint(2) = 5; // air gap
+    dataConstruction.Construct(4).LayerPoint(3) = 6; // window blind
+    dataConstruction.Construct(4).LayerPoint(4) = 5; // air gap
+    dataConstruction.Construct(4).LayerPoint(5) = 4; // glass
     // updated contruction and material layers data
-    EXPECT_EQ(Construct(4).TotLayers, 5);      // outer glass, air gap, blind, air gap, inner glass
-    EXPECT_EQ(Construct(4).TotGlassLayers, 2); // outer glass, inner glass
-    EXPECT_EQ(Construct(4).TotSolidLayers, 3); // glass, blind, glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotLayers, 5);      // outer glass, air gap, blind, air gap, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotGlassLayers, 2); // outer glass, inner glass
+    EXPECT_EQ(dataConstruction.Construct(4).TotSolidLayers, 3); // glass, blind, glass
     // construction layer material pointers. this construction has blind
-    EXPECT_EQ(Construct(4).LayerPoint(1), 4); // glass, outer layer
-    EXPECT_EQ(Construct(4).LayerPoint(2), 5); // air gap
-    EXPECT_EQ(Construct(4).LayerPoint(3), 6); // blind
-    EXPECT_EQ(Construct(4).LayerPoint(4), 5); // air gap
-    EXPECT_EQ(Construct(4).LayerPoint(5), 4); // glass, inner layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(1), 4); // glass, outer layer
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(2), 5); // air gap
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(3), 6); // blind
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(4), 5); // air gap
+    EXPECT_EQ(dataConstruction.Construct(4).LayerPoint(5), 4); // glass, inner layer
 
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer();
-    EXPECT_TRUE(SurfaceWindow(2).HasShadeOrBlindLayer); // the window construction has blind
+    EXPECT_TRUE(SurfaceWindow(windowSurfNum).HasShadeOrBlindLayer); // the window construction has blind
     // set the blind to movable
-    SurfaceWindow(2).MovableSlats = true;
+    SurfaceWindow(windowSurfNum).MovableSlats = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators();
     EXPECT_EQ(numEMSActuatorsAvailable, 2);
@@ -890,4 +894,96 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_EQ(EMSActuatorAvailable(2).ComponentTypeName, "Window Shading Control");
     EXPECT_EQ(EMSActuatorAvailable(2).ControlTypeName, "Slat Angle");
     EXPECT_EQ(EMSActuatorAvailable(2).Units, "[degrees]");
+}
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_setUserTemperatureLocationPerpendicular)
+{
+
+    Real64 userInputValue;
+    Real64 expectedReturnValue;
+    Real64 actualReturnValue;
+
+    dataConstruction.Construct.allocate(1);
+    auto &thisConstruct(dataConstruction.Construct(1));
+    thisConstruct.Name = "RadiantSystem1";
+
+    // Test 1: User value is less than zero--should be reset to zero
+    userInputValue = -0.25;
+    expectedReturnValue = 0.0;
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+
+    // Test 2: User value is greater than unity--should be reset to 1.0
+    userInputValue = 1.23456;
+    expectedReturnValue = 1.0;
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+
+    // Test 3: User value is valid (between 0 and 1)--returned value should be equal to user input
+    userInputValue = 0.234567;
+    expectedReturnValue = 0.234567;
+    actualReturnValue = thisConstruct.setUserTemperatureLocationPerpendicular(userInputValue);
+    EXPECT_EQ(actualReturnValue,expectedReturnValue);
+
+}
+
+TEST_F(EnergyPlusFixture, DataHeatBalance_setNodeSourceAndUserTemp)
+{
+    int expectedNodeNumberAtSource;
+    int expectedNodeNumberAtUserSpecifiedLocation;
+    dataConstruction.Construct.allocate(1);
+    auto &thisConstruct(dataConstruction.Construct(1));
+    thisConstruct.NumOfPerpendNodes = 4;
+
+    // Data common to all tests
+    Array1D_int nodePerLayer(Construction::MaxLayersInConstruct);
+    nodePerLayer(1) = 5;
+    nodePerLayer(2) = 6;
+    nodePerLayer(3) = 7;
+    nodePerLayer(4) = 8;
+    nodePerLayer(5) = 9;
+
+    // Test 1: Not a construction with an internal source--both results should be zero
+    thisConstruct.SourceSinkPresent = false;
+    expectedNodeNumberAtSource = 0;
+    expectedNodeNumberAtUserSpecifiedLocation = 0;
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+
+    // Test 2: Construction with Internal Source but 1-D
+    thisConstruct.SourceSinkPresent = true;
+    thisConstruct.SourceAfterLayer = 2;
+    thisConstruct.TempAfterLayer = 3;
+    thisConstruct.SolutionDimensions = 1;
+    expectedNodeNumberAtSource = 11;
+    expectedNodeNumberAtUserSpecifiedLocation = 18;
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+
+    // Test 3a: Construction with Internal Source using 2-D Solution
+    //          First sub-test--user location in line with source
+    thisConstruct.SourceAfterLayer = 2;
+    thisConstruct.TempAfterLayer = 3;
+    thisConstruct.SolutionDimensions = 2;
+    thisConstruct.userTemperatureLocationPerpendicular = 0.0;
+    expectedNodeNumberAtSource = 41;
+    expectedNodeNumberAtUserSpecifiedLocation = 69;
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+
+    // Test 3b: Construction with Internal Source using 2-D Solution
+    //          First sub-test--user location at mid-point between tubes
+    thisConstruct.SourceAfterLayer = 3;
+    thisConstruct.TempAfterLayer = 4;
+    thisConstruct.SolutionDimensions = 2;
+    thisConstruct.userTemperatureLocationPerpendicular = 1.0;
+    expectedNodeNumberAtSource = 69;
+    expectedNodeNumberAtUserSpecifiedLocation = 104;
+    thisConstruct.setNodeSourceAndUserTemp(nodePerLayer);
+    EXPECT_EQ(expectedNodeNumberAtSource,thisConstruct.NodeSource);
+    EXPECT_EQ(expectedNodeNumberAtUserSpecifiedLocation,thisConstruct.NodeUserTemp);
+
 }

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,9 +52,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SystemReports {
 
@@ -107,12 +109,14 @@ namespace SystemReports {
     extern Array1D<Real64> SysTotH2OHOT;
     extern Array1D<Real64> SysTotH2OCOLD;
     extern Array1D<Real64> SysTotElec;
-    extern Array1D<Real64> SysTotGas;
+    extern Array1D<Real64> SysTotNaturalGas;
+    extern Array1D<Real64> SysTotPropane;
     extern Array1D<Real64> SysTotSteam;
 
     extern Array1D<Real64> SysHumidHTNG;
     extern Array1D<Real64> SysHumidElec;
-    extern Array1D<Real64> SysHumidGas;
+    extern Array1D<Real64> SysHumidNaturalGas;
+    extern Array1D<Real64> SysHumidPropane;
     extern Array1D<Real64> SysEvapCLNG;
     extern Array1D<Real64> SysEvapElec;
     extern Array1D<Real64> SysHeatExHTNG;
@@ -133,9 +137,10 @@ namespace SystemReports {
     extern Array1D<Real64> SysHCCompElec;
     extern Array1D<Real64> SysHCCompElecRes;
     extern Array1D<Real64> SysHCCompHTNG;
-    extern Array1D<Real64> SysHCCompGas;
+    extern Array1D<Real64> SysHCCompNaturalGas;
+    extern Array1D<Real64> SysHCCompPropane;
     extern Array1D<Real64> SysHCCompSteam;
-    extern Array1D<Real64> SysDomesticH20;
+    extern Array1D<Real64> SysDomesticH2O;
 
     extern Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
     extern Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
@@ -223,9 +228,9 @@ namespace SystemReports {
 
     // Functions
 
-    void InitEnergyReports();
+    void InitEnergyReports(IOFiles &ioFiles);
 
-    void FindFirstLastPtr(int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
+    void FindFirstLastPtr(IOFiles &ioFiles, int &LoopType, int &LoopNum, int &ArrayCount, int &LoopCount, bool &ConnectionFlag);
 
     void UpdateZoneCompPtrArray(int &Idx,
                                 int const ListNum,
@@ -303,7 +308,7 @@ namespace SystemReports {
                              Real64 const CompLoad,
                              Real64 const CompEnergy);
 
-    void ReportMaxVentilationLoads();
+    void ReportMaxVentilationLoads(EnergyPlusData &state);
 
     void MatchPlantSys(int const AirLoopNum, // counter for zone air distribution inlets
                        int const BranchNum   // counter for zone air distribution inlets
@@ -318,7 +323,7 @@ namespace SystemReports {
                              int &MatchComp               // Component number of the match
     );
 
-    void ReportAirLoopConnections();
+    void ReportAirLoopConnections(IOFiles &ioFiles);
 
     //        End of Reporting subroutines for the SimAir Module
     // *****************************************************************************

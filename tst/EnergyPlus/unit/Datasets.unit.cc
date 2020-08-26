@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,9 +55,9 @@
 #include <gtest/gtest.h>
 
 // Fixtures, etc.
-#include <ConfiguredFunctions.hh>
-#include <DataGlobals.hh>
-#include <Fixtures/EnergyPlusFixture.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
 
@@ -147,6 +147,18 @@ TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2015)
 TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2016)
 {
     ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2016.idf"))));
+}
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2017)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2017.idf"))));
+}
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2018)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2018.idf"))));
+}
+TEST_F(DataSetFixture, LCCusePriceEscalationDataSet2019)
+{
+    ASSERT_TRUE(process_idf(delimited_string(read_lines_in_file(configured_source_directory() + "/datasets/LCCusePriceEscalationDataSet2019.idf"))));
 }
 TEST_F(DataSetFixture, MoistureMaterials)
 {

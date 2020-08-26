@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,8 +46,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus Headers
-#include <DataHeatBalFanSys.hh>
-#include <DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -240,6 +240,23 @@ namespace DataHeatBalFanSys {
     Array1D_int TempControlType;
     Array1D_int ComfortControlType;
 
+    Array1D<Real64> ZoneHeatIndex;
+    Array1D<Real64> ZoneHumidex;
+    Array1D_int ZoneNumOcc;
+    Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
+    Array1D<std::vector<Real64>> ZoneHumidexHourBins;
+    Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
+    Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
+    Array1D<std::vector<Real64>> ZoneLightingLevelOccuHourBins;
+
+    Array1D<Real64> ZoneOccPierceSET;
+    Array1D<Real64> ZoneOccPierceSETLastStep;
+    Array1D<std::vector<Real64>> ZoneLowSETHours; // LowSETHour, LowSETOccHour, LowSetLongestDur, LowSetLongestTimeStamp
+    Array1D<std::vector<Real64>> ZoneHighSETHours; //HighSETHour, HighSETOccHour, HighSetLongestDur, HighSetLongestTimeStamp
+
     // Object Data
     Array1D<ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
@@ -360,6 +377,21 @@ namespace DataHeatBalFanSys {
         ZoneW1.deallocate();
         TempControlType.deallocate();
         ComfortControlType.deallocate();
+        ZoneHeatIndex.deallocate();
+        ZoneHumidex.deallocate();
+        ZoneNumOcc.deallocate();;
+        ZoneHeatIndexHourBins.deallocate();
+        ZoneHeatIndexOccuHourBins.deallocate();
+        ZoneHumidexHourBins.deallocate();
+        ZoneHumidexOccuHourBins.deallocate();
+        ZoneOccPierceSET.deallocate();
+        ZoneOccPierceSETLastStep.deallocate();
+        ZoneLowSETHours.deallocate();
+        ZoneHighSETHours.deallocate();
+        ZoneCO2LevelHourBins.deallocate();
+        ZoneCO2LevelOccuHourBins.deallocate();
+        ZoneLightingLevelHourBins.deallocate();
+        ZoneLightingLevelOccuHourBins.deallocate();
         ZoneComfortControlsFanger.deallocate();
     }
 

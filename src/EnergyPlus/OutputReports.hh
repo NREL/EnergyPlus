@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,27 +52,28 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
-void ReportSurfaces();
+void ReportSurfaces(IOFiles &ioFiles);
 
-void LinesOut(std::string const &option);
+void LinesOut(IOFiles &ioFiles, std::string const &option);
 
-void DXFOut(std::string &PolygonAction,
-            std::string &ColorScheme // Name from user for color scheme or blank
+void DXFOut(IOFiles &ioFiles,
+            std::string const &PolygonAction,
+            std::string const &ColorScheme // Name from user for color scheme or blank
 );
 
-void DXFOutLines(std::string const &ColorScheme);
+void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme);
 
-void DXFOutWireFrame(std::string const &ColorScheme);
+void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme);
 
-void DetailsForSurfaces(int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
+void DetailsForSurfaces(IOFiles &ioFiles, int const RptType); // (1=Vertices only, 10=Details only, 11=Details with vertices)
 
-void CostInfoOut();
+void CostInfoOut(IOFiles &ioFiles);
 
-void VRMLOut(std::string &PolygonAction, std::string &ColorScheme);
+void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::string &ColorScheme);
 
 } // namespace EnergyPlus
 

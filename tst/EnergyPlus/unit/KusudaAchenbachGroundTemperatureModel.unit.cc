@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlus/DataIPShortCuts.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include "EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh"
 #include "EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh"
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -76,7 +77,7 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest1)
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
     EXPECT_NEAR(10.0, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);      // Jan 1
     EXPECT_NEAR(20.0, thisModel->getGroundTempAtTimeInSeconds(0.0, 15768000), 0.01); // June 1
@@ -118,7 +119,7 @@ TEST_F(EnergyPlusFixture, KusudaAchenbachGroundTempModelTest2) // lNumericFieldB
 
     std::string const CurrentModuleObject = CurrentModuleObjects(objectType_KusudaGroundTemp);
 
-    auto thisModel = GetGroundTempModelAndInit(CurrentModuleObject, "TEST");
+    auto thisModel = GetGroundTempModelAndInit(state, CurrentModuleObject, "TEST");
 
     EXPECT_NEAR(16.46, thisModel->getGroundTempAtTimeInSeconds(0.0, 0.0), 0.01);      // Jan 1
     EXPECT_NEAR(17.17, thisModel->getGroundTempAtTimeInSeconds(0.0, 11664000), 0.01); // May 15

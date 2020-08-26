@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,11 +61,17 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataAirSystems.hh>
-#include <DataSizing.hh>
-#include <MixedAir.hh>
-#include <SimAirServingZones.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataAirSystems;
@@ -75,14 +81,12 @@ using namespace SimAirServingZones;
 
 namespace EnergyPlus {
 
-TEST(SimAirServingZones, ReheatCoilSizing)
+TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
 {
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine test the GetHeatingSATempForSizing & GetHeatingSATempHumRatForSizing methods,
     // which are designed to get the proper reheat coil inlet temperature/humidity ratio for sizing
     // depending on the system configurations
-
-    ShowMessage("Begin Test: SimAirServingZones, ReheatCoilSizing");
 
     int NumPrimaryAirSys = 4; // total number of air loops
     int AirLoopNum;           // index of air loops
@@ -461,7 +465,7 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout1)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
 
     // 2 controllers on this AHU for 2 water coils on the branch
     // CanBeLockedOutByEcono should be false for both controller in this test
@@ -621,13 +625,947 @@ TEST_F(EnergyPlusFixture, GetAirPathData_ControllerLockout2)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimAirServingZones::GetAirPathData();
+    SimAirServingZones::GetAirPathData(state);
 
     // 2 controllers on this AHU for 2 water coils in the OA system
     // CanBeLockedOutByEcono should be false for the heating coil controller #1 in this test
     // CanBeLockedOutByEcono should be true for the cooling coil controller #2 in this test
     EXPECT_FALSE(PrimaryAirSystem(1).CanBeLockedOutByEcono(1));
     EXPECT_TRUE(PrimaryAirSystem(1).CanBeLockedOutByEcono(2));
+}
+
+TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Space1;                  !- Name",
+
+        "Zone,",
+        "  Space2;                !- Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space1,                   !- Zone Name",
+        "    Space1 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space1-1 In Node,         !- Zone Air Inlet Node or NodeList Name",
+        "    Space1 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space1 Node,              !- Zone Air Node Name",
+        "    Space1 Ret Node;          !- Zone Return Air Node Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space2,                   !- Zone Name",
+        "    Space2 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space2-1 In Node,         !- Zone Air Inlet Node or NodeList Name",
+        "    Space2 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space2 Node,              !- Zone Air Node Name",
+        "    Space2 Ret Node;          !- Zone Return Air Node Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space1 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE1-1 ATU,            !- Name",
+        "    Space1-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE1-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space2 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE2-1 ATU,            !- Name",
+        "    Space2-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE2-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE1-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space1-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE1-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE2-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space2-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE2-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  BranchList,",
+        "    VAV Sys 1 Branches,      !- Name",
+        "    VAV Sys 1 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 1 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 1,            !- Component 4 Name",
+        "    VAV Sys 1 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 1,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 1 Avail List,    !- Availability Manager List Name",
+        "    1.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 1 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 1,  !- Name",
+        "    Zone Eq In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter,  !- Name",
+        "    Zone Eq In Node,         !- Inlet Node Name",
+        "    SPACE1-1 ATU In Node,    !- Outlet 1 Node Name",
+        "    SPACE2-1 ATU In Node;    !- Outlet 2 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath1,          !- Name",
+        "    Demand Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer,   !- Name",
+        "    Demand Out Node,         !- Outlet Node Name",
+        "    Space1 Ret Node,         !- Inlet 1 Node Name",
+        "    Space2 Ret Node;         !- Inlet 2 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 1,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.35326,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 1 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream(""));
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SingleDuct::GetSysInput(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SplitterComponent::GetSplitterInput();
+    EXPECT_TRUE(compare_err_stream(""));
+    SimAirServingZones::GetAirPathData(state);
+    // Expect warnings about no controllers, clear err_stream
+    EXPECT_TRUE(has_err_output(true));
+    SimAirServingZones::InitAirLoops(state, true);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    // And finally, all of this gymnastics just to check if the airloopnums get set correctly
+    // For this test, both ADUs should be connected airloop 1 which is the only one here
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 1);
+}
+
+TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Space1;                  !- Name",
+
+        "Zone,",
+        "  Space2;                !- Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space1,                   !- Zone Name",
+        "    Space1 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space1-1 In Node,         !- Zone Air Inlet Node or NodeList Name",
+        "    Space1 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space1 Node,              !- Zone Air Node Name",
+        "    Space1 Ret Node;          !- Zone Return Air Node Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space2,                   !- Zone Name",
+        "    Space2 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space2-1 In Node,         !- Zone Air Inlet Node or NodeList Name",
+        "    Space2 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space2 Node,              !- Zone Air Node Name",
+        "    Space2 Ret Node;          !- Zone Return Air Node Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space1 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE1-1 ATU,            !- Name",
+        "    Space1-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE1-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space2 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE2-1 ATU,            !- Name",
+        "    Space2-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE2-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE1-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space1-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE1-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE2-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space2-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE2-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  BranchList,",
+        "    VAV Sys 1 Branches,      !- Name",
+        "    VAV Sys 1 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 1 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 1,            !- Component 4 Name",
+        "    VAV Sys 1 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 1,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 1 Avail List,    !- Availability Manager List Name",
+        "    1.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 1 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 1,  !- Name",
+        "    Zone Eq In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter,  !- Name",
+        "    Zone Eq In Node,         !- Inlet Node Name",
+        "    SPACE1-1 ATU In Node;    !- Outlet 1 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath1,          !- Name",
+        "    Demand Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer,   !- Name",
+        "    Demand Out Node,         !- Outlet Node Name",
+        "    Space1 Ret Node;         !- Inlet 1 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 1,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.35326,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 1 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name",
+
+        "  BranchList,",
+        "    VAV Sys 2 Branches,      !- Name",
+        "    VAV Sys 2 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 2 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 2,            !- Component 4 Name",
+        "    VAV Sys 2 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 2 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 2,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 2 Avail List,    !- Availability Manager List Name",
+        "    1.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 2 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 2 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand 2 Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq 2 In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 2 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 2,  !- Name",
+        "    Zone Eq 2 In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter 2;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter 2,  !- Name",
+        "    Zone Eq 2 In Node,         !- Inlet Node Name",
+        "    SPACE2-1 ATU In Node;    !- Outlet 2 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath2,          !- Name",
+        "    Demand 2 Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer 2;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer 2,   !- Name",
+        "    Demand 2 Out Node,         !- Outlet Node Name",
+        "    Space2 Ret Node;         !- Inlet 2 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 2,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.35326,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 2 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 2 Outlet Node;   !- Air Outlet Node Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream(""));
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SingleDuct::GetSysInput(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SplitterComponent::GetSplitterInput();
+    EXPECT_TRUE(compare_err_stream(""));
+    SimAirServingZones::GetAirPathData(state);
+    // Expect warnings about no controllers, clear err_stream
+    EXPECT_TRUE(has_err_output(true));
+    SimAirServingZones::InitAirLoops(state, true);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    // And finally, all of this gymnastics just to check if the airloopnums get set correctly
+    // For this test, each ADUs should be connected to a different airloop
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
+}
+
+TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Space1;                  !- Name",
+
+        "Zone,",
+        "  Space2;                !- Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space1,                   !- Zone Name",
+        "    Space1 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space1-1 In Node,         !- Zone Air Inlet Node or NodeList Name",
+        "    Space1 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space1 Node,              !- Zone Air Node Name",
+        "    Space1 Ret Node;          !- Zone Return Air Node Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space2,                   !- Zone Name",
+        "    Space2 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space2 Inlet Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    Space2 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space2 Node,              !- Zone Air Node Name",
+        "    Space2 Return Nodes;      !- Zone Return Air Node Name",
+
+        "  NodeList,",
+        "    Space2 Inlet Nodes,       !- Name",
+        "    Space2-1 In Node,         !- Node 1 Name",
+        "    Space2-2 In Node;         !- Node 2 Name",
+
+        "  NodeList,",
+        "    Space2 Return Nodes,       !- Name",
+        "    Space2-1 Ret Node,         !- Node 1 Name",
+        "    Space2-2 Ret Node;         !- Node 2 Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space1 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE1-1 ATU,            !- Name",
+        "    Space1-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE1-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space2 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "    ,                        !- Zone cooling fraction thingy",
+        "    ,                        !- Zone heating fraction thingy",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+        "    SPACE2-2 ATU,            !- Zone Equipment 2 Name",
+        "    2,                       !- Zone Equipment 2 Cooling Sequence",
+        "    2;                       !- Zone Equipment 2 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE2-1 ATU,            !- Name",
+        "    Space2-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE2-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE2-2 ATU,            !- Name",
+        "    Space2-2 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE2-2 VAV Reheat;     !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE1-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space1-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE1-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE2-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space2-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE2-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE2-2 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space2-2 In Node,        !- Air Outlet Node Name",
+        "    SPACE2-2 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  BranchList,",
+        "    VAV Sys 1 Branches,      !- Name",
+        "    VAV Sys 1 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 1 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 1,            !- Component 4 Name",
+        "    VAV Sys 1 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 1,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 1 Avail List,    !- Availability Manager List Name",
+        "    1.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 1 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 1,  !- Name",
+        "    Zone Eq In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter,  !- Name",
+        "    Zone Eq In Node,         !- Inlet Node Name",
+        "    SPACE1-1 ATU In Node,    !- Outlet 1 Node Name",
+        "    SPACE2-2 ATU In Node;    !- Outlet 2 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath1,          !- Name",
+        "    Demand Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer,   !- Name",
+        "    Demand Out Node,         !- Outlet Node Name",
+        "    Space1 Ret Node,         !- Inlet 1 Node Name",
+        "    Space2-2 Ret Node;       !- Inlet 2 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 1,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.35326,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 1 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name",
+
+        "  BranchList,",
+        "    VAV Sys 2 Branches,      !- Name",
+        "    VAV Sys 2 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 2 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 2,            !- Component 4 Name",
+        "    VAV Sys 2 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 2 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 2,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 2 Avail List,    !- Availability Manager List Name",
+        "    1.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 2 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 2 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand 2 Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq 2 In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 2 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 2,  !- Name",
+        "    Zone Eq 2 In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter 2;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter 2,  !- Name",
+        "    Zone Eq 2 In Node,         !- Inlet Node Name",
+        "    SPACE2-1 ATU In Node;    !- Outlet 2 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath2,          !- Name",
+        "    Demand 2 Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer 2;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer 2,   !- Name",
+        "    Demand 2 Out Node,         !- Outlet Node Name",
+        "    Space2-1 Ret Node;         !- Inlet 2 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 2,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.35326,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 2 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 2 Outlet Node;   !- Air Outlet Node Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream(""));
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SingleDuct::GetSysInput(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SplitterComponent::GetSplitterInput();
+    EXPECT_TRUE(compare_err_stream(""));
+    SimAirServingZones::GetAirPathData(state);
+    // Expect warnings about no controllers, clear err_stream
+    EXPECT_TRUE(has_err_output(true));
+    SimAirServingZones::InitAirLoops(state, true);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    // And finally, all of this gymnastics just to check if the airloopnums get set correctly
+    // For this test, each ADU 1-1 and 2-2 should be connected to airloop 1, and ADU 2-1 to airloop 1
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(2), 1);
+}
+
+TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  Space1;                  !- Name",
+
+        "Zone,",
+        "  Space2;                !- Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space1,                   !- Zone Name",
+        "    Space1 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space1-1 In Node,         !- Zone Air Inlet Node or NodeList Name",
+        "    Space1 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space1 Node,              !- Zone Air Node Name",
+        "    Space1 Ret Node;          !- Zone Return Air Node Name",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Space2,                   !- Zone Name",
+        "    Space2 Eq,                !- Zone Conditioning Equipment List Name",
+        "    Space2 Inlet Nodes,       !- Zone Air Inlet Node or NodeList Name",
+        "    Space2 Out Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "    Space2 Node,              !- Zone Air Node Name",
+        "    Space2 Return Nodes;      !- Zone Return Air Node Name",
+
+        "  NodeList,",
+        "    Space2 Inlet Nodes,       !- Name",
+        "    Space2-1 In Node,         !- Node 1 Name",
+        "    Space2-2 In Node;         !- Node 2 Name",
+
+        "  NodeList,",
+        "    Space2 Return Nodes,       !- Name",
+        "    Space2-1 Ret Node,         !- Node 1 Name",
+        "    Space2-2 Ret Node;         !- Node 2 Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space1 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE1-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE1-1 ATU,            !- Name",
+        "    Space1-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE1-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Space2 Eq,               !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SPACE2-1 ATU,            !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1,                       !- Zone Equipment 1 Heating or No - Load Sequence",
+        "    ,                        !- Zone cooling fraction thingy",
+        "    ,                        !- Zone heating fraction thingy",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type",
+        "    SPACE2-2 ATU,            !- Zone Equipment 2 Name",
+        "    2,                       !- Zone Equipment 2 Cooling Sequence",
+        "    2;                       !- Zone Equipment 2 Heating or No - Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE2-1 ATU,            !- Name",
+        "    Space2-1 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE2-1 VAV Reheat;     !- Air Terminal Name",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SPACE2-2 ATU,            !- Name",
+        "    Space2-2 In Node,        !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:VAV:NoReheat,  !- Air Terminal Object Type",
+        "    SPACE2-2 VAV Reheat;     !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE1-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space1-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE1-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE2-1 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space2-1 In Node,        !- Air Outlet Node Name",
+        "    SPACE2-1 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  AirTerminal:SingleDuct:VAV:NoReheat,",
+        "    SPACE2-2 VAV Reheat,     !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Space2-2 In Node,        !- Air Outlet Node Name",
+        "    SPACE2-2 ATU In Node,    !- Air Inlet Node Name",
+        "    1.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Constant,                !- Zone Minimum Air Flow Input Method",
+        "    0.3;                     !- Constant Minimum Air Flow Fraction",
+
+        "  BranchList,",
+        "    VAV Sys 1 Branches,      !- Name",
+        "    VAV Sys 1 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 1 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 1,            !- Component 4 Name",
+        "    VAV Sys 1 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 1,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 1 Avail List,    !- Availability Manager List Name",
+        "    1.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 1 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 1,  !- Name",
+        "    Zone Eq In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter,  !- Name",
+        "    Zone Eq In Node,         !- Inlet Node Name",
+        "    SPACE1-1 ATU In Node;    !- Outlet 1 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath1,          !- Name",
+        "    Demand Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer,   !- Name",
+        "    Demand Out Node,         !- Outlet Node Name",
+        "    Space1 Ret Node;         !- Inlet 1 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 1,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.35326,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 1 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 1 Outlet Node;   !- Air Outlet Node Name",
+
+        "  BranchList,",
+        "    VAV Sys 2 Branches,      !- Name",
+        "    VAV Sys 2 Main Branch;   !- Branch 1 Name",
+
+        "  Branch,",
+        "    VAV Sys 2 Main Branch,   !- Name",
+        "    ,                        !- Pressure Drop Curve Name",
+        "    Fan:VariableVolume,      !- Component 4 Object Type",
+        "    Supply Fan 2,            !- Component 4 Name",
+        "    VAV Sys 2 Inlet Node,    !- Component 4 Inlet Node Name",
+        "    VAV Sys 2 Outlet Node;   !- Component 4 Outlet Node Name",
+
+        "  AirLoopHVAC,",
+        "    VAV Sys 2,               !- Name",
+        "    ,                        !- Controller List Name",
+        "    VAV Sys 2 Avail List,    !- Availability Manager List Name",
+        "    1.0,                     !- Design Supply Air Flow Rate {m3/s}",
+        "    VAV Sys 2 Branches,      !- Branch List Name",
+        "    ,                        !- Connector List Name",
+        "    VAV Sys 2 Inlet Node,    !- Supply Side Inlet Node Name",
+        "    Demand 2 Out Node,         !- Demand Side Outlet Node Name",
+        "    Zone Eq 2 In Node,         !- Demand Side Inlet Node Names",
+        "    VAV Sys 2 Outlet Node;   !- Supply Side Outlet Node Names",
+
+        "  AirLoopHVAC:SupplyPath,",
+        "    Zone Supply Air Path 2,  !- Name",
+        "    Zone Eq 2 In Node,         !- Supply Air Path Inlet Node Name",
+        "    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type",
+        "    Zone Supply Air Splitter 2;  !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneSplitter,",
+        "    Zone Supply Air Splitter 2,  !- Name",
+        "    Zone Eq 2 In Node,         !- Inlet Node Name",
+        "    SPACE2-2 ATU In Node,    !- Outlet 1 Node Name",
+        "    SPACE2-1 ATU In Node;    !- Outlet 2 Node Name",
+
+        "  AirLoopHVAC:ReturnPath,",
+        "    ReturnAirPath2,          !- Name",
+        "    Demand 2 Out Node,         !- Return Air Path Outlet Node Name",
+        "    AirLoopHVAC:ZoneMixer,   !- Component 1 Object Type",
+        "    Zone Return Air Mixer 2;   !- Component 1 Name",
+
+        "  AirLoopHVAC:ZoneMixer,",
+        "    Zone Return Air Mixer 2,   !- Name",
+        "    Demand 2 Out Node,         !- Outlet Node Name",
+        "    Space2-1 Ret Node,         !- Inlet 1 Node Name",
+        "    Space2-2 Ret Node;         !- Inlet 2 Node Name",
+
+        "  Fan:VariableVolume,",
+        "    Supply Fan 2,            !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    0.7,                     !- Fan Total Efficiency",
+        "    600.0,                   !- Pressure Rise {Pa}",
+        "    1.0,                     !- Maximum Flow Rate {m3/s}",
+        "    FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method",
+        "    ,                        !- Fan Power Minimum Flow Fraction",
+        "    0.35326,                 !- Fan Power Minimum Air Flow Rate {m3/s}",
+        "    0.9,                     !- Motor Efficiency",
+        "    1.0,                     !- Motor In Airstream Fraction",
+        "    0.0015302446,            !- Fan Power Coefficient 1",
+        "    0.0052080574,            !- Fan Power Coefficient 2",
+        "    1.1086242,               !- Fan Power Coefficient 3",
+        "    -0.11635563,             !- Fan Power Coefficient 4",
+        "    0.000,                   !- Fan Power Coefficient 5",
+        "    VAV Sys 2 Inlet Node,    !- Air Inlet Node Name",
+        "    VAV Sys 2 Outlet Node;   !- Air Outlet Node Name",
+
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    EXPECT_TRUE(compare_err_stream(""));
+    DataZoneEquipment::GetZoneEquipmentData1(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SingleDuct::GetSysInput(state);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    SplitterComponent::GetSplitterInput();
+    EXPECT_TRUE(compare_err_stream(""));
+    SimAirServingZones::GetAirPathData(state);
+    // Expect warnings about no controllers, clear err_stream
+    EXPECT_TRUE(has_err_output(true));
+    SimAirServingZones::InitAirLoops(state, true);
+    EXPECT_TRUE(compare_err_stream(""));
+    ASSERT_FALSE(ErrorsFound);
+    // And finally, all of this gymnastics just to check if the airloopnums get set correctly
+    // For this test, ADU 1-1 should be connected to airloop 1, and ADU 2-1 and ADU 2-2 to airloop 2
+    // This test should fail before the fix for 7518 is added
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1), 1);
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(1), 2);
+    EXPECT_EQ(DataZoneEquipment::ZoneEquipConfig(2).InletNodeAirLoopNum(2), 2);
 }
 
 } // namespace EnergyPlus

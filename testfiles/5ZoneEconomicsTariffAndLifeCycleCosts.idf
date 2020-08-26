@@ -103,13 +103,13 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,9.2;
+  Version,9.4;
 
   Building,
     Building,                !- Name
     30.,                     !- North Axis {deg}
     City,                    !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
     FullExterior,            !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -126,7 +126,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    relative;                !- Coordinate System
+    Relative;                !- Coordinate System
 
   ScheduleTypeLimits,
     Any Number;              !- Name
@@ -1703,7 +1703,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE1-1,        !- Name
@@ -1734,7 +1739,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -1765,7 +1775,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE3-1,        !- Name
@@ -1796,7 +1811,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE4-1,        !- Name
@@ -1827,7 +1847,12 @@
     0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
     ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Heating Maximum Air Flow Fraction
+    ,                        !- Design Specification Zone Air Distribution Object Name
+    No,                      !- Account for Dedicated Outdoor Air System
+    NeutralSupplyAir,        !- Dedicated Outdoor Air System Control Strategy
+    autosize,                !- Dedicated Outdoor Air Low Setpoint Temperature for Design {C}
+    autosize;                !- Dedicated Outdoor Air High Setpoint Temperature for Design {C}
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE5-1,        !- Name
@@ -2173,8 +2198,8 @@
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
@@ -2183,8 +2208,8 @@
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -2193,8 +2218,8 @@
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
@@ -2203,8 +2228,8 @@
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
@@ -2213,8 +2238,8 @@
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 ATU,            !- Name
@@ -3377,11 +3402,11 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
@@ -3409,9 +3434,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3423,9 +3448,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML,                    !- Column Separator
@@ -3467,13 +3492,13 @@
   Output:Table:Monthly,
     Zone Electric Summary,   !- Name
     ,                        !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -3543,9 +3568,9 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Electricity:Facility,    !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Gas:Facility,            !- Variable or Meter 3 Name
+    NaturalGas:Facility,            !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Gas:Facility,            !- Variable or Meter 4 Name
+    NaturalGas:Facility,            !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -3567,13 +3592,13 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Diesel:Facility,         !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    FuelOil#1:Facility,      !- Variable or Meter 3 Name
+    FuelOilNo1:Facility,      !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    FuelOil#1:Facility,      !- Variable or Meter 4 Name
+    FuelOilNo1:Facility,      !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    FuelOil#2:Facility,      !- Variable or Meter 5 Name
+    FuelOilNo2:Facility,      !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    FuelOil#2:Facility,      !- Variable or Meter 6 Name
+    FuelOilNo2:Facility,      !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -3633,17 +3658,17 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -3663,25 +3688,25 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Fuel Oil,  !- Name
     ,                        !- Digits After Decimal
-    ExteriorEquipment:FuelOil#1,  !- Variable or Meter 1 Name
+    ExteriorEquipment:FuelOilNo1,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling:FuelOil#1,       !- Variable or Meter 2 Name
+    Cooling:FuelOilNo1,       !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Heating:FuelOil#1,       !- Variable or Meter 3 Name
+    Heating:FuelOilNo1,       !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    WaterSystems:FuelOil#1,  !- Variable or Meter 4 Name
+    WaterSystems:FuelOilNo1,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
-    Cogeneration:FuelOil#1,  !- Variable or Meter 5 Name
+    Cogeneration:FuelOilNo1,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    ExteriorEquipment:FuelOil#2,  !- Variable or Meter 6 Name
+    ExteriorEquipment:FuelOilNo2,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
-    Cooling:FuelOil#2,       !- Variable or Meter 7 Name
+    Cooling:FuelOilNo2,       !- Variable or Meter 7 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 7
-    Heating:FuelOil#2,       !- Variable or Meter 8 Name
+    Heating:FuelOilNo2,       !- Variable or Meter 8 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 8
-    WaterSystems:FuelOil#2,  !- Variable or Meter 9 Name
+    WaterSystems:FuelOilNo2,  !- Variable or Meter 9 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 9
-    Cogeneration:FuelOil#2,  !- Variable or Meter 10 Name
+    Cogeneration:FuelOilNo2,  !- Variable or Meter 10 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 10
 
   Output:Table:Monthly,
@@ -3783,17 +3808,17 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    InteriorEquipment:Gas,   !- Variable or Meter 1 Name
+    InteriorEquipment:NaturalGas,   !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    ExteriorEquipment:Gas,   !- Variable or Meter 2 Name
+    ExteriorEquipment:NaturalGas,   !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Heating:Gas,             !- Variable or Meter 3 Name
+    Heating:NaturalGas,             !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
-    Cooling:Gas,             !- Variable or Meter 4 Name
+    Cooling:NaturalGas,             !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    WaterSystems:Gas,        !- Variable or Meter 5 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
-    Cogeneration:Gas,        !- Variable or Meter 6 Name
+    Cogeneration:NaturalGas,        !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,
@@ -3813,25 +3838,25 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Fuel Oil,  !- Name
     ,                        !- Digits After Decimal
-    ExteriorEquipment:FuelOil#1,  !- Variable or Meter 1 Name
+    ExteriorEquipment:FuelOilNo1,  !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    Cooling:FuelOil#1,       !- Variable or Meter 2 Name
+    Cooling:FuelOilNo1,       !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Heating:FuelOil#1,       !- Variable or Meter 3 Name
+    Heating:FuelOilNo1,       !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
-    WaterSystems:FuelOil#1,  !- Variable or Meter 4 Name
+    WaterSystems:FuelOilNo1,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Cogeneration:FuelOil#1,  !- Variable or Meter 5 Name
+    Cogeneration:FuelOilNo1,  !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
-    ExteriorEquipment:FuelOil#2,  !- Variable or Meter 6 Name
+    ExteriorEquipment:FuelOilNo2,  !- Variable or Meter 6 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 6
-    Cooling:FuelOil#2,       !- Variable or Meter 7 Name
+    Cooling:FuelOilNo2,       !- Variable or Meter 7 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 7
-    Heating:FuelOil#2,       !- Variable or Meter 8 Name
+    Heating:FuelOilNo2,       !- Variable or Meter 8 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 8
-    WaterSystems:FuelOil#2,  !- Variable or Meter 9 Name
+    WaterSystems:FuelOilNo2,  !- Variable or Meter 9 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 9
-    Cogeneration:FuelOil#2,  !- Variable or Meter 10 Name
+    Cogeneration:FuelOilNo2,  !- Variable or Meter 10 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 10
 
   Output:Table:Monthly,
@@ -3937,11 +3962,11 @@
   Output:Table:Monthly,
     Chiller Report,          !- Name
     ,                        !- Digits After Decimal
-    Chiller Electric Energy, !- Variable or Meter 1 Name
+    Chiller Electricity Energy, !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Chiller Electric Power,  !- Variable or Meter 2 Name
+    Chiller Electricity Rate,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Chiller Electric Energy, !- Variable or Meter 3 Name
+    Chiller Electricity Energy, !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
     Chiller Evaporator Cooling Energy,  !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
@@ -3957,11 +3982,11 @@
   Output:Table:Monthly,
     Tower Report,            !- Name
     ,                        !- Digits After Decimal
-    Cooling Tower Fan Electric Energy,  !- Variable or Meter 1 Name
+    Cooling Tower Fan Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling Tower Fan Electric Energy,  !- Variable or Meter 2 Name
+    Cooling Tower Fan Electricity Energy,  !- Variable or Meter 2 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 2
-    Cooling Tower Fan Electric Power,  !- Variable or Meter 3 Name
+    Cooling Tower Fan Electricity Rate,  !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Cooling Tower Heat Transfer Rate,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
@@ -3977,13 +4002,13 @@
     ,                        !- Digits After Decimal
     Boiler Heating Energy,   !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Boiler Gas Energy,       !- Variable or Meter 2 Name
+    Boiler NaturalGas Energy,       !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Boiler Heating Energy,   !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
     Boiler Heating Rate,     !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Boiler Gas Rate,         !- Variable or Meter 5 Name
+    Boiler NaturalGas Rate,         !- Variable or Meter 5 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 5
     Boiler Inlet Temperature,!- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
@@ -3991,7 +4016,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 7
     Boiler Mass Flow Rate,   !- Variable or Meter 8 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 8
-    Boiler Ancillary Electric Power,  !- Variable or Meter 9 Name
+    Boiler Ancillary Electricity Rate,  !- Variable or Meter 9 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 9
 
   Output:Table:Monthly,
@@ -3999,7 +4024,7 @@
     ,                        !- Digits After Decimal
     Cooling Coil Total Cooling Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling Coil Electric Energy,  !- Variable or Meter 2 Name
+    Cooling Coil Electricity Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Cooling Coil Total Cooling Energy,  !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
@@ -4007,7 +4032,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Cooling Coil Latent Cooling Energy,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cooling Coil Crankcase Heater Electric Energy,  !- Variable or Meter 6 Name
+    Cooling Coil Crankcase Heater Electricity Energy,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
     Cooling Coil Runtime Fraction,  !- Variable or Meter 7 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 7
@@ -4019,9 +4044,9 @@
     Maximum,                 !- Aggregation Type for Variable or Meter 10
     Cooling Coil Latent Cooling Rate,  !- Variable or Meter 11 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 11
-    Cooling Coil Electric Power,  !- Variable or Meter 12 Name
+    Cooling Coil Electricity Rate,  !- Variable or Meter 12 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 12
-    Cooling Coil Crankcase Heater Electric Power,  !- Variable or Meter 13 Name
+    Cooling Coil Crankcase Heater Electricity Rate,  !- Variable or Meter 13 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 13
 
   Output:Table:Monthly,
@@ -4207,7 +4232,7 @@
     ,                        !- Digits After Decimal
     Zone Window Air Conditioner Total Cooling Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Window Air Conditioner Electric Energy,  !- Variable or Meter 2 Name
+    Zone Window Air Conditioner Electricity Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Zone Window Air Conditioner Total Cooling Energy,  !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
@@ -4221,7 +4246,7 @@
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 7
     Zone Window Air Conditioner Latent Cooling Rate,  !- Variable or Meter 8 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 8
-    Zone Window Air Conditioner Electric Power,  !- Variable or Meter 9 Name
+    Zone Window Air Conditioner Electricity Rate,  !- Variable or Meter 9 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 9
 
   Output:Table:Monthly,
@@ -4233,7 +4258,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Water Heater Burner Heating Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Water Heater Gas Energy, !- Variable or Meter 4 Name
+    Water Heater NaturalGas Energy, !- Variable or Meter 4 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 5 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 5
@@ -4251,13 +4276,13 @@
   Output:Table:Monthly,
     Generator Report,        !- Name
     ,                        !- Digits After Decimal
-    Generator Produced Electric Energy,  !- Variable or Meter 1 Name
+    Generator Produced AC Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Generator Diesel Energy, !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Generator Gas Energy,    !- Variable or Meter 3 Name
+    Generator NaturalGas Energy,    !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Generator Produced Electric Energy,  !- Variable or Meter 4 Name
+    Generator Produced AC Electricity Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4
     Generator Total Heat Recovery,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
@@ -4321,11 +4346,11 @@
   Output:Table:Monthly,
     Fan Report,              !- Name
     ,                        !- Digits After Decimal
-    Fan Electric Energy,     !- Variable or Meter 1 Name
+    Fan Electricity Energy,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Fan Rise in Air Temperature,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Fan Electric Power,      !- Variable or Meter 3 Name
+    Fan Electricity Rate,      !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Fan Rise in Air Temperature,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 4
@@ -4333,11 +4358,11 @@
   Output:Table:Monthly,
     Pump Report,             !- Name
     ,                        !- Digits After Decimal
-    Pump Electric Energy,    !- Variable or Meter 1 Name
+    Pump Electricity Energy,    !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Pump Fluid Heat Gain Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Pump Electric Power,     !- Variable or Meter 3 Name
+    Pump Electricity Rate,     !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Pump Shaft Power,        !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum,  !- Aggregation Type for Variable or Meter 4
@@ -4399,7 +4424,7 @@
 
   UtilityCost:Tariff,
     ExampleA-Gas,            !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     Therm,                   !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor

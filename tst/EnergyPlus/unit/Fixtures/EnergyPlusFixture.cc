@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,188 +53,24 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+
 // A to Z order
-#include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
-#include <EnergyPlus/CoolTower.hh>
-#include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DElightManagerF.hh>
-#include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataDefineEquip.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
-#include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataUCSDSharedData.hh>
-#include <EnergyPlus/DataZoneControls.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DaylightingManager.hh>
-#include <EnergyPlus/DemandManager.hh>
-#include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DirectAirManager.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/EconomicLifeCycleCost.hh>
-#include <EnergyPlus/EconomicTariff.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/EvaporativeCoolers.hh>
-#include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
-#include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/GroundHeatExchangers.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
-#include <EnergyPlus/HVACControllers.hh>
-#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
-#include <EnergyPlus/HVACManager.hh>
-#include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HVACStandAloneERV.hh>
-#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
-#include <EnergyPlus/HeatBalanceAirManager.hh>
-#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
-#include <EnergyPlus/HeatRecovery.hh>
-#include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HighTempRadiantSystem.hh>
-#include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/MixerComponent.hh>
-#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/OutputReportTabularAnnual.hh>
-#include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PVWatts.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
-#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/PipeHeatTransfer.hh>
-#include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
-#include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/PlantCentralGSHP.hh>
-#include <EnergyPlus/PlantChillers.hh>
-#include <EnergyPlus/PlantCondLoopOperation.hh>
-#include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantPipingSystemsManager.hh>
-#include <EnergyPlus/PlantPressureSystem.hh>
-#include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/PlantValves.hh>
-#include <EnergyPlus/PollutionModule.hh>
-#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Pumps.hh>
-#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsSchema.hh>
-#include <EnergyPlus/ReturnAirPathManager.hh>
-#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
-#include <EnergyPlus/RoomAirModelManager.hh>
-#include <EnergyPlus/RuntimeLanguageProcessor.hh>
-#include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SetPointManager.hh>
-#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SingleDuct.hh>
-#include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SolarCollectors.hh>
-#include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
-#include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/SwimmingPool.hh>
-#include <EnergyPlus/SystemAvailabilityManager.hh>
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/UnitHeater.hh>
-#include <EnergyPlus/UnitVentilator.hh>
-#include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/VentilatedSlab.hh>
-#include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
-#include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-
+#include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
+#include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
@@ -245,23 +81,32 @@ void EnergyPlusFixture::SetUpTestCase()
     EnergyPlus::inputProcessor = InputProcessor::factory();
 }
 
+void EnergyPlusFixture::openOutputFiles(IOFiles &ioFiles)
+{
+    ioFiles.eio.open_as_stringstream();
+    ioFiles.mtr.open_as_stringstream();
+    ioFiles.eso.open_as_stringstream();
+    ioFiles.audit.open_as_stringstream();
+    ioFiles.bnd.open_as_stringstream();
+    ioFiles.debug.open_as_stringstream();
+    ioFiles.mtd.open_as_stringstream();
+    ioFiles.edd.open_as_stringstream();
+}
+
 void EnergyPlusFixture::SetUp()
 {
-    clear_all_states();
+    EnergyPlus::clearAllStates(state);
+    EnergyPlus::inputProcessor->clear_state();
 
     show_message();
 
-    this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->eio_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
+    openOutputFiles(state.files);
 
-    DataGlobals::eso_stream = this->eso_stream.get();
-    DataGlobals::eio_stream = this->eio_stream.get();
-    DataGlobals::mtr_stream = this->mtr_stream.get();
-    DataGlobals::err_stream = this->err_stream.get();
-    DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
+    this->err_stream = new std::ostringstream;
+    this->json_stream = new std::ostringstream;
+
+    state.files.err_stream = std::unique_ptr<std::ostream>(this->err_stream);
+    state.files.json.json_stream = std::unique_ptr<std::ostream>(this->json_stream);
 
     m_cout_buffer = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     m_redirect_cout = std::unique_ptr<RedirectCout>(new RedirectCout(m_cout_buffer));
@@ -272,208 +117,29 @@ void EnergyPlusFixture::SetUp()
     UtilityRoutines::outputErrorHeader = false;
 
     Psychrometrics::InitializePsychRoutines();
+    FluidProperties::InitializeGlycRoutines();
     createCoilSelectionReportObj();
 }
 
 void EnergyPlusFixture::TearDown()
 {
 
-    clear_all_states();
-
     {
         IOFlags flags;
         flags.DISPOSE("DELETE");
-        ObjexxFCL::gio::close(OutputProcessor::OutputFileMeterDetails, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileStandard, flags);
-        ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileInits, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileZoneSizing, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileSysSizing, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileMeters, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileBNDetails, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileShadingFrac, flags);
+        state.files.mtd.del();
+        state.files.eso.del();
+        state.files.err_stream.reset();
+        state.files.eio.del();
+        state.files.debug.del();
+        state.files.zsz.del();
+        state.files.ssz.del();
+        state.files.mtr.del();
+        state.files.bnd.del();
+        state.files.shade.del();
     }
-}
 
-void EnergyPlusFixture::clear_all_states()
-{
-    // A to Z order
-    AirflowNetworkBalanceManager::clear_state();
-    BaseboardElectric::clear_state();
-    BaseboardRadiator::clear_state();
-    Boilers::clear_state();
-    BoilerSteam::clear_state();
-    BranchInputManager::clear_state();
-    CoolingPanelSimple::clear_state();
-    ChillerElectricEIR::clear_state();
-    ChillerExhaustAbsorption::clear_state();
-    ChillerGasAbsorption::clear_state();
-    ChillerIndirectAbsorption::clear_state();
-    CondenserLoopTowers::clear_state();
-    CoolTower::clear_state();
-    CrossVentMgr::clear_state();
-    CurveManager::clear_state();
-    AirflowNetwork::clear_state();
-    DataAirLoop::clear_state();
-    DataBranchAirLoopPlant::clear_state();
-    DataAirSystems::clear_state();
-    DataBranchNodeConnections::clear_state();
-    DataContaminantBalance::clear_state();
-    DataConvergParams::clear_state();
-    DataDefineEquip::clear_state();
-    DataEnvironment::clear_state();
-    DataErrorTracking::clear_state();
-    DataGenerators::clear_state();
-    DataGlobals::clear_state();
-    DataHeatBalance::clear_state();
-    DataHeatBalFanSys::clear_state();
-    DataHeatBalSurface::clear_state();
-    DataHVACGlobals::clear_state();
-    DataIPShortCuts::clear_state();
-    DataLoopNode::clear_state();
-    DataMoistureBalance::clear_state();
-    DataMoistureBalanceEMPD::clear_state();
-    DataOutputs::clear_state();
-    DataPlant::clear_state();
-    DataRoomAirModel::clear_state();
-    DataRuntimeLanguage::clear_state();
-    DataSizing::clear_state();
-    DataStringGlobals::clear_state();
-    DataSurfaceLists::clear_state();
-    DataSurfaces::clear_state();
-    DataSystemVariables::clear_state();
-    DataUCSDSharedData::clear_state();
-    DataZoneControls::clear_state();
-    DataZoneEnergyDemands::clear_state();
-    DataZoneEquipment::clear_state();
-    DaylightingManager::clear_state();
-    DemandManager::clear_state();
-    DesiccantDehumidifiers::clear_state();
-    DirectAirManager::clear_state();
-    DualDuct::clear_state();
-    DXCoils::clear_state();
-    clearFacilityElectricPowerServiceObject();
-    EarthTube::clear_state();
-    EconomicLifeCycleCost::clear_state();
-    EconomicTariff::clear_state();
-    EMSManager::clear_state();
-    EvaporativeCoolers::clear_state();
-    EvaporativeFluidCoolers::clear_state();
-    ExteriorEnergyUse::clear_state();
-    FanCoilUnits::clear_state();
-    Fans::clear_state();
-    FaultsManager::clear_state();
-    FluidCoolers::clear_state();
-    FluidProperties::clear_state();
-    Furnaces::clear_state();
-    GlobalNames::clear_state();
-    GroundHeatExchangers::clear_state();
-    GroundTemperatureManager::clear_state();
-    HeatBalanceAirManager::clear_state();
-    HeatBalanceIntRadExchange::clear_state();
-    HeatBalanceManager::clear_state();
-    HeatBalanceSurfaceManager::clear_state();
-    HeatBalFiniteDiffManager::clear_state();
-    HeatPumpWaterToWaterSimple::GshpSpecs::clear_state();
-    HeatPumpWaterToWaterCOOLING::clear_state();
-    HeatPumpWaterToWaterHEATING::clear_state();
-    HeatRecovery::clear_state();
-    HeatingCoils::clear_state();
-    HighTempRadiantSystem::clear_state();
-    Humidifiers::clear_state();
-    HVACControllers::clear_state();
-    HVACDXHeatPumpSystem::clear_state();
-    HVACDXSystem::clear_state();
-    HVACHXAssistedCoolingCoil::clear_state();
-    HVACFan::clearHVACFanObjects();
-    HVACManager::clear_state();
-    HVACSingleDuctInduc::clear_state();
-    HVACStandAloneERV::clear_state();
-    HVACUnitaryBypassVAV::clear_state();
-    HVACVariableRefrigerantFlow::clear_state();
-    HybridModel::clear_state();
-    HysteresisPhaseChange::clear_state();
-    EnergyPlus::inputProcessor->clear_state();
-    IceThermalStorage::clear_state();
-    IntegratedHeatPump::clear_state();
-    InternalHeatGains::clear_state();
-    LowTempRadiantSystem::clear_state();
-    MixedAir::clear_state();
-    MixerComponent::clear_state();
-    MoistureBalanceEMPDManager::clear_state();
-    NodeInputManager::clear_state();
-    OutAirNodeManager::clear_state();
-    OutdoorAirUnit::clear_state();
-    OutputProcessor::clear_state();
-    OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state();
-    OutputReportTabularAnnual::clear_state();
-    OutsideEnergySources::clear_state();
-    PackagedTerminalHeatPump::clear_state();
-    Pipes::clear_state();
-    PipeHeatTransfer::clear_state();
-    PlantCentralGSHP::clear_state();
-    PlantChillers::clear_state();
-    PlantCondLoopOperation::clear_state();
-    PlantLoadProfile::clear_state();
-    PlantLoopSolver::clear_state();
-    PlantManager::clear_state();
-    PlantPipingSystemsManager::clear_state();
-    PlantPressureSystem::clear_state();
-    PlantUtilities::clear_state();
-    PlantPipingSystemsManager::clear_state();
-    PlantValves::clear_state();
-    PollutionModule::clear_state();
-    PoweredInductionUnits::clear_state();
-    Psychrometrics::clear_state();
-    Pumps::clear_state();
-    PurchasedAirManager::clear_state();
-    PVWatts::clear_state();
-    clearCoilSelectionReportObj(); // ReportCoilSelection
-    ReturnAirPathManager::clear_state();
-    RoomAirModelAirflowNetwork::clear_state();
-    RoomAirModelManager::clear_state();
-    RuntimeLanguageProcessor::clear_state();
-    ScheduleManager::clear_state();
-    SetPointManager::clear_state();
-    SimAirServingZones::clear_state();
-    SimulationManager::clear_state();
-    SingleDuct::clear_state();
-    SizingManager::clear_state();
-    SolarCollectors::clear_state();
-    SolarShading::clear_state();
-    SplitterComponent::clear_state();
-    SteamCoils::clear_state();
-    SurfaceGeometry::clear_state();
-    SystemAvailabilityManager::clear_state();
-    SwimmingPool::clear_state();
-    ThermalComfort::clear_state();
-    UnitarySystems::clear_state();
-    UnitHeater::clear_state();
-    UnitVentilator::clear_state();
-    VariableSpeedCoils::clear_state();
-    VentilatedSlab::clear_state();
-    WaterCoils::clear_state();
-    WaterThermalTanks::clear_state();
-    WaterToAirHeatPumpSimple::clear_state();
-    EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::clear_state();
-    WaterUse::clear_state();
-    WeatherManager::clear_state();
-    WindowAC::clear_state();
-    WindowComplexManager::clear_state();
-    WindowEquivalentLayer::clear_state();
-    WindowManager::clear_state();
-    ZoneAirLoopEquipmentManager::clear_state();
-    ZoneContaminantPredictorCorrector::clear_state();
-    ZoneDehumidifier::clear_state();
-    ZoneEquipmentManager::clear_state();
-    ZonePlenum::clear_state();
-    ZoneTempPredictorCorrector::clear_state();
-    ResultsFramework::clear_state();
+    clearAllStates(this->state);
 }
 
 std::string EnergyPlusFixture::delimited_string(std::vector<std::string> const &strings, std::string const &delimiter)
@@ -507,28 +173,28 @@ bool EnergyPlusFixture::compare_json_stream(std::string const &expected_string, 
 
 bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = this->eso_stream->str();
+    auto const stream_str = state.files.eso.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->eso_stream->str(std::string());
+    if (reset_stream) state.files.eso.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = this->eio_stream->str();
+    auto const stream_str = state.files.eio.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->eio_stream->str(std::string());
+    if (reset_stream) state.files.eio.open_as_stringstream();
     return are_equal;
 }
 
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = this->mtr_stream->str();
+    auto const stream_str = state.files.mtr.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->mtr_stream->str(std::string());
+    if (reset_stream) state.files.mtr.open_as_stringstream();
     return are_equal;
 }
 
@@ -559,6 +225,15 @@ bool EnergyPlusFixture::compare_cerr_stream(std::string const &expected_string, 
     return are_equal;
 }
 
+bool EnergyPlusFixture::compare_dfs_stream(std::string const &expected_string, bool reset_stream)
+{
+    auto const stream_str = state.files.dfs.get_output();
+    EXPECT_EQ(expected_string, stream_str);
+    bool are_equal = (expected_string == stream_str);
+    if (reset_stream) state.files.dfs.open_as_stringstream();
+    return are_equal;
+}
+
 bool EnergyPlusFixture::has_json_output(bool reset_stream)
 {
     auto const has_output = this->json_stream->str().size() > 0;
@@ -568,22 +243,22 @@ bool EnergyPlusFixture::has_json_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 {
-    auto const has_output = this->eso_stream->str().size() > 0;
-    if (reset_stream) this->eso_stream->str(std::string());
+    auto const has_output = !state.files.eso.get_output().empty();
+    if (reset_stream) state.files.eso.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = this->eio_stream->str().size() > 0;
-    if (reset_stream) this->eio_stream->str(std::string());
+    auto const has_output = !state.files.eio.get_output().empty();
+    if (reset_stream) state.files.eio.open_as_stringstream();
     return has_output;
 }
 
 bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
 {
-    auto const has_output = this->mtr_stream->str().size() > 0;
-    if (reset_stream) this->mtr_stream->str(std::string());
+    auto const has_output = !state.files.mtr.get_output().empty();
+    if (reset_stream) state.files.mtr.open_as_stringstream();
     return has_output;
 }
 
@@ -608,11 +283,22 @@ bool EnergyPlusFixture::has_cerr_output(bool reset_stream)
     return has_output;
 }
 
+bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
+{
+    auto const has_output = !state.files.dfs.get_output().empty();
+    if (reset_stream) state.files.dfs.open_as_stringstream();
+    return has_output;
+}
+
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
 {
     bool success = true;
     inputProcessor->epJSON = inputProcessor->idf_parser->decode(idf_snippet, inputProcessor->schema, success);
 
+    // Add common objects that will trigger a warning if not present
+    if (inputProcessor->epJSON.find("Version") == inputProcessor->epJSON.end()) {
+        inputProcessor->epJSON["Version"] = {{"", {{"idf_order", 0}, {"version_identifier", DataStringGlobals::MatchVersion}}}};
+    }
     if (inputProcessor->epJSON.find("Building") == inputProcessor->epJSON.end()) {
         inputProcessor->epJSON["Building"] = {{"Bldg",
                                                {{"idf_order", 0},

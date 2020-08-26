@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,20 +53,20 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <EarthTube.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/EarthTube.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -99,6 +99,7 @@ namespace EarthTube {
     static std::string const BlankString;
 
     int TotEarthTube(0); // Total EarthTube Statements in input
+    bool GetInputFlag(true);
     // Parameters for Ventilation
     int const NaturalEarthTube(0);
     int const IntakeEarthTube(1);
@@ -116,6 +117,7 @@ namespace EarthTube {
     void clear_state()
     {
         TotEarthTube = 0;
+        GetInputFlag = true;
         EarthTubeSys.deallocate();
         ZnRptET.deallocate();
     }
@@ -133,8 +135,7 @@ namespace EarthTube {
         // the other drivers and simulation algorithms.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool GetInputFlag(true);
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
 
         // Obtains and Allocates heat balance related parameters from input file
         if (GetInputFlag) {
@@ -416,7 +417,7 @@ namespace EarthTube {
                                         "System",
                                         "State",
                                         Zone(EarthTubeSys(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Earth Tube Fan Electric Energy",
+                    SetupOutputVariable("Earth Tube Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRptET(EarthTubeSys(Loop).ZonePtr).EarthTubeFanElec,
                                         "System",
@@ -427,7 +428,7 @@ namespace EarthTube {
                                         _,
                                         _,
                                         "Building");
-                    SetupOutputVariable("Earth Tube Fan Electric Power",
+                    SetupOutputVariable("Earth Tube Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRptET(EarthTubeSys(Loop).ZonePtr).EarthTubeFanElecPower,
                                         "System",
@@ -533,12 +534,8 @@ namespace EarthTube {
         Real64 AirMassFlowRate;      // Actual Mass Flow Rate of Air inside Pipe
         Real64 AirSpecHeat;          // Specific Heat of Air
         Real64 AirDensity;           // Density of Air
-        static Array1D<Real64> EVF;  // DESIGN EARTHTUBE FLOW RATE (M**3/SEC)
 
-        // Allocate the EVF array
-        if (!allocated(EVF)) EVF.allocate(NumOfZones);
-
-        EVF = 0.0;
+        Real64 EVF;
         MCPTE = 0.0;
         MCPE = 0.0;
         EAMFL = 0.0;
@@ -556,9 +553,9 @@ namespace EarthTube {
             if (std::abs(MAT(NZ) - OutDryBulbTemp) < EarthTubeSys(Loop).DelTemperature) continue;
 
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, OutDryBulbTemp, OutHumRat);
-            AirSpecHeat = PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp);
-            EVF(NZ) = EarthTubeSys(Loop).DesignLevel * GetCurrentScheduleValue(EarthTubeSys(Loop).SchedPtr);
-            MCPE(NZ) = EVF(NZ) * AirDensity * AirSpecHeat *
+            AirSpecHeat = PsyCpAirFnW(OutHumRat);
+            EVF = EarthTubeSys(Loop).DesignLevel * GetCurrentScheduleValue(EarthTubeSys(Loop).SchedPtr);
+            MCPE(NZ) = EVF * AirDensity * AirSpecHeat *
                        (EarthTubeSys(Loop).ConstantTermCoef + std::abs(OutDryBulbTemp - MAT(NZ)) * EarthTubeSys(Loop).TemperatureTermCoef +
                         WindSpeed * (EarthTubeSys(Loop).VelocityTermCoef + WindSpeed * EarthTubeSys(Loop).VelocitySQTermCoef));
 
@@ -567,8 +564,8 @@ namespace EarthTube {
                 EarthTubeSys(Loop).FanPower = EAMFL(NZ) * EarthTubeSys(Loop).FanPressure / (EarthTubeSys(Loop).FanEfficiency * AirDensity);
             }
 
-            AverPipeAirVel = EVF(NZ) / Pi / pow_2(EarthTubeSys(Loop).r1);
-            AirMassFlowRate = EVF(NZ) * AirDensity;
+            AverPipeAirVel = EVF / Pi / pow_2(EarthTubeSys(Loop).r1);
+            AirMassFlowRate = EVF * AirDensity;
 
             // Calculation of Average Ground Temperature between Depth z1 and z2 at time t
             GroundTempz1z2t = EarthTubeSys(Loop).AverSoilSurTemp -
@@ -717,7 +714,7 @@ namespace EarthTube {
 
             // Break the infiltration load into heat gain and loss components.
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, OutDryBulbTemp, OutHumRat);
-            CpAir = PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp);
+            CpAir = PsyCpAirFnW(OutHumRat);
             ZnRptET(ZoneLoop).EarthTubeVolume = (MCPE(ZoneLoop) / CpAir / AirDensity) * ReportingConstant;
             ZnRptET(ZoneLoop).EarthTubeMass = (MCPE(ZoneLoop) / CpAir) * ReportingConstant;
             ZnRptET(ZoneLoop).EarthTubeVolFlowRate = MCPE(ZoneLoop) / CpAir / AirDensity;

@@ -21,7 +21,7 @@
 ! Note, this file was completely changed from Ver. 1.1.1 to 1.2 to add tests for different PV generators
 ! note  this file was changed for Ver. 1.2.2 to add new strategies for ventilated mounting configurations
 
-  Version,9.2;
+  Version,9.4;
 
   Timestep,4;
 
@@ -29,7 +29,7 @@
     PVtest,                  !- Name
     0,                       !- North Axis {deg}
     Suburbs,                 !- Terrain
-    0.04,                    !- Loads Convergence Tolerance Value
+    0.04,                    !- Loads Convergence Tolerance Value {W}
     0.40,                    !- Temperature Convergence Tolerance Value {deltaC}
     FullInteriorAndExterior, !- Solar Distribution
     25,                      !- Maximum Number of Warmup Days
@@ -180,6 +180,7 @@
     1,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.0,                     !- Tube Spacing {m}
+    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
     PVModule(glass),         !- Outside Layer
     PVModule(glass),         !- Layer 2
     B4 - 3 IN INSULATION,    !- Layer 3
@@ -588,8 +589,8 @@
     Zone1Air,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:IdealLoadsAirSystem,
     Zone1Air,                !- Name
@@ -710,27 +711,27 @@
     Simple PV South Vertical,!- Generator 1 Name
     Generator:Photovoltaic,  !- Generator 1 Object Type
     20000,                   !- Generator 1 Rated Electric Power Output {W}
-    always on,               !- Generator 1 Availability Schedule Name
+    ,                        !- Generator 1 Availability Schedule Name
     ,                        !- Generator 1 Rated Thermal to Electrical Power Ratio
     Simple PV Lat Tilt,      !- Generator 2 Name
     Generator:Photovoltaic,  !- Generator 2 Object Type
     20000,                   !- Generator 2 Rated Electric Power Output {W}
-    always on,               !- Generator 2 Availability Schedule Name
+    ,                        !- Generator 2 Availability Schedule Name
     ,                        !- Generator 2 Rated Thermal to Electrical Power Ratio
     Simple PV Flat,          !- Generator 3 Name
     Generator:Photovoltaic,  !- Generator 3 Object Type
     20000,                   !- Generator 3 Rated Electric Power Output {W}
-    always on,               !- Generator 3 Availability Schedule Name
+    ,                        !- Generator 3 Availability Schedule Name
     ,                        !- Generator 3 Rated Thermal to Electrical Power Ratio
     Simple PV Flat:Shaded to East,  !- Generator 4 Name
     Generator:Photovoltaic,  !- Generator 4 Object Type
     20000,                   !- Generator 4 Rated Electric Power Output {W}
-    always on,               !- Generator 4 Availability Schedule Name
+    ,                        !- Generator 4 Availability Schedule Name
     ,                        !- Generator 4 Rated Thermal to Electrical Power Ratio
     Simple PV Flat:Shaded to West,  !- Generator 5 Name
     Generator:Photovoltaic,  !- Generator 5 Object Type
     20000,                   !- Generator 5 Rated Electric Power Output {W}
-    always on,               !- Generator 5 Availability Schedule Name
+    ,                        !- Generator 5 Availability Schedule Name
     ,                        !- Generator 5 Rated Thermal to Electrical Power Ratio
     TRNSYSPV South Vertical, !- Generator 6 Name
     Generator:Photovoltaic,  !- Generator 6 Object Type
@@ -790,7 +791,7 @@
     SIMPLE INTEGRATED PV,    !- Generator 17 Name
     Generator:Photovoltaic,  !- Generator 17 Object Type
     20000,                   !- Generator 17 Rated Electric Power Output {W}
-    always on,               !- Generator 17 Availability Schedule Name
+    ,                        !- Generator 17 Availability Schedule Name
     ,                        !- Generator 17 Rated Thermal to Electrical Power Ratio
     TRNSYSPV INTEGRATED PV,  !- Generator 18 Name
     Generator:Photovoltaic,  !- Generator 18 Object Type
@@ -805,12 +806,13 @@
     SIMPLE Roof Paver PV,    !- Generator 20 Name
     Generator:Photovoltaic,  !- Generator 20 Object Type
     20000,                   !- Generator 20 Rated Electric Power Output {W}
-    always on,               !- Generator 20 Availability Schedule Name
+    ,                        !- Generator 20 Availability Schedule Name
     ,                        !- Generator 20 Rated Thermal to Electrical Power Ratio
     TRNSYSPV Roof Paver PV,  !- Generator 21 Name
     Generator:Photovoltaic,  !- Generator 21 Object Type
     20000,                   !- Generator 21 Rated Electric Power Output {W}
-    always on;               !- Generator 21 Availability Schedule Name
+    ,                        !- Generator 21 Availability Schedule Name
+    ;                        !- Generator 21 Rated Thermal to Electrical Power Ratio
 
   Generator:Photovoltaic,
     SIMPLE INTEGRATED PV,    !- Name
@@ -1106,13 +1108,13 @@
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
-  Output:Variable,*,Generator Produced DC Electric Power,hourly;
+  Output:Variable,*,Generator Produced DC Electricity Rate,hourly;
 
-  Output:Variable,*,Generator Produced DC Electric Energy,hourly;
+  Output:Variable,*,Generator Produced DC Electricity Energy,hourly;
 
-  Output:Variable,*,Inverter AC Output Electric Energy,hourly;
+  Output:Variable,*,Inverter AC Output Electricity Energy,hourly;
 
-  Output:Variable,*,Inverter AC Output Electric Power,hourly;
+  Output:Variable,*,Inverter AC Output Electricity Rate,hourly;
 
   Output:Variable,*,Generator PV Array Efficiency,hourly;
 
