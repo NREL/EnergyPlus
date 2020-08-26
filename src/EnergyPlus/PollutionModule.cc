@@ -1113,7 +1113,7 @@ namespace PollutionModule {
                             cCurrentModuleObject, "Coal", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.CoalCoef.NucLoSched, ErrorsFound);
                     }
 
-                } else if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                } else if (SELECT_CASE_var == "ELECTRICITY") {
                     if (Pollution.ElecCoef.FuelFactorUsed) {
                         ShowWarningError(cCurrentModuleObject + ": " + FuelType.FuelTypeNames(Loop) +
                                          " already entered. Previous entry will be used.");

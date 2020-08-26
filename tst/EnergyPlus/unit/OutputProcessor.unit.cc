@@ -1208,9 +1208,6 @@ namespace OutputProcessor {
     TEST_F(SQLiteFixture, OutputProcessor_getStandardMeterResourceType)
     {
         std::map<std::string, std::string> const resource_map = {{"ELECTRICITY", "Electricity"},
-                                                                 {"ELECTRIC", "Electricity"},
-                                                                 {"ELEC", "Electricity"},
-                                                                 {"GAS", "NaturalGas"},
                                                                  {"NATURALGAS", "NaturalGas"},
                                                                  {"GASOLINE", "Gasoline"},
                                                                  {"DIESEL", "Diesel"},
@@ -1218,7 +1215,6 @@ namespace OutputProcessor {
                                                                  {"FUELOILNO1", "FuelOilNo1"},
                                                                  {"FUELOILNO2", "FuelOilNo2"},
                                                                  {"PROPANE", "Propane"},
-                                                                 {"PROPANEGAS", "Propane"},
                                                                  {"WATER", "Water"},
                                                                  {"H2O", "Water"},
                                                                  {"ONSITEWATER", "OnSiteWater"},
