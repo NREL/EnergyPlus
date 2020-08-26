@@ -64,11 +64,6 @@ namespace EnergyPlus {
 
 namespace WaterThermalTanks {
 
-    extern int const heatMode;  // heating source is on, source will not turn off until setpoint temp is reached
-    extern int const floatMode; // heating source is off, source will not turn on until cutin temp is reached
-    extern int const ventMode;  // tank temp is above maximum temperature and water is venting
-    extern int const coolMode;  // cooling source is on, source will not turn off until setpoint temp is reached
-
     enum struct AmbientTempEnum
     {
         Schedule,   // ambient temperature around tank (or HPWH inlet air) is scheduled
@@ -148,21 +143,6 @@ namespace WaterThermalTanks {
         IndirectHeatPrimarySetpoint,
         IndirectHeatAltSetpoint
     };
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int numChilledWaterMixed;        // number of mixed chilled water tanks
-    extern int numChilledWaterStratified;   // number of stratified chilled water tanks
-    extern int numWaterHeaterMixed;         // number of mixed water heaters
-    extern int numWaterHeaterStratified;    // number of stratified water heaters
-    extern int numWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
-    extern int numWaterHeaterDesuperheater; // number of desuperheater heating coils
-    extern int numHeatPumpWaterHeater;      // number of heat pump water heaters
-
-    extern Real64 hpPartLoadRatio;            // part load ratio of HPWH
-    extern bool getWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
-    extern Real64 mixerInletAirSchedule;      // output of inlet air mixer node schedule
-    extern Real64 mdotAir;                    // mass flow rate of evaporator air, kg/s
-    extern int numWaterHeaterSizing;          // Number of sizing/design objects for water heaters.
 
     struct StratifiedNodeData
     {
@@ -652,13 +632,13 @@ namespace WaterThermalTanks {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars(IOFiles &ioFiles);
+        void setupOutputVars(EnergyPlusData &state, IOFiles &ioFiles);
 
         void setupZoneInternalGains();
 
         void setupChilledWaterTankOutputVars(IOFiles &ioFiles);
 
-        void setupWaterHeaterOutputVars(IOFiles &ioFiles);
+        void setupWaterHeaterOutputVars(EnergyPlusData &state, IOFiles &ioFiles);
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -670,7 +650,7 @@ namespace WaterThermalTanks {
 
         void initialize(EnergyPlusData &state, bool FirstHVACIteration);
 
-        bool SourceHeatNeed(Real64 OutletTemp, Real64 DeadBandTemp, Real64 SetPointTemp_loc);
+        bool SourceHeatNeed(EnergyPlusData &state, Real64 OutletTemp, Real64 DeadBandTemp, Real64 SetPointTemp_loc);
 
         void SizeDemandSidePlantConnections();
 
@@ -682,7 +662,7 @@ namespace WaterThermalTanks {
 
         void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _);
 
-        void CalcWaterThermalTank();
+        void CalcWaterThermalTank(EnergyPlusData &state);
 
         void SizeStandAloneWaterHeater();
 
@@ -690,21 +670,21 @@ namespace WaterThermalTanks {
 
         void ReportWaterThermalTank();
 
-        void CalcWaterThermalTankStratified(); // Water Heater being simulated
+        void CalcWaterThermalTankStratified(EnergyPlusData &state); // Water Heater being simulated
 
-        void CalcWaterThermalTankMixed(); // Water Heater being simulated
+        void CalcWaterThermalTankMixed(EnergyPlusData &state); // Water Heater being simulated
 
         void CalcStandardRatings(EnergyPlusData &state);
 
-        void ReportCWTankInits(IOFiles &ioFiles);
+        void ReportCWTankInits(EnergyPlusData &state, IOFiles &ioFiles);
 
-        Real64 GetHPWHSensedTankTemp();
+        Real64 GetHPWHSensedTankTemp(EnergyPlusData &state);
 
-        Real64 FindStratifiedTankSensedTemp(bool UseAverage = false);
+        Real64 FindStratifiedTankSensedTemp(EnergyPlusData &state, bool UseAverage = false);
 
         Real64 getDeadBandTemp();
 
-        Real64 PlantMassFlowRatesFunc(int InNodeNum,
+        Real64 PlantMassFlowRatesFunc(EnergyPlusData &state, int InNodeNum,
                                       bool FirstHVACIteration,
                                       SideEnum WaterThermalTankSide,
                                       int PlantLoopSide,
@@ -766,13 +746,13 @@ namespace WaterThermalTanks {
 
         void CalcDesuperheaterWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
-        Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        Real64 PLRResidualWaterThermalTank(EnergyPlusData &state, Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                            Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
         void CalcHeatPumpWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void ConvergeSingleSpeedHPWHCoilAndTank(Real64 partLoadRatio);
+        void ConvergeSingleSpeedHPWHCoilAndTank(EnergyPlusData &state, Real64 partLoadRatio);
 
         void SetVSHPWHFlowRates(EnergyPlusData &state, HeatPumpWaterHeaterData &HPWH,
                                 int SpeedNum,
@@ -782,7 +762,7 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
+        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
 
         Real64 PLRResidualIterSpeed(EnergyPlusData &state, Real64 SpeedRatio,        // speed ratio between two speed levels
                                     Array1D<Real64> const &Par
@@ -875,11 +855,6 @@ namespace WaterThermalTanks {
         }
     };
 
-    // Object Data
-    extern Array1D<WaterThermalTankData> WaterThermalTank;
-    extern Array1D<HeatPumpWaterHeaterData> HPWaterHeater;
-    extern Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
-
     // Functions
 
     void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int WaterHeaterNum, bool FirstHVACIteration);
@@ -894,13 +869,13 @@ namespace WaterThermalTanks {
 
     bool getHPWaterHeaterInput(EnergyPlusData &state);
 
-    bool getWaterHeaterMixedInputs();
+    bool getWaterHeaterMixedInputs(EnergyPlusData &state);
 
-    bool getWaterHeaterStratifiedInput();
+    bool getWaterHeaterStratifiedInput(EnergyPlusData &state);
 
-    bool getWaterTankMixedInput();
+    bool getWaterTankMixedInput(EnergyPlusData &state);
 
-    bool getWaterTankStratifiedInput();
+    bool getWaterTankStratifiedInput(EnergyPlusData &state);
 
     bool GetWaterThermalTankInput(EnergyPlusData &state);
 
@@ -910,9 +885,72 @@ namespace WaterThermalTanks {
 
     int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
-    void clear_state();
-
 } // namespace WaterThermalTanks
+
+    struct WaterThermalTanksData : BaseGlobalStruct {
+
+        int const heatMode;  // heating source is on, source will not turn off until setpoint temp is reached
+        int const floatMode; // heating source is off, source will not turn on until cut-in temp is reached
+        int const ventMode; // tank temp is above maximum temperature and water is venting
+        int const coolMode;  // cooling source is on, source will not turn off until setpoint temp is reached
+
+        int numChilledWaterMixed;        // number of mixed chilled water tanks
+        int numChilledWaterStratified;   // number of stratified chilled water tanks
+        int numWaterHeaterMixed;         // number of mixed water heaters
+        int numWaterHeaterStratified;    // number of stratified water heaters
+        int numWaterThermalTank;         // total number of water thermal tanks, hot and cold (MIXED + STRATIFIED)
+        int numWaterHeaterDesuperheater; // number of desuperheater heating coils
+        int numHeatPumpWaterHeater;      // number of heat pump water heaters
+        int numWaterHeaterSizing;        // Number of sizing/design objects for water heaters.
+
+        Real64 hpPartLoadRatio;       // part load ratio of HPWH
+        Real64 mixerInletAirSchedule; // output of inlet air mixer node schedule
+        Real64 mdotAir;               // mass flow rate of evaporator air, kg/s
+
+        Array1D<WaterThermalTanks::WaterThermalTankData> WaterThermalTank;
+        Array1D<WaterThermalTanks::HeatPumpWaterHeaterData> HPWaterHeater;
+        Array1D<WaterThermalTanks::WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
+        std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
+
+
+        bool getWaterThermalTankInputFlag; // Calls to Water Heater from multiple places in code
+        bool calcWaterThermalTankZoneGainsMyEnvrnFlag;
+
+        void clear_state() override
+        {
+            numChilledWaterMixed = 0;
+            numChilledWaterStratified = 0;
+            numWaterHeaterMixed = 0;
+            numWaterHeaterStratified = 0;
+            numWaterThermalTank = 0;
+            numWaterHeaterDesuperheater = 0;
+            numHeatPumpWaterHeater = 0;
+            numWaterHeaterSizing = 0;
+
+            hpPartLoadRatio = 0.0;
+            mixerInletAirSchedule = 0.0;
+            mdotAir = 0.0;
+
+            WaterThermalTank.deallocate();
+            HPWaterHeater.deallocate();
+            WaterHeaterDesuperheater.deallocate();
+            UniqueWaterThermalTankNames.clear();
+
+            getWaterThermalTankInputFlag = true;
+            calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
+        }
+
+        // Default Constructor
+        WaterThermalTanksData()
+            : heatMode(1), floatMode(0), ventMode(-1), coolMode(2), 
+              numChilledWaterMixed(0), numChilledWaterStratified(0), numWaterHeaterMixed(0), 
+              numWaterHeaterStratified(0), numWaterThermalTank(0), numWaterHeaterDesuperheater(0), 
+              numHeatPumpWaterHeater(0), numWaterHeaterSizing(0), hpPartLoadRatio(0.0), 
+              mixerInletAirSchedule(0.0), mdotAir(0.0), getWaterThermalTankInputFlag(true), 
+              calcWaterThermalTankZoneGainsMyEnvrnFlag(true)
+        {
+        }
+    };
 
 } // namespace EnergyPlus
 

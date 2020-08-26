@@ -2238,9 +2238,9 @@ namespace IntegratedHeatPump {
 
             if ((tankType == DataPlant::TypeOf_WtrHeaterMixed) || (tankType == DataPlant::TypeOf_WtrHeaterStratified) ||
                 (tankType == DataPlant::TypeOf_ChilledWaterTankMixed) || (tankType == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-
+                
                 int tankIDX = WaterThermalTanks::getTankIDX(state, IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
-                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
+                auto &tank = state.dataWaterThermalTanks->WaterThermalTank(tankIDX);
                 tank.callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
 
                 PlantLocation A(0, 0, 0, 0);
@@ -2251,9 +2251,9 @@ namespace IntegratedHeatPump {
             } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
 
                 int hpIDX = WaterThermalTanks::getHPTankIDX(state, IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
-                auto &HPWH = WaterThermalTanks::HPWaterHeater(hpIDX);
+                auto &HPWH = state.dataWaterThermalTanks->HPWaterHeater(hpIDX);
                 int tankIDX = HPWH.WaterHeaterTankNum;
-                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
+                auto &tank = state.dataWaterThermalTanks->WaterThermalTank(tankIDX);
                 tank.callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
                 IntegratedHeatPump::IntegratedHeatPumps(DXCoilNum).WHtankType = tankType;
 
