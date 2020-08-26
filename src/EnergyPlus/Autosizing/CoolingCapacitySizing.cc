@@ -88,7 +88,7 @@ Real64 CoolingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
                 this->autoSizedValue = _originalValue;
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
-                this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
+                this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).DesCoolingLoad;
             } else {
                 if (this->zoneEqSizing(this->curZoneEqNum).CoolingCapacity) { // Parent object calculated capacity
                     this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).DesCoolingLoad;

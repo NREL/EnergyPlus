@@ -20,6 +20,7 @@ set( test_src
   Autosizing/AutosizingFixture.hh
   Autosizing/All_Simple_Sizing.unit.cc
   Autosizing/CoolingAirFlowSizing.unit.cc
+  Autosizing/CoolingCapacitySizing.unit.cc
   Autosizing/CoolingSHRSizing.unit.cc
   Autosizing/CoolingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/CoolingWaterDesAirInletTempSizing.unit.cc
@@ -30,6 +31,7 @@ set( test_src
   Autosizing/CoolingWaterNumofTubesPerRowSizing.unit.cc
   Autosizing/HeatingAirFlowSizing.unit.cc
   Autosizing/HeatingAirflowUASizing.unit.cc
+  Autosizing/HeatingCapacitySizing.unit.cc
   Autosizing/HeatingWaterDesAirInletHumRatSizing.unit.cc
   Autosizing/HeatingWaterDesAirInletTempSizing.unit.cc
   Autosizing/HeatingWaterDesCoilLoadUsedForUASizing.unit.cc

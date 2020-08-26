@@ -93,7 +93,7 @@ Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
             if (!this->wasAutoSized && !this->sizingDesRunThisZone) {
                 this->autoSizedValue = _originalValue;
             } else if (this->zoneEqSizing(this->curZoneEqNum).DesignSizeFromParent) {
-                this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).AirVolFlow;
+                this->autoSizedValue = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
             } else {
                 if (this->zoneEqSizing(this->curZoneEqNum).HeatingCapacity) {
                     NominalCapacityDes = this->zoneEqSizing(this->curZoneEqNum).DesHeatingLoad;
@@ -299,7 +299,6 @@ Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                 if (this->curOASysNum > 0) {
                     if (this->oaSysEqSizing(this->curOASysNum).HeatingCapacity) {
                         DesCoilLoad = this->oaSysEqSizing(this->curOASysNum).DesHeatingLoad;
-                        // CoilOutTemp = -999.0; // , initialized at top
                     } else if (this->dataDesicRegCoil) {
                         DesCoilLoad = CpAirStd * DesMassFlow * (this->dataDesOutletAirTemp - this->dataDesInletAirTemp);
                         CoilOutTemp = this->dataDesOutletAirTemp;
@@ -356,7 +355,7 @@ Real64 HeatingCapacitySizer::size(Real64 _originalValue, bool &errorsFound)
                            this->finalSysSizing(this->curSysNum).HeatingTotalCapacity > 0.0) {
                     NominalCapacityDes = this->finalSysSizing(this->curSysNum).HeatingTotalCapacity;
                 } else {
-                    if (this->dataCoolCoilCap > 0.0) {
+                    if (this->dataCoolCoilCap > 0.0) { // this line can't get executed with same logic above else
                         NominalCapacityDes = this->dataCoolCoilCap;
                     } else if (DesCoilLoad >= DataHVACGlobals::SmallLoad) {
                         NominalCapacityDes = DesCoilLoad;
