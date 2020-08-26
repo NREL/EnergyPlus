@@ -173,7 +173,7 @@ namespace HVACSingleDuctInduc {
 
     void GetIndUnits();
 
-    void InitIndUnit(BranchInputManagerData &dataBranchInputManager,
+    void InitIndUnit(EnergyPlusData &state,
                      int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     );

@@ -204,7 +204,7 @@ namespace PipeHeatTransfer {
                               Real64 &EP_UNUSED(CurLoad),
                               bool const EP_UNUSED(RunFlag))
     {
-        this->InitPipesHeatTransfer(state.dataBranchInputManager, FirstHVACIteration);
+        this->InitPipesHeatTransfer(state, FirstHVACIteration);
         // make the calculations
         for (int InnerTimeStepCtr = 1; InnerTimeStepCtr <= nsvNumInnerTimeSteps; ++InnerTimeStepCtr) {
             {
@@ -825,7 +825,7 @@ namespace PipeHeatTransfer {
 
     //==============================================================================
 
-    void PipeHTData::InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
+    void PipeHTData::InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
     )
     {
 
@@ -890,7 +890,7 @@ namespace PipeHeatTransfer {
         // get some data only once
         if (this->OneTimeInit) {
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitPipesHeatTransfer: Program terminated due to previous condition(s).");

@@ -122,7 +122,7 @@ namespace Boilers {
                                bool const RunFlag)
     {
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
-        this->InitBoiler(state.dataBranchInputManager);
+        this->InitBoiler(state);
         this->CalcBoilerModel(state, CurLoad, RunFlag, sim_component.FlowCtrl);
         this->UpdateBoilerRecords(CurLoad, RunFlag);
     }
@@ -141,7 +141,7 @@ namespace Boilers {
 
     void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitBoiler(state.dataBranchInputManager);
+        this->InitBoiler(state);
         this->SizeBoiler();
     }
 
@@ -405,7 +405,7 @@ namespace Boilers {
         }
     }
 
-    void BoilerSpecs::InitBoiler(BranchInputManagerData &dataBranchInputManager) // number of the current boiler being simulated
+    void BoilerSpecs::InitBoiler(EnergyPlusData &state) // number of the current boiler being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -431,7 +431,7 @@ namespace Boilers {
 
             // Locate the boilers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Boiler_Simple,
                                                     this->LoopNum,

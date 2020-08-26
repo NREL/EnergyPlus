@@ -209,7 +209,6 @@ namespace MicroturbineElectricGenerator {
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
         void InitMTGenerators(EnergyPlusData &state,
-                              BranchInputManagerData &dataBranchInputManager,
                               bool RunFlag,
                               Real64 MyLoad, // electrical load in W
                               bool FirstHVACIteration);

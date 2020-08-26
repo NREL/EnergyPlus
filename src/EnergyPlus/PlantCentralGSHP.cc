@@ -161,7 +161,7 @@ namespace PlantCentralGSHP {
 
     void WrapperSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(state.dataBranchInputManager, 0.0, calledFromLocation.loopNum);
+        this->initialize(state, 0.0, calledFromLocation.loopNum);
         this->SizeWrapper();
     }
 
@@ -198,7 +198,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
-            this->initialize(state.dataBranchInputManager, CurLoad, calledFromLocation.loopNum);
+            this->initialize(state, CurLoad, calledFromLocation.loopNum);
             this->CalcWrapperModel(state, CurLoad, calledFromLocation.loopNum);
 
         } else if (calledFromLocation.loopNum == this->GLHELoopNum) {
@@ -1396,7 +1396,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         }
     }
 
-    void WrapperSpecs::initialize(BranchInputManagerData &dataBranchInputManager,
+    void WrapperSpecs::initialize(EnergyPlusData &state,
                                   Real64 MyLoad, // Demand Load
                                   int LoopNum    // Loop Number Index
     )
@@ -1423,7 +1423,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         if (this->MyWrapperFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->CWLoopNum,
@@ -1437,7 +1437,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     this->CHWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->HWLoopNum,
@@ -1451,7 +1451,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     this->HWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->GLHELoopNum,

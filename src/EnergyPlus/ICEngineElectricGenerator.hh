@@ -157,7 +157,7 @@ namespace ICEngineElectricGenerator {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitICEngineGenerators(BranchInputManagerData &dataBranchInputManager, bool RunFlag, bool FirstHVACIteration);
+        void InitICEngineGenerators(EnergyPlusData &state, bool RunFlag, bool FirstHVACIteration);
 
         void CalcICEngineGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 

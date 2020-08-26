@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -57,7 +56,6 @@
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -114,7 +112,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         auto &sim_component(DataPlant::PlantLoop(this->LoopNum).LoopSide(this->LoopSideNum).Branch(this->BranchNum).Comp(this->CompNum));
         this->calculate(CurLoad, RunFlag, sim_component.FlowCtrl);
         this->update(CurLoad, RunFlag, FirstHVACIteration);
@@ -134,7 +132,7 @@ namespace BoilerSteam {
 
     void BoilerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         this->autosize();
     }
 
@@ -293,7 +291,7 @@ namespace BoilerSteam {
         }
     }
 
-    void BoilerSpecs::initialize(BranchInputManagerData &dataBranchInputManager) // number of the current electric chiller being simulated
+    void BoilerSpecs::initialize(EnergyPlusData &state) // number of the current electric chiller being simulated
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -316,7 +314,7 @@ namespace BoilerSteam {
             this->setupOutputVars();
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, DataPlant::TypeOf_Boiler_Steam, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitBoiler: Program terminated due to previous condition(s).");

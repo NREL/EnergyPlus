@@ -183,7 +183,7 @@ namespace WaterToAirHeatPump {
 
     // Functions
 
-    void SimWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+    void SimWatertoAirHP(EnergyPlusData &state,
                          std::string const &CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
@@ -210,7 +210,7 @@ namespace WaterToAirHeatPump {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+    void InitWatertoAirHP(EnergyPlusData &state,
                           int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]

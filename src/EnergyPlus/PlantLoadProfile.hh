@@ -128,7 +128,7 @@ namespace PlantLoadProfile {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void InitPlantProfile(BranchInputManagerData &dataBranchInputManager);
+        void InitPlantProfile(EnergyPlusData &state);
 
         void UpdatePlantProfile();
 

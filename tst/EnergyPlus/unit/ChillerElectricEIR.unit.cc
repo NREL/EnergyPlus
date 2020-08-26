@@ -226,12 +226,12 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    thisEIR.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIR.initialize(state, RunFlag, MyLoad);
     thisEIR.size(state);
 
     // run through init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    thisEIR.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIR.initialize(state, RunFlag, MyLoad);
 
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIR.EvapMassFlowRateMax, 0.999898, 0.0000001);
@@ -350,11 +350,11 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     DataLoopNode::Node(thisEIRChiller.EvapOutletNodeNum).TempSetPoint = 6.67;
     DataLoopNode::Node(thisEIRChiller.EvapInletNodeNum).Temp = 16.0;
     // init and size
-    thisEIRChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIRChiller.initialize(state, RunFlag, MyLoad);
     thisEIRChiller.size(state);
     // init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    thisEIRChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIRChiller.initialize(state, RunFlag, MyLoad);
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIRChiller.EvapMassFlowRateMax, 0.999898, 0.0000001);
     // check autocalculate for evaporatively-cooled chiller condenser side fluid flow rate

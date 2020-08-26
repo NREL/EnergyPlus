@@ -545,7 +545,7 @@ namespace FuelCellElectricGenerator {
 
         static PlantComponent *factory_exhaust(EnergyPlusData &state, std::string const &objectName);
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
@@ -600,7 +600,6 @@ namespace FuelCellElectricGenerator {
         );
 
         void SimFuelCellGenerator(EnergyPlusData &state,
-                                  BranchInputManagerData &dataBranchInputManager,
                                   bool RunFlag,  // simulate Generator when TRUE
                                   Real64 MyLoad, // demand on electric generator
                                   bool FirstHVACIteration);

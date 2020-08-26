@@ -1205,8 +1205,8 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 
     MixedAir::GetOutsideAirSysInputs(state);
     SplitterComponent::GetSplitterInput();
-    BranchInputManager::GetMixerInput(state, state.dataBranchInputManager);
-    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager);
+    BranchInputManager::GetMixerInput(state);
+    BranchInputManager::ManageBranchInput(state);
 
     DataGlobals::SysSizingCalc = true;
     SimAirServingZones::GetAirPathData(state);

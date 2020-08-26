@@ -260,7 +260,7 @@ namespace EvaporativeFluidCoolers {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitEvapFluidCooler(BranchInputManagerData &dataBranchInputManager);
+        void InitEvapFluidCooler(EnergyPlusData &state);
 
         void SizeEvapFluidCooler();
 

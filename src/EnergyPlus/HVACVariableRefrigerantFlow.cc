@@ -320,7 +320,7 @@ namespace HVACVariableRefrigerantFlow {
         if ((VRF(VRFCondenser).CondenserType == DataHVACGlobals::WaterCooled) && (VRF(VRFCondenser).checkPlantCondTypeOneTime)) {
             // scan for loop connection data
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     VRF(VRFCondenser).Name,
                                                     VRF(VRFCondenser).VRFPlantTypeOfNum,
                                                     VRF(VRFCondenser).SourceLoopNum,
@@ -5234,7 +5234,7 @@ namespace HVACVariableRefrigerantFlow {
             if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 // hot water supplemental heating coil
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         VRFTU(VRFTUNum).SuppHeatCoilName,
                                                         TypeOf_CoilWaterSimpleHeating,
                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopNum,
@@ -5278,7 +5278,7 @@ namespace HVACVariableRefrigerantFlow {
             } else if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
                 // steam supplemental heating coil
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         VRFTU(VRFTUNum).SuppHeatCoilName,
                                                         TypeOf_CoilSteamAirHeating,
                                                         VRFTU(VRFTUNum).SuppHeatCoilLoopNum,

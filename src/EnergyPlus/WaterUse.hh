@@ -231,7 +231,7 @@ namespace WaterUse {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitConnections(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse);
+        void InitConnections(EnergyPlusData &state, WaterUseData &dataWaterUse);
 
         void CalcConnectionsFlowRates(WaterUseData &dataWaterUse, bool FirstHVACIteration);
 
@@ -246,7 +246,7 @@ namespace WaterUse {
         void setupOutputVars(WaterUseData &EP_UNUSED(dataWaterUse));
     };
 
-    void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse, bool FirstHVACIteration);
+    void SimulateWaterUse(EnergyPlusData &state, WaterUseData &dataWaterUse, bool FirstHVACIteration);
 
     void GetWaterUseInput(WaterUseData &dataWaterUse);
 

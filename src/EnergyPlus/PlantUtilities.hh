@@ -177,7 +177,7 @@ namespace PlantUtilities {
 
     void LogPlantConvergencePoints(bool const FirstHVACIteration);
 
-    void ScanPlantLoopsForObject(BranchInputManagerData &dataBranchInputManager,
+    void ScanPlantLoopsForObject(EnergyPlusData &state,
                                  std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,

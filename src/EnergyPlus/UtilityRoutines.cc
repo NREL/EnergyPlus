@@ -695,7 +695,7 @@ namespace UtilityRoutines {
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
+            TestBranchIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;

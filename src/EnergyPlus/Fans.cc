@@ -260,7 +260,7 @@ namespace Fans {
             SimZoneExhaustFan(state.fans, FanNum);
             // cpw22Aug2010 Add call for Component Model fan
         } else if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
-            SimComponentModelFan(state,state.fans, FanNum);
+            SimComponentModelFan(state, state.fans, FanNum);
         }
 
         // Update the current fan to the outlet nodes

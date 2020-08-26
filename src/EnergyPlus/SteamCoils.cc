@@ -536,7 +536,7 @@ namespace SteamCoils {
 
         if (MyPlantScanFlag(CoilNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state.dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     SteamCoil(CoilNum).Name,
                                     SteamCoil(CoilNum).Coil_PlantTypeNum,
                                     SteamCoil(CoilNum).LoopNum,

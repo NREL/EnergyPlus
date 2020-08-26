@@ -473,7 +473,7 @@ namespace AirLoopHVACDOAS {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                        PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
                                                                 DataPlant::TypeOf_CoilWaterCooling,
                                                                 thisDOAS.CWLoopNum,
@@ -499,7 +499,7 @@ namespace AirLoopHVACDOAS {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                        PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
                                                                 DataPlant::TypeOf_CoilWaterSimpleHeating,
                                                                 thisDOAS.HWLoopNum,
@@ -531,7 +531,7 @@ namespace AirLoopHVACDOAS {
                             ShowContinueError("The control node number is not found in " + CurrentModuleObject + " = " +
                                               state.dataAirLoop->OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum));
                         }
-                        PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                        PlantUtilities::ScanPlantLoopsForObject(state,
                                                                 CompName,
                                                                 DataPlant::TypeOf_CoilWaterDetailedFlatCooling,
                                                                 thisDOAS.CWLoopNum,

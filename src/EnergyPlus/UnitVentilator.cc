@@ -1342,7 +1342,7 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         UnitVent(UnitVentNum).HCoilName,
                                         UnitVent(UnitVentNum).HCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).HWLoopNum,
@@ -1369,7 +1369,7 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                 (UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         UnitVent(UnitVentNum).CCoilPlantName,
                                         UnitVent(UnitVentNum).CCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).CWLoopNum,

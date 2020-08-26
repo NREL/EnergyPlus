@@ -3853,7 +3853,7 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).ACHeatCoilName,
                                             TypeOf_CoilWaterSimpleHeating,
                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -3887,7 +3887,7 @@ namespace PackagedTerminalHeatPump {
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).ACHeatCoilName,
                                             TypeOf_CoilSteamAirHeating,
                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -3928,7 +3928,7 @@ namespace PackagedTerminalHeatPump {
                        (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam)) {
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).SuppHeatCoilName,
                                             TypeOf_CoilWaterSimpleHeating,
                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -3957,7 +3957,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 } else if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).SuppHeatCoilName,
                                             TypeOf_CoilSteamAirHeating,
                                             PTUnit(PTUnitNum).SuppCoilLoopNum,

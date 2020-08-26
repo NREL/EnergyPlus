@@ -140,7 +140,7 @@ namespace ChillerAbsorption {
             // called from dominant chilled water connection loop side
 
             // Calculate Load
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             this->calculate(CurLoad, RunFlag);
             this->updateRecords(CurLoad, RunFlag);
 
@@ -182,7 +182,7 @@ namespace ChillerAbsorption {
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
-        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
+        this->initialize(state, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->sizeChiller();
@@ -582,7 +582,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager,
+    void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
                                         bool RunFlag, // TRUE when chiller operating
                                         Real64 MyLoad)
     {
@@ -608,7 +608,7 @@ namespace ChillerAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Absorption,
                                                     this->CWLoopNum,
@@ -622,7 +622,7 @@ namespace ChillerAbsorption {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Absorption,
                                                         this->CDLoopNum,
@@ -639,7 +639,7 @@ namespace ChillerAbsorption {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Absorption, true);
             }
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Absorption,
                                                         this->GenLoopNum,
