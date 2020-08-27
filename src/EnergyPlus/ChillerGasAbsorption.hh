@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ChillerGasAbsorptionData;
 
 namespace ChillerGasAbsorption {
 
@@ -236,7 +235,7 @@ namespace ChillerGasAbsorption {
         );
     };
 
-    void GetGasAbsorberInput(EnergyPlusData &state, ChillerGasAbsorptionData &chillers);
+    void GetGasAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerGasAbsorption
 

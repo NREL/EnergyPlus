@@ -205,7 +205,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
+    GetElectricEIRChillerInput(state);
     auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
@@ -312,7 +312,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
+    GetElectricEIRChillerInput(state);
     auto &thisEIRChiller = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";

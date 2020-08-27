@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ChillerElectricEIRData;
 
 namespace ChillerElectricEIR {
 
@@ -255,7 +254,7 @@ namespace ChillerElectricEIR {
         void update(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetElectricEIRChillerInput(EnergyPlusData &state, ChillerElectricEIRData &chillers);
+    void GetElectricEIRChillerInput(EnergyPlusData &state);
 
 } // namespace ChillerElectricEIR
 

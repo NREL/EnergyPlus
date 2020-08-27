@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ChillerExhaustAbsorptionData;
 
 namespace ChillerExhaustAbsorption {
 
@@ -242,7 +241,7 @@ namespace ChillerExhaustAbsorption {
         void updateHeatRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetExhaustAbsorberInput(EnergyPlusData &state, ChillerExhaustAbsorptionData &chillers);
+    void GetExhaustAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerExhaustAbsorption
 

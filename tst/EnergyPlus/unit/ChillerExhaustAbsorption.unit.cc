@@ -297,7 +297,7 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_GetInput_Test)
     ASSERT_TRUE(process_idf(idf_objects));
     compare_err_stream("");
 
-    GetExhaustAbsorberInput(state, state.dataChillerExhaustAbsorption);
+    GetExhaustAbsorberInput(state);
 
     compare_err_stream("");
 

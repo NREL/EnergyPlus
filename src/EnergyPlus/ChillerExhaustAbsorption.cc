@@ -117,7 +117,7 @@ namespace ChillerExhaustAbsorption {
     {
         // Process the input data if it hasn't been done already
         if (state.dataChillerExhaustAbsorption.Sim_GetInput) {
-            GetExhaustAbsorberInput(state, state.dataChillerExhaustAbsorption);
+            GetExhaustAbsorberInput(state);
             state.dataChillerExhaustAbsorption.Sim_GetInput = false;
         }
         // Now look for this particular pipe in the list
@@ -225,12 +225,12 @@ namespace ChillerExhaustAbsorption {
         TempDesCondIn = this->TempDesCondReturn;
     }
 
-    void GetExhaustAbsorberInput(EnergyPlusData &state, ChillerExhaustAbsorptionData &chillers)
+    void GetExhaustAbsorberInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
-        //       MODIFIED         Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate Exhaust Fired Double Effect Absorption Chiller
+        //       MODIFIED         Mahabir Bhandari, ORNL, Aug 2011, modified to accommodate Exhaust Fired Double Effect Absorption Chiller
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -267,10 +267,10 @@ namespace ChillerExhaustAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(chillers.ExhaustAbsorber)) return;
+        if (allocated(state.dataChillerExhaustAbsorption.ExhaustAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        chillers.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
+        state.dataChillerExhaustAbsorption.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
 
         // LOAD ARRAYS
 
@@ -291,7 +291,7 @@ namespace ChillerExhaustAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ExhaustAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerExhaustAbsorption.ExhaustAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
             ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 

@@ -115,7 +115,7 @@ namespace ChillerIndirectAbsorption {
     {
         // Process the input data
         if (state.dataChillerIndirectAbsorption.GetInput) {
-            GetIndirectAbsorberInput(state, state.dataChillerIndirectAbsorption);
+            GetIndirectAbsorberInput(state);
             state.dataChillerIndirectAbsorption.GetInput = false;
         }
         // Now look for this particular object
@@ -201,7 +201,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void GetIndirectAbsorberInput(EnergyPlusData &state, ChillerIndirectAbsoprtionData &chillers)
+    void GetIndirectAbsorberInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          R. Raustad (FSEC)
@@ -223,20 +223,20 @@ namespace ChillerIndirectAbsorption {
         bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Absorption:Indirect";
-        chillers.NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerIndirectAbsorption.NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumIndirectAbsorbers <= 0) {
+        if (state.dataChillerIndirectAbsorption.NumIndirectAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
 
-        if (allocated(chillers.IndirectAbsorber)) return;
+        if (allocated(state.dataChillerIndirectAbsorption.IndirectAbsorber)) return;
 
-        chillers.IndirectAbsorber.allocate(chillers.NumIndirectAbsorbers);
+        state.dataChillerIndirectAbsorption.IndirectAbsorber.allocate(state.dataChillerIndirectAbsorption.NumIndirectAbsorbers);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-        for (AbsorberNum = 1; AbsorberNum <= chillers.NumIndirectAbsorbers; ++AbsorberNum) {
+        for (AbsorberNum = 1; AbsorberNum <= state.dataChillerIndirectAbsorption.NumIndirectAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           AbsorberNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -254,7 +254,7 @@ namespace ChillerIndirectAbsorption {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.IndirectAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerIndirectAbsorption.IndirectAbsorber(AbsorberNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {

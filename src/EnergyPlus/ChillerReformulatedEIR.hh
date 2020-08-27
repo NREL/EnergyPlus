@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ChillerReformulatedEIRData;
 
 namespace ChillerReformulatedEIR {
 
@@ -281,7 +280,7 @@ namespace ChillerReformulatedEIR {
         Real64 condOutTempResidual(EnergyPlusData &state, Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
     };
 
-    void GetElecReformEIRChillerInput(EnergyPlusData &state, ChillerReformulatedEIRData &chillers);
+    void GetElecReformEIRChillerInput(EnergyPlusData &state);
 
 } // namespace ChillerReformulatedEIR
 

@@ -119,7 +119,7 @@ namespace ChillerElectricEIR {
     {
         // Process the input data if it hasn't been done already
         if (state.dataChillerElectricEIR.getInputFlag) {
-            GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
+            GetElectricEIRChillerInput(state);
             state.dataChillerElectricEIR.getInputFlag = false;
         }
         // Now look for this particular object in the list
@@ -214,7 +214,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void GetElectricEIRChillerInput(EnergyPlusData &state, ChillerElectricEIRData &chillers)
+    void GetElectricEIRChillerInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Raustad, FSEC
@@ -228,18 +228,18 @@ namespace ChillerElectricEIR {
         bool ErrorsFound(false); // True when input errors are found
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:EIR";
-        chillers.NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerElectricEIR.NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumElectricEIRChillers <= 0) {
+        if (state.dataChillerElectricEIR.NumElectricEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        chillers.ElectricEIRChiller.allocate(chillers.NumElectricEIRChillers);
+        state.dataChillerElectricEIR.ElectricEIRChiller.allocate(state.dataChillerElectricEIR.NumElectricEIRChillers);
 
         // Load arrays with electric EIR chiller data
-        for (int EIRChillerNum = 1; EIRChillerNum <= chillers.NumElectricEIRChillers; ++EIRChillerNum) {
+        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerElectricEIR.NumElectricEIRChillers; ++EIRChillerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -260,7 +260,7 @@ namespace ChillerElectricEIR {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ElectricEIRChiller(EIRChillerNum);
+            auto &thisChiller = state.dataChillerElectricEIR.ElectricEIRChiller(EIRChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
 
             //   Performance curves

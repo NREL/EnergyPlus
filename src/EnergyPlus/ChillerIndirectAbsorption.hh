@@ -62,7 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct ChillerIndirectAbsoprtionData;
 
 namespace ChillerIndirectAbsorption {
 
@@ -236,7 +235,7 @@ namespace ChillerIndirectAbsorption {
         void calculate(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
-    void GetIndirectAbsorberInput(EnergyPlusData &state, ChillerIndirectAbsoprtionData &chillers);
+    void GetIndirectAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerIndirectAbsorption
 
