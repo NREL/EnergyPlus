@@ -102,7 +102,6 @@ namespace CrossVentMgr {
     Real64 constexpr CrecFlow2(0.466); // Second correlation constant for the recirculation flow rate
 
     void ManageUCSDCVModel(EnergyPlusData &state,
-                           ConvectionCoefficientsData &dataConvectionCoefficients,
                            CrossVentMgrData &dataCrossVentMgr,
                            int const ZoneNum) // index number for the specified zone
     {
@@ -121,7 +120,7 @@ namespace CrossVentMgr {
         InitUCSDCV(dataCrossVentMgr, ZoneNum);
 
         // perform Cross Ventilation model calculations
-        CalcUCSDCV(state, dataConvectionCoefficients, dataCrossVentMgr, ZoneNum);
+        CalcUCSDCV(state, dataCrossVentMgr, ZoneNum);
     }
 
     void InitUCSDCV(CrossVentMgrData &dataCrossVentMgr, int const ZoneNum)
@@ -158,7 +157,6 @@ namespace CrossVentMgr {
     }
 
     void HcUCSDCV(EnergyPlusData &state,
-                  ConvectionCoefficientsData &dataConvectionCoefficients,
                   CrossVentMgrData &dataCrossVentMgr,
                   int const ZoneNum)
     {
@@ -202,7 +200,7 @@ namespace CrossVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                 HWall(Ctd) = CVHcIn(SurfNum);
                 dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWall(Ctd);
                 dataCrossVentMgr.HA_R += Surface(SurfNum).Area * HWall(Ctd);
@@ -214,17 +212,17 @@ namespace CrossVentMgr {
                 if (SurfNum == 0) continue;
                 if (Surface(SurfNum).Tilt > 10.0 && Surface(SurfNum).Tilt < 170.0) { // Window Wall
                     TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                     HWindow(Ctd) = CVHcIn(SurfNum);
                     dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HWindow(Ctd);
                     dataCrossVentMgr.HA_R += Surface(SurfNum).Area * HWindow(Ctd);
                 }
                 if (Surface(SurfNum).Tilt <= 10.0) { // Window Ceiling
                     TempEffBulkAir(SurfNum) = ZTJET(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Ujet);
+                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Ujet);
                     Hjet = CVHcIn(SurfNum);
                     TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                     Hrec = CVHcIn(SurfNum);
                     HWindow(Ctd) = JetRecAreaRatio(ZoneNum) * Hjet + (1 - JetRecAreaRatio(ZoneNum)) * Hrec;
                     dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * (1.0 - JetRecAreaRatio(ZoneNum)) * TempSurfIn(SurfNum) * Hrec;
@@ -235,10 +233,10 @@ namespace CrossVentMgr {
                 }
                 if (Surface(SurfNum).Tilt >= 170.0) { // Window Floor
                     TempEffBulkAir(SurfNum) = ZTJET(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Ujet);
+                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Ujet);
                     Hjet = CVHcIn(SurfNum);
                     TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                    CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                    CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                     Hrec = CVHcIn(SurfNum);
                     HWindow(Ctd) = JetRecAreaRatio(ZoneNum) * Hjet + (1 - JetRecAreaRatio(ZoneNum)) * Hrec;
                     dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * (1.0 - JetRecAreaRatio(ZoneNum)) * TempSurfIn(SurfNum) * Hrec;
@@ -255,7 +253,7 @@ namespace CrossVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                 HDoor(Ctd) = CVHcIn(SurfNum);
                 dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HDoor(Ctd);
                 dataCrossVentMgr.HA_R += Surface(SurfNum).Area * HDoor(Ctd);
@@ -266,7 +264,7 @@ namespace CrossVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                 HInternal(Ctd) = CVHcIn(SurfNum);
                 dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * TempSurfIn(SurfNum) * HInternal(Ctd);
                 dataCrossVentMgr.HA_R += Surface(SurfNum).Area * HInternal(Ctd);
@@ -278,10 +276,10 @@ namespace CrossVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = ZTJET(ZoneNum);
-                CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Ujet);
+                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Ujet);
                 Hjet = CVHcIn(SurfNum);
                 TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                 Hrec = CVHcIn(SurfNum);
                 HCeiling(Ctd) = JetRecAreaRatio(ZoneNum) * Hjet + (1 - JetRecAreaRatio(ZoneNum)) * Hrec;
                 dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * (1 - JetRecAreaRatio(ZoneNum)) * TempSurfIn(SurfNum) * Hrec;
@@ -297,10 +295,10 @@ namespace CrossVentMgr {
                 Surface(SurfNum).TAirRef = AdjacentAirTemp;
                 if (SurfNum == 0) continue;
                 TempEffBulkAir(SurfNum) = ZTJET(ZoneNum);
-                CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Ujet);
+                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Ujet);
                 Hjet = CVHcIn(SurfNum);
                 TempEffBulkAir(SurfNum) = ZTREC(ZoneNum);
-                CalcDetailedHcInForDVModel(state, dataConvectionCoefficients, SurfNum, TempSurfIn, CVHcIn, Urec);
+                CalcDetailedHcInForDVModel(state, SurfNum, TempSurfIn, CVHcIn, Urec);
                 Hrec = CVHcIn(SurfNum);
                 HFloor(Ctd) = JetRecAreaRatio(ZoneNum) * Hjet + (1 - JetRecAreaRatio(ZoneNum)) * Hrec;
                 dataCrossVentMgr.HAT_R += Surface(SurfNum).Area * (1 - JetRecAreaRatio(ZoneNum)) * TempSurfIn(SurfNum) * Hrec;
@@ -718,7 +716,6 @@ namespace CrossVentMgr {
     }
 
     void CalcUCSDCV(EnergyPlusData &state,
-                    ConvectionCoefficientsData &dataConvectionCoefficients,
                     CrossVentMgrData &dataCrossVentMgr,
                     int const ZoneNum) // Which Zonenum
     {
@@ -799,7 +796,7 @@ namespace CrossVentMgr {
             ZoneCVisMixing(ZoneNum) = 0.0;
             ZoneCVhasREC(ZoneNum) = 1.0;
             for (Ctd = 1; Ctd <= 4; ++Ctd) {
-                HcUCSDCV(state, dataConvectionCoefficients,dataCrossVentMgr, ZoneNum);
+                HcUCSDCV(state,dataCrossVentMgr, ZoneNum);
                 if (JetRecAreaRatio(ZoneNum) != 1.0) {
                     ZTREC(ZoneNum) = (ConvGainsRec * CrecTemp + CrecTemp * dataCrossVentMgr.HAT_R + Tin(ZoneNum) * MCp_Total) / (CrecTemp * dataCrossVentMgr.HA_R + MCp_Total);
                 }
@@ -838,7 +835,7 @@ namespace CrossVentMgr {
                     ZTREC(ZoneNum) = ZTAveraged;
                     ZTJET(ZoneNum) = ZTAveraged;
                     ZTREC(ZoneNum) = ZTAveraged;
-                    HcUCSDCV(state, dataConvectionCoefficients, dataCrossVentMgr, ZoneNum);
+                    HcUCSDCV(state, dataCrossVentMgr, ZoneNum);
                     ZTAveraged = MAT(ZoneNum);
                     RoomOutflowTemp(ZoneNum) = ZTAveraged;
                     ZTJET(ZoneNum) = ZTAveraged;
@@ -870,7 +867,7 @@ namespace CrossVentMgr {
                 ZTREC(ZoneNum) = ZTAveraged;
                 ZTJET(ZoneNum) = ZTAveraged;
                 ZTREC(ZoneNum) = ZTAveraged;
-                HcUCSDCV(state, dataConvectionCoefficients, dataCrossVentMgr, ZoneNum);
+                HcUCSDCV(state, dataCrossVentMgr, ZoneNum);
                 ZTAveraged = MAT(ZoneNum);
                 RoomOutflowTemp(ZoneNum) = ZTAveraged;
                 ZTJET(ZoneNum) = ZTAveraged;

@@ -62,7 +62,6 @@
 namespace EnergyPlus {
 
     // Forward declarations
-    struct ConvectionCoefficientsData;
     struct EnergyPlusData;
     class IOFiles;
 
@@ -420,14 +419,12 @@ namespace ConvectionCoefficients {
     // Functions
 
     void InitInteriorConvectionCoeffs(EnergyPlusData &state,
-                                      ConvectionCoefficientsData &dataConvectionCoefficients,
                                       IOFiles &ioFiles,
                                       const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate = _    // if passed in, then only calculate surfaces that have this zone
     );
 
     void InitExteriorConvectionCoeff(EnergyPlusData &state,
-                                     ConvectionCoefficientsData &dataConvectionCoefficients,
                                      IOFiles &ioFiles,
                                      int SurfNum,      // Surface number (in Surface derived type)
                                      Real64 HMovInsul, // Equivalent convection coefficient of movable insulation
@@ -454,7 +451,7 @@ namespace ConvectionCoefficients {
                   Real64 WindDirection // Wind direction measured clockwise from geographhic North
     );
 
-    void GetUserConvectionCoefficients(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles);
+    void GetUserConvectionCoefficients(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
@@ -477,7 +474,6 @@ namespace ConvectionCoefficients {
     );
 
     void CalcDetailedHcInForDVModel(EnergyPlusData &state,
-                                    ConvectionCoefficientsData &dataConvectionCoefficients,
                                     int SurfNum,                          // surface number for which coefficients are being calculated
                                     const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                     Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
@@ -522,9 +518,9 @@ namespace ConvectionCoefficients {
                      Real64 &gnu        // Gap gas Nusselt number
     );
 
-    Real64 SetExtConvectionCoeff(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // Surface Number
+    Real64 SetExtConvectionCoeff(EnergyPlusData &state, int SurfNum); // Surface Number
 
-    Real64 SetIntConvectionCoeff(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // Surface Number
+    Real64 SetIntConvectionCoeff(EnergyPlusData &state, int SurfNum); // Surface Number
 
     Real64 CalcISO15099WindowIntConvCoeff(Real64 SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                           Real64 AirTemperature,     // Mean Air Temperature of Zone (or adjacent air temperature)
@@ -539,38 +535,36 @@ namespace ConvectionCoefficients {
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
 
-    void SetupAdaptiveConvectionStaticMetaData(ConvectionCoefficientsData &dataConvectionCoefficients, EnergyPlus::IOFiles &ioFiles);
+    void SetupAdaptiveConvectionStaticMetaData(EnergyPlusData &state, EnergyPlus::IOFiles &ioFiles);
 
-    void SetupAdaptiveConvectionRadiantSurfaceData(ConvectionCoefficientsData &dataConvectionCoefficients);
+    void SetupAdaptiveConvectionRadiantSurfaceData(EnergyPlusData &state);
 
-    void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // surface number for which coefficients are being calculated
+    void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, int SurfNum); // surface number for which coefficients are being calculated
 
     void ManageOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
-                                             ConvectionCoefficientsData &dataConvectionCoefficients,
                                              int SurfNum, // surface number for which coefficients are being calculated
                                              Real64 &Hc         // result for Hc Outside face, becomes HExt.
     );
 
     void EvaluateIntHcModels(EnergyPlusData &state,
-                             ConvectionCoefficientsData &dataConvectionCoefficients,
                              int SurfNum,
                              int ConvModelEquationNum,
                              Real64 &Hc // calculated Hc value
     );
 
-    void EvaluateExtHcModels(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int NaturalConvModelEqNum, int ForcedConvModelEqNum, Real64 &Hc);
+    void EvaluateExtHcModels(EnergyPlusData &state, int SurfNum, int NaturalConvModelEqNum, int ForcedConvModelEqNum, Real64 &Hc);
 
     void DynamicExtConvSurfaceClassification(int SurfNum); // surface number
 
-    void MapExtConvClassificationToHcModels(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // surface number
+    void MapExtConvClassificationToHcModels(EnergyPlusData &state, int SurfNum); // surface number
 
     void DynamicIntConvSurfaceClassification(int SurfNum); // surface number
 
-    void MapIntConvClassificationToHcModels(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // surface pointer index
+    void MapIntConvClassificationToHcModels(EnergyPlusData &state, int SurfNum); // surface pointer index
 
-    void CalcUserDefinedInsideHcModel(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int UserCurveNum, Real64 &Hc);
+    void CalcUserDefinedInsideHcModel(EnergyPlusData &state, int SurfNum, int UserCurveNum, Real64 &Hc);
 
-    void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int UserCurveNum, Real64 &H);
+    void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, int SurfNum, int UserCurveNum, Real64 &H);
 
     //** Begin catalog of Hc equation functions. **** !*************************************************
 
@@ -621,7 +615,7 @@ namespace ConvectionCoefficients {
                                                    Real64 HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     );
 
-    Real64 CalcAlamdariHammondUnstableHorizontal(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcAlamdariHammondUnstableHorizontal(EnergyPlusData &state,
                                                  Real64 DeltaTemp,         // [C] temperature difference between surface and air
                                                  Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                  int SurfNum               // for messages
@@ -631,7 +625,7 @@ namespace ConvectionCoefficients {
                                                Real64 HydraulicDiameter    // [m] characteristic size, = (4 * area) / perimeter
     );
 
-    Real64 CalcAlamdariHammondStableHorizontal(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcAlamdariHammondStableHorizontal(EnergyPlusData &state,
                                                Real64 DeltaTemp,         // [C] temperature difference between surface and air
                                                Real64 HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                int SurfNum               // for messages
@@ -641,7 +635,7 @@ namespace ConvectionCoefficients {
                                              Real64 Height     // [m] characteristic size, = zone height
     );
 
-    Real64 CalcAlamdariHammondVerticalWall(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcAlamdariHammondVerticalWall(EnergyPlusData &state,
                                            Real64 DeltaTemp, // [C] temperature difference between surface and air
                                            Real64 Height,    // [m] characteristic size, = zone height
                                            int SurfNum       // for messages
@@ -672,7 +666,7 @@ namespace ConvectionCoefficients {
                                                    Real64 const &AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
     );
 
-    Real64 CalcBeausoleilMorrisonMixedAssistedWall(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcBeausoleilMorrisonMixedAssistedWall(EnergyPlusData &state,
                                                    Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
                                                    Real64 const &Height,        // [m] characteristic size
                                                    Real64 const &SurfTemp,      // [C] surface temperature
@@ -686,7 +680,7 @@ namespace ConvectionCoefficients {
                                                    Real64 const &AirChangeRate // [ACH] [1/hour] supply air ACH for zone
     );
 
-    Real64 CalcBeausoleilMorrisonMixedOpposingWall(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcBeausoleilMorrisonMixedOpposingWall(EnergyPlusData &state,
                                                    Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
                                                    Real64 const &Height,        // [m] characteristic size
                                                    Real64 const &SurfTemp,      // [C] surface temperature
@@ -700,7 +694,7 @@ namespace ConvectionCoefficients {
                                                   Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     );
 
-    Real64 CalcBeausoleilMorrisonMixedStableFloor(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcBeausoleilMorrisonMixedStableFloor(EnergyPlusData &state,
                                                   Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
                                                   Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                   Real64 const &SurfTemp,          // [C] surface temperature
@@ -714,7 +708,7 @@ namespace ConvectionCoefficients {
                                                     Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     );
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(EnergyPlusData &state,
                                                     Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
                                                     Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                     Real64 const &SurfTemp,          // [C] surface temperature
@@ -728,7 +722,7 @@ namespace ConvectionCoefficients {
                                                     Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     );
 
-    Real64 CalcBeausoleilMorrisonMixedStableCeiling(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcBeausoleilMorrisonMixedStableCeiling(EnergyPlusData &state,
                                                     Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
                                                     Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                     Real64 const &SurfTemp,          // [C] surface temperature
@@ -742,7 +736,7 @@ namespace ConvectionCoefficients {
                                                       Real64 const &AirChangeRate     // [ACH] [1/hour] supply air ACH for zone
     );
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(EnergyPlusData &state,
                                                       Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
                                                       Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
                                                       Real64 const &SurfTemp,          // [C] surface temperature
@@ -755,7 +749,7 @@ namespace ConvectionCoefficients {
                                            Real64 QdotConv   // [W/m2] heat flux rate for rayleigh #
     );
 
-    Real64 CalcFohannoPolidoriVerticalWall(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcFohannoPolidoriVerticalWall(EnergyPlusData &state,
                                            Real64 DeltaTemp, // [C] temperature difference between surface and air
                                            Real64 Height,    // [m] characteristic size, height of zone
                                            Real64 SurfTemp,  // [C] surface temperature
@@ -771,7 +765,7 @@ namespace ConvectionCoefficients {
                                                        int WindowLocationType     // index for location types
     );
 
-    Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWindow(EnergyPlusData &state,
                                                        Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                        Real64 WindWallRatio,      // [ ] fraction of window area to wall area for zone
                                                        int WindowLocationType,    // index for location types
@@ -783,7 +777,7 @@ namespace ConvectionCoefficients {
                                                      int WindowLocationType    // index for location types
     );
 
-    Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserWall(EnergyPlusData &state,
                                                      Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                      int WindowLocationType,    // index for location types
                                                      int ZoneNum                // for messages
@@ -793,18 +787,18 @@ namespace ConvectionCoefficients {
                                                       Real64 ZoneExtPerimLength // [m] length of zone perimeter with exterior walls
     );
 
-    Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcGoldsteinNovoselacCeilingDiffuserFloor(EnergyPlusData &state,
                                                       Real64 ZoneExtPerimLength, // [m] length of zone perimeter with exterior walls
                                                       int ZoneNum                // for messages
     );
 
     Real64 CalcSparrowWindward(int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowWindward(ConvectionCoefficientsData &dataConvectionCoefficients, int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowWindward(EnergyPlusData &state, int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
     Real64 CalcSparrowLeeward(int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ);
 
-    Real64 CalcSparrowLeeward(ConvectionCoefficientsData &dataConvectionCoefficients, int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
+    Real64 CalcSparrowLeeward(EnergyPlusData &state, int RoughnessIndex, Real64 FacePerimeter, Real64 FaceArea, Real64 WindAtZ, int SurfNum);
 
     Real64 CalcMoWITTNatural(Real64 DeltaTemp);
 
@@ -828,20 +822,20 @@ namespace ConvectionCoefficients {
 
     Real64 CalcMitchell(Real64 WindAtZ, Real64 LengthScale);
 
-    Real64 CalcMitchell(ConvectionCoefficientsData &dataConvectionCoefficients, Real64 WindAtZ, Real64 LengthScale, int SurfNum);
+    Real64 CalcMitchell(EnergyPlusData &state, Real64 WindAtZ, Real64 LengthScale, int SurfNum);
 
     Real64 CalcBlockenWindward(Real64 WindAt10m,
                                Real64 WindDir,    // Wind direction measured clockwise from geographic North
                                Real64 SurfAzimuth // or Facing, Direction the surface outward normal faces (degrees)
     );
 
-    Real64 CalcEmmelVertical(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcEmmelVertical(EnergyPlusData &state,
                              Real64 WindAt10m,
                              Real64 WindDir,     // Wind direction measured clockwise from geographic North
                              Real64 SurfAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
                              int SurfNum);
 
-    Real64 CalcEmmelRoof(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcEmmelRoof(EnergyPlusData &state,
                          Real64 WindAt10m,
                          Real64 WindDir,                // Wind direction measured clockwise from geographic North
                          Real64 LongAxisOutwardAzimuth, // or Facing, Direction the surface outward normal faces (degrees)
@@ -854,7 +848,7 @@ namespace ConvectionCoefficients {
                          Real64 RoofPerimeter,
                          int RoughnessIndex);
 
-    Real64 CalcClearRoof(ConvectionCoefficientsData &dataConvectionCoefficients,
+    Real64 CalcClearRoof(EnergyPlusData &state,
                          int SurfNum,
                          Real64 SurfTemp,
                          Real64 AirTemp,

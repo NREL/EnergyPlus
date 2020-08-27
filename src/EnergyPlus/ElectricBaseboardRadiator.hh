@@ -58,7 +58,6 @@
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
-    struct ConvectionCoefficientsData;
     struct ZoneTempPredictorCorrectorData;
 
     // Forward Declarations

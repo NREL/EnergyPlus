@@ -634,7 +634,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -645,7 +645,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -656,7 +656,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -673,7 +673,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = 4.122;
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state,  SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -684,7 +684,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = 9.476;
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state,  SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -695,7 +695,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = 3.212;
 
-    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state,  SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 }
@@ -736,7 +736,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
-    CalcDetailedHcInForDVModel(state, state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn);
+    CalcDetailedHcInForDVModel(state, SurfNum, SurfTemp, HcIn);
     Hn = HcIn(1);
     EXPECT_NEAR(Hn, 1.520, 0.001);
 
@@ -748,7 +748,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
     Vhc(1) = 1.0;
-    CalcDetailedHcInForDVModel(state, state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn, Vhc);
+    CalcDetailedHcInForDVModel(state, SurfNum, SurfTemp, HcIn, Vhc);
     Hn = HcIn(1);
     EXPECT_NEAR(Hn, 4.347, 0.001);
 
@@ -943,18 +943,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 2.667, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1000,18 +1000,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 2.673, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1057,18 +1057,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 0.962, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableFloor(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1114,18 +1114,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 3.583, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1171,18 +1171,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 0.937, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1228,18 +1228,18 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     Real64 height = 1.0;
     Real64 surfTemp = 20.0;
     int zoneNum = 1;
-    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    Real64 convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 3.581, tolerance);
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state.dataConvectionCoefficients, deltaTemp, height, surfTemp, zoneNum);
+    convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(state, deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
 
@@ -1532,7 +1532,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.files, DataHeatBalSurface::TempSurfInTmp);
 
     int algorithm_identifier;
 
@@ -1772,8 +1772,8 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
-    ConvectionCoefficients::GetUserConvectionCoefficients(state, state.dataConvectionCoefficients, state.files);
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.files, DataHeatBalSurface::TempSurfInTmp);
+    ConvectionCoefficients::GetUserConvectionCoefficients(state, state.files);
 
     int algorithm_identifier;
 
