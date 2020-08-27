@@ -123,7 +123,7 @@ namespace EnergyPlus {
         ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
         ChillerGasAbsorptionData dataChillerGasAbsorption;
         ChillerReformulatedEIRData dataChillerReformulatedEIR;
-        ConvectionCoefficientsData dataConvectionCoefficients;
+        std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficients;
         CondenserLoopTowersData dataCondenserLoopTowers;
         CostEstimateManagerData dataCostEstimateManager;
         CoolTowerData dataCoolTower;
