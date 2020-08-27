@@ -3166,19 +3166,27 @@ namespace WaterThermalTanks {
             }
 
             Tank.Nodes = DataIPShortCuts::rNumericArgs(32);
+            int specifiedNodes = 0;
             Tank.AdditionalCond = DataIPShortCuts::rNumericArgs(33);
 
             Tank.AdditionalLossCoeff.allocate(Tank.Nodes);
             Tank.AdditionalLossCoeff = 0.0;
-            for (int NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum) {
-                if (NumNums > 32 + NodeNum) {
-                    Tank.AdditionalLossCoeff(NodeNum) = DataIPShortCuts::rNumericArgs(33 + NodeNum);
+            for (int NodeNum = 1; NodeNum <= 12; ++NodeNum) {
+                int index = 33 + NodeNum;
+                if (NumNums >= index) {
+                    if (NodeNum <= Tank.Nodes) {
+                        ++specifiedNodes;
+                        Tank.AdditionalLossCoeff(NodeNum) = DataIPShortCuts::rNumericArgs(index);
+                    } else if (!DataIPShortCuts::lNumericFieldBlanks(index) && (DataIPShortCuts::rNumericArgs(index) != 0)) {
+                        // If either blank, or zero (default), then do not warn
+                        ++specifiedNodes;
+                    }
                 } else {
                     break;
                 }
             }
 
-            if (NumNums > 33 + Tank.Nodes) {
+            if (specifiedNodes > Tank.Nodes) {
                 ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                  ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
             }
