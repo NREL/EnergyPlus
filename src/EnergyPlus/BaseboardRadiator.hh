@@ -136,15 +136,15 @@ namespace BaseboardRadiator {
                       Real64 &PowerMet,
                       int &CompIndex);
 
-    void GetBaseboardInput(BaseboardRadiatorData &baseboard);
+    void GetBaseboardInput(EnergyPlusData &state);
 
     void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNumSub);
 
     void SizeBaseboard(EnergyPlusData &state, int BaseboardNum);
 
-    void SimHWConvective(BaseboardRadiatorData &baseboard, int &BaseboardNum, Real64 &LoadMet);
+    void SimHWConvective(EnergyPlusData &state, int &BaseboardNum, Real64 &LoadMet);
 
-    void UpdateBaseboard(BaseboardRadiatorData &baseboard, int &BaseboardNum);
+    void UpdateBaseboard(EnergyPlusData &state, int &BaseboardNum);
 
     Real64 HWBaseboardUAResidual(EnergyPlusData &state,
                                  Real64 UA,           // UA of coil
