@@ -187,7 +187,7 @@ InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool ou
 
 bool InputOutputFile::good() const
 {
-    if (print_to_dev_null && os->bad()) { // badbit is set
+    if (os && print_to_dev_null && os->bad()) { // badbit is set
         return true;
     } else if (os) {
         return os->good();
