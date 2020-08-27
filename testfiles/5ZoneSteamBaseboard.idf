@@ -3401,11 +3401,11 @@
 
   Output:Meter,Electricity:Facility,Hourly;
 
-  Output:Meter,Heating:Gas,Hourly;
+  Output:Meter,Heating:NaturalGas,Hourly;
 
-  Output:Meter,Gas:Plant,Hourly;
+  Output:Meter,NaturalGas:Plant,Hourly;
 
-  Output:Meter,Gas:Facility,Hourly;
+  Output:Meter,NaturalGas:Facility,Hourly;
 
   Output:VariableDictionary,Regular;
 

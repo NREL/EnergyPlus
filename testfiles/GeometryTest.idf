@@ -2563,7 +2563,7 @@
 
   Output:Variable,*,Daylighting Lighting Power Multiplier,hourly;
 
-  Output:Variable,*,Zone Lights Electric Energy,hourly;
+  Output:Variable,*,Zone Lights Electricity Energy,hourly;
 
   Output:Meter,Electricity:Building,hourly;
 
@@ -2599,9 +2599,9 @@
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Building,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Building,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2609,9 +2609,9 @@
 
   Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Building,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Building,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

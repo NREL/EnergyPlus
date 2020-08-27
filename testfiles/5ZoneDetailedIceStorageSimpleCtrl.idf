@@ -3372,11 +3372,11 @@
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Energy,hourly,OnPeakEnergy;
+  Output:Variable,*,Chiller Electricity Energy,hourly,OnPeakEnergy;
 
-  Output:Variable,*,Chiller Electric Energy,hourly,OffPeakEnergy;
+  Output:Variable,*,Chiller Electricity Energy,hourly,OffPeakEnergy;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
@@ -3412,9 +3412,9 @@
 
   Output:Variable,*,Ice Thermal Storage Cooling Charge Energy,hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Power,hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Rate,hourly;
 
-  Output:Variable,*,Ice Thermal Storage Ancillary Electric Energy,hourly;
+  Output:Variable,*,Ice Thermal Storage Ancillary Electricity Energy,hourly;
 
   Output:Variable,Central Chiller Outlet Node,System Node Setpoint Temperature,hourly;
 
@@ -3440,9 +3440,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3454,9 +3454,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
@@ -3498,7 +3498,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,  !- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count
@@ -3506,7 +3506,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Chiller Electric Power,  !- Variable Name
+    Chiller Electricity Rate,  !- Variable Name
     0,                       !- Interval Start
     1000,                    !- Interval Size
     10,                      !- Interval Count

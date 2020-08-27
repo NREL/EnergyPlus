@@ -2153,7 +2153,7 @@
 
   Output:Variable,*,Baseboard Total Heating Rate,hourly,ReportSch;
 
-  Output:Variable,*,Baseboard Electric Energy,hourly,ReportSch;
+  Output:Variable,*,Baseboard Electricity Energy,hourly,ReportSch;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 

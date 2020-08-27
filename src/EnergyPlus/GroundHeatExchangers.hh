@@ -270,13 +270,13 @@ struct BranchInputManagerData;
                       updateCurSimTime(true), triggerDesignDayReset(false) {
             }
 
-            virtual void calcGFunctions() = 0;
+            virtual void calcGFunctions(IOFiles &ioFiles) = 0;
 
             void calcAggregateLoad();
 
             void updateGHX();
 
-            void calcGroundHeatExchanger();
+            void calcGroundHeatExchanger(IOFiles &ioFiles);
 
             inline bool isEven(int const val);
 
@@ -345,7 +345,7 @@ struct BranchInputManagerData;
 
             void calcLongTimestepGFunctions();
 
-            void calcGFunctions();
+            void calcGFunctions(IOFiles &ioFiles);
 
             Real64 calcHXResistance();
 
@@ -359,7 +359,7 @@ struct BranchInputManagerData;
 
             void readCacheFileAndCompareWithThisGLHECache();
 
-            void writeGLHECacheToFile();
+            void writeGLHECacheToFile(IOFiles &ioFiles);
 
             Real64 calcBHAverageResistance();
 
@@ -409,7 +409,7 @@ struct BranchInputManagerData;
 
             Real64 calcHXResistance();
 
-            void calcGFunctions();
+            void calcGFunctions(IOFiles &ioFiles);
 
             void initGLHESimVars(BranchInputManagerData &dataBranchInputManager);
 
