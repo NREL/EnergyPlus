@@ -646,9 +646,9 @@ TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
     testTableFile.filePath = testCSV;
     testTableFile.load(IOFiles::getSingleton(), testCSV);
     std::vector<double> TestArray;
-    std::pair<std::size_t, std::size_t> testPoint = std::make_pair(0,1);
-    TestArray = testTableFile.getArray(testPoint);
-    for (int i = 0; i < 7; i++){
-        EXPECT_EQ(TestArray[i], -5 );
-    }
+    std::size_t col = 2;
+    std::size_t row = 1;
+    const int expected_length = 168;
+    TestArray = testTableFile.getArray(std::make_pair(col,row));
+    EXPECT_EQ(TestArray.size(), expected_length );
 }
