@@ -111,11 +111,11 @@ namespace CondenserLoopTowers {
     std::string const cCoolingTower_VariableSpeed("CoolingTower:VariableSpeed");
     std::string const cCoolingTower_VariableSpeedMerkel("CoolingTower:VariableSpeed:Merkel");
 
-    PlantComponent *CoolingTower::factory(CondenserLoopTowersData &dataCondenserLoopTowers, std::string const &objectName)
+    PlantComponent *CoolingTower::factory(EnergyPlusData &state, CondenserLoopTowersData &dataCondenserLoopTowers, std::string const &objectName)
     {
         // Process the input data for towers if it hasn't been done already
         if (dataCondenserLoopTowers.GetInput) {
-            GetTowerInput(dataCondenserLoopTowers);
+            GetTowerInput(state, dataCondenserLoopTowers);
             dataCondenserLoopTowers.GetInput = false;
         }
         // Now look for this particular tower in the list
@@ -172,7 +172,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void GetTowerInput(CondenserLoopTowersData &dataCondenserLoopTowers)
+    void GetTowerInput(EnergyPlusData &state, CondenserLoopTowersData &dataCondenserLoopTowers)
     {
 
         // SUBROUTINE INFORMATION:
@@ -440,7 +440,7 @@ namespace CondenserLoopTowers {
             if (AlphArray(9).empty()) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(9),
                                                        ErrorsFound,
@@ -860,7 +860,7 @@ namespace CondenserLoopTowers {
             if (lAlphaFieldBlanks(9)) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(9),
                                                        ErrorsFound,
@@ -1484,7 +1484,7 @@ namespace CondenserLoopTowers {
             if (lAlphaFieldBlanks(11)) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(11),
                                                        ErrorsFound,
@@ -1779,7 +1779,7 @@ namespace CondenserLoopTowers {
             if (lAlphaFieldBlanks(13)) {
                 dataCondenserLoopTowers.towers(TowerNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        cCurrentModuleObject,
                                                        AlphArray(13),
                                                        ErrorsFound,

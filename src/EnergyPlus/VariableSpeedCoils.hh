@@ -389,7 +389,7 @@ namespace VariableSpeedCoils {
                                Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
-    void GetVarSpeedCoilInput();
+    void GetVarSpeedCoilInput(EnergyPlusData &state);
 
     // Beginning Initialization Section of the Module
     //******************************************************************************
@@ -431,57 +431,57 @@ namespace VariableSpeedCoils {
                                  int const SpeedNum              // Speed number, high bound, i.e. SpeedNum - 1 is the other side
     );
 
-    Real64 GetCoilCapacityVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacityVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                         std::string const &CoilName, // must match coil names for the coil type
                                         bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilIndexVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilAirFlowRateVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilAirFlowRateVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                            std::string const &CoilName, // must match coil names for the coil type
                                            bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNodeVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                       std::string const &CoilName, // must match coil names for the coil type
                                       bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNodeVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNodeVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                        std::string const &CoilName, // must match coil names for the coil type
                                        bool &ErrorsFound            // set to true if problem
     );
 
-    int GetVSCoilCondenserInletNode(std::string const &CoilName, // must match coil names for the coil type
+    int GetVSCoilCondenserInletNode(EnergyPlusData &state, std::string const &CoilName, // must match coil names for the coil type
                                     bool &ErrorsFound            // set to true if problem
     );
 
-    int GetVSCoilPLFFPLR(std::string const &CoilType, // must match coil types in this module
+    int GetVSCoilPLFFPLR(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetVSCoilCapFTCurveIndex(int const &CoilIndex, // must match coil names for the coil type
+    int GetVSCoilCapFTCurveIndex(EnergyPlusData &state, int const &CoilIndex, // must match coil names for the coil type
                                  bool &ErrorsFound     // set to true if problem
     );
 
-    Real64 GetVSCoilMinOATCompressor(std::string const &CoilName, // must match coil names for the coil type
+    Real64 GetVSCoilMinOATCompressor(EnergyPlusData &state, std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+    Real64 GetVSCoilMinOATCompressorUsingIndex(EnergyPlusData &state, int const CoilIndex, // index to cooling coil
                                                bool &ErrorsFound    // set to true if problem
     );
 
-    int GetVSCoilNumOfSpeeds(std::string const &CoilName, // must match coil names for the coil type
+    int GetVSCoilNumOfSpeeds(EnergyPlusData &state, std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     );
 
-    void SetVarSpeedCoilData(int const WSHPNum,                        // Number of OA Controller
+    void SetVarSpeedCoilData(EnergyPlusData &state, int const WSHPNum,                        // Number of OA Controller
                              bool &ErrorsFound,                        // Set to true if certain errors found
                              Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
                              Optional_int CompanionHeatingCoilNum = _, // Index to heating coil for cooling coil = SimpleWSHPNum

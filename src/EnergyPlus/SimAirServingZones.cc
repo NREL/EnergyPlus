@@ -1180,7 +1180,7 @@ namespace SimAirServingZones {
                             for (int OACompNum = 1; OACompNum <= OutsideAirSys(OANum).NumComponents; ++OACompNum) {
                                 CompType = OutsideAirSys(OANum).ComponentType(OACompNum);
                                 if (UtilityRoutines::SameString(CompType, "Coil:Heating:Water")) {
-                                    WaterCoilNodeNum = GetCoilWaterInletNode(CompType, OutsideAirSys(OANum).ComponentName(OACompNum), ErrorsFound);
+                                    WaterCoilNodeNum = GetCoilWaterInletNode(state, CompType, OutsideAirSys(OANum).ComponentName(OACompNum), ErrorsFound);
                                     if (WaterCoilNodeNum == ActuatorNodeNum) nonLockoutCoilFound = true;
                                     break;
                                 }
@@ -1200,7 +1200,7 @@ namespace SimAirServingZones {
                                     if (UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Heating:Water") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Cooling:Water")) {
-                                        WaterCoilNodeNum = GetCoilWaterInletNode(
+                                        WaterCoilNodeNum = GetCoilWaterInletNode(state, 
                                             CompType, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
                                         if (WaterCoilNodeNum == ActuatorNodeNum) {
                                             nonLockoutCoilFound = true;
@@ -1408,7 +1408,7 @@ namespace SimAirServingZones {
                 for (CompNum = 1; CompNum <= PrimaryAirSystem(AirSysNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                     CompType_Num = PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
                     if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
-                        WaterCoilNodeNum = GetCoilWaterInletNode(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                        WaterCoilNodeNum = GetCoilWaterInletNode(state, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                  PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                                                  ErrorsFound);
                         CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
@@ -1430,7 +1430,7 @@ namespace SimAirServingZones {
             for (int OACompNum = 1; OACompNum <= NumInList; ++OACompNum) {
                 CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
                 if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
-                    WaterCoilNodeNum = GetCoilWaterInletNode(GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
+                    WaterCoilNodeNum = GetCoilWaterInletNode(state, GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
                     CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
                     if (NodeNotFound) {
                         ErrorsFound = true;
@@ -3661,12 +3661,12 @@ namespace SimAirServingZones {
 
                 // Humidifier Types for the air system simulation
             } else if (SELECT_CASE_var == Humidifier) { // 'Humidifier:Steam:Electric' and 'Humidifier:Steam:Gas'
-                SimHumidifier(CompName, FirstHVACIteration, CompIndex);
+                SimHumidifier(state, CompName, FirstHVACIteration, CompIndex);
 
                 // Evap Cooler Types for the air system simulation
             } else if (SELECT_CASE_var == EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad', 'EvaporativeCooler:Indirect:CelDekPad'
                 // 'EvaporativeCooler:Indirect:WetCoil', 'EvaporativeCooler:Indirect:ResearchSpecial'
-                SimEvapCooler(CompName, CompIndex, AirLoopFlow(AirLoopNum).FanPLR);
+                SimEvapCooler(state, CompName, CompIndex, AirLoopFlow(AirLoopNum).FanPLR);
 
                 // Desiccant Dehumidifier Types for the air system simulation
             } else if (SELECT_CASE_var == Desiccant) { // 'Dehumidifier:Desiccant:NoFans', 'Dehumidifier:Desiccant:System'
@@ -4189,7 +4189,7 @@ namespace SimAirServingZones {
                     CoilName = CompName;
                     CoilType = CompType;
                 }
-                SetCoilDesFlow(CoilType, CoilName, PrimaryAirSystem(AirLoopNum).DesignVolFlowRate, ErrorsFound);
+                SetCoilDesFlow(state, CoilType, CoilName, PrimaryAirSystem(AirLoopNum).DesignVolFlowRate, ErrorsFound);
             }
         } // End of component loop
         if (ErrorsFound) {

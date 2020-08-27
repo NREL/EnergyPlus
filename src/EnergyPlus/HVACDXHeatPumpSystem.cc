@@ -397,9 +397,9 @@ namespace HVACDXHeatPumpSystem {
             }
 
             if (DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-                DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum = GetCoilInletNodeVariableSpeed(
+                DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum = GetCoilInletNodeVariableSpeed(state,
                     DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
-                DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNodeVariableSpeed(
+                DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum = GetCoilOutletNodeVariableSpeed(state,
                     DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
             } else {
                 DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum =

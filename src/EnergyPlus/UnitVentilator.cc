@@ -798,7 +798,7 @@ namespace UnitVentilator {
                                 errFlag = false;
                                 if (UnitVent(UnitVentNum).HCoilType == Heating_WaterCoilType) {
                                     UnitVent(UnitVentNum).HotControlNode =
-                                        GetCoilWaterInletNode("Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, errFlag);
+                                        GetCoilWaterInletNode(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, errFlag);
                                 } else {
                                     UnitVent(UnitVentNum).HCoil_Index =
                                         GetSteamCoilIndex("COIL:HEATING:STEAM", UnitVent(UnitVentNum).HCoilName, errFlag);
@@ -827,7 +827,7 @@ namespace UnitVentilator {
 
                         if (SELECT_CASE_var == Heating_WaterCoilType) {
                             UnitVent(UnitVentNum).MaxVolHotWaterFlow =
-                                GetWaterCoilMaxFlowRate("Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
+                                GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                             UnitVent(UnitVentNum).MaxVolHotSteamFlow = UnitVent(UnitVentNum).MaxVolHotWaterFlow;
 
                         } else if (SELECT_CASE_var == Heating_SteamCoilType) {
@@ -910,7 +910,7 @@ namespace UnitVentilator {
                             if (UnitVent(UnitVentNum).CCoilType != Cooling_CoilHXAssisted) {
                                 // mine the cold water node from the coil object
                                 UnitVent(UnitVentNum).ColdControlNode =
-                                    GetCoilWaterInletNode(UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, errFlag);
+                                    GetCoilWaterInletNode(state, UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, errFlag);
                             } else {
                                 UnitVent(UnitVentNum).ColdControlNode =
                                     GetHXCoilWaterInletNode(state, UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, errFlag);
@@ -934,10 +934,10 @@ namespace UnitVentilator {
 
                         if (SELECT_CASE_var == Cooling_CoilWaterCooling) {
                             UnitVent(UnitVentNum).MaxVolColdWaterFlow =
-                                GetWaterCoilMaxFlowRate("Coil:Cooling:Water", UnitVent(UnitVentNum).CCoilName, ErrorsFound);
+                                GetWaterCoilMaxFlowRate(state, "Coil:Cooling:Water", UnitVent(UnitVentNum).CCoilName, ErrorsFound);
                         } else if (SELECT_CASE_var == Cooling_CoilDetailedCooling) {
                             UnitVent(UnitVentNum).MaxVolColdWaterFlow =
-                                GetWaterCoilMaxFlowRate("Coil:Cooling:Water:DetailedGeometry", UnitVent(UnitVentNum).CCoilName, ErrorsFound);
+                                GetWaterCoilMaxFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", UnitVent(UnitVentNum).CCoilName, ErrorsFound);
                         } else if (SELECT_CASE_var == Cooling_CoilHXAssisted) {
                             UnitVent(UnitVentNum).MaxVolColdWaterFlow = GetHXAssistedCoilFlowRate(state,
                                 "CoilSystem:Cooling:Water:HeatExchangerAssisted", UnitVent(UnitVentNum).CCoilName, ErrorsFound);
@@ -2094,13 +2094,13 @@ namespace UnitVentilator {
                 } else {
                     CheckZoneSizing(cMO_UnitVentilator, UnitVent(UnitVentNum).Name);
 
-                    CoilWaterInletNode = GetCoilWaterInletNode("Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode("Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
+                    CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
+                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = MyPlantSizingIndex(
                             "COIL:HEATING:WATER", UnitVent(UnitVentNum).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
 
-                        CoilNum = GetWaterCoilIndex("COIL:HEATING:WATER", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
+                        CoilNum = GetWaterCoilIndex(state, "COIL:HEATING:WATER", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                         if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
@@ -2344,11 +2344,11 @@ namespace UnitVentilator {
                         CoolingCoilName = UnitVent(UnitVentNum).CCoilName;
                         CoolingCoilType = UnitVent(UnitVentNum).CCoilTypeCh;
                     }
-                    CoilWaterInletNode = GetCoilWaterInletNode(CoolingCoilType, CoolingCoilName, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode(CoolingCoilType, CoolingCoilName, ErrorsFound);
+                    CoilWaterInletNode = GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizCoolNum = MyPlantSizingIndex(CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
-                        CoilNum = GetWaterCoilIndex(CoolingCoilType, CoolingCoilName, ErrorsFound);
+                        CoilNum = GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                         if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
                             WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
@@ -2472,8 +2472,8 @@ namespace UnitVentilator {
             CoolingCoilName = UnitVent(UnitVentNum).CCoilName;
             CoolingCoilType = UnitVent(UnitVentNum).CCoilTypeCh;
         }
-        SetCoilDesFlow(CoolingCoilType, CoolingCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
-        SetCoilDesFlow(UnitVent(UnitVentNum).HCoilTypeCh, UnitVent(UnitVentNum).HCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
+        SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
+        SetCoilDesFlow(state, UnitVent(UnitVentNum).HCoilTypeCh, UnitVent(UnitVentNum).HCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
 
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = UnitVent(UnitVentNum).MaxVolHotWaterFlow;
@@ -2605,7 +2605,7 @@ namespace UnitVentilator {
                     auto const SELECT_CASE_var1(UnitVent(UnitVentNum).HCoilType);
 
                     if (SELECT_CASE_var1 == Heating_WaterCoilType) {
-                        CheckWaterCoilSchedule("Coil:Heating:Water",
+                        CheckWaterCoilSchedule(state, "Coil:Heating:Water",
                                                UnitVent(UnitVentNum).HCoilName,
                                                UnitVent(UnitVentNum).HCoilSchedValue,
                                                UnitVent(UnitVentNum).HCoil_Index);
@@ -2633,12 +2633,12 @@ namespace UnitVentilator {
                     auto const SELECT_CASE_var1(UnitVent(UnitVentNum).CCoilType);
 
                     if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
-                        CheckWaterCoilSchedule("Coil:Cooling:Water",
+                        CheckWaterCoilSchedule(state, "Coil:Cooling:Water",
                                                UnitVent(UnitVentNum).CCoilName,
                                                UnitVent(UnitVentNum).CCoilSchedValue,
                                                UnitVent(UnitVentNum).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
-                        CheckWaterCoilSchedule("Coil:Cooling:Water:DetailedGeometry",
+                        CheckWaterCoilSchedule(state, "Coil:Cooling:Water:DetailedGeometry",
                                                UnitVent(UnitVentNum).CCoilName,
                                                UnitVent(UnitVentNum).CCoilSchedValue,
                                                UnitVent(UnitVentNum).CCoil_Index);
@@ -2658,7 +2658,7 @@ namespace UnitVentilator {
                     auto const SELECT_CASE_var1(UnitVent(UnitVentNum).HCoilType);
 
                     if (SELECT_CASE_var1 == Heating_WaterCoilType) {
-                        CheckWaterCoilSchedule("Coil:Heating:Water",
+                        CheckWaterCoilSchedule(state, "Coil:Heating:Water",
                                                UnitVent(UnitVentNum).HCoilName,
                                                UnitVent(UnitVentNum).HCoilSchedValue,
                                                UnitVent(UnitVentNum).HCoil_Index);
@@ -2688,12 +2688,12 @@ namespace UnitVentilator {
                     auto const SELECT_CASE_var1(UnitVent(UnitVentNum).CCoilType);
 
                     if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
-                        CheckWaterCoilSchedule("Coil:Cooling:Water",
+                        CheckWaterCoilSchedule(state, "Coil:Cooling:Water",
                                                UnitVent(UnitVentNum).CCoilName,
                                                UnitVent(UnitVentNum).CCoilSchedValue,
                                                UnitVent(UnitVentNum).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
-                        CheckWaterCoilSchedule("Coil:Cooling:Water:DetailedGeometry",
+                        CheckWaterCoilSchedule(state, "Coil:Cooling:Water:DetailedGeometry",
                                                UnitVent(UnitVentNum).CCoilName,
                                                UnitVent(UnitVentNum).CCoilSchedValue,
                                                UnitVent(UnitVentNum).CCoil_Index);

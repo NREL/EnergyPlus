@@ -2876,7 +2876,7 @@ namespace RefrigeratedCase {
                     RefrigRack(RackNum).EvapWaterSupplyMode = WaterSupplyFromMains;
                 } else {
                     RefrigRack(RackNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                    WaterManager::SetupTankDemandComponent(RefrigRack(RackNum).Name,
+                    WaterManager::SetupTankDemandComponent(state, RefrigRack(RackNum).Name,
                                              CurrentModuleObject,
                                              RefrigRack(RackNum).SupplyTankName,
                                              ErrorsFound,
@@ -3392,7 +3392,7 @@ namespace RefrigeratedCase {
                         Condenser(CondNum).EvapWaterSupplyMode = WaterSupplyFromMains;
                     } else {
                         Condenser(CondNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                        WaterManager::SetupTankDemandComponent(Condenser(CondNum).Name,
+                        WaterManager::SetupTankDemandComponent(state, Condenser(CondNum).Name,
                                                  CurrentModuleObject,
                                                  Condenser(CondNum).SupplyTankName,
                                                  ErrorsFound,

@@ -238,7 +238,7 @@ namespace PoweredInductionUnits {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(PIU(PIUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitPIU(state.dataBranchInputManager, PIUNum, FirstHVACIteration);
+        InitPIU(state, PIUNum, FirstHVACIteration);
 
         TermUnitPIU = true;
 
@@ -431,7 +431,7 @@ namespace PoweredInductionUnits {
             // The reheat coil control node is necessary for hot water reheat, but not necessary for
             // electric or gas reheat.
             if (PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) {
-                PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
+                PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
             }
             if (PIU(PIUNum).HCoilType_Num == HCoilType_SteamAirHeating) {
                 PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
@@ -639,7 +639,7 @@ namespace PoweredInductionUnits {
             //                        NodeType_Water,NodeConnectionType_Actuator,1,ObjectIsParent)
             //  END IF
             if (PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) {
-                PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
+                PIU(PIUNum).HotControlNode = GetCoilWaterInletNode(state, cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
             }
             if (PIU(PIUNum).HCoilType_Num == HCoilType_SteamAirHeating) {
                 PIU(PIUNum).HotControlNode = GetCoilSteamInletNode(cAlphaArgs(9), cAlphaArgs(10), ErrorsFound);
@@ -747,7 +747,7 @@ namespace PoweredInductionUnits {
         }
     }
 
-    void InitPIU(BranchInputManagerData &dataBranchInputManager,
+    void InitPIU(EnergyPlusData &state,
                  int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     )
@@ -810,7 +810,7 @@ namespace PoweredInductionUnits {
         if (MyPlantScanFlag(PIUNum) && allocated(PlantLoop)) {
             if ((PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) || (PIU(PIUNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
                                         PIU(PIUNum).HCoil,
                                         PIU(PIUNum).HCoil_PlantTypeNum,
                                         PIU(PIUNum).HWLoopNum,
@@ -851,7 +851,7 @@ namespace PoweredInductionUnits {
 
         if (!SysSizingCalc && MySizeFlag(PIUNum) && !MyPlantScanFlag(PIUNum)) {
 
-            SizePIU(PIUNum);
+            SizePIU(state, PIUNum);
 
             HotConNode = PIU(PIUNum).HotControlNode;
             if (HotConNode > 0) {
@@ -973,7 +973,7 @@ namespace PoweredInductionUnits {
         // None needed
     }
 
-    void SizePIU(int const PIUNum)
+    void SizePIU(EnergyPlusData &state, int const PIUNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1311,8 +1311,8 @@ namespace PoweredInductionUnits {
                 CheckZoneSizing(PIU(PIUNum).UnitType, PIU(PIUNum).Name);
                 if (UtilityRoutines::SameString(PIU(PIUNum).HCoilType, "Coil:Heating:Water")) {
 
-                    CoilWaterInletNode = GetCoilWaterInletNode("Coil:Heating:Water", PIU(PIUNum).HCoil, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode("Coil:Heating:Water", PIU(PIUNum).HCoil, ErrorsFound);
+                    CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", PIU(PIUNum).HCoil, ErrorsFound);
+                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", PIU(PIUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
                             MyPlantSizingIndex("Coil:Heating:Water", PIU(PIUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
@@ -1471,7 +1471,7 @@ namespace PoweredInductionUnits {
             TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // coil report
             TermUnitSizing(CurTermUnitSizingNum).InducesPlenumAir = PIU(PIUNum).InducesPlenumAir;
             if (PIU(PIUNum).HCoilType_Num == HCoilType_SimpleHeating) {
-                SetCoilDesFlow(PIU(PIUNum).HCoilType, PIU(PIUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
+                SetCoilDesFlow(state, PIU(PIUNum).HCoilType, PIU(PIUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
             }
         }
 

@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
-    GetWaterCoilInput();
+    GetWaterCoilInput(state);
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
@@ -321,7 +321,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils1)
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     OutputReportPredefined::SetPredefinedTables();
-    sd_airterminal(1).SizeSys();
+    sd_airterminal(1).SizeSys(state);
     SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).UACoil, 199.86, 0.01);
 
@@ -496,7 +496,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
-    GetWaterCoilInput();
+    GetWaterCoilInput(state);
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
@@ -558,7 +558,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils2)
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    sd_airterminal(1).SizeSys();
+    sd_airterminal(1).SizeSys(state);
     SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 85.97495, 0.01);
@@ -733,7 +733,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
-    GetWaterCoilInput();
+    GetWaterCoilInput(state);
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
@@ -794,7 +794,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils3)
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    sd_airterminal(1).SizeSys();
+    sd_airterminal(1).SizeSys(state);
     SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 85.97495, 0.01);
@@ -970,7 +970,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
-    GetWaterCoilInput();
+    GetWaterCoilInput(state);
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
@@ -1031,7 +1031,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils4)
                 FinalZoneSizing(CurZoneEqNum).DesHeatMaxAirFlowFrac);
     TermUnitFinalZoneSizing(CurTermUnitSizingNum) = FinalZoneSizing(CurZoneEqNum);
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
-    sd_airterminal(1).SizeSys();
+    sd_airterminal(1).SizeSys(state);
     SizeWaterCoil(state, 1);
     EXPECT_NEAR(WaterCoil(1).MaxWaterVolFlowRate, .0000850575, 0.000000001);
     EXPECT_NEAR(WaterCoil(1).UACoil, 300.00, 0.01);
@@ -1166,7 +1166,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils5)
     EXPECT_EQ("SPACE1-1", Zone(1).Name);
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
-    GetWaterCoilInput();
+    GetWaterCoilInput(state);
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
@@ -1381,7 +1381,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
-    GetWaterCoilInput();
+    GetWaterCoilInput(state);
     WaterCoils::GetWaterCoilsInputFlag = false;
     WaterCoils::MySizeFlag(1) = true;
     WaterCoils::MyUAAndFlowCalcFlag(1) = false;
@@ -1409,7 +1409,7 @@ TEST_F(EnergyPlusFixture, TestSizingRoutineForHotWaterCoils6)
     sd_airterminal(1).ZoneFloorArea = Zone(1).FloorArea;
 
     OutputReportPredefined::SetPredefinedTables();
-    sd_airterminal(1).SizeSys();
+    sd_airterminal(1).SizeSys(state);
     DataGlobals::BeginEnvrnFlag = true;
 
     // water coil is user input for water flow and UA with performance input method = UFactorTimesAreaAndDesignWaterFlowRate and Rated Capacity =

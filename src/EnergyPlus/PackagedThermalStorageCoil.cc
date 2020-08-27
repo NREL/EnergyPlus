@@ -1480,7 +1480,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(item).EvapWaterSupplyName = cAlphaArgs(60);
                 TESCoil(item).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(TESCoil(item).Name,
+                SetupTankDemandComponent(state, TESCoil(item).Name,
                                          cCurrentModuleObject,
                                          TESCoil(item).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -1493,7 +1493,7 @@ namespace PackagedThermalStorageCoil {
             } else {
                 TESCoil(item).CondensateCollectName = cAlphaArgs(61);
                 TESCoil(item).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(TESCoil(item).Name,
+                SetupTankSupplyComponent(state, TESCoil(item).Name,
                                          cCurrentModuleObject,
                                          TESCoil(item).CondensateCollectName,
                                          ErrorsFound,

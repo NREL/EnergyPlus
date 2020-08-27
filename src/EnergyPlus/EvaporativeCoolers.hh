@@ -335,12 +335,12 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(std::string const &CompName, int &CompIndex, Real64 const PartLoadRatio = 1.0);
+    void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 const PartLoadRatio = 1.0);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetEvapInput();
+    void GetEvapInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -480,11 +480,11 @@ namespace EvaporativeCoolers {
     // Used to clear global data between Unit Tests, should not be normally called
     void clear_state();
 
-    int GetInletNodeNum(std::string const &EvapCondName,
+    int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName,
         bool &ErrorsFound
     );
 
-    int GetOutletNodeNum(std::string const &EvapCondName,
+    int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName,
         bool &ErrorsFound
     );
 

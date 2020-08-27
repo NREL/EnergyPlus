@@ -194,7 +194,7 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(std::string const &CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
+    void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 const ZoneEvapCoolerPLR)
     {
 
         // SUBROUTINE INFORMATION:
@@ -218,7 +218,7 @@ namespace EvaporativeCoolers {
 
         // Obtains and Allocates EvapCooler related parameters from input file
         if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
-            GetEvapInput();
+            GetEvapInput(state);
             GetInputEvapComponentsFlag = false;
         }
 
@@ -274,7 +274,7 @@ namespace EvaporativeCoolers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetEvapInput()
+    void GetEvapInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -387,7 +387,7 @@ namespace EvaporativeCoolers {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(EvapCond(EvapCoolNum).EvapCoolerName,
+                SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -469,7 +469,7 @@ namespace EvaporativeCoolers {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(EvapCond(EvapCoolNum).EvapCoolerName,
+                SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -564,7 +564,7 @@ namespace EvaporativeCoolers {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(EvapCond(EvapCoolNum).EvapCoolerName,
+                SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -659,7 +659,7 @@ namespace EvaporativeCoolers {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(EvapCond(EvapCoolNum).EvapCoolerName,
+                SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -784,7 +784,7 @@ namespace EvaporativeCoolers {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 EvapCond(EvapCoolNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(EvapCond(EvapCoolNum).EvapCoolerName,
+                SetupTankDemandComponent(state, EvapCond(EvapCoolNum).EvapCoolerName,
                                          cCurrentModuleObject,
                                          EvapCond(EvapCoolNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -3674,7 +3674,7 @@ namespace EvaporativeCoolers {
         int NodeNum;  // index to loop counter
 
         if (GetInputEvapComponentsFlag) {
-            GetEvapInput();
+            GetEvapInput(state);
             GetInputEvapComponentsFlag = false;
         }
 
@@ -4591,11 +4591,11 @@ namespace EvaporativeCoolers {
         }
 
         if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, PartLoadRatio);
+            SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, PartLoadRatio);
         }
 
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, PartLoadRatio);
+            SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, PartLoadRatio);
         }
         if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -4773,11 +4773,11 @@ namespace EvaporativeCoolers {
         }
 
         if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index);
+            SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index);
         }
 
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
+            SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index);
         }
         if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -4906,11 +4906,11 @@ namespace EvaporativeCoolers {
         }
 
         if (ZoneEvapUnit(UnitNum).EvapCooler_1_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, FanSpeedRatio);
+            SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_1_Name, ZoneEvapUnit(UnitNum).EvapCooler_1_Index, FanSpeedRatio);
         }
 
         if ((ZoneEvapUnit(UnitNum).EvapCooler_2_Index > 0) && ZoneEvapUnit(UnitNum).EvapCooler_2_AvailStatus) {
-            SimEvapCooler(ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, FanSpeedRatio);
+            SimEvapCooler(state, ZoneEvapUnit(UnitNum).EvapCooler_2_Name, ZoneEvapUnit(UnitNum).EvapCooler_2_Index, FanSpeedRatio);
         }
         if (ZoneEvapUnit(UnitNum).FanLocation == DrawThruFan) {
             if (ZoneEvapUnit(UnitNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -5009,7 +5009,7 @@ namespace EvaporativeCoolers {
         ZoneEquipmentListChecked = false;
     }
 
-    int GetInletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
+    int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -5028,7 +5028,7 @@ namespace EvaporativeCoolers {
         int WhichEvapCond;
 
         if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
-            GetEvapInput();
+            GetEvapInput(state);
             GetInputEvapComponentsFlag = false;
         }
 
@@ -5044,7 +5044,7 @@ namespace EvaporativeCoolers {
         return NodeNum;
     }
 
-    int GetOutletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
+    int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -5063,7 +5063,7 @@ namespace EvaporativeCoolers {
         int WhichEvapCond;
 
         if (GetInputEvapComponentsFlag) { // First time subroutine has been entered
-            GetEvapInput();
+            GetEvapInput(state);
             GetInputEvapComponentsFlag = false;
         }
         WhichEvapCond = UtilityRoutines::FindItemInList(EvapCondName, EvapCond, &EvapConditions::EvapCoolerName, NumEvapCool);

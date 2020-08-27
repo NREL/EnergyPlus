@@ -86,9 +86,9 @@ namespace EnergyPlus {
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
 }
 
-int CoilCoolingDX::factory(std::string const & coilName) {
+int CoilCoolingDX::factory(EnergyPlusData &state, std::string const & coilName) {
     if (coilCoolingDXGetInputFlag) {
-        CoilCoolingDX::getInput();
+        CoilCoolingDX::getInput(state);
         coilCoolingDXGetInputFlag = false;
     }
     int handle = -1;
@@ -107,7 +107,7 @@ void CoilCoolingDX::clear_state() {
     coilCoolingDXGetInputFlag = true;
 }
 
-void CoilCoolingDX::getInput() {
+void CoilCoolingDX::getInput(EnergyPlusData &state) {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
@@ -129,12 +129,12 @@ void CoilCoolingDX::getInput() {
         input_specs.condensate_collection_water_storage_tank_name = cAlphaArgs(9);
         input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
         CoilCoolingDX thisCoil;
-        thisCoil.instantiateFromInputSpec(input_specs);
+        thisCoil.instantiateFromInputSpec(state, input_specs);
         coilCoolingDXs.push_back(thisCoil);
     }
 }
 
-void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data)
+void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification& input_data)
 {
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
@@ -193,7 +193,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
                                                                         DataLoopNode::ObjectIsNotParent);
 
     if (!input_data.condensate_collection_water_storage_tank_name.empty()) {
-        WaterManager::SetupTankSupplyComponent(this->name,
+        WaterManager::SetupTankSupplyComponent(state, this->name,
                                                coilCoolingDXObjectName,
                                  input_data.condensate_collection_water_storage_tank_name,
                                  errorsFound,
@@ -202,7 +202,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     }
 
     if (!input_data.evaporative_condenser_supply_water_storage_tank_name.empty()) {
-        WaterManager::SetupTankDemandComponent(this->name,
+        WaterManager::SetupTankDemandComponent(state, this->name,
                                                coilCoolingDXObjectName,
                                  input_data.evaporative_condenser_supply_water_storage_tank_name,
                                  errorsFound,

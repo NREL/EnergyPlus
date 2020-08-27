@@ -966,7 +966,7 @@ namespace HVACMultiSpeedHeatPump {
                     MSHeatPump(MSHPNum).HeatCoilName = Alphas(11);
                     // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
-                    MSHeatPump(MSHPNum).CoilControlNode = GetCoilWaterInletNode("Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
+                    MSHeatPump(MSHPNum).CoilControlNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
                         ErrorsFound = true;
@@ -974,7 +974,7 @@ namespace HVACMultiSpeedHeatPump {
 
                     // Get the ReHeat Coil hot water max volume flow rate
                     errFlag = false;
-                    MSHeatPump(MSHPNum).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
+                    MSHeatPump(MSHPNum).MaxCoilFluidFlow = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).HeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
                         ErrorsFound = true;
@@ -1225,7 +1225,7 @@ namespace HVACMultiSpeedHeatPump {
                     // Get the Heating Coil water Inlet or control Node number
                     errFlag = false;
                     MSHeatPump(MSHPNum).SuppCoilControlNode =
-                        GetCoilWaterInletNode("Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
+                        GetCoilWaterInletNode(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
                         ErrorsFound = true;
@@ -1234,7 +1234,7 @@ namespace HVACMultiSpeedHeatPump {
                     // Get the ReHeat Coil hot water max volume flow rate
                     errFlag = false;
                     MSHeatPump(MSHPNum).MaxSuppCoilFluidFlow =
-                        GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
+                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHPNum).SuppHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + MSHeatPump(MSHPNum).Name);
                         ErrorsFound = true;
@@ -1904,7 +1904,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
                 MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow =
-                    GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
+                    GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
 
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
@@ -1912,7 +1912,7 @@ namespace HVACMultiSpeedHeatPump {
                                            PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow =
-                        GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound) * rho;
+                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
                 MSHeatPump(MSHeatPumpNum).CoilOutletNode = PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum)
@@ -1974,7 +1974,7 @@ namespace HVACMultiSpeedHeatPump {
                     ShowFatalError("InitMSHeatPump: Program terminated for previous conditions.");
                 }
                 MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow =
-                    GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
+                    GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
 
                 if (MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow > 0.0) {
                     rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
@@ -1982,7 +1982,7 @@ namespace HVACMultiSpeedHeatPump {
                                            PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidIndex,
                                            RoutineName);
                     MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow =
-                        GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound) * rho;
+                        GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound) * rho;
                 }
                 // fill outlet node for coil
                 MSHeatPump(MSHeatPumpNum).SuppCoilOutletNode = PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum)
@@ -2153,7 +2153,7 @@ namespace HVACMultiSpeedHeatPump {
                         SimulateWaterCoilComponents(state,
                             MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).HeatCoilNum);
 
-                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).LoopNum).FluidName,
                                                    DataGlobals::HWInitConvTemp,
@@ -2201,7 +2201,7 @@ namespace HVACMultiSpeedHeatPump {
                         SimulateWaterCoilComponents(state,
                             MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum);
 
-                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(MSHeatPump(MSHeatPumpNum).SuppLoopNum).FluidName,
                                                    DataGlobals::HWInitConvTemp,

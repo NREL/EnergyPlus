@@ -156,7 +156,7 @@ namespace Humidifiers {
         GetInputFlag = true;
     }
 
-    void SimHumidifier(std::string const &CompName,              // name of the humidifier unit
+    void SimHumidifier(EnergyPlusData &state, std::string const &CompName,              // name of the humidifier unit
                        bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
                        int &CompIndex                            // Pointer to Humidifier Unit
     )
@@ -179,7 +179,7 @@ namespace Humidifiers {
         Real64 WaterAddNeeded; // output in kg/s needed from humidifier to meet humidity setpoint
 
         if (GetInputFlag) {
-            GetHumidifierInput();
+            GetHumidifierInput(state);
             GetInputFlag = false;
         }
 
@@ -240,7 +240,7 @@ namespace Humidifiers {
         thisHum.ReportHumidifier();
     }
 
-    void GetHumidifierInput()
+    void GetHumidifierInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -353,7 +353,7 @@ namespace Humidifiers {
             if (lAlphaBlanks(5)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(
+                SetupTankDemandComponent(state, 
                     Alphas(1), CurrentModuleObject, Alphas(5), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }
@@ -419,9 +419,9 @@ namespace Humidifiers {
             if (lAlphaBlanks(6)) {
                 Humidifier(HumNum).SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                SetupTankDemandComponent(
+                SetupTankDemandComponent(state, 
                     Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).WaterTankDemandARRID);
-                SetupTankSupplyComponent(
+                SetupTankSupplyComponent(state,
                     Alphas(1), CurrentModuleObject, Alphas(6), ErrorsFound, Humidifier(HumNum).WaterTankID, Humidifier(HumNum).TankSupplyID);
                 Humidifier(HumNum).SuppliedByWaterSystem = true;
             }
@@ -1439,7 +1439,7 @@ namespace Humidifiers {
         AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * SecInHour;
     }
 
-    int GetAirInletNodeNum(std::string const &HumidifierName,
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
         bool &ErrorsFound
     )
     {
@@ -1461,7 +1461,7 @@ namespace Humidifiers {
 
         // Obtains and Allocates heat exchanger related parameters from input file
         if (GetInputFlag) {
-            GetHumidifierInput();
+            GetHumidifierInput(state);
             GetInputFlag = false;
         }
 
@@ -1477,7 +1477,7 @@ namespace Humidifiers {
         return NodeNum;
     }
 
-    int GetAirOutletNodeNum(std::string const &HumidifierName,
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
         bool &ErrorsFound
     )
     {
@@ -1486,7 +1486,7 @@ namespace Humidifiers {
         // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.
 
         if (GetInputFlag) {
-            GetHumidifierInput();
+            GetHumidifierInput(state);
             GetInputFlag = false;
         }
 

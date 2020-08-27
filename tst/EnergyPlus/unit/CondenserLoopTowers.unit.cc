@@ -508,7 +508,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
 
     WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
     state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
@@ -900,7 +900,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
 
     WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -1331,7 +1331,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
 
     WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -1746,7 +1746,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
 
     WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -2230,7 +2230,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
 
     WeatherManager::ResetEnvironmentCounter(state);
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
@@ -2659,7 +2659,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     SimulationManager::SetupSimulation(state, ErrorsFound);
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
     // check the low speed nominal capacity field is autosized
     EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCapWasAutoSized);
     // check user input value for high speed nominal capacity
@@ -3448,7 +3448,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     DataGlobals::KickOffSimulation = true;
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
 
@@ -3916,7 +3916,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
     auto &VSTower = state.dataCondenserLoopTowers.towers(1);
 
     DataPlant::PlantFirstSizesOkayToFinalize = true;

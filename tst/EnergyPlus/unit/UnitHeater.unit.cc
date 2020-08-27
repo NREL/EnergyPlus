@@ -1293,7 +1293,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetWaterCoilInput();
+    GetWaterCoilInput(state);
     EXPECT_FALSE(ErrorsFound);
     GetWaterCoilsInputFlag = false;
 

@@ -269,27 +269,9 @@ namespace FaultsManager {
         // METHODOLOGY EMPLOYED:
         // Get number of faults-related input objects and assign faults input to data structure
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using ScheduleManager::GetScheduleIndex;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetobjectItem call
@@ -450,7 +432,7 @@ namespace FaultsManager {
                 if (UtilityRoutines::SameString(SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil")) {
                     // Read in evaporative cooler is not done yet
                     if (EvaporativeCoolers::GetInputEvapComponentsFlag) {
-                        EvaporativeCoolers::GetEvapInput();
+                        EvaporativeCoolers::GetEvapInput(state);
                         EvaporativeCoolers::GetInputEvapComponentsFlag = false;
                     }
 
@@ -927,7 +909,7 @@ namespace FaultsManager {
                            UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Cooling:Water:Detailedgeometry")) {
                     // Read in coil input if not done yet
                     if (WaterCoils::GetWaterCoilsInputFlag) {
-                        WaterCoils::GetWaterCoilInput();
+                        WaterCoils::GetWaterCoilInput(state);
                         WaterCoils::GetWaterCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
@@ -1082,7 +1064,7 @@ namespace FaultsManager {
             {
                 // Read in tower input if not done yet
                 if (state.dataCondenserLoopTowers.GetInput) {
-                    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+                    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
                     state.dataCondenserLoopTowers.GetInput = false;
                 }
                 // Check the tower name and tower type
@@ -1186,7 +1168,7 @@ namespace FaultsManager {
             {
                 // Read in tower input if not done yet
                 if (state.dataCondenserLoopTowers.GetInput) {
-                    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+                    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
                     state.dataCondenserLoopTowers.GetInput = false;
                 }
                 // Check the tower name and tower type
@@ -1726,7 +1708,7 @@ namespace FaultsManager {
             {
                 // Obtains and Allocates WaterCoil related parameters from input file
                 if (WaterCoils::GetWaterCoilsInputFlag) {
-                    WaterCoils::GetWaterCoilInput();
+                    WaterCoils::GetWaterCoilInput(state);
                     WaterCoils::GetWaterCoilsInputFlag = false;
                 }
 

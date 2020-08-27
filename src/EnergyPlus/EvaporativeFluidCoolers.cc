@@ -104,11 +104,11 @@ namespace EvaporativeFluidCoolers {
     Array1D<EvapFluidCoolerSpecs> SimpleEvapFluidCooler; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleEvapFluidCoolerNames;
 
-    PlantComponent *EvapFluidCoolerSpecs::factory(int objectType, std::string const &objectName)
+    PlantComponent *EvapFluidCoolerSpecs::factory(EnergyPlusData &state, int objectType, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
         if (GetEvapFluidCoolerInputFlag) {
-            GetEvapFluidCoolerInput();
+            GetEvapFluidCoolerInput(state);
             GetEvapFluidCoolerInputFlag = false;
         }
 
@@ -124,7 +124,7 @@ namespace EvaporativeFluidCoolers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GetEvapFluidCoolerInput()
+    void GetEvapFluidCoolerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -342,7 +342,7 @@ namespace EvaporativeFluidCoolers {
             if (AlphArray(10).empty()) {
                 thisEFC.SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        DataIPShortCuts::cCurrentModuleObject,
                                                        AlphArray(10),
                                                        ErrorsFound,
@@ -623,7 +623,7 @@ namespace EvaporativeFluidCoolers {
             if (DataIPShortCuts::lAlphaFieldBlanks(9)) {
                 thisEFC.SuppliedByWaterSystem = false;
             } else { // water from storage tank
-                WaterManager::SetupTankDemandComponent(AlphArray(1),
+                WaterManager::SetupTankDemandComponent(state, AlphArray(1),
                                                        DataIPShortCuts::cCurrentModuleObject,
                                                        AlphArray(9),
                                                        ErrorsFound,

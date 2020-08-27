@@ -136,7 +136,7 @@ namespace ZoneDehumidifier {
 
     // Functions
 
-    void SimZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, std::string const &CompName,   // Name of the zone dehumidifier
+    void SimZoneDehumidifier(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier, std::string const &CompName,   // Name of the zone dehumidifier
                              int const ZoneNum,             // Number of zone being served
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                              Real64 &QSensOut,              // Sensible capacity delivered to zone (W)
@@ -144,7 +144,7 @@ namespace ZoneDehumidifier {
                              int &CompIndex                 // Index to the zone dehumidifier
     );
 
-    void GetZoneDehumidifierInput(ZoneDehumidifierData &dataZoneDehumidifier);
+    void GetZoneDehumidifierInput(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier);
 
     void InitZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
 
@@ -160,7 +160,7 @@ namespace ZoneDehumidifier {
 
     void ReportZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const DehumidNum); // Index of the current zone dehumidifier being simulated
 
-    bool GetZoneDehumidifierNodeNumber(ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber); // Node being tested
+    bool GetZoneDehumidifierNodeNumber(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber); // Node being tested
 
 } // namespace ZoneDehumidifier
 

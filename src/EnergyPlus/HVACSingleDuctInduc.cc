@@ -199,7 +199,7 @@ namespace HVACSingleDuctInduc {
 
         // First time SimIndUnit is called, get the input for all the passive terminal induction units
         if (GetIUInputFlag) {
-            GetIndUnits();
+            GetIndUnits(state);
             GetIUInputFlag = false;
         }
 
@@ -227,7 +227,7 @@ namespace HVACSingleDuctInduc {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitIndUnit(state.dataBranchInputManager, IUNum, FirstHVACIteration);
+        InitIndUnit(state, IUNum, FirstHVACIteration);
 
         TermUnitIU = true;
 
@@ -257,7 +257,7 @@ namespace HVACSingleDuctInduc {
         IndUnit(IUNum).ReportIndUnit();
     }
 
-    void GetIndUnits()
+    void GetIndUnits(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -380,7 +380,7 @@ namespace HVACSingleDuctInduc {
 
             IndUnit(IUNum).HCoil = Alphas(7); // name of heating coil object
             IsNotOK = false;
-            IndUnit(IUNum).HWControlNode = GetCoilWaterInletNode(IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, IsNotOK);
+            IndUnit(IUNum).HWControlNode = GetCoilWaterInletNode(state, IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError("In " + CurrentModuleObject + " = " + IndUnit(IUNum).Name);
                 ShowContinueError("..Only Coil:Heating:Water is allowed.");
@@ -402,7 +402,7 @@ namespace HVACSingleDuctInduc {
 
             IndUnit(IUNum).CCoil = Alphas(9); // name of cooling coil object
             IsNotOK = false;
-            IndUnit(IUNum).CWControlNode = GetCoilWaterInletNode(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, IsNotOK);
+            IndUnit(IUNum).CWControlNode = GetCoilWaterInletNode(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, IsNotOK);
             if (IsNotOK) {
                 ShowContinueError("In " + CurrentModuleObject + " = " + IndUnit(IUNum).Name);
                 ShowContinueError("..Only Coil:Cooling:Water or Coil:Cooling:Water:DetailedGeometry is allowed.");
@@ -496,7 +496,7 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void InitIndUnit(BranchInputManagerData &dataBranchInputManager,
+    void InitIndUnit(EnergyPlusData &state,
                      int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
@@ -564,7 +564,7 @@ namespace HVACSingleDuctInduc {
         if (MyPlantScanFlag(IUNum) && allocated(PlantLoop)) {
             if (IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
                                         IndUnit(IUNum).HCoil,
                                         IndUnit(IUNum).HCoil_PlantTypeNum,
                                         IndUnit(IUNum).HWLoopNum,
@@ -584,7 +584,7 @@ namespace HVACSingleDuctInduc {
             if (IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ||
                 IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state.dataBranchInputManager,
                                         IndUnit(IUNum).CCoil,
                                         IndUnit(IUNum).CCoil_PlantTypeNum,
                                         IndUnit(IUNum).CWLoopNum,
@@ -636,7 +636,7 @@ namespace HVACSingleDuctInduc {
 
         if (!SysSizingCalc && MySizeFlag(IUNum)) {
 
-            SizeIndUnit(IUNum);
+            SizeIndUnit(state, IUNum);
             MySizeFlag(IUNum) = false;
         }
 
@@ -747,7 +747,7 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void SizeIndUnit(int const IUNum)
+    void SizeIndUnit(EnergyPlusData &state, int const IUNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -883,8 +883,8 @@ namespace HVACSingleDuctInduc {
 
                 if (UtilityRoutines::SameString(IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
 
-                    CoilWaterInletNode = GetCoilWaterInletNode("Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode("Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
+                    CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
+                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", IndUnit(IUNum).HCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
                             MyPlantSizingIndex("Coil:Heating:Water", IndUnit(IUNum).HCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
@@ -986,8 +986,8 @@ namespace HVACSingleDuctInduc {
                 if (UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water") ||
                     UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
 
-                    CoilWaterInletNode = GetCoilWaterInletNode(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
+                    CoilWaterInletNode = GetCoilWaterInletNode(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
+                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizCoolNum =
                             MyPlantSizingIndex(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
@@ -1073,10 +1073,10 @@ namespace HVACSingleDuctInduc {
             // save the induction ratio for use in subsequent sizing calcs
             TermUnitSizing(CurTermUnitSizingNum).InducRat = IndUnit(IUNum).InducRatio;
             if (UtilityRoutines::SameString(IndUnit(IUNum).HCoilType, "Coil:Heating:Water")) {
-                SetCoilDesFlow(IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
+                SetCoilDesFlow(state, IndUnit(IUNum).HCoilType, IndUnit(IUNum).HCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
             }
             if (UtilityRoutines::SameString(IndUnit(IUNum).CCoilType, "Coil:Cooling:Water:DetailedGeometry")) {
-                SetCoilDesFlow(IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
+                SetCoilDesFlow(state, IndUnit(IUNum).CCoilType, IndUnit(IUNum).CCoil, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
             }
         }
     }
@@ -1569,7 +1569,7 @@ namespace HVACSingleDuctInduc {
 
     // ========================= Utilities =======================
 
-    bool FourPipeInductionUnitHasMixer(std::string const &CompName) // component (mixer) name
+    bool FourPipeInductionUnitHasMixer(EnergyPlusData &state, std::string const &CompName) // component (mixer) name
     {
 
         // FUNCTION INFORMATION:
@@ -1589,7 +1589,7 @@ namespace HVACSingleDuctInduc {
         int ItemNum;
 
         if (GetIUInputFlag) {
-            GetIndUnits();
+            GetIndUnits(state);
             GetIUInputFlag = false;
         }
 

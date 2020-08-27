@@ -90,6 +90,8 @@ namespace EnergyPlus {
     struct AirLoopHVACDOASData;
     struct BaseboardRadiatorData;
     struct BaseboardElectricData;
+
+    struct WaterManagerData;
     struct WaterThermalTanksData;
     struct WaterToAirHeatPumpData;
     struct WaterToAirHeatPumpSimpleData;
@@ -139,6 +141,7 @@ namespace EnergyPlus {
 
         IOFiles files;
 
+        std::unique_ptr<WaterManagerData> dataWaterManager;
         std::unique_ptr<WaterThermalTanksData> dataWaterThermalTanks;
         std::unique_ptr<WaterToAirHeatPumpData> dataWaterToAirHeatPump;
         std::unique_ptr<WaterToAirHeatPumpSimpleData> dataWaterToAirHeatPumpSimple;

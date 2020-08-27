@@ -257,7 +257,7 @@ namespace SingleDuct {
 
         void InitSys(EnergyPlusData &state, bool const FirstHVACIteration);
 
-        void SizeSys();
+        void SizeSys(EnergyPlusData &state);
 
         void SimVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 

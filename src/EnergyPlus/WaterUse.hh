@@ -227,7 +227,7 @@ namespace WaterUse {
         {
         }
 
-        static PlantComponent *factory(WaterUseData &dataWaterUse, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, WaterUseData &dataWaterUse, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -246,9 +246,9 @@ namespace WaterUse {
         void setupOutputVars(WaterUseData &EP_UNUSED(dataWaterUse));
     };
 
-    void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse, bool FirstHVACIteration);
+    void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void GetWaterUseInput(WaterUseData &dataWaterUse);
+    void GetWaterUseInput(EnergyPlusData &state, WaterUseData &dataWaterUse);
 
     void ReportStandAloneWaterUse(WaterUseData &dataWaterUse);
 

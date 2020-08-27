@@ -332,16 +332,7 @@ namespace WaterCoils {
                                      Optional_int_const FanOpMode = _,
                                      Optional<Real64 const> PartLoadRatio = _);
 
-    // Get Input Section of the Module
-    //******************************************************************************
-
-    void GetWaterCoilInput();
-
-    // End of Get Input subroutines for the HB Module
-    //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
+    void GetWaterCoilInput(EnergyPlusData &state);
 
     void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
@@ -349,12 +340,6 @@ namespace WaterCoils {
     CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
 
     void SizeWaterCoil(EnergyPlusData &state, int const CoilNum);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
 
     void CalcSimpleHeatingCoil(int const CoilNum,          // index to heating coil
                                int const FanOpMode,        // fan operating mode
@@ -374,10 +359,6 @@ namespace WaterCoils {
                      int const FanOpMode,       // fan operating mode
                      Real64 const PartLoadRatio // part-load ratio of heating coil
     );
-
-    // End Algorithm Section of the Module
-
-    // Coil Completely Dry Subroutine for Cooling Coil
 
     void CoilCompletelyDry(int const CoilNum,
                            Real64 const WaterTempIn,  // Entering water temperature
@@ -509,48 +490,48 @@ namespace WaterCoils {
                           int &icvg                         // Iteration convergence flag
     );
 
-    void CheckWaterCoilSchedule(std::string const &CompType, // unused1208
+    void CheckWaterCoilSchedule(EnergyPlusData &state, std::string const &CompType, // unused1208
                                 std::string const &CompName,
                                 Real64 &Value,
                                 int &CompIndex);
 
-    Real64 GetCoilMaxWaterFlowRate(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilWaterInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilWaterInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilWaterOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilWaterOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    void SetCoilDesFlow(std::string const &CoilType, // must match coil types in this module
+    void SetCoilDesFlow(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         Real64 const CoilDesFlow,    // coil volumetric air flow rate [m3/s]
                         bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetWaterCoilDesAirFlow(std::string const &CoilType, // must match coil types in this module
+    Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     );
 
-    void CheckActuatorNode(int const ActuatorNodeNum, // input actuator node number
+    void CheckActuatorNode(EnergyPlusData &state, int const ActuatorNodeNum, // input actuator node number
                            int &iNodeType,            // Cooling or Heating or 0
                            bool &NodeNotFound         // true if matching water inlet node not found
     );
@@ -571,12 +552,12 @@ namespace WaterCoils {
 
     Real64 EstimateHEXSurfaceArea(int const CoilNum); // coil number, [-]
 
-    int GetWaterCoilIndex(std::string const &CoilType, // must match coil types in this module
+    int GetWaterCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetWaterCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetWaterCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
@@ -591,14 +572,14 @@ namespace WaterCoils {
                                              bool &InitLoopEquip // If not zero, calculate the max load for operating conditions
     );
 
-    int GetWaterCoilAvailScheduleIndex(std::string const &CoilType, // must match coil types in this module
+    int GetWaterCoilAvailScheduleIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                        std::string const &CoilName, // must match coil names for the coil type
                                        bool &ErrorsFound            // set to true if problem
     );
 
     // sets data to a coil that is used as a regeneration air heating coil in
     // desiccant dehumidification system
-    void SetWaterCoilData(int const CoilNum,                           // index of hot water heating Coil
+    void SetWaterCoilData(EnergyPlusData &state, int const CoilNum,                           // index of hot water heating Coil
                           bool &ErrorsFound,                           // Set to true if certain errors found
                           Optional_bool DesiccantRegenerationCoil = _, // Flag that this coil is used as regeneration air heating coil
                           Optional_int DesiccantDehumIndex = _         // Index for the desiccant dehum system where this caoil is used

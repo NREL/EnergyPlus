@@ -274,7 +274,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates WaterCoil related parameters from input file
         if (GetWaterCoilsInputFlag) { // First time subroutine has been entered
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -338,7 +338,7 @@ namespace WaterCoils {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetWaterCoilInput()
+    void GetWaterCoilInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -674,7 +674,7 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 WaterCoil(CoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(WaterCoil(CoilNum).Name,
+                SetupTankSupplyComponent(state, WaterCoil(CoilNum).Name,
                                          CurrentModuleObject,
                                          WaterCoil(CoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -859,7 +859,7 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 WaterCoil(CoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(WaterCoil(CoilNum).Name,
+                SetupTankSupplyComponent(state, WaterCoil(CoilNum).Name,
                                          CurrentModuleObject,
                                          WaterCoil(CoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -5604,7 +5604,7 @@ namespace WaterCoils {
         }
     }
 
-    void CheckWaterCoilSchedule(std::string const &EP_UNUSED(CompType), // unused1208
+    void CheckWaterCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), // unused1208
                                 std::string const &CompName,
                                 Real64 &Value,
                                 int &CompIndex)
@@ -5627,7 +5627,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates WaterCoil related parameters from input file
         if (GetWaterCoilsInputFlag) { // First time subroutine has been entered
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5653,7 +5653,7 @@ namespace WaterCoils {
         }
     }
 
-    Real64 GetCoilMaxWaterFlowRate(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     )
@@ -5678,7 +5678,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates WaterCoil related parameters from input file
         if (GetWaterCoilsInputFlag) { // First time subroutine has been entered
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5705,7 +5705,7 @@ namespace WaterCoils {
         return MaxWaterFlowRate;
     }
 
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -5730,7 +5730,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates DXCoils
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5756,7 +5756,7 @@ namespace WaterCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state), std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -5781,7 +5781,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates DXCoils
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5808,7 +5808,7 @@ namespace WaterCoils {
         return NodeNumber;
     }
 
-    int GetCoilWaterInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilWaterInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     )
@@ -5833,7 +5833,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates DXCoils
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5859,7 +5859,7 @@ namespace WaterCoils {
         return NodeNumber;
     }
 
-    int GetCoilWaterOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilWaterOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     )
@@ -5884,7 +5884,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates DXCoils
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5910,7 +5910,7 @@ namespace WaterCoils {
         return NodeNumber;
     }
 
-    void SetCoilDesFlow(std::string const &CoilType, // must match coil types in this module
+    void SetCoilDesFlow(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         Real64 const CoilDesFlow,    // coil volumetric air flow rate [m3/s]
                         bool &ErrorsFound            // set to true if problem
@@ -5932,7 +5932,7 @@ namespace WaterCoils {
         int WhichCoil; // index to coil
 
         if (GetWaterCoilsInputFlag) { // First time subroutine has been entered
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5953,7 +5953,7 @@ namespace WaterCoils {
         }
     }
 
-    Real64 GetWaterCoilDesAirFlow(std::string const &CoilType, // must match coil types in this module
+    Real64 GetWaterCoilDesAirFlow(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     )
@@ -5977,7 +5977,7 @@ namespace WaterCoils {
         CoilDesAirFlow = 0.0;
 
         if (GetWaterCoilsInputFlag) { // First time subroutine has been entered
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -5997,7 +5997,7 @@ namespace WaterCoils {
         return CoilDesAirFlow;
     }
 
-    void CheckActuatorNode(int const ActuatorNodeNum, // input actuator node number
+    void CheckActuatorNode(EnergyPlusData &state, int const ActuatorNodeNum, // input actuator node number
                            int &iNodeType,            // Cooling or Heating or 0
                            bool &NodeNotFound         // true if matching water inlet node not found
     )
@@ -6013,33 +6013,13 @@ namespace WaterCoils {
         // This subroutine checks that the input actuator node number is matched by
         // the water inlet node number of some water coil
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichCoil;
         int CoilNum;
 
         // Obtains and Allocates DXCoils
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -6110,7 +6090,7 @@ namespace WaterCoils {
 
         // Obtains and Allocates DXCoils
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -6383,7 +6363,7 @@ namespace WaterCoils {
         return WaterCoil(CoilNum).UACoilTotal * UOverallHeatTransferCoef_inv; // Heat exchanger surface area [m2]
     }
 
-    int GetWaterCoilIndex(std::string const &CoilType, // must match coil types in this module
+    int GetWaterCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -6405,7 +6385,7 @@ namespace WaterCoils {
 
         // Obtains and allocates WaterCoil related parameters from input file
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -6428,7 +6408,7 @@ namespace WaterCoils {
         return IndexNum;
     }
 
-    Real64 GetWaterCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetWaterCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -6453,7 +6433,7 @@ namespace WaterCoils {
 
         // Obtains and allocates WaterCoil related parameters from input file
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -6573,7 +6553,7 @@ namespace WaterCoils {
         }
     }
 
-    int GetWaterCoilAvailScheduleIndex(std::string const &CoilType, // must match coil types in this module
+    int GetWaterCoilAvailScheduleIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                        std::string const &CoilName, // must match coil names for the coil type
                                        bool &ErrorsFound            // set to true if problem
     )
@@ -6599,7 +6579,7 @@ namespace WaterCoils {
         // Obtains and Allocates HeatingCoil related parameters from input file
         // Obtains and Allocates DXCoils
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 
@@ -6625,7 +6605,7 @@ namespace WaterCoils {
         return AvailSchIndex;
     }
 
-    void SetWaterCoilData(int const CoilNum,                       // Number of hot water heating Coil
+    void SetWaterCoilData(EnergyPlusData &state, int const CoilNum,                       // Number of hot water heating Coil
                           bool &ErrorsFound,                       // Set to true if certain errors found
                           Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
                           Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this caoil is used
@@ -6645,7 +6625,7 @@ namespace WaterCoils {
         using General::TrimSigDigits;
 
         if (GetWaterCoilsInputFlag) {
-            GetWaterCoilInput();
+            GetWaterCoilInput(state);
             GetWaterCoilsInputFlag = false;
         }
 

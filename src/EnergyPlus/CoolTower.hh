@@ -136,9 +136,9 @@ namespace CoolTower {
         }
     };
 
-    void ManageCoolTower(CoolTowerData &dataCoolTower);
+    void ManageCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower);
 
-    void GetCoolTower(CoolTowerData &dataCoolTower);
+    void GetCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower);
 
     void CalcCoolTower(CoolTowerData &dataCoolTower);
 

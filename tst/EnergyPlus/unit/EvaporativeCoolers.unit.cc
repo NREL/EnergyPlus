@@ -221,7 +221,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput();
+    GetEvapInput(state);
 
     // Set Parameters for Evap Cooler on Main Air Loop System
     PrimaryAirSystem(CurSysNum).Branch(1).Comp(1).Name = EvapCond(EvapCoolNum).EvapCoolerName;
@@ -301,7 +301,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput();
+    GetEvapInput(state);
     // check autosized input fields from idf snippet read
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).RecircPumpPower);
@@ -612,7 +612,7 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput();
+    GetEvapInput(state);
 
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
@@ -689,7 +689,7 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput();
+    GetEvapInput(state);
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).RecircPumpPower);
@@ -843,7 +843,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetEvapInput();
+    GetEvapInput(state);
     // check blank autosizable input fields default to autosize
     EXPECT_EQ(DataSizing::AutoSize, EvapCond(EvapCoolNum).DesVolFlowRate);
 
@@ -887,7 +887,7 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EvaporativeCoolers::GetEvapInput();
+    EvaporativeCoolers::GetEvapInput(state);
     ASSERT_FALSE(ErrorsFound);
 
     int AirLoopNum = 1;

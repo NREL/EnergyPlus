@@ -403,11 +403,11 @@ namespace WaterThermalTanks {
                 (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOnMode == IHPMode)) { // default is to specify the air nodes for SCWH mode
                 bool bDWHCoilReading = false;
                 this->HeatPumpAirInletNode =
-                    VariableSpeedCoils::GetCoilInletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+                    VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
                                                                       IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
                                                                       bDWHCoilReading);
                 this->HeatPumpAirOutletNode =
-                    VariableSpeedCoils::GetCoilOutletNodeVariableSpeed("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
+                    VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED",
                                                                        IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).DWHCoilName,
                                                                        bDWHCoilReading);
                 this->DXCoilAirInletNode = this->HeatPumpAirInletNode;
@@ -912,7 +912,7 @@ namespace WaterThermalTanks {
             } else if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(9), "Coil:Cooling:DX:VariableSpeed")) {
                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXVariableCooling;
                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum =
-                    VariableSpeedCoils::GetCoilIndexVariableSpeed(DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
+                    VariableSpeedCoils::GetCoilIndexVariableSpeed(state, DataIPShortCuts::cAlphaArgs(9), DataIPShortCuts::cAlphaArgs(10), errFlag);
                 if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) {
                     DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                         DataHeatBalance::HeatReclaimVS_DXCoil(state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
@@ -1357,9 +1357,9 @@ namespace WaterThermalTanks {
                 // This could be a variable speed heat pump water heater
                 bool bVSCoilErrFlag = false;
 
-                bool checkIHPFirst = IntegratedHeatPump::IHPInModel();
+                bool checkIHPFirst = IntegratedHeatPump::IHPInModel(state);
                 if (checkIHPFirst) {
-                    HPWH.DXCoilNum = IntegratedHeatPump::GetCoilIndexIHP("COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag);
+                    HPWH.DXCoilNum = IntegratedHeatPump::GetCoilIndexIHP(state, "COILSYSTEM:INTEGRATEDHEATPUMP:AIRSOURCE", HPWH.DXCoilName, bVSCoilErrFlag);
 
                     if (!bVSCoilErrFlag) {
                         HPWH.bIsIHP = true;
@@ -1368,7 +1368,7 @@ namespace WaterThermalTanks {
 
                 if (bVSCoilErrFlag || !checkIHPFirst) {
                     bVSCoilErrFlag = false;
-                    HPWH.DXCoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(
+                    HPWH.DXCoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(state,
                         "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed", HPWH.DXCoilName, bVSCoilErrFlag);
 
                     if (bVSCoilErrFlag) {
@@ -1601,13 +1601,13 @@ namespace WaterThermalTanks {
                 if (HPWH.bIsIHP) {
                     HPWH.Capacity =
                         GetDWHCoilCapacityIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
-                    HPWH.DXCoilAirInletNode = IntegratedHeatPump::GetCoilInletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    HPWH.DXCoilAirInletNode = IntegratedHeatPump::GetCoilInletNodeIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                     HPWH.DXCoilPLFFPLR =
-                        GetIHPDWHCoilPLFFPLR(HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
+                        GetIHPDWHCoilPLFFPLR(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
                 } else {
-                    HPWH.Capacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                    HPWH.DXCoilAirInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                    HPWH.DXCoilPLFFPLR = VariableSpeedCoils::GetVSCoilPLFFPLR(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    HPWH.Capacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    HPWH.DXCoilAirInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    HPWH.DXCoilPLFFPLR = VariableSpeedCoils::GetVSCoilPLFFPLR(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                 }
                 //         check the range of condenser pump power to be <= 5 gpm/ton, will be checked in the coil object
             }
@@ -1940,9 +1940,9 @@ namespace WaterThermalTanks {
                 // set fan outlet node variable for use in setting Node(FanOutletNode)%MassFlowRateMax for fan object
                 if (bIsVScoil) {
                     if (HPWH.bIsIHP) {
-                        HPWH.FanOutletNode = IntegratedHeatPump::GetDWHCoilInletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                        HPWH.FanOutletNode = IntegratedHeatPump::GetDWHCoilInletNodeIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                     } else {
-                        HPWH.FanOutletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                        HPWH.FanOutletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                     }
                 } else {
                     HPWH.FanOutletNode = DXCoils::DXCoil(HPWH.DXCoilNum).AirInNode;
@@ -2010,9 +2010,9 @@ namespace WaterThermalTanks {
             int DXCoilAirOutletNodeNum(0);
             if ((HPWH.DXCoilNum > 0) && (bIsVScoil)) {
                 if (HPWH.bIsIHP) {
-                    DXCoilAirOutletNodeNum = IntegratedHeatPump::GetDWHCoilOutletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    DXCoilAirOutletNodeNum = IntegratedHeatPump::GetDWHCoilOutletNodeIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                 } else {
-                    DXCoilAirOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
+                    DXCoilAirOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                 }
 
             } else if (HPWH.DXCoilNum > 0) {
@@ -8913,7 +8913,7 @@ namespace WaterThermalTanks {
                         IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).CurMode = IHPMode;
                         this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                     } else {
-                        SpeedNum = IntegratedHeatPump::GetLowSpeedNumIHP(HeatPump.DXCoilNum);
+                        SpeedNum = IntegratedHeatPump::GetLowSpeedNumIHP(state, HeatPump.DXCoilNum);
 
                         this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                         IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
@@ -9094,8 +9094,8 @@ namespace WaterThermalTanks {
                     SpeedRatio = 1.0;
                     int LowSpeedNum = 2;
                     if (HeatPump.bIsIHP) {
-                        LowSpeedNum = IntegratedHeatPump::GetLowSpeedNumIHP(HeatPump.DXCoilNum);
-                        MaxSpeedNum = IntegratedHeatPump::GetMaxSpeedNumIHP(HeatPump.DXCoilNum);
+                        LowSpeedNum = IntegratedHeatPump::GetLowSpeedNumIHP(state, HeatPump.DXCoilNum);
+                        MaxSpeedNum = IntegratedHeatPump::GetMaxSpeedNumIHP(state, HeatPump.DXCoilNum);
                     }
 
                     for (int i = LowSpeedNum; i <= MaxSpeedNum; ++i) {

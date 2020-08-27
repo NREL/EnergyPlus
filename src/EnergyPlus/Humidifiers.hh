@@ -57,6 +57,8 @@
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace Humidifiers {
 
     // Using/Aliasing
@@ -183,18 +185,18 @@ namespace Humidifiers {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SimHumidifier(std::string const &CompName,   // name of the humidifier unit
+    void SimHumidifier(EnergyPlusData &state, std::string const &CompName,   // name of the humidifier unit
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        int &CompIndex                 // Pointer to Humidifier Unit
     );
 
-    void GetHumidifierInput();
+    void GetHumidifierInput(EnergyPlusData &state);
 
-    int GetAirInletNodeNum(std::string const &HumidifierName,
+    int GetAirInletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
         bool &ErrorsFound
     );
 
-    int GetAirOutletNodeNum(std::string const &HumidifierName,
+    int GetAirOutletNodeNum(EnergyPlusData &state, std::string const &HumidifierName,
         bool &ErrorsFound
     );
 

@@ -319,7 +319,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
 
     GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
-    GetIndUnits();
+    GetIndUnits(state);
 
     EXPECT_EQ("AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction", IndUnit(1).UnitType); // AT SD VAV Reheat Type
     EXPECT_EQ("SPACE1-1 FPIU", IndUnit(1).Name);                                               // AT SD VAV Reheat Name

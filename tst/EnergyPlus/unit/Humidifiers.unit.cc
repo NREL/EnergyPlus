@@ -230,7 +230,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_GetHumidifierInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetHumidifierInput();
+    GetHumidifierInput(state);
     ASSERT_EQ(1, NumHumidifiers);
     EXPECT_EQ(1, Humidifier(1).EfficiencyCurvePtr);
 }

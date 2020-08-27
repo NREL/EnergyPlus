@@ -842,7 +842,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == Humidifier) { // 'Humidifier:Steam:Electric'
                 // 'Humidifier:Steam:Gas'
                 if (Sim) {
-                    SimHumidifier(CompName, FirstHVACIteration, CompIndex);
+                    SimHumidifier(state, CompName, FirstHVACIteration, CompIndex);
                 }
 
                 // Unglazed Transpired Solar Collector
@@ -864,7 +864,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == EvapCooler) { // 'EvaporativeCooler:Direct:CelDekPad','EvaporativeCooler:Indirect:CelDekPad'
                 // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
                 if (Sim) {
-                    SimEvapCooler(CompName, CompIndex);
+                    SimEvapCooler(state, CompName, CompIndex);
                 }
 
             } else if (SELECT_CASE_var == VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
@@ -5033,7 +5033,7 @@ namespace MixedAir {
                         CoilName = CompName;
                         CoilType = CompType;
                     }
-                    SetCoilDesFlow(CoilType, CoilName, this->MinOA, ErrorsFound);
+                    SetCoilDesFlow(state, CoilType, CoilName, this->MinOA, ErrorsFound);
                 }
             } // End of component loop
         }

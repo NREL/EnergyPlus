@@ -201,7 +201,7 @@ namespace RoomAirModelAirflowNetwork {
             thisRAFN.CalcRoomAirModelAirflowNetwork(ThisRoomAirNode);
         }
 
-        thisRAFN.UpdateRoomAirModelAirflowNetwork(*state.dataZoneDehumidifier);
+        thisRAFN.UpdateRoomAirModelAirflowNetwork(state);
 
     } // SimRoomAirModelAirflowNetwork
 
@@ -756,7 +756,7 @@ namespace RoomAirModelAirflowNetwork {
 
     } // CalcRoomAirModelAirflowNetwork
 
-    void RAFNData::UpdateRoomAirModelAirflowNetwork(ZoneDehumidifierData &dataZoneDehumidifier)
+    void RAFNData::UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -797,7 +797,7 @@ namespace RoomAirModelAirflowNetwork {
 
         if (!ThisRAFNZone.IsUsed) return;
 
-        if (!ZoneSizingCalc) SumSystemDepResponseForNode(dataZoneDehumidifier);
+        if (!ZoneSizingCalc) SumSystemDepResponseForNode(state);
 
         AirNodeNum = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
 
@@ -1381,7 +1381,7 @@ namespace RoomAirModelAirflowNetwork {
 
     //*****************************************************************************************
 
-    void RAFNData::SumSystemDepResponseForNode(ZoneDehumidifierData &dataZoneDehumidifier)
+    void RAFNData::SumSystemDepResponseForNode(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith
@@ -1422,7 +1422,7 @@ namespace RoomAirModelAirflowNetwork {
             for (I = 1; I <= ThisRAFNZone.Node(RoomAirNode).NumHVACs; ++I) {
                 if (ThisRAFNZone.Node(RoomAirNode).HVAC(I).TypeOfNum == ZoneEquipTypeOf_DehumidifierDX) {
                     if (SysOutputProvided == 0.0)
-                        SimZoneDehumidifier(dataZoneDehumidifier, ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
+                        SimZoneDehumidifier(state, *state.dataZoneDehumidifier, ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
                                             ZoneNum,
                                             false,
                                             SysOutputProvided,

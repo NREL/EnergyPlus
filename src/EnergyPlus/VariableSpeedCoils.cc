@@ -332,7 +332,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -424,7 +424,7 @@ namespace VariableSpeedCoils {
         VarSpeedCoil(DXCoilNum).SpeedRatioReport = SpeedRatio;
     }
 
-    void GetVarSpeedCoilInput()
+    void GetVarSpeedCoilInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1059,7 +1059,7 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(VarSpeedCoil(DXCoilNum).Name,
+                SetupTankDemandComponent(state, VarSpeedCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          VarSpeedCoil(DXCoilNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -1073,7 +1073,7 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 VarSpeedCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(VarSpeedCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, VarSpeedCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          VarSpeedCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,
@@ -6679,7 +6679,7 @@ namespace VariableSpeedCoils {
         VarSpeedCoil(DXCoilNum).QWasteHeat = QWasteHeat;
     }
 
-    Real64 GetCoilCapacityVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacityVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                         std::string const &CoilName, // must match coil names for the coil type
                                         bool &ErrorsFound            // set to true if problem
     )
@@ -6707,7 +6707,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -6741,7 +6741,7 @@ namespace VariableSpeedCoils {
         return CoilCapacity;
     }
 
-    int GetCoilIndexVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     )
@@ -6766,7 +6766,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -6781,7 +6781,7 @@ namespace VariableSpeedCoils {
         return IndexNum;
     }
 
-    Real64 GetCoilAirFlowRateVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilAirFlowRateVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                            std::string const &CoilName, // must match coil names for the coil type
                                            bool &ErrorsFound            // set to true if problem
     )
@@ -6806,7 +6806,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -6840,7 +6840,7 @@ namespace VariableSpeedCoils {
         return CoilAirFlowRate;
     }
 
-    int GetVSCoilPLFFPLR(std::string const &CoilType, // must match coil types in this module
+    int GetVSCoilPLFFPLR(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -6865,7 +6865,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -6884,7 +6884,7 @@ namespace VariableSpeedCoils {
         return PLRNumber;
     }
 
-    int GetVSCoilCapFTCurveIndex(int const &CoilIndex, // must match coil names for the coil type
+    int GetVSCoilCapFTCurveIndex(EnergyPlusData &state, int const &CoilIndex, // must match coil names for the coil type
                                  bool &ErrorsFound     // set to true if problem
     )
     {
@@ -6903,7 +6903,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -6918,7 +6918,7 @@ namespace VariableSpeedCoils {
         return CapFTIndex;
     }
 
-    int GetCoilInletNodeVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                       std::string const &CoilName, // must match coil names for the coil type
                                       bool &ErrorsFound            // set to true if problem
     )
@@ -6946,7 +6946,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -6965,7 +6965,7 @@ namespace VariableSpeedCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNodeVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNodeVariableSpeed(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                        std::string const &CoilName, // must match coil names for the coil type
                                        bool &ErrorsFound            // set to true if problem
     )
@@ -6993,7 +6993,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -7012,7 +7012,7 @@ namespace VariableSpeedCoils {
         return NodeNumber;
     }
 
-    int GetVSCoilCondenserInletNode(std::string const &CoilName, // must match coil names for the coil type
+    int GetVSCoilCondenserInletNode(EnergyPlusData &state, std::string const &CoilName, // must match coil names for the coil type
                                     bool &ErrorsFound            // set to true if problem
     )
     {
@@ -7035,7 +7035,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -7052,7 +7052,7 @@ namespace VariableSpeedCoils {
         return CondNode;
     }
 
-    Real64 GetVSCoilMinOATCompressor(std::string const &CoilName, // must match coil names for the coil type
+    Real64 GetVSCoilMinOATCompressor(EnergyPlusData &state, std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     )
     {
@@ -7075,7 +7075,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -7092,7 +7092,7 @@ namespace VariableSpeedCoils {
         return MinOAT;
     }
 
-    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+    Real64 GetVSCoilMinOATCompressorUsingIndex(EnergyPlusData &state, int const CoilIndex, // index to cooling coil
                                                bool &ErrorsFound    // set to true if problem
     )
     {
@@ -7111,7 +7111,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -7130,7 +7130,7 @@ namespace VariableSpeedCoils {
         return MinOAT;
     }
 
-    int GetVSCoilNumOfSpeeds(std::string const &CoilName, // must match coil names for the coil type
+    int GetVSCoilNumOfSpeeds(EnergyPlusData &state, std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     )
     {
@@ -7153,7 +7153,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -7169,7 +7169,7 @@ namespace VariableSpeedCoils {
         return Speeds;
     }
 
-    void SetVarSpeedCoilData(int const WSHPNum,                    // Number of OA Controller
+    void SetVarSpeedCoilData(EnergyPlusData &state, int const WSHPNum,                    // Number of OA Controller
                              bool &ErrorsFound,                    // Set to true if certain errors found
                              Optional_int CompanionCoolingCoilNum, // Index to cooling coil for heating coil = SimpleWSHPNum
                              Optional_int CompanionHeatingCoilNum, // Index to heating coil for cooling coil = SimpleWSHPNum
@@ -7193,7 +7193,7 @@ namespace VariableSpeedCoils {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetVarSpeedCoilInput();
+            GetVarSpeedCoilInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }

@@ -422,7 +422,7 @@ namespace HVACManager {
             }
         }
 
-        ManageWaterInits();
+        ManageWaterInits(state);
 
         // Only simulate once per zone timestep; must be after SimHVAC
         if (FirstTimeStepSysFlag && MetersHaveBeenInitialized) {
@@ -479,7 +479,7 @@ namespace HVACManager {
                     }
                 }
 
-                ManageWaterInits();
+                ManageWaterInits(state);
 
                 // Need to set the flag back since we do not need to shift the temps back again in the correct step.
                 ShortenTimeStepSys = false;
@@ -514,7 +514,7 @@ namespace HVACManager {
             DetectOscillatingZoneTemp(*state.dataZoneTempPredictorCorrector);
             UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             UpdateIceFractions();          // Update fraction of ice stored in TES
-            ManageWater();
+            ManageWater(state);
             // update electricity data for net, purchased, sold etc.
             DummyLogical = false;
             facilityElectricServiceObj->manageElectricPowerService(state, false, DummyLogical, true);

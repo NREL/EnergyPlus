@@ -186,12 +186,12 @@ namespace PoweredInductionUnits {
 
     void GetPIUs(EnergyPlusData &state);
 
-    void InitPIU(BranchInputManagerData &dataBranchInputManager,
+    void InitPIU(EnergyPlusData &state,
                  int const PIUNum,             // number of the current fan coil unit being simulated
                  bool const FirstHVACIteration // TRUE if first zone equip this HVAC step
     );
 
-    void SizePIU(int const PIUNum);
+    void SizePIU(EnergyPlusData &state, int const PIUNum);
 
     void CalcSeriesPIU(EnergyPlusData &state, int const PIUNum,             // number of the current PIU being simulated
                        int const ZoneNum,            // number of zone being served

@@ -2300,7 +2300,7 @@ namespace HVACVariableRefrigerantFlow {
                 VRF(VRFNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 VRF(VRFNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(VRF(VRFNum).Name,
+                SetupTankDemandComponent(state, VRF(VRFNum).Name,
                                          cCurrentModuleObject,
                                          VRF(VRFNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -4226,7 +4226,7 @@ namespace HVACVariableRefrigerantFlow {
                         // Get the supplemental heating coil water Inlet or control node number
                         errFlag = false;
                         VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode =
-                            WaterCoils::GetCoilWaterInletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                            WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", SuppHeatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
@@ -4234,7 +4234,7 @@ namespace HVACVariableRefrigerantFlow {
                         // Get the supplemental heating coil hot water max volume flow rate
                         errFlag = false;
                         VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
-                            WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                            WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", SuppHeatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
                             ErrorsFound = true;
@@ -5244,7 +5244,7 @@ namespace HVACVariableRefrigerantFlow {
                                                         _,
                                                         _);
 
-                WaterCoils::SetCoilDesFlow(DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).SuppHeatCoilType_Num),
+                WaterCoils::SetCoilDesFlow(state, DataHVACGlobals::cAllCoilTypes(VRFTU(VRFTUNum).SuppHeatCoilType_Num),
                                            VRFTU(VRFTUNum).SuppHeatCoilName,
                                            VRFTU(VRFTUNum).MaxHeatAirVolFlow,
                                            errFlag);
@@ -5253,7 +5253,7 @@ namespace HVACVariableRefrigerantFlow {
                     ShowFatalError(RoutineName + ": Program terminated for previous conditions.");
                 }
                 VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow =
-                    WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
+                    WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
 
                 if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow > 0.0) {
                     rho = GetDensityGlycol(PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
@@ -6003,7 +6003,7 @@ namespace HVACVariableRefrigerantFlow {
                             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex);
                         // design hot water volume flow rate
                         Real64 CoilMaxVolFlowRate =
-                            WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
+                            WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(VRFTU(VRFTUNum).SuppHeatCoilLoopNum).FluidName,
                                                    DataGlobals::HWInitConvTemp,
@@ -7708,7 +7708,7 @@ namespace HVACVariableRefrigerantFlow {
 
         if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
             bool ErrorsFound = false;
-            WaterCoils::SetCoilDesFlow(
+            WaterCoils::SetCoilDesFlow(state, 
                 VRFTU(VRFTUNum).SuppHeatCoilType, VRFTU(VRFTUNum).SuppHeatCoilName, VRFTU(VRFTUNum).MaxHeatAirVolFlow, ErrorsFound);
         }
 

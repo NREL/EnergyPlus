@@ -467,10 +467,10 @@ namespace CondenserLoopTowers {
                                   Array1D<Real64> const &Par // par(1) = Tower number
         );
 
-        static PlantComponent *factory(CondenserLoopTowersData &dataCondenserLoopTowers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, CondenserLoopTowersData &dataCondenserLoopTowers, std::string const &objectName);
     };
 
-    void GetTowerInput(CondenserLoopTowersData &dataCondenserLoopTowers);
+    void GetTowerInput(EnergyPlusData &state, CondenserLoopTowersData &dataCondenserLoopTowers);
 
 } // namespace CondenserLoopTowers
 

@@ -504,7 +504,7 @@ namespace HVACDXSystem {
                 } else if (UtilityRoutines::SameString(Alphas(6), "Coil:Cooling:DX:VariableSpeed")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = Coil_CoolingAirToAirVariableSpeed;
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex =
-                        GetCoilIndexVariableSpeed("Coil:Cooling:DX:VariableSpeed", DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrFound);
+                        GetCoilIndexVariableSpeed(state, "Coil:Cooling:DX:VariableSpeed", DXCoolingSystem(DXCoolSysNum).CoolingCoilName, ErrFound);
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
                         ErrorsFound = true;

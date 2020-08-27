@@ -52,35 +52,20 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
+    struct EnergyPlusData;
+
 namespace WaterManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-    // na
+    void ManageWater(EnergyPlusData &state);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
+    void ManageWaterInits(EnergyPlusData &state);
 
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE WaterManager:
-    // pointers for water storage tanks and their supply arrays
-    // pointers for water storage tanks and their demand arrays
-
-    // Functions
-
-    void clear_state();
-
-    void ManageWater();
-
-    void ManageWaterInits();
-
-    void GetWaterManagerInput();
+    void GetWaterManagerInput(EnergyPlusData &state);
 
     void UpdatePrecipitation();
 
@@ -90,7 +75,7 @@ namespace WaterManager {
 
     void CalcWaterStorageTank(int const TankNum); // Index of storage tank
 
-    void SetupTankSupplyComponent(std::string const &CompName,
+    void SetupTankSupplyComponent(EnergyPlusData &state, std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
@@ -104,7 +89,7 @@ namespace WaterManager {
                                           int &TankIndex,
                                           int &WaterSupplyIndex);
 
-    void SetupTankDemandComponent(std::string const &CompName,
+    void SetupTankDemandComponent(EnergyPlusData &state, std::string const &CompName,
                                   std::string const &CompType,
                                   std::string const &TankName,
                                   bool &ErrorsFound,
@@ -122,11 +107,35 @@ namespace WaterManager {
 
     void CalcGroundwaterWell(int const WellNum); // Index of well
 
-    void UpdateWaterManager();
+    void UpdateWaterManager(EnergyPlusData &state);
 
     void ReportWaterManager();
 
 } // namespace WaterManager
+
+struct WaterManagerData : BaseGlobalStruct {
+
+    bool MyOneTimeFlag;
+    bool GetInputFlag; // First time, input is "gotten"
+    bool MyEnvrnFlag;   // flag for init once at start of environment
+    bool MyWarmupFlag; // flag for init after warmup complete
+    bool MyTankDemandCheckFlag;
+
+    void clear_state() override
+    {
+        MyOneTimeFlag = true;
+        GetInputFlag = true;
+        MyEnvrnFlag = true;
+        MyWarmupFlag = false;
+        MyTankDemandCheckFlag = true;
+    }
+
+    // Default Constructor
+    WaterManagerData()
+        :     MyOneTimeFlag(true), GetInputFlag(true), MyEnvrnFlag(true), MyWarmupFlag(false), MyTankDemandCheckFlag(true)
+    {
+    }
+};
 
 } // namespace EnergyPlus
 

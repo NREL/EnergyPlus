@@ -2106,7 +2106,7 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // fourPipeInduction units
-            if (FourPipeInductionUnitHasMixer(MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
+            if (FourPipeInductionUnitHasMixer(state, MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
         }
     }
     FoundNames.deallocate();

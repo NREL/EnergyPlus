@@ -2896,7 +2896,7 @@ namespace ZoneEquipmentManager {
                                        LatOutputProvided);
 
                     } else if (SELECT_CASE_var == ZoneDXDehumidifier_Num) { // 'ZoneHVAC:Dehumidifier:DX'
-                        SimZoneDehumidifier(*state.dataZoneDehumidifier, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimZoneDehumidifier(state, *state.dataZoneDehumidifier, state.dataZoneEquipmentManager->PrioritySimOrder(EquipTypeNum).EquipName,
                                             ActualZoneNum,
                                             FirstHVACIteration,
                                             SysOutputProvided,
@@ -4757,7 +4757,7 @@ namespace ZoneEquipmentManager {
         }
 
         ManageEarthTube();
-        ManageCoolTower(state.dataCoolTower);
+        ManageCoolTower(state, state.dataCoolTower);
         ManageThermalChimney();
 
         // Assign zone air temperature

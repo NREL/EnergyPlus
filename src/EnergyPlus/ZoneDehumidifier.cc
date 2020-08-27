@@ -119,7 +119,7 @@ namespace ZoneDehumidifier {
     using General::TrimSigDigits;
     using namespace ScheduleManager;
 
-    void SimZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, std::string const &CompName,              // Name of the zone dehumidifier
+    void SimZoneDehumidifier(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier, std::string const &CompName,              // Name of the zone dehumidifier
                              int const ZoneNum,                        // Number of zone being served
                              bool const EP_UNUSED(FirstHVACIteration), // TRUE if 1st HVAC simulation of system timestep
                              Real64 &QSensOut,                         // Sensible capacity delivered to zone (W)
@@ -144,24 +144,12 @@ namespace ZoneDehumidifier {
         // Using/Aliasing
         using DataZoneEnergyDemands::ZoneSysMoistureDemand;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneDehumidNum;   // Index of zone dehumidifier being simulated
         Real64 QZnDehumidReq; // Zone dehumidification load required (kg moisture/sec)
 
         if (dataZoneDehumidifier.GetInputFlag) {
-            GetZoneDehumidifierInput(dataZoneDehumidifier);
+            GetZoneDehumidifierInput(state, dataZoneDehumidifier);
             dataZoneDehumidifier.GetInputFlag = false;
         }
 
@@ -198,7 +186,7 @@ namespace ZoneDehumidifier {
         ReportZoneDehumidifier(dataZoneDehumidifier, ZoneDehumidNum);
     }
 
-    void GetZoneDehumidifierInput(ZoneDehumidifierData &dataZoneDehumidifier)
+    void GetZoneDehumidifierInput(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier)
     {
 
         // SUBROUTINE INFORMATION:
@@ -213,30 +201,17 @@ namespace ZoneDehumidifier {
         // METHODOLOGY EMPLOYED:
         // Standard EnergyPlus methodology using available utility routines where appropriate.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
         using CurveManager::CurveValue;
         using CurveManager::GetCurveIndex;
         using NodeInputManager::GetOnlySingleNode;
         using WaterManager::SetupTankSupplyComponent;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetZoneDehumidifierInput");
         static std::string const CurrentModuleObject("ZoneHVAC:Dehumidifier:DX");
         Real64 const RatedInletAirTemp(26.7);
         Real64 const RatedInletAirRH(60.0);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ZoneDehumidIndex;           // Loop index
@@ -444,7 +419,7 @@ namespace ZoneDehumidifier {
                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode = dataZoneDehumidifier.CondensateDiscarded;
             } else {
                 dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).CondensateCollectMode = dataZoneDehumidifier.CondensateToTank;
-                SetupTankSupplyComponent(dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).Name,
+                SetupTankSupplyComponent(state, dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).Name,
                                          CurrentModuleObject,
                                          dataZoneDehumidifier.ZoneDehumid(ZoneDehumidIndex).CondensateCollectName,
                                          ErrorsFound,
@@ -1126,7 +1101,7 @@ namespace ZoneDehumidifier {
         }
     }
 
-    bool GetZoneDehumidifierNodeNumber(ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber) // Node being tested
+    bool GetZoneDehumidifierNodeNumber(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber) // Node being tested
     {
 
         // FUNCTION INFORMATION:
@@ -1139,36 +1114,13 @@ namespace ZoneDehumidifier {
         // After making sure get input is done, the node number of indicated
         // zone dehumidifier is returned.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
         // Return value
         bool FindZoneDehumidifierNodeNumber; // Zone Dehumidifier Node Number Check
 
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
         int ZoneDehumidIndex; // Loop index
 
-        // FUNCTION PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        // na
-
         if (dataZoneDehumidifier.GetInputFlag) {
-            GetZoneDehumidifierInput(dataZoneDehumidifier);
+            GetZoneDehumidifierInput(state, dataZoneDehumidifier);
             dataZoneDehumidifier.GetInputFlag = false;
         }
 

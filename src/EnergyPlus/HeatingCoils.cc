@@ -1087,7 +1087,7 @@ namespace HeatingCoils {
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:VariableSpeed")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COIL_DX_VARIABLE_COOLING;
                 HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum =
-                    VariableSpeedCoils::GetCoilIndexVariableSpeed(Alphas(5), Alphas(6), DXCoilErrFlag);
+                    VariableSpeedCoils::GetCoilIndexVariableSpeed(state, Alphas(5), Alphas(6), DXCoilErrFlag);
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) {
                     if (allocated(DataHeatBalance::HeatReclaimVS_DXCoil)) {
                         DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
@@ -3286,7 +3286,7 @@ namespace HeatingCoils {
                 break;
             }
         } else if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:VARIABLESPEED")) {
-            CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(CoilType, CoilName, GetCoilErrFlag);
+            CoilNum = VariableSpeedCoils::GetCoilIndexVariableSpeed(state, CoilType, CoilName, GetCoilErrFlag);
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
                 if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil(NumCoil).ReclaimHeatingCoilName != CoilName)
                     continue;
