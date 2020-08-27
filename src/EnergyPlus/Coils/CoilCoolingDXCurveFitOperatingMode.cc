@@ -68,10 +68,12 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     this->name = input_data.name;
     this->ratedGrossTotalCap = input_data.gross_rated_total_cooling_capacity;
     this->ratedEvapAirFlowRate = input_data.rated_evaporator_air_flow_rate;
+    this->ratedCondAirFlowRate = input_data.rated_condenser_air_flow_rate;
     this->maxCyclingRate = input_data.maximum_cycling_rate;
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
     this->timeForCondensateRemoval = input_data.nominal_time_for_condensate_removal_to_begin;
+    // TODO: UNUSED apply_latent_degradation_to_speeds_greater_than_1
     this->nominalEvaporativePumpPower = input_data.nominal_evap_condenser_pump_power;
 
     // Must all be greater than zero to use the latent capacity degradation model
