@@ -50,7 +50,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include "../Coils/CoilCoolingDXFixture.hh"
 
 using namespace EnergyPlus;
@@ -65,6 +68,9 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput )
 }
 
 TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
+
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
 
     std::string idf_objects = delimited_string({
 
@@ -93,8 +99,8 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
 
         "Coil:Cooling:DX:CurveFit:OperatingMode,",
         "  Coil Cooling DX Curve Fit Operating Mode 1, !- Name",
-        "  1000.0,                               !- Rated Gross Total Cooling Capacity {W}",
-        "  1.0,                                    !- Rated Evaporator Air Flow Rate {m3/s}",
+        "  Autosize,                               !- Rated Gross Total Cooling Capacity {W}",
+        "  Autosize,                                    !- Rated Evaporator Air Flow Rate {m3/s}",
         "  Autosize,                               !- Rated Condenser Air Flow Rate {m3/s}",
         "  0,                                      !- Maximum Cycling Rate {cycles/hr}",
         "  0,                                      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
@@ -110,13 +116,97 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     EXPECT_TRUE(process_idf( idf_objects, false ));
     CoilCoolingDXCurveFitOperatingMode thisMode("Coil Cooling DX Curve Fit Operating Mode 1");
     EXPECT_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
-    EXPECT_EQ(1.0, thisMode.ratedEvapAirFlowRate);
-    EXPECT_EQ(1000.0, thisMode.ratedGrossTotalCap);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedGrossTotalCap);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedCondAirFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.nominalEvaporativePumpPower);
+
+
+    DataSizing::FinalZoneSizing.allocate(1);
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataSizing::SysSizPeakDDNum.allocate(1);
+
+    DataSizing::CurSysNum = 0;
+    DataSizing::CurOASysNum = 0;
+    DataSizing::CurZoneEqNum = 1;
+    DataEnvironment::StdRhoAir = 1.0; // Prevent divide by zero in ReportSizingManager
+    DataEnvironment::StdBaroPress = 101325.0;
+
+    DataSizing::ZoneSizingRunDone = true;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).DesignSizeFromParent = false;
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod.allocate(25);
+    DataSizing::ZoneEqSizing(DataSizing::CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+
+    Real64 ratedEvapAirFlowRate = 1.005;
+
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolVolFlow = ratedEvapAirFlowRate;
+
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInTemp = 30.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).DesCoolCoilInHumRat = 0.001;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesTemp = 15.0;
+    DataSizing::FinalZoneSizing(DataSizing::CurZoneEqNum).CoolDesHumRat = 0.0006;
+
     thisMode.size(state);
 
-    EXPECT_EQ(1000.0, thisMode.ratedGrossTotalCap);
-    EXPECT_EQ(0.000114*thisMode.ratedGrossTotalCap, thisMode.ratedCondAirFlowRate);
-    EXPECT_EQ(0.004266*thisMode.ratedGrossTotalCap, thisMode.nominalEvaporativePumpPower);
+    // We need to commit, so that the ComponentSizes is actually written
+    EnergyPlus::sqlite->sqliteCommit();
+
+    EXPECT_EQ(ratedEvapAirFlowRate, thisMode.ratedEvapAirFlowRate);
+    Real64 ratedGrossTotalCap = 18827.616766698276;
+    EXPECT_EQ(ratedGrossTotalCap, thisMode.ratedGrossTotalCap);
+    // Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
+    Real64 ratedCondAirFlowRate = 0.000114 * ratedGrossTotalCap;
+    EXPECT_EQ(ratedCondAirFlowRate, thisMode.ratedCondAirFlowRate);
+    // Total Capacity * 0.004266 w/w (15 W/ton)
+    Real64 nominalEvaporativePumpPower = 0.004266 * ratedGrossTotalCap;
+    EXPECT_EQ(nominalEvaporativePumpPower, thisMode.nominalEvaporativePumpPower);
+
+    // Now check output tables to ensure that we also get the right units etc
+    const std::string compType = "Coil:Cooling:DX:CurveFit:OperatingMode";
+    const std::string compName = thisMode.name;
+    EXPECT_EQ(compName, "COIL COOLING DX CURVE FIT OPERATING MODE 1");
+
+    struct TestQuery
+    {
+        TestQuery(std::string t_description, std::string t_units, Real64 t_value)
+            : description(t_description), units(t_units), expectedValue(t_value),
+              displayString("Description='" + description + "'; Units='" + units + "'"){};
+
+        const std::string description;
+        const std::string units;
+        const Real64 expectedValue;
+        const std::string displayString;
+    };
+
+    std::vector<TestQuery> testQueries({
+        TestQuery("Design Size Rated Evaporator Air Flow Rate", "m3/s", ratedEvapAirFlowRate),
+        TestQuery("Design Size Rated Gross Total Cooling Capacity", "W", ratedGrossTotalCap),
+        TestQuery("Design Size Rated Condenser Air Flow Rate", "m3/s", ratedCondAirFlowRate),
+        TestQuery("Design Size Nominal Evaporative Condenser Pump Power", "W", nominalEvaporativePumpPower),
+    });
+
+    for (auto &testQuery : testQueries) {
+
+        std::string query("SELECT Value From ComponentSizes"
+                          "  WHERE CompType = '" +
+                          compType +
+                          "'"
+                          "  AND CompName = '" +
+                          compName +
+                          "'"
+                          "  AND Description = '" +
+                          testQuery.description + "'" + "  AND Units = '" + testQuery.units + "'");
+
+        // execAndReturnFirstDouble returns -10000.0 if not found
+        Real64 return_val = SQLiteFixture::execAndReturnFirstDouble(query);
+
+        if (return_val < 0) {
+            EXPECT_TRUE(false) << "Query returned nothing for " << testQuery.displayString;
+        } else {
+            EXPECT_NEAR(testQuery.expectedValue, return_val, 0.01) << "Failed for " << testQuery.displayString;
+        }
+    }
+
+    EnergyPlus::sqlite->sqliteCommit();
+
 }
