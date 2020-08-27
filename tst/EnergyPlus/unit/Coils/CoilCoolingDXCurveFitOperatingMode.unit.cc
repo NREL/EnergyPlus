@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include "../Coils/CoilCoolingDXFixture.hh"
 
 using namespace EnergyPlus;
@@ -61,4 +62,61 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitModeInput )
     CoilCoolingDXCurveFitOperatingMode thisMode("mode1");
     EXPECT_EQ("MODE1", thisMode.name);
     EXPECT_EQ("MODE1SPEED1", thisMode.speeds[0].name);
+}
+
+TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
+
+    std::string idf_objects = delimited_string({
+
+        "Coil:Cooling:DX,",
+        "  Coil Cooling DX 1,                      !- Name",
+        "  Air Loop HVAC Unitary System 5 Fan - Cooling Coil Node, !- Evaporator Inlet Node Name",
+        "  Air Loop HVAC Unitary System 5 Cooling Coil - Heating Coil Node, !- Evaporator Outlet Node Name",
+        "  Always On Discrete,                     !- Availability Schedule Name",
+        "  ,                                       !- Condenser Zone Name",
+        "  Coil Cooling DX 1 Condenser Inlet Node, !- Condenser Inlet Node Name",
+        "  Coil Cooling DX 1 Condenser Outlet Node, !- Condenser Outlet Node Name",
+        "  Coil Cooling DX Curve Fit Performance 1; !- Performance Object Name",
+        "",
+        "Coil:Cooling:DX:CurveFit:Performance,",
+        "  Coil Cooling DX Curve Fit Performance 1, !- Name",
+        "  0,                                      !- Crankcase Heater Capacity {W}",
+        "  -25,                                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "  10,                                     !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "  773.3,                                  !- Unit Internal Static Air Pressure {Pa}",
+        "  Discrete,                               !- Capacity Control Method",
+        "  0,                                      !- Evaporative Condenser Basin Heater Capacity {W/K}",
+        "  2,                                      !- Evaporative Condenser Basin Heater Setpoint Temperature {C}",
+        "  Always On Discrete,                     !- Evaporative Condenser Basin Heater Operating Schedule Name",
+        "  Electricity,                            !- Compressor Fuel Type",
+        "  Coil Cooling DX Curve Fit Operating Mode 1; !- Base Operating Mode",
+
+        "Coil:Cooling:DX:CurveFit:OperatingMode,",
+        "  Coil Cooling DX Curve Fit Operating Mode 1, !- Name",
+        "  1000.0,                               !- Rated Gross Total Cooling Capacity {W}",
+        "  1.0,                                    !- Rated Evaporator Air Flow Rate {m3/s}",
+        "  Autosize,                               !- Rated Condenser Air Flow Rate {m3/s}",
+        "  0,                                      !- Maximum Cycling Rate {cycles/hr}",
+        "  0,                                      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "  0,                                      !- Latent Capacity Time Constant {s}",
+        "  0,                                      !- Nominal Time for Condensate Removal to Begin {s}",
+        "  No,                                     !- Apply Latent Degradation to Speeds Greater than 1",
+        "  EvaporativelyCooled,                    !- Condenser Type",
+        "  Autosize,                               !- Nominal Evaporative Condenser Pump Power {W}",
+        "  1,                                      !- Nominal Speed Number",
+        "  Coil Cooling DX Curve Fit Speed 1;      !- Speed Name 1",
+    });
+    idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
+    EXPECT_TRUE(process_idf( idf_objects, false ));
+    CoilCoolingDXCurveFitOperatingMode thisMode("Coil Cooling DX Curve Fit Operating Mode 1");
+    EXPECT_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
+    EXPECT_EQ(1.0, thisMode.ratedEvapAirFlowRate);
+    EXPECT_EQ(1000.0, thisMode.ratedGrossTotalCap);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedCondAirFlowRate);
+    EXPECT_EQ(DataSizing::AutoSize, thisMode.nominalEvaporativePumpPower);
+    thisMode.size(state);
+
+    EXPECT_EQ(1000.0, thisMode.ratedGrossTotalCap);
+    EXPECT_EQ(0.000114*thisMode.ratedGrossTotalCap, thisMode.ratedCondAirFlowRate);
+    EXPECT_EQ(0.004266*thisMode.ratedGrossTotalCap, thisMode.nominalEvaporativePumpPower);
 }
