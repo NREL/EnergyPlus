@@ -625,7 +625,7 @@ This output field is the latent heat addition (humidification) rate of the unita
 
 This output field is the latent heat extraction (dehumidification) rate of the unitary system in Watts. This value is calculated as the difference between the total energy rate and the sensible energy rate provided by the unitary system. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are averaged for the timestep being reported.
 
-\paragraph{Unitary System Electric Power {[}W{]}}\label{unitary-system-electric-power-w}
+\paragraph{Unitary System Electricity Rate {[}W{]}}\label{unitary-system-electric-power-w}
 
 This output field is the electricity consumption rate of the unitary system in Watts. The consumption includes electricity used by the DX coils (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported. Any non-electric energy use is not reported by the unitary system object but is reported in the associated coil objects as appropriate.
 
@@ -633,7 +633,7 @@ This output field is the electricity consumption rate of the unitary system in W
 
 This output field is the electricity consumption of the unitary system in Joules for the timestep being reported. The consumption includes electricity used by the DX compressor (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported. Any non-electric energy use is not reported by the unitary system object but is reported in the associated coil objects as appropriate.
 
-\paragraph{Unitary System Ancillary Electric Power {[}W{]}}\label{unitary-system-ancillary-electric-power-w}
+\paragraph{Unitary System Ancillary Electricity Rate {[}W{]}}\label{unitary-system-ancillary-electric-power-w}
 
 This output field is the average auxiliary electricity consumption rate (including both on-cycle and off-cycle) in Watts for the timestep being reported.
 
@@ -2028,7 +2028,7 @@ This output field is the latent heat addition (humidification) rate of the multi
 
 This output field is the latent heat extraction (dehumidification) rate of the multispeed heat pump in Watts. This value is calculated as the difference between the total energy rate and the sensible energy rate provided by the multispeed heat pump. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are averaged for the timestep being reported.
 
-\paragraph{Unitary System Electric Power {[}W{]}}\label{unitary-system-electric-power-w-1}
+\paragraph{Unitary System Electricity Rate {[}W{]}}\label{unitary-system-electric-power-w-1}
 
 This output field is the electricity consumption rate of the multispeed heat pump in Watts. The consumption includes electricity used by the DX coils (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported. Any non-electric energy use is not reported by the heat pump object but is reported in the associated coil objects as appropriate.
 
@@ -2036,7 +2036,7 @@ This output field is the electricity consumption rate of the multispeed heat pum
 
 This output field is the electricity consumption of the multispeed heat pump in Joules for the timestep being reported. The consumption includes electricity used by the DX compressor (including crankcase heater if the fuel type is electricity), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), auxiliary power during on and off period, and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are summed for the timestep being reported. Any non-electric energy use is not reported by the heat pump object but is reported in the associated coil objects as appropriate.
 
-\paragraph{Unitary System Ancillary Electric Power {[}W{]}}\label{unitary-system-ancillary-electric-power-w-1}
+\paragraph{Unitary System Ancillary Electricity Rate {[}W{]}}\label{unitary-system-ancillary-electric-power-w-1}
 
 This output field is the average auxiliary electricity consumption rate (including both on-cycle and off-cycle) in Watts for the timestep being reported.
 
@@ -3225,7 +3225,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
 \item
   HVAC,Sum,Unitary System Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Unitary System Electric Power {[}W{]}
+  HVAC,Average,Unitary System Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Unitary System Electric Energy {[}J{]}
 \item
@@ -3288,7 +3288,7 @@ This output field is the latent heat extraction (dehumidification) rate of the C
 
 This output field is the latent heat extraction (dehumidification) of the CBVAV system in Joules over the timestep being reported. This value is calculated as the difference between the total energy and the sensible energy delivered by the system. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are summed for the timestep being reported.
 
-\paragraph{Unitary System Electric Power {[}W{]}}\label{unitary-system-electric-power-w-2}
+\paragraph{Unitary System Electricity Rate {[}W{]}}\label{unitary-system-electric-power-w-2}
 
 This output field is the electricity consumption rate of the CBVAV system in Watts. The consumption includes electricity used by the DX compressor (including crankcase heater), fans (indoor supply air fan and the condenser fans associated with the DX coil{[}s{]}), and the heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 

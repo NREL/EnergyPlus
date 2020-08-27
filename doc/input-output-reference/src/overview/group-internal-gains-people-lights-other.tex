@@ -930,7 +930,7 @@ Lights objects have output variables for individual objects and for zone totals.
 
 \begin{itemize}
 \item
-  Zone,Average,Lights Electric Power {[}W{]}
+  Zone,Average,Lights Electricity Rate {[}W{]}
 \item
   Zone,Sum,Lights Radiant Heat Gain {[}J{]}
 \item
@@ -954,7 +954,7 @@ Lights objects have output variables for individual objects and for zone totals.
 \item
   Zone,Sum,Lights Electric Energy {[}J{]}
 \item
-  Zone,Average,Zone Lights Electric Power {[}W{]}
+  Zone,Average,Zone Lights Electricity Rate {[}W{]}
 \item
   Zone,Sum,Zone Lights Radiant Heating Energy {[}J{]}
 \item
@@ -979,7 +979,7 @@ Lights objects have output variables for individual objects and for zone totals.
   Zone,Sum,Zone Lights Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Lights Electric Power {[}W{]}}\label{lights-electric-power-w}
+\paragraph{Lights Electricity Rate {[}W{]}}\label{lights-electric-power-w}
 
 The electric power input for the lights.
 
@@ -1017,7 +1017,7 @@ The total heat gain from lights. It is the sum of the following four outputs, i.
 
 The lighting electrical consumption including ballasts, if present. These will have the same value as Lights Total Heating Energy (above).
 
-\paragraph{Zone Lights Electric Power {[}W{]}}\label{zone-lights-electric-power-w}
+\paragraph{Zone Lights Electricity Rate {[}W{]}}\label{zone-lights-electric-power-w}
 
 The electric power input for all lights in the zone.
 
@@ -1935,7 +1935,7 @@ Each type of equipment object has output variables for individual objects and fo
 
 \begin{itemize}
 \item
-  Zone,Average,Electric Equipment Electric Power {[}W{]}
+  Zone,Average,Electric Equipment Electricity Rate {[}W{]}
 \item
   Zone,Sum,Electric Equipment Electric Energy {[}J{]}
 \item
@@ -1959,7 +1959,7 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Electric Equipment Total Heating Rate {[}W{]}
 \item
-  Zone,Average,Zone Electric Equipment Electric Power {[}W{]}
+  Zone,Average,Zone Electric Equipment Electricity Rate {[}W{]}
 \item
   Zone,Sum,Zone Electric Equipment Electric Energy {[}J{]}
 \item
@@ -2192,7 +2192,7 @@ Each type of equipment object has output variables for individual objects and fo
   Zone,Average,Zone Other Equipment Total Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Electric Equipment Electric Power {[}W{]}}\label{electric-equipment-electric-power-w}
+\paragraph{Electric Equipment Electricity Rate {[}W{]}}\label{electric-equipment-electric-power-w}
 
 \paragraph{Electric Equipment Electric Energy {[}J{]}}\label{electric-equipment-electric-energy-j}
 
@@ -2458,11 +2458,11 @@ ElectricEquipment:ITE:AirCooled Outputs
 \begin{itemize}
 \tightlist
 \item
-  Zone,Average,ITE CPU Electric Power {[}W{]}
+  Zone,Average,ITE CPU Electricity Rate {[}W{]}
 \item
-  Zone,Average,ITE Fan Electric Power {[}W{]}
+  Zone,Average,ITE Fan Electricity Rate {[}W{]}
 \item
-  Zone,Average,ITE UPS Electric Power {[}W{]}
+  Zone,Average,ITE UPS Electricity Rate {[}W{]}
 \item
   Zone,Average,ITE CPU Electric Power at Design Inlet Conditions {[}W{]}
 \item
@@ -2530,11 +2530,11 @@ ElectricEquipment:ITE:AirCooled Outputs
 \item
   Zone,Average,Zone ITE Adjusted Return Air Temperature {[}C{]}
 \item
-  Zone,Average,Zone ITE CPU Electric Power {[}W{]}
+  Zone,Average,Zone ITE CPU Electricity Rate {[}W{]}
 \item
-  Zone,Average,Zone ITE Fan Electric Power {[}W{]}
+  Zone,Average,Zone ITE Fan Electricity Rate {[}W{]}
 \item
-  Zone,Average,Zone ITE UPS Electric Power {[}W{]}
+  Zone,Average,Zone ITE UPS Electricity Rate {[}W{]}
 \item
   Zone,Average,Zone ITE CPU Electric Power at Design Inlet Conditions {[}W{]}
 \item
@@ -2579,9 +2579,9 @@ ElectricEquipment:ITE:AirCooled Outputs
   Zone,Sum,Zone ITE Any Air Inlet Relative Humidity Below Operating Range Time {[}hr{]}
 \end{itemize}
 
-\paragraph{Zone ITE CPU Electric Power {[}W{]}}\label{zone-ite-cpu-electric-power-w}
+\paragraph{Zone ITE CPU Electricity Rate {[}W{]}}\label{zone-ite-cpu-electric-power-w}
 
-ITE CPU Electric Power {[}W{]}
+ITE CPU Electricity Rate {[}W{]}
 
 \paragraph{Zone ITE CPU Electric Energy {[}J{]}}\label{zone-ite-cpu-electric-energy-j}
 
@@ -2599,9 +2599,9 @@ The electric power (or energy) input to the ITE equipment CPU (total power input
 
 The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power) if the air inlet temperature were held at the design condition. May be used to calculate ``IT efficiency'', the ratio of (IT energy consumed in the facility) / (IT energy that would have been consumed in the facility if the ITE were held at the reference temperature).
 
-\paragraph{Zone ITE Fan Electric Power {[}W{]}}\label{zone-ite-fan-electric-power-w}
+\paragraph{Zone ITE Fan Electricity Rate {[}W{]}}\label{zone-ite-fan-electric-power-w}
 
-\paragraph{ITE Fan Electric Power {[}W{]}}\label{ite-fan-electric-power-w}
+\paragraph{ITE Fan Electricity Rate {[}W{]}}\label{ite-fan-electric-power-w}
 
 \paragraph{Zone ITE Fan Electric Energy {[}J{]}}\label{zone-ite-fan-electric-energy-j}
 
@@ -2619,9 +2619,9 @@ The electric power (or energy) input to the ITE cooling fan. The ITE Fan Electri
 
 The electric power (or energy) input to the ITE cooling fan if the air inlet temperature were held at the design condition. May be used to calculate ``IT efficiency'', the ratio of (IT energy consumed in the facility) / (IT energy that would have been consumed in the facility if the ITE were held at the reference temperature).
 
-\paragraph{Zone ITE UPS Electric Power {[}W{]}}\label{zone-ite-ups-electric-power-w}
+\paragraph{Zone ITE UPS Electricity Rate {[}W{]}}\label{zone-ite-ups-electric-power-w}
 
-\paragraph{ITE UPS Electric Power {[}W{]}}\label{ite-ups-electric-power-w}
+\paragraph{ITE UPS Electricity Rate {[}W{]}}\label{ite-ups-electric-power-w}
 
 \paragraph{Zone ITE UPS Electric Energy {[}J{]}}\label{zone-ite-ups-electric-energy-j}
 
@@ -3400,7 +3400,7 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
 \begin{itemize}
 \tightlist
 \item
-  Zone,Average,Baseboard Electric Power {[}W{]}
+  Zone,Average,Baseboard Electricity Rate {[}W{]}
 \item
   Zone,Sum,Baseboard Electric Energy {[}J{]}
 \item
@@ -3416,7 +3416,7 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
 \item
   Zone,Average,Baseboard Total Heating Rate {[}W{]}
 \item
-  Zone,Average,Zone Baseboard Electric Power {[}W{]}
+  Zone,Average,Zone Baseboard Electricity Rate {[}W{]}
 \item
   Zone,Sum,Zone Baseboard Electric Energy {[}J{]}
 \item
@@ -3433,7 +3433,7 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
   Zone,Average,Zone Baseboard Total Heating Rate {[}W{]}
 \end{itemize}
 
-\paragraph{Baseboard Electric Power {[}W{]}}\label{baseboard-electric-power-w}
+\paragraph{Baseboard Electricity Rate {[}W{]}}\label{baseboard-electric-power-w}
 
 This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts.
 
@@ -3459,7 +3459,7 @@ These output variables are the amount of convective heat gain for the Zone\-Base
 
 These output variables are the amount of heat gain for the Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled object in Watts (for rate) or Joules. This is determined by the sum of the radiant and convective heat gains from the baseboard heat.
 
-\paragraph{Zone Baseboard Electric Power {[}W{]}}\label{zone-baseboard-electric-power-w}
+\paragraph{Zone Baseboard Electricity Rate {[}W{]}}\label{zone-baseboard-electric-power-w}
 
 This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts.
 

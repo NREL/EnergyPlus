@@ -874,7 +874,7 @@ This field reports the dry air sensible heat extraction rate of the fan coil uni
 
 This field is the dry air sensible heat extraction of the fan coil unit from the zone it is serving in Joules over the timestep being reported. This is determined by the outlet and zone conditions, the mass flow rate through the unit, and the timestep.
 
-\paragraph{Fan Coil Fan Electric Power {[}W{]}}\label{fan-coil-fan-electric-power-w}
+\paragraph{Fan Coil Fan Electricity Rate {[}W{]}}\label{fan-coil-fan-electric-power-w}
 
 This field reports the electricity consumption rate of the fan coil unit in Watts.
 
@@ -1213,7 +1213,7 @@ This field reports the sensible cooling output rate of the unit ventilator syste
 
 This field is the sensible cooling output of the unit ventilator system to the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the unit ventilator, and the timestep.
 
-\paragraph{Zone Unit Ventilator Fan Electric Power {[}W{]}}\label{zone-unit-ventilator-fan-electric-power-w}
+\paragraph{Zone Unit Ventilator Fan Electricity Rate {[}W{]}}\label{zone-unit-ventilator-fan-electric-power-w}
 
 This field reports the electric power consumption rate of the fan of the unit ventilator in Watts.
 
@@ -1413,7 +1413,7 @@ This field reports the heating output rate of the unit heater system to the zone
 
 This field is the heating output of the unit heater system to the zone it is serving in Joules over the timestep being reported. This is determined by outlet and zone air conditions, the mass flow rate through the unit heater, and the timestep.
 
-\paragraph{Zone Unit Heater Fan Electric Power {[}W{]}}\label{zone-unit-heater-fan-electric-power-w}
+\paragraph{Zone Unit Heater Fan Electricity Rate {[}W{]}}\label{zone-unit-heater-fan-electric-power-w}
 
 This field reports the electric power consumption rate of the fan of the unit heater in Watts.
 
@@ -1759,7 +1759,7 @@ ZoneHVAC:OutdoorAirUnit,
 \item
   HVAC,Sum, Zone Outdoor Air Unit Sensible Heating Energy {[}J{]}
 \item
-  HVAC,Average, Zone Outdoor Air Unit Fan Electric Power {[}W{]}
+  HVAC,Average, Zone Outdoor Air Unit Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum, Zone Outdoor Air Unit Fan Electric Energy {[}J{]}
 \item
@@ -1810,7 +1810,7 @@ These are the latent cooling output of the outdoor air unit system to the zone i
 
 These are the latent heating output of the outdoor air unit system to the zone it is serving, in Joules and Watts. This is determined by outlet and zone air conditions, the mass flow rate through the zone outdoor air unit, and the time step.
 
-\paragraph{Zone Outdoor Air Unit Fan Electric Power {[}W{]}}\label{zone-outdoor-air-unit-fan-electric-power-w}
+\paragraph{Zone Outdoor Air Unit Fan Electricity Rate {[}W{]}}\label{zone-outdoor-air-unit-fan-electric-power-w}
 
 This field reports the electric power consumption rate of the fan of the outdoor air unit in Watts.
 
@@ -2378,7 +2378,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
 \item
   HVAC,Sum,Zone Packaged Terminal Air Conditioner Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Packaged Terminal Air Conditioner Electric Power {[}W{]}
+  HVAC,Average,Zone Packaged Terminal Air Conditioner Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Packaged Terminal Air Conditioner Electric Energy {[}J{]}
 \item
@@ -2437,7 +2437,7 @@ This output field is the latent heat extraction (dehumidification) rate of the p
 
 This output field is the latent heat extraction (dehumidification) of the packaged terminal air conditioner from the zone it is serving in Joules over the timestep being reported. This value is calculated as the difference between the total energy delivered to the zone and the sensible energy delivered to the zone by the packaged terminal air conditioner. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are summed for the timestep being reported.
 
-\paragraph{Zone Packaged Terminal Air Conditioner Electric Power {[}W{]}}\label{zone-packaged-terminal-air-conditioner-electric-power-w}
+\paragraph{Zone Packaged Terminal Air Conditioner Electricity Rate {[}W{]}}\label{zone-packaged-terminal-air-conditioner-electric-power-w}
 
 This output field is the electricity consumption rate of the packaged terminal air conditioner in Watts. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the heating coil (includes electricity consumption rate for electric heating coil or parasitic electricity consumption rate for non-electric coils). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
@@ -2791,7 +2791,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
 \item
   HVAC,Sum,Zone Packaged Terminal Heat Pump Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Packaged Terminal Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Zone Packaged Terminal Heat Pump Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Packaged Terminal Heat Pump Electric Energy {[}J{]}
 \item
@@ -2850,7 +2850,7 @@ This output field is the latent heat extraction (dehumidification) rate of the p
 
 This output field is the latent heat extraction (dehumidification) of the packaged terminal heat pump from the zone it is serving in Joules over the timestep being reported. This value is calculated as the difference between the total energy delivered to the zone and the sensible energy delivered to the zone by the packaged terminal heat pump. This value is calculated for each HVAC system timestep being simulated, and the results (latent heat extraction only) are summed for the timestep being reported.
 
-\paragraph{Zone Packaged Terminal Heat Pump Electric Power {[}W{]}}\label{zone-packaged-terminal-heat-pump-electric-power-w}
+\paragraph{Zone Packaged Terminal Heat Pump Electricity Rate {[}W{]}}\label{zone-packaged-terminal-heat-pump-electric-power-w}
 
 This output field is the electricity consumption rate of the packaged terminal heat pump in Watts. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system timestep being simulated, and the results are averaged for the timestep being reported.
 
@@ -3289,7 +3289,7 @@ ZoneHVAC:WaterToAirHeatPump,
 \item
   HVAC,Sum,Zone Water to Air Heat Pump Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Water to Air Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Zone Water to Air Heat Pump Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Water to Air Heat Pump Electric Energy {[}J{]}
 \item
@@ -3348,7 +3348,7 @@ This output field is the latent heat extraction (dehumidification) rate of the W
 
 This output field is the latent heat extraction (dehumidification) of the Water to Air Heat Pump from the zone it is serving in Joules over the time step being reported. This value is calculated as the difference between the total energy delivered to the zone and the sensible energy delivered to the zone by the WaterToAirHP heat pump. This value is calculated for each HVAC system time step being simulated, and the results (latent heat extraction only) are summed for the time step being reported.
 
-\paragraph{Zone Water to Air Heat Pump Electric Power {[}W{]}}\label{zone-water-to-air-heat-pump-electric-power-w}
+\paragraph{Zone Water to Air Heat Pump Electricity Rate {[}W{]}}\label{zone-water-to-air-heat-pump-electric-power-w}
 
 This output field is the electricity consumption rate of the Water to Air Heat Pump in Watts. The consumption includes electricity used by the compressor (including crankcase heater), fans (indoor supply air fan and the condenser fan), and the supplemental heating coil (if electric). This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -3492,11 +3492,11 @@ Following is an example input for a zone DX dehumidifier object. A \hyperref[zon
 \item
   HVAC,Sum,Zone Dehumidifier Removed Water Mass {[}kg{]}
 \item
-  HVAC,Average,Zone Dehumidifier Electric Power {[}W{]}
+  HVAC,Average,Zone Dehumidifier Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Dehumidifier Electric Energy {[}J{]}
 \item
-  HVAC,Average,Zone Dehumidifier Off Cycle Parasitic Electric Power {[}W{]}
+  HVAC,Average,Zone Dehumidifier Off Cycle Parasitic Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Dehumidifier Off Cycle Parasitic Electric Energy {[}J{]}
 \item
@@ -3532,13 +3532,13 @@ This output field is the water removal rate by the dehumidifier in kg/s. This va
 
 This output field is the water removed by the dehumidifier in kg. This value is calculated for each HVAC system timestep, and the results are summed for the timestep being reported.
 
-\paragraph{Zone Dehumidifier Electric Power {[}W{]}}\label{zone-dehumidifier-electric-power-w}
+\paragraph{Zone Dehumidifier Electricity Rate {[}W{]}}\label{zone-dehumidifier-electric-power-w}
 
 \paragraph{Zone Dehumidifier Electric Energy {[}J{]}}\label{zone-dehumidifier-electric-energy-j}
 
 These outputs are the electric power and electric consumption of the dehumidifier for the time period being reported. They include all electricity used by the dehumidifier (including off-cycle electric parasitics). These values are calculated for each HVAC system timestep, and the results are averaged (power) or summed (consumption) for the timestep being reported. The electric consumption output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Zone Dehumidifier Off Cycle Parasitic Electric Power {[}W{]}}\label{zone-dehumidifier-off-cycle-parasitic-electric-power-w}
+\paragraph{Zone Dehumidifier Off Cycle Parasitic Electricity Rate {[}W{]}}\label{zone-dehumidifier-off-cycle-parasitic-electric-power-w}
 
 \paragraph{Zone Dehumidifier Off Cycle Parasitic Electric Energy {[}J{]}}\label{zone-dehumidifier-off-cycle-parasitic-electric-energy-j}
 
@@ -3828,7 +3828,7 @@ ZoneHVAC:EnergyRecoveryVentilator,
   HVAC,Average,Zone Ventilator Supply Fan Availability Status {[]}
 \end{itemize}
 
-\paragraph{Zone Ventilator Electric Power {[}W{]}}\label{zone-ventilator-electric-power-w}
+\paragraph{Zone Ventilator Electricity Rate {[}W{]}}\label{zone-ventilator-electric-power-w}
 
 This output field is the electric consumption rate of the stand alone energy recovery ventilator in Watts. This rate includes the electric consumption by the supply air fan, exhaust air fan and the generic air-to-air heat exchanger.
 
@@ -4106,11 +4106,11 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
 \item
   HVAC,Sum, Zone VRF Air Terminal Latent Heating Energy {[}J{]}
 \item
-  HVAC,Average, Zone VRF Air Terminal Cooling Electric Power {[}W{]}
+  HVAC,Average, Zone VRF Air Terminal Cooling Electricity Rate {[}W{]}
 \item
   HVAC,Sum, Zone VRF Air Terminal Cooling Electric Energy {[}J{]}
 \item
-  HVAC,Average,Zone VRF Air Terminal Heating Electric Power {[}W{]}
+  HVAC,Average,Zone VRF Air Terminal Heating Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone VRF Air Terminal Heating Electric Energy {[}J{]}
 \item

@@ -10,7 +10,7 @@ Many output variable names are common across all chiller types. These generic ch
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Electric Energy {[}J{]}
 \item
@@ -53,7 +53,7 @@ The following outputs are applicable only for evap-cooled chillers
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
 \end{itemize}
@@ -189,7 +189,7 @@ The following output is applicable only for indirect absorption chillersHVAC,Ave
   HVAC,Average,Chiller OtherFuel2 Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\subsubsection{Chiller Electric Power {[}W{]}}\label{chiller-electric-power-w}
+\subsubsection{Chiller Electricity Rate {[}W{]}}\label{chiller-electric-power-w}
 
 \subsubsection{Chiller Electric Energy {[}J{]}}\label{chiller-electric-energy-j}
 
@@ -211,7 +211,7 @@ These outputs are the evaporator (chilled water) inlet and outlet temperatures a
 
 \subsubsection{Chiller COP {[}W/W{]}}\label{chiller-cop-ww}
 
-This output is the coefficient of performance for the chiller during cooling operation. It is calculated as the evaporator heat transfer rate (Chiller Evaporator Cooling Rate) divided by the ``fuel'' consumption rate by the chiller. For the constant COP and electric chillers, the ``fuel'' is electricity so the divisor is Chiller Electric Power {[}W{]}. For the absorption chiller, the ``fuel'' is steam so the divisor is Steam Consumption Rate {[}W{]}.
+This output is the coefficient of performance for the chiller during cooling operation. It is calculated as the evaporator heat transfer rate (Chiller Evaporator Cooling Rate) divided by the ``fuel'' consumption rate by the chiller. For the constant COP and electric chillers, the ``fuel'' is electricity so the divisor is Chiller Electricity Rate {[}W{]}. For the absorption chiller, the ``fuel'' is steam so the divisor is Steam Consumption Rate {[}W{]}.
 
 \emph{Note that this variable is reported as zero when the chiller is not operating. When reported for frequencies longer than ``detailed'' (such as timestep, hourly, daily, monthly or environment), this output will only be meaningful when the chiller is operating for the entire reporting period. To determine an average COP for a longer time period, compute the COP based on total evaporator heat transfer divided by total electric or fuel input over the desired period.}
 
@@ -233,7 +233,7 @@ These outputs are the condenser heat transfer which is the heat rejected from th
 
 This output is the condenser (heat rejection) inlet temperature for air-cooled or evap-cooled chillers. For an air-cooled chiller, this output would be the dry-bulb temperature of the air entering the condenser coil. For an evap-cooled chiller, this output would be the wet-bulb temperature of the air entering the evaporatively-cooled condenser coil.
 
-\subsubsection{Chiller Basin Heater Electric Power {[}W{]}}\label{chiller-basin-heater-electric-power-w}
+\subsubsection{Chiller Basin Heater Electricity Rate {[}W{]}}\label{chiller-basin-heater-electric-power-w}
 
 \subsubsection{Chiller Basin Heater Electric Energy {[}J{]}}\label{chiller-basin-heater-electric-energy-j}
 
@@ -472,7 +472,7 @@ Chiller:Absorption,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Electric Energy {[}J{]}
 \item
@@ -704,7 +704,7 @@ Chiller:Absorption:Indirect,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Electric Energy {[}J{]}
 \item
@@ -882,7 +882,7 @@ Chiller:ConstantCOP, Little Chiller,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Electric Energy {[}J{]}
 \item
@@ -923,7 +923,7 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
 \end{itemize}
@@ -1330,7 +1330,7 @@ Chiller:Electric,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Electric Energy {[}J{]}
 \item
@@ -1373,7 +1373,7 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
 \end{itemize}
@@ -1643,7 +1643,7 @@ An example of this statement in an IDF is:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Electric Energy {[}J{]}
 \item
@@ -1705,7 +1705,7 @@ Air-cooled or Evap-cooled reported only when the condenser fan power ratio input
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Condenser Fan Electric Power {[}W{]}
+  HVAC,Average,Chiller Condenser Fan Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Condenser Fan Electric Consumption {[}J{]}
 \end{itemize}
@@ -1714,7 +1714,7 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
 \item
@@ -2409,7 +2409,7 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
 \end{itemize}
@@ -2947,7 +2947,7 @@ Chiller:CombustionTurbine,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Electric Power {[}W{]}
+  HVAC,Average,Chiller Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Electric Energy {[}J{]}
 \item
@@ -2990,7 +2990,7 @@ Evap-cooled:
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Average,Chiller Basin Heater Electric Energy {[}J{]}
 \end{itemize}
@@ -3247,7 +3247,7 @@ ChillerHeater:Absorption:DirectFired,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater Electric Energy {[}J{]}
 \item
@@ -3319,7 +3319,7 @@ Outputs specific to Direct Fired Absorption Chiller during cooling operation
 \item
   HVAC,Sum,Chiller Heater Cooling \textless{}Fuel Type\textgreater{} Consumption {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Cooling Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Cooling Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater Cooling Electric Energy {[}J{]}
 \item
@@ -3342,7 +3342,7 @@ Outputs specific to Direct Fired Absorption Chiller during heating operation
 \item
   HVAC,Sum,Chiller Heater Heating \textless{}Fuel Type\textgreater{} Energy {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Heating Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Heating Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater Heating Electric Energy {[}J{]}
 \item
@@ -3359,7 +3359,7 @@ Outputs specific to Direct Fired Absorption Chiller during heating operation
 
 The ``Chiller'' output variables are defined above under ``Generic Chiller Outputs.''~ The specific ``Direct Fired Absorption Chiller'' output variables and exceptions to the generic outputs are defined below.
 
-\paragraph{Chiller Heater Electric Power {[}W{]}}\label{chiller-heater-electric-power-w}
+\paragraph{Chiller Heater Electricity Rate {[}W{]}}\label{chiller-heater-electric-power-w}
 
 \paragraph{Chiller Heater Electric Energy {[}J{]}}\label{chiller-heater-electric-energy-j}
 
@@ -3381,7 +3381,7 @@ This is the average fraction of the time period during which the direct fired ab
 
 These outputs are the fuel input to the direct fired absorption chiller to serve cooling operation. Consumption is metered on Cooling:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\paragraph{Chiller Heater Cooling Electric Power {[}W{]}}\label{chiller-heater-cooling-electric-power-w}
+\paragraph{Chiller Heater Cooling Electricity Rate {[}W{]}}\label{chiller-heater-cooling-electric-power-w}
 
 \paragraph{Chiller Heater Cooling Electric Energy {[}J{]}}\label{chiller-heater-cooling-electric-energy-j}
 
@@ -3411,7 +3411,7 @@ These outputs are the heating delivered by the direct fired absorption chiller-h
 
 These outputs are the fuel input to the direct fired absorption chiller-heater to serve heating operation. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\paragraph{Chiller Heater Heating Electric Power {[}W{]}}\label{chiller-heater-heating-electric-power-w}
+\paragraph{Chiller Heater Heating Electricity Rate {[}W{]}}\label{chiller-heater-heating-electric-power-w}
 
 \paragraph{Chiller Heating Heating Electric Energy {[}J{]}}\label{chiller-heating-heating-electric-energy-j}
 
@@ -3651,7 +3651,7 @@ ChillerHeater:Absorption:DoubleEffect,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater Electric Energy {[}J{]}
 \item
@@ -3701,7 +3701,7 @@ Outputs specific to Exhaust Fired Absorption Chiller during cooling operation
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater Cooling Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Cooling Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater Cooling Electric Energy {[}J{]}
 \item
@@ -3724,7 +3724,7 @@ Outputs specific to Exhaust Fired Absorption Chiller during heating operation
 \item
   HVAC,Sum,Chiller Heater Heating Energy {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Heating Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater Heating Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater Heating Electric Energy {[}J{]}
 \item
@@ -3745,7 +3745,7 @@ Outputs specific to Exhaust Fired Absorption Chiller during heating operation
 
 The ``Chiller'' output variables are defined above under ``Generic Chiller Outputs.''~ The specific ``Exhaust Fired Absorption Chiller'' output variables and exceptions to the generic outputs are defined below.
 
-\paragraph{Chiller Heater Electric Power {[}W{]}}\label{chiller-heater-electric-power-w-1}
+\paragraph{Chiller Heater Electricity Rate {[}W{]}}\label{chiller-heater-electric-power-w-1}
 
 \paragraph{Chiller Heater Electric Energy {[}J{]}}\label{chiller-heater-electric-energy-j-1}
 
@@ -3773,7 +3773,7 @@ This is the average coefficient of performance for the chiller in cooling operat
 
 \paragraph{Chiller Heater Heating Energy {[}J{]}}\label{chiller-heater-heating-energy-j-1}
 
-\paragraph{Chiller Heater Heating Electric Power {[}W{]}}\label{chiller-heater-heating-electric-power-w-1}
+\paragraph{Chiller Heater Heating Electricity Rate {[}W{]}}\label{chiller-heater-heating-electric-power-w-1}
 
 \paragraph{Chiller Heater Heating Electric Energy {[}J{]}}\label{chiller-heater-heating-electric-energy-j}
 
@@ -3855,7 +3855,7 @@ The evaporator (chilled water) outlet temperature over the time step being repor
 
 The electric power input to the exhaust fired absorption chiller to serve cooling operation. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period. Consumption is metered on Heating:Electricity, Electricity:Plant, and Electricity:Facility.
 
-\paragraph{Chiller Heater Cooling Electric Power {[}W{]}}\label{chiller-heater-cooling-electric-power-w-1}
+\paragraph{Chiller Heater Cooling Electricity Rate {[}W{]}}\label{chiller-heater-cooling-electric-power-w-1}
 
 The electric power input to the Exhaust Fired absorption chiller to serve cooling operation. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -4042,7 +4042,7 @@ Outputs available from the boiler:
 \item
   HVAC,Average,Boiler Mass Flow Rate {[}kg/s{]}
 \item
-  HVAC,Average,Boiler Parasitic Electric Power {[}W{]}
+  HVAC,Average,Boiler Parasitic Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Boiler Ancillary Electric Energy {[}J{]}
 \item
@@ -4057,7 +4057,7 @@ Electric:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler Electric Power {[}W{]}
+  HVAC,Average,Boiler Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Boiler Electric Energy {[}J{]}
 \end{itemize}
@@ -4171,11 +4171,11 @@ This output is the thermal efficiency for the boiler during heating operation. I
 
 \paragraph{Boiler \textless{}Fuel Type\textgreater{} Energy {[}J{]} \textbackslash{}}\label{boiler-fuel-type-energy-j}
 
-\paragraph{Boiler Electric Power {[}W{]}}\label{boiler-electric-power-w}
+\paragraph{Boiler Electricity Rate {[}W{]}}\label{boiler-electric-power-w}
 
 These outputs are the energy input to the boiler. Valid fuel types are:~ Electric, Gas (natural gas), Propane, FuelOilNo1, FuelOilNo2, Coal, Diesel, Gasoline, OtherFuel1, OtherFuel2. Consumption is metered on Heating:\textless{}Fuel Type\textgreater{}, \textless{}Fuel Type\textgreater{}:Plant, and \textless{}Fuel Type\textgreater{}:Facility.
 
-\paragraph{Boiler Ancillary Electric Power {[}W{]}}\label{boiler-ancillary-electric-power-w}
+\paragraph{Boiler Ancillary Electricity Rate {[}W{]}}\label{boiler-ancillary-electric-power-w}
 
 \paragraph{Boiler Ancillary Electric Energy {[}J{]}}\label{boiler-ancillary-electric-energy-j}
 
@@ -4319,7 +4319,7 @@ Electric:
 
 \begin{itemize}
 \item
-  HVAC,Average,Boiler Electric Power {[}W{]}
+  HVAC,Average,Boiler Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Boiler Electric Energy {[}J{]}
 \end{itemize}
@@ -4429,7 +4429,7 @@ These outputs are the steam inlet and outlet temperatures and steam flow rate fo
 
 \paragraph{Boiler \textless{}Fuel Type\textgreater{} Energy {[}J{]}}\label{boiler-fuel-type-energy-j-1}
 
-\paragraph{Boiler Electric Power {[}W{]}}\label{boiler-electric-power-w-1}
+\paragraph{Boiler Electricity Rate {[}W{]}}\label{boiler-electric-power-w-1}
 
 \paragraph{Boiler Electric Energy {[}J{]}}\label{boiler-electric-energy-j}
 
@@ -4580,7 +4580,7 @@ This section describes the outputs available for the water to water heat pump, e
 \item
   HVAC,Sum,Heat Pump Source Side Heat Transfer Energy {[}J{]}
 \item
-  HVAC,Average,Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Heat Pump Electricity Rate {[}W{]}
 \item
   HVAC,Average,Heat Pump Load Side Heat Transfer Rate {[}W{]}
 \item
@@ -4611,7 +4611,7 @@ This output variable represents the cumulative heat transfer across the load sid
 
 This output variable represents the cumulative heat transfer across the source side coil. The values are calculated for each HVAC system time step being simulated, and the results are summed across the reporting period.
 
-\paragraph{Heat Pump Electric Power {[}W{]}}\label{water-to-water-heat-pump-electric-power-w}
+\paragraph{Heat Pump Electricity Rate {[}W{]}}\label{water-to-water-heat-pump-electric-power-w}
 
 This output variable represents the compressor power required to run the heat pump. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -4991,7 +4991,7 @@ This section describes the outputs available for the water to water heat pump, p
 
 \begin{itemize}
 \item
-  HVAC,Average,Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Heat Pump Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heat Pump Electric Energy {[}J{]}
 \item
@@ -5016,7 +5016,7 @@ This section describes the outputs available for the water to water heat pump, p
   HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Heat Pump Electric Power {[}W{]}}\label{water-to-water-heat-pump-electric-power-w-1}
+\paragraph{Heat Pump Electricity Rate {[}W{]}}\label{water-to-water-heat-pump-electric-power-w-1}
 
 This output variable represents the compressor power required to run the heat pump. The values are calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported.
 
@@ -5210,7 +5210,7 @@ This section describes the outputs available for the water to water heat pump, e
 
 \begin{itemize}
 \item
-  HVAC,Average,Heat Pump Electric Power {[}W{]}
+  HVAC,Average,Heat Pump Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heat Pump Electric Energy {[}J{]}
 \item
@@ -5235,7 +5235,7 @@ This section describes the outputs available for the water to water heat pump, e
   HVAC,Average,Heat Pump Source Side Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Heat Pump Electric Power {[}W{]}}\label{plhp_eir_outputs_power_usage}
+\paragraph{Heat Pump Electricity Rate {[}W{]}}\label{plhp_eir_outputs_power_usage}
 
 This output variable represents the average power usage of this coil during the specified reporting window.
 
@@ -5733,11 +5733,11 @@ CentralHeatPumpSystem,
 
 \begin{itemize}
 \item
-  HVAC,Average,Chiller Heater System Cooling Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater System Cooling Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater System Cooling Electric Energy{[}J{]}
 \item
-  HVAC,Average,Chiller Heater System Heating Electric Power {[}W{]}
+  HVAC,Average,Chiller Heater System Heating Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Chiller Heater System Heating Electric Energy{[}J{]}
 \item
@@ -5772,13 +5772,13 @@ CentralHeatPumpSystem,
   HVAC,Average,Chiller Heater System Source Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Chiller Heater System Cooling Electric Power {[}W{]}}\label{chiller-heater-system-cooling-electric-power-w}
+\paragraph{Chiller Heater System Cooling Electricity Rate {[}W{]}}\label{chiller-heater-system-cooling-electric-power-w}
 
 \paragraph{Chiller Heater System Cooling Electric Energy {[}J{]}}\label{chiller-heater-system-cooling-electric-energy-j}
 
 These outputs are the sums of the cooling electric power consumption of the central heat pump system containing one or more child objects. Cooling Energy is metered on Cooling:Electricity, Electricity:Plant, and Electricity:Facility.
 
-\paragraph{Chiller Heater System Heating Electric Power {[}W{]}}\label{chiller-heater-system-heating-electric-power-w}
+\paragraph{Chiller Heater System Heating Electricity Rate {[}W{]}}\label{chiller-heater-system-heating-electric-power-w}
 
 \paragraph{Chiller Heater System Heating Electric Energy {[}J{]}}\label{chiller-heater-system-heating-electric-energy-j}
 
@@ -6453,7 +6453,7 @@ Current detailed ice storage output variables are:
 \item
   System, Sum, Ice Thermal Storage Cooling Charge Energy {[}J{]}
 \item
-  System, Average, Ice Thermal Storage Ancillary Electric Power {[}W{]}
+  System, Average, Ice Thermal Storage Ancillary Electricity Rate {[}W{]}
 \item
   System, Sum, Ice Thermal Storage Ancillary Electric Energy {[}J{]}
 \item
@@ -6516,7 +6516,7 @@ The charging done (as a rate) to the ice storage unit
 
 The total charging done to the ice storage unit
 
-\paragraph{Ice Thermal Storage Ancillary Electric Power {[}W{]}}\label{ice-thermal-storage-ancillary-electric-power-w}
+\paragraph{Ice Thermal Storage Ancillary Electricity Rate {[}W{]}}\label{ice-thermal-storage-ancillary-electric-power-w}
 
 The electric power as a result of parasitic loads on the ice storage unit for things like controls or other miscellaneous parts of the ice storage unit itself
 

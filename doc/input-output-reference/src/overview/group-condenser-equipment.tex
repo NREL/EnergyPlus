@@ -332,7 +332,7 @@ Three examples of an IDF specification for this object are shown below:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -399,12 +399,12 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w}
 
 \paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j}
 
@@ -422,7 +422,7 @@ This is the rate at which heat is removed from the condenser water loop by the t
 
 These outputs are the tower water inlet and outlet temperatures, and mass flow rate of the circulating condenser water loop.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w}
 
 \paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j}
 
@@ -878,7 +878,7 @@ Four examples of an IDF specification for this object are shown below:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -947,12 +947,12 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-1}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-1}
 
 \paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-1}
 
@@ -970,7 +970,7 @@ This is the rate at which heat is removed from the condenser water loop by the t
 
 These outputs are the tower water inlet and outlet temperatures, and mass flow rate.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-1}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-1}
 
 \paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-1}
 
@@ -1340,7 +1340,7 @@ An example IDF specification follows.
 \item
   HVAC,Average,Cooling Tower Heat Transfer Rate {[}W{]}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -1397,12 +1397,12 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-2}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-2}
 
 \paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-2}
 
@@ -1428,7 +1428,7 @@ This output is the air flow ratio.~ The current air flow rate divided by the des
 
 This represents the number of cells operating at each time step.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-2}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-2}
 
 \paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-2}
 
@@ -1677,7 +1677,7 @@ CoolingTower:VariableSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -1744,12 +1744,12 @@ IF specified:
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Basin Heater Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Basin Heater Electric Energy {[}J{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-3}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-3}
 
 \paragraph{Cooling Tower Fan Electric Energy {[}J{]}}\label{cooling-tower-fan-electric-energy-j-3}
 
@@ -1775,7 +1775,7 @@ These outputs are the tower water inlet and outlet temperatures, and mass flow r
 
 This is the ratio of air flow through the tower to the design air flow rate. During times when the tower can maintain the condenser loop set point temperature using free convection (when the fan in not operating), the air flow rate ratio is assumed to be equal to the field Fraction of Tower Capacity in Free Convection Regime. During times when the fan cycles on/off to maintain the outlet water set point temperature, the air flow rate ratio is calculated as the summation of Fan Part-Load Ratio multiplied by the Minimum Air Flow Rate Ratio and (1.0 - Fan Part-Load Ratio) multiplied by the fraction of Tower Capacity in Free Convection Regime.
 
-\paragraph{Cooling Tower Basin Heater Electric Power {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-3}
+\paragraph{Cooling Tower Basin Heater Electricity Rate {[}W{]}}\label{cooling-tower-basin-heater-electric-power-w-3}
 
 \paragraph{Cooling Tower Basin Heater Electric Energy {[}J{]}}\label{cooling-tower-basin-heater-electric-energy-j-3}
 
@@ -2260,7 +2260,7 @@ EvaporativeFluidCooler:SingleSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -2306,7 +2306,7 @@ If Supply Water Storage Tank Name is specified:
   HVAC,Sum,Cooling Tower Starved Storage Tank Water Volume {[}m3{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-4}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-4}
 
 The average electric power consumption of the fluid cooler fan in Watts for the timestep being reported.
 
@@ -2571,7 +2571,7 @@ EvaporativeFluidCooler:TwoSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -2615,7 +2615,7 @@ If Supply Water Storage Tank Name is specified:
   HVAC,Sum,Cooling Tower Starved Storage Tank Water Volume {[}m3{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-5}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-5}
 
 The average electric power consumption of the fluid cooler fan in Watts for the timestep being reported.
 
@@ -2758,7 +2758,7 @@ FluidCooler:SingleSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -2773,7 +2773,7 @@ FluidCooler:SingleSpeed,
   HVAC,Average,Cooling Tower Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-6}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-6}
 
 The electric power consumption of the fluid cooler fans.
 
@@ -2920,7 +2920,7 @@ FluidCooler:TwoSpeed,
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Tower Fan Electric Power {[}W{]}
+  HVAC,Average,Cooling Tower Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Tower Fan Electric Energy {[}J{]}
 \item
@@ -2933,7 +2933,7 @@ FluidCooler:TwoSpeed,
   HVAC,Average,Cooling Tower Mass Flow Rate {[}kg/s{]}
 \end{itemize}
 
-\paragraph{Cooling Tower Fan Electric Power {[}W{]}}\label{cooling-tower-fan-electric-power-w-7}
+\paragraph{Cooling Tower Fan Electricity Rate {[}W{]}}\label{cooling-tower-fan-electric-power-w-7}
 
 Average fan electric power consumed.
 
