@@ -374,7 +374,7 @@ Steam Consumption for the system (Joules).
 
 Chilled Water Consumption for the system (Joules).
 
-\subsubsection{Air System Electric Energy}\label{air-system-electric-energy}
+\subsubsection{Air System Electricity Energy}\label{air-system-electric-energy}
 
 Electric Consumption for the system (Joules).
 
@@ -402,8 +402,8 @@ The Standard reports file includes these variables reporting in the Tabular repo
       Air System Hot Water Energy ,  SumOrAverage,
       Air System Steam Energy ,  SumOrAverage,
       Air System Chilled Water Energy,  SumOrAverage,
-      Air System Electric Energy,  SumOrAverage,
-      Air System Gas Energy,  SumOrAverage,
+      Air System Electricity Energy,  SumOrAverage,
+      Air System NaturalGas Energy,  SumOrAverage,
       Air System Water Volume,  SumOrAverage;
 \end{lstlisting}
 
@@ -483,7 +483,7 @@ Energy removed from air loop by user defined air terminal units (Joules)
 
 Reporting System Component Energy Use consists of eleven output variables that report the total energy consumption (in Joules) of system components by energy type and coil type. Electric energy consumption is reported for fans, heating and cooling coils in packaged (DX) systems, electric resistance heating coils, humidifiers, evaporative coolers and desiccant dehumidifiers.
 
-\subsubsection{Air System Fan Electric Energy}\label{air-system-fan-electric-energy}
+\subsubsection{Air System Fan Electricity Energy}\label{air-system-fan-electric-energy}
 
 Electric consumption for fans. (Joules)
 
@@ -495,15 +495,15 @@ Consumption for heating coil hot water (both purchased and plant supplied) (Joul
 
 Consumption for cooling coil chilled water (both purchased and plant supplied) (Joules)
 
-\subsubsection{Air System DX Heating Coil Electric Energy}\label{air-system-dx-heating-coil-electric-energy}
+\subsubsection{Air System DX Heating Coil Electricity Energy}\label{air-system-dx-heating-coil-electric-energy}
 
 Compressor plus condenser fan electricity use. (Joules)
 
-\subsubsection{Air System DX Cooling Coil Electric Energy}\label{air-system-dx-cooling-coil-electric-energy}
+\subsubsection{Air System DX Cooling Coil Electricity Energy}\label{air-system-dx-cooling-coil-electric-energy}
 
 Compressor plus condenser fan electricity use. (Joules)
 
-\subsubsection{Air System Heating Coil Electric Energy}\label{air-system-heating-coil-electric-energy}
+\subsubsection{Air System Heating Coil Electricity Energy}\label{air-system-heating-coil-electric-energy}
 
 Electricity consumption for the heating coil. (Joules)
 
@@ -519,15 +519,15 @@ Propane consumption for the heating coil. (Joules)
 
 Steam consumption for the heating coil (steam coils). (Joules)
 
-\subsubsection{Air System Humidifier Electric Energy}\label{air-system-humidifier-electric-energy}
+\subsubsection{Air System Humidifier Electricity Energy}\label{air-system-humidifier-electric-energy}
 
 Electricity consumption for the humidifiers. (Joules)
 
-\subsubsection{Air System Evaporative Cooler Electric Energy}\label{air-system-evaporative-cooler-electric-energy}
+\subsubsection{Air System Evaporative Cooler Electricity Energy}\label{air-system-evaporative-cooler-electric-energy}
 
 Electricity consumption for the evaporative coolers. (Joules)
 
-\subsubsection{Air System Desiccant Dehumidifier Electric Energy}\label{air-system-desiccant-dehumidifier-electric-energy}
+\subsubsection{Air System Desiccant Dehumidifier Electricity Energy}\label{air-system-desiccant-dehumidifier-electric-energy}
 
 Electricity consumption for the desiccant dehumidifiers. (Joules)
 
@@ -541,17 +541,17 @@ The Standard reports file includes these variables reporting in the Tabular repo
     Output:Table:Monthly,
       Air Loop System Component Energy Use,       !- Name
       ,                        !- DigitsAfterDecimal
-      Air System Fan Electric Energy,  SumOrAverage,
+      Air System Fan Electricity Energy,  SumOrAverage,
       Air System Heating Coil Hot Water Energy,  SumOrAverage,
       Air System Cooling Coil Chilled Water Energy,  SumOrAverage,
-      Air System DX Heating Coil Electric Energy,  SumOrAverage,
-      Air System DX Cooling Coil Electric Energy,  SumOrAverage,
-      Air System Heating Coil Electric Energy,  SumOrAverage,
+      Air System DX Heating Coil Electricity Energy,  SumOrAverage,
+      Air System DX Cooling Coil Electricity Energy,  SumOrAverage,
+      Air System Heating Coil Electricity Energy,  SumOrAverage,
       Air System Heating Coil Gas Energy,  SumOrAverage,
       Air System Heating Coil Steam Energy,  SumOrAverage,
-      Air System Humidifier Electric Energy,  SumOrAverage,
-      Air System Evaporative Cooler Electric Energy,  SumOrAverage,
-      Air System Desiccant Dehumidifier Electric Energy,  SumOrAverage;
+      Air System Humidifier Electricity Energy,  SumOrAverage,
+      Air System Evaporative Cooler Electricity Energy,  SumOrAverage,
+      Air System Desiccant Dehumidifier Electricity Energy,  SumOrAverage;
 \end{lstlisting}
 
 \subsection{Overall Air Loop Syntax}\label{overall-air-loop-syntax}
