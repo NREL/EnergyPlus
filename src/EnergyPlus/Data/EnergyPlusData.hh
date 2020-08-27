@@ -91,6 +91,7 @@ namespace EnergyPlus {
     struct BaseboardRadiatorData;
     struct BaseboardElectricData;
 
+    struct WaterCoilsData;
     struct WaterManagerData;
     struct WaterThermalTanksData;
     struct WaterToAirHeatPumpData;
@@ -141,6 +142,7 @@ namespace EnergyPlus {
 
         IOFiles files;
 
+        std::unique_ptr<WaterCoilsData> dataWaterCoils;
         std::unique_ptr<WaterManagerData> dataWaterManager;
         std::unique_ptr<WaterThermalTanksData> dataWaterThermalTanks;
         std::unique_ptr<WaterToAirHeatPumpData> dataWaterToAirHeatPump;

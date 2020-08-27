@@ -1629,11 +1629,6 @@ namespace UnitVentilator {
         using ReportSizingManager::RequestSizing;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetCoilSteamOutletNode;
-        using WaterCoils::GetCoilWaterInletNode;
-        using WaterCoils::GetCoilWaterOutletNode;
-        using WaterCoils::GetWaterCoilIndex;
-        using WaterCoils::SetCoilDesFlow;
-        using WaterCoils::WaterCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeUnitVentilator");
@@ -2094,15 +2089,15 @@ namespace UnitVentilator {
                 } else {
                     CheckZoneSizing(cMO_UnitVentilator, UnitVent(UnitVentNum).Name);
 
-                    CoilWaterInletNode = GetCoilWaterInletNode(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
+                    CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
+                    CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum = MyPlantSizingIndex(
                             "COIL:HEATING:WATER", UnitVent(UnitVentNum).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
 
-                        CoilNum = GetWaterCoilIndex(state, "COIL:HEATING:WATER", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
-                        if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
-                            WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
+                        CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", UnitVent(UnitVentNum).HCoilName, ErrorsFound);
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
+                            WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
                         } else {
                             if (PltSizHeatNum > 0) {
@@ -2344,13 +2339,13 @@ namespace UnitVentilator {
                         CoolingCoilName = UnitVent(UnitVentNum).CCoilName;
                         CoolingCoilType = UnitVent(UnitVentNum).CCoilTypeCh;
                     }
-                    CoilWaterInletNode = GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                    CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                    CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizCoolNum = MyPlantSizingIndex(CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
-                        CoilNum = GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
-                        if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
-                            WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
+                        CoilNum = WaterCoils::GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
+                            WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
                         } else {
                             if (PltSizCoolNum > 0) {
@@ -2472,8 +2467,8 @@ namespace UnitVentilator {
             CoolingCoilName = UnitVent(UnitVentNum).CCoilName;
             CoolingCoilType = UnitVent(UnitVentNum).CCoilTypeCh;
         }
-        SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
-        SetCoilDesFlow(state, UnitVent(UnitVentNum).HCoilTypeCh, UnitVent(UnitVentNum).HCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
+        WaterCoils::SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
+        WaterCoils::SetCoilDesFlow(state, UnitVent(UnitVentNum).HCoilTypeCh, UnitVent(UnitVentNum).HCoilName, UnitVent(UnitVentNum).MaxAirVolFlow, ErrorsFound);
 
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = UnitVent(UnitVentNum).MaxVolHotWaterFlow;

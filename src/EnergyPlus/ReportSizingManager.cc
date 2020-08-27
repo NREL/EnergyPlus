@@ -78,6 +78,7 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -357,7 +358,6 @@ namespace ReportSizingManager {
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
         using General::RoundSigDigits;
-        using General::SolveRoot;
         using General::TrimSigDigits;
         using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
@@ -369,7 +369,6 @@ namespace ReportSizingManager {
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbRhPb;
         using Psychrometrics::PsyWFnTdpPb;
-        using WaterCoils::SimpleHeatingCoilUAResidual;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         Real64 const Acc(0.0001); // Accuracy of result
@@ -2398,7 +2397,7 @@ namespace ReportSizingManager {
                         UA1 = DataCapacityUsedForSizing;
                         // Invert the simple heating coil model: given the design inlet conditions and the design load,
                         // find the design UA.
-                        SolveRoot(Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par);
+                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, AutosizeDes, WaterCoils::SimpleHeatingCoilUAResidual, UA0, UA1, Par);
                         if (SolFla == -1) {
                             ShowSevereError("Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"");
                             ShowContinueError("  Iteration limit exceeded in calculating coil UA");
@@ -3609,7 +3608,7 @@ namespace ReportSizingManager {
                         UA1 = DataCapacityUsedForSizing;
                         // Invert the simple heating coil model: given the design inlet conditions and the design load,
                         // find the design UA.
-                        SolveRoot(Acc, MaxIte, SolFla, AutosizeDes, SimpleHeatingCoilUAResidual, UA0, UA1, Par);
+                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, AutosizeDes, WaterCoils::SimpleHeatingCoilUAResidual, UA0, UA1, Par);
                         if (SolFla == -1) {
                             ShowSevereError("Autosizing of heating coil UA failed for Coil:Heating:Water \"" + CompName + "\"");
                             ShowContinueError("  Iteration limit exceeded in calculating coil UA");

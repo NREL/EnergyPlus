@@ -59,6 +59,7 @@ namespace EnergyPlus {
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
 
+        this->dataWaterCoils =  std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
         this->dataWaterManager =  std::unique_ptr<WaterManagerData>(new WaterManagerData);
         this->dataWaterThermalTanks =  std::unique_ptr<WaterThermalTanksData>(new WaterThermalTanksData);
         this->dataWaterToAirHeatPump =  std::unique_ptr<WaterToAirHeatPumpData>(new WaterToAirHeatPumpData);
@@ -105,6 +106,7 @@ namespace EnergyPlus {
         pipes.clear_state();
         dataPlantChillers.clear_state();
 
+        dataWaterCoils->clear_state();
         dataWaterManager->clear_state();
         dataWaterThermalTanks->clear_state();
         dataWaterToAirHeatPump->clear_state();

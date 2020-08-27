@@ -904,22 +904,22 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
 
     EXPECT_EQ(2, FaultsManager::NumFouledCoil);
     // This should also have called WaterCoil::GetWaterCoilInput
-    EXPECT_EQ(3, WaterCoils::NumWaterCoils);
+    EXPECT_EQ(3, state.dataWaterCoils->NumWaterCoils);
 
 
     // Check that fault association actually happened
     {
         int CoilNum = 1;
         int FaultIndex = 1;
-        EXPECT_EQ("AHU HW HEATING COIL", WaterCoils::WaterCoil(CoilNum).Name);
-        EXPECT_NEAR(6.64, WaterCoils::WaterCoil(CoilNum).UACoil, 0.0001);
-        EXPECT_EQ(WaterCoils::WaterCoil_SimpleHeating, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ("AHU HW HEATING COIL", state.dataWaterCoils->WaterCoil(CoilNum).Name);
+        EXPECT_NEAR(6.64, state.dataWaterCoils->WaterCoil(CoilNum).UACoil, 0.0001);
+        EXPECT_EQ(state.dataWaterCoils->WaterCoil_SimpleHeating, state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
 
         EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(WaterCoils::WaterCoil_SimpleHeating, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(state.dataWaterCoils->WaterCoil_SimpleHeating, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
 
-        EXPECT_TRUE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
-        EXPECT_EQ(FaultIndex, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+        EXPECT_TRUE(state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(FaultIndex, state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
 
         // Doesn't have an Availability Schedule
         EXPECT_EQ(-1, FaultsManager::FouledCoils(FaultIndex).AvaiSchedPtr);
@@ -940,14 +940,14 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     {
         int CoilNum = 2;
         int FaultIndex = 2;
-        EXPECT_EQ("AHU CHW COOLING COIL", WaterCoils::WaterCoil(CoilNum).Name);
-        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ("AHU CHW COOLING COIL", state.dataWaterCoils->WaterCoil(CoilNum).Name);
+        EXPECT_EQ(state.dataWaterCoils->WaterCoil_Cooling, state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
 
         EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
-        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+        EXPECT_EQ(state.dataWaterCoils->WaterCoil_Cooling, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
 
-        EXPECT_TRUE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
-        EXPECT_EQ(FaultIndex, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+        EXPECT_TRUE(state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(FaultIndex, state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
 
         // Has an Availabity Schedule
         EXPECT_EQ("AVAILSCHED", FaultsManager::FouledCoils(FaultIndex).AvaiSchedule);
@@ -973,11 +973,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     // No association if not meant!
     {
         int CoilNum = 3;
-        EXPECT_EQ("AHU CHW COIL WITH NO FAULT", WaterCoils::WaterCoil(CoilNum).Name);
-        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+        EXPECT_EQ("AHU CHW COIL WITH NO FAULT", state.dataWaterCoils->WaterCoil(CoilNum).Name);
+        EXPECT_EQ(state.dataWaterCoils->WaterCoil_Cooling, state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num);
 
-        EXPECT_FALSE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
-        EXPECT_EQ(0, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+        EXPECT_FALSE(state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(0, state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex);
     }
 
 }

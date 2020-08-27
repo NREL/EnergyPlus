@@ -226,7 +226,6 @@
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
-#include <EnergyPlus/WaterCoils.hh>
 
 void EnergyPlus::clearAllStates(EnergyPlusData &state)
 {
@@ -410,7 +409,6 @@ void EnergyPlus::clearAllStates(EnergyPlusData &state)
     UtilityRoutines::clear_state();
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
-    WaterCoils::clear_state();
     EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     ResultsFramework::clear_state();
 }

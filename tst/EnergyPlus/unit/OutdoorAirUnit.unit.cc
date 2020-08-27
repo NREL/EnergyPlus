@@ -595,27 +595,27 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
         loopsidebranch.Comp.allocate(1);
     }
 
-    WaterCoil(1).WaterLoopNum = 1;
-    WaterCoil(1).WaterLoopSide = 1;
-    WaterCoil(1).WaterLoopBranchNum = 1;
-    WaterCoil(1).WaterLoopCompNum = 1;
+    state.dataWaterCoils->WaterCoil(1).WaterLoopNum = 1;
+    state.dataWaterCoils->WaterCoil(1).WaterLoopSide = 1;
+    state.dataWaterCoils->WaterCoil(1).WaterLoopBranchNum = 1;
+    state.dataWaterCoils->WaterCoil(1).WaterLoopCompNum = 1;
 
     PlantLoop(1).Name = "ChilledWaterLoop";
     PlantLoop(1).FluidIndex = 1;
     PlantLoop(1).FluidName = "WATER";
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = WaterCoil(1).Name;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).Name = state.dataWaterCoils->WaterCoil(1).Name;
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).TypeOf_Num = TypeOf_CoilWaterCooling;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = WaterCoil(1).WaterInletNodeNum;
-    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = WaterCoil(1).WaterOutletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumIn = state.dataWaterCoils->WaterCoil(1).WaterInletNodeNum;
+    PlantLoop(1).LoopSide(1).Branch(1).Comp(1).NodeNumOut = state.dataWaterCoils->WaterCoil(1).WaterOutletNodeNum;
 
     PlantSizData(1).PlantLoopName = "ChilledWaterLoop";
     PlantSizData(1).ExitTemp = 6.7;
     PlantSizData(1).DeltaT = 5.0;
     PlantSizData(1).LoopType = DataSizing::CoolingLoop;
 
-    MyUAAndFlowCalcFlag.allocate(1);
-    MyUAAndFlowCalcFlag(1) = true;
-    MyUAAndFlowCalcFlag(1) = true;
+    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(1);
+    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
 
     DataGlobals::HourOfDay = 15;
     DataEnvironment::DSTIndicator = 0;
@@ -659,7 +659,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     int ZoneNum(1);
 
     InitOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration);
-    EXPECT_EQ(WaterCoil(1).MaxWaterVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
+    EXPECT_EQ(state.dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate, OutAirUnit(OAUnitNum).OAEquip(1).MaxVolWaterFlow);
 
     // calculate fan heat to get fan air-side delta T
     DataSizing::DataFanEnumType = DataAirSystems::objectVectorOOFanSystemModel;
@@ -678,8 +678,8 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     Real64 rho = GetDensityGlycol(PlantLoop(1).FluidName, DataGlobals::CWInitConvTemp, PlantLoop(1).FluidIndex, " ");
     Real64 DesCoolingCoilWaterVolFlowRate = DesWaterCoolingCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
     // check water coil water flow rate calc
-    EXPECT_EQ(DesWaterCoolingCoilLoad, WaterCoil(1).DesWaterCoolingCoilRate);
-    EXPECT_EQ(DesCoolingCoilWaterVolFlowRate, WaterCoil(1).MaxWaterVolFlowRate);
+    EXPECT_EQ(DesWaterCoolingCoilLoad, state.dataWaterCoils->WaterCoil(1).DesWaterCoolingCoilRate);
+    EXPECT_EQ(DesCoolingCoilWaterVolFlowRate, state.dataWaterCoils->WaterCoil(1).MaxWaterVolFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
@@ -919,9 +919,9 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     PlantSizData(1).DeltaT = 5.0;
     PlantSizData(1).LoopType = DataSizing::SteamLoop;
 
-    MyUAAndFlowCalcFlag.allocate(2);
-    MyUAAndFlowCalcFlag(1) = true;
-    MyUAAndFlowCalcFlag(2) = true;
+    state.dataWaterCoils->MyUAAndFlowCalcFlag.allocate(2);
+    state.dataWaterCoils->MyUAAndFlowCalcFlag(1) = true;
+    state.dataWaterCoils->MyUAAndFlowCalcFlag(2) = true;
 
     DataGlobals::HourOfDay = 15;
     DataEnvironment::DSTIndicator = 0;

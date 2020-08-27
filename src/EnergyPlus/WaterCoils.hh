@@ -53,88 +53,17 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
     // Forward declarations
     struct EnergyPlusData;
+    struct WaterCoilsData;
 
 namespace WaterCoils {
-
-    // Using/Aliasing
-
-    // Data
-    // PRIVATE ! Everything private unless explicitly made public
-
-    // MODULE PARAMETER DEFINITIONS
-
-    extern int const MaxPolynomOrder;
-    extern int const MaxOrderedPairs;
-
-    extern Real64 const PolyConvgTol;
-    extern Real64 const MinWaterMassFlowFrac;
-    extern Real64 const MinAirMassFlow;
-
-    // coil types in this module
-    extern int const WaterCoil_SimpleHeating;
-    extern int const WaterCoil_DetFlatFinCooling;
-    extern int const WaterCoil_Cooling;
-
-    extern int const CoilType_Cooling;
-    extern int const CoilType_Heating;
-
-    extern int const CoilModel_Simple;
-    extern int const CoilModel_Cooling;
-    extern int const CoilModel_Detailed;
-
-    // Parameters for Heat Exchanger Configuration
-    extern int const CounterFlow;
-    extern int const CrossFlow;
-    extern int const SimpleAnalysis;
-    extern int const DetailedAnalysis;
-
-    // Water Systems
-    extern int const CondensateDiscarded; // default mode where water is "lost"
-    extern int const CondensateToTank;    // collect coil condensate from air and store in water storage tank
-
-    // Parameters for COIL:Water:SimpleHeating Coil Performance Input Method
-    extern int const UAandFlow; // for Coil Performance Input Method = UA and Design Water Flow Rate
-    extern int const NomCap;    // for Coil Performance Input Method = Nominal Capacity
-
-    // Parameters Subroutine CoolingCoil: design calc or simulation calc.
-    extern int const DesignCalc; // ignore on/off check in CoolingCoil
-    extern int const SimCalc;    // pay attention to on/off check in CoolingCoil
-
-    // DERIVED TYPE DEFINITIONS
-
-    // MODULE VARIABLE DECLARATIONS:
-    extern int NumWaterCoils; // The Number of WaterCoils found in the Input
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool MyUAAndFlowCalcFlag;
-    extern Array1D_bool MyCoilDesignFlag;
-    extern Array1D_bool CoilWarningOnceFlag;
-    extern Array1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
-    extern Array1D_int PartWetCoolCoilErrs;   // error counting for detailed coils
-    extern bool GetWaterCoilsInputFlag;       // Flag set to make sure you get input once
-    extern Array1D_bool CheckEquipName;
-
-    // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine to check convergence and update nodes
-
-    // Reporting routines for module
-
-    // Other routines
-
-    // Types
 
     struct WaterCoilEquipConditions
     {
@@ -298,7 +227,7 @@ namespace WaterCoils {
               HeatExchType(0), CoolingCoilAnalysisMode(0), UACoilInternalPerUnitArea(0.0), UAWetExtPerUnitArea(0.0), UADryExtPerUnitArea(0.0),
               SurfAreaWetFractionSaved(0.0), UACoilVariable(0.0), RatioAirSideToWaterSideConvect(1.0), AirSideNominalConvect(0.0),
               LiquidSideNominalConvect(0.0), Control(0), AirInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
-              WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(CondensateDiscarded),
+              WaterLoopNum(0), WaterLoopSide(0), WaterLoopBranchNum(0), WaterLoopCompNum(0), CondensateCollectMode(1001),
               CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0), CoilPerfInpMeth(0),
               FaultyCoilFoulingFlag(false), FaultyCoilFoulingIndex(0), FaultyCoilFoulingFactor(0.0),
               DesiccantRegenerationCoil(false), DesiccantDehumNum(0), DesignWaterDeltaTemp(0.0), UseDesignWaterDeltaTemp(false), ControllerName(""),
@@ -318,12 +247,7 @@ namespace WaterCoils {
         }
     };
 
-    // Object Data
-    extern Array1D<WaterCoilEquipConditions> WaterCoil;
-    extern Array1D<WaterCoilNumericFieldData> WaterCoilNumericFields;
-
     // Functions
-    void clear_state();
 
     void SimulateWaterCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
@@ -337,30 +261,30 @@ namespace WaterCoils {
     void InitWaterCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration);
 
     void                                   // refactor for coil report
-    CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
+    CalcAdjustedCoilUA(EnergyPlusData &state, int const CoilNum); // refactor for coil report
 
     void SizeWaterCoil(EnergyPlusData &state, int const CoilNum);
 
-    void CalcSimpleHeatingCoil(int const CoilNum,          // index to heating coil
+    void CalcSimpleHeatingCoil(EnergyPlusData &state, int const CoilNum,          // index to heating coil
                                int const FanOpMode,        // fan operating mode
                                Real64 const PartLoadRatio, // part-load ratio of heating coil
                                int const CalcMode          // 1 = design calc; 2 = simulation calculation
     );
 
-    void CalcDetailFlatFinCoolingCoil(int const CoilNum,
+    void CalcDetailFlatFinCoolingCoil(EnergyPlusData &state, int const CoilNum,
                                       int const CalcMode,
                                       int const FanOpMode,       // fan operating mode
                                       Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
-    void CoolingCoil(int const CoilNum,
+    void CoolingCoil(EnergyPlusData &state, int const CoilNum,
                      bool const FirstHVACIteration,
                      int const CalcMode,
                      int const FanOpMode,       // fan operating mode
                      Real64 const PartLoadRatio // part-load ratio of heating coil
     );
 
-    void CoilCompletelyDry(int const CoilNum,
+    void CoilCompletelyDry(EnergyPlusData &state, int const CoilNum,
                            Real64 const WaterTempIn,  // Entering water temperature
                            Real64 const AirTempIn,    // Entering air dry bulb temperature
                            Real64 const CoilUA,       // Overall heat transfer coefficient
@@ -374,7 +298,7 @@ namespace WaterCoils {
 
     // Coil Completely Wet Subroutine for Cooling Coil
 
-    void CoilCompletelyWet(int const CoilNum,            // Number of Coil
+    void CoilCompletelyWet(EnergyPlusData &state, int const CoilNum,            // Number of Coil
                            Real64 const WaterTempIn,     // Water temperature IN to this function (C)
                            Real64 const AirTempIn,       // Air dry bulb temperature IN to this function(C)
                            Real64 const AirHumRat,       // Air Humidity Ratio IN to this funcation (C)
@@ -393,7 +317,7 @@ namespace WaterCoils {
 
     // Coil Part Wet Part Dry Subroutine for Cooling Coil
 
-    void CoilPartWetPartDry(int const CoilNum,             // Number of Coil
+    void CoilPartWetPartDry(EnergyPlusData &state, int const CoilNum,             // Number of Coil
                             bool const FirstHVACIteration, // Saving Old values
                             Real64 const InletWaterTemp,   // Entering liquid temperature(C)
                             Real64 const InletAirTemp,     // Entering air dry bulb temperature(C)
@@ -410,7 +334,7 @@ namespace WaterCoils {
 
     // Calculating coil UA for Cooling Coil
 
-    Real64 CalcCoilUAbyEffectNTU(int const CoilNum,
+    Real64 CalcCoilUAbyEffectNTU(EnergyPlusData &state, int const CoilNum,
                                  Real64 const CapacityStream1,     // Capacity rate of stream1.(W/C)
                                  Real64 const EnergyInStreamOne,   // Inlet state of stream1.(C)
                                  Real64 const CapacityStream2,     // Capacity rate of stream2.(W/C)
@@ -420,7 +344,7 @@ namespace WaterCoils {
 
     // Calculating coil outlet stream conditions and coil UA for Cooling Coil
 
-    void CoilOutletStreamCondition(int const CoilNum,
+    void CoilOutletStreamCondition(EnergyPlusData &state, int const CoilNum,
                                    Real64 const CapacityStream1,   // Capacity rate of stream1(W/C)
                                    Real64 const EnergyInStreamOne, // Inlet state of stream1 (C)
                                    Real64 const CapacityStream2,   // Capacity rate of stream2 (W/C)
@@ -432,7 +356,7 @@ namespace WaterCoils {
 
     // Subroutine for caculating outlet condition if coil is wet , for Cooling Coil
 
-    void WetCoilOutletCondition(int const CoilNum,
+    void WetCoilOutletCondition(EnergyPlusData &state, int const CoilNum,
                                 Real64 const AirTempIn,      // Entering air dry bulb temperature(C)
                                 Real64 const EnthAirInlet,   // Entering air enthalpy(J/kg)
                                 Real64 const EnthAirOutlet,  // Leaving air enthalpy(J/kg)
@@ -442,38 +366,23 @@ namespace WaterCoils {
                                 Real64 &SenWaterCoilLoad     // Sensible heat transfer rate(W)
     );
 
-    // Beginning of Update subroutines for the WaterCoil Module
-    // *****************************************************************************
+    void UpdateWaterCoil(EnergyPlusData &state, int const CoilNum);
 
-    void UpdateWaterCoil(int const CoilNum);
+    void ReportWaterCoil(EnergyPlusData &state, int const CoilNum);
 
-    //        End of Update subroutines for the WaterCoil Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the WaterCoil Module
-    // *****************************************************************************
-
-    void ReportWaterCoil(int const CoilNum);
-
-    //        End of Reporting subroutines for the WaterCoil Module
-    // *****************************************************************************
-
-    // Beginning of Coil Utility subroutines for the Detailed Model
-    // *****************************************************************************
-
-    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef);
+    void CalcDryFinEffCoef(EnergyPlusData &state, Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef);
 
     void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode);
 
     void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KBessFunc, int &ErrorCode);
 
-    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
+    void CalcPolynomCoef(EnergyPlusData &state, Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
 
-    Real64 SimpleHeatingCoilUAResidual(Real64 const UA,           // UA of coil
+    Real64 SimpleHeatingCoilUAResidual(EnergyPlusData &state, Real64 const UA,           // UA of coil
                                        Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
-    Real64 SimpleCoolingCoilUAResidual(Real64 const UA,           // UA of coil
+    Real64 SimpleCoolingCoilUAResidual(EnergyPlusData &state, Real64 const UA,           // UA of coil
                                        Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
@@ -550,7 +459,7 @@ namespace WaterCoils {
                             Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     );
 
-    Real64 EstimateHEXSurfaceArea(int const CoilNum); // coil number, [-]
+    Real64 EstimateHEXSurfaceArea(EnergyPlusData &state, int const CoilNum); // coil number, [-]
 
     int GetWaterCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
@@ -562,7 +471,7 @@ namespace WaterCoils {
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    void UpdateWaterToAirCoilPlantConnection(int const CoilTypeNum,
+    void UpdateWaterToAirCoilPlantConnection(EnergyPlusData &state, int const CoilTypeNum,
                                              std::string const &CoilName,
                                              int const EquipFlowCtrl, // Flow control mode for the equipment
                                              int const LoopNum,       // Plant loop index for where called from
@@ -586,18 +495,101 @@ namespace WaterCoils {
     );
 
     // estimate heating coil design inlet water temperature for autosizing UA-value
-    void EstimateCoilInletWaterTemp(int const CoilNum,                // index to heating coil
+    void EstimateCoilInletWaterTemp(EnergyPlusData &state, int const CoilNum,                // index to heating coil
                                     int const FanOpMode,              // fan operating mode
                                     Real64 const PartLoadRatio,       // part-load ratio of heating coil
                                     Real64 const UAMax,               // maximum UA-Value
                                     Real64 &DesCoilInletWaterTempUsed // estimated coil design inlet water temperature
     );
 
-    // End of Coil Utility subroutines
-    // *****************************************************************************
-
 } // namespace WaterCoils
 
+struct WaterCoilsData : BaseGlobalStruct {
+
+    int const MaxPolynomOrder;
+    int const MaxOrderedPairs;
+
+    Real64 const PolyConvgTol;
+    Real64 const MinWaterMassFlowFrac;
+    Real64 const MinAirMassFlow;
+
+    int const CoilType_Cooling;
+    int const CoilType_Heating;
+
+    int const CoilModel_Simple;
+    int const CoilModel_Cooling;
+    int const CoilModel_Detailed;
+
+    // Parameters for Heat Exchanger Configuration
+    int const CounterFlow;
+    int const CrossFlow;
+    int const SimpleAnalysis;
+    int const DetailedAnalysis;
+
+    // Water Systems
+    int const CondensateDiscarded; // default mode where water is "lost"
+    int const CondensateToTank;    // collect coil condensate from air and store in water storage tank
+
+                                         // Parameters for COIL:Water:SimpleHeating Coil Performance Input Method
+    int const UAandFlow; // for Coil Performance Input Method = UA and Design Water Flow Rate
+    int const NomCap;    // for Coil Performance Input Method = Nominal Capacity
+
+                            // Parameters Subroutine CoolingCoil: design calc or simulation calc.
+    int const DesignCalc; // ignore on/off check in CoolingCoil
+    int const SimCalc;    // pay attention to on/off check in CoolingCoil
+
+                             // DERIVED TYPE DEFINITIONS
+
+                             // MODULE VARIABLE DECLARATIONS:
+    int NumWaterCoils; // The Number of WaterCoils found in the Input
+    Array1D_bool MySizeFlag;
+    Array1D_bool MyUAAndFlowCalcFlag;
+    Array1D_bool MyCoilDesignFlag;
+    Array1D_bool CoilWarningOnceFlag;
+    Array1D_int WaterTempCoolCoilErrs;              // error counting for detailed coils
+    Array1D_int PartWetCoolCoilErrs;                // error counting for detailed coils
+    bool GetWaterCoilsInputFlag;              // Flag set to make sure you get input once
+    bool WaterCoilControllerCheckOneTimeFlag; // flg used to check water coil controller
+    Array1D_bool CheckEquipName;
+
+    bool InitWaterCoilOneTimeFlag;
+
+    // coil types in this module
+    int const WaterCoil_SimpleHeating;
+    int const WaterCoil_DetFlatFinCooling;
+    int const WaterCoil_Cooling;
+
+    Array1D<WaterCoils::WaterCoilEquipConditions> WaterCoil;
+    Array1D<WaterCoils::WaterCoilNumericFieldData> WaterCoilNumericFields;
+
+    void clear_state() override
+    {
+        NumWaterCoils = 0;
+        InitWaterCoilOneTimeFlag = true;
+        MySizeFlag.deallocate();
+        MyUAAndFlowCalcFlag.deallocate();
+        MyCoilDesignFlag.deallocate();
+        CoilWarningOnceFlag.deallocate();
+        WaterTempCoolCoilErrs.deallocate();
+        PartWetCoolCoilErrs.deallocate();
+        GetWaterCoilsInputFlag = true;
+        CheckEquipName.deallocate();
+        WaterCoil.deallocate();
+        WaterCoilNumericFields.deallocate();
+        WaterCoilControllerCheckOneTimeFlag = true;
+    }
+
+    // Default Constructor
+    WaterCoilsData()
+        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), 
+          MinAirMassFlow(0.001), CoilType_Cooling(1), CoilType_Heating(2), CoilModel_Simple(1), CoilModel_Cooling(2), CoilModel_Detailed(3), 
+          CounterFlow(1), CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001), 
+          CondensateToTank(1002), UAandFlow(1), NomCap(2), DesignCalc(1), SimCalc(2), NumWaterCoils(0), 
+          GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
+          InitWaterCoilOneTimeFlag(true), WaterCoil_SimpleHeating(DataPlant::TypeOf_CoilWaterSimpleHeating), WaterCoil_DetFlatFinCooling(DataPlant::TypeOf_CoilWaterDetailedFlatCooling), WaterCoil_Cooling(DataPlant::TypeOf_CoilWaterCooling)
+    {
+    }
+};
 } // namespace EnergyPlus
 
 #endif
