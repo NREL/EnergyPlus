@@ -185,6 +185,18 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = TempSize;
 
+
+    if (this->condenserType != AIRCOOLED) {
+        // Auto size Nominal Evaporative Condenser Pump Power to Total Capacity * 0.004266 w/w (15 W/ton)
+        SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+        DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
+        DataSizing::DataFractionUsedForSizing = 0.004266;
+        SizingString = "Nominal Evaporative Condenser Pump Power [W]";
+        TempSize = this->original_input_specs.nominal_evap_condenser_pump_power;
+        ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+        this->nominalEvaporativePumpPower = TempSize;
+    }
+
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
         curSpeed.parentModeRatedEvapAirFlowRate = this->ratedEvapAirFlowRate;
