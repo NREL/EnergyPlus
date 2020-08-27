@@ -648,7 +648,11 @@ TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
     std::vector<double> TestArray;
     std::size_t col = 2;
     std::size_t row = 1;
-    const int expected_length = 168;
+    unsigned long expected_length = 168;
     TestArray = testTableFile.getArray(std::make_pair(col,row));
     EXPECT_EQ(TestArray.size(), expected_length );
+
+    for (int i=0; i<TestArray.size(); i++ ){
+        EXPECT_FALSE(isnan(TestArray[i]));
+    }
 }
