@@ -457,7 +457,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(*state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -932,7 +932,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(*state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -989,7 +989,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(*state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1046,7 +1046,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(*state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1103,7 +1103,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(*state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1160,7 +1160,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(*state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1217,7 +1217,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(*state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
