@@ -4713,8 +4713,7 @@ namespace SurfaceGeometry {
                                     RoundSigDigits(dataMaterial.Material(MatGap2).Thickness, 3) + " )=[" + RoundSigDigits(MatGapCalc, 3) + "] >.001");
                                 ErrorsFound = true;
                             }
-                        }
-                        else { // Between-glass shade
+                        } else { // Between-glass shade
                             MatGapCalc = std::abs(dataMaterial.Material(MatGap).Thickness -
                                 (dataMaterial.Material(MatGap1).Thickness + dataMaterial.Material(MatGap2).Thickness + dataMaterial.Material(MatSh).Thickness));
                             if (MatGapCalc > 0.001) {
@@ -4735,41 +4734,42 @@ namespace SurfaceGeometry {
                     }
                 }
             }
+        }
 
-            if (SurfaceTmp(SurfNum).Sides != 3) { // Rectangular Window
-                // Initialize the FrameDivider number for this window. W5FrameDivider will be positive if
-                // this window's construction came from the Window5 data file and that construction had an
-                // associated frame or divider. It will be zero if the window's construction is not from the
-                // Window5 data file, or the construction is from the data file, but the construction has no
-                // associated frame or divider. Note that if there is a FrameDivider candidate for this
-                // window from the Window5 data file it is used instead of the window's input FrameDivider.
+        if (SurfaceTmp(SurfNum).Sides != 3) { // Rectangular Window
+            // Initialize the FrameDivider number for this window. W5FrameDivider will be positive if
+            // this window's construction came from the Window5 data file and that construction had an
+            // associated frame or divider. It will be zero if the window's construction is not from the
+            // Window5 data file, or the construction is from the data file, but the construction has no
+            // associated frame or divider. Note that if there is a FrameDivider candidate for this
+            // window from the Window5 data file it is used instead of the window's input FrameDivider.
 
-                if (SurfaceTmp(SurfNum).Construction != 0) {
-                    SurfaceTmp(SurfNum).FrameDivider = dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).W5FrameDivider;
+            if (SurfaceTmp(SurfNum).Construction != 0) {
+                SurfaceTmp(SurfNum).FrameDivider = dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).W5FrameDivider;
 
-                    // Warning if FrameAndDivider for this window is over-ridden by one from Window5 Data File
-                    if (SurfaceTmp(SurfNum).FrameDivider > 0 && !lAlphaFieldBlanks(FrameField)) {
-                        ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", " + cAlphaFieldNames(FrameField) + "=\"" +
-                            cAlphaArgs(FrameField) + "\"");
-                        ShowContinueError("will be replaced with FrameAndDivider from Window5 Data File entry " +
-                            dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Name);
-                    }
+                // Warning if FrameAndDivider for this window is over-ridden by one from Window5 Data File
+                if (SurfaceTmp(SurfNum).FrameDivider > 0 && !lAlphaFieldBlanks(FrameField)) {
+                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", " + cAlphaFieldNames(FrameField) + "=\"" +
+                        cAlphaArgs(FrameField) + "\"");
+                    ShowContinueError("will be replaced with FrameAndDivider from Window5 Data File entry " +
+                        dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).Name);
+                }
 
-                    if (!lAlphaFieldBlanks(FrameField) && SurfaceTmp(SurfNum).FrameDivider == 0) {
-                        SurfaceTmp(SurfNum).FrameDivider = UtilityRoutines::FindItemInList(cAlphaArgs(FrameField), FrameDivider);
-                        if (SurfaceTmp(SurfNum).FrameDivider == 0) {
-                            if (!dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
-                                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
-                                    "=\"" + cAlphaArgs(FrameField) + "\"");
-                                ErrorsFound = true;
-                            }
-                            else {
-                                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
-                                    "=\"" + cAlphaArgs(FrameField) + "\"");
-                                ShowContinueError("...Frame/Divider is not supported in Equivalent Layer Window model.");
-                            }
+                if (!lAlphaFieldBlanks(FrameField) && SurfaceTmp(SurfNum).FrameDivider == 0) {
+                    SurfaceTmp(SurfNum).FrameDivider = UtilityRoutines::FindItemInList(cAlphaArgs(FrameField), FrameDivider);
+                    if (SurfaceTmp(SurfNum).FrameDivider == 0) {
+                        if (!dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+                            ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
+                                "=\"" + cAlphaArgs(FrameField) + "\"");
+                            ErrorsFound = true;
+                        } else {
+                            ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) +
+                                "=\"" + cAlphaArgs(FrameField) + "\"");
+                            ShowContinueError("...Frame/Divider is not supported in Equivalent Layer Window model.");
                         }
-                        // Divider not allowed with between-glass shade or blind
+                    }
+                    // Divider not allowed with between-glass shade or blind
+                    for (int WSCPtr : SurfaceTmp(SurfNum).windowShadingControlList) {
                         if (!ErrorsFound && WSCPtr > 0 && ConstrNumSh > 0) {
                             if (WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassShade ||
                                 WindowShadingControl(WSCPtr).ShadingType == WSC_ST_BetweenGlassBlind) {
@@ -4786,18 +4786,18 @@ namespace SurfaceGeometry {
                                 } // End of check if window has divider
                             }     // End of check if window has a between-glass shade or blind
                         }         // End of check if window has a shaded construction
-                    }             // End of check if window has an associated FrameAndDivider
-                }                 // End of check if window has a construction
-            }
+                    }             // end of looping through window shading controls of window
+                }             // End of check if window has an associated FrameAndDivider
+            }                 // End of check if window has a construction
+        }
 
-            if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
-                if (SurfaceTmp(SurfNum).FrameDivider > 0) {
-                    // Equivalent Layer window does not have frame/divider model
-                    ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) + "=\"" +
-                        cAlphaArgs(FrameField) + "\"");
-                    ShowContinueError("Frame/Divider is not supported in Equivalent Layer Window model.");
-                    SurfaceTmp(SurfNum).FrameDivider = 0;
-                }
+        if (dataConstruction.Construct(SurfaceTmp(SurfNum).Construction).WindowTypeEQL) {
+            if (SurfaceTmp(SurfNum).FrameDivider > 0) {
+                // Equivalent Layer window does not have frame/divider model
+                ShowSevereError(cCurrentModuleObject + "=\"" + SurfaceTmp(SurfNum).Name + "\", invalid " + cAlphaFieldNames(FrameField) + "=\"" +
+                    cAlphaArgs(FrameField) + "\"");
+                ShowContinueError("Frame/Divider is not supported in Equivalent Layer Window model.");
+                SurfaceTmp(SurfNum).FrameDivider = 0;
             }
         }
     }
