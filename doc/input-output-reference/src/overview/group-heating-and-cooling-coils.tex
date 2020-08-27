@@ -2711,7 +2711,7 @@ Coil:Cooling:DX:MultiSpeed,
 \item
   HVAC,Sum,Cooling Coil Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Cooling Coil Electric Power{[}W{]}
+  HVAC,Average,Cooling Coil Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Coil Electricity Energy {[}J{]}
 \item
@@ -2722,7 +2722,7 @@ If not part of AirLoopHVAC:UnitaryHeatPump:AirToAir (if part of a heat pump, cra
 
 \begin{itemize}
 \item
-  HVAC,Average,Cooling Coil Crankcase Heater Electric Power{[}W{]}
+  HVAC,Average,Cooling Coil Crankcase Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Coil Crankcase Heater Electricity Energy {[}J{]}
 \end{itemize}
@@ -2735,11 +2735,11 @@ Evaporative-cooled condenser:
 \item
   HVAC,Sum,Cooling Coil Evaporative Condenser Water Volume{[}m3{]}
 \item
-  HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power{[}W{]}
+  HVAC,Average,Cooling Coil Evaporative Condenser Pump Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Cooling Coil Basin Heater Electric Power{[}W{]}
+  HVAC,Average,Cooling Coil Basin Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Coil Basin Heater Electricity Energy {[}J{]}
 \item
@@ -2813,7 +2813,7 @@ This is the electricity consumption of the DX coil compressor and condenser fan(
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the timestep being reported.
 
-\paragraph{Cooling Coil Crankcase Heater Electric Power{[}W{]}}\label{cooling-coil-crankcase-heater-electric-powerw}
+\paragraph{Cooling Coil Crankcase Heater Electricity Rate {[}W{]}}\label{cooling-coil-crankcase-heater-electric-powerw}
 
 This is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. If the DX Cooling Coil is used in a heat pump, the crankcase heater is reported only for the heating coil.
 
@@ -3225,7 +3225,7 @@ Coil:Cooling:DX:VariableSpeed,
 \item
   HVAC,Sum,Cooling Coil Evaporative Condenser Mains Water Volume {[}m3{]}
 \item
-  HVAC,Average,Cooling Coil Evaporative Condenser Pump Electric Power{[}W{]}
+  HVAC,Average,Cooling Coil Evaporative Condenser Pump Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Cooling Coil Evaporative Condenser Pump Electricity Energy {[}J{]}
 \item
@@ -3336,7 +3336,7 @@ The output variable is the total water volume consumed for condenser evaporative
 
 The output variable is the total water volume for condenser evaporative pre-cooling, obtained from the Mains Water supply, in m\(^{3}\) over the timestep being reported.
 
-\paragraph{Cooling Coil Evaporative Condenser Pump Electric Power{[}W{]}}\label{cooling-coil-evaporative-condenser-pump-electric-powerw}
+\paragraph{Cooling Coil Evaporative Condenser Pump Electricity Rate {[}W{]}}\label{cooling-coil-evaporative-condenser-pump-electric-powerw}
 
 The output variable is the average power consumption rate of the evaporative condenser pump, in Watts over the timestep being reported.
 
@@ -3850,15 +3850,15 @@ Coil:Heating:DX:SingleSpeed,
 \item
   HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Defrost Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Defrost Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Defrost Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Crankcase Heater Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Crankcase Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Crankcase Heater Electricity Energy {[}J{]}
 \item
@@ -4160,11 +4160,11 @@ COIL:Heating:DX:MultiSpeed,
 \item
   HVAC,Sum,Heating Coil Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Defrost Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Defrost Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Defrost Electricity Energy {[}J{]}
 \item
@@ -4172,7 +4172,7 @@ COIL:Heating:DX:MultiSpeed,
 \item
   HVAC,Sum,Heating Coil Defrost Gas Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Crankcase Heater Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Crankcase Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Crankcase Heater Electricity Energy {[}J{]}
 \item
@@ -4518,7 +4518,7 @@ Coil:Heating:DX:VariableSpeed,
 \item
   HVAC,Sum,Heating Coil Defrost Electricity Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Crankcase Heater Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Crankcase Heater Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Crankcase Heater Electricity Energy {[}J{]}
 \end{itemize}
@@ -4587,7 +4587,7 @@ The output variable is the total heating output of the coil in Joules over the t
 
 The output variable is the total source side heat transfer of the coil in Joules over the timestep being reported.
 
-\paragraph{Heating Coil Defrost Electric Power{[}W{]}}\label{heating-coil-defrost-electric-powerw}
+\paragraph{Heating Coil Defrost Electricity Rate {[}W{]}}\label{heating-coil-defrost-electric-powerw}
 
 The output variable is the average electric power used for defrosting, in Watts over the timestep being reported.
 
@@ -5750,7 +5750,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Pumped,
 \item
   HVAC,Sum,Heating Coil Total Water Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Water Heating Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Water Heating Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Water Heating Electricity Energy {[}J{]}
 \end{itemize}
@@ -5767,7 +5767,7 @@ This output field is the total heating output of the DX coil in Joules for the t
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
-\paragraph{Heating Coil Crankcase Heater Electric Power{[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-1}
+\paragraph{Heating Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-1}
 
 This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
@@ -5783,7 +5783,7 @@ This output field is the average water heating rate output of the DX coil (conde
 
 This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported. This is determined using the inlet and outlet water temperatures and the water mass flow rate through the condenser coil.
 
-\paragraph{Heating Coil Water Heating Electric Power{[}W{]}}\label{heating-coil-water-heating-electric-powerw}
+\paragraph{Heating Coil Water Heating Electricity Rate {[}W{]}}\label{heating-coil-water-heating-electric-powerw}
 
 This output field is the average electricity consumption rate of the DX coil compressor and condenser pump in Watts for the timestep being reported.
 
@@ -5951,7 +5951,7 @@ Coil:WaterHeating:AirToWaterHeatPump:Wrapped,
 \item
   HVAC,Sum,Heating Coil Total Water Heating Energy {[}J{]}
 \item
-  HVAC,Average,Heating Coil Water Heating Electric Power{[}W{]}
+  HVAC,Average,Heating Coil Water Heating Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Heating Coil Water Heating Electricity Energy {[}J{]}
 \end{itemize}
@@ -5968,7 +5968,7 @@ This output field is the total heating output of the DX coil in Joules for the t
 
 This output field is the average runtime fraction of the DX coil compressor for the timestep being reported. This also represents the runtime fraction of the condenser water pump.
 
-\paragraph{Heating Coil Crankcase Heater Electric Power{[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-2}
+\paragraph{Heating Coil Crankcase Heater Electricity Rate {[}W{]}}\label{heating-coil-crankcase-heater-electric-powerw-2}
 
 This output field is the average electricity consumption rate of the DX coil compressor's crankcase heater in Watts for the timestep being reported. The crankcase heater operates only when the compressor is off and the air surrounding the compressor is below the Maximum Ambient Temperature for Crankcase Heater Operation, otherwise this output variable is set equal to 0.
 
@@ -5984,7 +5984,7 @@ This output field is the average water heating rate output of the DX coil (conde
 
 This output field is the total water heating output of the DX coil (condenser coil plus condenser water pump) in Joules for the timestep being reported.
 
-\paragraph{Heating Coil Water Heating Electric Power{[}W{]}}\label{heating-coil-water-heating-electric-powerw-1}
+\paragraph{Heating Coil Water Heating Electricity Rate {[}W{]}}\label{heating-coil-water-heating-electric-powerw-1}
 
 This output field is the average electricity consumption rate of the DX coil compressor in Watts for the timestep being reported.
 

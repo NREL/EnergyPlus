@@ -1755,9 +1755,9 @@ HeatRecovery:
 
 Most of these chiller output variables are defined above under ``Generic Chiller Outputs.''~ Output variables not described above are discussed here.
 
-\paragraph{Chiller Condenser Fan Electric Power ~{[}W{]}}\label{chiller-condenser-fan-electric-power-w}
+\paragraph{Chiller Condenser Fan Electricity Rate ~{[}W{]}}\label{chiller-condenser-fan-electric-power-w}
 
-\paragraph{Chiller Condenser Fan Electric Energy ~{[}J{]}}\label{chiller-condenser-fan-electric-energy-j}
+\paragraph{Chiller Condenser Fan Electricity Energy ~{[}J{]}}\label{chiller-condenser-fan-electric-energy-j}
 
 These outputs are for the electric power consumption of the chiller condenser fan and are applicable to air- or evaporatively-cooled chillers. These reports are available only for the Chiller:Electric:EIR and only when the Condenser Fan Power Ratio input field is greater than 0. This output is also added to a meter object with Resource Type = Electricity, End Use Key = Chillers, Group Key = Plant (Ref. Output:Meter objects).
 
@@ -2026,7 +2026,7 @@ Chiller:Electric:ReformulatedEIR,
 
 \subsubsection{Outputs}\label{outputs-5-006}
 
-The output variables for Chiller:Electric:ReformulatedEIR are the same as the output variables for Chiller:Electric:EIR (ref. Electric EIR Chiller Outputs). except for the Chiller Condenser Fan Electric Power and Energy reports
+The output variables for Chiller:Electric:ReformulatedEIR are the same as the output variables for Chiller:Electric:EIR (ref. Electric EIR Chiller Outputs). except for the Chiller Condenser Fan Electricity Rate and Energy reports
 
 \subsection{Chiller:EngineDriven}\label{chillerenginedriven}
 
@@ -2380,8 +2380,8 @@ Chiller:EngineDriven,
 
 \begin{lstlisting}
 
-HVAC,Average,Chiller Electric Power [W]
-  HVAC,Sum,Chiller Electric Energy [J]
+HVAC,Average,Chiller Electricity Rate [W]
+  HVAC,Sum,Chiller Electricity Energy [J]
   Zone,Meter,Electricity:Plant [J]
   Zone,Meter,Cooling:Electricity [J]
   HVAC,Average,Chiller Evaporator Cooling Rate [W]
@@ -5735,11 +5735,11 @@ CentralHeatPumpSystem,
 \item
   HVAC,Average,Chiller Heater System Cooling Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater System Cooling Electric Energy{[}J{]}
+  HVAC,Sum,Chiller Heater System Cooling Electricity Energy {[}J{]}
 \item
   HVAC,Average,Chiller Heater System Heating Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater System Heating Electric Energy{[}J{]}
+  HVAC,Sum,Chiller Heater System Heating Electricity Energy {[}J{]}
 \item
   HVAC,Average,Chiller Heater System Cooling Rate {[}W{]}
 \item
@@ -6010,13 +6010,13 @@ ChillerHeaterPerformance:Electric:EIR,
 \item
   HVAC,Average,Chiller Heater Cycling Ratio Unit \textless{}x\textgreater{} {[]}
 \item
-  HVAC,Average,Chiller Heater Cooling Electric Power Unit \textless{}x\textgreater{} {[}W{]}
+  HVAC,Average,Chiller Heater Cooling Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Cooling Electric Energy Unit \textless{}x\textgreater{} {[}J{]}
+  HVAC,Sum,Chiller Heater Cooling Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}
 \item
-  HVAC,Average,Chiller Heater Heating Electric Power Unit \textless{}x\textgreater{} {[}W{]}
+  HVAC,Average,Chiller Heater Heating Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}
 \item
-  HVAC,Sum,Chiller Heater Heating Electric Energy Unit \textless{}x\textgreater{} {[}J{]}
+  HVAC,Sum,Chiller Heater Heating Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}
 \item
   HVAC,Average,Chiller Heater Cooling Rate Unit \textless{}x\textgreater{} {[}W{]}
 \item
@@ -6086,15 +6086,15 @@ This output is the ratio of the evaporator heat transfer rate plus the false loa
 
 The cycling ratio is the amount of time the chiller-heater operates during each simulation time step. If the chiller-heater part-load ratio falls below the minimum part-load ratio, the chiller-heater cycles on and off to meet the loads.
 
-\subsubsection{Chiller Heater Cooling Electric Power Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-cooling-electric-power-unit-x-w}
+\subsubsection{Chiller Heater Cooling Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-cooling-electric-power-unit-x-w}
 
-\subsubsection{Chiller Heater Cooling Electric Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-cooling-electric-energy-unit-x-j}
+\subsubsection{Chiller Heater Cooling Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-cooling-electric-energy-unit-x-j}
 
 These outputs are the cooling electric power consumption of the chiller-heater.
 
-\subsubsection{Chiller Heater Heating Electric Power Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-heating-electric-power-unit-x-w}
+\subsubsection{Chiller Heater Heating Electricity Rate Unit \textless{}x\textgreater{} {[}W{]}}\label{chiller-heater-heating-electric-power-unit-x-w}
 
-\subsubsection{Chiller Heater Heating Electric Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-heating-electric-energy-unit-x-j}
+\subsubsection{Chiller Heater Heating Electricity Energy Unit \textless{}x\textgreater{} {[}J{]}}\label{chiller-heater-heating-electric-energy-unit-x-j}
 
 These outputs are the heating electric power consumption of the chiller-heater.
 

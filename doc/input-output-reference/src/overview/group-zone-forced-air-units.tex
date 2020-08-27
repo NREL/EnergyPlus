@@ -833,7 +833,7 @@ An example input for a fan coil unit, including its constituent components, is s
 \item
   HVAC,Sum,Fan Coil Sensible Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Fan Coil Fan Electric Power{[}W{]}
+  HVAC,Average,Fan Coil Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Fan Coil Fan Electricity Energy {[}J{]}
 \item
@@ -1180,7 +1180,7 @@ ZoneHVAC:UnitVentilator,
 \item
   HVAC,Sum,Zone Unit Ventilator Sensible Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Unit Ventilator Fan Electric Power{[}W{]}
+  HVAC,Average,Zone Unit Ventilator Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Unit Ventilator Fan Electricity Energy {[}J{]}
 \item
@@ -1396,7 +1396,7 @@ ZoneHVAC:UnitHeater,
 \item
   HVAC,Sum,Zone Unit Heater Heating Energy {[}J{]}
 \item
-  HVAC,Average,Zone Unit Heater Fan Electric Power{[}W{]}
+  HVAC,Average,Zone Unit Heater Fan Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Unit Heater Fan Electricity Energy {[}J{]}
 \item
@@ -2057,7 +2057,7 @@ Following is an example input for the cycling window air conditioner, along with
 \item
   HVAC,Sum,Zone Window Air Conditioner Latent Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Zone Window Air Conditioner Electric Power{[}W{]}
+  HVAC,Average,Zone Window Air Conditioner Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Window Air Conditioner Electricity Energy {[}J{]}
 \item
@@ -2092,7 +2092,7 @@ This output is the latent heat extraction rate of the window air conditioner uni
 
 This is the latent heat extraction of the window air conditioner unit from the zone it is serving in Joules over the timestep being reported. This is determined by the outlet and zone conditions and the mass flow rate through the unit.
 
-\paragraph{Zone Window Air Conditioner Electric Power{[}W{]}}\label{zone-window-air-conditioner-electric-powerw}
+\paragraph{Zone Window Air Conditioner Electricity Rate {[}W{]}}\label{zone-window-air-conditioner-electric-powerw}
 
 This output is the electricity consumption rate of the window air conditioner unit in Watts. The consumption includes electricity used by the compressor and the fans (indoor supply air fan and the condenser fan).
 
@@ -3797,7 +3797,7 @@ ZoneHVAC:EnergyRecoveryVentilator,
 
 \begin{itemize}
 \item
-  HVAC,Average,Zone Ventilator Electric Power{[}W{]}
+  HVAC,Average,Zone Ventilator Electricity Rate {[}W{]}
 \item
   HVAC,Sum,Zone Ventilator Electricity Energy {[}J{]}
 \item
@@ -4165,7 +4165,7 @@ This is the latent heating rate output of the terminal unit in Watts. This is de
 
 This is the latent heating output of the terminal unit in Joules for the time step being reported. This is determined by the inlet and outlet air specific humidity ratios and the air mass flow rate through the unit. This value describes the latent heating energy delivered to the zone.
 
-\paragraph{Zone VRF Air Terminal Cooling Electric Power{[}W{]}}\label{zone-vrf-air-terminal-cooling-electric-powerw}
+\paragraph{Zone VRF Air Terminal Cooling Electricity Rate {[}W{]}}\label{zone-vrf-air-terminal-cooling-electric-powerw}
 
 This output field is the parasitic electricity consumption rate of the zone terminal unit in Watts. The consumption rate includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The terminal unit parasitic on and off electricity is reported in this cooling output variable when the unit operates in cooling mode or the most recent operation was for cooling.
 
@@ -4173,7 +4173,7 @@ This output field is the parasitic electricity consumption rate of the zone term
 
 This output field is the electricity consumption of the zone terminal unit in Joules for the time period being reported. The consumption includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are summed for the time step being reported. The terminal unit parasitic on and off electricity consumption is reported in this cooling output variable when the unit operates in cooling mode or the most recent operation was for cooling. This output is also added to a meter with Resource Type = Electricity, End Use Key = Cooling, Group Key = System (ref. Output:Meter objects).
 
-\paragraph{Zone VRF Air Terminal Heating Electric Power{[}W{]}}\label{zone-vrf-air-terminal-heating-electric-powerw}
+\paragraph{Zone VRF Air Terminal Heating Electricity Rate {[}W{]}}\label{zone-vrf-air-terminal-heating-electric-powerw}
 
 This output field is the parasitic electricity consumption rate of the zone terminal unit in Watts. The consumption rate includes parasitic electricity used by the zone terminal unit's transformers, controls, or other electricity consuming devices. This value is calculated for each HVAC system time step being simulated, and the results are averaged for the time step being reported. The terminal unit parasitic on and off electricity is reported in this heating output variable when the unit operates in heating mode or the most recent operation was for heating.
 
@@ -4439,12 +4439,12 @@ HVAC,Average,Zone Hybrid Unitary HVAC Outdoor Air Relative Humidity [%]
 HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Mass Flow Rate [kg/s]
 HVAC,Average,Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate [m3/s]
 HVAC,Average,Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate [m3/s]
-HVAC,Average,Zone Hybrid Unitary HVAC Electric Power [W]
-HVAC,Average,Zone Hybrid Unitary HVAC Electric Energy [J]
+HVAC,Average,Zone Hybrid Unitary HVAC Electricity Rate [W]
+HVAC,Average,Zone Hybrid Unitary HVAC Electricity Energy [J]
 Water use
 Second Fuel Use
 Third Fuel Use
-Supply Fan Electric Power
+Supply Fan Electricity Rate
 External Static Pressure
 HVAC,Average,Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate [kg/s]
 HVAC,Average,Zone Hybrid Unitary HVAC Ventilation Air Mass Flow Rate [kg/s]
@@ -4596,10 +4596,10 @@ This output reports the supply air flow as a standard density volume flow rate. 
 \paragraph{Zone Hybrid Unitary HVAC Ventilation Air Standard Density Volume Flow Rate [m3/s]}
 This output reports the outdoor air (ventilation) flow as a standard density volume flow rate. Standard density in EnergyPlus corresponds to dry air at 20ºC drybulb, and 101,325 Pa. The output is the average over the reporting period.
 
-\paragraph{Zone Hybrid Unitary HVAC Electric Power [W]}
+\paragraph{Zone Hybrid Unitary HVAC Electricity Rate [W]}
 This output reports the electric power input to the system. For each timestep the value is calculated as a time weighted average of the electric power for each of the settings selected for the time step. The output is the average over the reporting period.
 
-\paragraph{Zone Hybrid Unitary HVAC Electric Energy [J]}
+\paragraph{Zone Hybrid Unitary HVAC Electricity Energy [J]}
 This output reports the electric energy consumed by the system. For each timestep the value is calculated from the average electric power. The output is the sum over the reporting period.
 
 \paragraph{Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate [kg/s]}
