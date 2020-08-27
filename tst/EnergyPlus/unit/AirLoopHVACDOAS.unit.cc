@@ -4000,7 +4000,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(65).HumRat = 0.001;
     DataLoopNode::Node(66).HumRat = 0.001;
 
-    auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS.airloopDOAS[0];
+    auto &thisAirLoopDOASObjec = state.dataAirLoopHVACDOAS->airloopDOAS[0];
 
     int index = 0;
     thisAirLoopDOASObjec.SizingOnceFlag = false;
