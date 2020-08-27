@@ -952,7 +952,7 @@ Lights objects have output variables for individual objects and for zone totals.
 \item
   Zone,Average,Lights Total Heating Rate {[}W{]}
 \item
-  Zone,Sum,Lights Electric Energy {[}J{]}
+  Zone,Sum,Lights Electricity Energy {[}J{]}
 \item
   Zone,Average,Zone Lights Electricity Rate {[}W{]}
 \item
@@ -976,7 +976,7 @@ Lights objects have output variables for individual objects and for zone totals.
 \item
   Zone,Average,Zone Lights Total Heating Rate {[}W{]}
 \item
-  Zone,Sum,Zone Lights Electric Energy {[}J{]}
+  Zone,Sum,Zone Lights Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Lights Electricity Rate {[}W{]}}\label{lights-electric-power-w}
@@ -1013,7 +1013,7 @@ The amount of heat gain from lights that goes into the zone's return air (and, t
 
 The total heat gain from lights. It is the sum of the following four outputs, i.e., Total Heat Gain = Return Air Heat Gain + Radiant Heat Gain + Visible Heat Gain + Convective Heat Gain. It is also equal to the electrical input to the lights.
 
-\paragraph{Lights Electric Energy {[}J{]}}\label{lights-electric-energy-j}
+\paragraph{Lights Electricity Energy {[}J{]}}\label{lights-electric-energy-j}
 
 The lighting electrical consumption including ballasts, if present. These will have the same value as Lights Total Heating Energy (above).
 
@@ -1051,7 +1051,7 @@ The amount of heat gain from all lights in the zone that goes into the zone's re
 
 The total heat gain from all lights in the zone. It is the sum of the following four outputs, i.e., Total Heat Gain = Return Air Heat Gain + Radiant Heat Gain + Visible Heat Gain + Convective Heat Gain. It is also equal to the electrical input to the lights.
 
-\paragraph{Zone Lights Electric Energy {[}J{]}}\label{zone-lights-electric-energy-j}
+\paragraph{Zone Lights Electricity Energy {[}J{]}}\label{zone-lights-electric-energy-j}
 
 The lighting electrical consumption for all lights in the zone including ballasts, if present. This will have the same value as Zone Lights Total Heating Energy (above). However, this amount is also shown in the Electricity meters that are associated with the zone:
 
@@ -1937,7 +1937,7 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Electric Equipment Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Electric Equipment Electric Energy {[}J{]}
+  Zone,Sum,Electric Equipment Electricity Energy {[}J{]}
 \item
   Zone,Sum,Electric Equipment Radiant Heating Energy {[}J{]}
 \item
@@ -1961,7 +1961,7 @@ Each type of equipment object has output variables for individual objects and fo
 \item
   Zone,Average,Zone Electric Equipment Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Zone Electric Equipment Electric Energy {[}J{]}
+  Zone,Sum,Zone Electric Equipment Electricity Energy {[}J{]}
 \item
   Zone,Sum,Zone Electric Equipment Radiant Heating Energy {[}J{]}
 \item
@@ -2194,7 +2194,7 @@ Each type of equipment object has output variables for individual objects and fo
 
 \paragraph{Electric Equipment Electricity Rate {[}W{]}}\label{electric-equipment-electric-power-w}
 
-\paragraph{Electric Equipment Electric Energy {[}J{]}}\label{electric-equipment-electric-energy-j}
+\paragraph{Electric Equipment Electricity Energy {[}J{]}}\label{electric-equipment-electric-energy-j}
 
 The electric equipment electric power consumption in Watts (for power) or Joules (for energy). It is the sum of the radiant, convective, latent and lost components. This energy use is added to the electricity meters that are associated with the zone -- Electricity:Facility, Electricity:Buidling, Electricity:Zone:\textless{}Zone Name\textgreater{}, InteriorEquipment:Electricity: :Zone:\textless{}Zone Name\textgreater{}, and \textless{}End-Use Subcategory\textgreater{}:InteriorEquipment:Electricity.
 
@@ -2472,11 +2472,11 @@ ElectricEquipment:ITE:AirCooled Outputs
 \item
   Zone,Average,ITE Total Heat Gain to Zone Rate {[}W{]}
 \item
-  Zone,Sum,ITE CPU Electric Energy {[}J{]}
+  Zone,Sum,ITE CPU Electricity Energy {[}J{]}
 \item
-  Zone,Sum,ITE Fan Electric Energy {[}J{]}
+  Zone,Sum,ITE Fan Electricity Energy {[}J{]}
 \item
-  Zone,Sum,ITE UPS Electric Energy {[}J{]}
+  Zone,Sum,ITE UPS Electricity Energy {[}J{]}
 \item
   Zone,Sum,ITE CPU Electric Energy at Design Inlet Conditions {[}J{]}
 \item
@@ -2544,11 +2544,11 @@ ElectricEquipment:ITE:AirCooled Outputs
 \item
   Zone,Average,Zone ITE Total Heat Gain to Zone Rate {[}W{]}
 \item
-  Zone,Sum,Zone ITE CPU Electric Energy {[}J{]}
+  Zone,Sum,Zone ITE CPU Electricity Energy {[}J{]}
 \item
-  Zone,Sum,Zone ITE Fan Electric Energy {[}J{]}
+  Zone,Sum,Zone ITE Fan Electricity Energy {[}J{]}
 \item
-  Zone,Sum,Zone ITE UPS Electric Energy {[}J{]}
+  Zone,Sum,Zone ITE UPS Electricity Energy {[}J{]}
 \item
   Zone,Sum,Zone ITE CPU Electric Energy at Design Inlet Conditions {[}J{]}
 \item
@@ -2583,9 +2583,9 @@ ElectricEquipment:ITE:AirCooled Outputs
 
 ITE CPU Electricity Rate {[}W{]}
 
-\paragraph{Zone ITE CPU Electric Energy {[}J{]}}\label{zone-ite-cpu-electric-energy-j}
+\paragraph{Zone ITE CPU Electricity Energy {[}J{]}}\label{zone-ite-cpu-electric-energy-j}
 
-\paragraph{ITE CPU Electric Energy {[}J{]}}\label{ite-cpu-electric-energy-j}
+\paragraph{ITE CPU Electricity Energy {[}J{]}}\label{ite-cpu-electric-energy-j}
 
 The electric power (or energy) input to the ITE equipment CPU (total power input less cooling fan power). The ITE CPU Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
@@ -2603,9 +2603,9 @@ The electric power (or energy) input to the ITE equipment CPU (total power input
 
 \paragraph{ITE Fan Electricity Rate {[}W{]}}\label{ite-fan-electric-power-w}
 
-\paragraph{Zone ITE Fan Electric Energy {[}J{]}}\label{zone-ite-fan-electric-energy-j}
+\paragraph{Zone ITE Fan Electricity Energy {[}J{]}}\label{zone-ite-fan-electric-energy-j}
 
-\paragraph{ITE Fan Electric Energy {[}J{]}}\label{ite-fan-electric-energy-j}
+\paragraph{ITE Fan Electricity Energy {[}J{]}}\label{ite-fan-electric-energy-j}
 
 The electric power (or energy) input to the ITE cooling fan. The ITE Fan Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
@@ -2623,9 +2623,9 @@ The electric power (or energy) input to the ITE cooling fan if the air inlet tem
 
 \paragraph{ITE UPS Electricity Rate {[}W{]}}\label{ite-ups-electric-power-w}
 
-\paragraph{Zone ITE UPS Electric Energy {[}J{]}}\label{zone-ite-ups-electric-energy-j}
+\paragraph{Zone ITE UPS Electricity Energy {[}J{]}}\label{zone-ite-ups-electric-energy-j}
 
-\paragraph{ITE UPS Electric Energy {[}J{]}}\label{ite-ups-electric-energy-j}
+\paragraph{ITE UPS Electricity Energy {[}J{]}}\label{ite-ups-electric-energy-j}
 
 The net electric power (or energy) input to the ITE equipment UPS (total power input less power delivered to ITE). The ITE UPS Electric Energy output is also added to a meter object with Resource Type = Electricity, End Use Key = InteriorEquipment, Group Key = Building (Ref. \hyperref[outputmeter-and-outputmetermeterfileonly]{Output:Meter} object).
 
@@ -3402,7 +3402,7 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
 \item
   Zone,Average,Baseboard Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Baseboard Electric Energy {[}J{]}
+  Zone,Sum,Baseboard Electricity Energy {[}J{]}
 \item
   Zone,Sum,Baseboard Radiant Heating Energy {[}J{]}
 \item
@@ -3418,7 +3418,7 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
 \item
   Zone,Average,Zone Baseboard Electricity Rate {[}W{]}
 \item
-  Zone,Sum,Zone Baseboard Electric Energy {[}J{]}
+  Zone,Sum,Zone Baseboard Electricity Energy {[}J{]}
 \item
   Zone,Sum,Zone Baseboard Radiant Heating Energy {[}J{]}
 \item
@@ -3437,7 +3437,7 @@ ZoneBaseboard:OutdoorTemperatureControlled objects have output variables for ind
 
 This field is the electric power for the ZoneBaseboard:OutdoorTemperatureControlled object in Watts.
 
-\paragraph{Baseboard Electric Energy {[}J{]}}\label{baseboard-electric-energy-j}
+\paragraph{Baseboard Electricity Energy {[}J{]}}\label{baseboard-electric-energy-j}
 
 The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules.
 
@@ -3463,7 +3463,7 @@ These output variables are the amount of heat gain for the Zone\-Baseboard:\-Out
 
 This field is the electric power for all Zone\-Baseboard:\-Outdoor\-Temperature\-Controlled objects within the zone in Watts.
 
-\paragraph{Zone Baseboard Electric Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
+\paragraph{Zone Baseboard Electricity Energy {[}J{]}}\label{zone-baseboard-electric-energy-j}
 
 The outdoor temperature controlled baseboard heat option is assumed to be fueled by electricity. This field is the same as the Baseboard Total Heating Energy (above) in joules. However, this amount is also shown in the Electricity meters that are associated with the zone -- Electricity:\-Facility, Electricity:\-Buidling, Electricity:\-Zone:\-\textless{}Zone Name\textgreater{}, and Interior\-Equipment:\-Electricity.
 
