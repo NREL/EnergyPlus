@@ -1331,7 +1331,7 @@
     Furnace ACDXCoil 1 Operating Mode,  !- Name
     32000,                   !- Rated Gross Total Cooling Capacity {W}
     1.6,                     !- Rated Evaporator Air Flow Rate {m3/s}
-    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
     4,                       !- Maximum Cycling Rate {cycles/hr}
     0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     45,                      !- Latent Capacity Time Constant {s}

@@ -1692,7 +1692,7 @@
     Heat Pump ACDXCoil 1 Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Latent Capacity Time Constant {s}

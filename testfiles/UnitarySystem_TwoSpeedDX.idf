@@ -1777,15 +1777,6 @@
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-Output:Variable,Sys 1 Furnace DX Cool Cooling Coil Outlet,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,Sys 2 Furnace DX Cool Cooling Coil Outlet,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,Sys 3 Furnace DX Cool Cooling Coil Outlet,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,Sys 4 Furnace DX Cool Cooling Coil Outlet,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-Output:Variable,Sys 5 Furnace DX Cool Cooling Coil Outlet,System Node Standard Density Volume Flow Rate,hourly; !- HVAC Average [m3/s]
-
-Output:Variable,*,Unitary System Cycling Ratio,hourly; !- HVAC Average []
-Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average []
-
   Output:VariableDictionary,IDF;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
@@ -2364,13 +2355,6 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     For: AllDays,            !- Field 2
     Until: 24:00,1;          !- Field 3
 
-  Schedule:Compact,
-    AlwaysOff,   !- Name
-    HVACTemplate Any Number, !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,0;          !- Field 3
-
   AirLoopHVAC:UnitarySystem,
     Sys 1 Furnace DX Cool Unitary System,  !- Name
     Load,                    !- Control Type
@@ -2382,7 +2366,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 1 Furnace DX Cool Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    AlwaysOff,           !- Supply Air Fan Operating Mode Schedule Name
+    FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Sys 1 Furnace DX Cool Heating Coil,  !- Heating Coil Name
     1.0,                     !- DX Heating Coil Sizing Ratio
@@ -2458,7 +2442,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Sys 1 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Latent Capacity Time Constant {s}
@@ -2838,7 +2822,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 2 Furnace DX Cool Supply Fan,  !- Supply Fan Name
     DrawThrough,             !- Fan Placement
-    AlwaysOff,           !- Supply Air Fan Operating Mode Schedule Name
+    FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Sys 2 Furnace DX Cool Heating Coil,  !- Heating Coil Name
     1.0,                     !- DX Heating Coil Sizing Ratio
@@ -2914,7 +2898,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Sys 2 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Latent Capacity Time Constant {s}
@@ -3281,7 +3265,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 3 Heat Pump Air Source Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    AlwaysOff,           !- Supply Air Fan Operating Mode Schedule Name
+    FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Sys 3 Heat Pump Air Source Heating Coil,  !- Heating Coil Name
     1.0,                     !- DX Heating Coil Sizing Ratio
@@ -3357,7 +3341,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Sys 3 Heat Pump Air Source Cooling Coil Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Latent Capacity Time Constant {s}
@@ -3805,7 +3789,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 4 Heat Pump Air Source Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    AlwaysOff,           !- Supply Air Fan Operating Mode Schedule Name
+    FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Sys 4 Heat Pump Air Source Heating Coil,  !- Heating Coil Name
     1.0,                     !- DX Heating Coil Sizing Ratio
@@ -3881,7 +3865,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Sys 4 Heat Pump Air Source Cooling Coil Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Latent Capacity Time Constant {s}
@@ -4329,7 +4313,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Fan:VariableVolume,      !- Supply Fan Object Type
     Sys 5 Furnace DX Cool Supply Fan,  !- Supply Fan Name
     BlowThrough,             !- Fan Placement
-    AlwaysOff,           !- Supply Air Fan Operating Mode Schedule Name
+    FanAvailSched,           !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Sys 5 Furnace DX Cool Heating Coil,  !- Heating Coil Name
     1.0,                     !- DX Heating Coil Sizing Ratio
@@ -4405,7 +4389,7 @@ Output:Variable,*,Unitary System Compressor Speed Ratio,hourly; !- HVAC Average 
     Sys 5 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Rated Condenser Air Flow Rate {m3/s}
     ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     ,                        !- Latent Capacity Time Constant {s}
