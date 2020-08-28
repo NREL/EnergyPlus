@@ -540,7 +540,6 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
     //  which includes the part-load degradation on latent capacity
     if (this->doLatentDegradation && (fanOpMode == DataHVACGlobals::ContFanCycCoil)) {
         Real64 QLatActual = TotCap * (1.0 - SHR);
-        Real64 SHRUnadjusted = SHR;
         // TODO: Figure out HeatingRTF for this
         Real64 HeatingRTF = 0.0;
         SHR = calcEffectiveSHR(inletNode, inletWetBulb, SHR, RTF, ratedLatentCapacity, QLatActual, HeatingRTF);
@@ -556,7 +555,12 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
     }
 }
 
-Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 q, Real64 shr, Real64 h, Real64 p)
+Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 const tdb, // Inlet dry-bulb temperature {C}
+                                                    Real64 const w,   // Inlet humidity ratio {kg-H2O/kg-dryair}
+                                                    Real64 const q,   // Total capacity {W}
+                                                    Real64 const shr, // SHR
+                                                    Real64 const h,   // Inlet enthalpy {J/kg-dryair}
+                                                    Real64 const p)   // Outlet node pressure {Pa}
 {
 
     static std::string const RoutineName("CalcBypassFactor: ");
@@ -569,7 +573,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     Real64 deltaH = q / airMassFlowRate;
     Real64 outp = p;
     Real64 outh = h - deltaH;
-    Real64 outw = Psychrometrics::PsyWFnTdbH(tdb, h - (1.0 - this->grossRatedSHR) * deltaH); // enthalpy at Tdb,in and Wout
+    Real64 outw = Psychrometrics::PsyWFnTdbH(tdb, h - (1.0 - shr) * deltaH); // enthalpy at Tdb,in and Wout
     Real64 outtdb = Psychrometrics::PsyTdbFnHW(outh, outw);
     Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(outtdb, outw, outp);
 

@@ -159,16 +159,20 @@ struct CoilCoolingDXCurveFitSpeed
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int  const fanOpMode, Real64 condInletTemp);
     void size(EnergyPlusData &state, int speedNum, int maxSpeeds);
-    Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 q, Real64 shr, Real64 h, Real64 p);
+    Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 const tdb, // Inlet dry-bulb temperature {C}
+                                                        Real64 const w,   // Inlet humidity ratio {kg-H2O/kg-dryair}
+                                                        Real64 const q,   // Total capacity {W}
+                                                        Real64 const shr, // SHR
+                                                        Real64 const h,   // Inlet enthalpy {J/kg-dryair}
+                                                        Real64 const p);  // Outlet node pressure {Pa}
 
-    Real64 calcEffectiveSHR(
-        const DataLoopNode::NodeData& inletNode,
-        Real64 const inletWetBulb,
-        Real64 const SHRss,               // Steady-state sensible heat ratio
-        Real64 const RTF,                 // Compressor run-time fraction
-        Real64 const QLatRated,           // Rated latent capacity
-        Real64 const QLatActual,          // Actual latent capacity
-        Real64 const HeatingRTF // Used to recalculate Toff for cycling fan systems
+    Real64 calcEffectiveSHR(const DataLoopNode::NodeData &inletNode,
+                            Real64 const inletWetBulb,
+                            Real64 const SHRss,      // Steady-state sensible heat ratio
+                            Real64 const RTF,        // Compressor run-time fraction
+                            Real64 const QLatRated,  // Rated latent capacity
+                            Real64 const QLatActual, // Actual latent capacity
+                            Real64 const HeatingRTF  // Used to recalculate Toff for cycling fan systems
     );
 
 private:
