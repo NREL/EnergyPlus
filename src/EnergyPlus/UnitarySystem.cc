@@ -10518,7 +10518,7 @@ namespace UnitarySystems {
                                 CoilPLR = 1.0 * double(CompOn);
                                 this->m_CoolingSpeedRatio = PartLoadRatio * double(CompOn);
                             } else {
-                                CoilPLR = PartLoadRatio * double(CompOn);
+                                CoilPLR = 1.0 * double(CompOn);
                             }
                         } else {
                             CoilPLR = PartLoadRatio * double(CompOn);
