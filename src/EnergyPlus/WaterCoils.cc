@@ -2196,7 +2196,7 @@ namespace WaterCoils {
                 }
                 bPRINT = false;       // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
                                       // should print this!)
-                if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent && WaterCoil(CoilNum).DesAirVolFlowRate == DataFlowUsedForSizing) {
+                if (WaterCoil(CoilNum).DesAirVolFlowRate == DataFlowUsedForSizing) {
                     TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;  // represents parent object has hard-sized airflow
                 } else {
                     TempSize = AutoSize;  // get the autosized air volume flow rate for use in other calculations
@@ -5976,8 +5976,10 @@ namespace WaterCoils {
             UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water")) {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
-                if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") && WaterCoil(WhichCoil).DesAirVolFlowRate < 0.0) {
+                if (WaterCoil(WhichCoil).DesAirVolFlowRate <= 0.0) {
                     WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
+                } else {
+                    //WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
                 }
             } else {
                 ShowSevereError("GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"");
