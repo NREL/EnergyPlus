@@ -55,25 +55,28 @@ namespace EnergyPlus {
     EnergyPlusData::EnergyPlusData() {
         // todo, try to eliminate the need for the singleton
         IOFiles::setSingleton(&files);
-        this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
-        this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
-        this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
-        this->dataCurveManager = std::unique_ptr<CurveManagerData>(new CurveManagerData);
         this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
-        this->dataConvectionCoefficients = std::unique_ptr<ConvectionCoefficientsData>(new ConvectionCoefficientsData);
+        this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
+        this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
+        this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
+        this->dataBoilers = std::unique_ptr<BoilersData>(new BoilersData);
+        this->dataBoilerSteam = std::unique_ptr<BoilerSteamData>(new BoilerSteamData);
+        this->dataBranchInputManager = std::unique_ptr<BranchInputManagerData>(new BranchInputManagerData);
+        this->dataConvectionCoefficient = std::unique_ptr<ConvectionCoefficientsData>(new ConvectionCoefficientsData);
+        this->dataCurveManager = std::unique_ptr<CurveManagerData>(new CurveManagerData);
     }
 
     void EnergyPlusData::clear_state() {
+        this->dataAirLoop->clear_state();
         this->dataAirLoopHVACDOAS->clear_state();
         this->dataBaseboardElectric->clear_state();
         this->dataBaseboardRadiator->clear_state();
+        this->dataBoilers->clear_state();
+        this->dataBoilerSteam->clear_state();
+        this->dataBranchInputManager->clear_state();
+        this->dataConvectionCoefficient->clear_state();
         this->dataCurveManager->clear_state();
-        this->dataAirLoop->clear_state();
-        this->dataConvectionCoefficients->clear_state();
 
-        dataBoilers.clear_state();
-        dataBranchInputManager.clear_state();
-        dataSteamBoilers.clear_state();
         dataChilledCeilingPanelSimple.clear_state();
         dataChillerAbsorbers.clear_state();
         dataChillerElectricEIR.clear_state();

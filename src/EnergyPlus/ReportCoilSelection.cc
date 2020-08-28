@@ -49,6 +49,7 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -813,12 +814,12 @@ void ReportCoilSelection::doFinalProcessingOfCoilData(EnergyPlusData &state)
                     c->cpFluid * c->rhoFluid * DataSizing::PlantSizData(c->pltSizNum).DeltaT * DataSizing::PlantSizData(c->pltSizNum).DesVolFlowRate;
             } else {
                 // find boiler on this plant loop and get capacity from it
-                if (allocated(state.dataSteamBoilers.Boiler)) {
-                    for (int boilerIndex = 1; boilerIndex <= state.dataSteamBoilers.numBoilers; ++boilerIndex) {
-                        if (state.dataSteamBoilers.Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
-                            c->plantDesSupTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut;
-                            c->plantDesRetTemp = state.dataSteamBoilers.Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
-                            c->plantDesCapacity = state.dataSteamBoilers.Boiler(boilerIndex).NomCap;
+                if (allocated(state.dataBoilerSteam->Boiler)) {
+                    for (int boilerIndex = 1; boilerIndex <= state.dataBoilerSteam->numBoilers; ++boilerIndex) {
+                        if (state.dataBoilerSteam->Boiler(boilerIndex).LoopNum == c->waterLoopNum) { // steam boiler on this loop
+                            c->plantDesSupTemp = state.dataBoilerSteam->Boiler(boilerIndex).TempUpLimitBoilerOut;
+                            c->plantDesRetTemp = state.dataBoilerSteam->Boiler(boilerIndex).TempUpLimitBoilerOut - c->plantDesDeltaTemp;
+                            c->plantDesCapacity = state.dataBoilerSteam->Boiler(boilerIndex).NomCap;
                         }
                     }
                 }

@@ -56,10 +56,6 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
@@ -67,7 +63,6 @@
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
-#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CoolTower.hh>
@@ -100,8 +95,12 @@ namespace EnergyPlus {
 
     // forward declare all structs
     struct AirLoopHVACDOASData;
-    struct BaseboardRadiatorData;
     struct BaseboardElectricData;
+    struct BaseboardRadiatorData;
+    struct BoilersData;
+    struct BoilerSteamData;
+    struct BranchInputManagerData;
+    struct ConvectionCoefficientsData;
     struct CurveManagerData;
     struct DataAirLoopData;
 
@@ -109,13 +108,15 @@ namespace EnergyPlus {
         // module globals
 
         std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
-        std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
         std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
+        std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
+        std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
+        std::unique_ptr<BoilersData> dataBoilers;
+        std::unique_ptr<BoilerSteamData> dataBoilerSteam;
+        std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficient;
         std::unique_ptr<CurveManagerData> dataCurveManager;
         std::unique_ptr<DataAirLoopData> dataAirLoop;
-        BoilersData dataBoilers;
-        BoilerSteamData dataSteamBoilers;
-        BranchInputManagerData dataBranchInputManager;
+
         ChilledCeilingPanelSimpleData dataChilledCeilingPanelSimple;
         ChillerAbsorberData dataChillerAbsorbers;
         ChillerElectricEIRData dataChillerElectricEIR;
@@ -123,7 +124,6 @@ namespace EnergyPlus {
         ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
         ChillerGasAbsorptionData dataChillerGasAbsorption;
         ChillerReformulatedEIRData dataChillerReformulatedEIR;
-        std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficients;
         CondenserLoopTowersData dataCondenserLoopTowers;
         CostEstimateManagerData dataCostEstimateManager;
         CoolTowerData dataCoolTower;

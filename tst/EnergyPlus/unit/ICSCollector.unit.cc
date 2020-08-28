@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, ICSSolarCollectorTest_CalcPassiveExteriorBaffleGapTest
     QRadSWOutIncident.allocate(1);
     QRadSWOutIncident(1) = 0.0;
     // set user defined conv. coeff. calculation to false
-    state.dataConvectionCoefficients->GetUserSuppliedConvectionCoeffs = false;
+    state.dataConvectionCoefficient->GetUserSuppliedConvectionCoeffs = false;
 
     // SurfPtr( 1 ); // Array of indexes pointing to Surface structure in DataSurfaces
     Real64 const VentArea(0.1);  // Area available for venting the gap [m2]

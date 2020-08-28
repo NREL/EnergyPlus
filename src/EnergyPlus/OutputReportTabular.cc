@@ -67,6 +67,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -4995,8 +4996,8 @@ namespace OutputReportTabular {
         }
 
         // Water / steam boiler
-        for (iBoiler = 1; iBoiler <= state.dataBoilers.numBoilers; ++iBoiler) {
-            SysTotalHVACRejectHeatLoss += state.dataBoilers.Boiler(iBoiler).FuelConsumed + state.dataBoilers.Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers.Boiler(iBoiler).BoilerEnergy;
+        for (iBoiler = 1; iBoiler <= state.dataBoilers->numBoilers; ++iBoiler) {
+            SysTotalHVACRejectHeatLoss += state.dataBoilers->Boiler(iBoiler).FuelConsumed + state.dataBoilers->Boiler(iBoiler).ParasiticElecConsumption - state.dataBoilers->Boiler(iBoiler).BoilerEnergy;
         }
 
         // DX Coils air to air

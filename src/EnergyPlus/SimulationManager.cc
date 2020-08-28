@@ -387,7 +387,7 @@ namespace SimulationManager {
         }
         Available = true;
 
-        if (state.dataBranchInputManager.InvalidBranchDefinitions) {
+        if (state.dataBranchInputManager->InvalidBranchDefinitions) {
             ShowFatalError("Preceding error(s) in Branch Input cause termination.");
         }
 

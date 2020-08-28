@@ -93,13 +93,13 @@ namespace BoilerSteam {
     PlantComponent *BoilerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
-        if (state.dataSteamBoilers.getSteamBoilerInput) {
+        if (state.dataBoilerSteam->getSteamBoilerInput) {
             GetBoilerInput(state);
-            state.dataSteamBoilers.getSteamBoilerInput = false;
+            state.dataBoilerSteam->getSteamBoilerInput = false;
         }
 
         // Now look for this particular pipe in the list
-        for (auto &boiler : state.dataSteamBoilers.Boiler) {
+        for (auto &boiler : state.dataBoilerSteam->Boiler) {
             if (boiler.Name == objectName) {
                 return &boiler;
             }
@@ -160,21 +160,21 @@ namespace BoilerSteam {
 
         SteamFluidIndex = 0;
         DataIPShortCuts::cCurrentModuleObject = "Boiler:Steam";
-        state.dataSteamBoilers.numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataBoilerSteam->numBoilers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (state.dataSteamBoilers.numBoilers <= 0) {
+        if (state.dataBoilerSteam->numBoilers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // See if load distribution manager has already gotten the input
-        if (allocated(state.dataSteamBoilers.Boiler)) return;
+        if (allocated(state.dataBoilerSteam->Boiler)) return;
 
         // Boiler will have fuel input to it , that is it !
-        state.dataSteamBoilers.Boiler.allocate(state.dataSteamBoilers.numBoilers);
+        state.dataBoilerSteam->Boiler.allocate(state.dataBoilerSteam->numBoilers);
 
         // LOAD ARRAYS WITH CURVE FIT Boiler DATA
-        for (BoilerNum = 1; BoilerNum <= state.dataSteamBoilers.numBoilers; ++BoilerNum) {
+        for (BoilerNum = 1; BoilerNum <= state.dataBoilerSteam->numBoilers; ++BoilerNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           BoilerNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -190,7 +190,7 @@ namespace BoilerSteam {
             // ErrorsFound will be set to True if problem was found, left untouched otherwise
             GlobalNames::VerifyUniqueBoilerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
-            auto &thisBoiler = state.dataSteamBoilers.Boiler(BoilerNum);
+            auto &thisBoiler = state.dataBoilerSteam->Boiler(BoilerNum);
             thisBoiler.Name = DataIPShortCuts::cAlphaArgs(1);
 
             // Validate fuel type input
