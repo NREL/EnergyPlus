@@ -62,6 +62,13 @@ namespace EnergyPlus {
         this->dataBoilers = std::unique_ptr<BoilersData>(new BoilersData);
         this->dataBoilerSteam = std::unique_ptr<BoilerSteamData>(new BoilerSteamData);
         this->dataBranchInputManager = std::unique_ptr<BranchInputManagerData>(new BranchInputManagerData);
+        this->dataChilledCeilingPanelSimple = std::unique_ptr<ChilledCeilingPanelSimpleData>(new ChilledCeilingPanelSimpleData);
+        this->dataChillerAbsorber = std::unique_ptr<ChillerAbsorberData>(new ChillerAbsorberData);
+        this->dataChillerElectricEIR = std::unique_ptr<ChillerElectricEIRData>(new ChillerElectricEIRData);
+        this->dataChillerExhaustAbsorption = std::unique_ptr<ChillerExhaustAbsorptionData>(new ChillerExhaustAbsorptionData);
+        this->dataChillerGasAbsorption = std::unique_ptr<ChillerGasAbsorptionData>(new ChillerGasAbsorptionData);
+        this->dataChillerIndirectAbsorption = std::unique_ptr<ChillerIndirectAbsoprtionData>(new ChillerIndirectAbsoprtionData);
+        this->dataChillerReformulatedEIR = std::unique_ptr<ChillerReformulatedEIRData>(new ChillerReformulatedEIRData);
         this->dataConvectionCoefficient = std::unique_ptr<ConvectionCoefficientsData>(new ConvectionCoefficientsData);
         this->dataCurveManager = std::unique_ptr<CurveManagerData>(new CurveManagerData);
     }
@@ -74,16 +81,16 @@ namespace EnergyPlus {
         this->dataBoilers->clear_state();
         this->dataBoilerSteam->clear_state();
         this->dataBranchInputManager->clear_state();
+        this->dataChilledCeilingPanelSimple->clear_state();
+        this->dataChillerAbsorber->clear_state();
+        this->dataChillerElectricEIR->clear_state();
+        this->dataChillerExhaustAbsorption->clear_state();
+        this->dataChillerGasAbsorption->clear_state();
+        this->dataChillerIndirectAbsorption->clear_state();
+        this->dataChillerReformulatedEIR->clear_state();
         this->dataConvectionCoefficient->clear_state();
         this->dataCurveManager->clear_state();
 
-        dataChilledCeilingPanelSimple.clear_state();
-        dataChillerAbsorbers.clear_state();
-        dataChillerElectricEIR.clear_state();
-        dataChillerExhaustAbsorption.clear_state();
-        dataChillerGasAbsorption.clear_state();
-        dataChillerIndirectAbsorption.clear_state();
-        dataChillerReformulatedEIR.clear_state();
         dataCondenserLoopTowers.clear_state();
         dataCostEstimateManager.clear_state();
         dataCoolTower.clear_state();

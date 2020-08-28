@@ -104,12 +104,12 @@ TEST_F(EnergyPlusFixture, ChillerIndirectAbsorption_GetInput)
 
     GetIndirectAbsorberInput(state);
 
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber.size(), 1u);
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).Name, "BIG CHILLER");
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).NomCap, 10000.);
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).NomPumpPower, 150.);
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).MinPartLoadRat, 0.15);
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).MaxPartLoadRat, 1.00);
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).OptPartLoadRat, 0.65);
-    EXPECT_EQ(state.dataChillerIndirectAbsorption.IndirectAbsorber(1).LoopSubcool, 12.0);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber.size(), 1u);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber(1).Name, "BIG CHILLER");
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber(1).NomCap, 10000.);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber(1).NomPumpPower, 150.);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber(1).MinPartLoadRat, 0.15);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber(1).MaxPartLoadRat, 1.00);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber(1).OptPartLoadRat, 0.65);
+    EXPECT_EQ(state.dataChillerIndirectAbsorption->IndirectAbsorber(1).LoopSubcool, 12.0);
 }

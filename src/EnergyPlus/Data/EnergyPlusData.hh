@@ -56,13 +56,6 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
-#include <EnergyPlus/ChillerAbsorption.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CoolTower.hh>
@@ -100,6 +93,13 @@ namespace EnergyPlus {
     struct BoilersData;
     struct BoilerSteamData;
     struct BranchInputManagerData;
+    struct ChilledCeilingPanelSimpleData;
+    struct ChillerAbsorberData;
+    struct ChillerElectricEIRData;
+    struct ChillerExhaustAbsorptionData;
+    struct ChillerGasAbsorptionData;
+    struct ChillerIndirectAbsoprtionData;
+    struct ChillerReformulatedEIRData;
     struct ConvectionCoefficientsData;
     struct CurveManagerData;
     struct DataAirLoopData;
@@ -113,17 +113,17 @@ namespace EnergyPlus {
         std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
         std::unique_ptr<BoilersData> dataBoilers;
         std::unique_ptr<BoilerSteamData> dataBoilerSteam;
+        std::unique_ptr<ChilledCeilingPanelSimpleData> dataChilledCeilingPanelSimple;
+        std::unique_ptr<ChillerAbsorberData> dataChillerAbsorber;
+        std::unique_ptr<ChillerElectricEIRData> dataChillerElectricEIR;
+        std::unique_ptr<ChillerExhaustAbsorptionData> dataChillerExhaustAbsorption;
+        std::unique_ptr<ChillerGasAbsorptionData> dataChillerGasAbsorption;
+        std::unique_ptr<ChillerIndirectAbsoprtionData> dataChillerIndirectAbsorption;
+        std::unique_ptr<ChillerReformulatedEIRData> dataChillerReformulatedEIR;
         std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficient;
         std::unique_ptr<CurveManagerData> dataCurveManager;
         std::unique_ptr<DataAirLoopData> dataAirLoop;
 
-        ChilledCeilingPanelSimpleData dataChilledCeilingPanelSimple;
-        ChillerAbsorberData dataChillerAbsorbers;
-        ChillerElectricEIRData dataChillerElectricEIR;
-        ChillerExhaustAbsorptionData dataChillerExhaustAbsorption;
-        ChillerIndirectAbsoprtionData dataChillerIndirectAbsorption;
-        ChillerGasAbsorptionData dataChillerGasAbsorption;
-        ChillerReformulatedEIRData dataChillerReformulatedEIR;
         CondenserLoopTowersData dataCondenserLoopTowers;
         CostEstimateManagerData dataCostEstimateManager;
         CoolTowerData dataCoolTower;
