@@ -1923,7 +1923,7 @@
 
   Output:Variable,*,Zone Window Air Conditioner Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Zone Window Air Conditioner Electric Power,hourly;
+  Output:Variable,*,Zone Window Air Conditioner Electricity Rate,hourly;
 
   Output:Variable,*,Zone Window Air Conditioner Fan Part Load Ratio,hourly;
 
@@ -1973,13 +1973,13 @@
 
   Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Removed Water Mass,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electric Power,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electricity Rate,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electric Energy,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Electricity Energy,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Off Cycle Parasitic Electricity Energy,hourly;
 
   Output:Variable,North Zone Dehumidifier,Zone Dehumidifier Part Load Ratio,hourly;
 

@@ -1,10 +1,11 @@
-from ctypes import cdll, c_char_p
+from ctypes import cdll, c_char_p, c_void_p
 import os
 import sys
 
 from pyenergyplus.func import Functional
 from pyenergyplus.datatransfer import DataExchange
 from pyenergyplus.runtime import Runtime
+from pyenergyplus.state import StateManager
 
 
 def api_path() -> str:
@@ -67,14 +68,10 @@ class EnergyPlusAPI:
                                          as this is already instantiated for Plugin workflows.
         """
         self.api = cdll.LoadLibrary(api_path())
-        self.api.apiVersionFromEPlus.argtypes = []
+        self.api.apiVersionFromEPlus.argtypes = [c_void_p]
         self.api.apiVersionFromEPlus.restype = c_char_p
-        api_version_from_ep = float(self.api.apiVersionFromEPlus())
-        api_version_defined_here = float(self.api_version())
-        if api_version_defined_here != api_version_from_ep:
-            raise Exception("API version does not match, this API version: %s; E+ is expecting version: %s" % (
-                api_version_defined_here, api_version_from_ep
-            ))
+        # self.state provides access to the main EnergyPlus state management class, instantiated and ready to go
+        self.state_manager = StateManager(self.api)
         # self.functional provides access to a functional API class, instantiated and ready to go
         self.functional = Functional(self.api, running_as_python_plugin)
         # self.exchange provides access to a data exchange API class, instantiated and ready to go
@@ -92,3 +89,11 @@ class EnergyPlusAPI:
         :return:
         """
         return "${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"
+
+    def verify_api_version_match(self, state: c_void_p) -> None:
+        api_version_from_ep = float(self.api.apiVersionFromEPlus(state))
+        api_version_defined_here = float(self.api_version())
+        if api_version_defined_here != api_version_from_ep:
+            raise Exception("API version does not match, this API version: %s; E+ is expecting version: %s" % (
+                api_version_defined_here, api_version_from_ep
+            ))

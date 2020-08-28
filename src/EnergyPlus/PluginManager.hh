@@ -85,10 +85,6 @@ namespace PluginManagement {
         std::string emsAlias;
         bool runDuringWarmup;
         std::string stringIdentifier; // for diagnostic reporting
-#if LINK_WITH_PYTHON
-        PyObjectWrap pModule = nullptr;  // reference to module
-        PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
-#endif
 
         // setup/shutdown should only be called once construction is completely done, i.e., setup() should only be called once the vector holding all the
         // instances is done for the day, and shutdown should only be called when you are ready to destruct all the instances.  The things that happen
@@ -99,43 +95,68 @@ namespace PluginManagement {
 
         // methods
         static void reportPythonError();
-        bool run(int iCallingPoint) const; // calls main() on this plugin instance
+        bool run(EnergyPlusData &state, int iCallingPoint) const; // calls main() on this plugin instance
 
         // plugin calling point hooks
         const char * sHookBeginNewEnvironment = "on_begin_new_environment";
-        bool bHasBeginNewEnvironment = false;
+        const char * sHookBeginZoneTimestepBeforeSetCurrentWeather = "on_begin_zone_timestep_before_set_current_weather";
         const char * sHookAfterNewEnvironmentWarmUpIsComplete = "on_after_new_environment_warmup_is_complete";
-        bool bHasAfterNewEnvironmentWarmUpIsComplete = false;
         const char * sHookBeginZoneTimestepBeforeInitHeatBalance = "on_begin_zone_timestep_before_init_heat_balance";
-        bool bHasBeginZoneTimestepBeforeInitHeatBalance = false;
         const char * sHookBeginZoneTimestepAfterInitHeatBalance = "on_begin_zone_timestep_after_init_heat_balance";
-        bool bHasBeginZoneTimestepAfterInitHeatBalance = false;
         const char * sHookBeginTimestepBeforePredictor = "on_begin_timestep_before_predictor";
-        bool bHasBeginTimestepBeforePredictor = false;
         const char * sHookAfterPredictorBeforeHVACManagers = "on_after_predictor_before_hvac_managers";
-        bool bHasAfterPredictorBeforeHVACManagers = false;
         const char * sHookAfterPredictorAfterHVACManagers = "on_after_predictor_after_hvac_managers";
-        bool bHasAfterPredictorAfterHVACManagers = false;
         const char * sHookInsideHVACSystemIterationLoop = "on_inside_hvac_system_iteration_loop";
-        bool bHasInsideHVACSystemIterationLoop = false;
         const char * sHookEndOfZoneTimestepBeforeZoneReporting = "on_end_of_zone_timestep_before_zone_reporting";
-        bool bHasEndOfZoneTimestepBeforeZoneReporting = false;
         const char * sHookEndOfZoneTimestepAfterZoneReporting = "on_end_of_zone_timestep_after_zone_reporting";
-        bool bHasEndOfZoneTimestepAfterZoneReporting = false;
         const char * sHookEndOfSystemTimestepBeforeHVACReporting = "on_end_of_system_timestep_before_hvac_reporting";
-        bool bHasEndOfSystemTimestepBeforeHVACReporting = false;
         const char * sHookEndOfSystemTimestepAfterHVACReporting = "on_end_of_system_timestep_after_hvac_reporting";
-        bool bHasEndOfSystemTimestepAfterHVACReporting = false;
         const char * sHookEndOfZoneSizing = "on_end_of_zone_sizing";
-        bool bHasEndOfZoneSizing = false;
         const char * sHookEndOfSystemSizing = "on_end_of_system_sizing";
-        bool bHasEndOfSystemSizing = false;
         const char * sHookAfterComponentInputReadIn = "on_end_of_component_input_read_in";
-        bool bHasAfterComponentInputReadIn = false;
         const char * sHookUserDefinedComponentModel = "on_user_defined_component_model";
-        bool bHasUserDefinedComponentModel = false;
         const char * sHookUnitarySystemSizing = "on_unitary_system_sizing";
+        bool bHasBeginNewEnvironment = false;
+        bool bHasBeginZoneTimestepBeforeSetCurrentWeather = false;
+        bool bHasAfterNewEnvironmentWarmUpIsComplete = false;
+        bool bHasBeginZoneTimestepBeforeInitHeatBalance = false;
+        bool bHasBeginZoneTimestepAfterInitHeatBalance = false;
+        bool bHasBeginTimestepBeforePredictor = false;
+        bool bHasAfterPredictorBeforeHVACManagers = false;
+        bool bHasAfterPredictorAfterHVACManagers = false;
+        bool bHasInsideHVACSystemIterationLoop = false;
+        bool bHasEndOfZoneTimestepBeforeZoneReporting = false;
+        bool bHasEndOfZoneTimestepAfterZoneReporting = false;
+        bool bHasEndOfSystemTimestepBeforeHVACReporting = false;
+        bool bHasEndOfSystemTimestepAfterHVACReporting = false;
+        bool bHasEndOfZoneSizing = false;
+        bool bHasEndOfSystemSizing = false;
+        bool bHasAfterComponentInputReadIn = false;
+        bool bHasUserDefinedComponentModel = false;
         bool bHasUnitarySystemSizing = false;
+#if LINK_WITH_PYTHON
+        PyObjectWrap pModule = nullptr;  // reference to module
+        PyObjectWrap pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+        // precalculated function names as PyObjects
+        PyObjectWrap pBeginNewEnvironment = nullptr;
+        PyObjectWrap pBeginZoneTimestepBeforeSetCurrentWeather = nullptr;
+        PyObjectWrap pAfterNewEnvironmentWarmUpIsComplete = nullptr;
+        PyObjectWrap pBeginZoneTimestepBeforeInitHeatBalance = nullptr;
+        PyObjectWrap pBeginZoneTimestepAfterInitHeatBalance = nullptr;
+        PyObjectWrap pBeginTimestepBeforePredictor = nullptr;
+        PyObjectWrap pAfterPredictorBeforeHVACManagers = nullptr;
+        PyObjectWrap pAfterPredictorAfterHVACManagers = nullptr;
+        PyObjectWrap pInsideHVACSystemIterationLoop = nullptr;
+        PyObjectWrap pEndOfZoneTimestepBeforeZoneReporting = nullptr;
+        PyObjectWrap pEndOfZoneTimestepAfterZoneReporting = nullptr;
+        PyObjectWrap pEndOfSystemTimestepBeforeHVACReporting = nullptr;
+        PyObjectWrap pEndOfSystemTimestepAfterHVACReporting = nullptr;
+        PyObjectWrap pEndOfZoneSizing = nullptr;
+        PyObjectWrap pEndOfSystemSizing = nullptr;
+        PyObjectWrap pAfterComponentInputReadIn = nullptr;
+        PyObjectWrap pUserDefinedComponentModel = nullptr;
+        PyObjectWrap pUnitarySystemSizing = nullptr;
+#endif        
     };
 
     class PluginManager {
@@ -167,7 +188,7 @@ namespace PluginManagement {
         static void updatePluginValues();
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
-        static void runSingleUserDefinedPlugin(int index);
+        static void runSingleUserDefinedPlugin(EnergyPlusData &state, int index);
         static bool anyUnexpectedPluginObjects();
     };
 

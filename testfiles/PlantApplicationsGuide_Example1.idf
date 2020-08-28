@@ -939,12 +939,12 @@
   Timestep,1;
 
 ! **************************************OUTPUTS******************************
-! The main outputs are the chiller electric power, CT inlet temp, CT outlet temp, CT Heat
+! The main outputs are the chiller Electricity Rate, CT inlet temp, CT outlet temp, CT Heat
 ! transfer rate
 
   Output:VariableDictionary,Regular;
 
-  Output:Variable,*,Chiller Electric Power,timestep;
+  Output:Variable,*,Chiller Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Tower Inlet Temperature,timestep;
 
