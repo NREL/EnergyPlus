@@ -387,7 +387,7 @@ TEST_F(EnergyPlusFixture, BaseboardConvWater_SizingTest)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
     // get electric baseboard inputs
-    BaseboardRadiator::GetBaseboardInput(*state.dataBaseboardRadiator);
+    BaseboardRadiator::GetBaseboardInput(state);
 
     DataSizing::FinalZoneSizing.allocate(3);
     DataSizing::ZoneEqSizing.allocate(3);
