@@ -302,7 +302,7 @@ namespace EMSManager {
             PluginManagement::onBeginEnvironment();
         }
 
-        InitEMS(state.files, iCalledFrom);
+        InitEMS(state, state.files, iCalledFrom);
 
         // also call plugins and callbacks here for convenience
         bool anyPluginsOrCallbacksRan = false;
@@ -389,7 +389,7 @@ namespace EMSManager {
         ReportEMS();
     }
 
-    void InitEMS(IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
     {
 
         // SUBROUTINE INFORMATION:
@@ -446,7 +446,7 @@ namespace EMSManager {
             SetupSurfaceConstructionActuators();
             SetupSurfaceOutdoorBoundaryConditionActuators();
             SetupZoneOutdoorBoundaryConditionActuators();
-            GetEMSInput(ioFiles);
+            GetEMSInput(state, ioFiles);
             GetEMSUserInput = false;
         }
 
@@ -458,14 +458,14 @@ namespace EMSManager {
         // need to delay setup of HVAC actuator until after the systems input has been processed (if present)
         if (FinishProcessingUserInput && !DoingSizing && !KickOffSimulation) {
             SetupNodeSetPointsAsActuators();
-            SetupPrimaryAirSystemAvailMgrAsActuators();
+            SetupPrimaryAirSystemAvailMgrAsActuators(state);
             //    CALL SetupWindowShadingControlActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupThermostatActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupSurfaceConvectionActuators !this is too late for including in sizing, moved to GetEMSUserInput
             FinishProcessingUserInput = false;
         }
 
-        InitializeRuntimeLanguage(ioFiles);
+        InitializeRuntimeLanguage(state, ioFiles);
 
         if ((BeginEnvrnFlag) || (iCalledFrom == emsCallFromZoneSizing) || (iCalledFrom == emsCallFromSystemSizing) ||
             (iCalledFrom == emsCallFromUserDefinedComponentModel)) {
@@ -542,7 +542,7 @@ namespace EMSManager {
         ReportRuntimeLanguage();
     }
 
-    void GetEMSInput(IOFiles &ioFiles)
+    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -587,16 +587,12 @@ namespace EMSManager {
         int SensorNum;
         int ActuatorNum;
         int ActuatorVariableNum;
-        //  INTEGER                     :: ProgramNum
         int VariableNum; // local do loop index
         int NumAlphas;   // Number of elements in the alpha array
         int NumNums;     // Number of elements in the numeric array
         int AlphaNum;
         int IOStat; // IO Status when calling get input subroutine
-        //  CHARACTER(len=MaxNameLength), DIMENSION(99) :: AlphArray  ! Character string data  ! 99 should really be some kind of constant
-        //  REAL(r64), DIMENSION(1)          :: NumArray  ! Numeric data
         static bool ErrorsFound(false);
-        //  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -934,7 +930,7 @@ namespace EMSManager {
             }
         }
 
-        InitializeRuntimeLanguage(ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
+        InitializeRuntimeLanguage(state, ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
 
         if (NumProgramCallManagers > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
@@ -1732,7 +1728,7 @@ namespace EMSManager {
         return returnValue;
     }
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators()
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1751,7 +1747,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::PriAirSysAvailMgr;
         using DataAirSystems::PrimaryAirSystem;
 
         // Locals
@@ -1774,11 +1769,11 @@ namespace EMSManager {
 
         lDummy = false;
 
-        if (allocated(PriAirSysAvailMgr)) {
-            numAirLoops = isize(PriAirSysAvailMgr);
+        if (allocated(state.dataAirLoop->PriAirSysAvailMgr)) {
+            numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {

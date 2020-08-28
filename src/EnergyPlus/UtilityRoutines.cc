@@ -695,7 +695,7 @@ namespace UtilityRoutines {
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
+            TestBranchIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
@@ -707,8 +707,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.files);
-                ReportLoopConnections(state.files);
+                ReportAirLoopConnections(state, state.files);
+                ReportLoopConnections(state, state.files);
             }
 
         } else if (!ExitDuringSimulations) {

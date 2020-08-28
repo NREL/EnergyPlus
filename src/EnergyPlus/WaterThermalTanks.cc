@@ -711,13 +711,13 @@ namespace WaterThermalTanks {
             state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).MaxInletWaterTemp = DataIPShortCuts::rNumericArgs(5);
 
             if (!DataIPShortCuts::lAlphaFieldBlanks(4)) {
-                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
+                state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(4));
                 if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).Name + ":  " +
                                     DataIPShortCuts::cAlphaFieldNames(4) + " not found = " + DataIPShortCuts::cAlphaArgs(4));
                     ErrorsFound = true;
                 } else {
-                    ErrorsFound |= CurveManager::CheckCurveDims(state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp, // Curve index
                                                                 {2},                                                  // Valid dimensions
                                                                 RoutineName,                                          // Routine name
                                                                 DataIPShortCuts::cCurrentModuleObject,                // Object Type
@@ -727,7 +727,7 @@ namespace WaterThermalTanks {
                         if (state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp > 0) {
                             Real64 HEffFTemp = min(1.0,
                                                    max(0.0,
-                                                       CurveManager::CurveValue(state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
+                                                       CurveManager::CurveValue(state, state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).HEffFTemp,
                                                                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RatedInletWaterTemp,
                                                                                 state.dataWaterThermalTanks->WaterHeaterDesuperheater(DesuperheaterNum).RatedOutdoorAirTemp)));
                             if (std::abs(HEffFTemp - 1.0) > 0.05) {
@@ -1602,8 +1602,7 @@ namespace WaterThermalTanks {
                     HPWH.Capacity =
                         GetDWHCoilCapacityIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
                     HPWH.DXCoilAirInletNode = IntegratedHeatPump::GetCoilInletNodeIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
-                    HPWH.DXCoilPLFFPLR =
-                        GetIHPDWHCoilPLFFPLR(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
+                    HPWH.DXCoilPLFFPLR = GetIHPDWHCoilPLFFPLR(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
                 } else {
                     HPWH.Capacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                     HPWH.DXCoilAirInletNode = VariableSpeedCoils::GetCoilInletNodeVariableSpeed(state, HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
@@ -2329,14 +2328,14 @@ namespace WaterThermalTanks {
             }
 
             if (!DataIPShortCuts::cAlphaArgs(5).empty()) {
-                Tank.PLFCurve = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(5));
+                Tank.PLFCurve = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(5));
                 if (Tank.PLFCurve == 0) {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Part Load Factor curve not found = " + DataIPShortCuts::cAlphaArgs(5));
                     ErrorsFound = true;
                 } else {
                     bool IsValid;
-                    EnergyPlus::WaterThermalTanks::WaterThermalTankData::ValidatePLFCurve(Tank.PLFCurve, IsValid);
+                    EnergyPlus::WaterThermalTanks::WaterThermalTankData::ValidatePLFCurve(state, Tank.PLFCurve, IsValid);
 
                     if (!IsValid) {
                         ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
@@ -2344,7 +2343,7 @@ namespace WaterThermalTanks {
                         ErrorsFound = true;
                     }
 
-                    ErrorsFound |= CurveManager::CheckCurveDims(Tank.PLFCurve,                         // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, Tank.PLFCurve,                         // Curve index
                                                                 {1},                                   // Valid dimensions
                                                                 RoutineName,                           // Routine name
                                                                 DataIPShortCuts::cCurrentModuleObject, // Object Type
@@ -5270,7 +5269,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::ValidatePLFCurve(int const CurveIndex, bool &IsValid)
+    void WaterThermalTankData::ValidatePLFCurve(EnergyPlusData &state, int const CurveIndex, bool &IsValid)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5291,8 +5290,8 @@ namespace WaterThermalTanks {
         IsValid = true;
 
         // Check 0 and 1
-        if (CurveManager::CurveValue(CurveIndex, 0.0) <= 0) IsValid = false;
-        if (CurveManager::CurveValue(CurveIndex, 1.0) <= 0) IsValid = false;
+        if (CurveManager::CurveValue(state, CurveIndex, 0.0) <= 0) IsValid = false;
+        if (CurveManager::CurveValue(state, CurveIndex, 1.0) <= 0) IsValid = false;
     }
 
     void WaterThermalTankData::SetupStratifiedNodes()
@@ -5539,7 +5538,7 @@ namespace WaterThermalTanks {
         if (this->scanPlantLoopsFlag && allocated(DataPlant::PlantLoop)) {
             if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->TypeNum,
                                                         this->UseSide.loopNum,
@@ -5560,7 +5559,7 @@ namespace WaterThermalTanks {
                 // this is a heat pump water heater, need a separate block because TypeOf_HeatPumpWtrHeater shows up on Branch
                 //  (input should probably have been the associated tank )
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).Name,
                                                         state.dataWaterThermalTanks->HPWaterHeater(this->HeatPumpNum).TypeNum,
                                                         this->UseSide.loopNum,
@@ -5579,7 +5578,7 @@ namespace WaterThermalTanks {
             }
             if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         this->TypeNum,
                                                         this->SrcSide.loopNum,
@@ -6599,7 +6598,7 @@ namespace WaterThermalTanks {
                     Eoncycfuel += Qoncycfuel * TimeNeeded;
 
                     if (Qmaxcap > 0.0) PLR = Qheater / Qmaxcap;
-                    Real64 PLF = this->PartLoadFactor(PLR);
+                    Real64 PLF = this->PartLoadFactor(state, PLR);
                     Efuel += Qheater * TimeNeeded / (PLF * this->Efficiency);
 
                     Runtime += TimeNeeded;
@@ -6853,7 +6852,7 @@ namespace WaterThermalTanks {
 
         if (this->ControlType == ControlTypeEnum::Cycle) {
             // Recalculate Part Load Factor and fuel energy based on Runtime Fraction, instead of Part Load Ratio
-            Real64 PLF = this->PartLoadFactor(RTF);
+            Real64 PLF = this->PartLoadFactor(state, RTF);
             Efuel = Eheater / (PLF * this->Efficiency);
         }
 
@@ -7161,7 +7160,7 @@ namespace WaterThermalTanks {
         return CalcTempIntegral;
     }
 
-    Real64 WaterThermalTankData::PartLoadFactor(Real64 const PartLoadRatio_loc)
+    Real64 WaterThermalTankData::PartLoadFactor(EnergyPlusData &state, Real64 const PartLoadRatio_loc)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7175,7 +7174,7 @@ namespace WaterThermalTanks {
         // is MODULATE, or correlated to Runtime Fraction, if Heater Control Type is CYCLE.
 
         if (this->PLFCurve > 0) {
-            return max(CurveManager::CurveValue(this->PLFCurve, PartLoadRatio_loc), 0.1);
+            return max(CurveManager::CurveValue(state, this->PLFCurve, PartLoadRatio_loc), 0.1);
         } else {
             return 1.0;
         }
@@ -8087,7 +8086,7 @@ namespace WaterThermalTanks {
 
         Real64 HEffFTemp;
         if (DesupHtr.HEffFTemp > 0) {
-            HEffFTemp = max(0.0, CurveManager::CurveValue(DesupHtr.HEffFTemp, this->SavedTankTemp, DataEnvironment::OutDryBulbTemp));
+            HEffFTemp = max(0.0, CurveManager::CurveValue(state, DesupHtr.HEffFTemp, this->SavedTankTemp, DataEnvironment::OutDryBulbTemp));
         } else {
             HEffFTemp = 1.0;
         }
@@ -9093,7 +9092,7 @@ namespace WaterThermalTanks {
                     }
 
                 } else {
-                    DXCoils::CalcHPWHDXCoil(HeatPump.DXCoilNum, state.dataWaterThermalTanks->hpPartLoadRatio);
+                    DXCoils::CalcHPWHDXCoil(state, HeatPump.DXCoilNum, state.dataWaterThermalTanks->hpPartLoadRatio);
                 }
             } else if (bIterSpeed) {
                 for (int loopIter = 1; loopIter <= 4; ++loopIter) {
@@ -9648,7 +9647,7 @@ namespace WaterThermalTanks {
         Real64 PrevTankTemp = this->SourceOutletTemp;
         for (int i = 1; i <= 10; ++i) {
 
-            DXCoils::CalcHPWHDXCoil(HPWH.DXCoilNum, partLoadRatio);
+            DXCoils::CalcHPWHDXCoil(state, HPWH.DXCoilNum, partLoadRatio);
             this->SourceInletTemp = DataLoopNode::Node(HPWH.CondWaterOutletNode).Temp;
 
             this->CalcWaterThermalTank(state);
@@ -9828,7 +9827,8 @@ namespace WaterThermalTanks {
         return Par(7) - NewTankTemp;
     }
 
-    Real64 WaterThermalTankData::PLRResidualWaterThermalTank(EnergyPlusData &state, Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 WaterThermalTankData::PLRResidualWaterThermalTank(EnergyPlusData &state,
+                                                             Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                              Array1D<Real64> const &Par    // par(1) = HP set point temperature [C]
 
     )

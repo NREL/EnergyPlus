@@ -988,7 +988,8 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
     }
 }
 
-void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
+void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
+                                  ConvectionCoefficientsData &dataConvectionCoefficients,
                                   IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,         // Area available for venting the gap [m2]
@@ -1151,7 +1152,7 @@ void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoef
         // Initializations for this surface
         HMovInsul = 0.0;
         LocalWindArr(ThisSurf) = Surface(SurfPtr).WindSpeed;
-        InitExteriorConvectionCoeff(dataConvectionCoefficients, ioFiles,
+        InitExteriorConvectionCoeff(state, dataConvectionCoefficients, ioFiles,
             SurfPtr, HMovInsul, Roughness, AbsExt, TmpTsBaf, HExtARR(ThisSurf), HSkyARR(ThisSurf), HGroundARR(ThisSurf), HAirARR(ThisSurf));
         ConstrNum = Surface(SurfPtr).Construction;
         AbsThermSurf = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
@@ -1449,7 +1450,6 @@ void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFoun
 
     // Using/Aliasing
     using namespace DataLoopNode;
-    using DataAirLoop::AirToZoneNodeInfo;
     using DataHVACGlobals::NumPrimaryAirSys;
 
     // Locals
@@ -1494,8 +1494,8 @@ void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFoun
     // Final tests, look for duplicate nodes
     for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
         if (ValRetAPaths(1, Loop) != 0) continue;
-        if (AirToZoneNodeInfo(Loop).NumReturnNodes <= 0) continue;
-        ValRetAPaths(1, Loop) = AirToZoneNodeInfo(Loop).ZoneEquipReturnNodeNum(1);
+        if (state.dataAirLoop->AirToZoneNodeInfo(Loop).NumReturnNodes <= 0) continue;
+        ValRetAPaths(1, Loop) = state.dataAirLoop->AirToZoneNodeInfo(Loop).ZoneEquipReturnNodeNum(1);
     }
 
     for (Loop = 1; Loop <= NumPrimaryAirSys; ++Loop) {
@@ -1512,7 +1512,7 @@ void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFoun
             if (Count > 0) {
                 ShowSevereError("Duplicate Node detected in Return Air Paths");
                 ShowContinueError("Test Node=" + NodeID(TestNode));
-                ShowContinueError("In Air Path=" + AirToZoneNodeInfo(Loop).AirLoopName);
+                ShowContinueError("In Air Path=" + state.dataAirLoop->AirToZoneNodeInfo(Loop).AirLoopName);
                 ErrFound = true;
             }
         }
@@ -1543,8 +1543,6 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
     using SplitterComponent::SplitterCond;
     auto &GetZoneSplitterInput(SplitterComponent::GetSplitterInput);
     using namespace DataZoneEquipment;
-    //using namespace ZonePlenum;
-    using DataAirLoop::AirToZoneNodeInfo;
     using DataHVACGlobals::NumPrimaryAirSys;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1585,10 +1583,10 @@ void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
         // Determine which air loop this supply air path is connected to
         Found = 0;
         for (Count1 = 1; Count1 <= NumPrimaryAirSys; ++Count1) {
-            PrimaryAirLoopName = AirToZoneNodeInfo(Count1).AirLoopName;
+            PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
-            for (Count2 = 1; Count2 <= AirToZoneNodeInfo(Count1).NumSupplyNodes; ++Count2) {
-                if (SupplyAirPath(BCount).InletNodeNum == AirToZoneNodeInfo(Count1).ZoneEquipSupplyNodeNum(Count2)) Found = Count2;
+            for (Count2 = 1; Count2 <= state.dataAirLoop->AirToZoneNodeInfo(Count1).NumSupplyNodes; ++Count2) {
+                if (SupplyAirPath(BCount).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count1).ZoneEquipSupplyNodeNum(Count2)) Found = Count2;
             }
             if (Found != 0) break;
         }
@@ -1815,7 +1813,6 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
     // Using/Aliasing
     using namespace DataLoopNode;
     using namespace DataZoneEquipment;
-    using DataAirLoop::AirToZoneNodeInfo;
     using namespace ZonePlenum;
     using DataHVACGlobals::NumPrimaryAirSys;
     using MixerComponent::MixerCond;
@@ -1873,10 +1870,10 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
         //             Determine which air loop this supply air path is connected to
         Found = 0;
         for (Count1 = 1; Count1 <= NumPrimaryAirSys; ++Count1) {
-            PrimaryAirLoopName = AirToZoneNodeInfo(Count1).AirLoopName;
+            PrimaryAirLoopName = state.dataAirLoop->AirToZoneNodeInfo(Count1).AirLoopName;
             Found = 0;
-            for (Count2 = 1; Count2 <= AirToZoneNodeInfo(Count1).NumReturnNodes; ++Count2) {
-                if (ReturnAirPath(BCount).OutletNodeNum == AirToZoneNodeInfo(Count1).ZoneEquipReturnNodeNum(Count2)) Found = Count2;
+            for (Count2 = 1; Count2 <= state.dataAirLoop->AirToZoneNodeInfo(Count1).NumReturnNodes; ++Count2) {
+                if (ReturnAirPath(BCount).OutletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(Count1).ZoneEquipReturnNodeNum(Count2)) Found = Count2;
             }
             if (Found != 0) break;
         }
@@ -2032,15 +2029,15 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
         }
         // Determine Air Loop this Return Air Path is on
         for (Count2 = 1; Count2 <= NumPrimaryAirSys; ++Count2) {
-            if (AirToZoneNodeInfo(Count2).NumReturnNodes > 0) {
-                if (AllNodes(1) == AirToZoneNodeInfo(Count2).ZoneEquipReturnNodeNum(1)) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(Count2).NumReturnNodes > 0) {
+                if (AllNodes(1) == state.dataAirLoop->AirToZoneNodeInfo(Count2).ZoneEquipReturnNodeNum(1)) {
                     const auto WAirLoop = Count2;
                     ValRetAPaths(_, WAirLoop) = 0;
                     ValRetAPaths({1, CountNodes}, WAirLoop) = AllNodes({1, CountNodes});
                     break;
                 }
             } else {
-                ShowWarningError("TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + AirToZoneNodeInfo(Count2).AirLoopName);
+                ShowWarningError("TestReturnAirPathIntegrity: Air Loop has no Zone Equipment Return Node=" + state.dataAirLoop->AirToZoneNodeInfo(Count2).AirLoopName);
             }
         }
     }

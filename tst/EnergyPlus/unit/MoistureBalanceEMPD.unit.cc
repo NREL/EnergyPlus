@@ -99,7 +99,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errors_found);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -188,7 +188,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errors_found);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput(state.files);
 
@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errors_found);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -314,7 +314,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(*state.dataWindowEquivalentLayer, state.files, errors_found);
+    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface

@@ -57,6 +57,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+
+    // Forward declarations
     class IOFiles;
     struct EnergyPlusData;
 
@@ -106,7 +108,7 @@ namespace SizingManager {
 
     void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
-    void ManageSystemVentilationAdjustments();
+    void ManageSystemVentilationAdjustments(EnergyPlusData &state);
 
     void DetermineSystemPopulationDiversity(EnergyPlusData &state);
 

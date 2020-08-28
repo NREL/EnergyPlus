@@ -54,9 +54,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -80,13 +78,11 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 // EnergyPlus Headers
 using namespace EnergyPlus::BranchInputManager;
@@ -358,7 +354,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
 
     ASSERT_EQ(1, NumATMixers);
@@ -608,7 +604,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -939,7 +935,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1353,7 +1349,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -1766,7 +1762,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetPTUnit(state);
     GetPTUnitInputFlag = false;
 
@@ -2438,7 +2434,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -3117,7 +3113,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -4867,7 +4863,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -6621,7 +6617,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
 
     GetVRFInput(state);
     GetVRFInputFlag = false;
@@ -6868,7 +6864,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
@@ -7105,7 +7101,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     GetUnitVentilatorInput(state);
     GetUnitVentilatorInputFlag = false;
 
@@ -7347,8 +7343,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputDOASpecs)
     SizingManager::GetZoneSizingInput();
     GetZoneEquipmentData1(state);
     ZoneEquipmentManager::SetUpZoneSizingArrays(state);
-    GetZoneAirLoopEquipment(*state.dataZoneAirLoopEquipmentManager);
-    GetATMixers(*state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
+    GetATMixers(state, *state.dataZoneAirLoopEquipmentManager);
 
     ASSERT_EQ(2, NumATMixers);
     EXPECT_EQ("SPACE1-1 DOAS AIR TERMINAL", SysATMixer(1).Name);            // single duct air terminal mixer name
@@ -7932,7 +7928,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
         "    Zone Availability Manager,     !- Name",
         "    AvailabilityManager:NightCycle,!- Availability Manager 1 Object Type",
         "    NightCycle AvailMgr;           !- Availability Manager 1 Name",
-        
+
         " AvailabilityManager:NightCycle,",
         "    NightCycle AvailMgr,     !- Name",
         "    AlwaysOn,                !- Applicability Schedule Name",
@@ -8162,7 +8158,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
     SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus = 0;
     // run CalcNCycSysAvailMgr to the availability of the fan coil unit on
-    SystemAvailabilityManager::CalcNCycSysAvailMgr(SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+    SystemAvailabilityManager::CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the NightCycle has turned on the equipment
     EXPECT_EQ(DataHVACGlobals::CycleOn, AvailStatus);
     EXPECT_EQ(DataHVACGlobals::CycleOn, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);

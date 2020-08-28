@@ -153,7 +153,7 @@ namespace SwimmingPool {
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))
     {
-        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
+        this->initialize(state, FirstHVACIteration);
 
         this->calculate();
 
@@ -463,7 +463,7 @@ namespace SwimmingPool {
         }
     }
 
-    void SwimmingPoolData::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // true during the first HVAC iteration
+    void SwimmingPoolData::initialize(EnergyPlusData &state, bool const FirstHVACIteration // true during the first HVAC iteration
     )
     {
         // SUBROUTINE INFORMATION:
@@ -501,7 +501,7 @@ namespace SwimmingPool {
             this->MyOneTimeFlag = false;
         }
 
-        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(dataBranchInputManager);
+        SwimmingPoolData::initSwimmingPoolPlantLoopIndex(state);
 
         if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlagGeneral) {
             this->ZeroSourceSumHATsurf = 0.0;
@@ -706,7 +706,7 @@ namespace SwimmingPool {
             "Indoor Pool Current Cover LW Radiation Factor", OutputProcessor::Unit::None, this->CurCoverLWRadFac, "System", "Average", this->Name);
     }
 
-    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(BranchInputManagerData &dataBranchInputManager)
+    void SwimmingPoolData::initSwimmingPoolPlantLoopIndex(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -718,7 +718,7 @@ namespace SwimmingPool {
         if (MyPlantScanFlagPool && allocated(DataPlant::PlantLoop)) {
             errFlag = false;
             if (this->WaterInletNode > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_SwimmingPool_Indoor,
                                                         this->HWLoopNum,

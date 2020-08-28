@@ -2772,7 +2772,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     Real64 SSInletTemp = 24.0;
     Real64 InletAirPressure = 101320.0;
 
-    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
+    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(state, LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
                                              LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0,
                                              QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1,
                                              VariableSpeedCoils::VarSpeedCoil(1).capModFacTotal);

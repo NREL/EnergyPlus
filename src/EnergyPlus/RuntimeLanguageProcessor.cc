@@ -218,7 +218,7 @@ namespace RuntimeLanguageProcessor {
         WriteTraceMyOneTimeFlag = false;
     }
 
-    void InitializeRuntimeLanguage(IOFiles &ioFiles)
+    void InitializeRuntimeLanguage(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -308,7 +308,7 @@ namespace RuntimeLanguageProcessor {
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
             WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
 
-            GetRuntimeLanguageUserInput(ioFiles); // Load and parse all runtime language objects
+            GetRuntimeLanguageUserInput(state,ioFiles); // Load and parse all runtime language objects
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
@@ -2421,18 +2421,18 @@ namespace RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == FuncCurveValue) {
                         if (Operand(3).Type == 0 && Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
                                                                                                                  // 2nd independent | Z Value, 3rd
                                                                                                                  // independent | 4th independent |
                                                                                                                  // 5th independent
                         } else if (Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                             // Value, 3rd independent | 4th independent | 5th
                                                                                             // independent
                         } else if (Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number)); // curve index | X value | Y value, 2nd independent | Z
@@ -2440,14 +2440,14 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent
                         } else if (Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                              Operand(2).Number,
                                                              Operand(3).Number,
                                                              Operand(4).Number,
                                                              Operand(5).Number)); // curve index | X value | Y value, 2nd independent | Z Value, 3rd
                                                                                   // independent | 4th independent | 5th independent
                         } else {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number,
@@ -2612,7 +2612,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void GetRuntimeLanguageUserInput(IOFiles &ioFiles)
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2914,7 +2914,7 @@ namespace RuntimeLanguageProcessor {
                         }
                     }
 
-                    CurveIndexNum = GetCurveIndex(cAlphaArgs(2)); // curve name
+                    CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
                     if (CurveIndexNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");

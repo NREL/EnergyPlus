@@ -291,10 +291,10 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
                                                  ",",
                                                  ";"});
     ASSERT_TRUE(process_idf(idfTxt));
-    auto eplc(ElectPowerLoadCenter(state.files, 1));
+    auto eplc(ElectPowerLoadCenter(state,  1));
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
     DataHVACGlobals::TimeStepSys = 1.0;
-    eplc.inverterObj->simulate(884.018);
+    eplc.inverterObj->simulate(state, 884.018);
     EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
 }

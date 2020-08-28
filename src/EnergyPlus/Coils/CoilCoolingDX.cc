@@ -140,10 +140,10 @@ void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCo
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
-    this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
+    this->performance = CoilCoolingDXCurveFitPerformance(state, input_data.performance_object_name);
 
     if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
-        !this->performance.original_input_specs.alternate_operating_mode_name.empty() && 
+        !this->performance.original_input_specs.alternate_operating_mode_name.empty() &&
         !this->performance.original_input_specs.alternate_operating_mode2_name.empty()) {
         this->CoolingCoilType = DataHVACGlobals::CoilDX_SubcoolReheat;
     }
@@ -391,11 +391,11 @@ void CoilCoolingDX::oneTimeInit() {
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio", 
-                            OutputProcessor::Unit::None, 
-                            this->performance.ModeRatio, 
-                            "System", 
-                            "Average", 
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio",
+                            OutputProcessor::Unit::None,
+                            this->performance.ModeRatio,
+                            "System",
+                            "Average",
                             this->name);
         SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
                             OutputProcessor::Unit::W,
@@ -459,7 +459,7 @@ void CoilCoolingDX::size(EnergyPlusData &state) {
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -477,7 +477,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
-    this->performance.simulate(
+    this->performance.simulate(state,
         evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, LoadSHR);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
@@ -568,10 +568,10 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     // Fishy global things that need to be set here, try to set the AFN stuff now
     // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
-    DataAirLoop::LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+    state.dataAirLoop->LoopDXCoilRTF = this->coolingCoilRuntimeFraction;
     DataHVACGlobals::DXElecCoolingPower = this->elecCoolingPower;
     if (this->airLoopNum > 0) {
-        DataAirLoop::AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
+        state.dataAirLoop->AirLoopAFNInfo(this->airLoopNum).AFNLoopDXCoilRTF = this->coolingCoilRuntimeFraction;
         // The original calculation is below, but no heating yet
         //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     }

@@ -577,9 +577,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
                             auto lam = state.dataWindowManager->wle(ILam);
                             state.dataWindowManager->wlt(IGlass, ILam) = lam;
-                            state.dataWindowManager->t(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
-                            state.dataWindowManager->rff(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
-                            state.dataWindowManager->rbb(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
+                            state.dataWindowManager->t(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
+                            state.dataWindowManager->rff(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
+                            state.dataWindowManager->rbb(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
                         }
                         SolarSprectrumAverage(*state.dataWindowManager, state.dataWindowManager->t, tmpTrans);
                         SolarSprectrumAverage(*state.dataWindowManager, state.dataWindowManager->rff, tmpReflectSolBeamFront);
@@ -642,9 +642,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
                             auto lam = state.dataWindowManager->wle(ILam);
                             state.dataWindowManager->wlt(IGlass, ILam) = lam;
-                            state.dataWindowManager->tPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
-                            state.dataWindowManager->rfPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
-                            state.dataWindowManager->rbPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                            state.dataWindowManager->tPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            state.dataWindowManager->rfPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            state.dataWindowManager->rbPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                     // For use with between-glass shade/blind, save angular properties of isolated glass
@@ -835,9 +835,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)state.dataWindowManager->wle.size(); ++ILam) {
                             auto lam = state.dataWindowManager->wle(ILam);
                             state.dataWindowManager->wlt(IGlass, ILam) = lam;
-                            state.dataWindowManager->tPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
-                            state.dataWindowManager->rfPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
-                            state.dataWindowManager->rbPhi(IGlass, ILam) = CurveManager::CurveValue(dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
+                            state.dataWindowManager->tPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngTransDataPtr, Phi, lam);
+                            state.dataWindowManager->rfPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngFRefleDataPtr, Phi, lam);
+                            state.dataWindowManager->rbPhi(IGlass, ILam) = CurveManager::CurveValue(state, dataMaterial.Material(LayPtr).GlassSpecAngBRefleDataPtr, Phi, lam);
                         }
                     }
                 }
@@ -6852,7 +6852,6 @@ namespace WindowManager {
         using General::RoundSigDigits;
         using General::ScanForReports;
         // InterpBlind ! Blind profile angle interpolation function
-        using CurveManager::PerfCurve;
         using WindowComplexManager::CalcComplexWindowThermal;
         using WindowComplexManager::UpdateComplexWindows;
 
@@ -7134,9 +7133,9 @@ namespace WindowManager {
                                 }
                                 if (dataMaterial.Material(Layer).GlassSpectralAndAngle) {
                                     OpticalDataType = "SpectralAndAngle";
-                                    SpectralDataName = PerfCurve(dataMaterial.Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
-                                                       PerfCurve(dataMaterial.Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
-                                                       PerfCurve(dataMaterial.Material(Layer).GlassSpecAngBRefleDataPtr).Name;
+                                    SpectralDataName = state.dataCurveManager->PerfCurve(dataMaterial.Material(Layer).GlassSpecAngTransDataPtr).Name + ", " +
+                                                       state.dataCurveManager->PerfCurve(dataMaterial.Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
+                                                       state.dataCurveManager->PerfCurve(dataMaterial.Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
                                 static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
                                                                  ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");

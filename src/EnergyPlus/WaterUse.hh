@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 struct WaterUseData;
 
 namespace WaterUse {
@@ -231,7 +230,7 @@ namespace WaterUse {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitConnections(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse);
+        void InitConnections(EnergyPlusData &state, WaterUseData &dataWaterUse);
 
         void CalcConnectionsFlowRates(WaterUseData &dataWaterUse, bool FirstHVACIteration);
 

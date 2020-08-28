@@ -291,7 +291,8 @@ public: // methods
                                    int const DataWaterLoopNum   // plant loop structure index
     );
 
-    void setCoilEntAirTemp(std::string const &coilName,    // user-defined name of the coil
+    void setCoilEntAirTemp(EnergyPlusData &state,
+                           std::string const &coilName,    // user-defined name of the coil
                            std::string const &coilType,    // idf input object class name of coil
                            Real64 const entAirDryBulbTemp, // ideal loads sizing result for air entering coil drybulb temp (C)
                            int const curSysNum,            // airloop system number index, if non zero
@@ -327,7 +328,8 @@ public: // methods
                              Real64 const lvgAirHumRat    //
     );
 
-    void setCoilCoolingCapacity(EnergyPlusData &state, std::string const &coilName,    // user-defined name of the coil
+    void setCoilCoolingCapacity(EnergyPlusData &state,
+                                std::string const &coilName,    // user-defined name of the coil
                                 std::string const &coilType,    // idf input object class name of coil
                                 Real64 const totalCoolingCap,   // {W} coil cooling capacity
                                 bool const isAutoSize,          // true if value was autosized
@@ -340,7 +342,8 @@ public: // methods
                                 Real64 const DXFlowPerCapMaxRatio  // non dimensional ratio, capacity adjustment ratio max
     );
 
-    void setCoilHeatingCapacity(EnergyPlusData &state, std::string const &coilName,    // user-defined name of the coil
+    void setCoilHeatingCapacity(EnergyPlusData &state,
+                                std::string const &coilName,    // user-defined name of the coil
                                 std::string const &coilType,    // idf input object class name of coil
                                 Real64 const totalHeatingCap,   // {W} coil Heating capacity
                                 bool const isAutoSize,          // true if value was autosized
@@ -379,7 +382,8 @@ public: // methods
                                              int const dataWaterLoopNum    // plant loop structure index
     );
 
-    void setCoilUA(std::string const &coilName,            // user-defined name of the coil
+    void setCoilUA(EnergyPlusData &state,
+                   std::string const &coilName,            // user-defined name of the coil
                    std::string const &coilType,            // idf input object class name of coil
                    Real64 const UAvalue,                   // [W/k] UA value for coil,
                    Real64 const dataCapacityUsedForSizing, // [W] sizing global
@@ -411,7 +415,7 @@ public: // methods
     void setZoneLatentLoadHeatingIdealPeak(int const zoneIndex, Real64 const zoneHeatingLatentLoad);
 
 private: // methods
-    void doAirLoopSetup(int const coilVecIndex);
+    void doAirLoopSetup(EnergyPlusData &state, int const coilVecIndex);
 
     void doZoneEqSetup(EnergyPlusData &state, int const coilVecIndex);
 

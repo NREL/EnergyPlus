@@ -2129,7 +2129,7 @@ namespace EnergyPlus {
                 }
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         thisCircuit->Name,
                                                         TypeToLookFor,
                                                         thisCircuit->LoopNum,

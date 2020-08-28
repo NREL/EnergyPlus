@@ -305,7 +305,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     ZoneSysEnergyDemand.allocate(1);
 
     ProcessScheduleInput(state.files);   // read schedules
-    GetCurveInput();          // read curves
+    GetCurveInput(state);          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
     DataLoopNode::Node(EAFanInletNode).MassFlowRateMaxAvail = 0.60215437; // exhaust fan will not turn on unless max avail is set
 
     SetPredefinedTables();
-    SimOutdoorAirUnit(state, 
+    SimOutdoorAirUnit(state,
         "ZONE1OUTAIR", CurZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
     EXPECT_DOUBLE_EQ(FinalZoneSizing(CurZoneEqNum).MinOA, OutAirUnit(OAUnitNum).OutAirVolFlow);

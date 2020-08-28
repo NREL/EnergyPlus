@@ -111,15 +111,15 @@ namespace ChillerIndirectAbsorption {
     const char * fluidNameSteam = "STEAM";
     const char * fluidNameWater = "WATER";
 
-    PlantComponent *IndirectAbsorberSpecs::factory(ChillerIndirectAbsoprtionData &chillers, std::string const &objectName)
+    PlantComponent *IndirectAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
-        if (chillers.GetInput) {
-            GetIndirectAbsorberInput(chillers);
-            chillers.GetInput = false;
+        if (state.dataChillerIndirectAbsorption.GetInput) {
+            GetIndirectAbsorberInput(state);
+            state.dataChillerIndirectAbsorption.GetInput = false;
         }
         // Now look for this particular object
-        for (auto &thisAbs : chillers.IndirectAbsorber) {
+        for (auto &thisAbs : state.dataChillerIndirectAbsorption.IndirectAbsorber) {
             if (thisAbs.Name == objectName) {
                 return &thisAbs;
             }
@@ -134,8 +134,8 @@ namespace ChillerIndirectAbsorption {
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
 
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
-            this->calculate(CurLoad, RunFlag);
+            this->initialize(state, RunFlag, CurLoad);
+            this->calculate(state, CurLoad, RunFlag);
             this->updateRecords(CurLoad, RunFlag);
 
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
@@ -194,14 +194,14 @@ namespace ChillerIndirectAbsorption {
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
-        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
+        this->initialize(state, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->sizeChiller(); // only size when called from chilled water loop
+            this->sizeChiller(state); // only size when called from chilled water loop
         }
     }
 
-    void GetIndirectAbsorberInput(ChillerIndirectAbsoprtionData &chillers)
+    void GetIndirectAbsorberInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          R. Raustad (FSEC)
@@ -223,20 +223,20 @@ namespace ChillerIndirectAbsorption {
         bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Absorption:Indirect";
-        chillers.NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerIndirectAbsorption.NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumIndirectAbsorbers <= 0) {
+        if (state.dataChillerIndirectAbsorption.NumIndirectAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
 
-        if (allocated(chillers.IndirectAbsorber)) return;
+        if (allocated(state.dataChillerIndirectAbsorption.IndirectAbsorber)) return;
 
-        chillers.IndirectAbsorber.allocate(chillers.NumIndirectAbsorbers);
+        state.dataChillerIndirectAbsorption.IndirectAbsorber.allocate(state.dataChillerIndirectAbsorption.NumIndirectAbsorbers);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-        for (AbsorberNum = 1; AbsorberNum <= chillers.NumIndirectAbsorbers; ++AbsorberNum) {
+        for (AbsorberNum = 1; AbsorberNum <= state.dataChillerIndirectAbsorption.NumIndirectAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           AbsorberNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -254,7 +254,7 @@ namespace ChillerIndirectAbsorption {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.IndirectAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerIndirectAbsorption.IndirectAbsorber(AbsorberNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {
@@ -315,10 +315,11 @@ namespace ChillerIndirectAbsorption {
                                                DataIPShortCuts::cAlphaArgs(5),
                                                "Condenser (not tested) Nodes");
 
-            thisChiller.GeneratorInputCurvePtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(7));
+            thisChiller.GeneratorInputCurvePtr = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7));
             if (thisChiller.GeneratorInputCurvePtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(thisChiller.GeneratorInputCurvePtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            thisChiller.GeneratorInputCurvePtr, // Curve index
                                                             {1},                                                  // Valid dimensions
                                                             RoutineName,                                          // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject,                // Object Type
@@ -326,10 +327,10 @@ namespace ChillerIndirectAbsorption {
                                                             DataIPShortCuts::cAlphaFieldNames(7));                // Field Name
             }
 
-            thisChiller.PumpPowerCurvePtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(8));
+            thisChiller.PumpPowerCurvePtr = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(8));
             if (thisChiller.PumpPowerCurvePtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(thisChiller.PumpPowerCurvePtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, thisChiller.PumpPowerCurvePtr, // Curve index
                                                             {1},                                             // Valid dimensions
                                                             RoutineName,                                     // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject,           // Object Type
@@ -438,10 +439,10 @@ namespace ChillerIndirectAbsorption {
                 }
             }
 
-            thisChiller.CapFCondenserTempPtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(11));
+            thisChiller.CapFCondenserTempPtr = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(11));
             if (thisChiller.CapFCondenserTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(thisChiller.CapFCondenserTempPtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, thisChiller.CapFCondenserTempPtr, // Curve index
                                                             {1},                                                // Valid dimensions
                                                             RoutineName,                                        // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject,              // Object Type
@@ -449,10 +450,10 @@ namespace ChillerIndirectAbsorption {
                                                             DataIPShortCuts::cAlphaFieldNames(11));             // Field Name
             }
 
-            thisChiller.CapFEvaporatorTempPtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(12));
+            thisChiller.CapFEvaporatorTempPtr = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(12));
             if (thisChiller.CapFEvaporatorTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(thisChiller.CapFEvaporatorTempPtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, thisChiller.CapFEvaporatorTempPtr, // Curve index
                                                             {1},                                                 // Valid dimensions
                                                             RoutineName,                                         // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject,               // Object Type
@@ -460,10 +461,10 @@ namespace ChillerIndirectAbsorption {
                                                             DataIPShortCuts::cAlphaFieldNames(12));              // Field Name
             }
 
-            thisChiller.CapFGeneratorTempPtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(13));
+            thisChiller.CapFGeneratorTempPtr = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(13));
             if (thisChiller.CapFGeneratorTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(thisChiller.CapFGeneratorTempPtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, thisChiller.CapFGeneratorTempPtr, // Curve index
                                                             {1},                                                // Valid dimensions
                                                             RoutineName,                                        // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject,              // Object Type
@@ -471,10 +472,10 @@ namespace ChillerIndirectAbsorption {
                                                             DataIPShortCuts::cAlphaFieldNames(13));             // Field Name
             }
 
-            thisChiller.HeatInputFCondTempPtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(14));
+            thisChiller.HeatInputFCondTempPtr = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(14));
             if (thisChiller.HeatInputFCondTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(thisChiller.HeatInputFCondTempPtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, thisChiller.HeatInputFCondTempPtr, // Curve index
                                                             {1},                                                 // Valid dimensions
                                                             RoutineName,                                         // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject,               // Object Type
@@ -482,10 +483,10 @@ namespace ChillerIndirectAbsorption {
                                                             DataIPShortCuts::cAlphaFieldNames(14));              // Field Name
             }
 
-            thisChiller.HeatInputFEvapTempPtr = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(15));
+            thisChiller.HeatInputFEvapTempPtr = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(15));
             if (thisChiller.HeatInputFEvapTempPtr > 0) {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(thisChiller.HeatInputFEvapTempPtr, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, thisChiller.HeatInputFEvapTempPtr, // Curve index
                                                             {1},                                                 // Valid dimensions
                                                             RoutineName,                                         // Routine name
                                                             DataIPShortCuts::cCurrentModuleObject,               // Object Type
@@ -673,7 +674,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad)
+    void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -697,7 +698,7 @@ namespace ChillerIndirectAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                     this->CWLoopNum,
@@ -711,7 +712,7 @@ namespace ChillerIndirectAbsorption {
                                                     this->EvapInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                     this->CDLoopNum,
@@ -728,7 +729,7 @@ namespace ChillerIndirectAbsorption {
                 this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
 
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                         this->GenLoopNum,
@@ -916,7 +917,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::sizeChiller()
+    void IndirectAbsorberSpecs::sizeChiller(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -959,7 +960,7 @@ namespace ChillerIndirectAbsorption {
 
         Real64 SteamInputRatNom; // nominal energy input ratio (steam or hot water)
         if (this->GeneratorInputCurvePtr > 0) {
-            SteamInputRatNom = CurveManager::CurveValue(this->GeneratorInputCurvePtr, 1.0);
+            SteamInputRatNom = CurveManager::CurveValue(state, this->GeneratorInputCurvePtr, 1.0);
         } else {
             SteamInputRatNom = 1.0;
         }
@@ -1462,7 +1463,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::calculate(Real64 const MyLoad, bool const RunFlag)
+    void IndirectAbsorberSpecs::calculate(EnergyPlusData &state, Real64 const MyLoad, bool const RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         R. Raustad (FSEC)
@@ -1592,7 +1593,7 @@ namespace ChillerIndirectAbsorption {
         Real64 CapacityfAbsorberTemp; // performance curve output
 
         if (this->CapFCondenserTempPtr > 0) {
-            CapacityfAbsorberTemp = CurveManager::CurveValue(this->CapFCondenserTempPtr, TempCondIn);
+            CapacityfAbsorberTemp = CurveManager::CurveValue(state, this->CapFCondenserTempPtr, TempCondIn);
         } else {
             CapacityfAbsorberTemp = 1.0;
         }
@@ -1600,7 +1601,7 @@ namespace ChillerIndirectAbsorption {
         Real64 CapacityfEvaporatorTemp; // performance curve output
 
         if (this->CapFEvaporatorTempPtr > 0) {
-            CapacityfEvaporatorTemp = CurveManager::CurveValue(this->CapFEvaporatorTempPtr, TempEvapOut);
+            CapacityfEvaporatorTemp = CurveManager::CurveValue(state, this->CapFEvaporatorTempPtr, TempEvapOut);
         } else {
             CapacityfEvaporatorTemp = 1.0;
         }
@@ -1611,7 +1612,7 @@ namespace ChillerIndirectAbsorption {
             if (this->GeneratorInletNodeNum > 0) {
                 if (this->GenHeatSourceType == DataLoopNode::NodeType_Water) {
                     CapacityfGeneratorTemp =
-                        CurveManager::CurveValue(this->CapFGeneratorTempPtr, DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
+                        CurveManager::CurveValue(state, this->CapFGeneratorTempPtr, DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
                 } else {
                     CapacityfGeneratorTemp = 1.0;
                 }
@@ -1823,7 +1824,7 @@ namespace ChillerIndirectAbsorption {
 
         if (this->GeneratorInletNodeNum > 0) {
             if (this->HeatInputFCondTempPtr > 0) {
-                HeatInputfCondTemp = CurveManager::CurveValue(this->HeatInputFCondTempPtr, DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
+                HeatInputfCondTemp = CurveManager::CurveValue(state, this->HeatInputFCondTempPtr, DataLoopNode::Node(this->GeneratorInletNodeNum).Temp);
             } else {
                 HeatInputfCondTemp = 1.0;
             }
@@ -1834,7 +1835,7 @@ namespace ChillerIndirectAbsorption {
         Real64 HeatInputfEvapTemp; // performance curve output
 
         if (this->HeatInputFEvapTempPtr > 0) {
-            HeatInputfEvapTemp = CurveManager::CurveValue(this->HeatInputFEvapTempPtr, DataLoopNode::Node(this->EvapOutletNodeNum).Temp);
+            HeatInputfEvapTemp = CurveManager::CurveValue(state, this->HeatInputFEvapTempPtr, DataLoopNode::Node(this->EvapOutletNodeNum).Temp);
         } else {
             HeatInputfEvapTemp = 1.0;
         }
@@ -1843,7 +1844,7 @@ namespace ChillerIndirectAbsorption {
 
         // Calculate steam input ratio. Include impact of generator and evaporator temperatures
         if (this->GeneratorInputCurvePtr > 0) {
-            HeatInputRat = CurveManager::CurveValue(this->GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
+            HeatInputRat = CurveManager::CurveValue(state, this->GeneratorInputCurvePtr, PartLoadRat) * HeatInputfCondTemp * HeatInputfEvapTemp;
         } else {
             HeatInputRat = HeatInputfCondTemp * HeatInputfEvapTemp;
         }
@@ -1852,7 +1853,7 @@ namespace ChillerIndirectAbsorption {
 
         // Calculate electric input ratio
         if (this->PumpPowerCurvePtr > 0) {
-            ElectricInputRat = CurveManager::CurveValue(this->PumpPowerCurvePtr, PartLoadRat);
+            ElectricInputRat = CurveManager::CurveValue(state, this->PumpPowerCurvePtr, PartLoadRat);
         } else {
             ElectricInputRat = 1.0;
         }

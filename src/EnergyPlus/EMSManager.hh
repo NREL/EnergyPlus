@@ -98,11 +98,11 @@ namespace EMSManager {
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
-    void GetEMSInput(IOFiles &ioFiles);
+    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
@@ -123,7 +123,7 @@ namespace EMSManager {
     bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
                                         std::string const &varName);
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators();
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
 
     void SetupWindowShadingControlActuators();
 

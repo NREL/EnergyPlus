@@ -199,7 +199,7 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
 
     ASSERT_TRUE(process_idf(idf_objects));
     OutAirNodeManager::SetOutAirNodes();
-    EMSManager::GetEMSInput(state.files);
+    EMSManager::GetEMSInput(state, state.files);
 
     // now check that Erl variable is Null
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
@@ -1086,7 +1086,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EMSManager::CheckIfAnyEMS(state.files); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
     bool ErrorsFound(false);
-    CurveManager::GetCurveInputData(ErrorsFound); // process curve for use with EMS
+    CurveManager::GetCurveInputData(state, ErrorsFound); // process curve for use with EMS
     EXPECT_FALSE(ErrorsFound);
 
     bool anyRan;

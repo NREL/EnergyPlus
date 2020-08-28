@@ -111,7 +111,7 @@ namespace AirflowNetworkBalanceManager {
 
     void AllocateAndInitData();
 
-    void CalcAirflowNetworkAirBalance();
+    void CalcAirflowNetworkAirBalance(EnergyPlusData &state);
 
     Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
                                     Real64 mdot, // Mass flow rate
@@ -128,7 +128,8 @@ namespace AirflowNetworkBalanceManager {
                                      Real64 hOut     // User defined convection coefficient
     );
 
-    Real64 CalcWindPressure(int curve,           // Curve index, change this to pointer after curve refactor
+    Real64 CalcWindPressure(EnergyPlusData &state,
+                            int curve,           // Curve index, change this to pointer after curve refactor
                             bool symmetricCurve, // True if the curve is symmetric (0 to 180)
                             bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                             Real64 azimuth,      // Azimuthal angle of surface
@@ -150,7 +151,7 @@ namespace AirflowNetworkBalanceManager {
 
     void ReportAirflowNetwork();
 
-    void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
+    void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
     void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
@@ -172,7 +173,8 @@ namespace AirflowNetworkBalanceManager {
 
     int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
-    Real64 AFNPressureResidual(Real64 ExFanMassFlowRate,
+    Real64 AFNPressureResidual(EnergyPlusData &state,
+                               Real64 ExFanMassFlowRate,
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct
@@ -202,7 +204,8 @@ namespace AirflowNetworkBalanceManager {
         {
         }
 
-        void calc(int ZoneNum,
+        void calc(EnergyPlusData &state,
+                  int ZoneNum,
                   Real64 TimeOpenDuration,
                   Real64 TimeCloseDuration,
                   int &OpeningStatus,
@@ -219,8 +222,8 @@ namespace AirflowNetworkBalanceManager {
 
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
-        void initialize();
-        void calculateWindPressureCoeffs();
+        void initialize(EnergyPlusData &state);
+        void calculateWindPressureCoeffs(EnergyPlusData &state);
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;

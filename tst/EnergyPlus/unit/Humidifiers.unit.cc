@@ -192,7 +192,7 @@ TEST_F(EnergyPlusFixture, Humidifiers_EnergyUse)
     thisHum.CurMakeupWaterTemp = 20.0;
     OutBaroPress = 101325.0;
 
-    thisHum.CalcGasSteamHumidifier(0.040000010708118504);
+    thisHum.CalcGasSteamHumidifier(state, 0.040000010708118504);
     EXPECT_DOUBLE_EQ(103710.42776358133, thisHum.GasUseRate);
 
     thisHum.ReportHumidifier();
@@ -287,9 +287,9 @@ TEST_F(EnergyPlusFixture, Humidifiers_ThermalEfficiency)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    thisHum.EfficiencyCurvePtr = CurveManager::GetCurveIndex("THERMALEFFICIENCYFPLR");
+    thisHum.EfficiencyCurvePtr = CurveManager::GetCurveIndex(state, "THERMALEFFICIENCYFPLR");
 
-    thisHum.CalcGasSteamHumidifier(0.030);
+    thisHum.CalcGasSteamHumidifier(state, 0.030);
     EXPECT_NEAR(0.7875, thisHum.ThermalEff, 0.001);
 }
 

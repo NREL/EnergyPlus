@@ -297,22 +297,26 @@ namespace IntegratedHeatPump {
 
     bool IHPInModel(EnergyPlusData &state);
 
-    int GetCoilIndexIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexIHP(EnergyPlusData &state,
+                        std::string const &CoilType, // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNodeIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeIHP(EnergyPlusData &state,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDWHCoilInletNodeIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilInletNodeIHP(EnergyPlusData &state,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     );
 
-    int GetDWHCoilOutletNodeIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilOutletNodeIHP(EnergyPlusData &state,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
@@ -323,7 +327,8 @@ namespace IntegratedHeatPump {
                                  bool &ErrorsFound            // set to true if problem
     );
 
-    int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
+                             std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              IHPOperationMode const Mode, // mode coil type
                              bool &ErrorsFound            // set to true if problem

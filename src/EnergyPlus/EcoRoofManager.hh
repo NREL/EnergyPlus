@@ -70,7 +70,8 @@ namespace EcoRoofManager {
 
     // Functions
 
-    void CalcEcoRoof(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcEcoRoof(EnergyPlusData &state,
+                     ConvectionCoefficientsData &dataConvectionCoefficients,
                      IOFiles &ioFiles,
                      int const SurfNum, // Indicator of Surface Number for the current surface
                      int const ZoneNum, // Indicator for zone number where the current surface

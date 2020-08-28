@@ -153,8 +153,8 @@ namespace HVACSingleDuctInduc {
               DesHeatingLoad(0.0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0), AirLoopNum(0), OutdoorAirFlowRate(0.0)
         {
         }
-        void ReportIndUnit();
-        void CalcOutdoorAirVolumeFlowRate();
+        void ReportIndUnit(EnergyPlusData &state);
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
     // Object Data

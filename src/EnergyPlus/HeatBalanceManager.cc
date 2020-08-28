@@ -462,7 +462,7 @@ namespace HeatBalanceManager {
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(*state.dataWindowEquivalentLayer, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -1466,7 +1466,7 @@ namespace HeatBalanceManager {
         print(ioFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(EnergyPlusData &state, WindowEquivalentLayerData &dataWindowEquivalentLayer, IOFiles &ioFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -2080,20 +2080,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex(MaterialNames(5));
+                    dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(5));
                     if (dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
                                                                     {2},                                         // Valid dimensions
                                                                     RoutineName,                                 // Routine name
                                                                     CurrentModuleObject,                         // Object Type
                                                                     dataMaterial.Material(MaterNum).Name,                     // Object Name
                                                                     cAlphaFieldNames(5));                        // Field Name
 
-                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(state, dataMaterial.Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -2129,20 +2129,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(6));
+                    dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(6));
                     if (dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
                                                                     {2},                                          // Valid dimensions
                                                                     RoutineName,                                  // Routine name
                                                                     CurrentModuleObject,                          // Object Type
                                                                     dataMaterial.Material(MaterNum).Name,                      // Object Name
                                                                     cAlphaFieldNames(6));                         // Field Name
 
-                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(state, dataMaterial.Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
@@ -2178,20 +2178,20 @@ namespace HeatBalanceManager {
                     ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", blank field.");
                     ShowContinueError(" Table name must be entered when the key SpectralAndAngle is selected as Optical Data Type.");
                 } else {
-                    dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex(MaterialNames(7));
+                    dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr = CurveManager::GetCurveIndex(state, MaterialNames(7));
                     if (dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr == 0) {
                         ErrorsFound = true;
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
                                                                     {2},                                          // Valid dimensions
                                                                     RoutineName,                                  // Routine name
                                                                     CurrentModuleObject,                          // Object Type
                                                                     dataMaterial.Material(MaterNum).Name,                      // Object Name
                                                                     cAlphaFieldNames(7));                         // Field Name
 
-                        GetCurveMinMaxValues(dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        GetCurveMinMaxValues(state, dataMaterial.Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
                             ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +

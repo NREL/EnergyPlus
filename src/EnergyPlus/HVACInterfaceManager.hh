@@ -56,6 +56,9 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+
 namespace HVACInterfaceManager {
 
     // Data
@@ -118,7 +121,8 @@ namespace HVACInterfaceManager {
 
     // Functions
 
-    void UpdateHVACInterface(int const AirLoopNum, // airloop number for which air loop this is
+    void UpdateHVACInterface(EnergyPlusData &state,
+                             int const AirLoopNum, // airloop number for which air loop this is
                              int const CalledFrom,
                              int const OutletNode,    // Node number for the outlet of the side of the loop just simulated
                              int const InletNode,     // Node number for the inlet of the side that needs the outlet node data

@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace UserDefinedComponents {
 
@@ -205,7 +204,7 @@ namespace UserDefinedComponents {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, int LoopNum, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad);
 
         void report(int LoopNum);
     };
@@ -231,7 +230,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void report();
     };
@@ -263,7 +262,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, int ZoneNum);
+        void initialize(EnergyPlusData &state, int ZoneNum);
 
         void report();
     };
@@ -297,7 +296,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, int ZoneNum);
+        void initialize(EnergyPlusData &state, int ZoneNum);
 
         void report();
     };

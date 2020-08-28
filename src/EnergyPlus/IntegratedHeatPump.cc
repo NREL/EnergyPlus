@@ -64,7 +64,6 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -1103,7 +1102,6 @@ namespace IntegratedHeatPump {
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using GlobalNames::VerifyUniqueCoilName;
-        using namespace OutputReportPredefined;
         using General::TrimSigDigits;
         using VariableSpeedCoils::GetCoilIndexVariableSpeed;
         using VariableSpeedCoils::VarSpeedCoil;
@@ -2185,7 +2183,8 @@ namespace IntegratedHeatPump {
         }
     }
 
-    void DecideWorkMode(EnergyPlusData &state, int const DXCoilNum,
+    void DecideWorkMode(EnergyPlusData &state,
+                        int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
                         )                       // shall be called from a air loop parent
@@ -2353,21 +2352,21 @@ namespace IntegratedHeatPump {
         }
 
         // clear up
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).DWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
         return;
@@ -2403,7 +2402,8 @@ namespace IntegratedHeatPump {
         return !IntegratedHeatPumps.empty();
     }
 
-    int GetCoilIndexIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexIHP(EnergyPlusData &state,
+                        std::string const &CoilType, // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         bool &ErrorsFound            // set to true if problem
     )
@@ -2440,7 +2440,8 @@ namespace IntegratedHeatPump {
         return IndexNum;
     }
 
-    int GetCoilInletNodeIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeIHP(EnergyPlusData &state,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     )
@@ -2483,7 +2484,8 @@ namespace IntegratedHeatPump {
         return NodeNumber;
     }
 
-    int GetDWHCoilInletNodeIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilInletNodeIHP(EnergyPlusData &state,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     )
@@ -2526,7 +2528,8 @@ namespace IntegratedHeatPump {
         return NodeNumber;
     }
 
-    int GetDWHCoilOutletNodeIHP(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilOutletNodeIHP(EnergyPlusData &state,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -2569,7 +2572,8 @@ namespace IntegratedHeatPump {
         return NodeNumber;
     }
 
-    int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state, std::string const &CoilType,            // must match coil types in this module
+    int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
+                             std::string const &CoilType,            // must match coil types in this module
                              std::string const &CoilName,            // must match coil names for the coil type
                              IHPOperationMode const EP_UNUSED(Mode), // mode coil type
                              bool &ErrorsFound                       // set to true if problem
@@ -2619,7 +2623,8 @@ namespace IntegratedHeatPump {
         return PLRNumber;
     }
 
-    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state, std::string const &CoilType,            // must match coil types in this module
+    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
+                                 std::string const &CoilType,            // must match coil types in this module
                                  std::string const &CoilName,            // must match coil names for the coil type
                                  IHPOperationMode const EP_UNUSED(Mode), // mode coil type
                                  bool &ErrorsFound                       // set to true if problem
@@ -2659,7 +2664,7 @@ namespace IntegratedHeatPump {
                 CoilCapacity =
                     GetCoilCapacityVariableSpeed(state, IntegratedHeatPumps(WhichCoil).DWHCoilType, IntegratedHeatPumps(WhichCoil).DWHCoilName, ErrorsFound);
             } else {
-                CoilCapacity = GetCoilCapacityVariableSpeed(state, 
+                CoilCapacity = GetCoilCapacityVariableSpeed(state,
                     IntegratedHeatPumps(WhichCoil).SCWHCoilType, IntegratedHeatPumps(WhichCoil).SCWHCoilName, ErrorsFound);
             }
         } else {
@@ -2883,7 +2888,7 @@ namespace IntegratedHeatPump {
         return (AirVolFlowRate);
     }
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, 
+    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
         int const DXCoilNum,
         int const SpeedNum,
         Real64 const SpeedRatio,

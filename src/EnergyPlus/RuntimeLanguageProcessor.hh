@@ -179,7 +179,7 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage(IOFiles &ioFiles);
+    void InitializeRuntimeLanguage(EnergyPlusData &state, IOFiles &ioFiles);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
@@ -230,7 +230,7 @@ namespace RuntimeLanguageProcessor {
 
     int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
 
-    void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ReportRuntimeLanguage();
 

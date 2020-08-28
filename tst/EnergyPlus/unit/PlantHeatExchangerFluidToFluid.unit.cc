@@ -1071,7 +1071,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
@@ -2162,7 +2162,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
@@ -2469,14 +2469,14 @@ TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverri
     DataLoopNode::Node(3).TempSetPoint = 11.0;
 
     // now call the init routine
-    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state.dataBranchInputManager);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state);
 
     // check value in FreeCoolCntrlMinCntrlTemp
     EXPECT_NEAR(DataPlant::PlantLoop(1).LoopSide(2).Branch(2).Comp(1).FreeCoolCntrlMinCntrlTemp, 11.0, 0.001);
 
     // change the tolerance and check the result, issue 5626 fix subtracts tolerance
     PlantHeatExchangerFluidToFluid::FluidHX(1).TempControlTol = 1.5;
-    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state.dataBranchInputManager);
+    PlantHeatExchangerFluidToFluid::FluidHX(1).initialize(state);
 }
 
 } // namespace EnergyPlus

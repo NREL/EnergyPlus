@@ -133,7 +133,7 @@ public:
         FinalSysSizing.allocate(1);
         FinalZoneSizing.allocate(1);
         PrimaryAirSystem.allocate(1);
-        AirLoopControlInfo.allocate(1);
+        state.dataAirLoop->AirLoopControlInfo.allocate(1);
         InitializePsychRoutines();
     }
 
@@ -154,7 +154,7 @@ public:
         FinalSysSizing.clear();
         SysSizPeakDDNum.clear();
         PrimaryAirSystem.clear();
-        AirLoopControlInfo.clear();
+        state.dataAirLoop->AirLoopControlInfo.clear();
         cached_Twb.clear();
         cached_Psat.clear();
     }
@@ -281,7 +281,7 @@ TEST_F(WaterCoilsTest, WaterCoolingCoilSizing)
     CurOASysNum = 0;
     FinalSysSizing(1).DesMainVolFlow = 0.00359;
     FinalSysSizing(1).MassFlowAtCoolPeak = FinalSysSizing(1).DesMainVolFlow * StdRhoAir;
-    AirLoopControlInfo(1).UnitarySys = true;
+    state.dataAirLoop->AirLoopControlInfo(1).UnitarySys = true;
 
     state.dataWaterCoils->WaterCoil(CoilNum).Name = "Test Water Heating Coil";
     state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType = state.dataWaterCoils->CoilType_Heating;

@@ -480,7 +480,8 @@ namespace UnitVentilator {
                 GetOnlySingleNode(Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             // Get AirTerminal mixer data
-            GetATMixer(*state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
+            GetATMixer(state,
+                       *state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
                        UnitVent(UnitVentNum).ATMixerName,
                        UnitVent(UnitVentNum).ATMixerIndex,
                        UnitVent(UnitVentNum).ATMixerType,
@@ -1341,7 +1342,7 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         UnitVent(UnitVentNum).HCoilName,
                                         UnitVent(UnitVentNum).HCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).HWLoopNum,
@@ -1368,7 +1369,7 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                 (UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         UnitVent(UnitVentNum).CCoilPlantName,
                                         UnitVent(UnitVentNum).CCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).CWLoopNum,
@@ -3346,7 +3347,7 @@ namespace UnitVentilator {
                     Node(ATMixerPriNode).MassFlowRate =
                         min(min(Node(ATMixerPriNode).MassFlowRateMaxAvail, OAMassFlowRate), Node(InletNode).MassFlowRate);
                     // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
-                    SimATMixer(UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
+                    SimATMixer(state, UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
                 }
             } else {
                 SimUnitVentOAMixer(UnitVentNum, FanOpMode);
@@ -3427,7 +3428,7 @@ namespace UnitVentilator {
                     Node(ATMixerPriNode).MassFlowRate =
                         min(min(Node(ATMixerPriNode).MassFlowRateMaxAvail, OAMassFlowRate), Node(InletNode).MassFlowRate);
                     // now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
-                    SimATMixer(UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
+                    SimATMixer(state, UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
                 }
             } else {
                 SimUnitVentOAMixer(UnitVentNum, FanOpMode);
@@ -3550,7 +3551,7 @@ namespace UnitVentilator {
                 // set the primary air inlet mass flow rate
                 Node(ATMixerPriNode).MassFlowRate = min(Node(ATMixerPriNode).MassFlowRateMaxAvail, OAMassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
-                SimATMixer(UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
+                SimATMixer(state, UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
                 SpecHumMin = min(Node(ATMixOutNode).HumRat, Node(InletNode).HumRat);
                 LoadMet = Node(ATMixOutNode).MassFlowRate *
                           (PsyHFnTdbW(Node(ATMixOutNode).Temp, SpecHumMin) - PsyHFnTdbW(Node(InletNode).Temp, SpecHumMin));

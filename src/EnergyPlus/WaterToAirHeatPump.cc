@@ -60,7 +60,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
@@ -95,7 +94,6 @@ namespace WaterToAirHeatPump {
     // Jin, H. 2002. Parameter Estimation Based Models of Water Source Heat Pumps. Phd Thesis.
     // Oklahoma State University.
 
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using DataHVACGlobals::ContFanCycCoil;
@@ -176,15 +174,13 @@ namespace WaterToAirHeatPump {
         // Calculate the Correct Water to Air HP Model with the current HPNum
 
         if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingParamEst) {
-            InitWatertoAirHP(state,
-                HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+            InitWatertoAirHP(state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPCooling(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
 
         } else if (state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingParamEst) {
-            InitWatertoAirHP(state,
-                HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+            InitWatertoAirHP(state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
             CalcWatertoAirHPHeating(state, HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
             UpdateWatertoAirHP(state, HPNum);
@@ -835,7 +831,7 @@ namespace WaterToAirHeatPump {
 
         if (MyPlantScanFlag(HPNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state.dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).Name,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).WAHPPlantTypeOfNum,
                                     state.dataWaterToAirHeatPump->WatertoAirHP(HPNum).LoopNum,
@@ -1051,8 +1047,6 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using namespace FluidProperties;
-        using CurveManager::CurveValue;
-        using CurveManager::GetCurveIndex;
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;

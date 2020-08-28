@@ -58,11 +58,10 @@ namespace EnergyPlus {
 
     // Forward declarations
     class IOFiles;
-    struct ChilledCeilingPanelSimpleData;
     struct ConvectionCoefficientsData;
     struct EnergyPlusData;
     struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData; 
+    struct WindowEquivalentLayerData;
     struct WindowManagerData;
     struct ZoneTempPredictorCorrectorData;
 
@@ -153,7 +152,8 @@ namespace HeatBalanceSurfaceManager {
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
-    void CalcHeatBalanceOutsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
+                                    ConvectionCoefficientsData &dataConvectionCoefficients,
                                     IOFiles &ioFiles,
                                     Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
@@ -190,7 +190,7 @@ namespace HeatBalanceSurfaceManager {
                              bool &ErrorFlag         // Error flag for movable insulation problem
     );
 
-    void CalcExteriorVentedCavity(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const SurfNum); // index of surface
+    void CalcExteriorVentedCavity(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const SurfNum); // index of surface
 
     void GatherComponentLoadsSurfAbsFact();
 

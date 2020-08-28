@@ -52,21 +52,15 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -100,7 +94,6 @@ namespace HVACDXHeatPumpSystem {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
@@ -170,7 +163,6 @@ namespace HVACDXHeatPumpSystem {
         // This subroutine manages DXHeatPumpSystem component simulation.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DXCoils::SimDXCoil;
         using General::TrimSigDigits;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -219,9 +211,9 @@ namespace HVACDXHeatPumpSystem {
         }
 
         if (present(OAUnitNum)) {
-            InitDXHeatPumpSystem(DXSystemNum, AirLoopNum, OAUnitNum, OAUCoilOutTemp);
+            InitDXHeatPumpSystem(state, DXSystemNum, AirLoopNum, OAUnitNum, OAUCoilOutTemp);
         } else {
-            InitDXHeatPumpSystem(DXSystemNum, AirLoopNum);
+            InitDXHeatPumpSystem(state, DXSystemNum, AirLoopNum);
         }
 
         // Call the series of components that simulate a DX Heating System
@@ -266,10 +258,10 @@ namespace HVACDXHeatPumpSystem {
         // set econo lockout flag
         if (AirLoopNum != -1) { // IF the sysem is not an equipment of outdoor air unit
 
-            if ((DXHeatPumpSystem(DXSystemNum).PartLoadFrac > 0.0) && AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
-                AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
+            if ((DXHeatPumpSystem(DXSystemNum).PartLoadFrac > 0.0) && state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CanLockoutEconoWithCompressor) {
+                state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = true;
             } else {
-                AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
+                state.dataAirLoop->AirLoopControlInfo(AirLoopNum).ReqstEconoLockoutWithCompressor = false;
             }
         }
 
@@ -305,9 +297,6 @@ namespace HVACDXHeatPumpSystem {
         // Using/Aliasing
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
-        using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
-        using NodeInputManager::GetOnlySingleNode;
-        using namespace DataIPShortCuts;
         using DXCoils::GetCoilInletNode;
         using DXCoils::GetCoilOutletNode;
         using DXCoils::SetCoilSystemHeatingDXFlag;
@@ -469,7 +458,8 @@ namespace HVACDXHeatPumpSystem {
     // Beginning of Initialization subroutines for the Module
     // *****************************************************************************
 
-    void InitDXHeatPumpSystem(int const DXSystemNum,                // number of the current DX Sys being simulated
+    void InitDXHeatPumpSystem(EnergyPlusData &state,
+                              int const DXSystemNum,                // number of the current DX Sys being simulated
                               int const AirLoopNum,                 // number of the current air loop being simulated
                               Optional_int_const OAUnitNum,         // number of the current outdoor air unit being simulated
                               Optional<Real64 const> OAUCoilOutTemp // the coil inlet temperature of OutdoorAirUnit
@@ -491,7 +481,6 @@ namespace HVACDXHeatPumpSystem {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataHVACGlobals::DoSetPointTest;
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
@@ -563,7 +552,7 @@ namespace HVACDXHeatPumpSystem {
 
         } else if (AirLoopNum != -1) { // Not Outdoor Air Unit
             ControlNode = DXHeatPumpSystem(DXSystemNum).DXSystemControlNodeNum;
-            EconomizerFlag = AirLoopControlInfo(AirLoopNum).EconoActive;
+            EconomizerFlag = state.dataAirLoop->AirLoopControlInfo(AirLoopNum).EconoActive;
             DXHeatPumpSystem(DXSystemNum).DesiredOutletTemp = Node(ControlNode).TempSetPoint;
         }
     }
@@ -574,7 +563,8 @@ namespace HVACDXHeatPumpSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXHeatingSystem(EnergyPlusData &state, int const DXSystemNum,        // index to DXSystem
+    void ControlDXHeatingSystem(EnergyPlusData &state,
+                                int const DXSystemNum,        // index to DXSystem
                                 bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
@@ -734,14 +724,14 @@ namespace HVACDXHeatPumpSystem {
                             } else {
                                 if (DataGlobals::DoCoilDirectSolutions) {
                                     PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempOut1 - Node(InletNode).Temp);
-                                    SimDXCoil(state, 
+                                    SimDXCoil(state,
                                         CompName, On, FirstHVACIteration, DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex, FanOpMode, PartLoadFrac);
                                 } else {
                                     Par(1) = double(DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex);
                                     Par(2) = DesOutTemp;
                                     Par(3) = 1.0; // OnOffAirFlowFrac assume = 1.0 for continuous fan dx system
                                     Par(5) = double(FanOpMode);
-                                    SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
+                                    SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, DXHeatingCoilResidual, 0.0, 1.0, Par);
                                     if (SolFla == -1) {
                                         if (!WarmupFlag) {
                                             if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {
@@ -1084,7 +1074,8 @@ namespace HVACDXHeatPumpSystem {
         DXHeatPumpSystem(DXSystemNum).SpeedNum = SpeedNum;
     }
 
-    Real64 DXHeatingCoilResidual(Real64 const PartLoadFrac,  // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 DXHeatingCoilResidual(EnergyPlusData &state,
+                                 Real64 const PartLoadFrac,  // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par  // Par(1) = DX coil number
     )
     {
@@ -1134,7 +1125,7 @@ namespace HVACDXHeatPumpSystem {
         CoilIndex = int(Par(1));
         OnOffAirFlowFrac = Par(3);
 
-        CalcDXHeatingCoil(CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac);
+        CalcDXHeatingCoil(state, CoilIndex, PartLoadFrac, ContFanCycCoil, OnOffAirFlowFrac);
 
         OutletAirTemp = DXCoilOutletTemp(CoilIndex);
         Residuum = Par(2) - OutletAirTemp;

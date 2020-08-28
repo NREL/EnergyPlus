@@ -642,7 +642,7 @@ namespace WaterThermalTanks {
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
+        Real64 PartLoadFactor(EnergyPlusData &state, Real64 PartLoadRatio_loc);
 
         void CalcNodeMassFlows(InletModeEnum inletMode);
 
@@ -746,7 +746,8 @@ namespace WaterThermalTanks {
 
         void CalcDesuperheaterWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
-        Real64 PLRResidualWaterThermalTank(EnergyPlusData &state, Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        Real64 PLRResidualWaterThermalTank(EnergyPlusData &state,
+                                           Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                            Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
@@ -768,7 +769,7 @@ namespace WaterThermalTanks {
                                     Array1D<Real64> const &Par
         );
 
-        static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
+        static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
