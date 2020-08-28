@@ -2418,10 +2418,6 @@ namespace HeatBalanceSurfaceManager {
         int SurfSolIncPtr;           // Pointer to schedule surface gain object for interior side of the surface
 
         // Always initialize the shortwave quantities
-        QRadSWOutIncident = 0.0;
-        QRadSWOutIncidentBeam = 0.0;
-        QRadSWOutIncidentSkyDiffuse = 0.0;
-        QRadSWOutIncidentGndDiffuse = 0.0;
 
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             QRadSWOutAbs(SurfNum) = 0.0;
@@ -2443,37 +2439,17 @@ namespace HeatBalanceSurfaceManager {
             IntBmIncInsSurfIntensRep(SurfNum) = 0.0;
             IntBmIncInsSurfAmountRep(SurfNum) = 0.0;
 
+            QRadSWOutIncident(SurfNum) = 0.0;
+            QRadSWOutIncidentBeam(SurfNum) = 0.0;
+            QRadSWOutIncidentSkyDiffuse(SurfNum) = 0.0;
+            QRadSWOutIncidentGndDiffuse(SurfNum) = 0.0;
+
             QRadSWOutIncBmToDiffReflGnd(SurfNum) = 0.0;
             QRadSWOutIncSkyDiffReflGnd(SurfNum) = 0.0;
             QRadSWOutIncBmToBmReflObs(SurfNum) = 0.0;
             QRadSWOutIncBmToDiffReflObs(SurfNum) = 0.0;
             QRadSWOutIncSkyDiffReflObs(SurfNum) = 0.0;
             CosIncidenceAngle(SurfNum) = 0.0;
-            BSDFBeamDirectionRep(SurfNum) = 0;
-            BSDFBeamThetaRep(SurfNum) = 0.0;
-            BSDFBeamPhiRep(SurfNum) = 0.0;
-            OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
-
-            WinHeatGain(SurfNum) = 0.0;
-            WinHeatTransfer(SurfNum) = 0.0;
-            WinHeatGainRep(SurfNum) = 0.0;
-            WinHeatLossRep(SurfNum) = 0.0;
-            WinGainConvGlazToZoneRep(SurfNum) = 0.0;
-            WinGainIRGlazToZoneRep(SurfNum) = 0.0;
-            WinLossSWZoneToOutWinRep(SurfNum) = 0.0;
-            WinGainFrameDividerToZoneRep(SurfNum) = 0.0;
-            WinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
-            WinGainConvShadeToZoneRep(SurfNum) = 0.0;
-            WinGainIRShadeToZoneRep(SurfNum) = 0.0;
-            OtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
-            WinGapConvHtFlowRep(SurfNum) = 0.0;
-            OpaqSurfInsFaceCondGainRep(SurfNum) = 0.0;
-            OpaqSurfInsFaceCondLossRep(SurfNum) = 0.0;
-
-            WinShadingAbsorbedSolar(SurfNum) = 0.0;
-            WinSysSolTransmittance(SurfNum) = 0.0;
-            WinSysSolReflectance(SurfNum) = 0.0;
-            WinSysSolAbsorptance(SurfNum) = 0.0;
 
             BmIncInsSurfIntensRep(SurfNum) = 0.0;
             BmIncInsSurfAmountRep(SurfNum) = 0.0;
@@ -2482,11 +2458,11 @@ namespace HeatBalanceSurfaceManager {
             QRadSWwinAbsTotEnergy(SurfNum) = 0.0;
             BmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
             IntBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
-            WinHeatGainRepEnergy(SurfNum) = 0.0;
-            WinHeatLossRepEnergy(SurfNum) = 0.0;
-            WinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
-            WinHeatTransferRepEnergy(SurfNum) = 0.0;
-            WinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
+
+            OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
+            OpaqSurfInsFaceCondGainRep(SurfNum) = 0.0;
+            OpaqSurfInsFaceCondLossRep(SurfNum) = 0.0;
+
             SurfWinSkySolarInc(SurfNum) = 0.0;
             SurfWinGndSolarInc(SurfNum) = 0.0;
 
@@ -2580,6 +2556,32 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinBmSolRefldInsRevealRepEnergy(SurfNum) = 0.0;
                 SurfWinProfileAngHor(SurfNum) = 0.0;
                 SurfWinProfileAngVert(SurfNum) = 0.0;
+
+                BSDFBeamDirectionRep(SurfNum) = 0;
+                BSDFBeamThetaRep(SurfNum) = 0.0;
+                BSDFBeamPhiRep(SurfNum) = 0.0;
+                WinHeatGain(SurfNum) = 0.0;
+                WinHeatTransfer(SurfNum) = 0.0;
+                WinHeatGainRep(SurfNum) = 0.0;
+                WinHeatLossRep(SurfNum) = 0.0;
+                WinGainConvGlazToZoneRep(SurfNum) = 0.0;
+                WinGainIRGlazToZoneRep(SurfNum) = 0.0;
+                WinLossSWZoneToOutWinRep(SurfNum) = 0.0;
+                WinGainFrameDividerToZoneRep(SurfNum) = 0.0;
+                WinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
+                WinGainConvShadeToZoneRep(SurfNum) = 0.0;
+                WinGainIRShadeToZoneRep(SurfNum) = 0.0;
+                WinGapConvHtFlowRep(SurfNum) = 0.0;
+                WinShadingAbsorbedSolar(SurfNum) = 0.0;
+                WinSysSolTransmittance(SurfNum) = 0.0;
+                WinSysSolReflectance(SurfNum) = 0.0;
+                WinSysSolAbsorptance(SurfNum) = 0.0;
+                WinHeatGainRepEnergy(SurfNum) = 0.0;
+                WinHeatLossRepEnergy(SurfNum) = 0.0;
+                WinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
+                WinHeatTransferRepEnergy(SurfNum) = 0.0;
+                WinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
+                OtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
 
             }
         }
