@@ -784,7 +784,6 @@ namespace HeatBalanceSurfaceManager {
             CTFTsrcConstPart = 0.0;
             CTFTuserConstPart = 0.0;
         }
-//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
             int const firstSurfOpaque = Zone(zoneNum).NonWindowSurfaceFirst;
@@ -2419,6 +2418,96 @@ namespace HeatBalanceSurfaceManager {
         int SurfSolIncPtr;           // Pointer to schedule surface gain object for interior side of the surface
 
         // Always initialize the shortwave quantities
+        QRadSWOutIncident = 0.0;
+        QRadSWOutIncidentBeam = 0.0;
+        QRadSWOutIncidentSkyDiffuse = 0.0;
+        QRadSWOutIncidentGndDiffuse = 0.0;
+
+        for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            QRadSWOutAbs(SurfNum) = 0.0;
+            QRadSWInAbs(SurfNum) = 0.0;
+            QRadSWLightsInAbs(SurfNum) = 0.0;
+            InitialDifSolInAbs(SurfNum) = 0.0;
+            InitialDifSolInTrans(SurfNum) = 0.0;
+
+            QRadSWwinAbsTot(SurfNum) = 0.0;
+            SWwinAbsTotalReport(SurfNum) = 0.0;
+            InitialDifSolInAbsReport(SurfNum) = 0.0;
+            InitialDifSolInTransReport(SurfNum) = 0.0;
+            SWInAbsTotalReport(SurfNum) = 0.0;
+            SWOutAbsTotalReport(SurfNum) = 0.0;
+            SWOutAbsEnergyReport(SurfNum) = 0.0;
+
+            BmIncInsSurfIntensRep(SurfNum) = 0.0;
+            BmIncInsSurfAmountRep(SurfNum) = 0.0;
+            IntBmIncInsSurfIntensRep(SurfNum) = 0.0;
+            IntBmIncInsSurfAmountRep(SurfNum) = 0.0;
+
+            QRadSWOutIncBmToDiffReflGnd(SurfNum) = 0.0;
+            QRadSWOutIncSkyDiffReflGnd(SurfNum) = 0.0;
+            QRadSWOutIncBmToBmReflObs(SurfNum) = 0.0;
+            QRadSWOutIncBmToDiffReflObs(SurfNum) = 0.0;
+            QRadSWOutIncSkyDiffReflObs(SurfNum) = 0.0;
+            CosIncidenceAngle(SurfNum) = 0.0;
+            BSDFBeamDirectionRep(SurfNum) = 0;
+            BSDFBeamThetaRep(SurfNum) = 0.0;
+            BSDFBeamPhiRep(SurfNum) = 0.0;
+            OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
+
+            WinHeatGain(SurfNum) = 0.0;
+            WinHeatTransfer(SurfNum) = 0.0;
+            WinHeatGainRep(SurfNum) = 0.0;
+            WinHeatLossRep(SurfNum) = 0.0;
+            WinGainConvGlazToZoneRep(SurfNum) = 0.0;
+            WinGainIRGlazToZoneRep(SurfNum) = 0.0;
+            WinLossSWZoneToOutWinRep(SurfNum) = 0.0;
+            WinGainFrameDividerToZoneRep(SurfNum) = 0.0;
+            WinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
+            WinGainConvShadeToZoneRep(SurfNum) = 0.0;
+            WinGainIRShadeToZoneRep(SurfNum) = 0.0;
+            OtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
+            WinGapConvHtFlowRep(SurfNum) = 0.0;
+            OpaqSurfInsFaceCondGainRep(SurfNum) = 0.0;
+            OpaqSurfInsFaceCondLossRep(SurfNum) = 0.0;
+
+            WinShadingAbsorbedSolar(SurfNum) = 0.0;
+            WinSysSolTransmittance(SurfNum) = 0.0;
+            WinSysSolReflectance(SurfNum) = 0.0;
+            WinSysSolAbsorptance(SurfNum) = 0.0;
+
+            BmIncInsSurfIntensRep(SurfNum) = 0.0;
+            BmIncInsSurfAmountRep(SurfNum) = 0.0;
+            IntBmIncInsSurfIntensRep(SurfNum) = 0.0;
+            IntBmIncInsSurfAmountRep(SurfNum) = 0.0;
+            QRadSWwinAbsTotEnergy(SurfNum) = 0.0;
+            BmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
+            IntBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
+            WinHeatGainRepEnergy(SurfNum) = 0.0;
+            WinHeatLossRepEnergy(SurfNum) = 0.0;
+            WinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
+            WinHeatTransferRepEnergy(SurfNum) = 0.0;
+            WinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
+            SurfWinSkySolarInc(SurfNum) = 0.0;
+            SurfWinGndSolarInc(SurfNum) = 0.0;
+
+        }
+
+        for (int Lay = 1; Lay <= DataHeatBalance::MaxSolidWinLayers; Lay++) {
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                QRadSWwinAbsLayer(Lay, SurfNum) = 0.0;
+            }
+        }
+        for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                QRadSWwinAbs(Lay, SurfNum) = 0.0;
+            }
+        }
+
+        for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL; Lay++) {
+            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                InitialDifSolwinAbs(Lay, SurfNum) = 0.0;
+            }
+        }
 
         for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
             InitialZoneDifSolReflW(zoneNum) = 0.0;
@@ -2438,94 +2527,6 @@ namespace HeatBalanceSurfaceManager {
             ZoneOpaqSurfExtFaceCond(zoneNum) = 0.0;
             ZoneOpaqSurfExtFaceCondGainRep(zoneNum) = 0.0;
             ZoneOpaqSurfExtFaceCondLossRep(zoneNum) = 0.0;
-
-            int const firstSurf = Zone(zoneNum).SurfaceFirst;
-            int const lastSurf = Zone(zoneNum).SurfaceLast;
-            if (firstSurf == -1) continue;
-            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                QRadSWOutAbs(SurfNum) = 0.0;
-                QRadSWInAbs(SurfNum) = 0.0;
-                QRadSWLightsInAbs(SurfNum) = 0.0;
-                InitialDifSolInAbs(SurfNum) = 0.0;
-                InitialDifSolInTrans(SurfNum) = 0.0;
-
-                QRadSWwinAbsTot(SurfNum) = 0.0;
-                SWwinAbsTotalReport(SurfNum) = 0.0;
-                InitialDifSolInAbsReport(SurfNum) = 0.0;
-                InitialDifSolInTransReport(SurfNum) = 0.0;
-                SWInAbsTotalReport(SurfNum) = 0.0;
-                SWOutAbsTotalReport(SurfNum) = 0.0;
-                SWOutAbsEnergyReport(SurfNum) = 0.0;
-                QRadSWOutIncident(SurfNum) = 0.0;
-                QRadSWOutIncidentBeam(SurfNum) = 0.0;
-                BmIncInsSurfIntensRep(SurfNum) = 0.0;
-                BmIncInsSurfAmountRep(SurfNum) = 0.0;
-                IntBmIncInsSurfIntensRep(SurfNum) = 0.0;
-                IntBmIncInsSurfAmountRep(SurfNum) = 0.0;
-                QRadSWOutIncidentSkyDiffuse(SurfNum) = 0.0;
-                QRadSWOutIncidentGndDiffuse(SurfNum) = 0.0;
-                QRadSWOutIncBmToDiffReflGnd(SurfNum) = 0.0;
-                QRadSWOutIncSkyDiffReflGnd(SurfNum) = 0.0;
-                QRadSWOutIncBmToBmReflObs(SurfNum) = 0.0;
-                QRadSWOutIncBmToDiffReflObs(SurfNum) = 0.0;
-                QRadSWOutIncSkyDiffReflObs(SurfNum) = 0.0;
-                CosIncidenceAngle(SurfNum) = 0.0;
-                BSDFBeamDirectionRep(SurfNum) = 0;
-                BSDFBeamThetaRep(SurfNum) = 0.0;
-                BSDFBeamPhiRep(SurfNum) = 0.0;
-                OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
-
-                WinHeatGain(SurfNum) = 0.0;
-                WinHeatTransfer(SurfNum) = 0.0;
-                WinHeatGainRep(SurfNum) = 0.0;
-                WinHeatLossRep(SurfNum) = 0.0;
-                WinGainConvGlazToZoneRep(SurfNum) = 0.0;
-                WinGainIRGlazToZoneRep(SurfNum) = 0.0;
-                WinLossSWZoneToOutWinRep(SurfNum) = 0.0;
-                WinGainFrameDividerToZoneRep(SurfNum) = 0.0;
-                WinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
-                WinGainConvShadeToZoneRep(SurfNum) = 0.0;
-                WinGainIRShadeToZoneRep(SurfNum) = 0.0;
-                OtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
-                WinGapConvHtFlowRep(SurfNum) = 0.0;
-                OpaqSurfInsFaceCondGainRep(SurfNum) = 0.0;
-                OpaqSurfInsFaceCondLossRep(SurfNum) = 0.0;
-
-                WinShadingAbsorbedSolar(SurfNum) = 0.0;
-                WinSysSolTransmittance(SurfNum) = 0.0;
-                WinSysSolReflectance(SurfNum) = 0.0;
-                WinSysSolAbsorptance(SurfNum) = 0.0;
-
-                BmIncInsSurfIntensRep(SurfNum) = 0.0;
-                BmIncInsSurfAmountRep(SurfNum) = 0.0;
-                IntBmIncInsSurfIntensRep(SurfNum) = 0.0;
-                IntBmIncInsSurfAmountRep(SurfNum) = 0.0;
-                QRadSWwinAbsTotEnergy(SurfNum) = 0.0;
-                BmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
-                IntBmIncInsSurfAmountRepEnergy(SurfNum) = 0.0;
-                WinHeatGainRepEnergy(SurfNum) = 0.0;
-                WinHeatLossRepEnergy(SurfNum) = 0.0;
-                WinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
-                WinHeatTransferRepEnergy(SurfNum) = 0.0;
-                WinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
-
-            }
-            for (int Lay = 1; Lay <= DataHeatBalance::MaxSolidWinLayers; Lay++) {
-                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                    QRadSWwinAbsLayer(Lay, SurfNum) = 0.0;
-                }
-            }
-            for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
-                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                    QRadSWwinAbs(Lay, SurfNum) = 0.0;
-                }
-            }
-
-            for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL; Lay++) {
-                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-                    InitialDifSolwinAbs(Lay, SurfNum) = 0.0;
-                }
-            }
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
@@ -2579,8 +2580,7 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinBmSolRefldInsRevealRepEnergy(SurfNum) = 0.0;
                 SurfWinProfileAngHor(SurfNum) = 0.0;
                 SurfWinProfileAngVert(SurfNum) = 0.0;
-                SurfWinSkySolarInc(SurfNum) = 0.0;
-                SurfWinGndSolarInc(SurfNum) = 0.0;
+
             }
         }
 
@@ -2668,16 +2668,16 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-            high_resolution_clock::time_point t1 = high_resolution_clock::now();
+//            high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
-            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-            DataGlobals::solar_timer += time_span.count();
+//            high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+//            DataGlobals::solar_timer += time_span.count();
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
@@ -3307,9 +3307,7 @@ namespace HeatBalanceSurfaceManager {
                         QRadSWInAbs(SurfNum) += AISurf(SurfNum);
                     }
                 }
-
             } // End of surface loop
-
         } // End of sun-up check
     }
 
