@@ -1128,7 +1128,7 @@ namespace PackagedTerminalHeatPump {
 
             // Get AirTerminal mixer data
             GetATMixer(state,
-                       *state.dataZoneAirLoopEquipmentManager, PTUnit(PTUnitNum).Name,
+                       PTUnit(PTUnitNum).Name,
                        PTUnit(PTUnitNum).ATMixerName,
                        PTUnit(PTUnitNum).ATMixerIndex,
                        PTUnit(PTUnitNum).ATMixerType,
@@ -1957,7 +1957,7 @@ namespace PackagedTerminalHeatPump {
 
             // Get AirTerminal mixer data
             GetATMixer(state,
-                       *state.dataZoneAirLoopEquipmentManager, PTUnit(PTUnitNum).Name,
+                       PTUnit(PTUnitNum).Name,
                        PTUnit(PTUnitNum).ATMixerName,
                        PTUnit(PTUnitNum).ATMixerIndex,
                        PTUnit(PTUnitNum).ATMixerType,
@@ -2831,7 +2831,7 @@ namespace PackagedTerminalHeatPump {
 
             // Get AirTerminal mixer data
             GetATMixer(state,
-                       *state.dataZoneAirLoopEquipmentManager, PTUnit(PTUnitNum).Name,
+                       PTUnit(PTUnitNum).Name,
                        PTUnit(PTUnitNum).ATMixerName,
                        PTUnit(PTUnitNum).ATMixerIndex,
                        PTUnit(PTUnitNum).ATMixerType,

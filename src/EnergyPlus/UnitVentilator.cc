@@ -481,7 +481,7 @@ namespace UnitVentilator {
 
             // Get AirTerminal mixer data
             GetATMixer(state,
-                       *state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
+                       UnitVent(UnitVentNum).Name,
                        UnitVent(UnitVentNum).ATMixerName,
                        UnitVent(UnitVentNum).ATMixerIndex,
                        UnitVent(UnitVentNum).ATMixerType,

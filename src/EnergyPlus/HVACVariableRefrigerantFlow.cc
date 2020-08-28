@@ -4488,7 +4488,7 @@ namespace HVACVariableRefrigerantFlow {
 
             // Get AirTerminal mixer data
             GetATMixer(state,
-                       *state.dataZoneAirLoopEquipmentManager, VRFTU(VRFTUNum).Name,
+                       VRFTU(VRFTUNum).Name,
                        VRFTU(VRFTUNum).ATMixerName,
                        VRFTU(VRFTUNum).ATMixerIndex,
                        VRFTU(VRFTUNum).ATMixerType,

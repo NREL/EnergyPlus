@@ -3183,7 +3183,7 @@ namespace UnitarySystems {
 
                 // Get AirTerminal mixer data
                 SingleDuct::GetATMixer(state,
-                                       *state.dataZoneAirLoopEquipmentManager, thisObjectName,
+                                       thisObjectName,
                                        thisSys.m_ATMixerName,
                                        thisSys.m_ATMixerIndex,
                                        thisSys.ATMixerType,
