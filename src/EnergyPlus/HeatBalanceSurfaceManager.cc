@@ -568,7 +568,7 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin <= 0) continue;
+            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).ExtSolar) {
                     SurfaceWindow(SurfNum).IllumFromWinAtRefPtRep = 0.0;
@@ -720,7 +720,7 @@ namespace HeatBalanceSurfaceManager {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin <= 0) continue;
+            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 SurfWinFracTimeShadingDeviceOn(SurfNum) = 0.0;
                 if (SurfWinShadingFlag(SurfNum) > 0) {
@@ -3517,7 +3517,7 @@ namespace HeatBalanceSurfaceManager {
 
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin <= 0) continue;
+            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) { // Window
                 if (!Surface(SurfNum).HeatTransSurf || zoneNum == 0) continue; // Skip non-heat transfer surfaces
                 if (Surface(SurfNum).Class == SurfaceClass_TDD_Dome) continue; // Skip tubular daylighting device domes
@@ -3874,7 +3874,7 @@ namespace HeatBalanceSurfaceManager {
             }
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin <= 0) continue;
+            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // For window with an interior shade or blind, emissivity is a combination of glass and shade/blind emissivity
                 int ShadeFlag = SurfWinShadingFlag(SurfNum);

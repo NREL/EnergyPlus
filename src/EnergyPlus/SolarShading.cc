@@ -10397,7 +10397,7 @@ namespace SolarShading {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin <= 0) continue;
+            if (firstSurfWin == -1) continue;
             for (int ISurf = firstSurfWin; ISurf <= lastSurfWin; ++ISurf) {
 
                 SurfWinAirflowThisTS(ISurf) = 0.0;
@@ -11135,7 +11135,7 @@ namespace SolarShading {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin <= 0) continue;
+            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 // Added TH for initialization. CR 7596 inside reveal causing high cooling loads
                 // for outside reveals
@@ -11773,7 +11773,7 @@ namespace SolarShading {
         for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
             int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
             int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
-            if (firstSurfWin <= 0) continue;
+            if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
                     int WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr; // Window shading control number
