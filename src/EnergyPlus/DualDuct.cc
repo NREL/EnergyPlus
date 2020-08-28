@@ -75,9 +75,9 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -146,6 +146,24 @@ namespace DualDuct {
     // Object Data
     Array1D<DualDuctAirTerminal> dd_airterminal;
     std::unordered_map<std::string, std::string> UniqueDualDuctAirTerminalNames;
+    bool InitDualDuctMyOneTimeFlag(true);
+    bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
+    bool GetDualDuctOutdoorAirRecircUseFirstTimeOnly(true);
+
+    void clear_state() {
+        CheckEquipName.clear();
+        NumDDAirTerminal = 0;
+        NumDualDuctConstVolDampers = 0;
+        NumDualDuctVarVolDampers = 0;
+        NumDualDuctVarVolOA = 0;
+        MassFlowSetToler = 0.0;
+        GetDualDuctInputFlag = true;
+        dd_airterminal.clear();
+        UniqueDualDuctAirTerminalNames.clear();
+        InitDualDuctMyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+        GetDualDuctOutdoorAirRecircUseFirstTimeOnly = true;
+    }
 
     void SimulateDualDuct(std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
@@ -849,17 +867,15 @@ namespace DualDuct {
         int OAInNode; // Outdoor Air Inlet Node for VAV:OutdoorAir units
         int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
         int OutNode;
-        static bool MyOneTimeFlag(true);
         //static Array1D_bool MyEnvrnFlag;
         //static Array1D_bool MySizeFlag;
         //static Array1D_bool MyAirLoopFlag;
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 PeopleFlow;                           // local sum variable, m3/s
         // FLOW:
 
         // Do the Begin Simulation initializations
-        if (MyOneTimeFlag) {
+        if (InitDualDuctMyOneTimeFlag) {
 
             //MyEnvrnFlag.allocate(NumDDAirTerminal);
             //MySizeFlag.allocate(NumDDAirTerminal);
@@ -868,7 +884,7 @@ namespace DualDuct {
             //MySizeFlag = true;
             MassFlowSetToler = HVACFlowRateToler * 0.00001;
 
-            MyOneTimeFlag = false;
+            InitDualDuctMyOneTimeFlag = false;
         }
 
         if (!ZoneEquipmentListChecked && ZoneEquipInputsFilled) {
@@ -1529,7 +1545,6 @@ namespace DualDuct {
         this->dd_airterminalOutlet.AirMassFlowRateMaxAvail = MassFlow;
         this->dd_airterminalOutlet.AirMassFlowRateMinAvail = this->ZoneMinAirFrac * this->dd_airterminalHotAirInlet.AirMassFlowRateMax;
         this->dd_airterminalOutlet.AirEnthalpy = Enthalpy;
-        this->OutdoorAirFlowRate = MassFlow * AirLoopOAFrac;
 
         // Calculate the hot and cold damper position in %
         if ((this->dd_airterminalHotAirInlet.AirMassFlowRateMax == 0.0) || (this->dd_airterminalColdAirInlet.AirMassFlowRateMax == 0.0)) {
@@ -2025,6 +2040,9 @@ namespace DualDuct {
                     Node(OutletNode).GenContam = max(Node(HotInletNode).GenContam, Node(ColdInletNode).GenContam);
                 }
             }
+
+            this->CalcOutdoorAirVolumeFlowRate();
+
         } else if ( this->DamperType == DualDuct_OutdoorAir) {
 
             OutletNode = this->OutletNodeNum;
@@ -2122,7 +2140,7 @@ namespace DualDuct {
         // Still needs to report the Damper power from this component
     }
 
-    void ReportDualDuctConnections(OutputFiles &outputFiles)
+    void ReportDualDuctConnections(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2169,10 +2187,10 @@ namespace DualDuct {
                     // uninitialized
 
         // Report Dual Duct Dampers to BND File
-        print(outputFiles.bnd, "{}\n", "! ===============================================================");
-        print(outputFiles.bnd, "{}\n", Format_100);
-        print(outputFiles.bnd, " #Dual Duct Damper Connections,{}\n", NumDDAirTerminal * 2);
-        print(outputFiles.bnd, "{}\n", Format_102);
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", Format_100);
+        print(ioFiles.bnd, " #Dual Duct Damper Connections,{}\n", NumDDAirTerminal * 2);
+        print(ioFiles.bnd, "{}\n", Format_102);
 
         for (int Count1 = 1; Count1 <= NumDDAirTerminal; ++Count1) {
 
@@ -2224,7 +2242,7 @@ namespace DualDuct {
             }
 
             if ((dd_airterminal(Count1).DamperType == DualDuct_ConstantVolume) || (dd_airterminal(Count1).DamperType == DualDuct_VariableVolume)) {
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Hot Air,{}\n",
                       Count1,
                       DamperType,
@@ -2233,7 +2251,7 @@ namespace DualDuct {
                       NodeID(dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
 
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       " Dual Duct Damper,{},{},{},{},{},Cold Air,{}\n",
                       Count1,
                       DamperType,
@@ -2243,7 +2261,7 @@ namespace DualDuct {
                       ChrName);
 
             } else if (dd_airterminal(Count1).DamperType == DualDuct_OutdoorAir) {
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Outdoor Air,{}\n",
                       Count1,
                       DamperType,
@@ -2251,7 +2269,7 @@ namespace DualDuct {
                       NodeID(dd_airterminal(Count1).OAInletNodeNum),
                       NodeID(dd_airterminal(Count1).OutletNodeNum),
                       ChrName);
-                print(outputFiles.bnd,
+                print(ioFiles.bnd,
                       "Dual Duct Damper, {},{},{},{},{},Recirculated Air,{}\n",
                       Count1,
                       DamperType,
@@ -2276,8 +2294,6 @@ namespace DualDuct {
         // get routine to learn if a dual duct outdoor air unit is using its recirc deck
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //  INTEGER :: DDNum
-        static bool FirstTimeOnly(true);
         static Array1D_bool RecircIsUsedARR;
         static Array1D_string DamperNamesARR;
         int DamperIndex;                 // Loop index to Damper that you are currently loading input into
@@ -2300,7 +2316,7 @@ namespace DualDuct {
         //    GetDualDuctInputFlag=.FALSE.
         //  END IF
 
-        if (FirstTimeOnly) {
+        if (GetDualDuctOutdoorAirRecircUseFirstTimeOnly) {
             NumDualDuctVarVolOA = inputProcessor->getNumObjectsFound(cCMO_DDVarVolOA);
             RecircIsUsedARR.allocate(NumDualDuctVarVolOA);
             DamperNamesARR.allocate(NumDualDuctVarVolOA);
@@ -2328,7 +2344,7 @@ namespace DualDuct {
                     }
                 }
             }
-            FirstTimeOnly = false;
+            GetDualDuctOutdoorAirRecircUseFirstTimeOnly = false;
         }
 
         DamperIndex = UtilityRoutines::FindItemInList(CompName, DamperNamesARR, NumDualDuctVarVolOA);
@@ -2337,14 +2353,18 @@ namespace DualDuct {
         }
     }
 
+    void DualDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (this->dd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            // do nothing for now
+        }
+    }
+
     //        End of Reporting subroutines for the Damper Module
     // *****************************************************************************
-
-    void clear_state()
-    {
-        UniqueDualDuctAirTerminalNames.clear();
-        dd_airterminal.deallocate();
-    }
 
 } // namespace DualDuct
 

@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -3711,7 +3711,7 @@
 
   Output:Variable,*,Heat Exchanger Total Cooling Rate,hourly;
 
-  Output:Variable,*,Heat Exchanger Electric Power,hourly;
+  Output:Variable,*,Heat Exchanger Electricity Rate,hourly;
 
   Output:Variable,*,Heat Exchanger Sensible Effectiveness,hourly;
 

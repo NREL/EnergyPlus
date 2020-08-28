@@ -57,9 +57,9 @@
 #include <ObjexxFCL/Array2S.hh>
 
 // EnergyPlus Headers
+#include "IOFiles.hh"
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
 
 #define EP_cache_GlycolSpecificHeat
 
@@ -414,11 +414,11 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void ReportAndTestGlycols();
+    void ReportAndTestGlycols(EnergyPlus::IOFiles &ioFiles);
 
     //*****************************************************************************
 
-    void ReportAndTestRefrigerants();
+    void ReportAndTestRefrigerants(IOFiles &ioFiles);
 
     //*****************************************************************************
 

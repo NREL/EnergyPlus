@@ -57,6 +57,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace HVACDXHeatPumpSystem {
 
@@ -138,7 +140,7 @@ namespace HVACDXHeatPumpSystem {
 
     void clear_state();
 
-    void SimDXHeatPumpSystem(std::string const &DXHeatPumpSystemName,   // Name of DXSystem:Airloop object
+    void SimDXHeatPumpSystem(EnergyPlusData &state, std::string const &DXHeatPumpSystemName,   // Name of DXSystem:Airloop object
                              bool const FirstHVACIteration,             // True when first HVAC iteration
                              int const AirLoopNum,                      // Primary air loop number
                              int &CompIndex,                            // Index to CoilSystem:Heating:DX object
@@ -150,7 +152,7 @@ namespace HVACDXHeatPumpSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXHeatPumpSystemInput();
+    void GetDXHeatPumpSystemInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -170,7 +172,7 @@ namespace HVACDXHeatPumpSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXHeatingSystem(int const DXSystemNum,        // index to DXSystem
+    void ControlDXHeatingSystem(EnergyPlusData &state, int const DXSystemNum,        // index to DXSystem
                                 bool const FirstHVACIteration // First HVAC iteration flag
     );
 
@@ -180,19 +182,19 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
-    int GetHeatingCoilInletNodeNum(std::string const &DXCoilSysName, bool &InletNodeErrFlag);
+    int GetHeatingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &InletNodeErrFlag);
 
-    int GetHeatingCoilOutletNodeNum(std::string const &DXCoilSysName, bool &OutletNodeErrFlag);
+    int GetHeatingCoilOutletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &OutletNodeErrFlag);
 
 
 } // namespace HVACDXHeatPumpSystem

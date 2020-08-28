@@ -119,7 +119,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3760,17 +3760,17 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,hourly;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Tower Air Flow Rate Ratio,hourly;
 
   Output:Variable,*,Cooling Tower Fan Part Load Ratio,hourly;
 
-  Output:Variable,*,Cooling Tower Basin Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Tower Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Tower Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Tower Basin Heater Electricity Energy,hourly;
 
   Output:Variable,*,Cooling Tower Make Up Water Volume,hourly;
 
@@ -3788,9 +3788,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3802,9 +3802,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

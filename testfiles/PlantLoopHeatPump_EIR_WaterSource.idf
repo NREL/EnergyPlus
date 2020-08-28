@@ -8,7 +8,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with District Heating and Cooling as necessary.
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -724,9 +724,9 @@
 
   Output:Variable,*,Heat Pump Source Side Outlet Temperature,Hourly;
 
-  Output:Variable,*,Heat Pump Electric Power,Hourly;
+  Output:Variable,*,Heat Pump Electricity Rate,Hourly;
 
-  Output:Variable,*,Heat Pump Electric Energy,Hourly;
+  Output:Variable,*,Heat Pump Electricity Energy,Hourly;
 
   Output:Variable,*,Heat Pump Load Side Mass Flow Rate,Hourly;
 

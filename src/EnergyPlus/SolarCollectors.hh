@@ -59,6 +59,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace SolarCollectors {
 
     extern Array1D_bool CheckEquipName;
@@ -230,9 +234,9 @@ namespace SolarCollectors {
 
         void setupOutputVars();
 
-        void initialize();
+        void initialize(BranchInputManagerData &dataBranchInputManager);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void CalcTransRefAbsOfCover(Real64 IncidentAngle,              // Angle of incidence (radians)
                                     Real64 &TransSys,                  // cover system solar transmittance

@@ -101,7 +101,7 @@
   output:Sqlite,
     simple;                  !- Option Type
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2124,9 +2124,9 @@
 
   Output:Variable,*,Unitary System Latent Cooling Energy,hourly;
 
-  Output:Variable,*,Unitary System Electric Power,hourly;
+  Output:Variable,*,Unitary System Electricity Rate,hourly;
 
-  Output:Variable,*,Unitary System Electric Energy,hourly;
+  Output:Variable,*,Unitary System Electricity Energy,hourly;
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,hourly;
 
@@ -2146,7 +2146,7 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Upper Speed Level,hourly;
 
@@ -2164,7 +2164,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
 
@@ -2218,13 +2218,13 @@
 
   Output:Variable,*,Heating Coil Neighboring Speed Levels Ratio,hourly;
 
-  Output:Variable,*,Heating Coil Defrost Electric Power,hourly;
+  Output:Variable,*,Heating Coil Defrost Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Defrost Electric Energy,hourly;
+  Output:Variable,*,Heating Coil Defrost Electricity Energy,hourly;
 
-  Output:Variable,*,Heating Coil Crankcase Heater Electric Power,hourly;
+  Output:Variable,*,Heating Coil Crankcase Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Crankcase Heater Electric Energy,hourly;
+  Output:Variable,*,Heating Coil Crankcase Heater Electricity Energy,hourly;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
@@ -2246,5 +2246,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DEBUGGINGDATA ===========
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 

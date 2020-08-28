@@ -122,7 +122,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:PACKAGEDTERMINALHEATPUMP ===========
 
@@ -2563,7 +2563,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Heat Pump Latent Cooling Rate,Hourly;
 
-  Output:Variable,*,Zone Packaged Terminal Heat Pump Electric Power,Hourly;
+  Output:Variable,*,Zone Packaged Terminal Heat Pump Electricity Rate,Hourly;
 
   Output:Variable,*,Zone Packaged Terminal Heat Pump Fan Part Load Ratio,Hourly;
 
@@ -2571,11 +2571,11 @@
 
   Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,Hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Hourly;
+  Output:Variable,*,Heating Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Fan Electric Power,Hourly;
+  Output:Variable,*,Fan Electricity Rate,Hourly;
 
   Output:Variable,*,Fan Runtime Fraction,Hourly;
 

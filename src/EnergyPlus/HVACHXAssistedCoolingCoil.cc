@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatRecovery.hh>
@@ -164,7 +165,7 @@ namespace HVACHXAssistedCoolingCoil {
         CheckEquipName.deallocate();
     }
 
-    void SimHXAssistedCoolingCoil(std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+    void SimHXAssistedCoolingCoil(EnergyPlusData &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -205,7 +206,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -251,7 +252,7 @@ namespace HVACHXAssistedCoolingCoil {
         } else {
             AirFlowRatio = 1.0;
         }
-        CalcHXAssistedCoolingCoil(HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
+        CalcHXAssistedCoolingCoil(state, HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
 
         // Update the current HXAssistedCoil output
         //  Call UpdateHXAssistedCoolingCoil(HXAssistedCoilNum), not required. Updates done by the HX and cooling coil components.
@@ -270,7 +271,7 @@ namespace HVACHXAssistedCoolingCoil {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHXAssistedCoolingCoilInput()
+    void GetHXAssistedCoolingCoilInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -399,10 +400,11 @@ namespace HVACHXAssistedCoolingCoil {
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
                 HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
                 CoolingCoilErrFlag = false;
-                GetDXCoilIndex(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                GetDXCoilIndex(state, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
                                CoolingCoilErrFlag,
-                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType);
+                               HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
+                               ObjexxFCL::Optional_bool_const());
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                     ErrorsFound = true;
@@ -458,7 +460,7 @@ namespace HVACHXAssistedCoolingCoil {
             if (UtilityRoutines::SameString(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, "Coil:Cooling:DX:SingleSpeed")) {
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum = GetDXCoilInletNode(
+                CoolingCoilInletNodeNum = GetDXCoilInletNode(state, 
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
@@ -475,7 +477,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum = GetDXCoilOutletNode(
+                CoolingCoilOutletNodeNum = GetDXCoilOutletNode(state,
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...Occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
@@ -672,11 +674,11 @@ namespace HVACHXAssistedCoolingCoil {
 
                 //         Check node names in heat exchanger and coil objects for consistency
                 CoolingCoilErrFlag = false;
-                CoolingCoilInletNodeNum = GetWaterCoilInletNode(
+                CoolingCoilInletNodeNum = GetWaterCoilInletNode(state, 
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 CoolingCoilWaterInletNodeNum = GetCoilWaterInletNode(
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
-                GetControllerNameAndIndex(CoolingCoilWaterInletNodeNum,
+                GetControllerNameAndIndex(state, CoolingCoilWaterInletNodeNum,
                                           HXAssistedCoil(HXAssistedCoilNum).ControllerName,
                                           HXAssistedCoil(HXAssistedCoilNum).ControllerIndex,
                                           CoolingCoilErrFlag);
@@ -694,7 +696,7 @@ namespace HVACHXAssistedCoolingCoil {
                     ErrorsFound = true;
                 }
                 CoolingCoilErrFlag = false;
-                CoolingCoilOutletNodeNum = GetWaterCoilOutletNode(
+                CoolingCoilOutletNodeNum = GetWaterCoilOutletNode(state,
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, CoolingCoilErrFlag);
                 if (CoolingCoilErrFlag)
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
@@ -849,7 +851,7 @@ namespace HVACHXAssistedCoolingCoil {
     // End Initialization Section of the Module
     //******************************************************************************
 
-    void CalcHXAssistedCoolingCoil(int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
+    void CalcHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,       // FirstHVACIteration flag
                                    int const CompOp,                    // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,          // Cooling coil part load ratio
@@ -940,7 +942,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Force at least 2 iterations to pass outlet node information
         while ((std::abs(Error) > 0.0005 && Iter <= MaxIter) || Iter < 2) {
 
-            SimHeatRecovery(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
+            SimHeatRecovery(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
                             FirstHVACIteration,
                             HXAssistedCoil(HXAssistedCoilNum).HeatExchangerIndex,
                             FanOpMode,
@@ -953,7 +955,7 @@ namespace HVACHXAssistedCoolingCoil {
                             HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num);
 
             if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-                SimDXCoil(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                SimDXCoil(state, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                           CompOp,
                           FirstHVACIteration,
                           HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
@@ -967,20 +969,23 @@ namespace HVACHXAssistedCoolingCoil {
                 Real64 HPTimeConstant(0.0);        // Heat pump time constant [s]
                 Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
                 Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
-                VariableSpeedCoils::SimVariableSpeedCoils(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                int CompOn = CompOp;
+                if (PartLoadRatio == 0.0) CompOn = 0;
+                VariableSpeedCoils::SimVariableSpeedCoils(state,
+                                                          HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                                                           HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,
-                                                          CompOp,
+                                                          FanOpMode,
                                                           MaxONOFFCyclesperHour,
                                                           HPTimeConstant,
                                                           FanDelayTime,
-                                                          1.0,
+                                                          CompOn,
                                                           PartLoadRatio,
                                                           HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds,
                                                           QZnReq,
                                                           QLatReq,
                                                           OnOffAirFlowRatio); // call vs coil model at top speed.
             } else {
-                SimulateWaterCoilComponents(
+                SimulateWaterCoilComponents(state,
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
             }
 
@@ -1015,7 +1020,7 @@ namespace HVACHXAssistedCoolingCoil {
     //        End of Reporting subroutines for the HXAssistedCoil Module
     // *****************************************************************************
 
-    void GetHXDXCoilIndex(std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+    void GetHXDXCoilIndex(EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1031,7 +1036,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1051,7 +1056,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    void CheckHXAssistedCoolingCoilSchedule(std::string const &EP_UNUSED(CompType), // unused1208
+    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), // unused1208
                                             std::string const &CompName,
                                             Real64 &Value,
                                             int &CompIndex)
@@ -1076,7 +1081,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1108,7 +1113,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -1140,7 +1145,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1157,7 +1162,7 @@ namespace HVACHXAssistedCoolingCoil {
                 // coil does not have capacity in input so mine information from DX cooling coil
 
                 if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                    CoilCapacity = GetDXCoilCapacity(HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
+                    CoilCapacity = GetDXCoilCapacity(state, HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
                 } else if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
                         HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
@@ -1190,7 +1195,7 @@ namespace HVACHXAssistedCoolingCoil {
         return CoilCapacity;
     }
 
-    int GetCoilGroupTypeNum(std::string const &CoilType,     // must match coil types in this module
+    int GetCoilGroupTypeNum(EnergyPlusData &state, std::string const &CoilType,     // must match coil types in this module
                             std::string const &CoilName,     // must match coil names for the coil type
                             bool &ErrorsFound,               // set to true if problem
                             Optional_bool_const PrintWarning // prints warning message if true
@@ -1217,7 +1222,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1247,7 +1252,7 @@ namespace HVACHXAssistedCoolingCoil {
         return TypeNum;
     }
 
-    int GetCoilObjectTypeNum(std::string const &CoilType,     // must match coil types in this module
+    int GetCoilObjectTypeNum(EnergyPlusData &state, std::string const &CoilType,     // must match coil types in this module
                              std::string const &CoilName,     // must match coil names for the coil type
                              bool &ErrorsFound,               // set to true if problem
                              Optional_bool_const PrintWarning // prints warning message if true
@@ -1275,7 +1280,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1304,7 +1309,7 @@ namespace HVACHXAssistedCoolingCoil {
         return TypeNum;
     }
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -1330,7 +1335,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1351,7 +1356,7 @@ namespace HVACHXAssistedCoolingCoil {
         return NodeNumber;
     }
 
-    int GetCoilWaterInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilWaterInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     )
@@ -1380,7 +1385,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1412,7 +1417,7 @@ namespace HVACHXAssistedCoolingCoil {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -1438,7 +1443,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1459,7 +1464,7 @@ namespace HVACHXAssistedCoolingCoil {
         return NodeNumber;
     }
 
-    std::string GetHXDXCoilType(std::string const &CoilType, // must match coil types in this module
+    std::string GetHXDXCoilType(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -1485,7 +1490,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1506,7 +1511,7 @@ namespace HVACHXAssistedCoolingCoil {
         return DXCoilType;
     }
 
-    std::string GetHXDXCoilName(std::string const &CoilType, // must match coil types in this module
+    std::string GetHXDXCoilName(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -1532,7 +1537,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1554,7 +1559,7 @@ namespace HVACHXAssistedCoolingCoil {
         return DXCoilName;
     }
 
-    int GetActualDXCoilIndex(std::string const &CoilType, // must match coil types in this module
+    int GetActualDXCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     )
@@ -1580,7 +1585,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1602,7 +1607,7 @@ namespace HVACHXAssistedCoolingCoil {
         return DXCoilIndex;
     }
 
-    std::string GetHXCoilType(std::string const &CoilType, // must match coil types in this module
+    std::string GetHXCoilType(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     )
@@ -1628,7 +1633,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1649,7 +1654,7 @@ namespace HVACHXAssistedCoolingCoil {
         return CoolingCoilType;
     }
 
-    void GetHXCoilTypeAndName(std::string const &CoilType,  // must match coil types in this module
+    void GetHXCoilTypeAndName(EnergyPlusData &state, std::string const &CoilType,  // must match coil types in this module
                               std::string const &CoilName,  // must match coil names for the coil type
                               bool &ErrorsFound,            // set to true if problem
                               std::string &CoolingCoilType, // returned type of cooling coil
@@ -1672,7 +1677,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1693,7 +1698,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    Real64 GetCoilMaxWaterFlowRate(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     )
@@ -1723,7 +1728,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1739,8 +1744,8 @@ namespace HVACHXAssistedCoolingCoil {
                 }
             } else if (UtilityRoutines::SameString(CoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                 if (WhichCoil != 0) {
-                    MaxWaterFlowRate = GetWaterCoilMaxFlowRate(cAllCoilTypes(GetCoilObjectTypeNum(CoilType, CoilName, ErrorsFound)),
-                                                               GetHXDXCoilName(CoilType, CoilName, ErrorsFound),
+                    MaxWaterFlowRate = GetWaterCoilMaxFlowRate(cAllCoilTypes(GetCoilObjectTypeNum(state, CoilType, CoilName, ErrorsFound)),
+                                                               GetHXDXCoilName(state, CoilType, CoilName, ErrorsFound),
                                                                ErrorsFound);
                 }
             } else {
@@ -1761,7 +1766,7 @@ namespace HVACHXAssistedCoolingCoil {
         return MaxWaterFlowRate;
     }
 
-    Real64 GetHXCoilAirFlowRate(std::string const &CoilType, // must match coil types in this module
+    Real64 GetHXCoilAirFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -1790,7 +1795,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 
@@ -1821,7 +1826,7 @@ namespace HVACHXAssistedCoolingCoil {
         return MaxAirFlowRate;
     }
 
-    bool VerifyHeatExchangerParent(std::string const &HXType, // must match coil types in this module
+    bool VerifyHeatExchangerParent(EnergyPlusData &state, std::string const &HXType, // must match coil types in this module
                                    std::string const &HXName  // must match coil names for the coil type
     )
     {
@@ -1844,7 +1849,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Obtains and allocates HXAssistedCoolingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been called, get input data
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false; // Set logic flag to disallow getting the input data on future calls to this subroutine
         }
 

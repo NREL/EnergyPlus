@@ -58,6 +58,8 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace Furnaces {
 
@@ -327,7 +329,7 @@ namespace Furnaces {
 
     void clear_state();
 
-    void SimFurnace(std::string const &FurnaceName,
+    void SimFurnace(EnergyPlusData &state, std::string const &FurnaceName,
                     bool const FirstHVACIteration,
                     int const AirLoopNum, // Primary air loop number
                     int &CompIndex        // Pointer to which furnace
@@ -336,7 +338,7 @@ namespace Furnaces {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFurnaceInput();
+    void GetFurnaceInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for this Module
     //******************************************************************************
@@ -344,7 +346,7 @@ namespace Furnaces {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitFurnace(int const FurnaceNum,         // index to Furnace
+    void InitFurnace(EnergyPlusData &state, int const FurnaceNum,         // index to Furnace
                      int const AirLoopNum,         // index to air loop
                      Real64 &OnOffAirFlowRatio,    // ratio of on to off air mass flow rate
                      int &OpMode,                  // fan operating mode
@@ -362,7 +364,7 @@ namespace Furnaces {
                               Real64 const PartLoadRatio // coil part-load ratio
     );
 
-    void SizeFurnace(int const FurnaceNum, bool const FirstHVACIteration);
+    void SizeFurnace(EnergyPlusData &state, int const FurnaceNum, bool const FirstHVACIteration);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -370,14 +372,14 @@ namespace Furnaces {
     // Beginning of Update subroutines for the Furnace Module
     // *****************************************************************************
 
-    void CalcNewZoneHeatOnlyFlowRates(int const FurnaceNum,          // Index to furnace
+    void CalcNewZoneHeatOnlyFlowRates(EnergyPlusData &state, int const FurnaceNum,          // Index to furnace
                                       bool const FirstHVACIteration, // Iteration flag
                                       Real64 const ZoneLoad,         // load to be met by furnace (W)
                                       Real64 &HeatCoilLoad,          // actual load passed to heating coil (W)
                                       Real64 &OnOffAirFlowRatio      // ratio of coil on to coil off air flow rate
     );
 
-    void CalcNewZoneHeatCoolFlowRates(int const FurnaceNum,
+    void CalcNewZoneHeatCoolFlowRates(EnergyPlusData &state, int const FurnaceNum,
                                       bool const FirstHVACIteration,
                                       int const CompOp,          // compressor operation flag (1=On, 0=Off)
                                       Real64 const ZoneLoad,     // the control zone load (watts)
@@ -388,7 +390,7 @@ namespace Furnaces {
                                       bool &HXUnitOn             // flag to control HX based on zone moisture load
     );
 
-    void CalcWaterToAirHeatPump(int const AirLoopNum,          // index to air loop
+    void CalcWaterToAirHeatPump(EnergyPlusData &state, int const AirLoopNum,          // index to air loop
                                 int const FurnaceNum,          // index to Furnace
                                 bool const FirstHVACIteration, // TRUE on first HVAC iteration
                                 int const CompOp,              // compressor operation flag (1=On, 0=Off)
@@ -396,7 +398,7 @@ namespace Furnaces {
                                 Real64 const MoistureLoad      // the control zone latent load (watts)
     );
 
-    void CalcFurnaceOutput(int const FurnaceNum,
+    void CalcFurnaceOutput(EnergyPlusData &state, int const FurnaceNum,
                            bool const FirstHVACIteration,
                            int const FanOpMode,            // Cycling fan or constant fan
                            int const CompOp,               // Compressor on/off; 1=on, 0=off
@@ -414,11 +416,11 @@ namespace Furnaces {
     //        End of Update subroutines for the Furnace Module
     // *****************************************************************************
 
-    Real64 CalcFurnaceResidual(Real64 const PartLoadRatio,  // DX cooling coil part load ratio
+    Real64 CalcFurnaceResidual(EnergyPlusData &state, Real64 const PartLoadRatio,  // DX cooling coil part load ratio
                                Array1D<Real64> const &Par   // Function parameters
     );
 
-    Real64 CalcWaterToAirResidual(Real64 const PartLoadRatio,  // DX cooling coil part load ratio
+    Real64 CalcWaterToAirResidual(EnergyPlusData &state, Real64 const PartLoadRatio,  // DX cooling coil part load ratio
                                   Array1D<Real64> const &Par   // Function parameters
     );
 
@@ -440,7 +442,7 @@ namespace Furnaces {
                        int const AirLoopNum  // index to air loop
     );
 
-    void CalcNonDXHeatingCoils(int const FurnaceNum,           // Furnace Index
+    void CalcNonDXHeatingCoils(EnergyPlusData &state, int const FurnaceNum,           // Furnace Index
                                bool const SuppHeatingCoilFlag, // .TRUE. if supplemental heating coil
                                bool const FirstHVACIteration,  // flag for first HVAC iteration in the time step
                                Real64 const QCoilLoad,         // load met by unit (watts)
@@ -448,7 +450,7 @@ namespace Furnaces {
                                Real64 &HeatCoilLoadmet         // Heating Load Met
     );
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
                                 Array1D<Real64> const &Par // Par(5) is the requested coil load
     );
 
@@ -456,7 +458,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void SimVariableSpeedHP(int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
+    void SimVariableSpeedHP(EnergyPlusData &state, int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const AirLoopNum,          // index to air loop
                             Real64 const QZnReq,           // required zone load
@@ -466,7 +468,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void ControlVSHPOutput(int const FurnaceNum,          // Unit index of engine driven heat pump
+    void ControlVSHPOutput(EnergyPlusData &state, int const FurnaceNum,          // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -482,7 +484,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void CalcVarSpeedHeatPump(int const FurnaceNum,          // Variable speed heat pump number
+    void CalcVarSpeedHeatPump(EnergyPlusData &state, int const FurnaceNum,          // Variable speed heat pump number
                               bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                               int const CompOp,              // Compressor on/off; 1=on, 0=off
                               int const SpeedNum,            // Speed number
@@ -498,24 +500,24 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    Real64 VSHPCyclingResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSHPCyclingResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1D<Real64> const &Par  // par(1) = FurnaceNum
     );
 
     //******************************************************************************
 
-    Real64 VSHPSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSHPSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                              Array1D<Real64> const &Par // par(1) = MSHPNum
     );
 
-    void SetVSHPAirFlow(int const FurnaceNum,                 // Unit index
+    void SetVSHPAirFlow(EnergyPlusData &state, int const FurnaceNum,                 // Unit index
                         Real64 const PartLoadRatio,           // unit part load ratio
                         Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
                         Optional_int_const SpeedNum = _,      // Speed number
                         Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );
 
-    void SetOnOffMassFlowRateVSCoil(int const FurnaceNum,          // index to furnace
+    void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state, int const FurnaceNum,          // index to furnace
                                     int const ZoneNum,             // index to zone
                                     bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                                     int const AirLoopNum,          // index to air loop !unused1208
@@ -526,7 +528,8 @@ namespace Furnaces {
                                     Real64 &PartLoadRatio          // coil part-load ratio
     );
 
-    void SetMinOATCompressor(int const FurnaceNum,                    // index to furnace
+    void SetMinOATCompressor(EnergyPlusData &state,
+                             int const FurnaceNum,                    // index to furnace
                              std::string const &FurnaceName,          // name of furnace
                              std::string const &cCurrentModuleObject, // type of furnace
                              int const CoolingCoilIndex,              // index of cooling coil

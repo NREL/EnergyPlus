@@ -313,7 +313,11 @@ namespace Psychrometrics {
 #endif
     }
 
-    void ShowPsychrometricSummary()
+#ifdef EP_psych_stats
+    void ShowPsychrometricSummary(OutputFile &auditFile)
+#else
+    void ShowPsychrometricSummary(InputOutputFile &)
+#endif
     {
 
         // SUBROUTINE INFORMATION:
@@ -340,8 +344,6 @@ namespace Psychrometrics {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -351,24 +353,20 @@ namespace Psychrometrics {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 #ifdef EP_psych_stats
-        int EchoInputFile; // found unit number for "eplusout.audit"
         int Loop;
         Real64 AverageIterations;
-        std::string istring;
 
-        EchoInputFile = FindUnitNumber(outputAuditFile);
-        if (EchoInputFile == 0) return;
+        if (!auditFile.good()) return;
         if (any_gt(NumTimesCalled, 0)) {
-            ObjexxFCL::gio::write(EchoInputFile, fmtA) << "RoutineName,#times Called,Avg Iterations";
+            print(auditFile, "RoutineName,#times Called,Avg Iterations\n");
             for (Loop = 1; Loop <= NumPsychMonitors; ++Loop) {
                 if (!PsyReportIt(Loop)) continue;
-                ObjexxFCL::gio::write(istring, fmtLD) << NumTimesCalled(Loop);
-                strip(istring);
+                const auto istring = fmt::to_string(NumTimesCalled(Loop));
                 if (NumIterations(Loop) > 0) {
                     AverageIterations = double(NumIterations(Loop)) / double(NumTimesCalled(Loop));
-                    ObjexxFCL::gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring + ',' + RoundSigDigits(AverageIterations, 2);
+                    print(auditFile, "{},{},{:.2R}\n", PsyRoutineNames(Loop), istring, AverageIterations);
                 } else {
-                    ObjexxFCL::gio::write(EchoInputFile, fmtA) << PsyRoutineNames(Loop) + ',' + istring;
+                    print(auditFile, "{},{}\n", PsyRoutineNames(Loop), istring);
                 }
             }
         }
@@ -584,7 +582,6 @@ namespace Psychrometrics {
         int const itmax(100); // Maximum No of Iterations
         static Real64 convTol(0.0001);
         static std::string const RoutineName("PsyTwbFnTdbWPb");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -751,7 +748,7 @@ namespace Psychrometrics {
         }
 
 #ifdef generatetestdata
-        ObjexxFCL::gio::write(OutputFileDebug, fmtLD) << TDB << dW << Patm << Twb;
+        print(IOFiles::getSingleton().debug, "{}{}{}{}", TDB, dW, Patm, Twb);
 #endif
 
         return TWB;

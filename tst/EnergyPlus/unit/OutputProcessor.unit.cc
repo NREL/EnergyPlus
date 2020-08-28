@@ -52,12 +52,13 @@
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -149,7 +150,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -160,7 +161,7 @@ namespace OutputProcessor {
         int StartMinute = 0;
         bool PrintESOTimeStamp = true;
 
-        ReportTSMeters(StartMinute, EndMinute, PrintESOTimeStamp, true);
+        ReportTSMeters(state, StartMinute, EndMinute, PrintESOTimeStamp, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -215,7 +216,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -226,7 +227,7 @@ namespace OutputProcessor {
         int StartMinute = 0;
         bool PrintESOTimeStamp = false;
 
-        ReportTSMeters(StartMinute, EndMinute, PrintESOTimeStamp, true);
+        ReportTSMeters(state, StartMinute, EndMinute, PrintESOTimeStamp, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -279,7 +280,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -287,7 +288,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportHRMeters(true);
+        ReportHRMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -347,7 +348,7 @@ namespace OutputProcessor {
         DailyStampReportNbr = 1;
         DailyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -355,7 +356,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportDYMeters(true);
+        ReportDYMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -419,7 +420,7 @@ namespace OutputProcessor {
         MonthlyStampReportNbr = 1;
         MonthlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -427,7 +428,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportMNMeters(true);
+        ReportMNMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -491,7 +492,7 @@ namespace OutputProcessor {
         RunPeriodStampReportNbr = 1;
         RunPeriodStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -499,7 +500,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportSMMeters(true);
+        ReportSMMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -563,7 +564,7 @@ namespace OutputProcessor {
         YearlyStampReportNbr = 1;
         YearlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        DataGlobals::DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataGlobals::CalendarYear = 2017;
         DataGlobals::CalendarYearChr = "2017";
@@ -573,7 +574,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        OutputProcessor::ReportYRMeters(true);
+        OutputProcessor::ReportYRMeters(state.files, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -624,7 +625,7 @@ namespace OutputProcessor {
         int CurDayType = 10;
 
         // TSMeter
-        WriteTimeStampFormatData(outputFiles().mtr,
+        WriteTimeStampFormatData(state.files.mtr,
                                  ReportingFrequency::TimeStep,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
@@ -641,7 +642,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // TSMeter
-        WriteTimeStampFormatData(outputFiles().mtr,
+        WriteTimeStampFormatData(state.files.mtr,
                                  ReportingFrequency::EachCall,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
@@ -658,7 +659,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,10.00,WinterDesignDay"}, "\n")));
 
         // HRMeter
-        WriteTimeStampFormatData(outputFiles().mtr,
+        WriteTimeStampFormatData(state.files.mtr,
                                  ReportingFrequency::Hourly,
                                  TimeStepStampReportNbr,
                                  TimeStepStampReportChr,
@@ -675,7 +676,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0, 1, 0.00,60.00,WinterDesignDay"}, "\n")));
 
         // DYMeter
-        WriteTimeStampFormatData(outputFiles().mtr,
+        WriteTimeStampFormatData(state.files.mtr,
                                  ReportingFrequency::Daily,
                                  DailyStampReportNbr,
                                  DailyStampReportChr,
@@ -692,7 +693,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12,21, 0,WinterDesignDay"}, "\n")));
 
         // MNMeter
-        WriteTimeStampFormatData(outputFiles().mtr,
+        WriteTimeStampFormatData(state.files.mtr,
                                  ReportingFrequency::Monthly,
                                  MonthlyStampReportNbr,
                                  MonthlyStampReportChr,
@@ -709,7 +710,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,12"}, "\n")));
 
         // SMMeter
-        WriteTimeStampFormatData(outputFiles().mtr,
+        WriteTimeStampFormatData(state.files.mtr,
                                  ReportingFrequency::Simulation,
                                  RunPeriodStampReportNbr,
                                  RunPeriodStampReportChr,
@@ -726,7 +727,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1"}, "\n")));
 
         // Bad input
-        WriteTimeStampFormatData(outputFiles().mtr,
+        WriteTimeStampFormatData(state.files.mtr,
                                  static_cast<ReportingFrequency>(999),
                                  RunPeriodStampReportNbr,
                                  RunPeriodStampReportChr,
@@ -764,15 +765,15 @@ namespace OutputProcessor {
         EnergyPlus::sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
 
-        WriteReportMeterData(outputFiles(), 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false);
+        WriteReportMeterData(state.files, 1, "1", 999.9, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,999.9"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportMeterData(outputFiles(), 1, "1", 999.9, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0, false);
+        WriteReportMeterData(state.files, 1, "1", 999.9, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,999.9"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -785,7 +786,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -798,7 +799,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -811,7 +812,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -824,7 +825,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -836,7 +837,7 @@ namespace OutputProcessor {
                              true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -848,7 +849,7 @@ namespace OutputProcessor {
                              true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -860,7 +861,7 @@ namespace OutputProcessor {
                              true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -872,7 +873,7 @@ namespace OutputProcessor {
                              true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -884,7 +885,7 @@ namespace OutputProcessor {
                              true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60"}, "\n")));
 
-        WriteReportMeterData(outputFiles(),
+        WriteReportMeterData(state.files,
                              1,
                              "1",
                              616771620.98702729,
@@ -896,7 +897,7 @@ namespace OutputProcessor {
                              true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60"}, "\n")));
 
-        WriteReportMeterData(outputFiles(), 1, "1", 0, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false);
+        WriteReportMeterData(state.files, 1, "1", 0, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,0.0"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
@@ -937,20 +938,20 @@ namespace OutputProcessor {
         EnergyPlus::sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
 
-        WriteReportRealData(1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0);
+        WriteReportRealData(state.files, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportRealData(1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0);
+        WriteReportRealData(state.files, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0.0, 0, 0.0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportRealData(1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0.0, 0, 0.0, 0);
+        WriteReportRealData(state.files, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0.0, 0, 0.0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportRealData(
-            1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
+        WriteReportRealData(state.files,
+                            1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136.2516839253, 12210110, 4283136.2587211775, 12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925, 1,10,4283136.2587211779,24,60"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Summed,
@@ -962,7 +963,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Summed,
@@ -974,7 +975,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Averaged,
@@ -986,7 +987,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Averaged,
@@ -998,7 +999,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Averaged,
@@ -1010,7 +1011,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Averaged,
@@ -1022,7 +1023,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925, 1,10,4283136.2587211779,24,60"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Averaged,
@@ -1034,7 +1035,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925,21, 1,10,4283136.2587211779,21,24,60"}, "\n")));
 
-        WriteReportRealData(1,
+        WriteReportRealData(state.files,1,
                             "1",
                             616771620.98702729,
                             StoreType::Averaged,
@@ -1046,7 +1047,7 @@ namespace OutputProcessor {
                             12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.09870273,4283136.251683925,12,21, 1,10,4283136.2587211779,12,21,24,60"}, "\n")));
 
-        WriteReportRealData(1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0);
+        WriteReportRealData(state.files, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0.0, 0, 0.0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -1084,46 +1085,49 @@ namespace OutputProcessor {
         EnergyPlus::sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
 
-        WriteReportIntegerData(1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0);
+        WriteReportIntegerData(state.files, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0, 0, 0, 0);
+        WriteReportIntegerData(state.files, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::EachCall, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0, 0, 0, 0);
+        WriteReportIntegerData(state.files, 1, "1", 999.9, StoreType::Summed, 1, ReportingFrequency::Hourly, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460);
+        WriteReportIntegerData(
+            state.files, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136, 1,10,4283196,24,60"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460);
+        WriteReportIntegerData(
+            state.files, 1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136,21, 1,10,4283196,21,24,60"}, "\n")));
 
-        WriteReportIntegerData(
-            1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460);
+        WriteReportIntegerData(state.files,
+                               1, "1", 616771620.98702729, StoreType::Summed, 1, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.987027,4283136,12,21, 1,10,4283196,12,21,24,60"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 0, 0, 0, 0);
+        WriteReportIntegerData(state.files, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::TimeStep, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 0, 0, 0, 0);
+        WriteReportIntegerData(state.files, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::EachCall, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 0, 0, 0, 0);
+        WriteReportIntegerData(state.files, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Hourly, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460);
+        WriteReportIntegerData(
+            state.files, 1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Daily, 4283136, 12210110, 4283196, 12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027,4283136, 1,10,4283196,24,60"}, "\n")));
 
-        WriteReportIntegerData(
-            1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460);
+        WriteReportIntegerData(state.files,
+                               1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Monthly, 4283136, 12210110, 4283196, 12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027,4283136,21, 1,10,4283196,21,24,60"}, "\n")));
 
-        WriteReportIntegerData(
-            1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460);
+        WriteReportIntegerData(state.files,
+                               1, "1", 616771620.98702729, StoreType::Averaged, 10, ReportingFrequency::Simulation, 4283136, 12210110, 4283196, 12212460);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,61677162.0987027,4283136,12,21, 1,10,4283196,12,21,24,60"}, "\n")));
 
-        WriteReportIntegerData(1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0);
+        WriteReportIntegerData(state.files, 1, "1", 0, StoreType::Summed, 1, ReportingFrequency::TimeStep, 0, 0, 0, 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -1161,25 +1165,25 @@ namespace OutputProcessor {
         EnergyPlus::sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
 
-        WriteNumericData(1, "1", 999);
+        WriteNumericData(state.files, 1, "1", 999);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999"}, "\n")));
 
-        WriteNumericData(1, "1", 0);
+        WriteNumericData(state.files, 1, "1", 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0"}, "\n")));
 
-        WriteNumericData(1, "1", -999);
+        WriteNumericData(state.files, 1, "1", -999);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-999"}, "\n")));
 
-        WriteNumericData(1, "1", 999.9);
+        WriteNumericData(state.files, 1, "1", 999.9);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,999.9"}, "\n")));
 
-        WriteNumericData(1, "1", 0.0);
+        WriteNumericData(state.files, 1, "1", 0.0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
-        WriteNumericData(1, "1", -999.9);
+        WriteNumericData(state.files, 1, "1", -999.9);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-999.9"}, "\n")));
 
-        WriteNumericData(1, "1", 0);
+        WriteNumericData(state.files, 1, "1", 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0"}, "\n")));
 
         auto reportDataResults = queryResult("SELECT * FROM ReportData;", "ReportData");
@@ -1206,13 +1210,13 @@ namespace OutputProcessor {
         std::map<std::string, std::string> const resource_map = {{"ELECTRICITY", "Electricity"},
                                                                  {"ELECTRIC", "Electricity"},
                                                                  {"ELEC", "Electricity"},
-                                                                 {"GAS", "Gas"},
-                                                                 {"NATURALGAS", "Gas"},
+                                                                 {"GAS", "NaturalGas"},
+                                                                 {"NATURALGAS", "NaturalGas"},
                                                                  {"GASOLINE", "Gasoline"},
                                                                  {"DIESEL", "Diesel"},
                                                                  {"COAL", "Coal"},
-                                                                 {"FUELOIL#1", "FuelOil#1"},
-                                                                 {"FUELOIL#2", "FuelOil#2"},
+                                                                 {"FUELOILNO1", "FuelOilNo1"},
+                                                                 {"FUELOILNO2", "FuelOilNo2"},
                                                                  {"PROPANE", "Propane"},
                                                                  {"PROPANEGAS", "Propane"},
                                                                  {"WATER", "Water"},
@@ -1293,12 +1297,12 @@ namespace OutputProcessor {
     TEST_F(SQLiteFixture, OutputProcessor_determineIndexGroupKeyFromMeterName)
     {
         std::map<std::string, int> const resource_map = {{"Electricity:Facility", 100},
-                                                         {"Gas:Facility", 101},
+                                                         {"NaturalGas:Facility", 101},
                                                          {"DistricHeating:Facility", 102},
                                                          {"DistricCooling:Facility", 103},
                                                          {"ElectricityNet:Facility", 104},
                                                          {"Electricity:Building", 201},
-                                                         {"Gas:Building", 202},
+                                                         {"NaturalGas:Building", 202},
                                                          {"Electricity:HVAC", 301},
                                                          {"InteriorLights:Electricity", 401},
                                                          {"InteriorLights:Electricity:Zone", 501},
@@ -1468,11 +1472,11 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeMeterDictionaryItem)
     {
-        InitializeOutput();
+        InitializeOutput(state.files);
 
         EnergyPlus::sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::TimeStep,
                                  StoreType::Averaged,
                                  1,
@@ -1486,7 +1490,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,1,meterName [J] !TimeStep"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1,meterName [J] !TimeStep"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::TimeStep,
                                  StoreType::Summed,
                                  2,
@@ -1500,7 +1504,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"2,1,meterName [W] !TimeStep"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"2,1,meterName [W] !TimeStep"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::TimeStep,
                                  StoreType::Averaged,
                                  3,
@@ -1514,7 +1518,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"3,1,Cumulative meterName [J] !TimeStep"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"3,1,Cumulative meterName [J] !TimeStep"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::TimeStep,
                                  StoreType::Averaged,
                                  4,
@@ -1527,7 +1531,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"4,1,meterName [W] !TimeStep"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::TimeStep,
                                  StoreType::Averaged,
                                  5,
@@ -1540,7 +1544,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"5,1,Cumulative meterName [W] !TimeStep"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::EachCall,
                                  StoreType::Averaged,
                                  6,
@@ -1554,7 +1558,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"6,1,meterName [J] !Each Call"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"6,1,meterName [J] !Each Call"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::EachCall,
                                  StoreType::Summed,
                                  7,
@@ -1568,7 +1572,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"7,1,meterName [J] !Each Call"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"7,1,meterName [J] !Each Call"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::EachCall,
                                  StoreType::Averaged,
                                  8,
@@ -1582,7 +1586,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"8,1,Cumulative meterName [J] !Each Call"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"8,1,Cumulative meterName [J] !Each Call"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::EachCall,
                                  StoreType::Averaged,
                                  9,
@@ -1595,7 +1599,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"9,1,meterName [J] !Each Call"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::EachCall,
                                  StoreType::Averaged,
                                  10,
@@ -1608,7 +1612,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"10,1,Cumulative meterName [J] !Each Call"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Hourly,
                                  StoreType::Averaged,
                                  11,
@@ -1622,7 +1626,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"11,1,meterName [J] !Hourly"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"11,1,meterName [J] !Hourly"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Hourly,
                                  StoreType::Summed,
                                  12,
@@ -1636,7 +1640,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"12,1,meterName [] !Hourly"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"12,1,meterName [] !Hourly"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Hourly,
                                  StoreType::Averaged,
                                  13,
@@ -1650,7 +1654,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"13,1,Cumulative meterName [] !Hourly"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"13,1,Cumulative meterName [] !Hourly"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Hourly,
                                  StoreType::Averaged,
                                  14,
@@ -1663,7 +1667,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"14,1,meterName [] !Hourly"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Hourly,
                                  StoreType::Averaged,
                                  15,
@@ -1676,7 +1680,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"15,1,Cumulative meterName [] !Hourly"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Daily,
                                  StoreType::Averaged,
                                  16,
@@ -1690,7 +1694,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"16,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Daily,
                                  StoreType::Summed,
                                  17,
@@ -1704,7 +1708,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"17,7,meterName [] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Daily,
                                  StoreType::Averaged,
                                  18,
@@ -1718,7 +1722,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"18,1,Cumulative meterName [deltaC] !Daily "}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"18,1,Cumulative meterName [deltaC] !Daily "}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Daily,
                                  StoreType::Averaged,
                                  19,
@@ -1731,7 +1735,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"19,7,meterName [deltaC] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Daily,
                                  StoreType::Averaged,
                                  20,
@@ -1744,7 +1748,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"20,1,Cumulative meterName [deltaC] !Daily "}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Monthly,
                                  StoreType::Averaged,
                                  21,
@@ -1758,7 +1762,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"21,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Monthly,
                                  StoreType::Summed,
                                  22,
@@ -1772,7 +1776,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"22,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Monthly,
                                  StoreType::Averaged,
                                  23,
@@ -1786,7 +1790,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"23,1,Cumulative meterName [deltaC] !Monthly "}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"23,1,Cumulative meterName [deltaC] !Monthly "}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Monthly,
                                  StoreType::Averaged,
                                  24,
@@ -1799,7 +1803,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"24,9,meterName [deltaC] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Monthly,
                                  StoreType::Averaged,
                                  25,
@@ -1812,7 +1816,7 @@ namespace OutputProcessor {
                                  true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"25,1,Cumulative meterName [deltaC] !Monthly "}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Simulation,
                                  StoreType::Averaged,
                                  26,
@@ -1828,7 +1832,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Simulation,
                                  StoreType::Summed,
                                  27,
@@ -1844,7 +1848,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Simulation,
                                  StoreType::Averaged,
                                  28,
@@ -1858,7 +1862,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"28,1,Cumulative meterName [deltaC] !RunPeriod "}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"28,1,Cumulative meterName [deltaC] !RunPeriod "}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Simulation,
                                  StoreType::Averaged,
                                  29,
@@ -1872,7 +1876,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_mtr_stream(
             delimited_string({"29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteMeterDictionaryItem(outputFiles(),
+        WriteMeterDictionaryItem(state.files,
                                  ReportingFrequency::Simulation,
                                  StoreType::Averaged,
                                  30,
@@ -1929,7 +1933,7 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_writeReportVariableDictionaryItem)
     {
-        InitializeOutput();
+        InitializeOutput(state.files);
 
         EnergyPlus::sqlite->createSQLiteTimeIndexRecord(4, 1, 1, 0, 2017);
 
@@ -1944,7 +1948,7 @@ namespace OutputProcessor {
         OutputProcessor::TimeStepType aThirdTimeStepType = OutputProcessor::TimeStepType::TimeStepZone;
         std::string aThirdTimeStepString = timeStepZoneString;
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::TimeStep,
                                           StoreType::Averaged,
                                           1,
@@ -1959,7 +1963,7 @@ namespace OutputProcessor {
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::TimeStep,
                                           StoreType::Summed,
                                           2,
@@ -1974,7 +1978,7 @@ namespace OutputProcessor {
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"2,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::TimeStep,
                                           StoreType::Averaged,
                                           3,
@@ -1989,7 +1993,7 @@ namespace OutputProcessor {
                                           "scheduleName");
         EXPECT_TRUE(compare_eso_stream(delimited_string({"3,1,keyedValue,variableName [m3/s] !TimeStep,scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::TimeStep,
                                           StoreType::Averaged,
                                           4,
@@ -2005,7 +2009,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(delimited_string({"4,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
         // Hum, can no longer pass Something else than what's in the enum...
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::TimeStep,
                                           StoreType::Averaged,
                                           5,
@@ -2020,7 +2024,7 @@ namespace OutputProcessor {
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"5,1,keyedValue,variableName [m3/s] !TimeStep"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::EachCall,
                                           StoreType::Averaged,
                                           6,
@@ -2035,7 +2039,7 @@ namespace OutputProcessor {
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"6,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::EachCall,
                                           StoreType::Summed,
                                           7,
@@ -2050,7 +2054,7 @@ namespace OutputProcessor {
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"7,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::EachCall,
                                           StoreType::Averaged,
                                           8,
@@ -2065,7 +2069,7 @@ namespace OutputProcessor {
                                           "scheduleName");
         EXPECT_TRUE(compare_eso_stream(delimited_string({"8,1,keyedValue,variableName [m3/s] !Each Call,scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::EachCall,
                                           StoreType::Averaged,
                                           9,
@@ -2080,7 +2084,7 @@ namespace OutputProcessor {
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"9,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::EachCall,
                                           StoreType::Averaged,
                                           10,
@@ -2095,7 +2099,7 @@ namespace OutputProcessor {
                                           _);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"10,1,keyedValue,variableName [m3/s] !Each Call"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Hourly,
                                           StoreType::Averaged,
                                           11,
@@ -2112,7 +2116,7 @@ namespace OutputProcessor {
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"11,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Hourly,
                                           StoreType::Summed,
                                           12,
@@ -2129,7 +2133,7 @@ namespace OutputProcessor {
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"12,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Hourly,
                                           StoreType::Averaged,
                                           13,
@@ -2146,7 +2150,7 @@ namespace OutputProcessor {
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"13,1,keyedValue,variableName [m3/s] !Hourly,scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Hourly,
                                           StoreType::Averaged,
                                           14,
@@ -2163,7 +2167,7 @@ namespace OutputProcessor {
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"14,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Hourly,
                                           StoreType::Averaged,
                                           15,
@@ -2180,7 +2184,7 @@ namespace OutputProcessor {
         TrackingHourlyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"15,1,keyedValue,variableName [m3/s] !Hourly"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Daily,
                                           StoreType::Averaged,
                                           16,
@@ -2197,7 +2201,7 @@ namespace OutputProcessor {
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"16,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Daily,
                                           StoreType::Summed,
                                           17,
@@ -2214,7 +2218,7 @@ namespace OutputProcessor {
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"17,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Daily,
                                           StoreType::Averaged,
                                           18,
@@ -2232,7 +2236,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"18,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute],scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Daily,
                                           StoreType::Averaged,
                                           19,
@@ -2249,7 +2253,7 @@ namespace OutputProcessor {
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"19,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Daily,
                                           StoreType::Averaged,
                                           20,
@@ -2266,7 +2270,7 @@ namespace OutputProcessor {
         TrackingDailyVariables = false;
         EXPECT_TRUE(compare_eso_stream(delimited_string({"20,7,keyedValue,variableName [m3/s] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Monthly,
                                           StoreType::Averaged,
                                           21,
@@ -2284,7 +2288,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"21,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Monthly,
                                           StoreType::Summed,
                                           22,
@@ -2302,7 +2306,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"22,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Monthly,
                                           StoreType::Averaged,
                                           23,
@@ -2320,7 +2324,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"23,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute],scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Monthly,
                                           StoreType::Averaged,
                                           24,
@@ -2338,7 +2342,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"24,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Monthly,
                                           StoreType::Averaged,
                                           25,
@@ -2356,7 +2360,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(
             compare_eso_stream(delimited_string({"25,9,keyedValue,variableName [m3/s] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Simulation,
                                           StoreType::Averaged,
                                           26,
@@ -2374,7 +2378,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"26,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Simulation,
                                           StoreType::Summed,
                                           27,
@@ -2392,7 +2396,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"27,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Simulation,
                                           StoreType::Averaged,
                                           28,
@@ -2410,7 +2414,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(delimited_string(
             {"28,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute],scheduleName"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Simulation,
                                           StoreType::Averaged,
                                           29,
@@ -2428,7 +2432,7 @@ namespace OutputProcessor {
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"29,11,keyedValue,variableName [m3/s] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
-        WriteReportVariableDictionaryItem(outputFiles(),
+        WriteReportVariableDictionaryItem(state.files,
                                           ReportingFrequency::Simulation,
                                           StoreType::Averaged,
                                           30,
@@ -2488,17 +2492,17 @@ namespace OutputProcessor {
         EnergyPlus::sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
 
-        WriteCumulativeReportMeterData(1, "1", 616771620.98702729, true);
+        WriteCumulativeReportMeterData(state.files, 1, "1", 616771620.98702729, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteCumulativeReportMeterData(1, "1", 616771620.98702729, false);
+        WriteCumulativeReportMeterData(state.files, 1, "1", 616771620.98702729, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,616771620.9870273"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,616771620.9870273"}, "\n")));
 
-        WriteCumulativeReportMeterData(1, "1", 0, true);
+        WriteCumulativeReportMeterData(state.files, 1, "1", 0, true);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,0.0"}, "\n")));
 
-        WriteCumulativeReportMeterData(1, "1", 0, false);
+        WriteCumulativeReportMeterData(state.files, 1, "1", 0, false);
         EXPECT_TRUE(compare_mtr_stream(delimited_string({"1,0.0"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0"}, "\n")));
 
@@ -2524,206 +2528,206 @@ namespace OutputProcessor {
         EnergyPlus::sqlite->createSQLiteReportDictionaryRecord(
             1, 1, "Zone", "Environment", "Site Outdoor Air Drybulb Temperature", 1, "C", 1, false, _);
 
-        WriteNumericData(1, "1", 0);
+        WriteNumericData(state.files, 1, "1", 0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0"}, "\n")));
 
-        WriteNumericData(1, "1", 0.1);
+        WriteNumericData(state.files, 1, "1", 0.1);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.1"}, "\n")));
 
-        WriteNumericData(1, "1", -0.1);
+        WriteNumericData(state.files, 1, "1", -0.1);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-0.1"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e-2);
+        WriteNumericData(state.files, 1, "1", 1.0e-2);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.01"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.01"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-3);
+        WriteNumericData(state.files, 1, "1", 1.0e-3);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.001"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.001"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-4);
+        WriteNumericData(state.files, 1, "1", 1.0e-4);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0001"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.0001"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-5);
+        WriteNumericData(state.files, 1, "1", 1.0e-5);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.00001"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.00001"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-6);
+        WriteNumericData(state.files, 1, "1", 1.0e-6);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.000001"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.000001"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-7);
+        WriteNumericData(state.files, 1, "1", 1.0e-7);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-7"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-7"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-8);
+        WriteNumericData(state.files, 1, "1", 1.0e-8);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-8"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-8"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-9);
+        WriteNumericData(state.files, 1, "1", 1.0e-9);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-9"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-9"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-10);
+        WriteNumericData(state.files, 1, "1", 1.0e-10);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-10"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-10"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-11);
+        WriteNumericData(state.files, 1, "1", 1.0e-11);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-11"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-11"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-12);
+        WriteNumericData(state.files, 1, "1", 1.0e-12);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-12"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-12"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-13);
+        WriteNumericData(state.files, 1, "1", 1.0e-13);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-13"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-13"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-14);
+        WriteNumericData(state.files, 1, "1", 1.0e-14);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-14"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-14"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-15);
+        WriteNumericData(state.files, 1, "1", 1.0e-15);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-15"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-15"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-16);
+        WriteNumericData(state.files, 1, "1", 1.0e-16);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-16"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-16"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", -1.0e-16);
+        WriteNumericData(state.files, 1, "1", -1.0e-16);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-1e-16"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-1e-16"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e-19);
+        WriteNumericData(state.files, 1, "1", 1.0e-19);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-19"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e-19"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 0.5);
+        WriteNumericData(state.files, 1, "1", 0.5);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,0.5"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0);
+        WriteNumericData(state.files, 1, "1", 1.0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1.0"}, "\n")));
 
-        WriteNumericData(1, "1", 10.0);
+        WriteNumericData(state.files, 1, "1", 10.0);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,10.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e2);
+        WriteNumericData(state.files, 1, "1", 1.0e2);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,100.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e3);
+        WriteNumericData(state.files, 1, "1", 1.0e3);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e4);
+        WriteNumericData(state.files, 1, "1", 1.0e4);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,10000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e5);
+        WriteNumericData(state.files, 1, "1", 1.0e5);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,100000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e6);
+        WriteNumericData(state.files, 1, "1", 1.0e6);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e7);
+        WriteNumericData(state.files, 1, "1", 1.0e7);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,10000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e8);
+        WriteNumericData(state.files, 1, "1", 1.0e8);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,100000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e9);
+        WriteNumericData(state.files, 1, "1", 1.0e9);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e10);
+        WriteNumericData(state.files, 1, "1", 1.0e10);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,10000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e11);
+        WriteNumericData(state.files, 1, "1", 1.0e11);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,100000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e12);
+        WriteNumericData(state.files, 1, "1", 1.0e12);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1000000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e13);
+        WriteNumericData(state.files, 1, "1", 1.0e13);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,10000000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e14);
+        WriteNumericData(state.files, 1, "1", 1.0e14);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,100000000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e15);
+        WriteNumericData(state.files, 1, "1", 1.0e15);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1000000000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e16);
+        WriteNumericData(state.files, 1, "1", 1.0e16);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,10000000000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", 1.0e17);
+        WriteNumericData(state.files, 1, "1", 1.0e17);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,100000000000000000.0"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,100000000000000000.0"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", -1.0e16);
+        WriteNumericData(state.files, 1, "1", -1.0e16);
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-10000000000000000.0"}, "\n")));
 
-        WriteNumericData(1, "1", -1.0e17);
+        WriteNumericData(state.files, 1, "1", -1.0e17);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-100000000000000000.0"}, "\n")));
 #else
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,-100000000000000000.0"}, "\n")));
 #endif
 
-        WriteNumericData(1, "1", 1.0e25);
+        WriteNumericData(state.files, 1, "1", 1.0e25);
 #if defined(_WIN32) && _MSC_VER < 1900
         EXPECT_TRUE(compare_eso_stream(delimited_string({"1,1e25"}, "\n")));
 #else
@@ -2924,8 +2928,8 @@ namespace OutputProcessor {
                                                            {"J", "ELEC", "PURCHASEDELECTRICEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "SOLDELECTRICEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "NATURALGASEMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FUELOIL#1EMISSIONS", "endUseSub", "HVAC"},
-                                                           {"J", "ELEC", "FUELOIL#2EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELEC", "FUELOILNO1EMISSIONS", "endUseSub", "HVAC"},
+                                                           {"J", "ELEC", "FUELOILNO2EMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "COALEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "GASOLINEEMISSIONS", "endUseSub", "HVAC"},
                                                            {"J", "ELEC", "PROPANEEMISSIONS", "endUseSub", "HVAC"},
@@ -3016,10 +3020,10 @@ namespace OutputProcessor {
                                                      "endUseSub:SoldElectricEmissions:Electricity",
                                                      "NaturalGasEmissions:Electricity",
                                                      "endUseSub:NaturalGasEmissions:Electricity",
-                                                     "FuelOil#1Emissions:Electricity",
-                                                     "endUseSub:FuelOil#1Emissions:Electricity",
-                                                     "FuelOil#2Emissions:Electricity",
-                                                     "endUseSub:FuelOil#2Emissions:Electricity",
+                                                     "FuelOilNo1Emissions:Electricity",
+                                                     "endUseSub:FuelOilNo1Emissions:Electricity",
+                                                     "FuelOilNo2Emissions:Electricity",
+                                                     "endUseSub:FuelOilNo2Emissions:Electricity",
                                                      "CoalEmissions:Electricity",
                                                      "endUseSub:CoalEmissions:Electricity",
                                                      "GasolineEmissions:Electricity",
@@ -3140,7 +3144,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
 
         NumOfReqVariables = inputProcessor->getNumObjectsFound("Output:Variable");
 
@@ -3195,7 +3199,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
 
         auto const keyed_value = "ENVIRONMENT";
         auto const var_name = "SITE OUTDOOR AIR DRYBULB TEMPERATURE";
@@ -3259,7 +3263,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         inputProcessor->preScanReportingVariables();
-        InitializeOutput();
+        InitializeOutput(state.files);
 
         Real64 ilgrGarage;
         Real64 ilgrLiving;
@@ -3280,11 +3284,11 @@ namespace OutputProcessor {
         DataGlobals::DoWeathSim = true;
         DataGlobals::TimeStepZone = 0.25;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
 
         NumExtraVars = 0;
         BuildKeyVarList("LIVING", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 3);
@@ -3316,7 +3320,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         inputProcessor->preScanReportingVariables();
-        InitializeOutput();
+        InitializeOutput(state.files);
 
         Real64 ilgrGarage;
         Real64 ilgrLiving1;
@@ -3337,11 +3341,11 @@ namespace OutputProcessor {
         DataGlobals::DoWeathSim = true;
         DataGlobals::TimeStepZone = 0.25;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
 
         NumExtraVars = 0;
         BuildKeyVarList("LIVING1", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 2);
@@ -3364,9 +3368,9 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        InitializeOutput();
+        InitializeOutput(state.files);
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
 
         auto const var_name = "Site Outdoor Air Drybulb Temperature";
 
@@ -3505,7 +3509,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
 
@@ -3537,17 +3541,17 @@ namespace OutputProcessor {
     TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseSubKey)
     {
         std::string const idf_objects = delimited_string({
-            "Output:Variable,*,Chiller Electric Energy,runperiod;",
-            "Output:Variable,*,Lights Electric Energy,runperiod;",
-            "Output:Variable,*,Environmental Impact Fuel Oil #2 CO2 Emissions Mass,runperiod;",
+            "Output:Variable,*,Chiller Electricity Energy,runperiod;",
+            "Output:Variable,*,Lights Electricity Energy,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil No 2 CO2 Emissions Mass,runperiod;",
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
 
         Real64 cooling_consumption = 0.;
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             cooling_consumption,
                             "System",
@@ -3561,7 +3565,7 @@ namespace OutputProcessor {
 
 
         Real64 light_consumption = 0.;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3577,7 +3581,7 @@ namespace OutputProcessor {
                             1);
 
         Real64 fuel_oil_co2 = 0.;
-        SetupOutputVariable("Environmental Impact Fuel Oil #2 CO2 Emissions Mass",
+        SetupOutputVariable("Environmental Impact Fuel Oil No 2 CO2 Emissions Mass",
                             OutputProcessor::Unit::kg,
                             fuel_oil_co2,
                             "System",
@@ -3585,7 +3589,7 @@ namespace OutputProcessor {
                             "Site",
                             _,
                             "CO2",
-                            "FuelOil#2Emissions",
+                            "FuelOilNo2Emissions",
                             _,                    // EndUseSubKey
                             "");     
 
@@ -3630,10 +3634,10 @@ namespace OutputProcessor {
 
         // fuel oil CO2 emissions
         // testing a non-ABUPS end use with no sub end use specified
-        found = UtilityRoutines::FindItem("FuelOil#2Emissions:CO2", EnergyMeters);
+        found = UtilityRoutines::FindItem("FuelOilNo2Emissions:CO2", EnergyMeters);
         EXPECT_NE(0, found);
         EXPECT_EQ("CO2", EnergyMeters(found).ResourceType);
-        EXPECT_EQ("FuelOil#2Emissions", EnergyMeters(found).EndUse);
+        EXPECT_EQ("FuelOilNo2Emissions", EnergyMeters(found).EndUse);
         EXPECT_EQ("", EnergyMeters(found).EndUseSub);
     }
 
@@ -3641,22 +3645,22 @@ namespace OutputProcessor {
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_star)
     {
-        std::string const idf_objects = delimited_string({"Output:Variable,*,Boiler Gas Rate,runperiod;"});
+        std::string const idf_objects = delimited_string({"Output:Variable,*,Boiler NaturalGas Rate,runperiod;"});
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         Real64 fuel_used = 999;
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3665,28 +3669,28 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "2,11,Boiler2,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "3,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
+            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "2,11,Boiler2,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "3,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_regex)
     {
-        std::string const idf_objects = delimited_string({"Output:Variable,Boiler[13],Boiler Gas Rate,runperiod;"});
+        std::string const idf_objects = delimited_string({"Output:Variable,Boiler[13],Boiler NaturalGas Rate,runperiod;"});
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         Real64 fuel_used = 999;
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3695,28 +3699,28 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "2,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
+            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "2,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_regex_2)
     {
-        std::string const idf_objects = delimited_string({"Output:Variable,Boiler.*,Boiler Gas Rate,runperiod;"});
+        std::string const idf_objects = delimited_string({"Output:Variable,Boiler.*,Boiler NaturalGas Rate,runperiod;"});
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         Real64 fuel_used = 999;
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler3");
 
         auto reportDataDictionaryResults = queryResult("SELECT * FROM ReportDataDictionary;", "ReportDataDictionary");
 
         std::vector<std::vector<std::string>> reportDataDictionary({
-            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler Gas Rate", "Run Period", "", "W"},
-            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler Gas Rate", "Run Period", "", "W"},
+            {"1", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"2", "0", "Avg", "System", "HVAC System", "Boiler2", "Boiler NaturalGas Rate", "Run Period", "", "W"},
+            {"3", "0", "Avg", "System", "HVAC System", "Boiler3", "Boiler NaturalGas Rate", "Run Period", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -3725,9 +3729,9 @@ namespace OutputProcessor {
         auto reportExtendedDataResults = queryResult("SELECT * FROM ReportExtendedData;", "ReportExtendedData");
 
         compare_eso_stream(
-            delimited_string({"1,11,Boiler1,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "2,11,Boiler2,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
-                              "3,11,Boiler3,Boiler Gas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
+            delimited_string({"1,11,Boiler1,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "2,11,Boiler2,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+                              "3,11,Boiler3,Boiler NaturalGas Rate [W] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n"));
     }
 
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_regex_3)
@@ -3736,7 +3740,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         Real64 vol_flow = 999;
         SetupOutputVariable(
             "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001");
@@ -3786,7 +3790,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         Real64 vol_flow = 999;
         SetupOutputVariable(
             "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001");
@@ -3843,10 +3847,10 @@ namespace OutputProcessor {
         auto const keyed_value = "Environment";
         auto const var_name = "Site Outdoor Air Drybulb Temperature";
 
-        InitializeOutput();
+        InitializeOutput(state.files);
 
-        GetReportVariableInput(outputFiles());
-        CheckReportVariable(keyed_value, var_name);
+        GetReportVariableInput(state.files);
+        CheckReportVariable(state.files, keyed_value, var_name);
 
         EXPECT_EQ(5, NumOfReqVariables);
 
@@ -3899,15 +3903,15 @@ namespace OutputProcessor {
             "    MyGeneralLights,         !- Name",
             "    Electricity,             !- Fuel Type",
             "    SPACE1-1 Lights 1,       !- Key Name 1",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 1",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 1",
             "    SPACE2-1 Lights 1,       !- Key Name 2",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 2",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 2",
             "    SPACE3-1 Lights 1,       !- Key Name 3",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 3",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 3",
             "    SPACE4-1 Lights 1,       !- Key Name 4",
-            "    Lights Electric Energy,  !- Output Variable or Meter Name 4",
+            "    Lights Electricity Energy,  !- Output Variable or Meter Name 4",
             "    SPACE5-1 Lights 1,       !- Key Name 5",
-            "    Lights Electric Energy;  !- Output Variable or Meter Name 5",
+            "    Lights Electricity Energy;  !- Output Variable or Meter Name 5",
             "  Meter:Custom,",
             "    Building Infiltration Heat Loss,  !- Name",
             "    Generic,                 !- Fuel Type",
@@ -3923,7 +3927,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
         Real64 light_consumption = 0;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3937,7 +3941,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3951,7 +3955,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3965,7 +3969,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -3979,7 +3983,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4051,7 +4055,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        InitializeOutput();
+        InitializeOutput(state.files);
 
         int meter_array_ptr = -1;
         bool errors_found = false;
@@ -4107,7 +4111,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4141,11 +4145,11 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4159,7 +4163,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4173,7 +4177,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4187,7 +4191,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4201,7 +4205,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4222,9 +4226,9 @@ namespace OutputProcessor {
         SetupOutputVariable("Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE4-1");
         SetupOutputVariable("Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, zone_infil_total_loss, "System", "Sum", "SPACE5-1");
 
-        UpdateMeterReporting(outputFiles());
+        UpdateMeterReporting(state.files);
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4338,7 +4342,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
-            "Output:Variable,*,Boiler Gas Rate,detailed;",
+            "Output:Variable,*,Boiler NaturalGas Rate,detailed;",
             "Output:Variable,*,Boiler Heating Rate,detailed;",
             "Output:Meter,Electricity:Facility,detailed;",
             "Output:Meter,Electricity:Facility,timestep;",
@@ -4351,7 +4355,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4385,11 +4389,11 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4403,7 +4407,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4417,7 +4421,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4431,7 +4435,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4445,7 +4449,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4468,11 +4472,11 @@ namespace OutputProcessor {
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
         SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
 
-        UpdateMeterReporting(outputFiles());
+        UpdateMeterReporting(state.files);
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4501,7 +4505,7 @@ namespace OutputProcessor {
             {"11", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Monthly", "", "J"},
             {"13", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Run Period", "", "J"},
             {"180", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
-            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W"},
+            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -4543,7 +4547,7 @@ namespace OutputProcessor {
             "5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
             "6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
             "180,1,Boiler1,Boiler Heating Rate [W] !Each Call",
-            "181,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+            "181,1,Boiler1,Boiler NaturalGas Rate [W] !Each Call",
             "8,1,Electricity:Facility [J] !Each Call",
             "9,1,Electricity:Facility [J] !Hourly",
             "10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -4595,7 +4599,7 @@ namespace OutputProcessor {
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,daily;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,monthly;",
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,runperiod;",
-            "Output:Variable,*,Boiler Gas Rate,detailed;",
+            "Output:Variable,*,Boiler NaturalGas Rate,detailed;",
             "Output:Variable,*,Boiler Heating Rate,detailed;",
             "Output:Meter,Electricity:Facility,detailed;",
             "Output:Meter,Electricity:Facility,timestep;",
@@ -4608,7 +4612,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4642,11 +4646,11 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4660,7 +4664,7 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4674,7 +4678,7 @@ namespace OutputProcessor {
                             "SPACE2-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4688,7 +4692,7 @@ namespace OutputProcessor {
                             "SPACE3-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4702,7 +4706,7 @@ namespace OutputProcessor {
                             "SPACE4-1",
                             1,
                             1);
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -4725,11 +4729,11 @@ namespace OutputProcessor {
         Real64 fuel_used = 999;
         Real64 boiler_load = 999;
         SetupOutputVariable("Boiler Heating Rate", OutputProcessor::Unit::W, boiler_load, "System", "Average", "Boiler1");
-        SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
+        SetupOutputVariable("Boiler NaturalGas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
 
-        UpdateMeterReporting(outputFiles());
+        UpdateMeterReporting(state.files);
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4754,7 +4758,7 @@ namespace OutputProcessor {
             {"11", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Monthly", "", "J"},
             {"13", "1", "Sum", "Facility:Electricity", "Zone", "", "Electricity:Facility", "Run Period", "", "J"},
             {"180", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Heating Rate", "HVAC System Timestep", "", "W"},
-            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler Gas Rate", "HVAC System Timestep", "", "W"},
+            {"181", "0", "Avg", "System", "HVAC System", "Boiler1", "Boiler NaturalGas Rate", "HVAC System Timestep", "", "W"},
         });
 
         EXPECT_EQ(reportDataDictionary, reportDataDictionaryResults);
@@ -4780,7 +4784,7 @@ namespace OutputProcessor {
             "5,9,Environment,Site Outdoor Air Drybulb Temperature [C] !Monthly [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]",
             "6,11,Environment,Site Outdoor Air Drybulb Temperature [C] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
             "180,1,Boiler1,Boiler Heating Rate [W] !Each Call",
-            "181,1,Boiler1,Boiler Gas Rate [W] !Each Call",
+            "181,1,Boiler1,Boiler NaturalGas Rate [W] !Each Call",
             "8,1,Electricity:Facility [J] !Each Call",
             "9,1,Electricity:Facility [J] !Hourly",
             "10,7,Electricity:Facility [J] !Daily [Value,Min,Hour,Minute,Max,Hour,Minute]",
@@ -4813,7 +4817,7 @@ namespace OutputProcessor {
 
         // Setup so that UpdateDataandReport can be called.
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4846,9 +4850,9 @@ namespace OutputProcessor {
 
         DataGlobals::WarmupFlag = true;
 
-        ReportOutputFileHeaders(outputFiles());
+        ReportOutputFileHeaders(state.files);
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         Array1D<ZonePurchasedAir> PurchAir; // Used to specify purchased air parameters
         PurchAir.allocate(1);
         SetupOutputVariable("Zone Ideal Loads Supply Air Total Heating Energy",
@@ -4864,34 +4868,34 @@ namespace OutputProcessor {
                             "System");
 
         PurchAir(1).TotHeatEnergy = 1.1;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.3;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.5;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.7;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.9;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 2.2;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         DataGlobals::WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]",
@@ -4921,16 +4925,16 @@ namespace OutputProcessor {
         ResetAccumulationWhenWarmupComplete();
 
         PurchAir(1).TotHeatEnergy = 100.0;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 200.0;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 300.0;
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
@@ -4945,7 +4949,7 @@ namespace OutputProcessor {
     {
         std::string const idf_objects = delimited_string({
             "Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;",
-            "Output:Variable,*,Boiler Gas Rate,detailed;",
+            "Output:Variable,*,Boiler NaturalGas Rate,detailed;",
             "Output:Variable,*,Boiler Heating Rate,detailed;",
             "Output:Meter,Electricity:Facility,timestep;",
         });
@@ -4953,7 +4957,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4987,11 +4991,11 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -5005,8 +5009,8 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         GenOutputVariablesAuditReport();
 
@@ -5014,7 +5018,7 @@ namespace OutputProcessor {
             "   ** Warning ** The following Report Variables were requested but not generated -- check.rdd file",
             "   **   ~~~   ** Either the IDF did not contain these elements, the variable name is misspelled,",
             "   **   ~~~   ** or the requested variable is an advanced output which requires Output : Diagnostics, DisplayAdvancedReportVariables;",
-            "   ************* Key=*, VarName=BOILER GAS RATE, Frequency=Detailed",
+            "   ************* Key=*, VarName=BOILER NATURALGAS RATE, Frequency=Detailed",
             "   ************* Key=*, VarName=BOILER HEATING RATE, Frequency=Detailed",
         });
 
@@ -5031,7 +5035,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        DataGlobals::DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -5065,14 +5069,14 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        OutputReportTabular::GetInputTabularMonthly();
+        OutputReportTabular::GetInputTabularMonthly(state.files);
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput(outputFiles());
+        GetReportVariableInput(state.files);
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
-        SetupOutputVariable("Lights Electric Energy",
+        SetupOutputVariable("Lights Electricity Energy",
                             OutputProcessor::Unit::J,
                             light_consumption,
                             "Zone",
@@ -5086,8 +5090,8 @@ namespace OutputProcessor {
                             "SPACE1-1",
                             1,
                             1);
-        UpdateMeterReporting(outputFiles());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateMeterReporting(state.files);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         NumExtraVars = 0;
         BuildKeyVarList("Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2);
@@ -5372,6 +5376,37 @@ namespace OutputProcessor {
         EXPECT_EQ(" [ergs/century]", unitStringFromDDitem(8));
 
         EXPECT_EQ(" [swamps/county]", unitStringFromDDitem(9));
+    }
+
+    TEST_F(EnergyPlusFixture, OutputProcessor_GetCustomMeterInput)
+    {
+        std::string const idf_objects = delimited_string({
+            "Meter:Custom,",
+            "FuelOilNo1CustomMeter,      !- Name",
+            "FuelOilNo1,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo1:Facility;        !- Variable or Meter 1 Name",
+            
+            "Meter:Custom,",
+            "FuelOilNo2CustomMeter,      !- Name",
+            "FuelOilNo2,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "FuelOilNo2:Facility;        !- Variable or Meter 1 Name",
+
+            "Meter:Custom,",
+            "NaturalGasCustomMeter,      !- Name",
+            "NaturalGas,                 !- Fuel Type",
+            ",                           !- Key Name 1",
+            "NaturalGas:Facility;        !- Variable or Meter 1 Name",
+            });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        bool errors_found = false;
+
+        GetCustomMeterInput(errors_found);
+
+        EXPECT_FALSE(errors_found);
     }
 } // namespace OutputProcessor
 

@@ -126,7 +126,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -1391,7 +1391,7 @@
 
   Output:Variable,*,Zone Lights Total Heating Energy,hourly;
 
-  Output:Variable,*,Zone Lights Electric Energy,hourly;
+  Output:Variable,*,Zone Lights Electricity Energy,hourly;
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 

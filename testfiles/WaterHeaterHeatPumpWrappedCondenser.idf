@@ -14,7 +14,7 @@
 ! System:   None.
 ! Plant:    Plant loop with one WaterHeater:Stratified object with heat pump water heating connected to two water use equipment
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Water Heater DHW Plant Loop Example,  !- Name
@@ -669,13 +669,13 @@
 
   Output:Variable,*,Water Heater Heater 2 Runtime Fraction,timestep;
 
-  Output:Variable,*,Water Heater Electric Power,timestep;
+  Output:Variable,*,Water Heater Electricity Rate,timestep;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,timestep;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,timestep;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,timestep;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Water Heating Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Water Heating Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Water Heating Rate,timestep;
 

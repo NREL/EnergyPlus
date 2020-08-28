@@ -46,7 +46,7 @@
 ! Environmental Emissions: No
 ! Utility Tariffs: No
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -437,9 +437,9 @@
 
   Output:Variable,*,Plant Loop Pressure Difference,Hourly;
 
-  Output:Variable,*,Pump Electric Energy,hourly;
+  Output:Variable,*,Pump Electricity Energy,hourly;
 
-  Output:Variable,*,Pump Electric Power,hourly;
+  Output:Variable,*,Pump Electricity Rate,hourly;
 
   Output:VariableDictionary,Regular;
 

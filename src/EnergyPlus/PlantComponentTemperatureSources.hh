@@ -60,6 +60,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace PlantComponentTemperatureSources {
 
     // MODULE PARAMETER DEFINITIONS:
@@ -109,7 +113,7 @@ namespace PlantComponentTemperatureSources {
         // Destructor
         ~WaterSourceSpecs() = default;
 
-        void initialize(Real64 &MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, Real64 &MyLoad);
 
         void setupOutputVars();
 
@@ -119,13 +123,13 @@ namespace PlantComponentTemperatureSources {
 
         void update();
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &_SizFac) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         static PlantComponent *factory(std::string const &objectName);
     };

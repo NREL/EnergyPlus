@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2732,13 +2732,13 @@
 
   Output:Variable,*,Transformer Efficiency,timestep;
 
-  Output:Variable,*,Transformer Input Electric Power,timestep;
+  Output:Variable,*,Transformer Input Electricity Rate,timestep;
 
-  Output:Variable,*,Transformer Input Electric Energy,timestep;
+  Output:Variable,*,Transformer Input Electricity Energy,timestep;
 
-  Output:Variable,*,Transformer Output Electric Power,timestep;
+  Output:Variable,*,Transformer Output Electricity Rate,timestep;
 
-  Output:Variable,*,Transformer Output Electric Energy,timestep;
+  Output:Variable,*,Transformer Output Electricity Energy,timestep;
 
   Output:Variable,*,Transformer No Load Loss Rate,timestep;
 
@@ -2752,7 +2752,7 @@
 
   Output:Variable,*,Transformer Thermal Loss Energy,timestep;
 
-  Output:Variable,*,Transformer Cogeneration Electric Loss Energy,timestep;
+  Output:Variable,*,Transformer Cogeneration Electricity Loss Energy,timestep;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 

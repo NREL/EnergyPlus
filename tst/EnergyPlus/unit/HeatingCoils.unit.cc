@@ -52,6 +52,7 @@
 // Google Test Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -71,7 +72,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_OtherFuel1);
 }
@@ -88,7 +89,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
                                                       "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
 
     EXPECT_FALSE(process_idf(idf_objects, false));
-    ASSERT_THROW(HeatingCoils::GetHeatingCoilInput(), std::runtime_error);
+    ASSERT_THROW(HeatingCoils::GetHeatingCoilInput(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** <root>[Coil:Heating:Fuel][Furnace Coil][fuel_type] - \"Electricity\" - Failed to match against any enum values.",
@@ -102,6 +103,20 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeInputError)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
+TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypeCoal)
+{
+    std::string const idf_objects = delimited_string(
+        {"Coil:Heating:Fuel,", "  Furnace Coil,            !- Name", "  ,    !- Availability Schedule Name", "  Coal,                 !- FuelType",
+         "  0.8,                     !- Gas Burner Efficiency", "  20000,                   !- Nominal Capacity {W}",
+         "  Heating Coil Air Inlet Node,  !- Air Inlet Node Name", "  Air Loop Outlet Node;    !- Air Outlet Node Name"});
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
+
+    EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Coal);
+}
+
 TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 {
     std::string const idf_objects = delimited_string(
@@ -111,7 +126,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_FuelTypePropaneGas)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput());
+    ASSERT_NO_THROW(HeatingCoils::GetHeatingCoilInput(state));
 
     EXPECT_EQ(HeatingCoils::HeatingCoil(1).FuelType_Num, DataGlobalConstants::iRT_Propane);
 }

@@ -53,6 +53,7 @@
 
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -65,8 +66,8 @@
 #include <EnergyPlus/HVACUnitaryBypassVAV.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -642,28 +643,28 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     bool ErrorsFound = false;
     bool firstHVACIteration = true;
     // Read objects
-    SimulationManager::GetProjectData(outputFiles());
-    HeatBalanceManager::GetProjectControlData(outputFiles(), ErrorsFound);
+    SimulationManager::GetProjectData(state);
+    HeatBalanceManager::GetProjectControlData(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(outputFiles(), ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetHeatBalanceInput();
+    HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
-    ZoneTempPredictorCorrector::InitZoneAirSetPoints();
+    ZoneTempPredictorCorrector::InitZoneAirSetPoints(state.dataZoneTempPredictorCorrector);
     bool simZone = false;
     bool simAir = false;
     DataHeatBalance::MassConservation.allocate(DataGlobals::NumOfZones);
-    ZoneEquipmentManager::ManageZoneEquipment(firstHVACIteration, simZone, simAir);
-    SimAirServingZones::GetAirPathData();
+    ZoneEquipmentManager::ManageZoneEquipment(state, firstHVACIteration, simZone, simAir);
+    SimAirServingZones::GetAirPathData(state);
     SplitterComponent::GetSplitterInput();
-    SimAirServingZones::InitAirLoops(firstHVACIteration);
+    SimAirServingZones::InitAirLoops(state, firstHVACIteration);
 
     // set up zone load indicators
     DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(2);
@@ -680,7 +681,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(2).SequencedOutputRequiredToCoolingSP(1) = -1000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(2).SequencedOutputRequiredToHeatingSP(1) = -2000.0;
 
-    HVACUnitaryBypassVAV::GetCBVAV(); // get UnitarySystem input from object above
+    HVACUnitaryBypassVAV::GetCBVAV(state); // get UnitarySystem input from object above
 
     int CBVAVNum = 1;
     int zoneIndex = 1;
@@ -736,8 +737,10 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_AutoSize)
 
     cbvav.OpMode = DataHVACGlobals::CycFanCycCoil;   // must set one type of fan operating mode to initialize CalcSetPointTempTarget
     DataLoopNode::Node(cbvav.AirInNode).Temp = 24.0; // initialize inlet node temp used to initialize CalcSetPointTempTarget
+    cbvav.AirLoopNumber = 1;
+    DataAirLoop::AirLoopFlow.allocate(cbvav.AirLoopNumber);
 
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
 
     // expect CBVAV air flow to match FinalSysSizing info
     EXPECT_EQ(cbvav.MaxCoolAirVolFlow, finalSysSizing.DesMainVolFlow);
@@ -781,11 +784,13 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;
 
     cbvav.OpMode = DataHVACGlobals::CycFanCycCoil; // set fan operating mode
+    cbvav.AirLoopNumber = 1;
+    DataAirLoop::AirLoopFlow.allocate(cbvav.AirLoopNumber);
 
     // First time through GetZoneLoads CBVAV.HeatCoolMode gets set IF there is a load and won't exectute again until the simulation time increases
     // There is no load here and CBVAV.HeatCoolMode did not change so cbvav.changeOverTimer also did not get set (change) in previous call
     // so there is no need to reset cbvav.changeOverTimer here but it wouldn't hurt if it was reset to -1.0
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, 0);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
@@ -801,7 +806,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
     // No need to reset changeOverTimer since previous load was not cooling or heating and changeOverTimer DID NOT get set
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     // Now changeOverTimer = 0 and GetZoneLoads will not execute again unless changeOverTimer is reset, but only needs to occur when load changes
     EXPECT_EQ(cbvav.changeOverTimer, 0.0); // expect timer now set to current time (0.0) plus minModeChangeTime(0.0), so = 0.0
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::CoolingMode);
@@ -812,17 +817,17 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 9.56, 0.01);
 
     Real64 PartLoadFrac = 0.0;
-    HVACUnitaryBypassVAV::ControlCBVAVOutput(cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::ControlCBVAVOutput(state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(PartLoadFrac, 1.0); // load = -9000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is around 7,000 W
 
     // reduce load and check that outlet temp meets set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -7000.0;  // load to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
     // No need to reset changeOverTimer since load did not change
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     Real64 FullOutput = 0.0;
-    HVACUnitaryBypassVAV::CalcCBVAV(cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
-    EXPECT_NEAR(PartLoadFrac, 0.935, 0.001); // load = -7000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is just over 7,000 W
+    HVACUnitaryBypassVAV::CalcCBVAV(state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
+    EXPECT_NEAR(PartLoadFrac, 0.9387, 0.001); // load = -7000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is just over 7,000 W
     EXPECT_NEAR(cbvav.OutletTempSetPoint, DataLoopNode::Node(cbvav.AirOutNode).Temp, 0.0001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 12.771, 0.001);
 
@@ -832,7 +837,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     cbvav.changeOverTimer = -1.0; // The load switched to heating so reset timer so GetZoneLoads executes
     // test timer function by setting minModeChangeTime to 2 hrs
     cbvav.minModeChangeTime = 2.0;
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.changeOverTimer, 2.0); // expect timer now set to current time (0.0) plus minModeChangeTime(2.0), so = 2.0
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
@@ -841,7 +846,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_NoOASys)
     EXPECT_LE(cbvav.OutletTempSetPoint, cbvav.MaxLATHeating);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.23, 0.01);
     FullOutput = 0.0;
-    HVACUnitaryBypassVAV::CalcCBVAV(cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::CalcCBVAV(state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_LT(PartLoadFrac, 1.0); // load = 7000 W, coil capacity = 10,000 W
     EXPECT_NEAR(cbvav.OutletTempSetPoint, DataLoopNode::Node(cbvav.AirOutNode).Temp, 0.0001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.228, 0.001);
@@ -874,8 +879,10 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.61;
 
     cbvav.OpMode = DataHVACGlobals::CycFanCycCoil; // set fan operating mode
+    cbvav.AirLoopNumber = 1;
+    DataAirLoop::AirLoopFlow.allocate(cbvav.AirLoopNumber);
 
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, 0);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
@@ -890,7 +897,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     // initialize cooling load
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::CoolingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 1);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
@@ -899,16 +906,16 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 9.59, 0.01);
 
     Real64 PartLoadFrac = 0.0;
-    HVACUnitaryBypassVAV::ControlCBVAVOutput(cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::ControlCBVAVOutput(state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(PartLoadFrac, 1.0); // load = -9000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is around 7,000 W
 
     // reduce load and check that outlet temp meets set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -6000.0;  // load to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
     cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     Real64 FullOutput = 0.0;
-    HVACUnitaryBypassVAV::CalcCBVAV(cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::CalcCBVAV(state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_LT(PartLoadFrac, 1.0); // load = -6000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is around 7,000 W
     EXPECT_NEAR(cbvav.OutletTempSetPoint, DataLoopNode::Node(cbvav.AirOutNode).Temp, 0.0001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 14.392, 0.001);
@@ -917,7 +924,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 15000.0; // more capacity needed to get to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0;  // load to heating set point
     cbvav.changeOverTimer = -1.0;                                                                  // reset timer so GetZoneLoads executes
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 1);
@@ -925,7 +932,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_InternalOAMixer)
     EXPECT_LE(cbvav.OutletTempSetPoint, cbvav.MaxLATHeating);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.21, 0.01);
     FullOutput = 0.0;
-    HVACUnitaryBypassVAV::CalcCBVAV(cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::CalcCBVAV(state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_LT(PartLoadFrac, 1.0); // load = 7000 W, coil capacity = 10,000 W
     EXPECT_NEAR(cbvav.OutletTempSetPoint, DataLoopNode::Node(cbvav.AirOutNode).Temp, 0.0001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.208, 0.001);
@@ -962,7 +969,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
 
     cbvav.OpMode = DataHVACGlobals::CycFanCycCoil; // set fan operating mode
 
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, 0);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
@@ -977,7 +984,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -9000.0;  // load to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
     cbvav.changeOverTimer = -1.0; // reset timer so GetZoneLoads executes
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::CoolingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 1);
     EXPECT_EQ(cbvav.NumZonesHeated, 0);
@@ -986,14 +993,14 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 9.56, 0.01);
 
     Real64 PartLoadFrac = 0.0;
-    HVACUnitaryBypassVAV::ControlCBVAVOutput(cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::ControlCBVAVOutput(state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(PartLoadFrac, 1.0); // load = -9000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is around 7,000 W
 
     // set FirstHVACIteration = false and use box outlet mass flow rate to set bypass flow
     FirstHVACIteration = false;
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.3;
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    HVACUnitaryBypassVAV::ControlCBVAVOutput(cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::ControlCBVAVOutput(state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_NEAR(DataLoopNode::Node(cbvav.AirOutNode).MassFlowRate, DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 9.56, 0.01);
     EXPECT_NEAR(
@@ -1004,9 +1011,9 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     FirstHVACIteration = true;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = -7000.0; // load to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = -15000.0; // more load to heating set point
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     Real64 FullOutput = 0.0;
-    HVACUnitaryBypassVAV::CalcCBVAV(cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::CalcCBVAV(state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_LT(PartLoadFrac, 1.0); // load = -7000 W, coil capacity = 10,000 W, SHR = 0.7 so max sensible is around 7,000 W
     EXPECT_NEAR(cbvav.OutletTempSetPoint, DataLoopNode::Node(cbvav.AirOutNode).Temp, 0.0001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 12.771, 0.001);
@@ -1014,8 +1021,8 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     // set FirstHVACIteration = false and use box outlet mass flow rate to set bypass flow
     FirstHVACIteration = false;
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.3;
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    HVACUnitaryBypassVAV::ControlCBVAVOutput(cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::ControlCBVAVOutput(state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_NEAR(DataLoopNode::Node(cbvav.AirOutNode).MassFlowRate, DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 12.771, 0.01);
     EXPECT_NEAR(
@@ -1029,7 +1036,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToCoolingSP(1) = 15000.0; // more capacity needed to get to cooling set point
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).SequencedOutputRequiredToHeatingSP(1) = 7000.0;  // load to heating set point
     cbvav.changeOverTimer = -1.0;                                                                  // reset timer so GetZoneLoads executes
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_EQ(cbvav.HeatCoolMode, HVACUnitaryBypassVAV::HeatingMode);
     EXPECT_EQ(cbvav.NumZonesCooled, 0);
     EXPECT_EQ(cbvav.NumZonesHeated, 1);
@@ -1037,7 +1044,7 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     EXPECT_LE(cbvav.OutletTempSetPoint, cbvav.MaxLATHeating);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.23, 0.01);
     FullOutput = 0.0;
-    HVACUnitaryBypassVAV::CalcCBVAV(cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::CalcCBVAV(state, cbvavNum, FirstHVACIteration, PartLoadFrac, FullOutput, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_LT(PartLoadFrac, 1.0); // load = 7000 W, coil capacity = 10,000 W
     EXPECT_NEAR(cbvav.OutletTempSetPoint, DataLoopNode::Node(cbvav.AirOutNode).Temp, 0.0001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.228, 0.001);
@@ -1045,8 +1052,8 @@ TEST_F(CBVAVSys, UnitaryBypassVAV_Mixerconnected)
     // set FirstHVACIteration = false and use box outlet mass flow rate to set bypass flow
     FirstHVACIteration = false;
     DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate = 0.2;
-    HVACUnitaryBypassVAV::InitCBVAV(cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
-    HVACUnitaryBypassVAV::ControlCBVAVOutput(cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::InitCBVAV(state, cbvavNum, FirstHVACIteration, AirLoopNum, OnOffAirFlowRatio, HXUnitOn);
+    HVACUnitaryBypassVAV::ControlCBVAVOutput(state, cbvavNum, FirstHVACIteration, PartLoadFrac, OnOffAirFlowRatio, HXUnitOn);
     EXPECT_NEAR(DataLoopNode::Node(cbvav.AirOutNode).MassFlowRate, DataLoopNode::Node(cbvav.CBVAVBoxOutletNode(1)).MassFlowRate, 0.000001);
     EXPECT_NEAR(cbvav.OutletTempSetPoint, 35.228, 0.01);
     EXPECT_NEAR(

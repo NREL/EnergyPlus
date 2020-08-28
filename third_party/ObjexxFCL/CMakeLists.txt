@@ -1,7 +1,7 @@
 set( target_name objexx )
 
 if (UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-sign-compare")
 endif()
 
 set(src
@@ -123,13 +123,10 @@ set(src
   src/ObjexxFCL/Format.cc
   src/ObjexxFCL/Format.hh
   src/ObjexxFCL/FormattedIO.hh
-  src/ObjexxFCL/gio.cc
-  src/ObjexxFCL/gio.hh
+        src/ObjexxFCL/gio.hh
   src/ObjexxFCL/gio_Fmt.fwd.hh
   src/ObjexxFCL/gio_Fmt.hh
-  src/ObjexxFCL/GlobalStreams.cc
-  src/ObjexxFCL/GlobalStreams.hh
-  src/ObjexxFCL/Index.cc
+        src/ObjexxFCL/Index.cc
   src/ObjexxFCL/Index.fwd.hh
   src/ObjexxFCL/Index.hh
   src/ObjexxFCL/IndexRange.cc
@@ -139,9 +136,7 @@ set(src
   src/ObjexxFCL/IndexSlice.fwd.hh
   src/ObjexxFCL/IndexSlice.hh
   src/ObjexxFCL/InitializerSentinel.hh
-  src/ObjexxFCL/Inquire.cc
-  src/ObjexxFCL/Inquire.hh
-  src/ObjexxFCL/IOFlags.cc
+        src/ObjexxFCL/IOFlags.cc
   src/ObjexxFCL/IOFlags.fwd.hh
   src/ObjexxFCL/IOFlags.hh
   src/ObjexxFCL/MArray.all.fwd.hh
@@ -175,10 +170,7 @@ set(src
   src/ObjexxFCL/Omit.hh
   src/ObjexxFCL/Optional.fwd.hh
   src/ObjexxFCL/Optional.hh
-  src/ObjexxFCL/Print.cc
-  src/ObjexxFCL/Print.fwd.hh
-  src/ObjexxFCL/Print.hh
-  src/ObjexxFCL/ProxySentinel.hh
+        src/ObjexxFCL/ProxySentinel.hh
   src/ObjexxFCL/random.cc
   src/ObjexxFCL/random.hh
   src/ObjexxFCL/Read.cc
@@ -197,12 +189,7 @@ set(src
   src/ObjexxFCL/SetWrapper.hh
   src/ObjexxFCL/Sticky.fwd.hh
   src/ObjexxFCL/Sticky.hh
-  src/ObjexxFCL/Stream.cc
-  src/ObjexxFCL/stream.functions.cc
-  src/ObjexxFCL/stream.functions.hh
-  src/ObjexxFCL/Stream.fwd.hh
-  src/ObjexxFCL/Stream.hh
-  src/ObjexxFCL/string.constants.cc
+        src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc
   src/ObjexxFCL/string.functions.hh
@@ -225,9 +212,6 @@ set(src
   src/ObjexxFCL/Vector4.fwd.hh
   src/ObjexxFCL/Vector4.hh
   src/ObjexxFCL/vectorize.hh
-  src/ObjexxFCL/Write.cc
-  src/ObjexxFCL/Write.fwd.hh
-  src/ObjexxFCL/Write.hh
 )
 
 set( test_src
@@ -263,8 +247,7 @@ set( test_src
   tst/unit/Fmath.unit.cc
   tst/unit/fmt.unit.cc
   tst/unit/gio.unit.cc
-  tst/unit/GlobalStreams.unit.cc
-  tst/unit/Index.unit.cc
+        tst/unit/Index.unit.cc
   tst/unit/IndexRange.unit.cc
   tst/unit/IndexSlice.unit.cc
   tst/unit/main.cc
@@ -279,22 +262,19 @@ set( test_src
   tst/unit/numeric.unit.cc
   tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc
-  tst/unit/Print.unit.cc
-  tst/unit/random.unit.cc
+        tst/unit/random.unit.cc
   tst/unit/Read.unit.cc
   tst/unit/Reference.Optional.unit.cc
   tst/unit/Reference.unit.cc
   tst/unit/Required.unit.cc
   tst/unit/Sticky.unit.cc
-  tst/unit/Stream.unit.cc
-  tst/unit/string.functions.unit.cc
+        tst/unit/string.functions.unit.cc
   tst/unit/time.unit.cc
   tst/unit/TypeTraits.unit.cc
   tst/unit/ubyte.unit.cc
   tst/unit/Vector2.unit.cc
   tst/unit/Vector3.unit.cc
   tst/unit/Vector4.unit.cc
-  tst/unit/Write.unit.cc
 )
 
 add_library( ${target_name} ${src} )

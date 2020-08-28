@@ -6,8 +6,8 @@ Zone Air Humidity Ratio
 Zone Air System Sensible Heating Energy
 Unitary System Fan Part Load Ratio
 Heating Coil Air Heating Rate
-Heating Coil Gas Rate
-Heating Coil Gas Energy
+Heating Coil NaturalGas Rate
+Heating Coil NaturalGas Energy
 System Node Mass Flow Rate
 AIR LOOP INLET NODE,System Node Temperature
 HEATING COIL AIR INLET NODE,System Node Temperature
@@ -18,7 +18,7 @@ AIR LOOP OUTLET NODE,System Node Temperature
 Cooling Coil Total Cooling Rate
 Cooling Coil Sensible Cooling Rate
 Cooling Coil Latent Cooling Rate
-Cooling Coil Electric Power
+Cooling Coil Electricity Rate
 Cooling Coil Runtime Fraction
 Heat Exchanger Sensible Heating Rate
 Heat Exchanger Latent Gain Rate
@@ -26,5 +26,5 @@ Heat Exchanger Total Heating Rate
 Heat Exchanger Sensible Cooling Rate
 Heat Exchanger Latent Cooling Rate
 Heat Exchanger Total Cooling Rate
-Heat Exchanger Electric Power
+Heat Exchanger Electricity Rate
 0

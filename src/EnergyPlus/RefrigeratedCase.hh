@@ -59,6 +59,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EneryPlusData;
+struct BranchInputManagerData;
+
 namespace RefrigeratedCase {
 
     extern int const WaterSupplyFromMains;
@@ -366,11 +370,11 @@ namespace RefrigeratedCase {
 
         void ReportRackSystem(int RackNum);
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigSystemData
@@ -860,11 +864,11 @@ namespace RefrigeratedCase {
 
         void UpdateCondenser();
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
     };
 
     struct RefrigGasCoolerData
@@ -1517,34 +1521,34 @@ namespace RefrigeratedCase {
 
     // Functions
 
-    void ManageRefrigeratedCaseRacks();
+    void ManageRefrigeratedCaseRacks(EnergyPlusData &state);
 
-    void GetRefrigerationInput();
+    void GetRefrigerationInput(EnergyPlusData &state);
 
     void SetupReportInput();
 
     void InitRefrigeration();
 
-    void InitRefrigerationPlantConnections();
+    void InitRefrigerationPlantConnections(BranchInputManagerData &dataBranchInputManager);
 
     void SimulateDetailedRefrigerationSystems();
 
     void SimulateDetailedTransRefrigSystems();
 
-    void GetRefrigeratedRackIndex(std::string const &Name,
+    void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
                                   int SysType,
                                   bool &ErrorsFound,
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);
 
-    void ReportRefrigerationComponents(OutputFiles &outputFiles);
+    void ReportRefrigerationComponents(IOFiles &ioFiles);
 
     void SumZoneImpacts();
 
-    void CheckRefrigerationInput();
+    void CheckRefrigerationInput(EnergyPlusData &state);
 
-    void SimAirChillerSet(std::string const &AirChillerSetName,
+    void SimAirChillerSet(EnergyPlusData &state, std::string const &AirChillerSetName,
                           int ZoneNum,
                           bool FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -1559,7 +1563,7 @@ namespace RefrigeratedCase {
                         Real64 AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
     );
 
-    void FigureRefrigerationZoneGains();
+    void FigureRefrigerationZoneGains(EnergyPlusData &state);
 
     void ZeroHVACValues();
 

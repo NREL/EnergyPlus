@@ -61,18 +61,19 @@
 #include <functional>
 
 namespace EnergyPlus {
-class OutputFile;
 
+    // Forward declarations
+    struct EnergyPlusData;
+    class InputOutputFile;
+    class IOFiles;
 
-int AbortEnergyPlus();
+int AbortEnergyPlus(EnergyPlusData &state);
 
-void CloseMiscOpenFiles();
+void CloseMiscOpenFiles(IOFiles &ioFiles);
 
 void CloseOutOpenFiles();
 
-int EndEnergyPlus();
-
-int GetNewUnitNumber();
+int EndEnergyPlus(IOFiles &ioFiles);
 
 int FindUnitNumber(std::string const &FileName); // File name to be searched.
 
@@ -134,7 +135,7 @@ public:
     {}
 };
 
-using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::OutputFile>>;
+using OptionalOutputFileRef = Optional<std::reference_wrapper<EnergyPlus::InputOutputFile>>;
 
 void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1 = _, OptionalOutputFileRef OutUnit2 = _);
 
@@ -555,10 +556,6 @@ namespace UtilityRoutines {
 
     bool IsNameEmpty(std::string &NameToVerify, std::string const &StringToDisplay, bool &ErrorFound);
 
-    std::string IPTrimSigDigits(int const IntegerValue);
-
-
-
     // Two structs for case insensitive containers.
     // Eg: for unordered_map, we need to have a case insenstive hasher and a case insensitive comparator
     // (The default allocator for unordered_map is fine)
@@ -573,9 +570,13 @@ namespace UtilityRoutines {
         bool operator()(const std::string& a, const std::string& b) const noexcept;
     };
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
-    inline bool exists(const std::string& filename);
+    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+
+    bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
 
 } // namespace UtilityRoutines
 

@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -1847,7 +1847,7 @@
 
   Output:Variable,*,Zone Window Air Conditioner Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Zone Window Air Conditioner Electric Power,hourly;
+  Output:Variable,*,Zone Window Air Conditioner Electricity Rate,hourly;
 
   Output:Variable,*,Zone Window Air Conditioner Fan Part Load Ratio,hourly;
 

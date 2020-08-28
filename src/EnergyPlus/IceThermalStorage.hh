@@ -57,6 +57,8 @@
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace IceThermalStorage {
 
@@ -152,9 +154,9 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSimpleIceStorage();
+        void InitSimpleIceStorage(BranchInputManagerData &dataBranchInputManager);
 
         void CalcIceStorageDormant();
 
@@ -251,9 +253,9 @@ namespace IceThermalStorage {
 
         static PlantComponent *factory(std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitDetailedIceStorage();
+        void InitDetailedIceStorage(BranchInputManagerData &dataBranchInputManager);
 
         void SimDetailedIceStorage();
 

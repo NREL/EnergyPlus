@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -1389,61 +1389,61 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,Monthly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Monthly;
+  Output:Variable,*,Cooling Coil Electricity Energy,Monthly;
 
-  Output:Variable,*,Fan Electric Energy,Monthly;
+  Output:Variable,*,Fan Electricity Energy,Monthly;
 
   Output:Variable,*,Zone Air Temperature,Monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Timestep;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Daily;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil Gas Energy,Monthly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Annual;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Annual;
 
-  Output:Variable,*,Heating Coil Electric Energy,Timestep;
+  Output:Variable,*,Heating Coil Electricity Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Electric Energy,Hourly;
+  Output:Variable,*,Heating Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Daily;
+  Output:Variable,*,Heating Coil Electricity Energy,Daily;
 
-  Output:Variable,*,Heating Coil Electric Energy,Monthly;
+  Output:Variable,*,Heating Coil Electricity Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Annual;
+  Output:Variable,*,Heating Coil Electricity Energy,Annual;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Timestep;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Timestep;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Daily;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Daily;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Monthly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,Annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,Annual;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,Timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Hourly;
+  Output:Variable,*,Cooling Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Daily;
+  Output:Variable,*,Cooling Coil Electricity Energy,Daily;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Monthly;
+  Output:Variable,*,Cooling Coil Electricity Energy,Monthly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Annual;
+  Output:Variable,*,Cooling Coil Electricity Energy,Annual;
 
-  Output:Variable,*,Fan Electric Energy,Timestep;
+  Output:Variable,*,Fan Electricity Energy,Timestep;
 
-  Output:Variable,*,Fan Electric Energy,Hourly;
+  Output:Variable,*,Fan Electricity Energy,Hourly;
 
-  Output:Variable,*,Fan Electric Energy,Daily;
+  Output:Variable,*,Fan Electricity Energy,Daily;
 
-  Output:Variable,*,Fan Electric Energy,Monthly;
+  Output:Variable,*,Fan Electricity Energy,Monthly;
 
-  Output:Variable,*,Fan Electric Energy,Annual;
+  Output:Variable,*,Fan Electricity Energy,Annual;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Daily;
 
@@ -1563,11 +1563,11 @@
 
   Output:Meter,Electricity:Facility,Monthly;
 
-  Output:Meter,Heating:Gas,Monthly;
+  Output:Meter,Heating:NaturalGas,Monthly;
 
-  Output:Meter,Gas:HVAC,Monthly;
+  Output:Meter,NaturalGas:HVAC,Monthly;
 
-  Output:Meter,Gas:Facility,Monthly;
+  Output:Meter,NaturalGas:Facility,Monthly;
 
 !-   ===========  ALL OBJECTS IN CLASS: REPORT ===========
 

@@ -116,8 +116,6 @@ namespace HVACInterfaceManager {
     // MODULE VARIABLE DECLARATIONS:
     bool CommonPipeSetupFinished(false);
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ConductionTransferFunctionCalc
-
     // Object Data
     Array1D<CommonPipeData> PlantCommonPipe;
 

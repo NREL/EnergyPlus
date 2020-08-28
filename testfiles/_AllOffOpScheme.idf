@@ -109,7 +109,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -2240,7 +2240,7 @@
 
   Output:Variable,Chilled Water Condenser Loop,Plant Supply Side Outlet Temperature,timestep;
 
-  Output:Variable,Big Chiller,Chiller Electric Power,timestep;
+  Output:Variable,Big Chiller,Chiller Electricity Rate,timestep;
 
   Output:Variable,Big Chiller,Chiller Evaporator Cooling Rate,timestep;
 
@@ -2266,7 +2266,7 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 

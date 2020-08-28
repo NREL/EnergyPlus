@@ -43,7 +43,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1032,9 +1032,9 @@
 
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Pump Electric Energy,hourly;
+  Output:Variable,*,Pump Electricity Energy,hourly;
 
-  Output:Variable,*,Pump Electric Power,hourly;
+  Output:Variable,*,Pump Electricity Rate,hourly;
 
   Output:Variable,*,Pump Shaft Power,hourly;
 

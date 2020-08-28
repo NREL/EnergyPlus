@@ -47,45 +47,97 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
+#include <EnergyPlus/api/state.h>
+
+#ifdef _WIN32
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
 
 int numWarnings = 0;
 int oneTimeHalfway = 0;
 
-void newEnvrnHandler() {
+void BeginNewEnvironmentHandler(EnergyPlusState state) {
+    printf("CALLBACK: %s\n", __PRETTY_FUNCTION__);
+    issueWarning(state, "Fake Warning at new environment");
+    issueSevere(state, "Fake Severe at new environment");
+    issueText(state, "Just some text at the new environment");
+}
+void AfterNewEnvironmentWarmupCompleteHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void BeginZoneTimeStepBeforeInitHeatBalanceHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void BeginZoneTimeStepAfterInitHeatBalanceHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void BeginTimeStepBeforePredictorHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void AfterPredictorBeforeHVACManagersHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void AfterPredictorAfterHVACManagersHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void InsideSystemIterationLoopHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void EndOfZoneTimeStepBeforeZoneReportingHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void EndOfZoneTimeStepAfterZoneReportingHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void EndOfSystemTimeStepBeforeHVACReportingHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void EndOfSystemTimeStepAfterHVACReportingHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void EndOfZoneSizingHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void EndOfSystemSizingHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void EndOfAfterComponentGetInputHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void UnitarySystemSizingHandler(EnergyPlusState state) { printf("CALLBACK: %s\n", __PRETTY_FUNCTION__); }
+void stdOutHandler(const char * message) { printf("CAPTURED STDOUT: %s\n", message); }
+
+void newEnvrnHandler(EnergyPlusState state) {
     printf("Starting a new environment\n");
 }
 
-void progressHandler(int const progress) {
+void progressHandler(EnergyPlusState state, int const progress) {
     if (oneTimeHalfway == 0 && progress > 50) {
         printf("Were halfway there!\n");
         oneTimeHalfway = 1;
     }
 }
 
-void errorHandler(const char * message) {
+void errorHandler(EnergyPlusState state, int level, const char * message) {
     char * warning = strstr(message, "Warning");
     if (warning) {
         numWarnings++;
     }
 }
 
+void externalHVAC(EnergyPlusState state) {
+    printf("External HVAC called\n");
+}
+
 int main(int argc, const char * argv[]) {
-    registerProgressCallback(progressHandler);
-    registerErrorCallback(errorHandler);
-    energyplus(argc, argv);
+//    callbackBeginNewEnvironment(BeginNewEnvironmentHandler);
+//    callbackAfterNewEnvironmentWarmupComplete(AfterNewEnvironmentWarmupCompleteHandler);
+//    callbackBeginZoneTimeStepBeforeInitHeatBalance(BeginZoneTimeStepBeforeInitHeatBalanceHandler);
+//    callbackBeginZoneTimeStepAfterInitHeatBalance(BeginZoneTimeStepAfterInitHeatBalanceHandler);
+//    callbackBeginTimeStepBeforePredictor(BeginTimeStepBeforePredictorHandler);
+//    callbackAfterPredictorBeforeHVACManagers(AfterPredictorBeforeHVACManagersHandler);
+//    callbackAfterPredictorAfterHVACManagers(AfterPredictorAfterHVACManagersHandler);
+//    callbackInsideSystemIterationLoop(InsideSystemIterationLoopHandler);
+//    callbackEndOfZoneTimeStepBeforeZoneReporting(EndOfZoneTimeStepBeforeZoneReportingHandler);
+//    callbackEndOfZoneTimeStepAfterZoneReporting(EndOfZoneTimeStepAfterZoneReportingHandler);
+//    callbackEndOfSystemTimeStepBeforeHVACReporting(EndOfSystemTimeStepBeforeHVACReportingHandler);
+//    callbackEndOfSystemTimeStepAfterHVACReporting(EndOfSystemTimeStepAfterHVACReportingHandler);
+//    callbackEndOfZoneSizing(EndOfZoneSizingHandler);
+//    callbackEndOfSystemSizing(EndOfSystemSizingHandler);
+//    callbackEndOfAfterComponentGetInput(EndOfAfterComponentGetInputHandler);
+//    callbackUnitarySystemSizing(UnitarySystemSizingHandler);
+//    registerProgressCallback(progressHandler);
+//    registerErrorCallback(errorHandler);
+    EnergyPlusState state = stateNew();
+    energyplus(state, argc, argv);
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
     }
     oneTimeHalfway = 0;
-    cClearAllStates(); // note previous callbacks are cleared here
-    callbackAfterNewEnvironmentWarmupComplete(newEnvrnHandler);
-    energyplus(argc, argv);
+    stateReset(state); // note previous callbacks are cleared here
+    callbackAfterNewEnvironmentWarmupComplete(state, newEnvrnHandler);
+    registerStdOutCallback(state, stdOutHandler);
+    energyplus(state, argc, argv);
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
     }
+    stateReset(state);
+    registerExternalHVACManager(state, externalHVAC);
+    energyplus(state, argc, argv);
     return 0;
 }

@@ -1,10 +1,14 @@
 project(CalcSoilSurfTemp Fortran)
 
+cmake_minimum_required(VERSION 3.5.1)
+
+cmake_policy(SET CMP0012 NEW) # if() recognizes boolean constants
+
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
-set(SRC EPWRead.f90 SoilSurfTemp.f90) 
+set(SRC EPWRead.f90 SoilSurfTemp.f90)
 
 set(STATIC_EXE FALSE)
 
@@ -43,6 +47,7 @@ endif()
 
 set(SKIP_BUILD_RPATH TRUE)
 ADD_EXECUTABLE( CalcSoilSurfTemp ${SRC} )
+set_target_properties(CalcSoilSurfTemp PROPERTIES FOLDER Auxiliary)
 
 install( TARGETS CalcSoilSurfTemp DESTINATION PreProcess/CalcSoilSurfTemp )
 if(NOT ${STATIC_EXE})

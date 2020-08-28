@@ -22,7 +22,7 @@
 ! Plant:    None.
 ! SolDis=FullExterior, Aniso, Simple Interior and Exterior Convection
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -2175,7 +2175,7 @@
 
   Output:Variable,*,Earth Tube Water Mass Flow Rate,hourly;
 
-  Output:Variable,*,Earth Tube Fan Electric Energy,hourly;
+  Output:Variable,*,Earth Tube Fan Electricity Energy,hourly;
 
   Output:Variable,*,Earth Tube Zone Inlet Air Temperature,hourly;
 

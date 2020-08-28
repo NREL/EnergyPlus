@@ -36,7 +36,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 6
 
-  Version,9.3;
+  Version,9.4;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4580,7 +4580,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -5375,11 +5375,11 @@
 
   Output:Meter,InteriorEquipment:Electricity,Timestep;
 
-  Output:Meter,Gas:Facility,Timestep;
+  Output:Meter,NaturalGas:Facility,Timestep;
 
-  Output:Meter,Heating:Gas,Timestep;
+  Output:Meter,Heating:NaturalGas,Timestep;
 
-  Output:Meter,Water Heater:WaterSystems:Gas,Timestep;
+  Output:Meter,Water Heater:WaterSystems:NaturalGas,Timestep;
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,Timestep;
 
@@ -5397,7 +5397,7 @@
 
   Output:Variable,*,Air System Total Cooling Energy,Timestep;
 
-  Output:Variable,*,Air System Fan Electric Energy,Timestep;
+  Output:Variable,*,Air System Fan Electricity Energy,Timestep;
 
   Output:Variable,*,Zone Mean Air Temperature,Timestep;
 

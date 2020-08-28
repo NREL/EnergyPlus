@@ -75,7 +75,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -86488,13 +86488,13 @@
 
   Output:Variable,*,Zone Mean Air Temperature,Hourly;
 
-  Output:Variable,*,Zone Lights Electric Energy,Hourly;
+  Output:Variable,*,Zone Lights Electricity Energy,Hourly;
 
-  Output:Variable,*,Air System DX Cooling Coil Electric Energy,Hourly;
+  Output:Variable,*,Air System DX Cooling Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Air System Fan Electric Energy,Hourly;
+  Output:Variable,*,Air System Fan Electricity Energy,Hourly;
 
-  Output:Variable,*,Air System Gas Energy,Hourly;
+  Output:Variable,*,Air System NaturalGas Energy,Hourly;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PPD,Hourly;
 
@@ -86543,13 +86543,13 @@
   Output:Table:Monthly,
     Zone Electric Summary,   !- Name
     2,                       !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -86561,17 +86561,17 @@
   Output:Table:Monthly,
     Air Loop System Component Energy Use,  !- Name
     2,                       !- Digits After Decimal
-    Air System Fan Electric Energy,  !- Variable or Meter 1 Name
+    Air System Fan Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Air System Fan Electric Energy,  !- Variable or Meter 2 Name
+    Air System Fan Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Air System DX Cooling Coil Electric Energy,  !- Variable or Meter 3 Name
+    Air System DX Cooling Coil Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Air System DX Cooling Coil Electric Energy,  !- Variable or Meter 4 Name
+    Air System DX Cooling Coil Electricity Energy,  !- Variable or Meter 4 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 4
-    Air System Heating Coil Gas Energy,  !- Variable or Meter 5 Name
+    Air System Heating Coil NaturalGas Energy,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Air System Heating Coil Gas Energy,  !- Variable or Meter 6 Name
+    Air System Heating Coil NaturalGas Energy,  !- Variable or Meter 6 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 6
 
   Output:Table:Monthly,

@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3652,11 +3652,11 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
-  Output:Variable,*,Chiller Electric Power,hourly;
+  Output:Variable,*,Chiller Electricity Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
@@ -3684,9 +3684,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3698,9 +3698,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   Output:Meter:MeterFileOnly,MyGeneralLights,monthly;
 
@@ -3725,27 +3725,27 @@
 
   Meter:Custom,
     MyGeneralLights,         !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     SPACE1-1 Lights 1,       !- Key Name 1
-    Lights Electric Energy,  !- Output Variable or Meter Name 1
+    Lights Electricity Energy,  !- Output Variable or Meter Name 1
     SPACE2-1 Lights 1,       !- Key Name 2
-    Lights Electric Energy,  !- Output Variable or Meter Name 2
+    Lights Electricity Energy,  !- Output Variable or Meter Name 2
     SPACE3-1 Lights 1,       !- Key Name 3
-    Lights Electric Energy,  !- Output Variable or Meter Name 3
+    Lights Electricity Energy,  !- Output Variable or Meter Name 3
     SPACE4-1 Lights 1,       !- Key Name 4
-    Lights Electric Energy,  !- Output Variable or Meter Name 4
+    Lights Electricity Energy,  !- Output Variable or Meter Name 4
     SPACE5-1 Lights 1,       !- Key Name 5
-    Lights Electric Energy;  !- Output Variable or Meter Name 5
+    Lights Electricity Energy;  !- Output Variable or Meter Name 5
 
   Meter:Custom,
     MyBuildingElectric,      !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     ,                        !- Key Name 1
     Electricity:Building;    !- Output Variable or Meter Name 1
 
   Meter:CustomDecrement,
     MyBuildingOther,         !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     Electricity:Building,    !- Source Meter Name
     ,                        !- Key Name 1
     MyGeneralLights;         !- Output Variable or Meter Name 1

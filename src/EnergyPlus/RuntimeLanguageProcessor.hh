@@ -119,6 +119,8 @@ namespace RuntimeLanguageProcessor {
     extern int DayOfWeekVariableNum;
     extern int DayOfYearVariableNum;
     extern int HourVariableNum;
+    extern int TimeStepsPerHourVariableNum;
+    extern int TimeStepNumVariableNum;
     extern int MinuteVariableNum;
     extern int HolidayVariableNum;
     extern int DSTVariableNum;
@@ -174,11 +176,11 @@ namespace RuntimeLanguageProcessor {
     // Functions
     void clear_state();
 
-    void InitializeRuntimeLanguage();
+    void InitializeRuntimeLanguage(IOFiles &ioFiles);
 
     void BeginEnvrnInitializeRuntimeLanguage();
 
-    void ParseStack(int const StackNum);
+    void ParseStack(IOFiles &ioFiles, int const StackNum);
 
     int AddInstruction(int const StackNum,
                        int const LineNum,
@@ -191,13 +193,10 @@ namespace RuntimeLanguageProcessor {
                   std::string const &Error // error message to be added to ErlStack
     );
 
-    ErlValueType EvaluateStack(int const StackNum);
+    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum);
 
-    void WriteTrace(int const StackNum,
-                    int const InstructionNum,
-                    ErlValueType const &ReturnValue,
-                    bool const seriousErrorFound // if true then also call energyplus error severe->fatal with Erl program line info
-    );
+    void
+    WriteTrace(IOFiles &ioFiles, int const StackNum, int const InstructionNum, ErlValueType const &ReturnValue, bool const seriousErrorFound);
 
     //******************************************************************************************
 
@@ -205,7 +204,8 @@ namespace RuntimeLanguageProcessor {
 
     //******************************************************************************************
 
-    void ParseExpression(std::string const &InString, // String of expression text written in the Runtime Language
+    void ParseExpression(IOFiles &ioFiles,
+                         std::string const &InString, // String of expression text written in the Runtime Language
                          int const StackNum,          // Parent StackNum??
                          int &ExpressionNum,          // index of expression in structure
                          std::string const &Line      // Actual line from string
@@ -217,11 +217,19 @@ namespace RuntimeLanguageProcessor {
 
     ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound);
 
-    void GetRuntimeLanguageUserInput();
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D<Real64> &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    void TodayTomorrowWeather(
+        int const FunctionCode, Real64 const Operand1, Real64 const Operand2, Array2D_bool &TodayTomorrowWeatherSource, ErlValueType &ReturnVal);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<Real64> &TodayTomorrowWeatherSource, Real64 &value);
+
+    int TodayTomorrowWeather(int hour, int timestep, Array2D<bool> &TodayTomorrowWeatherSource, int &value);
+
+    void GetRuntimeLanguageUserInput(IOFiles &ioFiles);
 
     void ReportRuntimeLanguage();
-
-    std::string IntegerToString(int const Number);
 
     ErlValueType SetErlValueNumber(Real64 const Number, Optional<ErlValueType const> OrigValue = _);
 

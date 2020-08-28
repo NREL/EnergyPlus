@@ -117,7 +117,7 @@
 ! Results:
 ! Standard Reports:            Variable Dictionary, Construction, Surfaces (Details with vertices, DXF)
 ! Timestep or Hourly Variables: None
-! Time Bins Report:            Outdoor Dry Bulb, Outdoor Dew Point, Outdoor Relative Humidity, Outdoor Humidity Ratio, Outdoor Enthalpy, Wind Speed, Wind Direction, Direct Solar, Diffuse Solar, Electricity:Facility, Gas:Facility, Surface Outside Face Temperature, Surface Inside Face Temperature
+! Time Bins Report:            Outdoor Dry Bulb, Outdoor Dew Point, Outdoor Relative Humidity, Outdoor Humidity Ratio, Outdoor Enthalpy, Wind Speed, Wind Direction, Direct Solar, Diffuse Solar, Electricity:Facility, NaturalGas:Facility, Surface Outside Face Temperature, Surface Inside Face Temperature
 ! Monthly Table Report:        Zone Cooling Summary, Zone Heating Summary, Zone Electric Summary, Space Gains, Peak Space Gains, Space Gain Components at Cooling Peak, Energy Consumption - Electricity, End-Use Energy Consumption - Electricity, End-Use Energy Consumption - Natural Gas, Peak Energy End-Use - Electricity, Electric Components of Peak Demand, Peak Energy End-Use - Natural Gas, Setpoints Not Met With Temperatures, Comfort Report - Simple 55, Occupant Comfort Data Summary, DX Report,
 !                              Window Report, Window Energy Report, Window Zone Summary, Window Energy Zone Summary, Average Outdoor Conditions, Outdoor Conditions Maximum Drybulb, Outdoor Conditions Minimum Drybulb, Outdoor Conditions Maximum Wetbulb, Outdoor Conditions Maximum Dew Point, Outdoor Ground Conditions, Water Heater Report, Fan Report, Zone Temperature Oscillation Report
 ! HTML Report:                 AnnualBuildingUtilityPerformanceSummary
@@ -126,7 +126,7 @@
 ! Report Variables:            All available in RDD (442 requested, monthly and annual results)
 !
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Small Office 2 Story 4 zone 550 m2,  !- Name
@@ -3856,17 +3856,17 @@
 
   Output:Variable,*,Zone Air Terminal Sensible Heating Rate,annual;
 
-  Output:Variable,*,Zone Lights Electric Energy,monthly;
+  Output:Variable,*,Zone Lights Electricity Energy,monthly;
 
-  Output:Variable,*,Zone Lights Electric Energy,annual;
+  Output:Variable,*,Zone Lights Electricity Energy,annual;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,monthly;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,monthly;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,annual;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,annual;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,monthly;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,monthly;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,annual;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,annual;
 
   Output:Variable,*,Zone Electric Equipment Convective Heating Energy,monthly;
 
@@ -3892,13 +3892,13 @@
 
   Output:Variable,*,Fan Rise in Air Temperature,annual;
 
-  Output:Variable,*,Fan Electric Energy,monthly;
+  Output:Variable,*,Fan Electricity Energy,monthly;
 
-  Output:Variable,*,Fan Electric Energy,annual;
+  Output:Variable,*,Fan Electricity Energy,annual;
 
-  Output:Variable,*,Fan Electric Power,monthly;
+  Output:Variable,*,Fan Electricity Rate,monthly;
 
-  Output:Variable,*,Fan Electric Power,annual;
+  Output:Variable,*,Fan Electricity Rate,annual;
 
   Output:Variable,*,Unitary System Fan Part Load Ratio,monthly;
 
@@ -3932,45 +3932,45 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,annual;
 
-  Output:Variable,*,Cooling Coil Electric Energy,monthly;
+  Output:Variable,*,Cooling Coil Electricity Energy,monthly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,annual;
+  Output:Variable,*,Cooling Coil Electricity Energy,annual;
 
-  Output:Variable,*,Cooling Coil Electric Power,monthly;
+  Output:Variable,*,Cooling Coil Electricity Rate,monthly;
 
-  Output:Variable,*,Cooling Coil Electric Power,annual;
+  Output:Variable,*,Cooling Coil Electricity Rate,annual;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,monthly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,annual;
 
-  Output:Variable,*,Heating Coil Electric Energy,monthly;
+  Output:Variable,*,Heating Coil Electricity Energy,monthly;
 
-  Output:Variable,*,Heating Coil Electric Energy,annual;
+  Output:Variable,*,Heating Coil Electricity Energy,annual;
 
-  Output:Variable,*,Heating Coil Electric Power,monthly;
+  Output:Variable,*,Heating Coil Electricity Rate,monthly;
 
-  Output:Variable,*,Heating Coil Electric Power,annual;
+  Output:Variable,*,Heating Coil Electricity Rate,annual;
 
   Output:Variable,*,Heating Coil Heating Energy,monthly;
 
   Output:Variable,*,Heating Coil Heating Energy,annual;
 
-  Output:Variable,*,Heating Coil Gas Energy,monthly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,monthly;
 
-  Output:Variable,*,Heating Coil Gas Energy,annual;
+  Output:Variable,*,Heating Coil NaturalGas Energy,annual;
 
-  Output:Variable,*,Heating Coil Gas Rate,monthly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,monthly;
 
-  Output:Variable,*,Heating Coil Gas Rate,annual;
+  Output:Variable,*,Heating Coil NaturalGas Rate,annual;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,monthly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Energy,annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Energy,annual;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,monthly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,monthly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,annual;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,annual;
 
   Output:Variable,*,Heating Coil Heating Rate,monthly;
 
@@ -4068,13 +4068,13 @@
 
   Output:Variable,*,Water Heater Net Heat Transfer Energy,annual;
 
-  Output:Variable,*,Water Heater Gas Energy,monthly;
+  Output:Variable,*,Water Heater NaturalGas Energy,monthly;
 
-  Output:Variable,*,Water Heater Gas Energy,annual;
+  Output:Variable,*,Water Heater NaturalGas Energy,annual;
 
-  Output:Variable,*,Water Heater Gas Rate,monthly;
+  Output:Variable,*,Water Heater NaturalGas Rate,monthly;
 
-  Output:Variable,*,Water Heater Gas Rate,annual;
+  Output:Variable,*,Water Heater NaturalGas Rate,annual;
 
   Output:Variable,*,Water Heater Water Volume,monthly;
 
@@ -4160,93 +4160,93 @@
 
   Output:Variable,*,Environmental Impact Electricity Nuclear Low Level Waste Volume,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO2 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas CO2 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO2 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas CO2 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas CO Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas CO Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas CO Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas CH4 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas CH4 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas CH4 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas CH4 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas NOx Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas NOx Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas NOx Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas NOx Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas N2O Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas N2O Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas N2O Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas N2O Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas SO2 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas SO2 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas SO2 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas SO2 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas PM Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas PM Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM10 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas PM10 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM10 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas PM10 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM2.5 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas PM2.5 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas PM2.5 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas PM2.5 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas NH3 Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas NH3 Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas NH3 Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas NH3 Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas NMVOC Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas NMVOC Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas NMVOC Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas NMVOC Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Hg Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Hg Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Hg Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Hg Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Pb Emissions Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Pb Emissions Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Pb Emissions Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Pb Emissions Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Water Consumption Volume,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Water Consumption Volume,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Water Consumption Volume,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Water Consumption Volume,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear High Level Waste Mass,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear High Level Waste Mass,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear High Level Waste Mass,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear High Level Waste Mass,annual;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear Low Level Waste Volume,monthly;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear Low Level Waste Volume,monthly;
 
-  Output:Variable,*,Environmental Impact Natural Gas Nuclear Low Level Waste Volume,annual;
+  Output:Variable,*,Environmental Impact NaturalGas Nuclear Low Level Waste Volume,annual;
 
   Output:Meter:MeterFileOnly,Cooling:Electricity,monthly;
 
   Output:Meter:MeterFileOnly,Cooling:Electricity,annual;
 
-  Output:Meter:MeterFileOnly,WaterSystems:Gas,monthly;
+  Output:Meter:MeterFileOnly,WaterSystems:NaturalGas,monthly;
 
-  Output:Meter:MeterFileOnly,WaterSystems:Gas,annual;
+  Output:Meter:MeterFileOnly,WaterSystems:NaturalGas,annual;
 
   Output:Meter:MeterFileOnly,Fans:Electricity,monthly;
 
   Output:Meter:MeterFileOnly,Fans:Electricity,annual;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,annual;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,annual;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,annual;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,annual;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,annual;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,annual;
 
   Output:Meter:MeterFileOnly,Water:Plant,monthly;
 
@@ -4280,9 +4280,9 @@
 
   Output:Meter:MeterFileOnly,Heating:Electricity,annual;
 
-  Output:Meter:MeterFileOnly,Heating:Gas,monthly;
+  Output:Meter:MeterFileOnly,Heating:NaturalGas,monthly;
 
-  Output:Meter:MeterFileOnly,Heating:Gas,annual;
+  Output:Meter:MeterFileOnly,Heating:NaturalGas,annual;
 
   Output:Meter:MeterFileOnly,InteriorEquipment:Electricity,monthly;
 
@@ -4741,7 +4741,7 @@
 
   Output:Table:TimeBins,
     *,                       !- Key Value
-    Gas:Facility,            !- Variable Name
+    NaturalGas:Facility,            !- Variable Name
     0,                       !- Interval Start
     750,                     !- Interval Size
     20;                      !- Interval Count
@@ -4793,13 +4793,13 @@
   Output:Table:Monthly,
     Zone Electric Summary,   !- Name
     ,                        !- Digits After Decimal
-    Zone Lights Electric Energy,  !- Variable or Meter 1 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Zone Lights Electric Energy,  !- Variable or Meter 2 Name
+    Zone Lights Electricity Energy,  !- Variable or Meter 2 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 2
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 3 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
-    Zone Electric Equipment Electric Energy,  !- Variable or Meter 4 Name
+    Zone Electric Equipment Electricity Energy,  !- Variable or Meter 4 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 4
 
   Output:Table:Monthly,
@@ -4873,9 +4873,9 @@
   Output:Table:Monthly,
     End-Use Energy Consumption - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    Heating:Gas,             !- Variable or Meter 1 Name
+    Heating:NaturalGas,             !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    WaterSystems:Gas,        !- Variable or Meter 2 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 2 Name
     SumOrAverage;            !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -4913,9 +4913,9 @@
   Output:Table:Monthly,
     Peak Energy End-Use - Natural Gas,  !- Name
     ,                        !- Digits After Decimal
-    Heating:Gas,             !- Variable or Meter 1 Name
+    Heating:NaturalGas,             !- Variable or Meter 1 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 1
-    WaterSystems:Gas,        !- Variable or Meter 2 Name
+    WaterSystems:NaturalGas,        !- Variable or Meter 2 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 2
 
   Output:Table:Monthly,
@@ -4969,7 +4969,7 @@
     ,                        !- Digits After Decimal
     Cooling Coil Total Cooling Energy,  !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
-    Cooling Coil Electric Energy,  !- Variable or Meter 2 Name
+    Cooling Coil Electricity Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
     Cooling Coil Total Cooling Energy,  !- Variable or Meter 3 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 3
@@ -4977,7 +4977,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 4
     Cooling Coil Latent Cooling Energy,  !- Variable or Meter 5 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 5
-    Cooling Coil Crankcase Heater Electric Energy,  !- Variable or Meter 6 Name
+    Cooling Coil Crankcase Heater Electricity Energy,  !- Variable or Meter 6 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 6
     Cooling Coil Runtime Fraction,  !- Variable or Meter 7 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 7
@@ -4989,9 +4989,9 @@
     Maximum,                 !- Aggregation Type for Variable or Meter 10
     Cooling Coil Latent Cooling Rate,  !- Variable or Meter 11 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 11
-    Cooling Coil Electric Power,  !- Variable or Meter 12 Name
+    Cooling Coil Electricity Rate,  !- Variable or Meter 12 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 12
-    Cooling Coil Crankcase Heater Electric Power,  !- Variable or Meter 13 Name
+    Cooling Coil Crankcase Heater Electricity Rate,  !- Variable or Meter 13 Name
     Maximum;                 !- Aggregation Type for Variable or Meter 13
 
   Output:Table:Monthly,
@@ -5165,7 +5165,7 @@
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Water Heater Use Side Heat Transfer Energy,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Water Heater Gas Energy, !- Variable or Meter 3 Name
+    Water Heater NaturalGas Energy, !- Variable or Meter 3 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 3
     Water Heater Total Demand Heat Transfer Energy,  !- Variable or Meter 4 Name
     HoursNonZero,            !- Aggregation Type for Variable or Meter 4
@@ -5177,11 +5177,11 @@
   Output:Table:Monthly,
     Fan Report,              !- Name
     ,                        !- Digits After Decimal
-    Fan Electric Energy,     !- Variable or Meter 1 Name
+    Fan Electricity Energy,     !- Variable or Meter 1 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 1
     Fan Rise in Air Temperature,  !- Variable or Meter 2 Name
     SumOrAverage,            !- Aggregation Type for Variable or Meter 2
-    Fan Electric Power,      !- Variable or Meter 3 Name
+    Fan Electricity Rate,      !- Variable or Meter 3 Name
     Maximum,                 !- Aggregation Type for Variable or Meter 3
     Fan Rise in Air Temperature,  !- Variable or Meter 4 Name
     ValueWhenMaximumOrMinimum;  !- Aggregation Type for Variable or Meter 4

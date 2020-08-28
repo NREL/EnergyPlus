@@ -86,7 +86,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -1177,9 +1177,9 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Heating Coil Electric Power,timestep;
+  Output:Variable,*,Heating Coil Electricity Rate,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,timestep;
 
@@ -1207,7 +1207,7 @@
 
   Output:Variable,*,Cooling Coil Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,timestep;
 
@@ -1217,7 +1217,7 @@
 
   Output:Variable,*,Cooling Coil Source Side Heat Transfer Energy,timestep;
 
-  Output:Variable,*,Heating Coil Electric Energy,timestep;
+  Output:Variable,*,Heating Coil Electricity Energy,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
 
@@ -1227,9 +1227,9 @@
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 
@@ -1267,9 +1267,9 @@
 
   Output:Variable,*,Zone Water to Air Heat Pump Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Water to Air Heat Pump Electric Power,timestep;
+  Output:Variable,*,Zone Water to Air Heat Pump Electricity Rate,timestep;
 
-  Output:Variable,*,Zone Water to Air Heat Pump Electric Energy,timestep;
+  Output:Variable,*,Zone Water to Air Heat Pump Electricity Energy,timestep;
 
   Output:Variable,*,Zone Water to Air Heat Pump Fan Part Load Ratio,timestep;
 
@@ -1321,7 +1321,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1331,7 +1331,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   Material:NoMass,
     R19LAYER,                !- Name

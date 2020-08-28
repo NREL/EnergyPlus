@@ -20,7 +20,7 @@
 !           chillers and purchased cooling.  Priority based controls determine which piece of equipment
 !           tries to meet the load.
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -2157,7 +2157,7 @@
 
   Output:Variable,*,Fan Rise in Air Temperature,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 

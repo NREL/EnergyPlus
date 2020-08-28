@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MicroturbineElectricGenerator.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -99,6 +100,12 @@ namespace MicroturbineElectricGenerator {
 
     // Object Data
     Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
+
+    void clear_state() {
+        NumMTGenerators = 0;
+        GetMTInput = true;
+        MTGenerator.clear();
+    }
 
     PlantComponent *MTGeneratorSpecs::factory(std::string const &objectName)
     {
@@ -317,23 +324,14 @@ namespace MicroturbineElectricGenerator {
                 }
             }
 
-            // Fuel Type case statement
-            {
-                auto const SELECT_CASE_var(AlphArray(5));
-                if (is_blank(SELECT_CASE_var)) { // If blank, then the default is Natural Gas
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "NATURALGAS") {
-                    MTGenerator(GeneratorNum).FuelType = "Gas";
-
-                } else if (SELECT_CASE_var == "PROPANE") {
-                    MTGenerator(GeneratorNum).FuelType = "Propane";
-
-                } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
-                    ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
-                    ErrorsFound = true;
-                }
+            // Validate fuel type input
+            bool FuelTypeError(false);
+            UtilityRoutines::ValidateFuelType(AlphArray(5), MTGenerator(GeneratorNum).FuelType, FuelTypeError);
+            if (FuelTypeError) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " \"" + MTGenerator(GeneratorNum).Name + "\"");
+                ShowSevereError("Invalid " + DataIPShortCuts::cAlphaFieldNames(5) + "  = " + AlphArray(5));
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             MTGenerator(GeneratorNum).FuelHigherHeatingValue = NumArray(8);
@@ -767,9 +765,9 @@ namespace MicroturbineElectricGenerator {
 
     void MTGeneratorSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->ElecPowerGenerated, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->EnergyGen,
                             "System",
@@ -840,9 +838,9 @@ namespace MicroturbineElectricGenerator {
 
         if (this->StandbyPower > 0.0) { // Report Standby Power if entered by user
             SetupOutputVariable(
-                "Generator Standby Electric Power", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
+                "Generator Standby Electricity Rate", OutputProcessor::Unit::W, this->StandbyPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Standby Electric Energy",
+            SetupOutputVariable("Generator Standby Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->StandbyEnergy,
                                 "System",
@@ -857,9 +855,9 @@ namespace MicroturbineElectricGenerator {
 
         if (this->AncillaryPower > 0.0) { // Report Ancillary Power if entered by user
             SetupOutputVariable(
-                "Generator Ancillary Electric Power", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
+                "Generator Ancillary Electricity Rate", OutputProcessor::Unit::W, this->AncillaryPowerRate, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Ancillary Electric Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable("Generator Ancillary Electricity Energy", OutputProcessor::Unit::J, this->AncillaryEnergy, "System", "Sum", this->Name);
         }
 
         //   Report combustion air outlet conditions if exhaust air calculations are active
@@ -872,7 +870,7 @@ namespace MicroturbineElectricGenerator {
         }
     }
 
-    void MTGeneratorSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void MTGeneratorSpecs::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool EP_UNUSED(FirstHVACIteration),
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))
@@ -889,7 +887,8 @@ namespace MicroturbineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void MTGeneratorSpecs::InitMTGenerators(bool const RunFlag,
+    void MTGeneratorSpecs::InitMTGenerators(BranchInputManagerData &dataBranchInputManager,
+                                            bool const RunFlag,
                                             Real64 const MyLoad, // electrical load in W
                                             bool const FirstHVACIteration)
     {
@@ -916,7 +915,8 @@ namespace MicroturbineElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_Generator_MicroTurbine,
                                                     this->HRLoopNum,
                                                     this->HRLoopSideNum,

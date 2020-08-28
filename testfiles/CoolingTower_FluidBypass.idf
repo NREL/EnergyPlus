@@ -70,7 +70,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -10639,7 +10639,7 @@
 
   UtilityCost:Tariff,
     IN_EIAMonthlyRateGas,    !- Name
-    Gas:Facility,            !- Output Meter Name
+    NaturalGas:Facility,            !- Output Meter Name
     MCF,                     !- Conversion Factor Choice
     ,                        !- Energy Conversion Factor
     ,                        !- Demand Conversion Factor
@@ -10857,9 +10857,9 @@
 
   Output:Variable,*,Cooling Tower Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Power,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Cooling Tower Fan Electric Energy,timestep;
+  Output:Variable,*,Cooling Tower Fan Electricity Energy,timestep;
 
   Output:Variable,CoolSys1,Plant Supply Side Cooling Demand Rate,timestep;
 

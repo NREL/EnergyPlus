@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -2906,25 +2906,25 @@
 
   Output:Variable,*,Cooling Coil Part Load Ratio,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
   Output:Variable,*,Cooling Coil Source Side Heat Transfer Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Basin Heater Electric Energy,hourly;
+  Output:Variable,*,Cooling Coil Basin Heater Electricity Energy,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
   Output:Variable,*,People Occupant Count,hourly;
 
@@ -2992,7 +2992,7 @@
 
   Output:Variable,*,Unitary System Latent Heating Rate,hourly;
 
-  Output:Variable,*,Unitary System Ancillary Electric Power,hourly;
+  Output:Variable,*,Unitary System Ancillary Electricity Rate,hourly;
 
   Output:Variable,*,Unitary System Dehumidification Induced Heating Demand Rate,hourly;
 
@@ -3002,7 +3002,7 @@
 
   Output:Variable,*,Unitary System Frost Control Status,hourly;
 
-  Output:Variable,*,Unitary System Heating Ancillary Electric Energy,hourly;
+  Output:Variable,*,Unitary System Heating Ancillary Electricity Energy,hourly;
 
   Output:Variable,*,Unitary System Cycling Ratio,hourly;
 

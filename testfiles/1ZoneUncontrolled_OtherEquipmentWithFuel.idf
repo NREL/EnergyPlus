@@ -88,7 +88,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -388,7 +388,7 @@
 
   Output:Variable,*,Zone Other Equipment Total Heating Energy,monthly;
 
-  Output:Variable,*,Other Equipment FuelOil#2 Rate,hourly;
+  Output:Variable,*,Other Equipment FuelOilNo2 Rate,hourly;
 
   Output:Variable,*,Other Equipment Total Heating Rate,hourly;
 
@@ -404,7 +404,7 @@
 
   Output:Meter:MeterFileOnly,EnergyTransfer:Facility,hourly;
 
-  Output:Meter,FuelOil#2:Facility,hourly;
+  Output:Meter,FuelOilNo2:Facility,hourly;
 
   OutputControl:Table:Style,
     ALL;                     !- Column Separator

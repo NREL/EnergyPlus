@@ -426,7 +426,7 @@
 !
 !
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Exercise 2C,             !- Name
@@ -2127,17 +2127,17 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,RunPeriod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,Monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,Monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,Monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,Monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,Monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,Monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,RunPeriod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,RunPeriod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,RunPeriod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,RunPeriod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,RunPeriod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,RunPeriod;
 
   Output:VariableDictionary,Regular;
 

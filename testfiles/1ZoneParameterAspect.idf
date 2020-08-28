@@ -57,7 +57,7 @@
 ! Floor Area:              300 m2
 ! Number of Stories:       1
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -626,7 +626,7 @@
 
   Output:Variable,*,System Node Temperature,hourly;
 
-  Output:Variable,*,Baseboard Electric Power,hourly;
+  Output:Variable,*,Baseboard Electricity Rate,hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 

@@ -104,7 +104,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2153,7 +2153,7 @@
 
   Output:Variable,*,Baseboard Total Heating Rate,hourly,ReportSch;
 
-  Output:Variable,*,Baseboard Electric Energy,hourly,ReportSch;
+  Output:Variable,*,Baseboard Electricity Energy,hourly,ReportSch;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
@@ -2179,7 +2179,9 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DEBUGGINGDATA ===========
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   Output:SQLite,
     Simple;                  !- Option Type

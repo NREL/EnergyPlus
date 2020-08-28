@@ -52,6 +52,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace NonZoneEquipmentManager {
 
@@ -63,7 +65,7 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(bool FirstHVACIteration,
+    void ManageNonZoneEquipment(EnergyPlusData &state, bool FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     );
 
