@@ -159,12 +159,13 @@ struct CoilCoolingDXCurveFitSpeed
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int  const fanOpMode, Real64 condInletTemp);
     void size(EnergyPlusData &state, int speedNum, int maxSpeeds);
-    Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 const tdb, // Inlet dry-bulb temperature {C}
-                                                        Real64 const w,   // Inlet humidity ratio {kg-H2O/kg-dryair}
-                                                        Real64 const q,   // Total capacity {W}
-                                                        Real64 const shr, // SHR
-                                                        Real64 const h,   // Inlet enthalpy {J/kg-dryair}
-                                                        Real64 const p);  // Outlet node pressure {Pa}
+ 
+    Real64 CalcBypassFactor(Real64 const tdb, // Inlet dry-bulb temperature {C}
+                            Real64 const w,   // Inlet humidity ratio {kg-H2O/kg-dryair}
+                            Real64 const q,   // Total capacity {W}
+                            Real64 const shr, // SHR
+                            Real64 const h,   // Inlet enthalpy {J/kg-dryair}
+                            Real64 const p);  // Outlet node pressure {Pa}
 
     Real64 calcEffectiveSHR(const DataLoopNode::NodeData &inletNode,
                             Real64 const inletWetBulb,
