@@ -2196,17 +2196,21 @@ namespace WaterCoils {
                 }
                 bPRINT = false;       // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
                                       // should print this!)
-                TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;  // get the autosized air volume flow rate for use in other calculations
+                if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent && WaterCoil(CoilNum).DesAirVolFlowRate == DataFlowUsedForSizing) {
+                    TempSize = WaterCoil(CoilNum).DesAirVolFlowRate;  // represents parent object has hard-sized airflow
+                } else {
+                    TempSize = AutoSize;  // get the autosized air volume flow rate for use in other calculations
+                }
                 SizingString.clear(); // doesn't matter
                 CompName = WaterCoil(CoilNum).Name;
                 RequestSizing(state, CompType, CompName, CoolingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                 WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * TempSize; // inlet air mass flow rate is the autosized value
                 // Check if the air volume flow rate is defined in parent HVAC equipment and set water coil design air volume flow rate accordingly
                 if (CurZoneEqNum > 0) {
-                    if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent) {
+                    if (ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent && WaterCoil(CoilNum).DesAirVolFlowRate == TempSize) {
                         DataAirFlowUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
                         DataFlowUsedForSizing = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
-                        WaterCoil(CoilNum).DesAirVolFlowRate = ZoneEqSizing(CurZoneEqNum).AirVolFlow;
+                        WaterCoil(CoilNum).DesAirVolFlowRate = AutoSize; // represents water coil being autosized
                     } else {
                         DataAirFlowUsedForSizing = TempSize; // many autosized inputs use the design (autosized) air volume flow rate, save this value
                         DataFlowUsedForSizing = TempSize;
@@ -5973,8 +5977,6 @@ namespace WaterCoils {
             WhichCoil = UtilityRoutines::FindItem(CoilName, WaterCoil);
             if (WhichCoil != 0) {
                 if (UtilityRoutines::SameString(CoilType, "Coil:Cooling:Water") && WaterCoil(WhichCoil).DesAirVolFlowRate < 0.0) {
-                    WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
-                } else {
                     WaterCoil(WhichCoil).DesAirVolFlowRate = CoilDesFlow;
                 }
             } else {
