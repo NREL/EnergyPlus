@@ -6285,16 +6285,16 @@ namespace ZoneTempPredictorCorrector {
                     SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (Zone(ZoneNum).NoHeatToReturnAir) {
                         SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        WinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        WinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        if (WinHeatGain(SurfNum) >= 0.0) {
-                            WinHeatGainRep(SurfNum) = WinHeatGain(SurfNum);
-                            WinHeatGainRepEnergy(SurfNum) = WinHeatGainRep(SurfNum) * TimeStepZoneSec;
+                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
+                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
+                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * TimeStepZoneSec;
                         } else {
-                            WinHeatLossRep(SurfNum) = -WinHeatGain(SurfNum);
-                            WinHeatLossRepEnergy(SurfNum) = WinHeatLossRep(SurfNum) * TimeStepZoneSec;
+                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
+                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * TimeStepZoneSec;
                         }
-                        WinHeatTransferRepEnergy(SurfNum) = WinHeatTransfer(SurfNum) * TimeStepZoneSec;
+                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatTransfer(SurfNum) * TimeStepZoneSec;
                     }
                 }
 

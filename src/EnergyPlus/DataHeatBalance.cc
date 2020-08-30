@@ -654,12 +654,15 @@ namespace DataHeatBalance {
     Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
     // reflection from obstructions (W/m2)
     Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-    Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
-    Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
-    Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
+
+
+    Array1D_int SurfWinBSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
+    Array1D<Real64> SurfWinBSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
+    Array1D<Real64> SurfWinBSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
     Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
     Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
+
 
     Array2D<Real64> FenLaySurfTempFront;            // Front surface temperatures of fenestration layers
     Array2D<Real64> FenLaySurfTempBack;             // Back surface temperatures of fenestration layers
@@ -1005,9 +1008,9 @@ namespace DataHeatBalance {
         QRadSWOutIncBmToDiffReflObs.deallocate();
         QRadSWOutIncSkyDiffReflObs.deallocate();
         CosIncidenceAngle.deallocate();
-        BSDFBeamDirectionRep.deallocate();
-        BSDFBeamThetaRep.deallocate();
-        BSDFBeamPhiRep.deallocate();
+        SurfWinBSDFBeamDirectionRep.deallocate();
+        SurfWinBSDFBeamThetaRep.deallocate();
+        SurfWinBSDFBeamPhiRep.deallocate();
         QRadSWwinAbsTot.deallocate();
         QRadSWwinAbsLayer.deallocate();
         FenLaySurfTempFront.deallocate();

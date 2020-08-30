@@ -1461,7 +1461,7 @@ namespace DaylightingDevices {
         using DataHeatBalance::QRadSWwinAbs;
         using DataHeatBalance::QRadSWwinAbsTot;
         using DataHeatBalance::QS;
-        using DataSurfaces::WinTransSolar;
+        using DataSurfaces::SurfWinTransSolar;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS: na
@@ -1482,12 +1482,12 @@ namespace DaylightingDevices {
 
             // Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
             // All solar arriving at the diffuser is assumed to be isotropically diffuse by this point
-            QRefl = (QRadSWOutIncident(DiffSurf) - QRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - WinTransSolar(DiffSurf);
+            QRefl = (QRadSWOutIncident(DiffSurf) - QRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
             QRefl += QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
 
-            TotTDDPipeGain = WinTransSolar(TDDPipe(PipeNum).Dome) - QRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
+            TotTDDPipeGain = SurfWinTransSolar(TDDPipe(PipeNum).Dome) - QRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
                              QRefl * (1.0 - TDDPipe(PipeNum).TransSolIso / transDiff) +
                              QRadSWwinAbs(1, TDDPipe(PipeNum).Dome) * Surface(DiffSurf).Area / 2.0 +
                              QRadSWwinAbs(1, DiffSurf) * Surface(DiffSurf).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to

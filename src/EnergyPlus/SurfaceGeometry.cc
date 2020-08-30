@@ -267,8 +267,7 @@ namespace SurfaceGeometry {
         SurfWinBmSolRefldInsRevealRepEnergy.dimension(NumSurfaces, 0);
         SurfWinProfileAngHor.dimension(NumSurfaces, 0);
         SurfWinProfileAngVert.dimension(NumSurfaces, 0);
-        SurfWinSkySolarInc.dimension(NumSurfaces, 0);
-        SurfWinGndSolarInc.dimension(NumSurfaces, 0);
+
         SurfWinShadingFlag.dimension(NumSurfaces, 0);
         SurfWinShadingFlagEMSOn.dimension(NumSurfaces, 0);
         SurfWinShadingFlagEMSValue.dimension(NumSurfaces, 0);

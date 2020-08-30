@@ -473,30 +473,7 @@ namespace SolarShading {
             MultIsoSky = 0.0;
             MultCircumSolar = 0.0;
             MultHorizonZenith = 0.0;
-            WinTransSolar = 0.0;
-            WinBmSolar = 0.0;
-            WinBmBmSolar = 0.0;
-            WinBmDifSolar = 0.0;
 
-            WinDifSolar = 0.0;
-            WinDirSolTransAtIncAngle = 0.0;
-            WinHeatGain = 0.0;
-            WinHeatTransfer = 0.0;
-            WinHeatGainRep = 0.0;
-            WinHeatLossRep = 0.0;
-            WinGainConvGlazToZoneRep = 0.0;
-            WinGainIRGlazToZoneRep = 0.0;
-            WinLossSWZoneToOutWinRep = 0.0;
-            WinGainFrameDividerToZoneRep = 0.0;
-            WinGainConvGlazShadGapToZoneRep = 0.0;
-            WinGainConvShadeToZoneRep = 0.0;
-            OtherConvGainInsideFaceToZoneRep = 0.0;
-            WinGainIRShadeToZoneRep = 0.0;
-            WinGapConvHtFlowRep = 0.0;
-            WinShadingAbsorbedSolar = 0.0;
-            WinSysSolTransmittance = 0.0;
-            WinSysSolReflectance = 0.0;
-            WinSysSolAbsorptance = 0.0;
             InsideGlassCondensationFlag = 0;
             InsideFrameCondensationFlag = 0;
             InsideDividerCondensationFlag = 0;
@@ -536,18 +513,6 @@ namespace SolarShading {
             InitialDifSolInTransReport = 0.0;
             SWInAbsTotalReport = 0.0;
             WindowRevealStatus = 0;
-            // energy
-            WinTransSolarEnergy = 0.0;
-            WinBmSolarEnergy = 0.0;
-            WinBmBmSolarEnergy = 0.0;
-            WinBmDifSolarEnergy = 0.0;
-
-            WinDifSolarEnergy = 0.0;
-            WinHeatGainRepEnergy = 0.0;
-            WinHeatLossRepEnergy = 0.0;
-            WinGapConvHtFlowRepEnergy = 0.0;
-            WinHeatTransferRepEnergy = 0.0;
-            WinShadingAbsorbedSolarEnergy = 0.0;
             ZoneTransSolarEnergy = 0.0;
             ZoneBmSolFrExtWinsRepEnergy = 0.0;
             ZoneBmSolFrIntWinsRepEnergy = 0.0;
@@ -562,6 +527,53 @@ namespace SolarShading {
             IntBmIncInsSurfAmountRepEnergy = 0.0;
             //    IntDifIncInsSurfAmountRepEnergy=0.0
             QRadSWwinAbsTotEnergy = 0.0;
+
+            // Surface Win
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                if (firstSurfWin == -1) continue;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+
+                    SurfWinTransSolar(SurfNum) = 0.0;
+                    SurfWinBmSolar(SurfNum) = 0.0;
+                    SurfWinBmBmSolar(SurfNum) = 0.0;
+                    SurfWinBmDifSolar(SurfNum) = 0.0;
+                    SurfWinDifSolar(SurfNum) = 0.0;
+                    SurfWinDirSolTransAtIncAngle(SurfNum) = 0.0;
+
+                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
+
+                    SurfWinHeatGain(SurfNum) = 0.0;
+                    SurfWinHeatTransfer(SurfNum) = 0.0;
+                    SurfWinHeatGainRep(SurfNum) = 0.0;
+                    SurfWinHeatLossRep(SurfNum) = 0.0;
+
+                    SurfWinGainConvGlazToZoneRep(SurfNum) = 0.0;
+                    SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
+                    SurfWinLossSWZoneToOutWinRep(SurfNum) = 0.0;
+                    SurfWinGainFrameDividerToZoneRep(SurfNum) = 0.0;
+                    SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
+                    SurfWinGainConvShadeToZoneRep(SurfNum) = 0.0;
+                    SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
+                    SurfWinGapConvHtFlowRep(SurfNum) = 0.0;
+                    SurfWinShadingAbsorbedSolar(SurfNum) = 0.0;
+
+                    SurfWinSysSolTransmittance(SurfNum) = 0.0;
+                    SurfWinSysSolReflectance(SurfNum) = 0.0;
+                    SurfWinSysSolAbsorptance(SurfNum) = 0.0;
+
+                    SurfWinDifSolarEnergy(SurfNum) = 0.0;
+                    SurfWinHeatGainRepEnergy(SurfNum) = 0.0;
+                    SurfWinHeatLossRepEnergy(SurfNum) = 0.0;
+                    SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
+                    SurfWinHeatTransferRepEnergy(SurfNum) = 0.0;
+                    SurfWinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
+                }
+            }
         }
 
         // Initialize these once
@@ -1015,30 +1027,30 @@ namespace SolarShading {
         MultIsoSky.dimension(TotSurfaces, 0.0);
         MultCircumSolar.dimension(TotSurfaces, 0.0);
         MultHorizonZenith.dimension(TotSurfaces, 0.0);
-        WinTransSolar.dimension(TotSurfaces, 0.0);
-        WinBmSolar.dimension(TotSurfaces, 0.0);
-        WinBmBmSolar.dimension(TotSurfaces, 0.0);
-        WinBmDifSolar.dimension(TotSurfaces, 0.0);
+        SurfWinTransSolar.dimension(TotSurfaces, 0.0);
+        SurfWinBmSolar.dimension(TotSurfaces, 0.0);
+        SurfWinBmBmSolar.dimension(TotSurfaces, 0.0);
+        SurfWinBmDifSolar.dimension(TotSurfaces, 0.0);
 
-        WinDifSolar.dimension(TotSurfaces, 0.0);
-        WinDirSolTransAtIncAngle.dimension(TotSurfaces, 0.0);
-        WinHeatGain.dimension(TotSurfaces, 0.0);
-        WinHeatTransfer.dimension(TotSurfaces, 0.0);
-        WinHeatGainRep.dimension(TotSurfaces, 0.0);
-        WinHeatLossRep.dimension(TotSurfaces, 0.0);
-        WinGainConvGlazToZoneRep.dimension(TotSurfaces, 0.0);
-        WinGainIRGlazToZoneRep.dimension(TotSurfaces, 0.0);
-        WinLossSWZoneToOutWinRep.dimension(TotSurfaces, 0.0);
-        WinGainFrameDividerToZoneRep.dimension(TotSurfaces, 0.0);
-        WinGainConvGlazShadGapToZoneRep.dimension(TotSurfaces, 0.0);
-        WinGainConvShadeToZoneRep.dimension(TotSurfaces, 0.0);
-        OtherConvGainInsideFaceToZoneRep.dimension(TotSurfaces, 0.0);
-        WinGainIRShadeToZoneRep.dimension(TotSurfaces, 0.0);
-        WinGapConvHtFlowRep.dimension(TotSurfaces, 0.0);
-        WinShadingAbsorbedSolar.dimension(TotSurfaces, 0.0);
-        WinSysSolTransmittance.dimension(TotSurfaces, 0.0);
-        WinSysSolReflectance.dimension(TotSurfaces, 0.0);
-        WinSysSolAbsorptance.dimension(TotSurfaces, 0.0);
+        SurfWinDifSolar.dimension(TotSurfaces, 0.0);
+        SurfWinDirSolTransAtIncAngle.dimension(TotSurfaces, 0.0);
+        SurfWinHeatGain.dimension(TotSurfaces, 0.0);
+        SurfWinHeatTransfer.dimension(TotSurfaces, 0.0);
+        SurfWinHeatGainRep.dimension(TotSurfaces, 0.0);
+        SurfWinHeatLossRep.dimension(TotSurfaces, 0.0);
+        SurfWinGainConvGlazToZoneRep.dimension(TotSurfaces, 0.0);
+        SurfWinGainIRGlazToZoneRep.dimension(TotSurfaces, 0.0);
+        SurfWinLossSWZoneToOutWinRep.dimension(TotSurfaces, 0.0);
+        SurfWinGainFrameDividerToZoneRep.dimension(TotSurfaces, 0.0);
+        SurfWinGainConvGlazShadGapToZoneRep.dimension(TotSurfaces, 0.0);
+        SurfWinGainConvShadeToZoneRep.dimension(TotSurfaces, 0.0);
+        SurfWinOtherConvGainInsideFaceToZoneRep.dimension(TotSurfaces, 0.0);
+        SurfWinGainIRShadeToZoneRep.dimension(TotSurfaces, 0.0);
+        SurfWinGapConvHtFlowRep.dimension(TotSurfaces, 0.0);
+        SurfWinShadingAbsorbedSolar.dimension(TotSurfaces, 0.0);
+        SurfWinSysSolTransmittance.dimension(TotSurfaces, 0.0);
+        SurfWinSysSolReflectance.dimension(TotSurfaces, 0.0);
+        SurfWinSysSolAbsorptance.dimension(TotSurfaces, 0.0);
         InsideGlassCondensationFlag.dimension(TotSurfaces, 0);
         InsideFrameCondensationFlag.dimension(TotSurfaces, 0);
         InsideDividerCondensationFlag.dimension(TotSurfaces, 0);
@@ -1080,9 +1092,9 @@ namespace SolarShading {
         QRadSWOutIncBmToDiffReflObs.dimension(TotSurfaces, 0.0);
         QRadSWOutIncSkyDiffReflObs.dimension(TotSurfaces, 0.0);
         CosIncidenceAngle.dimension(TotSurfaces, 0.0);
-        BSDFBeamDirectionRep.dimension(TotSurfaces, 0);
-        BSDFBeamThetaRep.dimension(TotSurfaces, 0.0);
-        BSDFBeamPhiRep.dimension(TotSurfaces, 0.0);
+        SurfWinBSDFBeamDirectionRep.dimension(TotSurfaces, 0);
+        SurfWinBSDFBeamThetaRep.dimension(TotSurfaces, 0.0);
+        SurfWinBSDFBeamPhiRep.dimension(TotSurfaces, 0.0);
         QRadSWwinAbsTot.dimension(TotSurfaces, 0.0);
 
         QRadSWwinAbsLayer.dimension(DataHeatBalance::MaxSolidWinLayers, TotSurfaces, 0.0);
@@ -1115,17 +1127,19 @@ namespace SolarShading {
         YTEMP1.dimension(2 * (MaxVerticesPerSurface + 1), 0.0);
 
         // energy
-        WinTransSolarEnergy.dimension(TotSurfaces, 0.0);
-        WinBmSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinTransSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinBmSolarEnergy.dimension(TotSurfaces, 0.0);
 
-        WinBmBmSolarEnergy.dimension(TotSurfaces, 0.0);
-        WinBmDifSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinBmBmSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinBmDifSolarEnergy.dimension(TotSurfaces, 0.0);
 
-        WinDifSolarEnergy.dimension(TotSurfaces, 0.0);
-        WinHeatGainRepEnergy.dimension(TotSurfaces, 0.0);
-        WinHeatLossRepEnergy.dimension(TotSurfaces, 0.0);
-        WinGapConvHtFlowRepEnergy.dimension(TotSurfaces, 0.0);
-        WinHeatTransferRepEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinDifSolarEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinHeatGainRepEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinHeatLossRepEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinGapConvHtFlowRepEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinHeatTransferRepEnergy.dimension(TotSurfaces, 0.0);
+        SurfWinShadingAbsorbedSolarEnergy.dimension(TotSurfaces, 0.0);
+
         ZoneTransSolarEnergy.dimension(NumOfZones, 0.0);
         ZoneBmSolFrExtWinsRepEnergy.dimension(NumOfZones, 0.0);
         ZoneBmSolFrIntWinsRepEnergy.dimension(NumOfZones, 0.0);
@@ -1144,7 +1158,7 @@ namespace SolarShading {
         //  ALLOCATE(IntDifIncInsSurfAmountRepEnergy(TotSurfaces))
         //  IntDifIncInsSurfAmountRepEnergy=0.0
         QRadSWwinAbsTotEnergy.dimension(TotSurfaces, 0.0);
-        WinShadingAbsorbedSolarEnergy.dimension(TotSurfaces, 0.0);
+
         for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
             SurfWinBmSolAbsdOutsReveal(SurfNum) = 0.0;
             SurfWinBmSolRefldOutsRevealReport(SurfNum) = 0.0;
@@ -1364,19 +1378,19 @@ namespace SolarShading {
                                     Surface(SurfLoop).Name);
                 SetupOutputVariable("Surface Window BSDF Beam Direction Number",
                                     OutputProcessor::Unit::None,
-                                    BSDFBeamDirectionRep(SurfLoop),
+                                    SurfWinBSDFBeamDirectionRep(SurfLoop),
                                     "Zone",
                                     "Average",
                                     Surface(SurfLoop).Name);
                 SetupOutputVariable("Surface Window BSDF Beam Theta Angle",
                                     OutputProcessor::Unit::rad,
-                                    BSDFBeamThetaRep(SurfLoop),
+                                    SurfWinBSDFBeamThetaRep(SurfLoop),
                                     "Zone",
                                     "Average",
                                     Surface(SurfLoop).Name);
                 SetupOutputVariable("Surface Window BSDF Beam Phi Angle",
                                     OutputProcessor::Unit::rad,
-                                    BSDFBeamPhiRep(SurfLoop),
+                                    SurfWinBSDFBeamPhiRep(SurfLoop),
                                     "Zone",
                                     "Average",
                                     Surface(SurfLoop).Name);
@@ -1433,13 +1447,13 @@ namespace SolarShading {
 
                     SetupOutputVariable("Surface Window Transmitted Solar Radiation Rate",
                                         OutputProcessor::Unit::W,
-                                        WinTransSolar(SurfLoop),
+                                        SurfWinTransSolar(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Transmitted Beam Solar Radiation Rate",
                                         OutputProcessor::Unit::W,
-                                        WinBmSolar(SurfLoop),
+                                        SurfWinBmSolar(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
@@ -1447,50 +1461,50 @@ namespace SolarShading {
                     // added TH 12/9/2009
                     SetupOutputVariable("Surface Window Transmitted Beam To Beam Solar Radiation Rate",
                                         OutputProcessor::Unit::W,
-                                        WinBmBmSolar(SurfLoop),
+                                        SurfWinBmBmSolar(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Transmitted Beam To Diffuse Solar Radiation Rate",
                                         OutputProcessor::Unit::W,
-                                        WinBmDifSolar(SurfLoop),
+                                        SurfWinBmDifSolar(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
 
                     SetupOutputVariable("Surface Window Transmitted Diffuse Solar Radiation Rate",
                                         OutputProcessor::Unit::W,
-                                        WinDifSolar(SurfLoop),
+                                        SurfWinDifSolar(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Heat Gain Rate",
                                         OutputProcessor::Unit::W,
-                                        WinHeatGainRep(SurfLoop),
+                                        SurfWinHeatGainRep(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Heat Loss Rate",
                                         OutputProcessor::Unit::W,
-                                        WinHeatLossRep(SurfLoop),
+                                        SurfWinHeatLossRep(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Gap Convective Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        WinGapConvHtFlowRep(SurfLoop),
+                                        SurfWinGapConvHtFlowRep(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Shading Device Absorbed Solar Radiation Rate",
                                         OutputProcessor::Unit::W,
-                                        WinShadingAbsorbedSolar(SurfLoop),
+                                        SurfWinShadingAbsorbedSolar(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Net Heat Transfer Rate",
                                         OutputProcessor::Unit::W,
-                                        WinHeatTransfer(SurfLoop),
+                                        SurfWinHeatTransfer(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
@@ -1499,50 +1513,50 @@ namespace SolarShading {
                         // CurrentModuleObject='Windows/GlassDoors(Advanced)'
                         SetupOutputVariable("Surface Window Inside Face Glazing Zone Convection Heat Gain Rate",
                                             OutputProcessor::Unit::W,
-                                            WinGainConvGlazToZoneRep(SurfLoop),
+                                            SurfWinGainConvGlazToZoneRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Inside Face Glazing Net Infrared Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
-                                            WinGainIRGlazToZoneRep(SurfLoop),
+                                            SurfWinGainIRGlazToZoneRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Shortwave from Zone Back Out Window Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
-                                            WinLossSWZoneToOutWinRep(SurfLoop),
+                                            SurfWinLossSWZoneToOutWinRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Inside Face Frame and Divider Zone Heat Gain Rate",
                                             OutputProcessor::Unit::W,
-                                            WinGainFrameDividerToZoneRep(SurfLoop),
+                                            SurfWinGainFrameDividerToZoneRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Inside Face Gap between Shade and Glazing Zone Convection Heat Gain Rate",
                                             OutputProcessor::Unit::W,
-                                            WinGainConvGlazShadGapToZoneRep(SurfLoop),
+                                            SurfWinGainConvGlazShadGapToZoneRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Inside Face Shade Zone Convection Heat Gain Rate",
                                             OutputProcessor::Unit::W,
-                                            WinGainConvShadeToZoneRep(SurfLoop),
+                                            SurfWinGainConvShadeToZoneRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Inside Face Shade Net Infrared Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
-                                            WinGainIRShadeToZoneRep(SurfLoop),
+                                            SurfWinGainIRShadeToZoneRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         if (dataConstruction.Construct(Surface(SurfLoop).Construction).WindowTypeEQL) {
                             SetupOutputVariable("Surface Window Inside Face Other Convection Heat Gain Rate",
                                                 OutputProcessor::Unit::W,
-                                                OtherConvGainInsideFaceToZoneRep(SurfLoop),
+                                                SurfWinOtherConvGainInsideFaceToZoneRep(SurfLoop),
                                                 "Zone",
                                                 "Average",
                                                 Surface(SurfLoop).Name);
@@ -1651,13 +1665,13 @@ namespace SolarShading {
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Transmitted Solar Radiation Energy",
                                         OutputProcessor::Unit::J,
-                                        WinTransSolarEnergy(SurfLoop),
+                                        SurfWinTransSolarEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Transmitted Beam Solar Radiation Energy",
                                         OutputProcessor::Unit::J,
-                                        WinBmSolarEnergy(SurfLoop),
+                                        SurfWinBmSolarEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
@@ -1665,69 +1679,69 @@ namespace SolarShading {
                     // added TH 12/9/2009
                     SetupOutputVariable("Surface Window Transmitted Beam To Beam Solar Radiation Energy",
                                         OutputProcessor::Unit::J,
-                                        WinBmBmSolarEnergy(SurfLoop),
+                                        SurfWinBmBmSolarEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Transmitted Beam To Diffuse Solar Radiation Energy",
                                         OutputProcessor::Unit::J,
-                                        WinBmDifSolarEnergy(SurfLoop),
+                                        SurfWinBmDifSolarEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
 
                     SetupOutputVariable("Surface Window Transmitted Diffuse Solar Radiation Energy",
                                         OutputProcessor::Unit::J,
-                                        WinDifSolarEnergy(SurfLoop),
+                                        SurfWinDifSolarEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Heat Gain Energy",
                                         OutputProcessor::Unit::J,
-                                        WinHeatGainRepEnergy(SurfLoop),
+                                        SurfWinHeatGainRepEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Heat Loss Energy",
                                         OutputProcessor::Unit::J,
-                                        WinHeatLossRepEnergy(SurfLoop),
+                                        SurfWinHeatLossRepEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Gap Convective Heat Transfer Energy",
                                         OutputProcessor::Unit::J,
-                                        WinGapConvHtFlowRepEnergy(SurfLoop),
+                                        SurfWinGapConvHtFlowRepEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Shading Device Absorbed Solar Radiation Energy",
                                         OutputProcessor::Unit::J,
-                                        WinShadingAbsorbedSolarEnergy(SurfLoop),
+                                        SurfWinShadingAbsorbedSolarEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window Net Heat Transfer Energy",
                                         OutputProcessor::Unit::J,
-                                        WinHeatTransferRepEnergy(SurfLoop),
+                                        SurfWinHeatTransferRepEnergy(SurfLoop),
                                         "Zone",
                                         "Sum",
                                         Surface(SurfLoop).Name);
 
                     SetupOutputVariable("Surface Window System Solar Transmittance",
                                         OutputProcessor::Unit::None,
-                                        WinSysSolTransmittance(SurfLoop),
+                                        SurfWinSysSolTransmittance(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window System Solar Reflectance",
                                         OutputProcessor::Unit::None,
-                                        WinSysSolReflectance(SurfLoop),
+                                        SurfWinSysSolReflectance(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
                     SetupOutputVariable("Surface Window System Solar Absorptance",
                                         OutputProcessor::Unit::None,
-                                        WinSysSolAbsorptance(SurfLoop),
+                                        SurfWinSysSolAbsorptance(SurfLoop),
                                         "Zone",
                                         "Average",
                                         Surface(SurfLoop).Name);
@@ -1938,14 +1952,14 @@ namespace SolarShading {
                         if (SurfWinOriginalClass(SurfLoop) != SurfaceClass_TDD_Diffuser) {
                             SetupOutputVariable("Surface Window Transmitted Solar Radiation Rate",
                                                 OutputProcessor::Unit::W,
-                                                WinTransSolar(SurfLoop),
+                                                SurfWinTransSolar(SurfLoop),
                                                 "Zone",
                                                 "Average",
                                                 Surface(SurfLoop).Name);
                         }
                         SetupOutputVariable("Surface Window Transmitted Beam Solar Radiation Rate",
                                             OutputProcessor::Unit::W,
-                                            WinBmSolar(SurfLoop),
+                                            SurfWinBmSolar(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
@@ -1953,44 +1967,44 @@ namespace SolarShading {
                         // added TH 12/9/2009
                         SetupOutputVariable("Surface Window Transmitted Beam To Beam Solar Radiation Rate",
                                             OutputProcessor::Unit::W,
-                                            WinBmBmSolar(SurfLoop),
+                                            SurfWinBmBmSolar(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Transmitted Beam To Diffuse Solar Radiation Rate",
                                             OutputProcessor::Unit::W,
-                                            WinBmDifSolar(SurfLoop),
+                                            SurfWinBmDifSolar(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
 
                         SetupOutputVariable("Surface Window Transmitted Diffuse Solar Radiation Rate",
                                             OutputProcessor::Unit::W,
-                                            WinDifSolar(SurfLoop),
+                                            SurfWinDifSolar(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Heat Gain Rate",
                                             OutputProcessor::Unit::W,
-                                            WinHeatGainRep(SurfLoop),
+                                            SurfWinHeatGainRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Heat Loss Rate",
                                             OutputProcessor::Unit::W,
-                                            WinHeatLossRep(SurfLoop),
+                                            SurfWinHeatLossRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Gap Convective Heat Transfer Rate",
                                             OutputProcessor::Unit::W,
-                                            WinGapConvHtFlowRep(SurfLoop),
+                                            SurfWinGapConvHtFlowRep(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Shading Device Absorbed Solar Radiation Rate",
                                             OutputProcessor::Unit::W,
-                                            WinShadingAbsorbedSolar(SurfLoop),
+                                            SurfWinShadingAbsorbedSolar(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
@@ -2058,77 +2072,77 @@ namespace SolarShading {
                         if (SurfWinOriginalClass(SurfLoop) != SurfaceClass_TDD_Diffuser) {
                             SetupOutputVariable("Surface Window Transmitted Solar Radiation Energy",
                                                 OutputProcessor::Unit::J,
-                                                WinTransSolarEnergy(SurfLoop),
+                                                SurfWinTransSolarEnergy(SurfLoop),
                                                 "Zone",
                                                 "Sum",
                                                 Surface(SurfLoop).Name);
                         }
                         SetupOutputVariable("Surface Window Transmitted Beam Solar Radiation Energy",
                                             OutputProcessor::Unit::J,
-                                            WinBmSolarEnergy(SurfLoop),
+                                            SurfWinBmSolarEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
 
                         SetupOutputVariable("Surface Window Transmitted Beam To Beam Solar Radiation Energy",
                                             OutputProcessor::Unit::J,
-                                            WinBmBmSolarEnergy(SurfLoop),
+                                            SurfWinBmBmSolarEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Transmitted Beam To Diffuse Solar Radiation Energy",
                                             OutputProcessor::Unit::J,
-                                            WinBmDifSolarEnergy(SurfLoop),
+                                            SurfWinBmDifSolarEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
 
                         SetupOutputVariable("Surface Window Transmitted Diffuse Solar Radiation Energy",
                                             OutputProcessor::Unit::J,
-                                            WinDifSolarEnergy(SurfLoop),
+                                            SurfWinDifSolarEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Heat Gain Energy",
                                             OutputProcessor::Unit::J,
-                                            WinHeatGainRepEnergy(SurfLoop),
+                                            SurfWinHeatGainRepEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Heat Loss Energy",
                                             OutputProcessor::Unit::J,
-                                            WinHeatLossRepEnergy(SurfLoop),
+                                            SurfWinHeatLossRepEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Gap Convective Heat Transfer Energy",
                                             OutputProcessor::Unit::J,
-                                            WinGapConvHtFlowRepEnergy(SurfLoop),
+                                            SurfWinGapConvHtFlowRepEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window Shading Device Absorbed Solar Radiation Energy",
                                             OutputProcessor::Unit::J,
-                                            WinShadingAbsorbedSolarEnergy(SurfLoop),
+                                            SurfWinShadingAbsorbedSolarEnergy(SurfLoop),
                                             "Zone",
                                             "Sum",
                                             Surface(SurfLoop).Name);
 
                         SetupOutputVariable("Surface Window System Solar Transmittance",
                                             OutputProcessor::Unit::None,
-                                            WinSysSolTransmittance(SurfLoop),
+                                            SurfWinSysSolTransmittance(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window System Solar Reflectance",
                                             OutputProcessor::Unit::None,
-                                            WinSysSolReflectance(SurfLoop),
+                                            SurfWinSysSolReflectance(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
                         SetupOutputVariable("Surface Window System Solar Absorptance",
                                             OutputProcessor::Unit::None,
-                                            WinSysSolAbsorptance(SurfLoop),
+                                            SurfWinSysSolAbsorptance(SurfLoop),
                                             "Zone",
                                             "Average",
                                             Surface(SurfLoop).Name);
@@ -2310,7 +2324,7 @@ namespace SolarShading {
                                     Surface(SurfLoop).Name);
                 SetupOutputVariable("Surface Window Transmitted Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
-                                    WinTransSolar(SurfLoop),
+                                    SurfWinTransSolar(SurfLoop),
                                     "Zone",
                                     "Average",
                                     Surface(SurfLoop).Name);
@@ -2323,7 +2337,7 @@ namespace SolarShading {
                                     Surface(SurfLoop).Name);
                 SetupOutputVariable("Surface Window Transmitted Solar Radiation Energy",
                                     OutputProcessor::Unit::J,
-                                    WinTransSolarEnergy(SurfLoop),
+                                    SurfWinTransSolarEnergy(SurfLoop),
                                     "Zone",
                                     "Sum",
                                     Surface(SurfLoop).Name);
@@ -2344,7 +2358,7 @@ namespace SolarShading {
                                     Surface(SurfLoop).Name);
                 SetupOutputVariable("Surface Window Transmitted Solar Radiation Rate",
                                     OutputProcessor::Unit::W,
-                                    WinTransSolar(SurfLoop),
+                                    SurfWinTransSolar(SurfLoop),
                                     "Zone",
                                     "Average",
                                     Surface(SurfLoop).Name);
@@ -2357,7 +2371,7 @@ namespace SolarShading {
                                     Surface(SurfLoop).Name);
                 SetupOutputVariable("Surface Window Transmitted Solar Radiation Energy",
                                     OutputProcessor::Unit::J,
-                                    WinTransSolarEnergy(SurfLoop),
+                                    SurfWinTransSolarEnergy(SurfLoop),
                                     "Zone",
                                     "Sum",
                                     Surface(SurfLoop).Name);
@@ -6795,9 +6809,6 @@ namespace SolarShading {
         WinTransDifSolar = 0.0;
         WinTransDifSolarGnd = 0.0;
         WinTransDifSolarSky = 0.0;
-        WinBmSolar = 0.0;
-        WinBmBmSolar = 0.0;
-        WinBmDifSolar = 0.0;
         WinTransBmBmSolar = 0.0;
         WinTransBmDifSolar = 0.0;
         TBmBm = 0.0;
@@ -6805,7 +6816,6 @@ namespace SolarShading {
         TBmBmEQL = 0.0;
         TBmDiffEQL = 0.0;
 
-        WinDifSolar = 0.0;
         ZoneTransSolar = 0.0;
         ZoneBmSolFrExtWinsRep = 0.0;
         ZoneBmSolFrIntWinsRep = 0.0;
@@ -6813,21 +6823,30 @@ namespace SolarShading {
         ZoneDifSolFrIntWinsRep = 0.0;
         IntBeamAbsByShadFac = 0.0;
         ExtBeamAbsByShadFac = 0.0;
-        // energy
-        WinBmSolarEnergy = 0.0;
-        WinBmBmSolarEnergy = 0.0;
-        WinBmDifSolarEnergy = 0.0;
 
-        WinDifSolarEnergy = 0.0;
-        ZoneTransSolarEnergy = 0.0;
-        ZoneBmSolFrExtWinsRepEnergy = 0.0;
-        ZoneBmSolFrIntWinsRepEnergy = 0.0;
-        ZoneDifSolFrExtWinsRepEnergy = 0.0;
-        ZoneDifSolFrIntWinsRepEnergy = 0.0;
+        for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+            ZoneTransSolarEnergy(zoneNum) = 0.0;
+            ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+            ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+            ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+            ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin == -1) continue;
+            for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                SurfWinBmSolar(SurfNum) = 0.0;
+                SurfWinBmBmSolar(SurfNum) = 0.0;
+                SurfWinBmDifSolar(SurfNum) = 0.0;
+                // energy
+                SurfWinBmSolarEnergy(SurfNum) = 0.0;
+                SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
+                SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
 
-        for (int SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
-            SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
-            SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
+                SurfWinDifSolarEnergy(SurfNum) = 0.0;
+                SurfWinDifSolar(SurfNum) = 0.0;
+                SurfWinBmSolTransThruIntWinRep(SurfNum) = 0.0;
+                SurfWinBmSolTransThruIntWinRepEnergy(SurfNum) = 0.0;
+            }
         }
 
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++enclosureNum) {
@@ -7310,8 +7329,8 @@ namespace SolarShading {
                 // SKY AND GROUND DIFFUSE SOLAR GAIN INTO ZONE FROM EXTERIOR WINDOW
                 //-----------------------------------------------------------------
 
-                SkySolarInc = SurfWinSkySolarInc(SurfNum);
-                GndSolarInc = SurfWinGndSolarInc(SurfNum);
+                SkySolarInc = SurfSkySolarInc(SurfNum);
+                GndSolarInc = SurfGndSolarInc(SurfNum);
 
                 if (SurfWinWindowModelType(SurfNum) != WindowBSDFModel &&
                     SurfWinWindowModelType(SurfNum) != WindowEQLModel) { // Regular window
@@ -8317,9 +8336,9 @@ namespace SolarShading {
                                 IBm = ComplexWind(SurfNum).Geom(CurCplxFenState).SolBmIndex(HourOfDay, TimeStep);
 
                                 // Report variables for complex fenestration here
-                                BSDFBeamDirectionRep(SurfNum) = IBm;
-                                BSDFBeamThetaRep(SurfNum) = ComplexWind(SurfNum).Geom(CurCplxFenState).ThetaBm(HourOfDay, TimeStep);
-                                BSDFBeamPhiRep(SurfNum) = ComplexWind(SurfNum).Geom(CurCplxFenState).PhiBm(HourOfDay, TimeStep);
+                                SurfWinBSDFBeamDirectionRep(SurfNum) = IBm;
+                                SurfWinBSDFBeamThetaRep(SurfNum) = ComplexWind(SurfNum).Geom(CurCplxFenState).ThetaBm(HourOfDay, TimeStep);
+                                SurfWinBSDFBeamPhiRep(SurfNum) = ComplexWind(SurfNum).Geom(CurCplxFenState).PhiBm(HourOfDay, TimeStep);
 
                                 int BaseSurf = Surface(SurfNum).BaseSurf;  // Base surface number for current complex window
                                 // Get total number of back surfaces for current window (surface)
@@ -8710,15 +8729,15 @@ namespace SolarShading {
                             SkySolarTrans = DifSolarRad * TransTDD(PipeNum, CosInc, SolarAniso) * AnisoSkyMult(SurfNum2);
                             GndSolarTrans = GndSolarRad * TDDPipe(PipeNum).TransSolIso * Surface(SurfNum2).ViewFactorGround;
 
-                            WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
-                            WinDifSolar(SurfNum) = SkySolarTrans * Surface(SurfNum).Area + GndSolarTrans * Surface(SurfNum).Area;
-                            WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
-                            WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
+                            SurfWinDifSolar(SurfNum) = SkySolarTrans * Surface(SurfNum).Area + GndSolarTrans * Surface(SurfNum).Area;
+                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
 
-                            WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
-                            WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum); //[W]
+                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
 
-                            TDDPipe(PipeNum).TransmittedSolar = WinTransSolar(SurfNum);
+                            TDDPipe(PipeNum).TransmittedSolar = SurfWinTransSolar(SurfNum);
                             // TDDPipe(PipeNum)%TransSolBeam = TBmBm ! Reported above
                             if (DifSolarInc > 0) {
                                 TDDPipe(PipeNum).TransSolDiff = (SkySolarTrans + GndSolarTrans) / DifSolarInc;
@@ -8735,51 +8754,51 @@ namespace SolarShading {
                             DifSolarInc = DifSolarRad * AnisoSkyMult(SurfNum) + GndSolarRad * Surface(SurfNum).ViewFactorGround +
                                           ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
 
-                            WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
-                            WinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
-                            WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
-                            WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
+                            SurfWinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
+                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
 
-                            WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
-                            WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum); //[W]
+                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
 
                         } else { // Regular window
-                            SkySolarInc = SurfWinSkySolarInc(SurfNum);
-                            GndSolarInc = SurfWinGndSolarInc(SurfNum);
+                            SkySolarInc = SurfSkySolarInc(SurfNum);
+                            GndSolarInc = SurfGndSolarInc(SurfNum);
                             DifSolarInc = SkySolarInc + GndSolarInc;
-                            WinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
+                            SurfWinBmSolar(SurfNum) = BeamSolarRad * WinTransBmSolar(SurfNum);
                             // Note: for complex fenestration, WinTransDifSolar has previously been defined using the effective
                             // transmittance for sky and ground diffuse radiation (including beam radiation reflected from the ground)
                             // so these calculations should be correct
-                            WinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
-                            WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
-                            WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinDifSolar(SurfNum) = DifSolarInc * WinTransDifSolar(SurfNum);
+                            SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
                             if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn) {
                                 if (Blind(SurfWinBlindNumber(SurfNum)).SlatOrientation == Horizontal) {
-                                    WinDifSolar(SurfNum) = SkySolarInc * WinTransDifSolarSky(SurfNum) + GndSolarInc * WinTransDifSolarGnd(SurfNum);
-                                    WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
+                                    SurfWinDifSolar(SurfNum) = SkySolarInc * WinTransDifSolarSky(SurfNum) + GndSolarInc * WinTransDifSolarGnd(SurfNum);
+                                    SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
                                 }
                             }
 
-                            WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum); //[W]
-                            WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+                            SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum); //[W]
+                            SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
                         }
 
                         // added TH 12/9/2009, CR 7907 & 7809
-                        WinBmBmSolar(SurfNum) = BeamSolarRad * WinTransBmBmSolar;
+                        SurfWinBmBmSolar(SurfNum) = BeamSolarRad * WinTransBmBmSolar;
 
-                        WinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar;
-                        WinBmBmSolarEnergy(SurfNum) = WinBmBmSolar(SurfNum) * TimeStepZoneSec;
-                        WinBmDifSolarEnergy(SurfNum) = WinBmDifSolar(SurfNum) * TimeStepZoneSec;
+                        SurfWinBmDifSolar(SurfNum) = BeamSolarRad * WinTransBmDifSolar;
+                        SurfWinBmBmSolarEnergy(SurfNum) = SurfWinBmBmSolar(SurfNum) * TimeStepZoneSec;
+                        SurfWinBmDifSolarEnergy(SurfNum) = SurfWinBmDifSolar(SurfNum) * TimeStepZoneSec;
 
-                        WinDirSolTransAtIncAngle(SurfNum) = TBmBm + TBmDif; // For TDD:DIFFUSER this is the TDD transmittance
+                        SurfWinDirSolTransAtIncAngle(SurfNum) = TBmBm + TBmDif; // For TDD:DIFFUSER this is the TDD transmittance
 
                         // Solar not added by TDD:DOME; added to zone via TDD:DIFFUSER
                         if (Surface(SurfNum).Class != SurfaceClass_TDD_Dome) {
-                            ZoneTransSolar(enclosureNum) += WinTransSolar(SurfNum);                         //[W]
+                            ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
                             ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * TimeStepZoneSec; //[J]
-                            ZoneBmSolFrExtWinsRep(enclosureNum) += WinBmSolar(SurfNum);
-                            ZoneDifSolFrExtWinsRep(enclosureNum) += WinDifSolar(SurfNum);
+                            ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
+                            ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
                             ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec;   //[J]
                             ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec; //[J]
                         }
@@ -8958,8 +8977,8 @@ namespace SolarShading {
                             // is becuase BeamSolarRad is direct normal radiation (looking at the Sun) while QRadSWOutIncident
                             // is normal to window incidence. Since BSDF coefficients are taking into account angle of incidence,
                             // BeamSolarRad should be used in this case
-                            QRadSWwinAbs(Lay, SurfNum) = cplxState.WinSkyFtAbs(Lay) * SurfWinSkySolarInc(SurfNum2) +
-                                                         cplxState.WinSkyGndAbs(Lay) * SurfWinGndSolarInc(SurfNum2) + AWinSurf(Lay, SurfNum) * BeamSolarRad +
+                            QRadSWwinAbs(Lay, SurfNum) = cplxState.WinSkyFtAbs(Lay) * SurfSkySolarInc(SurfNum2) +
+                                                         cplxState.WinSkyGndAbs(Lay) * SurfGndSolarInc(SurfNum2) + AWinSurf(Lay, SurfNum) * BeamSolarRad +
                                                          AWinCFOverlap(Lay, SurfNum) * BeamSolarRad;
                             QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
                             AWinSurfDiffFront(Lay, SurfNum) = cplxState.WinSkyGndAbs(Lay);
@@ -8980,7 +8999,7 @@ namespace SolarShading {
                             // Simon: Same not as for BSDF. Normal solar radiation should be taken here because angle of
                             // incidence is already taken into account
                             auto absBeam = AWinSurf(Lay, SurfNum) * BeamSolarRad;
-                            auto absDiff = AWinSurfDiffFront(Lay, SurfNum) * (SurfWinSkySolarInc(SurfNum2) + SurfWinGndSolarInc(SurfNum2));
+                            auto absDiff = AWinSurfDiffFront(Lay, SurfNum) * (SurfSkySolarInc(SurfNum2) + SurfGndSolarInc(SurfNum2));
                             QRadSWwinAbs(Lay, SurfNum) = (absBeam + absDiff);
                             QRadSWwinAbsLayer(Lay, SurfNum) = QRadSWwinAbs(Lay, SurfNum) * Surface(SurfNum).Area;
                         }
@@ -8992,14 +9011,14 @@ namespace SolarShading {
                 ////////////////////////////////////////////////////////////////////
                 Real64 Tdiff = aLayer->getPropertySimple(PropertySimple::T, Side::Front, Scattering::DiffuseDiffuse, Theta, Phi);
                 dataConstruction.Construct(ConstrNum).TransDiff = Tdiff;
-                Real64 DSZoneWin = SurfWinSkySolarInc(SurfNum2) * Tdiff * Surface(SurfNum2).Area;
+                Real64 DSZoneWin = SurfSkySolarInc(SurfNum2) * Tdiff * Surface(SurfNum2).Area;
                 if ((DifSolarRad != 0)) {
                     DSZoneWin /= DifSolarRad;
                 } else {
                     DSZoneWin /= 1e-8;
                 }
 
-                Real64 DGZoneWin = SurfWinGndSolarInc(SurfNum2) * Tdiff * Surface(SurfNum2).Area;
+                Real64 DGZoneWin = SurfGndSolarInc(SurfNum2) * Tdiff * Surface(SurfNum2).Area;
                 (GndSolarRad != 0) ? DGZoneWin /= GndSolarRad : DGZoneWin /= 1e-8;
 
                 DSZone(enclosureNum) = DSZoneWin;
@@ -9014,13 +9033,13 @@ namespace SolarShading {
                 Real64 WinTransBmDifSolar = TBmDif * SunLitFract * CosInc * Surface(SurfNum).Area * window.InOutProjSLFracMult(HourOfDay);
                 BTOTZone += WinTransBmBmSolar + WinTransBmDifSolar;
 
-                Real64 DifSolarRadiation = SurfWinSkySolarInc(SurfNum2) + SurfWinGndSolarInc(SurfNum2);
-                WinBmSolar(SurfNum) = BeamSolarRad * (TBmBm + TBmDif) * Surface(SurfNum).Area * CosInc;
-                WinDifSolar(SurfNum) = DifSolarRadiation * Tdiff * Surface(SurfNum).Area;
-                WinBmSolarEnergy(SurfNum) = WinBmSolar(SurfNum) * TimeStepZoneSec;
-                WinDifSolarEnergy(SurfNum) = WinDifSolar(SurfNum) * TimeStepZoneSec;
-                WinTransSolar(SurfNum) = WinBmSolar(SurfNum) + WinDifSolar(SurfNum);
-                WinTransSolarEnergy(SurfNum) = WinTransSolar(SurfNum) * TimeStepZoneSec;
+                Real64 DifSolarRadiation = SurfSkySolarInc(SurfNum2) + SurfGndSolarInc(SurfNum2);
+                SurfWinBmSolar(SurfNum) = BeamSolarRad * (TBmBm + TBmDif) * Surface(SurfNum).Area * CosInc;
+                SurfWinDifSolar(SurfNum) = DifSolarRadiation * Tdiff * Surface(SurfNum).Area;
+                SurfWinBmSolarEnergy(SurfNum) = SurfWinBmSolar(SurfNum) * TimeStepZoneSec;
+                SurfWinDifSolarEnergy(SurfNum) = SurfWinDifSolar(SurfNum) * TimeStepZoneSec;
+                SurfWinTransSolar(SurfNum) = SurfWinBmSolar(SurfNum) + SurfWinDifSolar(SurfNum);
+                SurfWinTransSolarEnergy(SurfNum) = SurfWinTransSolar(SurfNum) * TimeStepZoneSec;
 
                 // Add beam solar absorbed by outside reveal to outside of window's base surface.
                 // Add beam solar absorbed by inside reveal to inside of window's base surface.
@@ -9096,10 +9115,10 @@ namespace SolarShading {
                         }
                     }
                 }
-                ZoneTransSolar(enclosureNum) += WinTransSolar(SurfNum);                         //[W]
+                ZoneTransSolar(enclosureNum) += SurfWinTransSolar(SurfNum);                         //[W]
                 ZoneTransSolarEnergy(enclosureNum) = ZoneTransSolar(enclosureNum) * TimeStepZoneSec; //[J]
-                ZoneBmSolFrExtWinsRep(enclosureNum) += WinBmSolar(SurfNum);
-                ZoneDifSolFrExtWinsRep(enclosureNum) += WinDifSolar(SurfNum);
+                ZoneBmSolFrExtWinsRep(enclosureNum) += SurfWinBmSolar(SurfNum);
+                ZoneDifSolFrExtWinsRep(enclosureNum) += SurfWinDifSolar(SurfNum);
                 ZoneBmSolFrExtWinsRepEnergy(enclosureNum) = ZoneBmSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec;   //[J]
                 ZoneDifSolFrExtWinsRepEnergy(enclosureNum) = ZoneDifSolFrExtWinsRep(enclosureNum) * TimeStepZoneSec; //[J]
             }
@@ -11938,7 +11957,7 @@ namespace SolarShading {
 
                 // Init transmitted solar debug vars
                 ViewFactorTotal = 0.0;
-                WinDifSolarTrans = WinDifSolar(DifTransSurfNum);
+                WinDifSolarTrans = SurfWinDifSolar(DifTransSurfNum);
                 ZoneDifSolarTrans += WinDifSolarTrans;
 
                 // Init Exterior Window accumulators for debugging

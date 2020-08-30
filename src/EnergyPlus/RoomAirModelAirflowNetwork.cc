@@ -1086,17 +1086,17 @@ namespace RoomAirModelAirflowNetwork {
                     SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (Zone(ZoneNum).NoHeatToReturnAir) {
                         SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        WinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        WinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
-                        if (WinHeatGain(SurfNum) >= 0.0) {
-                            WinHeatGainRep(SurfNum) = WinHeatGain(SurfNum);
-                            WinHeatGainRepEnergy(SurfNum) = WinHeatGainRep(SurfNum) * TimeStepZone * SecInHour;
+                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
+                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
+                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * TimeStepZone * SecInHour;
                         } else {
-                            WinHeatLossRep(SurfNum) = -WinHeatGain(SurfNum);
-                            WinHeatLossRepEnergy(SurfNum) = WinHeatLossRep(SurfNum) * TimeStepZone * SecInHour;
+                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
+                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * TimeStepZone * SecInHour;
                         }
-                        WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
-                        WinHeatTransferRepEnergy(SurfNum) = WinHeatGain(SurfNum) * TimeStepZone * SecInHour;
+                        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
+                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatGain(SurfNum) * TimeStepZone * SecInHour;
                     }
                 }
 

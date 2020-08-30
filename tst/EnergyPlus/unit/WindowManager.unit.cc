@@ -302,7 +302,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
         inSurfTempPrev = inSurfTemp;
     }
 
-    EXPECT_GT(DataSurfaces::WinHeatLossRep(winNum), DataSurfaces::WinHeatTransfer(winNum));
+    EXPECT_GT(DataSurfaces::SurfWinHeatLossRep(winNum), DataSurfaces::SurfWinHeatTransfer(winNum));
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
@@ -522,23 +522,23 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalance::QRadSWwinAbs.allocate(1, 3);
     DataHeatBalance::QRadThermInAbs.allocate(3);
     DataHeatBalance::QRadSWOutIncident.allocate(3);
-    DataSurfaces::WinTransSolar.allocate(3);
+    DataSurfaces::SurfWinTransSolar.allocate(3);
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
-    DataSurfaces::WinHeatGain.allocate(3);
-    DataSurfaces::WinHeatTransfer.allocate(3);
-    DataSurfaces::WinGainConvGlazToZoneRep.allocate(3);
-    DataSurfaces::WinGainIRGlazToZoneRep.allocate(3);
-    DataSurfaces::WinGapConvHtFlowRep.allocate(3);
-    DataSurfaces::WinGapConvHtFlowRepEnergy.allocate(3);
+    DataSurfaces::SurfWinHeatGain.allocate(3);
+    DataSurfaces::SurfWinHeatTransfer.allocate(3);
+    DataSurfaces::SurfWinGainConvGlazToZoneRep.allocate(3);
+    DataSurfaces::SurfWinGainIRGlazToZoneRep.allocate(3);
+    DataSurfaces::SurfWinGapConvHtFlowRep.allocate(3);
+    DataSurfaces::SurfWinGapConvHtFlowRepEnergy.allocate(3);
     DataHeatBalance::QS.allocate(1);
-    DataSurfaces::WinLossSWZoneToOutWinRep.allocate(3);
-    DataSurfaces::WinSysSolTransmittance.allocate(3);
-    DataSurfaces::WinSysSolAbsorptance.allocate(3);
-    DataSurfaces::WinSysSolReflectance.allocate(3);
+    DataSurfaces::SurfWinLossSWZoneToOutWinRep.allocate(3);
+    DataSurfaces::SurfWinSysSolTransmittance.allocate(3);
+    DataSurfaces::SurfWinSysSolAbsorptance.allocate(3);
+    DataSurfaces::SurfWinSysSolReflectance.allocate(3);
     DataSurfaces::InsideGlassCondensationFlag.allocate(3);
-    DataSurfaces::WinGainFrameDividerToZoneRep.allocate(3);
+    DataSurfaces::SurfWinGainFrameDividerToZoneRep.allocate(3);
     DataSurfaces::InsideFrameCondensationFlag.allocate(3);
     DataSurfaces::InsideDividerCondensationFlag.allocate(3);
 
@@ -560,7 +560,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
     DataHeatBalFanSys::QSteamBaseboardSurf = 0.0;
     DataHeatBalFanSys::QElecBaseboardSurf = 0.0;
-    DataSurfaces::WinTransSolar = 0.0;
+    DataSurfaces::SurfWinTransSolar = 0.0;
     DataHeatBalance::QS = 0.0;
 
     Real64 inSurfTemp;
@@ -2749,23 +2749,23 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalance::QRadSWwinAbs.allocate(1, 3);
     DataHeatBalance::QRadThermInAbs.allocate(3);
     DataHeatBalance::QRadSWOutIncident.allocate(3);
-    DataSurfaces::WinTransSolar.allocate(3);
+    DataSurfaces::SurfWinTransSolar.allocate(3);
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
-    DataSurfaces::WinHeatGain.allocate(3);
-    DataSurfaces::WinHeatTransfer.allocate(3);
-    DataSurfaces::WinGainConvGlazToZoneRep.allocate(3);
-    DataSurfaces::WinGainIRGlazToZoneRep.allocate(3);
-    DataSurfaces::WinGapConvHtFlowRep.allocate(3);
-    DataSurfaces::WinGapConvHtFlowRepEnergy.allocate(3);
+    DataSurfaces::SurfWinHeatGain.allocate(3);
+    DataSurfaces::SurfWinHeatTransfer.allocate(3);
+    DataSurfaces::SurfWinGainConvGlazToZoneRep.allocate(3);
+    DataSurfaces::SurfWinGainIRGlazToZoneRep.allocate(3);
+    DataSurfaces::SurfWinGapConvHtFlowRep.allocate(3);
+    DataSurfaces::SurfWinGapConvHtFlowRepEnergy.allocate(3);
     DataHeatBalance::QS.allocate(1);
-    DataSurfaces::WinLossSWZoneToOutWinRep.allocate(3);
-    DataSurfaces::WinSysSolTransmittance.allocate(3);
-    DataSurfaces::WinSysSolAbsorptance.allocate(3);
-    DataSurfaces::WinSysSolReflectance.allocate(3);
+    DataSurfaces::SurfWinLossSWZoneToOutWinRep.allocate(3);
+    DataSurfaces::SurfWinSysSolTransmittance.allocate(3);
+    DataSurfaces::SurfWinSysSolAbsorptance.allocate(3);
+    DataSurfaces::SurfWinSysSolReflectance.allocate(3);
     DataSurfaces::InsideGlassCondensationFlag.allocate(3);
-    DataSurfaces::WinGainFrameDividerToZoneRep.allocate(3);
+    DataSurfaces::SurfWinGainFrameDividerToZoneRep.allocate(3);
     DataSurfaces::InsideFrameCondensationFlag.allocate(3);
     DataSurfaces::InsideDividerCondensationFlag.allocate(3);
 
@@ -2787,7 +2787,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
     DataHeatBalFanSys::QSteamBaseboardSurf = 0.0;
     DataHeatBalFanSys::QElecBaseboardSurf = 0.0;
-    DataSurfaces::WinTransSolar = 0.0;
+    DataSurfaces::SurfWinTransSolar = 0.0;
     DataHeatBalance::QS = 0.0;
 
     Real64 inSurfTemp;

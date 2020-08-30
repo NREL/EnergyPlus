@@ -3491,38 +3491,38 @@ namespace WindowManager {
                                      EpsShIR1 * (dataWindowManager.sigma * pow_4(dataWindowManager.thetas(dataWindowManager.nglfacep - 1)) - dataWindowManager.Rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
                 NetIRHeatGainGlass = ShadeArea * (dataWindowManager.emis(2 * dataWindowManager.ngllayer) * TauShIR / ShGlReflFacIR) * (dataWindowManager.sigma * pow_4(dataWindowManager.thetas(2 * dataWindowManager.ngllayer)) - dataWindowManager.Rmir);
                 ConvHeatGainFrZoneSideOfShade = ShadeArea * dataWindowManager.hcin * (dataWindowManager.thetas(dataWindowManager.nglfacep) - dataWindowManager.tin);
-                WinHeatGain(SurfNum) =
-                    WinTransSolar(SurfNum) + ConvHeatFlowNatural + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
-                WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+                SurfWinHeatGain(SurfNum) =
+                        SurfWinTransSolar(SurfNum) + ConvHeatFlowNatural + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
+                SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
                 // store components for reporting
-                WinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
-                WinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfShade;
-                WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
-                WinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainShade;
+                SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
+                SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfShade;
+                SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
+                SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainShade;
             } else {
                 // Interior shade or blind not present; innermost layer is glass
                 CondHeatGainGlass = Surface(SurfNum).Area * dataWindowManager.scon(dataWindowManager.ngllayer) * (dataWindowManager.thetas(2 * dataWindowManager.ngllayer - 1) - dataWindowManager.thetas(2 * dataWindowManager.ngllayer));
                 NetIRHeatGainGlass = Surface(SurfNum).Area * dataWindowManager.emis(2 * dataWindowManager.ngllayer) * (dataWindowManager.sigma * pow_4(dataWindowManager.thetas(2 * dataWindowManager.ngllayer)) - dataWindowManager.Rmir);
                 ConvHeatGainFrZoneSideOfGlass = Surface(SurfNum).Area * dataWindowManager.hcin * (dataWindowManager.thetas(2 * dataWindowManager.ngllayer) - dataWindowManager.tin);
-                WinHeatGain(SurfNum) = WinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
-                WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+                SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
+                SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
                 // store components for reporting
-                WinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
-                WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
+                SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
+                SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
             }
 
             // Add convective heat gain from airflow window
             // Note: effect of fan heat on gap outlet temperature is neglected since fan power (based
             // on pressure drop through the gap) is extremely small
 
-            WinGapConvHtFlowRep(SurfNum) = 0.0;
-            WinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
+            SurfWinGapConvHtFlowRep(SurfNum) = 0.0;
+            SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
             TotAirflowGap = SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
             TAirflowGapOutletC = TAirflowGapOutlet - dataWindowManager.TKelvin;
             SurfWinTAirflowGapOutlet(SurfNum) = TAirflowGapOutletC;
             if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
-                WinGapConvHtFlowRep(SurfNum) = ConvHeatFlowForced;
-                WinGapConvHtFlowRepEnergy(SurfNum) = WinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
+                SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowForced;
+                SurfWinGapConvHtFlowRepEnergy(SurfNum) = SurfWinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
                 // Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
                 if (SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir ||
@@ -3538,8 +3538,8 @@ namespace WindowManager {
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir) {
                         SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
-                        WinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
-                        WinHeatTransfer(SurfNum) += ConvHeatGainToZoneAir;
+                        SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
+                        SurfWinHeatTransfer(SurfNum) += ConvHeatGainToZoneAir;
                     } else {
                         SurfWinRetHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                     }
@@ -3568,27 +3568,27 @@ namespace WindowManager {
             } else if (ShadeFlag == SwitchableGlazing) {
                 TransDiff = InterpSw(SurfWinSwitchingFactor(SurfNum), dataConstruction.Construct(ConstrNum).TransDiff, dataConstruction.Construct(ConstrNumSh).TransDiff);
             }
-            WinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            WinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
             // shouldn't this be + outward flowing fraction of absorbed SW? -- do not know whose comment this is?  LKL (9/2012)
-            WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGShadeOn ||
                 ShadeFlag == BGBlindOn || ShadeFlag == ExtScreenOn) {
-                WinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
+                SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
                                                    (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
-                WinShadingAbsorbedSolarEnergy(SurfNum) = WinShadingAbsorbedSolar(SurfNum) * TimeStepZoneSec;
+                SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * TimeStepZoneSec;
             }
             if (SunIsUp) {
-                WinSysSolTransmittance(SurfNum) =
-                    WinTransSolar(SurfNum) / (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
-                WinSysSolAbsorptance(SurfNum) = (QRadSWwinAbsTot(SurfNum) + WinShadingAbsorbedSolar(SurfNum)) /
+                SurfWinSysSolTransmittance(SurfNum) =
+                        SurfWinTransSolar(SurfNum) / (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                SurfWinSysSolAbsorptance(SurfNum) = (QRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
                                                 (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
-                WinSysSolReflectance(SurfNum) = 1.0 - WinSysSolTransmittance(SurfNum) - WinSysSolAbsorptance(SurfNum);
+                SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
-                WinSysSolTransmittance(SurfNum) = 0.0;
-                WinSysSolAbsorptance(SurfNum) = 0.0;
-                WinSysSolReflectance(SurfNum) = 0.0;
+                SurfWinSysSolTransmittance(SurfNum) = 0.0;
+                SurfWinSysSolAbsorptance(SurfNum) = 0.0;
+                SurfWinSysSolReflectance(SurfNum) = 0.0;
             }
 
             // Save hcv for use in divider calc with interior or exterior shade (see CalcWinFrameAndDividerTemps)
@@ -5913,9 +5913,9 @@ namespace WindowManager {
                 SurfWinFrameHeatLoss(SurfNum) = std::abs(FrameHeatGain);
             }
 
-            WinHeatGain(SurfNum) += FrameHeatGain;
-            WinHeatTransfer(SurfNum) += FrameHeatTransfer;
-            WinGainFrameDividerToZoneRep(SurfNum) = FrameHeatGain;
+            SurfWinHeatGain(SurfNum) += FrameHeatGain;
+            SurfWinHeatTransfer(SurfNum) += FrameHeatTransfer;
+            SurfWinGainFrameDividerToZoneRep(SurfNum) = FrameHeatGain;
         } // End of check if window has a frame
 
         if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinStormWinFlag(SurfNum) < 1) {
@@ -5977,9 +5977,9 @@ namespace WindowManager {
             } else {
                 SurfWinDividerHeatLoss(SurfNum) = std::abs(DividerHeatGain);
             }
-            WinHeatGain(SurfNum) += DividerHeatGain;
-            WinHeatTransfer(SurfNum) += DividerHeatTransfer;
-            WinGainFrameDividerToZoneRep(SurfNum) += DividerHeatGain;
+            SurfWinHeatGain(SurfNum) += DividerHeatGain;
+            SurfWinHeatTransfer(SurfNum) += DividerHeatTransfer;
+            SurfWinGainFrameDividerToZoneRep(SurfNum) += DividerHeatGain;
             // If interior shade is present it is assumed that both the convective and IR radiative gain
             // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
             // interaction between divider and shade is ignored due to the difficulty of calculating this interaction

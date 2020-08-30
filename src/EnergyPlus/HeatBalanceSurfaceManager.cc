@@ -1591,6 +1591,9 @@ namespace HeatBalanceSurfaceManager {
         HGrndFD.dimension(TotSurfaces, 0.0);
         HAirFD.dimension(TotSurfaces, 0.0);
 
+        SurfSkySolarInc.dimension(TotSurfaces, 0);
+        SurfGndSolarInc.dimension(TotSurfaces, 0);
+
         DisplayString("Setting up Surface Reporting Variables");
 
         // Setup surface report variables CurrentModuleObject='Opaque Surfaces'
@@ -2463,8 +2466,8 @@ namespace HeatBalanceSurfaceManager {
             OpaqSurfInsFaceCondGainRep(SurfNum) = 0.0;
             OpaqSurfInsFaceCondLossRep(SurfNum) = 0.0;
 
-            SurfWinSkySolarInc(SurfNum) = 0.0;
-            SurfWinGndSolarInc(SurfNum) = 0.0;
+            SurfSkySolarInc(SurfNum) = 0.0;
+            SurfGndSolarInc(SurfNum) = 0.0;
 
         }
 
@@ -2557,31 +2560,34 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinProfileAngHor(SurfNum) = 0.0;
                 SurfWinProfileAngVert(SurfNum) = 0.0;
 
-                BSDFBeamDirectionRep(SurfNum) = 0;
-                BSDFBeamThetaRep(SurfNum) = 0.0;
-                BSDFBeamPhiRep(SurfNum) = 0.0;
-                WinHeatGain(SurfNum) = 0.0;
-                WinHeatTransfer(SurfNum) = 0.0;
-                WinHeatGainRep(SurfNum) = 0.0;
-                WinHeatLossRep(SurfNum) = 0.0;
-                WinGainConvGlazToZoneRep(SurfNum) = 0.0;
-                WinGainIRGlazToZoneRep(SurfNum) = 0.0;
-                WinLossSWZoneToOutWinRep(SurfNum) = 0.0;
-                WinGainFrameDividerToZoneRep(SurfNum) = 0.0;
-                WinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
-                WinGainConvShadeToZoneRep(SurfNum) = 0.0;
-                WinGainIRShadeToZoneRep(SurfNum) = 0.0;
-                WinGapConvHtFlowRep(SurfNum) = 0.0;
-                WinShadingAbsorbedSolar(SurfNum) = 0.0;
-                WinSysSolTransmittance(SurfNum) = 0.0;
-                WinSysSolReflectance(SurfNum) = 0.0;
-                WinSysSolAbsorptance(SurfNum) = 0.0;
-                WinHeatGainRepEnergy(SurfNum) = 0.0;
-                WinHeatLossRepEnergy(SurfNum) = 0.0;
-                WinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
-                WinHeatTransferRepEnergy(SurfNum) = 0.0;
-                WinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
-                OtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
+                SurfWinHeatGain(SurfNum) = 0.0;
+                SurfWinHeatTransfer(SurfNum) = 0.0;
+                SurfWinHeatGainRep(SurfNum) = 0.0;
+                SurfWinHeatLossRep(SurfNum) = 0.0;
+                SurfWinGainConvGlazToZoneRep(SurfNum) = 0.0;
+                SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
+                SurfWinLossSWZoneToOutWinRep(SurfNum) = 0.0;
+                SurfWinGainFrameDividerToZoneRep(SurfNum) = 0.0;
+                SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = 0.0;
+                SurfWinGainConvShadeToZoneRep(SurfNum) = 0.0;
+                SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
+                SurfWinGapConvHtFlowRep(SurfNum) = 0.0;
+                SurfWinShadingAbsorbedSolar(SurfNum) = 0.0;
+                SurfWinSysSolTransmittance(SurfNum) = 0.0;
+                SurfWinSysSolReflectance(SurfNum) = 0.0;
+                SurfWinSysSolAbsorptance(SurfNum) = 0.0;
+                SurfWinHeatGainRepEnergy(SurfNum) = 0.0;
+                SurfWinHeatLossRepEnergy(SurfNum) = 0.0;
+                SurfWinGapConvHtFlowRepEnergy(SurfNum) = 0.0;
+                SurfWinHeatTransferRepEnergy(SurfNum) = 0.0;
+                SurfWinShadingAbsorbedSolarEnergy(SurfNum) = 0.0;
+                SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = 0.0;
+
+                SurfWinBSDFBeamDirectionRep(SurfNum) = 0;
+                SurfWinBSDFBeamThetaRep(SurfNum) = 0.0;
+                SurfWinBSDFBeamPhiRep(SurfNum) = 0.0;
+
+
 
             }
         }
@@ -2593,30 +2599,37 @@ namespace HeatBalanceSurfaceManager {
             QC = 0.0;
             QDV = 0.0;
             // unused    QBV = 0.0
-            ZoneTransSolar = 0.0;
-            ZoneBmSolFrExtWinsRep = 0.0;
-            ZoneBmSolFrIntWinsRep = 0.0;
-            ZoneDifSolFrExtWinsRep = 0.0;
-            ZoneDifSolFrIntWinsRep = 0.0;
-            WinTransSolar = 0.0;
-            WinBmSolar = 0.0;
-            WinBmBmSolar = 0.0;
-            WinBmDifSolar = 0.0;
 
-            WinDifSolar = 0.0;
-            WinDirSolTransAtIncAngle = 0.0;
-            // energy
-            ZoneTransSolarEnergy = 0.0;
-            ZoneBmSolFrExtWinsRepEnergy = 0.0;
-            ZoneBmSolFrIntWinsRepEnergy = 0.0;
-            ZoneDifSolFrExtWinsRepEnergy = 0.0;
-            ZoneDifSolFrIntWinsRepEnergy = 0.0;
-            WinTransSolarEnergy = 0.0;
-            WinBmSolarEnergy = 0.0;
-            WinBmBmSolarEnergy = 0.0;
-            WinBmDifSolarEnergy = 0.0;
-
-            WinDifSolarEnergy = 0.0;
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                ZoneTransSolar(zoneNum) = 0.0;
+                ZoneBmSolFrExtWinsRep(zoneNum) = 0.0;
+                ZoneBmSolFrIntWinsRep(zoneNum) = 0.0;
+                ZoneDifSolFrExtWinsRep(zoneNum) = 0.0;
+                ZoneDifSolFrIntWinsRep(zoneNum) = 0.0;
+                // energy
+                ZoneTransSolarEnergy(zoneNum) = 0.0;
+                ZoneBmSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+                ZoneBmSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+                ZoneDifSolFrExtWinsRepEnergy(zoneNum) = 0.0;
+                ZoneDifSolFrIntWinsRepEnergy(zoneNum) = 0.0;
+                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                if (firstSurfWin == -1) continue;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    SurfWinTransSolar(SurfNum) = 0.0;
+                    SurfWinBmSolar(SurfNum) = 0.0;
+                    SurfWinBmBmSolar(SurfNum) = 0.0;
+                    SurfWinBmDifSolar(SurfNum) = 0.0;
+                    SurfWinDifSolar(SurfNum) = 0.0;
+                    SurfWinDirSolTransAtIncAngle(SurfNum) = 0.0;
+                    // energy
+                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmBmSolarEnergy(SurfNum) = 0.0;
+                    SurfWinBmDifSolarEnergy(SurfNum) = 0.0;
+                    SurfWinDifSolarEnergy(SurfNum) = 0.0;
+                }
+            }
 
             if (NumOfTDDPipes > 0) {
                 for (auto &e : TDDPipe) {
@@ -2641,10 +2654,10 @@ namespace HeatBalanceSurfaceManager {
             Array2D<Real64>::size_type lSH(CalcSolRefl ? ReflFacBmToBmSolObs.index(HourOfDay, 1) : 0u);
             Array2D<Real64>::size_type lSP(CalcSolRefl ? ReflFacBmToBmSolObs.index(PreviousHour, 1) : 0u);
             for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                SurfWinSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
-                SurfWinGndSolarInc(SurfNum) = GndSolarRad * Surface(SurfNum).ViewFactorGround;
+                SurfSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
+                SurfGndSolarInc(SurfNum) = GndSolarRad * Surface(SurfNum).ViewFactorGround;
                 // For Complex Fenestrations:
-                SurfWinSkyGndSolarInc(SurfNum) = SurfWinGndSolarInc(SurfNum);
+                SurfWinSkyGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
                 SurfWinBmGndSolarInc(SurfNum) = 0.0;
                 if (CalcSolRefl) { // Tuned Linear indexing // [ lSH ] == ( HourOfDay, SurfNum ) // [ lSP ] == ( PreviousHour, SurfNum )
 
@@ -2656,9 +2669,9 @@ namespace HeatBalanceSurfaceManager {
                     BmToDiffReflFacGnd(SurfNum) = WeightNow * ReflFacBmToDiffSolGnd[lSH] + WeightPreviousHour * ReflFacBmToDiffSolGnd[lSP];
 
                     // TH2 CR 9056
-                    SurfWinSkySolarInc(SurfNum) +=
+                    SurfSkySolarInc(SurfNum) +=
                         BeamSolarRad * (BmToBmReflFacObs(SurfNum) + BmToDiffReflFacObs(SurfNum)) + DifSolarRad * ReflFacSkySolObs(SurfNum);
-                    SurfWinGndSolarInc(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum) +
+                    SurfGndSolarInc(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum) +
                                                          DifSolarRad * GndReflectance * ReflFacSkySolGnd(SurfNum);
 
                     ++lSH;
@@ -2812,8 +2825,8 @@ namespace HeatBalanceSurfaceManager {
                         SurfNum2 = SurfNum;
                         CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
                         BeamSolar = BeamSolarRad;
-                        SkySolarInc = SurfWinSkySolarInc(SurfNum);
-                        GndSolarInc = SurfWinGndSolarInc(SurfNum);
+                        SkySolarInc = SurfSkySolarInc(SurfNum);
+                        GndSolarInc = SurfGndSolarInc(SurfNum);
                     }
 
                     // Cosine of incidence angle and solar incident on outside of surface, for reporting
@@ -6453,18 +6466,18 @@ namespace HeatBalanceSurfaceManager {
         // CalcWindowHeatBalance.
         // Only for Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window
         for (int surfNum : HTWindowSurfs) {
-            WinHeatGain(surfNum) = 0.0;
-            WinHeatTransfer(surfNum) = 0.0;
-            WinHeatGainRep(surfNum) = 0.0;
-            WinHeatLossRep(surfNum) = 0.0;
-            WinGainConvGlazToZoneRep(surfNum) = 0.0;
-            WinGainIRGlazToZoneRep(surfNum) = 0.0;
-            WinLossSWZoneToOutWinRep(surfNum) = 0.0;
-            WinGainFrameDividerToZoneRep(surfNum) = 0.0;
-            WinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
-            WinGainConvShadeToZoneRep(surfNum) = 0.0;
-            OtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
-            WinGainIRShadeToZoneRep(surfNum) = 0.0;
+            SurfWinHeatGain(surfNum) = 0.0;
+            SurfWinHeatTransfer(surfNum) = 0.0;
+            SurfWinHeatGainRep(surfNum) = 0.0;
+            SurfWinHeatLossRep(surfNum) = 0.0;
+            SurfWinGainConvGlazToZoneRep(surfNum) = 0.0;
+            SurfWinGainIRGlazToZoneRep(surfNum) = 0.0;
+            SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
+            SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
+            SurfWinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
+            SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
+            SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
+            SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
             SurfWinFrameQRadOutAbs(surfNum) = 0.0;
             SurfWinFrameQRadInAbs(surfNum) = 0.0;
             SurfWinDividerQRadOutAbs(surfNum) = 0.0;
@@ -6861,23 +6874,23 @@ namespace HeatBalanceSurfaceManager {
                     Real64 const Sigma_Temp_4(DataGlobals::StefanBoltzmann * pow_4(TempSurfIn(SurfNum)));
 
                     // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                    WinHeatGain(SurfNum) =
-                        WinTransSolar(SurfNum) + HConvIn_surf * surface.Area * (TempSurfIn(SurfNum) - RefAirTemp(SurfNum)) +
-                        dataConstruction.Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
+                    SurfWinHeatGain(SurfNum) =
+                            SurfWinTransSolar(SurfNum) + HConvIn_surf * surface.Area * (TempSurfIn(SurfNum) - RefAirTemp(SurfNum)) +
+                            dataConstruction.Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                             (Sigma_Temp_4 - (SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) +
                                              QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum))) -
-                        QS(surface.SolarEnclIndex) * surface.Area *
-                            dataConstruction.Construct(surface.Construction).TransDiff; // Transmitted solar | Convection | IR exchange | IR
+                                             QS(surface.SolarEnclIndex) * surface.Area * dataConstruction.Construct(surface.Construction).TransDiff;
+                    // Transmitted solar | Convection | IR exchange | IR
                     // Zone diffuse interior shortwave reflected back into the TDD
-                    WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+                    SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
 
                     // fill out report vars for components of Window Heat Gain
-                    WinGainConvGlazToZoneRep(SurfNum) = HConvIn_surf * surface.Area * (TempSurfIn(SurfNum) - RefAirTemp(SurfNum));
-                    WinGainIRGlazToZoneRep(SurfNum) =
+                    SurfWinGainConvGlazToZoneRep(SurfNum) = HConvIn_surf * surface.Area * (TempSurfIn(SurfNum) - RefAirTemp(SurfNum));
+                    SurfWinGainIRGlazToZoneRep(SurfNum) =
                         dataConstruction.Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                         (Sigma_Temp_4 - (SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) +
                                          QHWBaseboardSurf(SurfNum) + QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum)));
-                    WinLossSWZoneToOutWinRep(SurfNum) =
+                    SurfWinLossSWZoneToOutWinRep(SurfNum) =
                         QS(surface.SolarEnclIndex) * surface.Area * dataConstruction.Construct(surface.Construction).TransDiff;
                 } else {                             // Regular window
                     if (InsideSurfIterations == 0) { // Do windows only once
@@ -7107,23 +7120,23 @@ namespace HeatBalanceSurfaceManager {
 
             // Window heat gain/loss
             if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
-                if (DataSurfaces::WinHeatGain(surfNum) >= 0.0) {
-                    DataSurfaces::WinHeatGainRep(surfNum) = DataSurfaces::WinHeatGain(surfNum);
-                    DataSurfaces::WinHeatGainRepEnergy(surfNum) = DataSurfaces::WinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                if (DataSurfaces::SurfWinHeatGain(surfNum) >= 0.0) {
+                    DataSurfaces::SurfWinHeatGainRep(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum);
+                    DataSurfaces::SurfWinHeatGainRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
                 } else {
-                    DataSurfaces::WinHeatLossRep(surfNum) = -DataSurfaces::WinHeatGain(surfNum);
-                    DataSurfaces::WinHeatLossRepEnergy(surfNum) = DataSurfaces::WinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                    DataSurfaces::SurfWinHeatLossRep(surfNum) = -DataSurfaces::SurfWinHeatGain(surfNum);
+                    DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
                 }
 
-                DataSurfaces::WinHeatTransferRepEnergy(surfNum) = DataSurfaces::WinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
+                DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
                 if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                     int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
-                    DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::WinHeatGainRep(surfNum);
-                    DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::WinHeatLossRep(surfNum);
+                    DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
+                    DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
                 }
                 if (DataSurfaces::Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
                     int zoneNum = DataSurfaces::Surface(surfNum).Zone;
-                    DataHeatBalance::ZoneWinHeatGain(zoneNum) += DataSurfaces::WinHeatGain(surfNum);
+                    DataHeatBalance::ZoneWinHeatGain(zoneNum) += DataSurfaces::SurfWinHeatGain(surfNum);
                 }
             }
         }
@@ -7323,18 +7336,18 @@ namespace HeatBalanceSurfaceManager {
             int const firstWindowSurf = Zone(zoneNum).WindowSurfaceFirst;
             int const lastWindowSurf = Zone(zoneNum).WindowSurfaceLast;
             for (int surfNum = firstWindowSurf; surfNum <= lastWindowSurf; ++surfNum) {
-                WinHeatGain(surfNum) = 0.0;
-                WinHeatTransfer(surfNum) = 0.0;
-                WinHeatGainRep(surfNum) = 0.0;
-                WinHeatLossRep(surfNum) = 0.0;
-                WinGainConvGlazToZoneRep(surfNum) = 0.0;
-                WinGainIRGlazToZoneRep(surfNum) = 0.0;
-                WinLossSWZoneToOutWinRep(surfNum) = 0.0;
-                WinGainFrameDividerToZoneRep(surfNum) = 0.0;
-                WinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
-                WinGainConvShadeToZoneRep(surfNum) = 0.0;
-                OtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
-                WinGainIRShadeToZoneRep(surfNum) = 0.0;
+                SurfWinHeatGain(surfNum) = 0.0;
+                SurfWinHeatTransfer(surfNum) = 0.0;
+                SurfWinHeatGainRep(surfNum) = 0.0;
+                SurfWinHeatLossRep(surfNum) = 0.0;
+                SurfWinGainConvGlazToZoneRep(surfNum) = 0.0;
+                SurfWinGainIRGlazToZoneRep(surfNum) = 0.0;
+                SurfWinLossSWZoneToOutWinRep(surfNum) = 0.0;
+                SurfWinGainFrameDividerToZoneRep(surfNum) = 0.0;
+                SurfWinGainConvGlazShadGapToZoneRep(surfNum) = 0.0;
+                SurfWinGainConvShadeToZoneRep(surfNum) = 0.0;
+                SurfWinOtherConvGainInsideFaceToZoneRep(surfNum) = 0.0;
+                SurfWinGainIRShadeToZoneRep(surfNum) = 0.0;
                 SurfWinFrameQRadOutAbs(surfNum) = 0.0;
                 SurfWinFrameQRadInAbs(surfNum) = 0.0;
                 SurfWinDividerQRadOutAbs(surfNum) = 0.0;
@@ -7575,24 +7588,23 @@ namespace HeatBalanceSurfaceManager {
                         Real64 const Sigma_Temp_4(DataGlobals::StefanBoltzmann * pow_4(TempSurfIn(surfNum)));
 
                         // Calculate window heat gain for TDD:DIFFUSER since this calculation is usually done in WindowManager
-                        WinHeatGain(surfNum) =
-                            WinTransSolar(surfNum) + HConvIn_surf * surface.Area * (TempSurfIn(surfNum) - RefAirTemp(surfNum)) +
-                            dataConstruction.Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
+                        SurfWinHeatGain(surfNum) =
+                                SurfWinTransSolar(surfNum) + HConvIn_surf * surface.Area * (TempSurfIn(surfNum) - RefAirTemp(surfNum)) +
+                                dataConstruction.Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                                 (Sigma_Temp_4 - (SurfWinIRfromParentZone(surfNum) + QHTRadSysSurf(surfNum) + QCoolingPanelSurf(surfNum) +
-                                                 QHWBaseboardSurf(surfNum) + QSteamBaseboardSurf(surfNum) + QElecBaseboardSurf(surfNum))) -
-                            QS(surface.SolarEnclIndex) * surface.Area *
+                                                 QHWBaseboardSurf(surfNum) + QSteamBaseboardSurf(surfNum) + QElecBaseboardSurf(surfNum))) - QS(surface.SolarEnclIndex) * surface.Area *
                                 dataConstruction.Construct(surface.Construction)
                                     .TransDiff; // Transmitted solar | Convection | IR exchange | IR
                                                 // Zone diffuse interior shortwave reflected back into the TDD
-                        WinHeatTransfer(surfNum) = WinHeatGain(surfNum);
+                        SurfWinHeatTransfer(surfNum) = SurfWinHeatGain(surfNum);
 
                         // fill out report vars for components of Window Heat Gain
-                        WinGainConvGlazToZoneRep(surfNum) = HConvIn_surf * surface.Area * (TempSurfIn(surfNum) - RefAirTemp(surfNum));
-                        WinGainIRGlazToZoneRep(surfNum) =
+                        SurfWinGainConvGlazToZoneRep(surfNum) = HConvIn_surf * surface.Area * (TempSurfIn(surfNum) - RefAirTemp(surfNum));
+                        SurfWinGainIRGlazToZoneRep(surfNum) =
                             dataConstruction.Construct(surface.Construction).InsideAbsorpThermal * surface.Area *
                             (Sigma_Temp_4 - (SurfWinIRfromParentZone(surfNum) + QHTRadSysSurf(surfNum) + QCoolingPanelSurf(surfNum) +
                                              QHWBaseboardSurf(surfNum) + QSteamBaseboardSurf(surfNum) + QElecBaseboardSurf(surfNum)));
-                        WinLossSWZoneToOutWinRep(surfNum) =
+                        SurfWinLossSWZoneToOutWinRep(surfNum) =
                             QS(surface.SolarEnclIndex) * surface.Area * dataConstruction.Construct(surface.Construction).TransDiff;
                     } else {                             // Regular window
                         if (InsideSurfIterations == 0) { // Do windows only once
@@ -7811,23 +7823,23 @@ namespace HeatBalanceSurfaceManager {
 
                 // Window heat gain/loss
                 if (DataSurfaces::Surface(surfNum).Class == DataSurfaces::SurfaceClass_Window) {
-                    if (DataSurfaces::WinHeatGain(surfNum) >= 0.0) {
-                        DataSurfaces::WinHeatGainRep(surfNum) = DataSurfaces::WinHeatGain(surfNum);
-                        DataSurfaces::WinHeatGainRepEnergy(surfNum) = DataSurfaces::WinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                    if (DataSurfaces::SurfWinHeatGain(surfNum) >= 0.0) {
+                        DataSurfaces::SurfWinHeatGainRep(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum);
+                        DataSurfaces::SurfWinHeatGainRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGainRep(surfNum) * DataGlobals::TimeStepZoneSec;
                     } else {
-                        DataSurfaces::WinHeatLossRep(surfNum) = -DataSurfaces::WinHeatGain(surfNum);
-                        DataSurfaces::WinHeatLossRepEnergy(surfNum) = DataSurfaces::WinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
+                        DataSurfaces::SurfWinHeatLossRep(surfNum) = -DataSurfaces::SurfWinHeatGain(surfNum);
+                        DataSurfaces::SurfWinHeatLossRepEnergy(surfNum) = DataSurfaces::SurfWinHeatLossRep(surfNum) * DataGlobals::TimeStepZoneSec;
                     }
 
-                    DataSurfaces::WinHeatTransferRepEnergy(surfNum) = DataSurfaces::WinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
+                    DataSurfaces::SurfWinHeatTransferRepEnergy(surfNum) = DataSurfaces::SurfWinHeatGain(surfNum) * DataGlobals::TimeStepZoneSec;
                     if (DataSurfaces::SurfWinOriginalClass(surfNum) == DataSurfaces::SurfaceClass_TDD_Diffuser) { // Tubular daylighting device
                         int pipeNum = DataSurfaces::SurfWinTDDPipeNum(surfNum);
-                        DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::WinHeatGainRep(surfNum);
-                        DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::WinHeatLossRep(surfNum);
+                        DataDaylightingDevices::TDDPipe(pipeNum).HeatGain = DataSurfaces::SurfWinHeatGainRep(surfNum);
+                        DataDaylightingDevices::TDDPipe(pipeNum).HeatLoss = DataSurfaces::SurfWinHeatLossRep(surfNum);
                     }
                     if (DataSurfaces::Surface(surfNum).ExtSolar) { // WindowManager's definition of ZoneWinHeatGain/Loss
                         int zoneNum = DataSurfaces::Surface(surfNum).Zone;
-                        DataHeatBalance::ZoneWinHeatGain(zoneNum) += DataSurfaces::WinHeatGain(surfNum);
+                        DataHeatBalance::ZoneWinHeatGain(zoneNum) += DataSurfaces::SurfWinHeatGain(surfNum);
                     }
                 }
             }

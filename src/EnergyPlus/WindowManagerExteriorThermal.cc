@@ -176,10 +176,10 @@ namespace WindowManager {
             auto NetIRHeatGainGlass = ShadeArea * (glassEmiss * TauShIR / ShGlReflFacIR) * (dataWindowManager.sigma * pow(dataWindowManager.thetas(dataWindowManager.nglface), 4) - rmir);
             auto tind = surface.getInsideAirTemperature(SurfNum) + KelvinConv;
             auto ConvHeatGainFrZoneSideOfShade = ShadeArea * HConvIn(SurfNum) * (dataWindowManager.thetas(dataWindowManager.nglfacep) - tind);
-            WinHeatGain(SurfNum) = WinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
-            WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+            SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
+            SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
 
-            WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
+            SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
 
             // Effective shade and glass emissivities that are used later for energy calculations.
             // This needs to be checked as well. (Simon)
@@ -212,17 +212,17 @@ namespace WindowManager {
             SurfWinEffInsSurfTemp(SurfNum) = aLayers[totLayers - 1]->getTemperature(Side::Back) - dataWindowManager.TKelvin;
             SurfaceWindow(SurfNum).EffGlassEmiss = aLayers[totLayers - 1]->getSurface(Side::Back)->getEmissivity();
 
-            WinHeatGain(SurfNum) = WinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
-            WinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
-            WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
+            SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
+            SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
+            SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
 
-            WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+            SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
         }
 
         auto TransDiff = construction.TransDiff;
-        WinHeatGain(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        WinHeatTransfer(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
-        WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
+        SurfWinHeatGain(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        SurfWinHeatTransfer(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(); ++k) {
             SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = dataWindowManager.thetas(2 * k - 1);

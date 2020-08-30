@@ -910,23 +910,23 @@ namespace WindowEquivalentLayer {
         NetIRHeatGainWindow = Surface(SurfNum).Area * LWAbsIn * (StefanBoltzmann * pow_4(SurfInsideTemp + KelvinConv) - rmir);
         ConvHeatGainWindow = Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
         // Window heat gain (or loss) is calculated here
-        WinHeatGain(SurfNum) = WinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
-        WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+        SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
+        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
         SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
         // store for component reporting
-        WinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
-        WinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
-        WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
-        WinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
+        SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
+        SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
         if (InSideLayerType == ltyGLAZE) {
             // no interior sade
-            WinGainIRShadeToZoneRep(SurfNum) = 0.0;
+            SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
         } else {
             // Interior shade exists
-            WinGainIRGlazToZoneRep(SurfNum) = 0.0;
+            SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
         }
         // Advanced report variable (DisplayAdvancedReportVariables)
-        OtherConvGainInsideFaceToZoneRep(SurfNum) = SurfWinOtherConvHeatGain(SurfNum);
+        SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = SurfWinOtherConvHeatGain(SurfNum);
     }
 
     void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)
