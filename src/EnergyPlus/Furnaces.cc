@@ -11514,6 +11514,7 @@ namespace Furnaces {
         int InletNode;              // inlet node number for PTHPNum
         Real64 AverageUnitMassFlow; // average supply air mass flow rate over time step
         int OutNode;                // Outlet node number in MSHP loop
+        Real64 IHPMaxFlowRate(0.0);//max flow rate of IHP object
 
         InletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
         OutNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
@@ -11565,9 +11566,16 @@ namespace Furnaces {
             if (!CurDeadBandOrSetback(Furnace(FurnaceNum).ControlZoneNum) && present(SpeedNum)) {
                 // if(present(SpeedNum)) {
                 CompOnMassFlow = GetAirMassFlowRateIHP(state, Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, SpeedRatio, false);
-                CompOnFlowRatio =
-                    CompOnMassFlow /
-                    GetAirMassFlowRateIHP(state, Furnace(FurnaceNum).CoolingCoilIndex, GetMaxSpeedNumIHP(Furnace(FurnaceNum).CoolingCoilIndex), 1.0, false);
+                //avoid divided by zero during DWH mode
+                IHPMaxFlowRate = GetAirMassFlowRateIHP(
+                    state, Furnace(FurnaceNum).CoolingCoilIndex, GetMaxSpeedNumIHP(Furnace(FurnaceNum).CoolingCoilIndex), 1.0, false);
+                if (IHPMaxFlowRate > 0.0) {
+                    CompOnFlowRatio = CompOnMassFlow / IHPMaxFlowRate; 
+                }                    
+                else {
+                    CompOnFlowRatio = 0.0;
+                }                                        
+                    
                 MSHPMassFlowRateLow = GetAirMassFlowRateIHP(state, Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 0.0, false);
                 MSHPMassFlowRateHigh = GetAirMassFlowRateIHP(state, Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum, 1.0, false);
             }
