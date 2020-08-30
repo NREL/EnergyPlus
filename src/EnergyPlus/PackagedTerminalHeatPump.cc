@@ -7237,6 +7237,14 @@ namespace PackagedTerminalHeatPump {
                 SaveCompressorPLR = 1.0;
             }
 
+            // in case that the VS coil only has one speed level
+            if ((PTUnit(PTUnitNum).NumOfSpeedCooling == 1) && CoolingLoad) {
+                SaveCompressorPLR = PartLoadFrac;
+            } else if ((PTUnit(PTUnitNum).NumOfSpeedHeating == 1) && HeatingLoad) {
+                SaveCompressorPLR = PartLoadFrac;
+            }
+
+
             if (PartLoadFrac == 1.0 && SaveCompressorPLR < 1.0) {
                 PartLoadFrac = SaveCompressorPLR;
             }

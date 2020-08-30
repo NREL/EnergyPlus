@@ -9793,6 +9793,7 @@ namespace Furnaces {
         using DataHVACGlobals::SmallMassFlow;
         using DataZoneEquipment::ZoneEquipConfig;
         using IntegratedHeatPump::DecideWorkMode;
+        using IntegratedHeatPump::GetMaxSpeedNumIHP;
 
         Real64 PartLoadFrac;                 // compressor part load fraction
         Real64 SpeedRatio;                   // compressor speed ratio
@@ -9819,6 +9820,8 @@ namespace Furnaces {
         int TotBranchNum;                    // total exit branch number
         int ZoneSideNodeNum;                 // zone equip supply node
         bool EconoActive;                    // TRUE if Economizer is active
+        Real64 TotalZoneSensibleLoadIHP;     // Total ZONE sensible load input for IHP mode determination
+
 
         // to be removed by furnace/unitary system
 
@@ -9873,9 +9876,26 @@ namespace Furnaces {
         }
 
         SaveMassFlowRate = Node(InletNode).MassFlowRate;
+        
+		// prevent unintended cooling and heating in reversed modes
+        if (CoolingLoad && (TotalZoneSensibleLoad > 0)) {
+            TotalZoneSensibleLoad = 0.0;
+        } else if (HeatingLoad && (TotalZoneSensibleLoad < 0)) {
+            TotalZoneSensibleLoad = 0.0;
+        }
+
         // decide current working mode for IHP
-        if ((FirstHVACIteration) && (Furnace(FurnaceNum).bIsIHP))
-            DecideWorkMode(state, Furnace(FurnaceNum).CoolingCoilIndex, TotalZoneSensibleLoad, TotalZoneLatentLoad);
+        if ((FirstHVACIteration) && (Furnace(FurnaceNum).bIsIHP)) {
+            TotalZoneSensibleLoadIHP = TotalZoneSensibleLoad;
+            // prevent unintended cooling and heating in reversed modes
+            if (CoolingLoad && (TotalZoneSensibleLoad > 0)) {
+                TotalZoneSensibleLoadIHP = 0.0;
+            } else if (HeatingLoad && (TotalZoneSensibleLoad < 0)) {
+                TotalZoneSensibleLoadIHP = 0.0;
+            }
+            DecideWorkMode(state, Furnace(FurnaceNum).CoolingCoilIndex, TotalZoneSensibleLoadIHP, TotalZoneLatentLoad);
+        }
+		
 
         if (!FirstHVACIteration && Furnace(FurnaceNum).OpMode == CycFanCycCoil &&
             (QZnReq < (-1.0 * SmallLoad) || TotalZoneLatentLoad < (-1.0 * SmallLoad)) && EconoActive) {
@@ -9940,6 +9960,17 @@ namespace Furnaces {
         } else {
             if (SpeedNum > 1) {
                 SaveCompressorPLR = 1.0;
+            }
+
+            // in case that the VS coil only has one speed level
+            if ((Furnace(FurnaceNum).NumOfSpeedCooling == 1) && CoolingLoad) {
+                SaveCompressorPLR = PartLoadFrac;
+            } else if ((Furnace(FurnaceNum).NumOfSpeedHeating == 1) && HeatingLoad) {
+                SaveCompressorPLR = PartLoadFrac;
+            } else if (Furnace(FurnaceNum).bIsIHP) {
+                if (GetMaxSpeedNumIHP(Furnace(FurnaceNum).CoolingCoilIndex) == 1) {
+                    SaveCompressorPLR = PartLoadFrac;
+                }
             }
 
             if (PartLoadFrac == 1.0 && SaveCompressorPLR < 1.0) {
@@ -10158,6 +10189,7 @@ namespace Furnaces {
         static int ErrCountVar(0); // Counter used to minimize the occurrence of output warnings
         IHPOperationMode IHPMode(IHPOperationMode::IdleMode);
         int GridResponseMode(VariableSpeedCoils::GRID_SENLAT);
+        int MaxSpeedNum(1);
 
         // FLOW
         SupHeaterLoad = 0.0;
@@ -10219,7 +10251,10 @@ namespace Furnaces {
             PartLoadFrac = 0.0;
         }
 
-        if (Furnace(FurnaceNum).bIsIHP) SpeedNum = GetMaxSpeedNumIHP(Furnace(FurnaceNum).CoolingCoilIndex);
+        if (Furnace(FurnaceNum).bIsIHP) {
+            SpeedNum = GetMaxSpeedNumIHP(Furnace(FurnaceNum).CoolingCoilIndex);
+            MaxSpeedNum = SpeedNum;
+        };
 
         CalcVarSpeedHeatPump(state,
                              FurnaceNum,
@@ -10347,7 +10382,12 @@ namespace Furnaces {
                     PartLoadFrac = 1.0;
                     SpeedRatio = 1.0;
                     if (QZnReq < (-1.0 * SmallLoad)) { // Cooling
-                        for (i = 2; i <= Furnace(FurnaceNum).NumOfSpeedCooling; ++i) {
+
+                        if (!Furnace(FurnaceNum).bIsIHP) {
+                            MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
+                        }
+
+                        for (i = 2; i <= MaxSpeedNum; ++i) {
                             CalcVarSpeedHeatPump(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
@@ -10368,7 +10408,11 @@ namespace Furnaces {
                             }
                         }
                     } else {
-                        for (i = 2; i <= Furnace(FurnaceNum).NumOfSpeedHeating; ++i) {
+                        if (!Furnace(FurnaceNum).bIsIHP) {
+                            MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedHeating;
+                        }
+
+                        for (i = 2; i <= MaxSpeedNum; ++i) {
                             CalcVarSpeedHeatPump(state,
                                                  FurnaceNum,
                                                  FirstHVACIteration,
@@ -10748,7 +10792,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
                                BlankString,
-                               Furnace(FurnaceNum).HeatingCoilIndex,
+                               Furnace(FurnaceNum).CoolingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
                                Furnace(FurnaceNum).HPTimeConstant,
@@ -10916,7 +10960,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).bIsIHP) {
                         SimIHP(state,
                                BlankString,
-                               Furnace(FurnaceNum).HeatingCoilIndex,
+                               Furnace(FurnaceNum).CoolingCoilIndex,
                                Furnace(FurnaceNum).OpMode,
                                Furnace(FurnaceNum).MaxONOFFCyclesperHour,
                                Furnace(FurnaceNum).HPTimeConstant,

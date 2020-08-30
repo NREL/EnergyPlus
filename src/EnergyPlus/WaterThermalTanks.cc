@@ -9005,6 +9005,11 @@ namespace WaterThermalTanks {
                         {
                             this->MaxCapacity = 0.0;
                             this->MinCapacity = 0.0;
+                        } 
+                        else // turn on
+                        {
+                            this->MaxCapacity = HeatPump.BackupElementCapacity;
+                            this->MinCapacity = HeatPump.BackupElementCapacity;
                         }
                     }
                 } else {

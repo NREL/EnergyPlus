@@ -2319,9 +2319,10 @@ namespace IntegratedHeatPump {
         } else if (SensLoad > SmallLoad) {
             IntegratedHeatPumps(DXCoilNum).SHDWHRunTime = WHHeatTimeSav + TimeStepSys * SecInHour;
 
-            if (WHHeatTimeSav > IntegratedHeatPumps(DXCoilNum).TimeLimitSHDWH) {
+			if (IntegratedHeatPumps(DXCoilNum).SHDWHRunTime > IntegratedHeatPumps(DXCoilNum).TimeLimitSHDWH) {
                 IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHDWHElecHeatOnMode;
-            } else {
+            }
+            else {
                 IntegratedHeatPumps(DXCoilNum).CurMode = IHPOperationMode::SHDWHElecHeatOffMode;
             };
         } else {
@@ -2826,6 +2827,9 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::DWHMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).DWHCoilIndex;
             FlowScale = 1.0;
+            if (!IsCallbyWH) {
+                FlowScale = 0.0;
+            };
             break;
         case IHPOperationMode::SCWHMatchSCMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
@@ -3016,6 +3020,9 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::DWHMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).DWHCoilIndex;
             FlowScale = 1.0;
+            if (!IsCallbyWH) {
+                FlowScale = 0.0;
+            };
             break;
         case IHPOperationMode::SCWHMatchSCMode:
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
