@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -1421,8 +1420,6 @@ namespace MixedAir {
         int i;
 
         // Formats
-
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
         if (GetOASysInputFlag) { // Gets input for object  first time Sim routine is called

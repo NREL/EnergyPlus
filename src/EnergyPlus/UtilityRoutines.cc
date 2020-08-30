@@ -662,7 +662,6 @@ namespace UtilityRoutines {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt OutFmt("('Press ENTER to continue after reading above message>')");
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -1838,7 +1837,6 @@ namespace UtilityRoutines {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

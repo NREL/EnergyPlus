@@ -56,7 +56,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/numeric.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -535,9 +534,6 @@ namespace OutputReportTabular {
     Array1D<MonthlyColumnsType> MonthlyColumns;
     Array1D<TOCEntriesType> TOCEntries;
     Array1D<UnitConvType> UnitConv;
-
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     namespace {
         bool GatherMonthlyResultsForTimestepRunOnce(true);
@@ -15907,10 +15903,12 @@ namespace OutputReportTabular {
         // Return value
         Real64 realValue;
 
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::read(stringIn, fmtLD, flags) >> realValue;
-            if (flags.err()) return -99999.0;
+        std::stringstream ss{stringIn};
+        ss.imbue(std::locale("C"));
+        ss >> realValue;
+
+        if (ss.bad()) {
+            return -99999.0;
         }
         return realValue;
     }

@@ -12755,7 +12755,6 @@ namespace RefrigeratedCase {
                                          "(W/m),Defrost (W/m)");
         static constexpr auto Format_108("!  <Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)");
         static constexpr auto Format_109("! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks");
-        static ObjexxFCL::gio::Fmt Format_114("(',',1X,F7.1)");
         static constexpr auto Format_117("! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems");
         static constexpr auto Format_118(
             "! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used, # Refrigerated Cases "

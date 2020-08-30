@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
@@ -363,7 +362,6 @@ namespace DataTimings {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na

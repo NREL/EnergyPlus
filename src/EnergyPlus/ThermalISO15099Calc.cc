@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
@@ -505,7 +504,6 @@ namespace ThermalISO15099Calc {
         static Real64 fluxs(0.0);
         static Real64 qeff(0.0);
         static Real64 flux_nonsolar(0.0);
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         static Array1D<Real64> Atop_eff(maxlay, 0.0);
         static Array1D<Real64> Abot_eff(maxlay, 0.0);

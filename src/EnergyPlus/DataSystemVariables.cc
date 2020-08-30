@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -230,8 +229,6 @@ namespace DataSystemVariables {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const blank;
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -246,7 +243,7 @@ namespace DataSystemVariables {
         if (firstTime) {
             ioFiles.audit.ensure_open("CheckForActualFileName", ioFiles.outputControl.audit);
             get_environment_variable(cInputPath1, envinputpath1);
-            if (envinputpath1 != blank) {
+            if (!envinputpath1.empty()) {
                 pos = index(envinputpath1, pathChar, true); // look backwards for pathChar
                 if (pos != std::string::npos) envinputpath1.erase(pos + 1);
             }
@@ -257,7 +254,7 @@ namespace DataSystemVariables {
 
 
         FileFound = false;
-        CheckedFileName = blank;
+        CheckedFileName.clear();
         InputFileName = originalInputFileName;
         makeNativePath(InputFileName);
 

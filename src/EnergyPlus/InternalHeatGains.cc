@@ -228,7 +228,6 @@ namespace InternalHeatGains {
         using NodeInputManager::GetOnlySingleNode;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetInternalHeatGains: ");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

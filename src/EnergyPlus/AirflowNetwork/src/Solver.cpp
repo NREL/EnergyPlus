@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 #include "AirflowNetwork/Solver.hpp"
 #include "AirflowNetwork/Elements.hpp"
@@ -196,12 +195,6 @@ namespace AirflowNetwork {
         int n;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_900("(1X,i2)");
-        static ObjexxFCL::gio::Fmt Format_901("(1X,2I4,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_902("(1X,2I4,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_903("(9X,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_904("(1X,2I4,1F9.4)");
-        static ObjexxFCL::gio::Fmt Format_910("(1X,I4,2(I4,F9.4),I4,2F4.1)");
 
         // Assume a network to simulate multizone airflow is a subset of the network to simulate air distribution system.
         // Network array size is allocated based on the network of air distribution system.
@@ -885,9 +878,6 @@ namespace AirflowNetwork {
         Real64 DP;
         std::array<Real64, 2> F{{0.0, 0.0}};
         std::array<Real64, 2> DF{{0.0, 0.0}};
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_901("(A5,3I3,4E16.7)");
 
         // FLOW:
         for (n = 1; n <= NetworkNumOfNodes; ++n) {

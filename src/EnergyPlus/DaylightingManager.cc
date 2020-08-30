@@ -57,7 +57,6 @@
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
 #include <ObjexxFCL/Vector4.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 #include <ObjexxFCL/random.hh>
 #include <ObjexxFCL/string.functions.hh>
@@ -531,7 +530,6 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -4371,8 +4369,6 @@ namespace DaylightingManager {
         using namespace DataIPShortCuts;
         using namespace DElightManagerF; // Module for managing DElight subroutines
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-
         int TotDaylightingControls;  // Total Daylighting:Controls inputs (splitflux or delight type)
         bool ErrorsFound;            // Error flag
         Real64 dLatitude;       // double for argument passing
@@ -4677,8 +4673,6 @@ namespace DaylightingManager {
         using DataStringGlobals::CharTab;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         Array1D_int ZoneMapCount;
         int MapNum;
@@ -5285,8 +5279,6 @@ namespace DaylightingManager {
         using namespace OutputReportPredefined;
         using ScheduleManager::GetScheduleIndex;
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-
         int refPtNum;
         std::string refName;
         Real64 CosBldgRelNorth;         // Cosine of Building rotation
@@ -5512,7 +5504,6 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -9936,8 +9927,6 @@ namespace DaylightingManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt FmtA("(A)");
-
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -10147,7 +10136,6 @@ namespace DaylightingManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt FmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
