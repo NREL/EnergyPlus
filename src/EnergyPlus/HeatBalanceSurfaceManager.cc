@@ -2587,8 +2587,6 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinBSDFBeamThetaRep(SurfNum) = 0.0;
                 SurfWinBSDFBeamPhiRep(SurfNum) = 0.0;
 
-
-
             }
         }
 
@@ -2632,6 +2630,10 @@ namespace HeatBalanceSurfaceManager {
             }
 
             if (NumOfTDDPipes > 0) {
+                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    SurfWinTransSolar(SurfNum) = 0.0;
+                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
+                }
                 for (auto &e : TDDPipe) {
                     e.TransSolBeam = 0.0;
                     e.TransSolDiff = 0.0;
