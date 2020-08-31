@@ -141,6 +141,14 @@ namespace HeatBalanceSurfaceManager {
 
     void ReportIntMovInsInsideSurfTemp();
 
+    void CalcThermalResilience();
+
+    void ReportThermalResilience();
+
+    void ReportCO2Resilience();
+
+    void ReportVisualResilience();
+
     // End of Reporting subroutines for the HB Module
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager

@@ -539,7 +539,7 @@ void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,      
 
         case BBWaterConvOnlyNum: // 'ZONEHVAC:BASEBOARD:CONVECTIVE:WATER'
             // Simulate baseboard
-            SimHWConvective(state.dataBaseboardRadiator, CompNum, LoadMet);
+            SimHWConvective(state, CompNum, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;

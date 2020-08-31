@@ -3564,7 +3564,7 @@ namespace ZoneTempPredictorCorrector {
             // Calculate the various heat balance sums
 
             // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, false);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -6077,7 +6077,8 @@ namespace ZoneTempPredictorCorrector {
                       Real64 &SumMCp,     // Zone sum of MassFlowRate*Cp
                       Real64 &SumMCpT,    // Zone sum of MassFlowRate*Cp*T
                       Real64 &SumSysMCp,  // Zone sum of air system MassFlowRate*Cp
-                      Real64 &SumSysMCpT  // Zone sum of air system MassFlowRate*Cp*T
+                      Real64 &SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
+                      bool const CorrectorFlag
     )
     {
 
@@ -6173,84 +6174,85 @@ namespace ZoneTempPredictorCorrector {
         // Sum all system air flow: SumSysMCp, SumSysMCpT
         // Check to see if this is a controlled zone
         ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
+        if (CorrectorFlag) {
+            // Check to see if this is a plenum zone
+            ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
+            ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
 
-        // Check to see if this is a plenum zone
-        ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
-        ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
+            // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
+            if (ControlledZoneAirFlag) {
+                ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
+                auto const &zec(ZoneEquipConfig(ZoneEquipConfigNum));
+                for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
+                    // Get node conditions
+                    //  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
+                    //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
+                    auto const &node(Node(zec.InletNode(NodeNum)));
+                    NodeTemp = node.Temp;
+                    MassFlowRate = node.MassFlowRate;
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
-        // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
-        if (ControlledZoneAirFlag) {
-            ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
-            auto const &zec(ZoneEquipConfig(ZoneEquipConfigNum));
-            for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
+                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                    SumSysMCp += MassFlowRate_CpAir;
+                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                } // NodeNum
+
+            } else if (ZoneRetPlenumAirFlag) {
+                ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
+                auto const &zrpc(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum));
+                Real64 const air_hum_rat(ZoneAirHumRat(ZoneNum));
+                for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
+                    // Get node conditions
+                    auto const &node(Node(zrpc.InletNode(NodeNum)));
+                    NodeTemp = node.Temp;
+                    MassFlowRate = node.MassFlowRate;
+                    CpAir = PsyCpAirFnW(air_hum_rat);
+
+                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                    SumSysMCp += MassFlowRate_CpAir;
+                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                } // NodeNum
+                // add in the leaks
+                for (int ADUListIndex = 1, ADUListIndex_end = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs;
+                     ADUListIndex <= ADUListIndex_end;
+                     ++ADUListIndex) {
+                    ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+                    if (AirDistUnit(ADUNum).UpStreamLeak) {
+                        ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                        NodeTemp = Node(ADUInNode).Temp;
+                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
+                        CpAir = PsyCpAirFnW(air_hum_rat);
+                        Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                        SumSysMCp += MassFlowRate_CpAir;
+                        SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                    }
+                    if (AirDistUnit(ADUNum).DownStreamLeak) {
+                        ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                        NodeTemp = Node(ADUOutNode).Temp;
+                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                        CpAir = PsyCpAirFnW(air_hum_rat);
+                        Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                        SumSysMCp += MassFlowRate_CpAir;
+                        SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                    }
+                }
+
+            } else if (ZoneSupPlenumAirFlag) {
+                ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
                 // Get node conditions
-                //  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
-                //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
-                auto const &node(Node(zec.InletNode(NodeNum)));
-                NodeTemp = node.Temp;
-                MassFlowRate = node.MassFlowRate;
+                NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+                MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
-                Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                SumSysMCp += MassFlowRate_CpAir;
-                SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-            } // NodeNum
-
-        } else if (ZoneRetPlenumAirFlag) {
-            ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-            auto const &zrpc(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum));
-            Real64 const air_hum_rat(ZoneAirHumRat(ZoneNum));
-            for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
-                // Get node conditions
-                auto const &node(Node(zrpc.InletNode(NodeNum)));
-                NodeTemp = node.Temp;
-                MassFlowRate = node.MassFlowRate;
-                CpAir = PsyCpAirFnW(air_hum_rat);
-
-                Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                SumSysMCp += MassFlowRate_CpAir;
-                SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-            } // NodeNum
-            // add in the leaks
-            for (int ADUListIndex = 1, ADUListIndex_end = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ADUListIndex <= ADUListIndex_end;
-                 ++ADUListIndex) {
-                ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                if (AirDistUnit(ADUNum).UpStreamLeak) {
-                    ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
-                    NodeTemp = Node(ADUInNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnW(air_hum_rat);
-                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                    SumSysMCp += MassFlowRate_CpAir;
-                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-                }
-                if (AirDistUnit(ADUNum).DownStreamLeak) {
-                    ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
-                    NodeTemp = Node(ADUOutNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnW(air_hum_rat);
-                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                    SumSysMCp += MassFlowRate_CpAir;
-                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-                }
+                SumSysMCp += MassFlowRate * CpAir;
+                SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
 
-        } else if (ZoneSupPlenumAirFlag) {
-            ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
-            // Get node conditions
-            NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+            ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 
-            SumSysMCp += MassFlowRate * CpAir;
-            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+            SumSysMCp /= ZoneMult;
+            SumSysMCpT /= ZoneMult;
         }
-
-        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-
-        SumSysMCp /= ZoneMult;
-        SumSysMCpT /= ZoneMult;
-
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 

@@ -111,9 +111,6 @@ namespace DataGlobalConstants {
     std::string const cRT_Natural_Gas("NaturalGas");
     std::string const cRT_Natural_GasUC("NATURALGAS");
     int const iRT_Natural_Gas(1002);
-    std::string const cRT_Gas("Gas");
-    std::string const cRT_GasUC("GAS");
-    int const iRT_Gas(1002);
     std::string const cRT_Gasoline("Gasoline");
     std::string const cRT_GasolineUC("GASOLINE");
     int const iRT_Gasoline(1003);
@@ -251,7 +248,7 @@ namespace DataGlobalConstants {
     Array1D_string const cRT_ValidTypes({0, NumOfResourceTypes},
                                         {cRT_None,
                                          cRT_Electricity,
-                                         cRT_Gas,
+                                         cRT_Natural_Gas,
                                          cRT_Gasoline,
                                          cRT_Diesel,
                                          cRT_Coal,
@@ -346,7 +343,7 @@ namespace DataGlobalConstants {
                 ResourceTypeNum = iRT_Electricity;
 
             } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS")) {
-                ResourceTypeNum = iRT_Gas;
+                ResourceTypeNum = iRT_Natural_Gas;
 
             } else if (SELECT_CASE_var == "GASOLINE") {
                 ResourceTypeNum = iRT_Gasoline;
@@ -509,8 +506,8 @@ namespace DataGlobalConstants {
             if (SELECT_CASE_var == iRT_Electricity) {
                 ResourceTypeChar = "Electricity";
 
-            } else if (SELECT_CASE_var == iRT_Gas) {
-                ResourceTypeChar = "Gas";
+            } else if (SELECT_CASE_var == iRT_Natural_Gas) {
+                ResourceTypeChar = "NaturalGas";
 
             } else if (SELECT_CASE_var == iRT_Gasoline) {
                 ResourceTypeChar = "Gasoline";

@@ -758,87 +758,87 @@ namespace PollutionModule {
                     Pollution.NatGasCoef.Source = rNumericArgs(2);
                     if (!lAlphaFieldBlanks(3)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.NatGasCoef.SourceSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(3), cAlphaArgs(3), Pollution.NatGasCoef.SourceSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.CO2 = rNumericArgs(3);
                     if (!lAlphaFieldBlanks(4)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.NatGasCoef.CO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(4), cAlphaArgs(4), Pollution.NatGasCoef.CO2Sched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.CO = rNumericArgs(4);
                     if (!lAlphaFieldBlanks(5)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.NatGasCoef.COSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(5), cAlphaArgs(5), Pollution.NatGasCoef.COSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.CH4 = rNumericArgs(5);
                     if (!lAlphaFieldBlanks(6)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.NatGasCoef.CH4Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(6), cAlphaArgs(6), Pollution.NatGasCoef.CH4Sched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.NOx = rNumericArgs(6);
                     if (!lAlphaFieldBlanks(7)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.NatGasCoef.NOxSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(7), cAlphaArgs(7), Pollution.NatGasCoef.NOxSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.N2O = rNumericArgs(7);
                     if (!lAlphaFieldBlanks(8)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.NatGasCoef.N2OSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(8), cAlphaArgs(8), Pollution.NatGasCoef.N2OSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.SO2 = rNumericArgs(8);
                     if (!lAlphaFieldBlanks(9)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.NatGasCoef.SO2Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(9), cAlphaArgs(9), Pollution.NatGasCoef.SO2Sched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.PM = rNumericArgs(9);
                     if (!lAlphaFieldBlanks(10)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.NatGasCoef.PMSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(10), cAlphaArgs(10), Pollution.NatGasCoef.PMSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.PM10 = rNumericArgs(10);
                     if (!lAlphaFieldBlanks(11)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.NatGasCoef.PM10Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(11), cAlphaArgs(11), Pollution.NatGasCoef.PM10Sched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.PM25 = rNumericArgs(11);
                     if (!lAlphaFieldBlanks(12)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.NatGasCoef.PM25Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(12), cAlphaArgs(12), Pollution.NatGasCoef.PM25Sched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.NH3 = rNumericArgs(12);
                     if (!lAlphaFieldBlanks(13)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.NatGasCoef.NH3Sched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(13), cAlphaArgs(13), Pollution.NatGasCoef.NH3Sched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.NMVOC = rNumericArgs(13);
                     if (!lAlphaFieldBlanks(14)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.NatGasCoef.NMVOCSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(14), cAlphaArgs(14), Pollution.NatGasCoef.NMVOCSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.Hg = rNumericArgs(14);
                     if (!lAlphaFieldBlanks(15)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.NatGasCoef.HgSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(15), cAlphaArgs(15), Pollution.NatGasCoef.HgSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.Pb = rNumericArgs(15);
                     if (!lAlphaFieldBlanks(16)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.NatGasCoef.PbSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(16), cAlphaArgs(16), Pollution.NatGasCoef.PbSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.Water = rNumericArgs(16);
                     if (!lAlphaFieldBlanks(17)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.NatGasCoef.WaterSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(17), cAlphaArgs(17), Pollution.NatGasCoef.WaterSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.NucHi = rNumericArgs(17);
                     if (!lAlphaFieldBlanks(18)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.NatGasCoef.NucHiSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(18), cAlphaArgs(18), Pollution.NatGasCoef.NucHiSched, ErrorsFound);
                     }
                     Pollution.NatGasCoef.NucLo = rNumericArgs(18);
                     if (!lAlphaFieldBlanks(19)) {
                         CheckFFSchedule(
-                            cCurrentModuleObject, "Natural Gas", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
+                            cCurrentModuleObject, "NaturalGas", cAlphaFieldNames(19), cAlphaArgs(19), Pollution.NatGasCoef.NucLoSched, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
@@ -1745,7 +1745,7 @@ namespace PollutionModule {
         FuelType.DieselFacilityIndex = GetMeterIndex("Diesel:Facility");
         FuelType.PurchCoolFacilityIndex = GetMeterIndex("DistrictCooling:Facility");
         FuelType.PurchHeatFacilityIndex = GetMeterIndex("DistrictHeating:Facility");
-        FuelType.NatGasFacilityIndex = GetMeterIndex("Gas:Facility");
+        FuelType.NatGasFacilityIndex = GetMeterIndex("NaturalGas:Facility");
         FuelType.GasolineFacilityIndex = GetMeterIndex("Gasoline:Facility");
         FuelType.CoalFacilityIndex = GetMeterIndex("Coal:Facility");
         FuelType.FuelOil1FacilityIndex = GetMeterIndex("FuelOilNo1:Facility");
@@ -1850,7 +1850,7 @@ namespace PollutionModule {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelType.FuelTypeNames(Loop)));
                 if (SELECT_CASE_var == "NATURALGAS") {
                     // Pollutants from Natural Gas
-                    SetupOutputVariable("Environmental Impact Natural Gas Source Energy",
+                    SetupOutputVariable("Environmental Impact NaturalGas Source Energy",
                                         OutputProcessor::Unit::J,
                                         Pollution.NatGasComp.Source,
                                         "System",
@@ -1861,7 +1861,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas CO2 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas CO2 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.CO2Pollution,
                                         "System",
@@ -1872,7 +1872,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas CO Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas CO Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.COPollution,
                                         "System",
@@ -1883,7 +1883,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas CH4 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas CH4 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.CH4Pollution,
                                         "System",
@@ -1894,7 +1894,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas NOx Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas NOx Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.NOxPollution,
                                         "System",
@@ -1905,7 +1905,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas N2O Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas N2O Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.N2OPollution,
                                         "System",
@@ -1916,7 +1916,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas SO2 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas SO2 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.SO2Pollution,
                                         "System",
@@ -1927,7 +1927,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas PM Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas PM Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.PMPollution,
                                         "System",
@@ -1938,7 +1938,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas PM10 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas PM10 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.PM10Pollution,
                                         "System",
@@ -1949,7 +1949,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas PM2.5 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas PM2.5 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.PM25Pollution,
                                         "System",
@@ -1960,7 +1960,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas NH3 Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas NH3 Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.NH3Pollution,
                                         "System",
@@ -1971,7 +1971,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas NMVOC Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas NMVOC Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.NMVOCPollution,
                                         "System",
@@ -1982,7 +1982,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas Hg Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas Hg Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.HgPollution,
                                         "System",
@@ -1993,7 +1993,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas Pb Emissions Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas Pb Emissions Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.PbPollution,
                                         "System",
@@ -2004,7 +2004,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas Water Consumption Volume",
+                    SetupOutputVariable("Environmental Impact NaturalGas Water Consumption Volume",
                                         OutputProcessor::Unit::L,
                                         Pollution.NatGasComp.WaterPollution,
                                         "System",
@@ -2015,7 +2015,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas Nuclear High Level Waste Mass",
+                    SetupOutputVariable("Environmental Impact NaturalGas Nuclear High Level Waste Mass",
                                         OutputProcessor::Unit::kg,
                                         Pollution.NatGasComp.NucHiPollution,
                                         "System",
@@ -2026,7 +2026,7 @@ namespace PollutionModule {
                                         "NaturalGasEmissions",
                                         _,
                                         "");
-                    SetupOutputVariable("Environmental Impact Natural Gas Nuclear Low Level Waste Volume",
+                    SetupOutputVariable("Environmental Impact NaturalGas Nuclear Low Level Waste Volume",
                                         OutputProcessor::Unit::m3,
                                         Pollution.NatGasComp.NucLoPollution,
                                         "System",

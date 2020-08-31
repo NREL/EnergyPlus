@@ -2193,7 +2193,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Latent Cooling Rate,Hourly;
 
-  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electric Power,Hourly;
+  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electricity Rate,Hourly;
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio,Hourly;
 
@@ -2201,17 +2201,17 @@
 
   Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,Hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Hourly;
+  Output:Variable,*,Heating Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Hourly;
 
   Output:Variable,*,Heating Coil Runtime Fraction,Hourly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,Hourly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,Hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
 
@@ -2225,9 +2225,9 @@
 
   Output:Variable,*,Cooling Coil Latent Cooling Energy,Hourly;
 
-  Output:Variable,*,Cooling Coil Electric Power,Hourly;
+  Output:Variable,*,Cooling Coil Electricity Rate,Hourly;
 
-  Output:Variable,*,Cooling Coil Electric Energy,Hourly;
+  Output:Variable,*,Cooling Coil Electricity Energy,Hourly;
 
   Output:Variable,*,Cooling Coil Runtime Fraction,Hourly;
 

@@ -1784,9 +1784,9 @@
 
   Output:Variable,*,Unitary System Latent Cooling Energy,timestep;
 
-  Output:Variable,*,Unitary System Electric Power,timestep;
+  Output:Variable,*,Unitary System Electricity Rate,timestep;
 
-  Output:Variable,*,Unitary System Electric Energy,timestep;
+  Output:Variable,*,Unitary System Electricity Energy,timestep;
 
   Output:Variable,*,Unitary System Compressor Part Load Ratio,timestep;
 
@@ -1814,7 +1814,7 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,timestep;
 
@@ -1850,9 +1850,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1862,9 +1862,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:DEBUGGINGDATA ===========
 

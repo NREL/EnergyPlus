@@ -527,18 +527,18 @@ namespace ElectricBaseboardRadiator {
                                 "Average",
                                 ElecBaseboard(BaseboardNum).EquipName);
 
-            SetupOutputVariable("Baseboard Electric Energy",
+            SetupOutputVariable("Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 ElecBaseboard(BaseboardNum).ElecUseLoad,
                                 "System",
                                 "Sum",
                                 ElecBaseboard(BaseboardNum).EquipName,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "HEATING",
                                 _,
                                 "System");
-            SetupOutputVariable("Baseboard Electric Power",
+            SetupOutputVariable("Baseboard Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ElecBaseboard(BaseboardNum).ElecUseRate,
                                 "System",
