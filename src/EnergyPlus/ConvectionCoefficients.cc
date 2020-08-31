@@ -6316,7 +6316,7 @@ namespace ConvectionCoefficients {
 
         Real64 Hforced;
 
-        if (ACH > 3.0) {
+        if (ACH >= 3.0) {
             Hforced = 3.873 + 0.082 * std::pow(ACH, 0.98);
             return Hforced;
         } else { // Revert to purely natural convection
@@ -6341,7 +6341,7 @@ namespace ConvectionCoefficients {
 
         Real64 Hforced;
 
-        if (ACH > 3.0) {
+        if (ACH >= 3.0) {
             Hforced = 2.234 + 4.099 * std::pow(ACH, 0.503);
             return Hforced;
         } else { // Revert to purely natural convection
@@ -6366,7 +6366,7 @@ namespace ConvectionCoefficients {
 
         Real64 Hforced;
 
-        if (ACH > 3.0) {
+        if (ACH >= 3.0) {
             Hforced = 1.208 + 1.012 * std::pow(ACH, 0.604);
             return Hforced;
         } else { // Revert to purely natural convection

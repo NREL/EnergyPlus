@@ -870,6 +870,75 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
 
 }
 
+TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelations)
+{
+
+    Real64 ACH;
+    Real64 Tsurf;
+    Real64 Tair;
+    Real64 cosTilt;
+    Real64 humRat;
+    Real64 height;
+    bool isWindow;
+    Real64 ExpectedHconv;
+    Real64 CalculatedHconv;
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    // Test 1: Forced Convection All Correlations (Floor, Ceiling, Wall)
+    ACH = 3.3;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 4.13721502661183;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 9.70692167003631;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 3.28943537910741;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+
+    // Test 2: Natural Convection All Correlations (Floor, Ceiling, Wall)--note, all should give same answer because of how variables are set
+    ACH = 0.25;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 1.2994;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    
+    // Test 3: Mixed Covection All Correlations (Floor, Ceiling, Wall)
+    ACH = 1.75;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 2.70653;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 5.32826;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 2.23620;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+
+}
+
 TEST_F(ConvectionCoefficientsFixture, TestWindward)
 {
 
