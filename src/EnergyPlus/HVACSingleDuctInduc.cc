@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -67,6 +68,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -77,6 +79,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -169,7 +172,7 @@ namespace HVACSingleDuctInduc {
 
     // Functions
 
-    void SimIndUnit(std::string const &CompName,   // name of the terminal unit
+    void SimIndUnit(EnergyPlusData &state, std::string const &CompName,   // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
                     int const ZoneNodeNum,         // zone node number of zone served by the terminal unit
@@ -224,7 +227,7 @@ namespace HVACSingleDuctInduc {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitIndUnit(IUNum, FirstHVACIteration);
+        InitIndUnit(state.dataBranchInputManager, IUNum, FirstHVACIteration);
 
         TermUnitIU = true;
 
@@ -234,7 +237,7 @@ namespace HVACSingleDuctInduc {
 
             if (SELECT_CASE_var == SingleDuct_CV_FourPipeInduc) {
 
-                SimFourPipeIndUnit(IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
+                SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
             } else {
                 ShowSevereError("Illegal Induction Unit Type used=" + IndUnit(IUNum).UnitType);
@@ -248,10 +251,10 @@ namespace HVACSingleDuctInduc {
         // the tasks usually done by the Update and Report routines are not required in a compound terminal unit.
 
         // Update the current unit's outlet nodes. No update needed
-        // CALL UpdateIndUnit(IUNum)
+        // CALL UpdateIndUnit(IUNum);
 
         // Fill the report variables. There are no report variables
-        // CALL ReportIndUnit(IUNum)
+        IndUnit(IUNum).ReportIndUnit();
     }
 
     void GetIndUnits()
@@ -473,6 +476,13 @@ namespace HVACSingleDuctInduc {
                     ErrorsFound = true;
                 }
             }
+            // report variable for all single duct air terminals
+            SetupOutputVariable("Zone Air Terminal Outdoor Air Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                IndUnit(IUNum).OutdoorAirFlowRate,
+                                "System",
+                                "Average",
+                                IndUnit(IUNum).Name);
         }
 
         Alphas.deallocate();
@@ -486,7 +496,8 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void InitIndUnit(int const IUNum,              // number of the current induction unit being simulated
+    void InitIndUnit(BranchInputManagerData &dataBranchInputManager,
+                     int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
@@ -553,7 +564,8 @@ namespace HVACSingleDuctInduc {
         if (MyPlantScanFlag(IUNum) && allocated(PlantLoop)) {
             if (IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
                 errFlag = false;
-                ScanPlantLoopsForObject(IndUnit(IUNum).HCoil,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        IndUnit(IUNum).HCoil,
                                         IndUnit(IUNum).HCoil_PlantTypeNum,
                                         IndUnit(IUNum).HWLoopNum,
                                         IndUnit(IUNum).HWLoopSide,
@@ -572,7 +584,8 @@ namespace HVACSingleDuctInduc {
             if (IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ||
                 IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling) {
                 errFlag = false;
-                ScanPlantLoopsForObject(IndUnit(IUNum).CCoil,
+                ScanPlantLoopsForObject(dataBranchInputManager,
+                                        IndUnit(IUNum).CCoil,
                                         IndUnit(IUNum).CCoil_PlantTypeNum,
                                         IndUnit(IUNum).CWLoopNum,
                                         IndUnit(IUNum).CWLoopSide,
@@ -1068,7 +1081,7 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void SimFourPipeIndUnit(int const IUNum,              // number of the current unit being simulated
+    void SimFourPipeIndUnit(EnergyPlusData &state, int const IUNum,              // number of the current unit being simulated
                             int const ZoneNum,            // number of zone being served
                             int const ZoneNodeNum,        // zone node number
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
@@ -1101,6 +1114,7 @@ namespace HVACSingleDuctInduc {
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals
@@ -1212,7 +1226,7 @@ namespace HVACSingleDuctInduc {
         Node(SecNode).MassFlowRate = SecAirMassFlow;
         // initialize the water inlet nodes to minimum
         // fire the unit at min water flow
-        CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, QPriOnly);
+        CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, QPriOnly);
         // the load to be met by the secondary air stream coils is QZnReq-PowerMet
 
         if (UnitOn) {
@@ -1220,7 +1234,7 @@ namespace HVACSingleDuctInduc {
             if (QToHeatSetPt - QPriOnly > SmallLoad) {
                 // heating coil
                 // check that it can meet the load
-                CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
+                CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
                 if (PowerMet > QToHeatSetPt + SmallLoad) {
                     Par(1) = double(IUNum);
                     if (FirstHVACIteration) {
@@ -1234,7 +1248,7 @@ namespace HVACSingleDuctInduc {
                     Par(6) = QPriOnly;
                     Par(7) = PowerMet;
                     ErrTolerance = IndUnit(IUNum).HotControlOffset;
-                    SolveRoot(ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par);
+                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par);
                     if (SolFlag == -1) {
                         if (IndUnit(IUNum).HWCoilFailNum1 == 0) {
                             ShowWarningMessage("SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
@@ -1269,7 +1283,7 @@ namespace HVACSingleDuctInduc {
             } else if (QToCoolSetPt - QPriOnly < -SmallLoad) {
                 // cooling coil
                 // check that it can meet the load
-                CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
+                CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
                 if (PowerMet < QToCoolSetPt - SmallLoad) {
                     Par(1) = double(IUNum);
                     if (FirstHVACIteration) {
@@ -1283,7 +1297,7 @@ namespace HVACSingleDuctInduc {
                     Par(6) = QPriOnly;
                     Par(7) = PowerMet;
                     ErrTolerance = IndUnit(IUNum).ColdControlOffset;
-                    SolveRoot(ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
+                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
                     if (SolFlag == -1) {
                         if (IndUnit(IUNum).CWCoilFailNum1 == 0) {
                             ShowWarningMessage("SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
@@ -1316,12 +1330,12 @@ namespace HVACSingleDuctInduc {
                     }
                 }
             } else {
-                CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
+                CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
             }
 
         } else {
             // unit off
-            CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
+            CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
         }
         Node(OutletNode).MassFlowRateMax = IndUnit(IUNum).MaxTotAirMassFlow;
 
@@ -1330,7 +1344,7 @@ namespace HVACSingleDuctInduc {
         // conditions have been set by CalcFourPipeIndUnit either explicitly or as a result of the simple component calls.
     }
 
-    void CalcFourPipeIndUnit(int const IUNum,               // Unit index
+    void CalcFourPipeIndUnit(EnergyPlusData &state, int const IUNum,               // Unit index
                              bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                              int const ZoneNode,            // zone node number
                              Real64 const HWFlow,           // hot water flow (kg/s)
@@ -1431,13 +1445,13 @@ namespace HVACSingleDuctInduc {
                              IndUnit(IUNum).CWCompNum);
         //  Node(ColdControlNode)%MassFlowRate = CWFlow
 
-        SimulateWaterCoilComponents(IndUnit(IUNum).HCoil, FirstHVACIteration, IndUnit(IUNum).HCoil_Num);
-        SimulateWaterCoilComponents(IndUnit(IUNum).CCoil, FirstHVACIteration, IndUnit(IUNum).CCoil_Num);
+        SimulateWaterCoilComponents(state, IndUnit(IUNum).HCoil, FirstHVACIteration, IndUnit(IUNum).HCoil_Num);
+        SimulateWaterCoilComponents(state, IndUnit(IUNum).CCoil, FirstHVACIteration, IndUnit(IUNum).CCoil_Num);
         SimAirMixer(IndUnit(IUNum).MixerName, IndUnit(IUNum).Mixer_Num);
         LoadMet = TotAirMassFlow * CpAirZn * (Node(OutletNode).Temp - Node(ZoneNode).Temp);
     }
 
-    Real64 FourPipeIUHeatingResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
@@ -1489,13 +1503,13 @@ namespace HVACSingleDuctInduc {
         FirstHVACSoln = (Par(2) > 0.0);
         ZoneNodeIndex = int(Par(3));
         MinCWFlow = Par(4);
-        CalcFourPipeIndUnit(IUIndex, FirstHVACSoln, ZoneNodeIndex, HWFlow, MinCWFlow, UnitOutput);
+        CalcFourPipeIndUnit(state, IUIndex, FirstHVACSoln, ZoneNodeIndex, HWFlow, MinCWFlow, UnitOutput);
         Residuum = (Par(5) - UnitOutput) / (Par(7) - Par(6));
 
         return Residuum;
     }
 
-    Real64 FourPipeIUCoolingResidual(Real64 const CWFlow,       // cold water flow rate in kg/s
+    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state, Real64 const CWFlow,       // cold water flow rate in kg/s
                                      Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
@@ -1547,7 +1561,7 @@ namespace HVACSingleDuctInduc {
         FirstHVACSoln = (Par(2) > 0.0);
         ZoneNodeIndex = int(Par(3));
         MinHWFlow = Par(4);
-        CalcFourPipeIndUnit(IUIndex, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, CWFlow, UnitOutput);
+        CalcFourPipeIndUnit(state, IUIndex, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, CWFlow, UnitOutput);
         Residuum = (Par(5) - UnitOutput) / (Par(7) - Par(6));
 
         return Residuum;
@@ -1586,6 +1600,24 @@ namespace HVACSingleDuctInduc {
         }
 
         return YesNo;
+    }
+
+    void IndUnitData::ReportIndUnit()
+    {
+        // Purpose: this subroutine for reporting
+
+        // set zone OA volume flow rate
+        this->CalcOutdoorAirVolumeFlowRate();
+    }
+
+    void IndUnitData::CalcOutdoorAirVolumeFlowRate()
+    {
+        // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
+        if (this->AirLoopNum > 0) {
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+        } else {
+            this->OutdoorAirFlowRate = 0.0;
+        }
     }
 
 } // namespace HVACSingleDuctInduc

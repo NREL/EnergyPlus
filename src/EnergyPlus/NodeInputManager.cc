@@ -62,6 +62,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -92,7 +93,6 @@ namespace NodeInputManager {
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using DataGlobals::DisplayAdvancedReportVariables;
-    using DataGlobals::OutputFileBNDetails;
     using General::TrimSigDigits;
     using namespace DataLoopNode;
     using namespace BranchNodeConnections;
@@ -200,7 +200,6 @@ namespace NodeInputManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetNodeNums: ");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -211,7 +210,6 @@ namespace NodeInputManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int ThisOne; // Indicator for this Name
         //  CHARACTER(len=20) :: CaseNodeFluidType
-        std::string cNodeFluidType;
         std::string ConnectionType;
         int Loop;
         int FluidStreamNum; // Fluid stream number passed to RegisterNodeConnection
@@ -223,10 +221,8 @@ namespace NodeInputManager {
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
-            ObjexxFCL::gio::write(cNodeFluidType, fmtLD) << NodeFluidType;
-            strip(cNodeFluidType);
             ShowSevereError(RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type.");
-            ShowContinueError("..Invalid FluidType=" + cNodeFluidType);
+            ShowContinueError("..Invalid FluidType=" + std::to_string(NodeFluidType));
             ErrorsFound = true;
             ShowFatalError("Preceding issue causes termination.");
         }
@@ -287,7 +283,7 @@ namespace NodeInputManager {
         }
     }
 
-    void SetupNodeVarsForReporting()
+    void SetupNodeVarsForReporting(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -325,24 +321,11 @@ namespace NodeInputManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int NumNode; // Loop Variable
-        int Count0;
-        std::string ChrOut;
-        std::string ChrOut1;
-        std::string ChrOut2;
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('! #Nodes,<Number of Unique Nodes>')");
-        static ObjexxFCL::gio::Fmt Format_701("(A)");
-        static ObjexxFCL::gio::Fmt Format_702("('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
-        static ObjexxFCL::gio::Fmt Format_703(
-            "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         if (!NodeVarsSetup) {
             if (!AbortProcessing) {
                 MoreNodeInfo.allocate(NumOfUniqueNodeNames);
-                for (NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
+                for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     // Setup Report variables for the Nodes for HVAC Reporting, CurrentModuleObject='Node Name'
                     SetupOutputVariable(
                         "System Node Temperature", OutputProcessor::Unit::C, Node(NumNode).Temp, "System", "Average", NodeID(NumNode));
@@ -520,47 +503,39 @@ namespace NodeInputManager {
             }
             NodeVarsSetup = true;
 
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! This file shows details about the branches, nodes, and other";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! elements of the flow connections.";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! This file is intended for use in \"debugging\" potential problems";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! that may also be detected by the program, but may be more easily";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! identified by \"eye\".";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! This file is also intended to support software which draws a";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! schematic diagram of the HVAC system.";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
+            print(ioFiles.bnd, "{}\n", "! This file shows details about the branches, nodes, and other");
+            print(ioFiles.bnd, "{}\n", "! elements of the flow connections.");
+            print(ioFiles.bnd, "{}\n", "! This file is intended for use in \"debugging\" potential problems");
+            print(ioFiles.bnd, "{}\n", "! that may also be detected by the program, but may be more easily");
+            print(ioFiles.bnd, "{}\n", "! identified by \"eye\".");
+            print(ioFiles.bnd, "{}\n", "! This file is also intended to support software which draws a");
+            print(ioFiles.bnd, "{}\n", "! schematic diagram of the HVAC system.");
+            print(ioFiles.bnd, "{}\n", "! ===============================================================");
             // Show the node names on the Branch-Node Details file
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_700);
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << NumOfUniqueNodeNames;
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Nodes," + stripped(ChrOut);
+            static constexpr auto Format_700("! #Nodes,<Number of Unique Nodes>");
+            print(ioFiles.bnd, "{}\n", Format_700);
+            print(ioFiles.bnd, " #Nodes,{}\n", NumOfUniqueNodeNames);
             if (NumOfUniqueNodeNames > 0) {
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_702);
+                static constexpr auto Format_702(
+                    "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
+                print(ioFiles.bnd, "{}\n", Format_702);
             }
-            Count0 = 0;
-            for (NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
-                ObjexxFCL::gio::write(ChrOut, fmtLD) << NumNode;
-                strip(ChrOut);
-                ObjexxFCL::gio::write(ChrOut1, fmtLD) << NodeRef(NumNode);
-                strip(ChrOut1);
-                ChrOut2 = ValidNodeFluidTypes(Node(NumNode).FluidType);
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Node," + ChrOut + ',' + NodeID(NumNode) + ',' + ChrOut2 + ',' + ChrOut1;
+            int Count0 = 0;
+            for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
+               print(ioFiles.bnd, " Node,{},{},{},{}\n", NumNode, NodeID(NumNode), ValidNodeFluidTypes(Node(NumNode).FluidType) ,NodeRef(NumNode));
                 if (NodeRef(NumNode) == 0) ++Count0;
             }
             // Show suspicious node names on the Branch-Node Details file
             if (Count0 > 0) {
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
-                    << "! Suspicious nodes have 0 references.  It is normal for some nodes, however.";
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! Listing nodes with 0 references (culled from previous list):";
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_703);
-                for (NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
+                print(ioFiles.bnd, "{}\n", "! ===============================================================");
+                print(ioFiles.bnd, "{}\n", "! Suspicious nodes have 0 references.  It is normal for some nodes, however.");
+                print(ioFiles.bnd, "{}\n", "! Listing nodes with 0 references (culled from previous list):");
+                static constexpr auto Format_703(
+                    "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
+                print(ioFiles.bnd, "{}\n", Format_703);
+                for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     if (NodeRef(NumNode) > 0) continue;
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << NumNode;
-                    strip(ChrOut);
-                    ObjexxFCL::gio::write(ChrOut1, fmtLD) << NodeRef(NumNode);
-                    strip(ChrOut1);
-                    ChrOut2 = ValidNodeFluidTypes(Node(NumNode).FluidType);
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
-                        << " Suspicious Node," + ChrOut + ',' + NodeID(NumNode) + ',' + ChrOut2 + ',' + ChrOut1;
+                    print(ioFiles.bnd, " Suspicious Node,{},{},{},{}\n", NumNode, NodeID(NumNode),ValidNodeFluidTypes(Node(NumNode).FluidType) ,  NodeRef(NumNode));
                 }
             }
         }
@@ -737,7 +712,6 @@ namespace NodeInputManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -746,19 +720,15 @@ namespace NodeInputManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int NumNode(0); // Loop Variable
-        static std::string cNodeFluidType;
 
         if (NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric &&
             NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown) {
-            ObjexxFCL::gio::write(cNodeFluidType, fmtLD) << NodeFluidType;
-            strip(cNodeFluidType);
-            ShowSevereError("AssignNodeNumber: Invalid FluidType=" + cNodeFluidType);
+            ShowSevereError("AssignNodeNumber: Invalid FluidType=" + std::to_string(NodeFluidType));
             ErrorsFound = true;
             ShowFatalError("AssignNodeNumber: Preceding issue causes termination.");
         }
 
-        NumNode = 0;
+        int NumNode = 0;
         if (NumOfUniqueNodeNames > 0) {
             NumNode = UtilityRoutines::FindItemInList(Name, NodeID({1, NumOfUniqueNodeNames}), NumOfUniqueNodeNames);
             if (NumNode > 0) {

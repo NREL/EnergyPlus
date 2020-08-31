@@ -66,6 +66,10 @@
 
 namespace EnergyPlus {
 
+    // Forward Declarations
+    struct EnergyPlusData;
+    struct WindowManagerData;
+
 namespace DataSurfaces {
 
     // Using/Aliasing
@@ -478,10 +482,11 @@ namespace DataSurfaces {
     extern Array1D<Real64> WinGapConvHtFlowRepEnergy;     // Energy of WinGapConvHtFlowRep [J]
     extern Array1D<Real64> WinHeatTransferRepEnergy;      // Energy of WinHeatTransfer [J]
 
-    extern std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
+    extern std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces - simulation order
     extern std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     extern std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
     extern std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
+    extern std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
     extern bool AnyHeatBalanceInsideSourceTerm;  // True if any SurfaceProperty:HeatBalanceSourceTerm inside face used
     extern bool AnyHeatBalanceOutsideSourceTerm; // True if any SurfaceProperty:HeatBalanceSourceTerm outside face used
@@ -692,6 +697,9 @@ namespace DataSurfaces {
         Real64 CosTilt;                   // Cosine of surface tilt angle
         bool IsConvex;                    // true if the surface is convex.
         bool IsDegenerate;                // true if the surface is degenerate.
+        bool VerticesProcessed;           // true if vertices have been processed (only used for base surfaces)
+        Real64 XShift;                    // relative coordinate shift data - used by child subsurfaces
+        Real64 YShift;                    // relative coordinate shift data - used by child subsurfaces
         // Precomputed parameters for PierceSurface performance
         ShapeCat shapeCat;   // Shape category
         Plane plane;         // Plane
@@ -770,7 +778,7 @@ namespace DataSurfaces {
         int IntConvWindowLocation;       // relative location of window in zone for interior Hc models
         bool IntConvSurfGetsRadiantHeat;
         bool IntConvSurfHasActiveInIt;
-        bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
+        bool IsRadSurfOrVentSlabOrPool; // surface cannot be part of both a radiant surface & ventilated slab group
         // LG added 1/6/12
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
         // Air boundaries
@@ -794,11 +802,12 @@ namespace DataSurfaces {
               ShadowSurfRecSurfNum(0), MaterialMovInsulExt(0), MaterialMovInsulInt(0), SchedMovInsulExt(0), SchedMovInsulInt(0),
               MovInsulIntPresent(false), MovInsulIntPresentPrevTS(false), Centroid(0.0, 0.0, 0.0), lcsx(0.0, 0.0, 0.0), lcsy(0.0, 0.0, 0.0),
               lcsz(0.0, 0.0, 0.0), NewellAreaVector(0.0, 0.0, 0.0), NewellSurfaceNormalVector(0.0, 0.0, 0.0), OutNormVec(3, 0.0), SinAzim(0.0),
-              CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0),
-              WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0), StormWinConstruction(0), StormWinShadedConstruction(0),
-              FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp), OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false),
-              OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0), OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0),
-              WindSpeed(0.0), WindSpeedEMSOverrideOn(false), WindSpeedEMSOverrideValue(0.0),
+              CosAzim(0.0), SinTilt(0.0), CosTilt(0.0), IsConvex(true), IsDegenerate(false), VerticesProcessed(false), XShift(0.0), YShift(0.0),
+              shapeCat(ShapeCat::Unknown), plane(0.0, 0.0, 0.0, 0.0), WindowShadingControlPtr(0), HasShadeControl(false), ShadedConstruction(0),
+              StormWinConstruction(0), StormWinShadedConstruction(0), FrameDivider(0), Multiplier(1.0), Shelf(0), TAirRef(ZoneMeanAirTemp),
+              OutDryBulbTemp(0.0), OutDryBulbTempEMSOverrideOn(false), OutDryBulbTempEMSOverrideValue(0.0), OutWetBulbTemp(0.0),
+              OutWetBulbTempEMSOverrideOn(false), OutWetBulbTempEMSOverrideValue(0.0), WindSpeed(0.0), WindSpeedEMSOverrideOn(false),
+              WindSpeedEMSOverrideValue(0.0),
 
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
@@ -810,7 +819,7 @@ namespace DataSurfaces {
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
               OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
               IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
+              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), IsRadSurfOrVentSlabOrPool(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
         {
         }
 
@@ -830,7 +839,7 @@ namespace DataSurfaces {
 
         Real64 getOutsideAirTemperature(const int t_SurfNum) const;
 
-        Real64 getOutsideIR(const int t_SurfNum) const;
+        Real64 getOutsideIR(WindowManagerData &dataWindowManager, const int t_SurfNum) const;
 
         static Real64 getSWIncident(const int t_SurfNum);
 

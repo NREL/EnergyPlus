@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     NONE,                    !- Name
@@ -2323,7 +2323,7 @@
 
   Output:Variable,*,Fan Rise in Air Temperature,monthly;
 
-  Output:Variable,*,Fan Electric Energy,monthly;
+  Output:Variable,*,Fan Electricity Energy,monthly;
 
   Output:Variable,*,Plant Supply Side Cooling Demand Rate,monthly;
 
@@ -2343,7 +2343,7 @@
 
   Output:Variable,*,Boiler Mass Flow Rate,monthly;
 
-  Output:Variable,*,Boiler Ancillary Electric Power,monthly;
+  Output:Variable,*,Boiler Ancillary Electricity Rate,monthly;
 
   Output:Variable,Cooling Coil Air Inlet Node,System Node Mass Flow Rate,monthly;
 
@@ -2378,8 +2378,8 @@
 !  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
 !  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 !  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
-!  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
-!  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+!  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
+!  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 

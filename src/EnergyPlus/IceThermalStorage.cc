@@ -63,6 +63,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -179,7 +180,7 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void SimpleIceStorageData::simulate(const PlantLocation &calledFromLocation,
+    void SimpleIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
                                         bool EP_UNUSED(FirstHVACIteration),
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)
@@ -207,7 +208,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitSimpleIceStorage();
+        this->InitSimpleIceStorage(state.dataBranchInputManager);
 
         //------------------------------------------------------------------------
         // FIRST PROCESS (MyLoad = 0.0 as IN)
@@ -287,7 +288,7 @@ namespace IceThermalStorage {
         this->RecordOutput(MyLoad2, RunFlag);
     }
 
-    void DetailedIceStorageData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void DetailedIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                           bool EP_UNUSED(FirstHVACIteration),
                                           Real64 &EP_UNUSED(CurLoad),
                                           bool EP_UNUSED(RunFlag))
@@ -302,7 +303,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitDetailedIceStorage(); // Initialize detailed ice storage
+        this->InitDetailedIceStorage(state.dataBranchInputManager); // Initialize detailed ice storage
 
         this->SimDetailedIceStorage(); // Simulate detailed ice storage
 
@@ -1135,9 +1136,9 @@ namespace IceThermalStorage {
         SetupOutputVariable("Ice Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->ChargingEnergy, "System", "Sum", this->Name);
 
         SetupOutputVariable(
-            "Ice Thermal Storage Ancillary Electric Power", OutputProcessor::Unit::W, this->ParasiticElecRate, "System", "Average", this->Name);
+            "Ice Thermal Storage Ancillary Electricity Rate", OutputProcessor::Unit::W, this->ParasiticElecRate, "System", "Average", this->Name);
 
-        SetupOutputVariable("Ice Thermal Storage Ancillary Electric Energy",
+        SetupOutputVariable("Ice Thermal Storage Ancillary Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->ParasiticElecEnergy,
                             "System",
@@ -1150,7 +1151,7 @@ namespace IceThermalStorage {
                             "System");
     }
 
-    void DetailedIceStorageData::InitDetailedIceStorage()
+    void DetailedIceStorageData::InitDetailedIceStorage(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1169,7 +1170,8 @@ namespace IceThermalStorage {
 
         if (this->MyPlantScanFlag) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
                                                     DataPlant::TypeOf_TS_IceDetailed,
                                                     this->PlantLoopNum,
                                                     this->PlantLoopSideNum,
@@ -1238,7 +1240,7 @@ namespace IceThermalStorage {
         this->ParasiticElecEnergy = 0.0;
     }
 
-    void SimpleIceStorageData::InitSimpleIceStorage()
+    void SimpleIceStorageData::InitSimpleIceStorage(BranchInputManagerData &dataBranchInputManager)
     {
 
         bool errFlag;
@@ -1246,7 +1248,7 @@ namespace IceThermalStorage {
         if (this->MyPlantScanFlag) {
             // Locate the storage on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                 this->Name, DataPlant::TypeOf_TS_IceSimple, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitSimpleIceStorage: Program terminated due to previous condition(s).");

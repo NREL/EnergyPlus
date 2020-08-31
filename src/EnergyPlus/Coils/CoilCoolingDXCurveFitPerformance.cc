@@ -47,6 +47,7 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -54,16 +55,13 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -295,16 +293,16 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size()
+void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        this->normalMode.size();
-        if (this->hasAlternateMode == DataHVACGlobals::coilEnhancedMode) {
-            this->alternateMode.size();
+        this->normalMode.size(state);
+        if (this->hasAlternateMode == coilEnhancedMode) {
+            this->alternateMode.size(state);
         }
-        if (this->hasAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
-            this->alternateMode.size();
-            this->alternateMode2.size();
+        if (this->hasAlternateMode == coilSubcoolReheatMode) {
+            this->alternateMode.size(state);
+            this->alternateMode2.size(state);
         }
         this->mySizeFlag = false;
     }
@@ -358,9 +356,11 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex,
+                                                           IOFiles &ioFiles) {
 
-
+    using General::SolveRoot;
+    using TempSolveRoot::SolveRoot;
     // If fan index hasn't been set, we can't do anything
     if (supplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
         ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" + this->name +
@@ -374,7 +374,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
             "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
             "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
             "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')\n");
-    print(outputFiles.eio, Format_890);
+    print(ioFiles.eio, Format_890);
 
     std::string const RoutineName = "CoilCoolingDXCurveFitPerformance::calcStandardRatings";
 
@@ -433,8 +433,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                 fanInletNode = HVACFan::fanObjs[supplyFanIndex]->inletNodeNum;
                 fanOutletNode = HVACFan::fanObjs[supplyFanIndex]->outletNodeNum;
             } else { // TODO: Are there other fan types to be considered here??
-                fanInletNode = Fans::GetFanInletNode("FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
-                fanOutletNode = Fans::GetFanOutletNode("FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanInletNode = Fans::GetFanInletNode(state, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanOutletNode = Fans::GetFanOutletNode(state, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
             }
 
             // set node state variables in preparation for fan model.
@@ -446,10 +446,10 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
             DataLoopNode::Node(fanInletNode).Enthalpy =
                 Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, DataLoopNode::Node(fanInletNode).HumRat);
             if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                 fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
             } else {
-                Fans::SimulateFanComponents(supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+                Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
                 fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
             }
 
@@ -558,8 +558,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
         Real64 const AccuracyTolerance(0.2); // tolerance in AHRI 340/360 Table 6 note 1
         int const MaximumIterations(1000);
         Real64 PartLoadAirMassFlowRate = 0.0;
-        auto f = std::bind(&CoilCoolingDXCurveFitPerformance::calcIEERResidual, this, std::placeholders::_1, std::placeholders::_2);
-        General::SolveRoot(AccuracyTolerance,
+        auto f = std::bind(&CoilCoolingDXCurveFitPerformance::calcIEERResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        TempSolveRoot::SolveRoot(state, AccuracyTolerance,
                            MaximumIterations,
                            SolverFlag,
                            PartLoadAirMassFlowRate,
@@ -600,10 +600,10 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                 DataLoopNode::Node(fanInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                    HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                     fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
                 } else {
-                    Fans::SimulateFanComponents(supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+                    Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
                     fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
                 }
 
@@ -681,7 +681,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 
     // begin output
     if (this->oneTimeEIOHeaderWrite) {
-        print(outputFiles.eio, Format_890); // TODO: Verify this works
+        print(ioFiles.eio, Format_890); // TODO: Verify this works
         this->oneTimeEIOHeaderWrite = false;
         OutputReportPredefined::pdstVAVDXCoolCoil =
             OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
@@ -745,12 +745,12 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 
     static constexpr auto fmt = " VAV DX Cooling Coil Standard Rating Information, {},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R}\n";
     if (this->unitStatic > 0) {
-        print(outputFiles.eio, fmt,"Coil:Cooling:DX", this->name,"Fan:VariableVolume",
+        print(ioFiles.eio, fmt,"Coil:Cooling:DX", this->name,"Fan:VariableVolume",
               supplyFanName, NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
     } else {
-        print(outputFiles.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
+        print(ioFiles.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
               "N/A", NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
@@ -763,7 +763,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, this->name, EER_TestPoint_SI[0], 2);
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, this->name, EER_TestPoint_IP[0], 2);
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, this->name, IEER, 2);
-    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, this->name, "N/A");
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERUserIP, this->name, "N/A");
+    OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERStandardIP, this->name, "N/A");
     OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilType, this->name, "Coil:Cooling:DX");
@@ -788,7 +789,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 }
 
 Real64
-CoilCoolingDXCurveFitPerformance::calcIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlusData &state,Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par)
 {
     // FUNCTION INFORMATION:
@@ -860,10 +861,10 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(Real64 const SupplyAirMassFlo
             Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
         DataLoopNode::Node(FanInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(IndoorUnitInletDryBulb, DataLoopNode::Node(FanInletNodeNum).HumRat);
         if (supplyFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+            HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
         } else {
             // TODO: I am hoping we can just pass in the supply fan name
-            Fans::SimulateFanComponents("", true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+            Fans::SimulateFanComponents(state, "", true, supplyFanIndex, _, true, false, FanStaticPressureRise);
         }
 
         FanHeatCorrection = DataLoopNode::Node(FanOutletNodeNum).Enthalpy - DataLoopNode::Node(FanInletNodeNum).Enthalpy;

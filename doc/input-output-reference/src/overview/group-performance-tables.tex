@@ -7,7 +7,7 @@ This group of objects consists of tabular data which are used to characterize th
 Input for tables representing data with one or more independent
 variables.
 
-\subsubsection{Inputs}\label{inputs}
+\subsubsection{Inputs}
 
 \paragraph{Field: Name}\label{field-name}
 
@@ -51,7 +51,7 @@ The (non-normalized) maximum allowable value of the evaluated table after interp
 and extrapolation. Values greater than the maximum will be replaced by
 the maximum. If this field is left blank, no limit is imposed.
 
-\paragraph{Field: Output Unit Type}\label{field-output-unit-type}
+\paragraph{Field: Output Unit Type}
 
 This field is used to indicate the kind of units that may be associated
 with the output values. It is used by interfaces or input editors (e.g., IDF Editor) to display the
@@ -221,7 +221,7 @@ for three independent variables (\texttt{iv1}, \texttt{iv2},
 \bottomrule
 \end{longtable}
 
-\subsubsection{Example IDF}\label{example-idf}
+\subsubsection{Example IDF}
 
 \begin{lstlisting}
 Table:Lookup,
@@ -243,10 +243,10 @@ Table:Lookup,
   33988.3473,  32330.1846,  30681.4701,  29314.75872, 29042.2038,  27683.36592, 26301.11353;
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs}
+\subsubsection{Outputs}
 
 \paragraph{Performance Curve Output Value
-{[}{]}}\label{performance-curve-output-value}
+{[}{]}}
 
 The current value of the performance table. Performance curves and
 tables use the same output variable. This value is averaged over the
@@ -336,7 +336,7 @@ respectively. The output values
 
 \subsubsection{Inputs}\label{inputs-1}
 
-\paragraph{Field: Name}\label{field-name-1}
+\paragraph{Field: Name}
 
 A unique user-assigned name for a list of independent variables. This
 name is referenced by Table:Lookup objects. The name of this list object
@@ -367,7 +367,7 @@ Table:Lookup object.
 
 \subsubsection{Inputs}\label{inputs-2}
 
-\paragraph{Field: Name}\label{field-name-2}
+\paragraph{Field: Name}
 
 A unique user-assigned name for an independent variables. This name is
 referenced by Table:IndependentVariableList objects. The name of this
@@ -440,7 +440,7 @@ normalization will be calculated. If this field is left blank the Normalization
 Reference Value of all other Table:IndependentVariable objects within the same
 Table:IndependentVariableList must also be left blank.
 
-\paragraph{Field: Unit Type}\label{field-unit-type}
+\paragraph{Field: Unit Type}
 
 This field is used to indicate the kind of units that may be associated
 with this independent variable. It is used by interfaces or input editors (e.g., IDF Editor) to display the

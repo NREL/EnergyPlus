@@ -66,6 +66,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -134,14 +135,14 @@ namespace OutsideEnergySources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void OutsideEnergySourceSpecs::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
                                             Real64 &CurLoad, bool RunFlag) {
-        this->initialize(CurLoad);
+        this->initialize(state.dataBranchInputManager, CurLoad);
         this->calculate(RunFlag, CurLoad);
     }
 
-    void OutsideEnergySourceSpecs::onInitLoopEquip(const PlantLocation &) {
-        this->initialize(0.0);
+    void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &) {
+        this->initialize(state.dataBranchInputManager, 0.0);
         this->size();
     }
 
@@ -245,7 +246,7 @@ namespace OutsideEnergySources {
 
     }
 
-    void OutsideEnergySourceSpecs::initialize(Real64 MyLoad)
+    void OutsideEnergySourceSpecs::initialize(BranchInputManagerData &dataBranchInputManager, Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -268,7 +269,7 @@ namespace OutsideEnergySources {
         if (this->OneTimeInitFlag) {
             // Locate the unit on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->Name,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager, this->Name,
                                                     this->EnergyType,
                                     this->LoopNum,
                                     this->LoopSideNum,

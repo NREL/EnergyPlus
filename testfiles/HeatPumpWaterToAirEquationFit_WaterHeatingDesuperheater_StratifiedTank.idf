@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3905,9 +3905,9 @@
 
   Output:Variable,*,Zone Air Humidity Ratio,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
@@ -3933,9 +3933,9 @@
 
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Cooling Coil Air Mass Flow Rate,hourly;
 
@@ -4011,17 +4011,17 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Electric Energy,hourly;
+  Output:Variable,*,Water Heater Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater Off Cycle Parasitic Electricity Energy,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Parasitic Electric Energy,hourly;
+  Output:Variable,*,Water Heater On Cycle Parasitic Electricity Energy,hourly;
 
   Output:Variable,*,Water Heater Water Volume Flow Rate,hourly;
 
@@ -4031,9 +4031,9 @@
 
   Output:Variable,*,Water Heater Heat Reclaim Efficiency Modifier Multiplier,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Power,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Pump Electric Energy,hourly;
+  Output:Variable,*,Water Heater Pump Electricity Energy,hourly;
 
   Output:VariableDictionary,Regular;
 
@@ -4051,7 +4051,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -4063,7 +4063,7 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

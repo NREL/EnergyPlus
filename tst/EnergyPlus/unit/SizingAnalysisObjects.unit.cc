@@ -51,13 +51,17 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/AirLoopHVACDOAS.hh>
+#include <EnergyPlus/BaseboardElectric.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/SizingAnalysisObjects.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -86,7 +90,7 @@ public:
     // constructor for test fixture class
     SizingAnalysisObjectsTest()
     {
-        OutputFiles::getSingleton().eio.open_as_stringstream();
+        state.files.eio.open_as_stringstream();
         // fill in test log data values
         lowLogVal = 50.0;
         midLogVal = 75.0;
@@ -152,6 +156,9 @@ public:
         PlantSizData.deallocate();
         TimeValue.clear();
     }
+
+
+    EnergyPlusData state;
 };
 
 TEST_F(SizingAnalysisObjectsTest, testZoneUpdateInLoggerFramework)
@@ -366,7 +373,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTest)
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(OutputFiles::getSingleton(), 1);
+    TestAnalysisObj.ResolveDesignFlowRate(state.files, 1);
 
     EXPECT_DOUBLE_EQ(0.0015, PlantLoop(1).MaxVolFlowRate); //  m3/s
     EXPECT_DOUBLE_EQ(1.5, PlantLoop(1).MaxMassFlowRate);   //  m3/s
@@ -522,7 +529,7 @@ TEST_F(SizingAnalysisObjectsTest, PlantCoincidentAnalyObjTestNullMassFlowRateTim
 
     EXPECT_DOUBLE_EQ(0.002, PlantLoop(1).MaxVolFlowRate); //  m3/s
 
-    TestAnalysisObj.ResolveDesignFlowRate(OutputFiles::getSingleton(), 1);
+    TestAnalysisObj.ResolveDesignFlowRate(state.files, 1);
 
     EXPECT_NEAR(0.00015, PlantLoop(1).MaxVolFlowRate, 0.00001); //  m3/s
     EXPECT_NEAR(0.15, PlantLoop(1).MaxMassFlowRate, 0.001);     //  m3/s

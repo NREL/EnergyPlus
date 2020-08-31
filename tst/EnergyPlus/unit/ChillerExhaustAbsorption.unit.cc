@@ -297,30 +297,30 @@ TEST_F(EnergyPlusFixture, ExhAbsorption_GetInput_Test)
     ASSERT_TRUE(process_idf(idf_objects));
     compare_err_stream("");
 
-    GetExhaustAbsorberInput();
+    GetExhaustAbsorberInput(state.dataChillerExhaustAbsorption);
 
     compare_err_stream("");
 
-    EXPECT_EQ(1u, ExhaustAbsorber.size());
-    EXPECT_EQ("EXH CHILLER", ExhaustAbsorber(1).Name);
+    EXPECT_EQ(1u, state.dataChillerExhaustAbsorption.ExhaustAbsorber.size());
+    EXPECT_EQ("EXH CHILLER", state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).Name);
 
-    EXPECT_EQ(100000., ExhaustAbsorber(1).NomCoolingCap);
-    EXPECT_EQ(0.8, ExhaustAbsorber(1).NomHeatCoolRatio);
-    EXPECT_EQ(0.97, ExhaustAbsorber(1).ThermalEnergyCoolRatio);
-    EXPECT_EQ(1.25, ExhaustAbsorber(1).ThermalEnergyHeatRatio);
-    EXPECT_EQ(0.01, ExhaustAbsorber(1).ElecCoolRatio);
-    EXPECT_EQ(0.005, ExhaustAbsorber(1).ElecHeatRatio);
+    EXPECT_EQ(100000., state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).NomCoolingCap);
+    EXPECT_EQ(0.8, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).NomHeatCoolRatio);
+    EXPECT_EQ(0.97, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).ThermalEnergyCoolRatio);
+    EXPECT_EQ(1.25, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).ThermalEnergyHeatRatio);
+    EXPECT_EQ(0.01, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).ElecCoolRatio);
+    EXPECT_EQ(0.005, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).ElecHeatRatio);
 
-    EXPECT_EQ(0.000001, ExhaustAbsorber(1).MinPartLoadRat);
-    EXPECT_EQ(1.0, ExhaustAbsorber(1).MaxPartLoadRat);
-    EXPECT_EQ(0.6, ExhaustAbsorber(1).OptPartLoadRat);
+    EXPECT_EQ(0.000001, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).MinPartLoadRat);
+    EXPECT_EQ(1.0, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).MaxPartLoadRat);
+    EXPECT_EQ(0.6, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).OptPartLoadRat);
 
-    EXPECT_EQ(29., ExhaustAbsorber(1).TempDesCondReturn);
-    EXPECT_EQ(7., ExhaustAbsorber(1).TempDesCHWSupply);
-    EXPECT_EQ(0.0011, ExhaustAbsorber(1).EvapVolFlowRate);
-    EXPECT_EQ(0.0043, ExhaustAbsorber(1).HeatVolFlowRate);
+    EXPECT_EQ(29., state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).TempDesCondReturn);
+    EXPECT_EQ(7., state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).TempDesCHWSupply);
+    EXPECT_EQ(0.0011, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).EvapVolFlowRate);
+    EXPECT_EQ(0.0043, state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).HeatVolFlowRate);
 
-    EXPECT_TRUE(ExhaustAbsorber(1).isEnterCondensTemp);
-    EXPECT_FALSE(ExhaustAbsorber(1).isWaterCooled);
-    EXPECT_EQ(2., ExhaustAbsorber(1).CHWLowLimitTemp);
+    EXPECT_TRUE(state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).isEnterCondensTemp);
+    EXPECT_FALSE(state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).isWaterCooled);
+    EXPECT_EQ(2., state.dataChillerExhaustAbsorption.ExhaustAbsorber(1).CHWLowLimitTemp);
 }

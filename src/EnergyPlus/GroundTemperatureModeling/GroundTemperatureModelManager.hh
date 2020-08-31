@@ -57,9 +57,12 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
+
+    struct DataGlobal;
 
 namespace GroundTemperatureManager {
 
@@ -75,7 +78,7 @@ namespace GroundTemperatureManager {
 
     extern std::vector<std::shared_ptr<BaseGroundTempsModel>> groundTempModels;
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(std::string const &type, std::string const &name);
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &type, std::string const &name);
 
     void clear_state();
 

@@ -24,7 +24,7 @@
 ! Plant:    None.
 ! SolDis=FullExterior, Aniso, Simple Interior and Exterior Convection
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,4;
 
@@ -2174,7 +2174,7 @@
 
   Output:Variable,*,Zone Ventilation Mass,hourly;
 
-  Output:Variable,*,Zone Ventilation Fan Electric Energy,hourly;
+  Output:Variable,*,Zone Ventilation Fan Electricity Energy,hourly;
 
   Output:Variable,*,Zone Ventilation Air Inlet Temperature,hourly;
 

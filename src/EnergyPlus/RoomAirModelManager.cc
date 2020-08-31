@@ -75,6 +75,7 @@
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MundtSimMgr.hh>
@@ -124,6 +125,7 @@ namespace RoomAirModelManager {
 
     bool GetUCSDDVDataFlag(true); // UCSD
     bool GetAirModelData(true);   // Used to "get" all air model data
+    bool MyOneTimeFlag(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -135,9 +137,10 @@ namespace RoomAirModelManager {
     {
         GetUCSDDVDataFlag = true;
         GetAirModelData = true;
+        MyOneTimeFlag = true;
     }
 
-    void ManageAirModel(int &ZoneNum)
+    void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -181,7 +184,7 @@ namespace RoomAirModelManager {
 
         // FLOW:
         if (GetAirModelData) {
-            GetAirModelDatas();
+            GetAirModelDatas(state);
             GetAirModelData = false;
         }
 
@@ -205,23 +208,23 @@ namespace RoomAirModelManager {
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) { // UCDV Displacement Ventilation model
                 // simulate room airflow using UCSDDV model
-                ManageUCSDDVModel(ZoneNum);
+                ManageUCSDDVModel(state.dataConvectionCoefficients, ZoneNum);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) { // UCSD Cross Ventilation model
                 // simulate room airflow using UCSDDV model
-                ManageUCSDCVModel(ZoneNum);
+                ManageUCSDCVModel(state.dataConvectionCoefficients, state.dataCrossVentMgr, ZoneNum);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
-                ManageUCSDUFModels(ZoneNum, RoomAirModel_UCSDUFI);
+                ManageUCSDUFModels(state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFI);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) { // UCSD UFAD exterior zone model
                 // simulate room airflow using the UCSDUFE model
-                ManageUCSDUFModels(ZoneNum, RoomAirModel_UCSDUFE);
+                ManageUCSDUFModels(state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFE);
 
             } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) { // RoomAirflowNetwork zone model
                 // simulate room airflow using the AirflowNetwork - based model
-                SimRoomAirModelAirflowNetwork(ZoneNum);
+                SimRoomAirModelAirflowNetwork(state, ZoneNum);
 
             } else { // mixing air model
                      // do nothing
@@ -231,7 +234,7 @@ namespace RoomAirModelManager {
 
     //*****************************************************************************************
 
-    void GetAirModelDatas()
+    void GetAirModelDatas(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -277,7 +280,7 @@ namespace RoomAirModelManager {
         GetMundtData(ErrorsFound);
 
         // get airflow network model info for all zones
-        GetRoomAirflowNetworkData(ErrorsFound);
+        GetRoomAirflowNetworkData(state, ErrorsFound);
 
         // get UCSDDV model controls for all zones
         GetDisplacementVentData(ErrorsFound);
@@ -1370,7 +1373,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    void GetRoomAirflowNetworkData(bool &ErrorsFound) // True if errors found during this get input routine
+    void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
     {
 
         // SUBROUTINE INFORMATION:
@@ -1751,7 +1754,7 @@ namespace RoomAirModelManager {
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ReturnFraction =
                                 rNumericArgs(2 + (EquipLoop - 1) * 2);
 
-                            IntEquipError = CheckEquipName(RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ObjectTypeName,
+                            IntEquipError = CheckEquipName(state, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ObjectTypeName,
                                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).Name,
                                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).SupplyNodeName,
                                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ReturnNodeName,
@@ -1934,7 +1937,6 @@ namespace RoomAirModelManager {
         Real64 AinCV;
         int AirflowNetworkSurfPtr;
         int NSides;
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
 
         static int CompNum(0);  // AirflowNetwork Component number
@@ -2735,7 +2737,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    void GetRAFNNodeNum(std::string const &RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
+    void GetRAFNNodeNum(EnergyPlusData &state, std::string const &RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
                         int &ZoneNum,                    // The zone number associate with the node name
                         int &RAFNNodeNum,                // RoomAir:Node:AirflowNetwork Number
                         bool &Errorfound                 // true if an error is found (TODO: Useless, RAFNodeNum is 0 when Errorfound is true)
@@ -2758,7 +2760,7 @@ namespace RoomAirModelManager {
 
         // Obtains and Allocates RoomAirSettings : AirflowNetwork
         if (GetAirModelData) {
-            GetAirModelDatas();
+            GetAirModelDatas(state);
             GetAirModelData = false;
         }
 
@@ -2781,7 +2783,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    bool CheckEquipName(std::string const &EquipType, // Equipment type
+    bool CheckEquipName(EnergyPlusData &state, std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
@@ -2862,7 +2864,7 @@ namespace RoomAirModelManager {
             SupplyNodeName = Alphas(4);
             ReturnNodeName = "";   // Zone return node
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) { // ZoneHVAC : EnergyRecoveryVentilator
-            I = GetFanOutletNode("Fan:OnOff", Alphas(4), errorfound);
+            I = GetFanOutletNode(state, "Fan:OnOff", Alphas(4), errorfound);
             if (errorfound) {
             }
             SupplyNodeName = NodeID(I); // ?????

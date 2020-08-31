@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3407,6 +3407,10 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,Hourly;
 
+  Output:Variable,*,Boiler Heating Rate,Hourly;
+
+  Output:Variable,*,Boiler Steam Efficiency,Hourly;
+
 ! Reporting NODES Values
 
   Output:Variable,VAV SYS 1 Air Loop Outlet,System Node Temperature,hourly;
@@ -3433,11 +3437,11 @@
 
   Output:Meter,Electricity:Facility,Hourly;
 
-  Output:Meter,Heating:Gas,Hourly;
+  Output:Meter,Heating:NaturalGas,Hourly;
 
-  Output:Meter,Gas:Plant,Hourly;
+  Output:Meter,NaturalGas:Plant,Hourly;
 
-  Output:Meter,Gas:Facility,Hourly;
+  Output:Meter,NaturalGas:Facility,Hourly;
 
   Output:VariableDictionary,Regular;
 

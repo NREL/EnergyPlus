@@ -52,7 +52,9 @@
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
@@ -87,7 +89,6 @@ namespace DataGlobals {
     // Thus, all variables in this module must be PUBLIC.
     bool runReadVars(false);
     bool DDOnlySimulation(false);
-    bool AnnualSimulation(false);
     bool outputEpJSONConversion(false);
     bool outputEpJSONConversionOnly(false);
     bool isEpJSON(false);
@@ -96,12 +97,14 @@ namespace DataGlobals {
     bool isUBJSON(false);
     bool isBSON(false);
     bool preserveIDFOrder(true);
+    bool stopSimulation(false);
+    std::function<void (void *)> externalHVACManager;
+    bool externalHVACManagerInitialized(false);
 
     // MODULE PARAMETER DEFINITIONS:
     int const BeginDay(1);
     int const DuringDay(2);
     int const EndDay(3);
-    int const EndZoneSizingCalc(4);
     int const EndSysSizingCalc(5);
 
     // Parameters for KindOfSim
@@ -154,12 +157,13 @@ namespace DataGlobals {
     int const emsCallFromEndZoneTimestepAfterZoneReporting(12);   // Identity where EMS called from
     int const emsCallFromSetupSimulation(13);                     // identify where EMS called from,
     // this is for input processing only
-    int const emsCallFromExternalInterface(14);         // Identity where EMS called from
-    int const emsCallFromComponentGetInput(15);         // EMS called from end of get input for a component
-    int const emsCallFromUserDefinedComponentModel(16); // EMS called from inside a custom user component model
-    int const emsCallFromUnitarySystemSizing(17);       // EMS called from unitary system compound component
-    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18); // Identity where EMS called from
-    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19); // Identity where EMS called from
+    int const emsCallFromExternalInterface(14);                        // Identity where EMS called from
+    int const emsCallFromComponentGetInput(15);                        // EMS called from end of get input for a component
+    int const emsCallFromUserDefinedComponentModel(16);                // EMS called from inside a custom user component model
+    int const emsCallFromUnitarySystemSizing(17);                      // EMS called from unitary system compound component
+    int const emsCallFromBeginZoneTimestepBeforeInitHeatBalance(18);   // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepAfterInitHeatBalance(19);    // Identity where EMS called from
+    int const emsCallFromBeginZoneTimestepBeforeSetCurrentWeather(20); // Identity where EMS called from
 
     int const ScheduleAlwaysOn(-1); // Value when passed to schedule routines gives back 1.0 (on)
 
@@ -179,7 +183,6 @@ namespace DataGlobals {
     bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
     bool BeginTimeStepFlag(false);      // True at the start of each time step, False after first subtime step of time step
     int DayOfSim(0);                    // Counter for days (during the simulation)
-    std::string DayOfSimChr("0");       // Counter for days (during the simulation) (character -- for reporting)
     int CalendarYear(0);                // Calendar year of the current day of simulation
     std::string CalendarYearChr;        // Calendar year of the current day of simulation (character -- for reporting)
     bool EndEnvrnFlag(false);           // True at the end of each environment (last time step of last hour of last day of environ)
@@ -197,20 +200,8 @@ namespace DataGlobals {
     int TimeStep(0);                   // Counter for time steps (fractional hours)
     Real64 TimeStepZone(0.0);          // Zone time step in fractional hours
     bool WarmupFlag(false);            // True during the warmup portion of a simulation
-    int OutputFileStandard(0);         // Unit number for the standard output file (hourly data only)
-    std::ostream *eso_stream(nullptr); // Internal stream used for eso output (used for performance)
-    JsonOutputStreams jsonOutputStreams;
-    int OutputStandardError(0);                      // Unit number for the standard error output file
-    std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
-    int OutputFileDebug(0);                          // Unit number for debug outputs
-    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
-    std::ostream *mtr_stream(nullptr);               // Internal stream used for mtr output (used for performance)
-    int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
-    int OutputFileBNDetails(0);                      // Unit number for Branch-Node Details
-    int OutputDElightIn(0);                          // Unit number for the DElight In file
-    std::ostream *delightin_stream(nullptr);         // Internal stream used for DElight In file
     bool ZoneSizingCalc(false);                      // TRUE if zone sizing calculation
     bool SysSizingCalc(false);                       // TRUE if system sizing calculation
     bool DoZoneSizing(false);                        // User input in SimulationControl object
@@ -246,12 +237,10 @@ namespace DataGlobals {
     bool AnyEnergyManagementSystemInModel(false);  // true if there is any EMS or Erl in model.  otherwise false
     bool AnyLocalEnvironmentsInModel(false);       // true if there is any local environmental data objected defined in model, otherwise false
     bool AnyPlantInModel(false);                   // true if there are any plant or condenser loops in model, otherwise false
-    int CacheIPErrorFile(0);                       // Cache IP errors until IDF processing done.
     bool AnyIdealCondEntSetPointInModel(false);    // true if there is any ideal condenser entering set point manager in model.
     bool RunOptCondEntTemp(false);                 // true if the ideal condenser entering set point optimization is running
     bool CompLoadReportIsReq(false);               // true if the extra sizing calcs are performed to create a "pulse" for the load component report
     bool isPulseZoneSizing(false);                 // true during the set of zone sizing calcs that include the "pulse" for the load component report
-    int OutputFileZonePulse(0); // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
     bool doLoadComponentPulseNow(false); // true for the time step that is the "pulse" for the load component report
     bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
@@ -263,26 +252,27 @@ namespace DataGlobals {
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
-    void (*progressCallback)(int const);
-    void (*messageCallback)(const char * message);
-    void (*errorCallback)(const char * errorMessage);
+    std::function<void(int const)> progressCallback;
+    std::function<void(const std::string &)> messageCallback;
+    std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
 
     bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void clear_state(IOFiles &ioFiles)
     {
-
         runReadVars = false;
         DDOnlySimulation = false;
-        AnnualSimulation = false;
         outputEpJSONConversion = false;
         outputEpJSONConversionOnly = false;
         isEpJSON = false;
         isCBOR = false;
         isMsgPack = false;
         preserveIDFOrder = true;
+        stopSimulation = false;
+        externalHVACManager = nullptr;
+        externalHVACManagerInitialized = false;
         BeginDayFlag = false;
         BeginEnvrnFlag = false;
         BeginHourFlag = false;
@@ -290,7 +280,6 @@ namespace DataGlobals {
         BeginFullSimFlag = false;
         BeginTimeStepFlag = false;
         DayOfSim = 0;
-        DayOfSimChr = "0";
         CalendarYear = 0;
         CalendarYearChr = "0";
         EndEnvrnFlag = false;
@@ -307,14 +296,15 @@ namespace DataGlobals {
         TimeStep = 0;
         TimeStepZone = 0.0;
         WarmupFlag = false;
-        OutputFileStandard = 0;
-        OutputStandardError = 0;
+        ioFiles.eso.close();
+        ioFiles.err_stream.reset();
         StdOutputRecordCount = 0;
-        OutputFileDebug = 0;
-        OutputFilePerfLog = 0;
-        OutputFileShadingFrac = 0;
+        ioFiles.debug.close();
+        ioFiles.zsz.close();
+        ioFiles.ssz.close();
+        ioFiles.mtr.close();
+        ioFiles.shade.close();
         StdMeterRecordCount = 0;
-        OutputFileBNDetails = 0;
         ZoneSizingCalc = false;
         SysSizingCalc = false;
         DoZoneSizing = false;
@@ -350,12 +340,10 @@ namespace DataGlobals {
         AnyEnergyManagementSystemInModel = false;
         AnyLocalEnvironmentsInModel = false;
         AnyPlantInModel = false;
-        CacheIPErrorFile = 0;
         AnyIdealCondEntSetPointInModel = false;
         RunOptCondEntTemp = false;
         CompLoadReportIsReq = false;
         isPulseZoneSizing = false;
-        OutputFileZonePulse = 0;
         doLoadComponentPulseNow = false;
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;
@@ -367,10 +355,8 @@ namespace DataGlobals {
         progressCallback = nullptr;
         messageCallback = nullptr;
         errorCallback = nullptr;
-        eso_stream = nullptr;
-        mtr_stream = nullptr;
-        err_stream = nullptr;
-        delightin_stream = nullptr;
+        ioFiles.mtr.close();
+        ioFiles.err_stream.reset();
         eplusRunningViaAPI = false;
     }
 

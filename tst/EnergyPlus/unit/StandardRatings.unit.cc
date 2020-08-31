@@ -52,14 +52,14 @@
 
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
@@ -249,14 +249,14 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     using CurveManager::NumCurves;
     using StandardRatings::CalcChillerIPLV;
     using DataPlant::TypeOf_Chiller_ElectricEIR;
-    
+
     // Setup an air-cooled Chiller:Electric:EIR chiller
-    ChillerElectricEIR::ElectricEIRChiller.allocate(1);
-    ChillerElectricEIR::ElectricEIRChiller(1).Name = "Air Cooled Chiller";
-    ChillerElectricEIR::ElectricEIRChiller(1).RefCap = 216000; // W
-    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
-    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType = ChillerElectricEIR::AirCooled;
-    ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat = 0.15;
+    state.dataChillerElectricEIR.ElectricEIRChiller.allocate(1);
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).Name = "Air Cooled Chiller";
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCap = 216000; // W
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCOP = 2.81673861898309; // W/W
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).CondenserType = DataPlant::CondenserType::AIRCOOLED;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).MinUnloadRat = 0.15;
 
     int CurveNum;
     NumCurves = 3;
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Var1Max = 10;
     PerfCurve(CurveNum).Var2Min = 23.89;
     PerfCurve(CurveNum).Var2Max = 46.11;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFTIndex = 1;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
     CurveNum = 2;
@@ -298,7 +298,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Var1Max = 10;
     PerfCurve(CurveNum).Var2Min = 10;
     PerfCurve(CurveNum).Var2Max = 46.11;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
     CurveNum = 3;
@@ -313,19 +313,19 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Coeff4 = 0.412199944;
     PerfCurve(CurveNum).Var1Min = 0;
     PerfCurve(CurveNum).Var1Max = 1;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
+    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
-    CalcChillerIPLV(OutputFiles::getSingleton(),
-                    ChillerElectricEIR::ElectricEIRChiller(1).Name,
+    CalcChillerIPLV(state.files,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).Name,
                     TypeOf_Chiller_ElectricEIR,
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCap,
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP,
-                    ChillerElectricEIR::ElectricEIRChiller(1).CondenserType,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFTIndex,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFTIndex,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex,
-                    ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCap,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).RefCOP,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).CondenserType,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerCapFTIndex,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFTIndex,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).ChillerEIRFPLRIndex,
+                    state.dataChillerElectricEIR.ElectricEIRChiller(1).MinUnloadRat,
                     IPLV,
                     Optional<const Real64>(),
                     ObjexxFCL::Optional_int_const(),
@@ -334,4 +334,465 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
 
 }
+
+TEST_F(EnergyPlusFixture, SingleSpeedCoolingCoil_SEERValueTest)
+{
+    // Tests SEER Value calculation for single speed DX cooling coil
+    // using user's PLF curve and AHRI default PLF curve
+
+    std::string const idf_objects = delimited_string({
+        "   Coil:Cooling:DX:SingleSpeed,",
+        "     Heat Pump ACDXCoil,      !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     autosize,                !- Gross Rated Total Cooling Capacity {W}",
+        "     autosize,                !- Gross Rated Sensible Heat Ratio",
+        "     4.0,                     !- Gross Rated Cooling COP {W/W}",
+        "     autosize,                !- Rated Air Flow Rate {m3/s}",
+        "     495.0,                   !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "     DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name",
+        "     Heating Coil Air Inlet Node,  !- Air Outlet Node Name",
+        "     HPACCoolCapFT,           !- Total Cooling Capacity Function of Temperature Curve Name",
+        "     HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "     HPACCOOLEIRFT,           !- Energy Input Ratio Function of Temperature Curve Name",
+        "     HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "     HPACCOOLPLFFPLR;         !- Part Load Fraction Correlation Curve Name",
+
+        "   Curve:Biquadratic,",
+        "     HPACCoolCapFT,           !- Name",
+        "     0.766956,                !- Coefficient1 Constant",
+        "     0.0107756,               !- Coefficient2 x",
+        "    -0.0000414703,            !- Coefficient3 x**2",
+        "     0.00134961,              !- Coefficient4 y",
+        "    -0.000261144,             !- Coefficient5 y**2",
+        "     0.000457488,             !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     18.0,                    !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Biquadratic,",
+        "     HPACCOOLEIRFT,           !- Name",
+        "     0.297145,                !- Coefficient1 Constant",
+        "     0.0430933,               !- Coefficient2 x",
+        "    -0.000748766,             !- Coefficient3 x**2",
+        "     0.00597727,              !- Coefficient4 y",
+        "     0.000482112,             !- Coefficient5 y**2",
+        "    -0.000956448,             !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     18.0,                    !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     HPACHeatCapFT,           !- Name",
+        "     0.758746,                !- Coefficient1 Constant",
+        "     0.027626,                !- Coefficient2 x",
+        "     0.000148716,             !- Coefficient3 x**2",
+        "     0.0000034992,            !- Coefficient4 x**3",
+        "     -20.0,                   !- Minimum Value of x",
+        "     20.0,                    !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     HPACHeatCapFFF,          !- Name",
+        "     0.84,                    !- Coefficient1 Constant",
+        "     0.16,                    !- Coefficient2 x",
+        "     0.0,                     !- Coefficient3 x**2",
+        "     0.0,                     !- Coefficient4 x**3",
+        "     0.5,                     !- Minimum Value of x",
+        "     1.5;                     !- Maximum Value of x",
+
+        "   Curve:Cubic,",
+        "     HPACHeatEIRFT,           !- Name",
+        "     1.19248,                 !- Coefficient1 Constant",
+        "    -0.0300438,               !- Coefficient2 x",
+        "     0.00103745,              !- Coefficient3 x**2",
+        "    -0.000023328,             !- Coefficient4 x**3",
+        "    -20.0,                    !- Minimum Value of x",
+        "     20.0,                    !- Maximum Value of x",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Quadratic,",
+        "     HPACCoolCapFFF,          !- Name",
+        "     0.8,                     !- Coefficient1 Constant",
+        "     0.2,                     !- Coefficient2 x",
+        "     0.0,                     !- Coefficient3 x**2",
+        "     0.5,                     !- Minimum Value of x",
+        "     1.5;                     !- Maximum Value of x",
+
+        "   Curve:Quadratic,",
+        "     HPACCOOLEIRFFF,          !- Name",
+        "     1.156,                   !- Coefficient1 Constant",
+        "    -0.1816,                  !- Coefficient2 x",
+        "     0.0256,                  !- Coefficient3 x**2",
+        "     0.5,                     !- Minimum Value of x",
+        "     1.5;                     !- Maximum Value of x",
+
+        "   Curve:Linear,",
+        "     HPACCOOLPLFFPLR,         !- Name",
+        "     0.90,                    !- Coefficient1 Constant",
+        "     0.10,                    !- Coefficient2 x",
+        "     0.0,                     !- Minimum Value of x",
+        "     1.0;                     !- Maximum Value of x",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetDXCoils(state);
+
+    auto &thisCoil(DXCoils::DXCoil(1));
+    auto &thisCoolPLFfPLR(PerfCurve(thisCoil.PLFFPLR(1)));
+    // ckeck user PLF curve coefficients
+    EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);
+    EXPECT_EQ(0.10, thisCoolPLFfPLR.Coeff2);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR.Var1Min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR.Var1Max);
+    Real64 minEIRfLowPLRXInput(0.0);
+    Real64 maxEIRfLowPLRXInput(0.0);
+    // check user PLF curve PLR limits
+    CurveManager::GetCurveMinMaxValues(thisCoil.PLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.0, minEIRfLowPLRXInput);
+    EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
+
+    // Test 1: user PLF curve is different from the AHRI Std 210/240-2008 default PLF Curve
+    Array1D<Real64> NetCoolingCapRated(1);
+    Real64 SEER_User(0.0);
+    Real64 SEER_Standard(0.0);
+    Real64 EER(0.0);
+    Real64 IEER(0.0);
+    NetCoolingCapRated = 0.0;
+    // set rated capacity and flow rate
+    thisCoil.RatedTotCap(1) = 25000.0;
+    thisCoil.RatedAirVolFlowRate(1) = 1.300;
+    // calculate standard ratings
+    SingleSpeedDXCoolingCoilStandardRatings(thisCoil.Name,
+                                            thisCoil.DXCoilType,
+                                            thisCoil.CCapFTemp(1),
+                                            thisCoil.CCapFFlow(1),
+                                            thisCoil.EIRFTemp(1),
+                                            thisCoil.EIRFFlow(1),
+                                            thisCoil.PLFFPLR(1),
+                                            thisCoil.RatedTotCap(1),
+                                            thisCoil.RatedCOP(1),
+                                            thisCoil.RatedAirVolFlowRate(1),
+                                            thisCoil.FanPowerPerEvapAirFlowRate(1),
+                                            NetCoolingCapRated(1),
+        SEER_User,
+        SEER_Standard,
+                                            EER,
+                                            IEER);
+    // check SEER values calculated using user PLF and default PLF curve
+    EXPECT_NEAR(13.00, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(11.98, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+
+    // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
+    // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
+    // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
+    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a 
+    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b 
+    thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
+    // reset output variables
+    SEER_User = 0.0;
+    SEER_Standard = 0.0;
+    EER = 0.0;
+    IEER = 0.0;
+    NetCoolingCapRated = 0.0;
+    // rerun the standard ratings calculation
+    SingleSpeedDXCoolingCoilStandardRatings(thisCoil.Name,
+                                            thisCoil.DXCoilType,
+                                            thisCoil.CCapFTemp(1),
+                                            thisCoil.CCapFFlow(1),
+                                            thisCoil.EIRFTemp(1),
+                                            thisCoil.EIRFFlow(1),
+                                            thisCoil.PLFFPLR(1),
+                                            thisCoil.RatedTotCap(1),
+                                            thisCoil.RatedCOP(1),
+                                            thisCoil.RatedAirVolFlowRate(1),
+                                            thisCoil.FanPowerPerEvapAirFlowRate(1),
+                                            NetCoolingCapRated(1),
+                                            SEER_User,
+                                            SEER_Standard,
+                                            EER,
+                                            IEER);
+    // SEER and SEER_Default must match for the same PLF curve
+    EXPECT_DOUBLE_EQ(SEER_User, SEER_Standard);
+    EXPECT_NEAR(11.98, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(11.98, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+}
+
+TEST_F(EnergyPlusFixture, MultiSpeedCoolingCoil_SEERValueTest)
+{
+    // Tests SEER Value calculation for multi speed DX cooling coil
+    // using user's PLF curve and AHRI default PLF curve
+
+    std::string const idf_objects = delimited_string({
+        "   Coil:Cooling:DX:MultiSpeed,",
+        "     MS DX Cooling Coil,      !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     MSDXClgCoil AirInletNode,!- Air Inlet Node Name",
+        "     MSDXHtgCoil AirInletNode,!- Air Outlet Node Name",
+        "     Condenser Air Inlet Node,!- Condenser Air Inlet Node Name",
+        "     AirCooled,               !- Condenser Type",
+        "     -8.0,                    !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}",
+        "     ,                        !- Supply Water Storage Tank Name",
+        "     ,                        !- Condensate Collection Water Storage Tank Name",
+        "     No,                      !- Apply Part Load Fraction to Speeds Greater than 1",
+        "     No,                      !- Apply Latent Degradation to Speeds Greater than 1",
+        "     200.0,                   !- Crankcase Heater Capacity {W}",
+        "     10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}",
+        "     ,                        !- Basin Heater Capacity {W/K}",
+        "     ,                        !- Basin Heater Setpoint Temperature {C}",
+        "     ,                        !- Basin Heater Operating Schedule Name",
+        "     NaturalGas,              !- Fuel Type",
+        "     4,                       !- Number of Speeds",
+        "     7500,                    !- Speed 1 Gross Rated Total Cooling Capacity {W}",
+        "     0.75,                    !- Speed 1 Gross Rated Sensible Heat Ratio",
+        "     4.0,                     !- Speed 1 Gross Rated Cooling COP {W/W}",
+        "     0.40,                    !- Speed 1 Rated Air Flow Rate {m3/s}",
+        "     453.3,                   !- Speed 1 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "     HPACCoolCapFT Speed,     !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name",
+        "     HPACCoolCapFF Speed,     !- Speed 1 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "     HPACCOOLEIRFT Speed,     !- Speed 1 Energy Input Ratio Function of Temperature Curve Name",
+        "     HPACCOOLEIRFF Speed,     !- Speed 1 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "     HPACCOOLPLFFPLR Speed,   !- Speed 1 Part Load Fraction Correlation Curve Name",
+        "     1000.0,                  !- Speed 1 Nominal Time for Condensate Removal to Begin {s}",
+        "     1.5,                     !- Speed 1 Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}",
+        "     3.0,                     !- Speed 1 Maximum Cycling Rate {cycles/hr}",
+        "     45.0,                    !- Speed 1 Latent Capacity Time Constant {s}",
+        "     0.2,                     !- Speed 1 Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "     HAPCCoolWHFT Speed,      !- Speed 1 Waste Heat Function of Temperature Curve Name",
+        "     0.9,                     !- Speed 1 Evaporative Condenser Effectiveness {dimensionless}",
+        "     0.05,                    !- Speed 1 Evaporative Condenser Air Flow Rate {m3/s}",
+        "     50,                      !- Speed 1 Rated Evaporative Condenser Pump Power Consumption {W}",
+        "     17500,                   !- Speed 2 Gross Rated Total Cooling Capacity {W}",
+        "     0.75,                    !- Speed 2 Gross Rated Sensible Heat Ratio",
+        "     4.0,                     !- Speed 2 Gross Rated Cooling COP {W/W}",
+        "     0.85,                    !- Speed 2 Rated Air Flow Rate {m3/s}",
+        "     523.3,                   !- Speed 2 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "     HPACCoolCapFT Speed,     !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name",
+        "     HPACCoolCapFF Speed,     !- Speed 2 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "     HPACCOOLEIRFT Speed,     !- Speed 2 Energy Input Ratio Function of Temperature Curve Name",
+        "     HPACCOOLEIRFF Speed,     !- Speed 2 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "     HPACCOOLPLFFPLR Speed,   !- Speed 2 Part Load Fraction Correlation Curve Name",
+        "     1000.0,                  !- Speed 2 Nominal Time for Condensate Removal to Begin {s}",
+        "     1.5,                     !- Speed 2 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}",
+        "     3.0,                     !- Speed 2 Maximum Cycling Rate {cycles/hr}",
+        "     45.0,                    !- Speed 2 Latent Capacity Time Constant {s}",
+        "     0.2,                     !- Speed 2 Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "     HAPCCoolWHFT Speed,      !- Speed 2 Waste Heat Function of Temperature Curve Name",
+        "     0.9,                     !- Speed 2 Evaporative Condenser Effectiveness {dimensionless}",
+        "     0.1,                     !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}",
+        "     60,                      !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}",
+        "     25500,                   !- Speed 3 Gross Rated Total Cooling Capacity {W}",
+        "     0.75,                    !- Speed 3 Gross Rated Sensible Heat Ratio",
+        "     4.0,                     !- Speed 3 Gross Rated Cooling COP {W/W}",
+        "     1.25,                    !- Speed 3 Rated Air Flow Rate {m3/s}",
+        "     573.3,                   !- Speed 3 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "     HPACCoolCapFT Speed,     !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name",
+        "     HPACCoolCapFF Speed,     !- Speed 3 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "     HPACCOOLEIRFT Speed,     !- Speed 3 Energy Input Ratio Function of Temperature Curve Name",
+        "     HPACCOOLEIRFF Speed,     !- Speed 3 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "     HPACCOOLPLFFPLR Speed,   !- Speed 3 Part Load Fraction Correlation Curve Name",
+        "     1000.0,                  !- Speed 3 Nominal Time for Condensate Removal to Begin {s}",
+        "     1.5,                     !- Speed 3 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}",
+        "     3.0,                     !- Speed 3 Maximum Cycling Rate {cycles/hr}",
+        "     45.0,                    !- Speed 3 Latent Capacity Time Constant {s}",
+        "     0.2,                     !- Speed 3 Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "     HAPCCoolWHFT Speed,      !- Speed 3 Waste Heat Function of Temperature Curve Name",
+        "     0.9,                     !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}",
+        "     0.2,                     !- Speed 3 Evaporative Condenser Air Flow Rate {m3/s}",
+        "     80,                      !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}",
+        "     35500,                   !- Speed 4 Gross Rated Total Cooling Capacity {W}",
+        "     0.75,                    !- Speed 4 Gross Rated Sensible Heat Ratio",
+        "     4.0,                     !- Speed 4 Gross Rated Cooling COP {W/W}",
+        "     1.75,                    !- Speed 4 Rated Air Flow Rate {m3/s}",
+        "     673.3,                   !- Speed 4 Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}",
+        "     HPACCoolCapFT Speed,     !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name",
+        "     HPACCoolCapFF Speed,     !- Speed 4 Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "     HPACCOOLEIRFT Speed,     !- Speed 4 Energy Input Ratio Function of Temperature Curve Name",
+        "     HPACCOOLEIRFF Speed,     !- Speed 4 Energy Input Ratio Function of Flow Fraction Curve Name",
+        "     HPACCOOLPLFFPLR Speed,   !- Speed 4 Part Load Fraction Correlation Curve Name",
+        "     1000.0,                  !- Speed 4 Nominal Time for Condensate Removal to Begin {s}",
+        "     1.5,                     !- Speed 4 Ratio of Initial Moisture Evaporation Rate and steady state Latent Capacity {dimensionless}",
+        "     4.0,                     !- Speed 4 Maximum Cycling Rate {cycles/hr}",
+        "     45.0,                    !- Speed 4 Latent Capacity Time Constant {s}",
+        "     0.2,                     !- Speed 4 Rated Waste Heat Fraction of Power Input {dimensionless}",
+        "     HAPCCoolWHFT Speed,      !- Speed 4 Waste Heat Function of Temperature Curve Name",
+        "     0.9,                     !- Speed 4 Evaporative Condenser Effectiveness {dimensionless}",
+        "     0.3,                     !- Speed 4 Evaporative Condenser Air Flow Rate {m3/s}",
+        "     100;                     !- Speed 4 Rated Evaporative Condenser Pump Power Consumption {W}",
+
+        "   OutdoorAir:Node,",
+        "     Outdoor Condenser Air Node,  !- Name",
+        "     1.0;                     !- Height Above Ground {m}",
+
+        "   Curve:Biquadratic,",
+        "     HPACCoolCapFT Speed,     !- Name",
+        "     0.476428E+00,            !- Coefficient1 Constant",
+        "     0.401147E-01,            !- Coefficient2 x",
+        "     0.226411E-03,            !- Coefficient3 x**2",
+        "    -0.827136E-03,            !- Coefficient4 y",
+        "    -0.732240E-05,            !- Coefficient5 y**2",
+        "    -0.446278E-03,            !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     23.88889,                !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     HPACCoolCapFF Speed,     !- Name",
+        "     0.47278589,              !- Coefficient1 Constant",
+        "     1.2433415,               !- Coefficient2 x",
+        "    -1.0387055,               !- Coefficient3 x**2",
+        "     0.32257813,              !- Coefficient4 x**3",
+        "     0.5,                     !- Minimum Value of x",
+        "     1.5;                     !- Maximum Value of x",
+
+        "   Curve:Biquadratic,",
+        "     HPACCOOLEIRFT Speed,     !- Name",
+        "     0.632475E+00,            !- Coefficient1 Constant",
+        "    -0.121321E-01,            !- Coefficient2 x",
+        "     0.507773E-03,            !- Coefficient3 x**2",
+        "     0.155377E-01,            !- Coefficient4 y",
+        "     0.272840E-03,            !- Coefficient5 y**2",
+        "    -0.679201E-03,            !- Coefficient6 x*y",
+        "     12.77778,                !- Minimum Value of x",
+        "     23.88889,                !- Maximum Value of x",
+        "     23.88889,                !- Minimum Value of y",
+        "     46.11111,                !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+
+        "   Curve:Cubic,",
+        "     HPACCOOLEIRFF Speed,     !- Name",
+        "     0.47278589,              !- Coefficient1 Constant",
+        "     1.2433415,               !- Coefficient2 x",
+        "    -1.0387055,               !- Coefficient3 x**2",
+        "     0.32257813,              !- Coefficient4 x**3",
+        "     0.5,                     !- Minimum Value of x",
+        "     1.5;                     !- Maximum Value of x",
+
+        "   Curve:Linear,",
+        "     HPACCOOLPLFFPLR Speed,   !- Name",
+        "     0.90,                    !- Coefficient1 Constant",
+        "     0.10,                    !- Coefficient2 x",
+        "     0.0,                     !- Minimum Value of x",
+        "     1.0;                     !- Maximum Value of x",
+
+        "   Curve:Biquadratic,",
+        "     HAPCCoolWHFT Speed,      !- Name",
+        "     1.0,                     !- Coefficient1 Constant",
+        "     0.0,                     !- Coefficient2 x",
+        "     0.0,                     !- Coefficient3 x**2",
+        "     0.0,                     !- Coefficient4 y",
+        "     0.0,                     !- Coefficient5 y**2",
+        "     0.0,                     !- Coefficient6 x*y",
+        "     0,                       !- Minimum Value of x",
+        "     50,                      !- Maximum Value of x",
+        "     0,                       !- Minimum Value of y",
+        "     50,                      !- Maximum Value of y",
+        "     ,                        !- Minimum Curve Output",
+        "     ,                        !- Maximum Curve Output",
+        "     Temperature,             !- Input Unit Type for X",
+        "     Temperature,             !- Input Unit Type for Y",
+        "     Dimensionless;           !- Output Unit Type",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    GetDXCoils(state);
+
+    auto &thisCoil(DXCoils::DXCoil(1));
+    auto &thisCoolPLFfPLR(PerfCurve(thisCoil.MSPLFFPLR(1)));
+    // ckeck user PLF curve coefficients
+    EXPECT_EQ(0.90, thisCoolPLFfPLR.Coeff1);
+    EXPECT_EQ(0.10, thisCoolPLFfPLR.Coeff2);
+    EXPECT_EQ(0.0, thisCoolPLFfPLR.Var1Min);
+    EXPECT_EQ(1.0, thisCoolPLFfPLR.Var1Max);
+    Real64 minEIRfLowPLRXInput(0.0);
+    Real64 maxEIRfLowPLRXInput(0.0);
+    // check user PLF curve PLR limits
+    CurveManager::GetCurveMinMaxValues(thisCoil.MSPLFFPLR(1), minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    EXPECT_EQ(0.0, minEIRfLowPLRXInput);
+    EXPECT_EQ(1.0, maxEIRfLowPLRXInput);
+
+    // Test 1: user PLF curve is different from the AHRI Std 210/240-2008 default PLF Curve
+    Array1D<Real64> NetCoolingCapRated(thisCoil.NumOfSpeeds);
+    Real64 SEER_User(0.0);
+    Real64 SEER_Standard(0.0);
+    NetCoolingCapRated = 0.0;
+    // calculate standard ratings for multispeed DX cooling coil
+    MultiSpeedDXCoolingCoilStandardRatings(thisCoil.MSCCapFTemp,
+                                           thisCoil.MSCCapFFlow,
+                                           thisCoil.MSEIRFTemp,
+                                           thisCoil.MSEIRFFlow,
+                                           thisCoil.MSPLFFPLR,
+                                           thisCoil.MSRatedTotCap,
+                                           thisCoil.MSRatedCOP,
+                                           thisCoil.MSRatedAirVolFlowRate,
+                                           thisCoil.MSFanPowerPerEvapAirFlowRate,
+                                           thisCoil.NumOfSpeeds,
+                                           NetCoolingCapRated(thisCoil.NumOfSpeeds),
+                                           SEER_User,
+                                           SEER_Standard);
+    // check SEER values calculated using user PLF and default PLF curve
+    EXPECT_NEAR(13.95, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.86, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+
+    // Test 2: user PLF curve is the same as the AHRI Std 210/240-2008 default PLF Curve
+    // reset the user PLF curve to the AHRI Std 210/240-2008 default PLF curve
+    // AHRI Std 210/240-2008 default PLF curve is linear equation, PLF = a + b * PLR
+    thisCoolPLFfPLR.Coeff1 = 0.75;  // = a 
+    thisCoolPLFfPLR.Coeff2 = 0.25;  // = b 
+    thisCoolPLFfPLR.Var1Min = 0.0;  // PLR minimum value allowed by the PLF curve
+    thisCoolPLFfPLR.Var1Max = 1.0;  // PLR maximum value allowed by the PLF curve
+    // reset output variables
+    SEER_User = 0.0;
+    SEER_Standard = 0.0;
+    NetCoolingCapRated = 0.0;
+    // rerun the standard ratings calculation
+    MultiSpeedDXCoolingCoilStandardRatings(thisCoil.MSCCapFTemp,
+                                           thisCoil.MSCCapFFlow,
+                                           thisCoil.MSEIRFTemp,
+                                           thisCoil.MSEIRFFlow,
+                                           thisCoil.MSPLFFPLR,
+                                           thisCoil.MSRatedTotCap,
+                                           thisCoil.MSRatedCOP,
+                                           thisCoil.MSRatedAirVolFlowRate,
+                                           thisCoil.MSFanPowerPerEvapAirFlowRate,
+                                           thisCoil.NumOfSpeeds,
+                                           NetCoolingCapRated(thisCoil.NumOfSpeeds),
+                                           SEER_User,
+                                           SEER_Standard);
+    // SEER and SEER_Default must match for the same PLF curve
+    EXPECT_DOUBLE_EQ(SEER_User, SEER_Standard);
+    EXPECT_NEAR(13.86, SEER_User * StandardRatings::ConvFromSIToIP, 0.01);
+    EXPECT_NEAR(13.86, SEER_Standard * StandardRatings::ConvFromSIToIP, 0.01);
+}
+
 } // namespace EnergyPlus

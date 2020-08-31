@@ -94,7 +94,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Output:Diagnostics,
     DisplayAllWarnings;      !- Key 1
@@ -4215,27 +4215,27 @@
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Heating Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Heating Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Cooling Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Cooling Electricity Energy,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Total Cooling Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Total Heating Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Crankcase Heater Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Crankcase Heater Electricity Energy,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Rate,timestep;
 
-  Output:Variable,*,VRF Heat Pump Defrost Electric Energy,timestep;
+  Output:Variable,*,VRF Heat Pump Defrost Electricity Energy,timestep;
 
   Output:Variable,*,VRF Heat Pump Indoor Unit Evaporating Temperature,timestep;
 
@@ -4245,17 +4245,17 @@
 
   Output:Variable,*,VRF Heat Pump Outdoor Unit Evaporating Temperature,timestep;
 
-  Output:Variable,*,VRF Heat Pump Compressor Electric Power,timestep;
+  Output:Variable,*,VRF Heat Pump Compressor Electricity Rate,timestep;
 
   Output:Variable,*,VRF Heat Pump Compressor Rotating Speed,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Power,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Power,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Energy,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Energy,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Energy,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Energy,timestep;
 
   Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,timestep;
 

@@ -49,13 +49,13 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/floops.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -63,7 +63,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
@@ -73,13 +72,14 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -87,6 +87,7 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
@@ -164,7 +165,6 @@ namespace WaterThermalTanks {
     Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
     std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
 
-    static ObjexxFCL::gio::Fmt fmtLD("*");
 
     bool getWaterThermalTankInputFlag(true); // Calls to Water Heater from multiple places in code
     bool calcWaterThermalTankZoneGainsMyEnvrnFlag(true);
@@ -193,11 +193,11 @@ namespace WaterThermalTanks {
         calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
     }
 
-    PlantComponent *WaterThermalTankData::factory(std::string const &objectName)
+    PlantComponent *WaterThermalTankData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -213,9 +213,9 @@ namespace WaterThermalTanks {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterThermalTankData::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void WaterThermalTankData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(true);
+        this->initialize(state, true);
         this->MinePlantStructForInfo();
         if (calledFromLocation.loopNum > 0) {
             if ((this->SrcSide.loopNum == calledFromLocation.loopNum) || (this->UseSide.loopNum == calledFromLocation.loopNum)) {
@@ -235,9 +235,9 @@ namespace WaterThermalTanks {
 
         if (DataPlant::PlantFirstSizesOkayToFinalize) {
             if (!this->IsChilledWaterTank) {
-                this->CalcStandardRatings(OutputFiles::getSingleton());
+                this->CalcStandardRatings(state);
             } else {
-                this->ReportCWTankInits(OutputFiles::getSingleton());
+                this->ReportCWTankInits(state.files);
             }
         }
     }
@@ -250,10 +250,10 @@ namespace WaterThermalTanks {
         OptLoad = this->MaxCapacity;
     }
 
-    int getTankIDX(std::string const &CompName, int &CompIndex)
+    int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -283,10 +283,10 @@ namespace WaterThermalTanks {
         return CompNum;
     }
 
-    int getHPTankIDX(std::string const &CompName, int &CompIndex)
+    int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -316,7 +316,7 @@ namespace WaterThermalTanks {
         return CompNum;
     }
 
-    void WaterThermalTankData::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    void WaterThermalTankData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -328,7 +328,7 @@ namespace WaterThermalTanks {
         this->callerLoopNum = calledFromLocation.loopNum;
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(state.files);
             this->myOneTimeInitFlag = false;
         }
 
@@ -346,7 +346,7 @@ namespace WaterThermalTanks {
         } else {
             this->UseCurrentFlowLock = 1;
         }
-        this->initialize(FirstHVACIteration);
+        this->initialize(state, FirstHVACIteration);
         //       Plant connected water heaters may have a desuperheater heating coil attached
         if (this->DesuperheaterNum == 0) {
             if ((this->TypeNum == DataPlant::TypeOf_WtrHeaterMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed)) {
@@ -363,11 +363,11 @@ namespace WaterThermalTanks {
         this->callerLoopNum = 0;
     }
 
-    PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
+    PlantComponent *HeatPumpWaterHeaterData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -383,10 +383,10 @@ namespace WaterThermalTanks {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void HeatPumpWaterHeaterData::onInitLoopEquip(const PlantLocation &calledFromLocation)
+    void HeatPumpWaterHeaterData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         auto &Tank = WaterThermalTank(this->WaterHeaterTankNum);
-        Tank.onInitLoopEquip(calledFromLocation);
+        Tank.onInitLoopEquip(state, calledFromLocation);
     }
 
     void HeatPumpWaterHeaterData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -399,7 +399,7 @@ namespace WaterThermalTanks {
         OptLoad = this->Capacity;
     }
 
-    void HeatPumpWaterHeaterData::simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
+    void HeatPumpWaterHeaterData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool EP_UNUSED(RunFlag))
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Brandon Anderson
@@ -414,7 +414,7 @@ namespace WaterThermalTanks {
 
         if (this->myOneTimeInitFlag) {
             if (Tank.myOneTimeInitFlag) {
-                Tank.setupOutputVars();
+                Tank.setupOutputVars(state.files);
                 Tank.myOneTimeInitFlag = false;
             }
             this->myOneTimeInitFlag = false;
@@ -435,7 +435,7 @@ namespace WaterThermalTanks {
             Tank.UseCurrentFlowLock = 1;
         }
 
-        Tank.initialize(FirstHVACIteration);
+        Tank.initialize(state, FirstHVACIteration);
 
         int InletNodeSav = this->HeatPumpAirInletNode;
         int OutletNodeSav = this->HeatPumpAirOutletNode;
@@ -449,7 +449,7 @@ namespace WaterThermalTanks {
             IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankType = this->TypeNum;
             IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankName = this->Name;
             IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankID = this->WaterHeaterTankNum;
-            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(this->DXCoilNum);
+            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(state, this->DXCoilNum);
 
             if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
                 (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
@@ -472,7 +472,7 @@ namespace WaterThermalTanks {
             }
         }
 
-        Tank.CalcHeatPumpWaterHeater(FirstHVACIteration);
+        Tank.CalcHeatPumpWaterHeater(state, FirstHVACIteration);
         Tank.UpdateWaterThermalTank();
         Tank.ReportWaterThermalTank();
 
@@ -486,7 +486,7 @@ namespace WaterThermalTanks {
         Tank.callerLoopNum = 0;
     }
 
-    void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration)
+    void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int const WaterHeaterNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -507,7 +507,7 @@ namespace WaterThermalTanks {
         Real64 MyLoad;
 
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -517,7 +517,7 @@ namespace WaterThermalTanks {
         if (Tank.StandAlone) {
             bool localRunFlag = true;
             PlantLocation A(0, 0, 0, 0);
-            Tank.simulate(A, FirstHVACIteration, MyLoad, localRunFlag);
+            Tank.simulate(state, A, FirstHVACIteration, MyLoad, localRunFlag);
 
             // HPWHs with inlet air from a zone and not connected to a plant loop are simulated through a CALL from ZoneEquipmentManager.
             // HPWHs that are plant connected are always simulated through a CALL from PlantLoopEquipments directly to SimWaterThermalTank.
@@ -532,7 +532,7 @@ namespace WaterThermalTanks {
                 (HPWaterHtr.InletAirConfiguration == AmbientTempEnum::OutsideAir || HPWaterHtr.InletAirConfiguration == AmbientTempEnum::Schedule)) {
                 bool LocalRunFlag = true;
                 PlantLocation A(0, 0, 0, 0);
-                HPWaterHtr.simulate(A, FirstHVACIteration, MyLoad, LocalRunFlag);
+                HPWaterHtr.simulate(state, A, FirstHVACIteration, MyLoad, LocalRunFlag);
             }
 
             // Only simulate stand-alone water heaters with desuperheater water heating coils here.  Plant connected water heaters
@@ -541,12 +541,12 @@ namespace WaterThermalTanks {
             if (WaterHeaterDesuperheater(Tank.DesuperheaterNum).StandAlone) {
                 bool localRunFlag = true;
                 PlantLocation A(0, 0, 0, 0);
-                Tank.simulate(A, FirstHVACIteration, MyLoad, localRunFlag);
+                Tank.simulate(state, A, FirstHVACIteration, MyLoad, localRunFlag);
             }
         }
     }
 
-    void SimHeatPumpWaterHeater(std::string const &CompName,
+    void SimHeatPumpWaterHeater(EnergyPlusData &state, std::string const &CompName,
                                 bool const FirstHVACIteration,
                                 Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -567,7 +567,7 @@ namespace WaterThermalTanks {
 
         // FLOW:
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput(OutputFiles::getSingleton());
+            GetWaterThermalTankInput(state);
             getWaterThermalTankInputFlag = false;
         }
 
@@ -600,7 +600,7 @@ namespace WaterThermalTanks {
             Real64 MyLoad;
 
             PlantLocation A(0, 0, 0, 0);
-            HPWaterHeater(HeatPumpNum).simulate(A, FirstHVACIteration, MyLoad, LocalRunFlag);
+            HPWaterHeater(HeatPumpNum).simulate(state, A, FirstHVACIteration, MyLoad, LocalRunFlag);
 
             SensLoadMet = HPWaterHeater(HeatPumpNum).HPWaterHeaterSensibleCapacity;
             LatLoadMet = HPWaterHeater(HeatPumpNum).HPWaterHeaterLatentCapacity;
@@ -611,7 +611,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void CalcWaterThermalTankZoneGains()
+    void CalcWaterThermalTankZoneGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -635,7 +635,7 @@ namespace WaterThermalTanks {
                 return;
             } else {
                 if (getWaterThermalTankInputFlag) {
-                    GetWaterThermalTankInput(OutputFiles::getSingleton());
+                    GetWaterThermalTankInput(state);
                     getWaterThermalTankInputFlag = false;
                 }
                 if (numWaterThermalTank == 0) return;
@@ -697,7 +697,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    bool getDesuperHtrInput()
+    bool getDesuperHtrInput(EnergyPlusData &state)
     {
         bool ErrorsFound = false;
         std::string const RoutineName = "getDesuperHtrInput";
@@ -938,10 +938,12 @@ namespace WaterThermalTanks {
                 } else {
                     WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSource = CoilObjEnum::DXMultiSpeed;
                 }
-                DXCoils::GetDXCoilIndex(WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
+                DXCoils::GetDXCoilIndex(state,
+                                        WaterHeaterDesuperheater(DesuperheaterNum).HeatingSourceName,
                                         WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum,
                                         errFlag,
-                                        DataIPShortCuts::cCurrentModuleObject);
+                                        DataIPShortCuts::cCurrentModuleObject,
+                                        ObjexxFCL::Optional_bool_const());
                 if (allocated(DataHeatBalance::HeatReclaimDXCoil)) {
                     DataHeatBalance::HeatReclaimDataBase &HeatReclaim =
                         DataHeatBalance::HeatReclaimDXCoil(WaterHeaterDesuperheater(DesuperheaterNum).ReclaimHeatingSourceIndexNum);
@@ -1090,7 +1092,7 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     } // namespace WaterThermalTanks
 
-    bool getHPWaterHeaterInput()
+    bool getHPWaterHeaterInput(EnergyPlusData &state)
     {
         bool ErrorsFound = false;
 
@@ -1403,7 +1405,7 @@ namespace WaterThermalTanks {
             // check that the DX Coil exists
             bool DXCoilErrFlag = false;
             bool bIsVScoil = false;
-            DXCoils::GetDXCoilIndex(HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
+            DXCoils::GetDXCoilIndex(state, HPWH.DXCoilName, HPWH.DXCoilNum, DXCoilErrFlag, DataIPShortCuts::cCurrentModuleObject, true);
             if (DXCoilErrFlag) {
                 // This could be a variable speed heat pump water heater
                 bool bVSCoilErrFlag = false;
@@ -1575,13 +1577,13 @@ namespace WaterThermalTanks {
             } else {
                 if (UtilityRoutines::SameString(HPWH.FanType, "Fan:SystemModel")) {
                     HPWH.FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(HPWH.FanName)); // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, HPWH.FanName)); // call constructor
                     HPWH.FanNum = HVACFan::getFanObjectVectorIndex(HPWH.FanName);
                     FanVolFlow = HVACFan::fanObjs[HPWH.FanNum]->designAirVolFlowRate;
 
                 } else {
-                    Fans::GetFanType(HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
-                    Fans::GetFanIndex(HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
+                    Fans::GetFanType(state, HPWH.FanName, HPWH.FanType_Num, errFlag, DataIPShortCuts::cCurrentModuleObject, HPWH.Name);
+                    Fans::GetFanIndex(state, HPWH.FanName, HPWH.FanNum, errFlag, DataIPShortCuts::cCurrentModuleObject);
                     Fans::GetFanVolFlow(HPWH.FanNum, FanVolFlow);
                 }
             }
@@ -1590,9 +1592,9 @@ namespace WaterThermalTanks {
                 VariableSpeedCoils::setVarSpeedHPWHFanTypeNum(HPWH.DXCoilNum, HPWH.FanType_Num);
                 VariableSpeedCoils::setVarSpeedHPWHFanIndex(HPWH.DXCoilNum, HPWH.FanNum);
             } else {
-                DXCoils::SetDXCoolingCoilData(HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
-                DXCoils::SetDXCoolingCoilData(HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanNum);
-                DXCoils::SetDXCoolingCoilData(
+                DXCoils::SetDXCoolingCoilData(state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanName);
+                DXCoils::SetDXCoolingCoilData(state, HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanNum);
+                DXCoils::SetDXCoolingCoilData(state,
                     HPWH.DXCoilNum, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, HPWH.FanType_Num);
             }
 
@@ -1651,7 +1653,7 @@ namespace WaterThermalTanks {
 
                 if (HPWH.bIsIHP) {
                     HPWH.Capacity =
-                        GetDWHCoilCapacityIHP(HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
+                        GetDWHCoilCapacityIHP(state, HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
                     HPWH.DXCoilAirInletNode = IntegratedHeatPump::GetCoilInletNodeIHP(HPWH.DXCoilType, HPWH.DXCoilName, DXCoilErrFlag);
                     HPWH.DXCoilPLFFPLR =
                         GetIHPDWHCoilPLFFPLR(HPWH.DXCoilType, HPWH.DXCoilName, IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode, DXCoilErrFlag);
@@ -1912,7 +1914,7 @@ namespace WaterThermalTanks {
             if ((HPWH.InletAirConfiguration == AmbientTempEnum::TempZone || HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) &&
                 HPWH.AmbientTempZone > 0) {
                 if (!DataZoneEquipment::ZoneEquipInputsFilled) {
-                    DataZoneEquipment::GetZoneEquipmentData();
+                    DataZoneEquipment::GetZoneEquipmentData(state);
                     DataZoneEquipment::ZoneEquipInputsFilled = true;
                 }
                 if (allocated(DataZoneEquipment::ZoneEquipConfig)) {
@@ -2006,7 +2008,7 @@ namespace WaterThermalTanks {
                 FanOutletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->outletNodeNum;
             } else {
                 errFlag = false;
-                FanOutletNodeNum = Fans::GetFanOutletNode(HPWH.FanType, HPWH.FanName, errFlag);
+                FanOutletNodeNum = Fans::GetFanOutletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -2028,7 +2030,7 @@ namespace WaterThermalTanks {
                 FanInletNodeNum = HVACFan::fanObjs[HPWH.FanNum]->inletNodeNum;
             } else {
                 errFlag = false;
-                FanInletNodeNum = Fans::GetFanInletNode(HPWH.FanType, HPWH.FanName, errFlag);
+                FanInletNodeNum = Fans::GetFanInletNode(state, HPWH.FanType, HPWH.FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in unit=\"" + HPWH.Name + "\".");
                     ErrorsFound = true;
@@ -2327,10 +2329,10 @@ namespace WaterThermalTanks {
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(4));
                 if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.FuelType = "Gas";
+                    Tank.FuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.FuelType = "Diesel";
@@ -2342,10 +2344,10 @@ namespace WaterThermalTanks {
                     Tank.FuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.FuelType = "FuelOil#1";
+                    Tank.FuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.FuelType = "FuelOil#2";
+                    Tank.FuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
@@ -2366,7 +2368,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Heater Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(4));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2413,10 +2415,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OffCycParaFuelType = "Gas";
+                    Tank.OffCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OffCycParaFuelType = "Diesel";
@@ -2428,10 +2430,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OffCycParaFuelType = "FuelOil#1";
+                    Tank.OffCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OffCycParaFuelType = "FuelOil#2";
+                    Tank.OffCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
@@ -2452,7 +2454,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(6));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2468,10 +2470,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OnCycParaFuelType = "Gas";
+                    Tank.OnCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OnCycParaFuelType = "Diesel";
@@ -2483,10 +2485,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OnCycParaFuelType = "FuelOil#1";
+                    Tank.OnCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OnCycParaFuelType = "FuelOil#2";
+                    Tank.OnCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OnCycParaFuelType = "Propane";
@@ -2507,7 +2509,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid On-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(7));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2918,10 +2920,10 @@ namespace WaterThermalTanks {
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(7));
                 if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.FuelType = "Gas";
+                    Tank.FuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.FuelType = "Diesel";
@@ -2933,10 +2935,10 @@ namespace WaterThermalTanks {
                     Tank.FuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.FuelType = "FuelOil#1";
+                    Tank.FuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.FuelType = "FuelOil#2";
+                    Tank.FuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.FuelType = "Propane";
@@ -2957,7 +2959,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Heater Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(7));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.FuelType = "Electric";
+                    Tank.FuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -2979,10 +2981,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OffCycParaFuelType = "Gas";
+                    Tank.OffCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OffCycParaFuelType = "Diesel";
@@ -2994,10 +2996,10 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OffCycParaFuelType = "FuelOil#1";
+                    Tank.OffCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OffCycParaFuelType = "FuelOil#2";
+                    Tank.OffCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OffCycParaFuelType = "Propane";
@@ -3018,7 +3020,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(8));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OffCycParaFuelType = "Electric";
+                    Tank.OffCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -3035,10 +3037,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = Tank.FuelType;
 
                 } else if (SELECT_CASE_var == "ELECTRICITY") {
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
 
                 } else if (SELECT_CASE_var == "NATURALGAS") {
-                    Tank.OnCycParaFuelType = "Gas";
+                    Tank.OnCycParaFuelType = "NaturalGas";
 
                 } else if (SELECT_CASE_var == "DIESEL") {
                     Tank.OnCycParaFuelType = "Diesel";
@@ -3050,10 +3052,10 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Coal";
 
                 } else if (SELECT_CASE_var == "FUELOILNO1") {
-                    Tank.OnCycParaFuelType = "FuelOil#1";
+                    Tank.OnCycParaFuelType = "FuelOilNo1";
 
                 } else if (SELECT_CASE_var == "FUELOILNO2") {
-                    Tank.OnCycParaFuelType = "FuelOil#2";
+                    Tank.OnCycParaFuelType = "FuelOilNo2";
 
                 } else if (SELECT_CASE_var == "PROPANE") {
                     Tank.OnCycParaFuelType = "Propane";
@@ -3074,7 +3076,7 @@ namespace WaterThermalTanks {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid On-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(9));
                     // Set to Electric to avoid errors when setting up output variables
-                    Tank.OnCycParaFuelType = "Electric";
+                    Tank.OnCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
             }
@@ -3343,19 +3345,27 @@ namespace WaterThermalTanks {
             }
 
             Tank.Nodes = DataIPShortCuts::rNumericArgs(32);
+            int specifiedNodes = 0;
             Tank.AdditionalCond = DataIPShortCuts::rNumericArgs(33);
 
             Tank.AdditionalLossCoeff.allocate(Tank.Nodes);
             Tank.AdditionalLossCoeff = 0.0;
-            for (int NodeNum = 1; NodeNum <= Tank.Nodes; ++NodeNum) {
-                if (NumNums > 32 + NodeNum) {
-                    Tank.AdditionalLossCoeff(NodeNum) = DataIPShortCuts::rNumericArgs(33 + NodeNum);
+            for (int NodeNum = 1; NodeNum <= 12; ++NodeNum) {
+                int index = 33 + NodeNum;
+                if (NumNums >= index) {
+                    if (NodeNum <= Tank.Nodes) {
+                        ++specifiedNodes;
+                        Tank.AdditionalLossCoeff(NodeNum) = DataIPShortCuts::rNumericArgs(index);
+                    } else if (!DataIPShortCuts::lNumericFieldBlanks(index) && (DataIPShortCuts::rNumericArgs(index) != 0)) {
+                        // If either blank, or zero (default), then do not warn
+                        ++specifiedNodes;
+                    }
                 } else {
                     break;
                 }
             }
 
-            if (NumNums > 33 + Tank.Nodes) {
+            if (specifiedNodes > Tank.Nodes) {
                 ShowWarningError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                  ":  More Additional Loss Coefficients were entered than the number of nodes; extra coefficients will not be used");
             }
@@ -3473,14 +3483,14 @@ namespace WaterThermalTanks {
 
             Tank.MassFlowRateMin = 0.0;
             Tank.IgnitionDelay = 0.0;
-            Tank.FuelType = "Electric";
+            Tank.FuelType = "Electricity";
             Tank.Efficiency = 1.0;
             Tank.PLFCurve = 0;
             Tank.OffCycParaLoad = 0.0;
-            Tank.OffCycParaFuelType = "Electric";
+            Tank.OffCycParaFuelType = "Electricity";
             Tank.OffCycParaFracToTank = 0.0;
             Tank.OnCycParaLoad = 0.0;
-            Tank.OnCycParaFuelType = "Electric";
+            Tank.OnCycParaFuelType = "Electricity";
             Tank.OnCycParaFracToTank = 0.0;
 
             {
@@ -3774,14 +3784,14 @@ namespace WaterThermalTanks {
             Tank.SetPointTempSchedule2 = 0;
             Tank.MaxCapacity2 = 0.0;
             Tank.HeaterHeight2 = 0.0;
-            Tank.FuelType = "Electric";
+            Tank.FuelType = "Electricity";
 
             Tank.OffCycParaLoad = 0.0;
-            Tank.OffCycParaFuelType = "Electric";
+            Tank.OffCycParaFuelType = "Electricity";
             Tank.OffCycParaFracToTank = 0.0;
             Tank.OffCycParaHeight = 0.0;
             Tank.OnCycParaLoad = 0.0;
-            Tank.OnCycParaFuelType = "Electric";
+            Tank.OnCycParaFuelType = "Electricity";
             Tank.OnCycParaFracToTank = 0.0;
             Tank.OnCycParaHeight = 0.0;
 
@@ -4033,7 +4043,7 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    bool GetWaterThermalTankInput(OutputFiles &outputFiles)
+    bool GetWaterThermalTankInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4043,7 +4053,7 @@ namespace WaterThermalTanks {
         //                      B. Griffith, Oct. 2007 extensions for indirect water heaters
         //                      B. Griffith, Feb. 2008 extensions for autosizing water heaters
         //                      BG Mar 2009.  Trap for bad heater height input for stratified water heater CR7718
-        //						B. Shen 12/2014, add air-source variable-speed heat pump water heating
+        //                      B. Shen 12/2014, add air-source variable-speed heat pump water heating
 
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the water heater, HPWH, and/or desuperheater heating coil input from the input file.
@@ -4054,7 +4064,7 @@ namespace WaterThermalTanks {
         static std::string const RoutineNameNoColon("GetWaterThermalTankInput");
 
         // Make sure refrigeration input is gotten before this input
-        RefrigeratedCase::CheckRefrigerationInput();
+        RefrigeratedCase::CheckRefrigerationInput(state);
 
         if (getWaterThermalTankInputFlag) {
             numWaterHeaterMixed = inputProcessor->getNumObjectsFound(cMixedWHModuleObj);
@@ -4083,11 +4093,11 @@ namespace WaterThermalTanks {
                     "Inlets,Number Of Outlets\n");
 
                 // Write water heater header for EIO
-                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(outputFiles.eio, Format_720);
-                if (numHeatPumpWaterHeater > 0) print(outputFiles.eio, Format_721);
-                if (numWaterHeaterStratified > 0) print(outputFiles.eio, Format_722);
-                if (numChilledWaterMixed > 0) print(outputFiles.eio, Format_725);
-                if (numChilledWaterStratified > 0) print(outputFiles.eio, Format_726);
+                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(state.files.eio, Format_720);
+                if (numHeatPumpWaterHeater > 0) print(state.files.eio, Format_721);
+                if (numWaterHeaterStratified > 0) print(state.files.eio, Format_722);
+                if (numChilledWaterMixed > 0) print(state.files.eio, Format_725);
+                if (numChilledWaterStratified > 0) print(state.files.eio, Format_726);
             }
 
             if (numWaterThermalTank > 0) {
@@ -4104,12 +4114,12 @@ namespace WaterThermalTanks {
 
             // =======   Get Coil:WaterHeating:Desuperheater ======================================================================
             if (numWaterHeaterDesuperheater > 0) {
-                ErrorsFound |= getDesuperHtrInput();
+                ErrorsFound |= getDesuperHtrInput(state);
             }
 
             //  =======   Get HEAT PUMP:WATER HEATER ===============================================================================
             if (numHeatPumpWaterHeater > 0) {
-                ErrorsFound |= getHPWaterHeaterInput();
+                ErrorsFound |= getHPWaterHeaterInput(state);
             }
 
             //  =======   Get WATER HEATER:MIXED ===================================================================================
@@ -4238,8 +4248,8 @@ namespace WaterThermalTanks {
                         BranchNodeConnections::SetUpCompSets(
                             HPWH.Type, HPWH.Name, HPWH.TankType, HPWH.TankName, HPWH.OutletNodeName1, HPWH.InletNodeName1, "HPWH To Tank");
 
-                        // do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
-                        if (Tank.ControlType == ControlTypeEnum::Modulate) {
+                        // If WaterHeaterMixed: do not allow modulating control for HPWH's (i.e. modulating control usually used for tankless WH's)
+                        if ((Tank.TypeNum == DataPlant::TypeOf_WtrHeaterMixed) && (Tank.ControlType == ControlTypeEnum::Modulate)) {
                             ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + HPWH.Name + ':');
                             ShowContinueError("Heater Control Type for " + Tank.Type + " = " + Tank.Name + " must be CYCLE.");
                             ErrorsFound = true;
@@ -4782,19 +4792,19 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    void WaterThermalTankData::setupOutputVars()
+    void WaterThermalTankData::setupOutputVars(IOFiles &ioFiles)
     {
         if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-            this->setupChilledWaterTankOutputVars(OutputFiles::getSingleton());
+            this->setupChilledWaterTankOutputVars(ioFiles);
         } else {
             // moving setupWaterHeaterOutputVars to here causes big table diffs...
-            this->setupWaterHeaterOutputVars(OutputFiles::getSingleton());
+            this->setupWaterHeaterOutputVars(ioFiles);
         }
         // moving setupZoneInternalGains to here causes math and table diffs...
         // this->setupZoneInternalGains();
     }
 
-    void WaterThermalTankData::setupChilledWaterTankOutputVars(OutputFiles &outputFiles)
+    void WaterThermalTankData::setupChilledWaterTankOutputVars(IOFiles &ioFiles)
     {
 
         // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
@@ -4895,7 +4905,7 @@ namespace WaterThermalTanks {
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_724,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -4943,7 +4953,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::setupWaterHeaterOutputVars(OutputFiles &outputFiles)
+    void WaterThermalTankData::setupWaterHeaterOutputVars(IOFiles &ioFiles)
     {
 
         // Setup report variables for WaterHeater:Mixed
@@ -5040,8 +5050,8 @@ namespace WaterThermalTanks {
         SetupOutputVariable("Water Heater Runtime Fraction", OutputProcessor::Unit::None, this->RuntimeFraction, "System", "Average", this->Name);
         SetupOutputVariable("Water Heater Part Load Ratio", OutputProcessor::Unit::None, this->PartLoadRatio, "System", "Average", this->Name);
 
-        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
-            SetupOutputVariable("Water Heater Electric Power", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
+        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
+            SetupOutputVariable("Water Heater Electricity Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
         } else {
             SetupOutputVariable(
                 "Water Heater " + this->FuelType + " Rate", OutputProcessor::Unit::W, this->FuelRate, "System", "Average", this->Name);
@@ -5057,8 +5067,8 @@ namespace WaterThermalTanks {
                             "DHW",
                             this->EndUseSubcategoryName,
                             "Plant");
-        if (UtilityRoutines::SameString(this->OffCycParaFuelType, "Electric")) {
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electric Power",
+        if (UtilityRoutines::SameString(this->OffCycParaFuelType, "Electricity")) {
+            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->OffCycParaFuelRate,
                                 "System",
@@ -5083,9 +5093,9 @@ namespace WaterThermalTanks {
                             "DHW",
                             this->EndUseSubcategoryName,
                             "Plant");
-        if (UtilityRoutines::SameString(this->OnCycParaFuelType, "Electric")) {
+        if (UtilityRoutines::SameString(this->OnCycParaFuelType, "Electricity")) {
             SetupOutputVariable(
-                "Water Heater On Cycle Parasitic Electric Power", OutputProcessor::Unit::W, this->OnCycParaFuelRate, "System", "Average", this->Name);
+                "Water Heater On Cycle Parasitic Electricity Rate", OutputProcessor::Unit::W, this->OnCycParaFuelRate, "System", "Average", this->Name);
         } else {
             SetupOutputVariable("Water Heater On Cycle Parasitic " + this->OnCycParaFuelType + " Rate",
                                 OutputProcessor::Unit::W,
@@ -5137,28 +5147,28 @@ namespace WaterThermalTanks {
             SetupOutputVariable(
                 "Water Heater Compressor Part Load Ratio", OutputProcessor::Unit::None, HPWH.HeatingPLR, "System", "Average", HPWH.Name);
             SetupOutputVariable(
-                "Water Heater Off Cycle Ancillary Electric Power", OutputProcessor::Unit::W, HPWH.OffCycParaFuelRate, "System", "Average", HPWH.Name);
-            SetupOutputVariable("Water Heater Off Cycle Ancillary Electric Energy",
+                "Water Heater Off Cycle Ancillary Electricity Rate", OutputProcessor::Unit::W, HPWH.OffCycParaFuelRate, "System", "Average", HPWH.Name);
+            SetupOutputVariable("Water Heater Off Cycle Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HPWH.OffCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 HPWH.Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
             SetupOutputVariable(
-                "Water Heater On Cycle Ancillary Electric Power", OutputProcessor::Unit::W, HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name);
-            SetupOutputVariable("Water Heater On Cycle Ancillary Electric Energy",
+                "Water Heater On Cycle Ancillary Electricity Rate", OutputProcessor::Unit::W, HPWH.OnCycParaFuelRate, "System", "Average", HPWH.Name);
+            SetupOutputVariable("Water Heater On Cycle Ancillary Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 HPWH.OnCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 HPWH.Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
@@ -5180,37 +5190,37 @@ namespace WaterThermalTanks {
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater On Cycle Parasitic Electric Power",
+            SetupOutputVariable("Water Heater On Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelRate,
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater On Cycle Parasitic Electric Energy",
+            SetupOutputVariable("Water Heater On Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OnCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electric Power",
+            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelRate,
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Off Cycle Parasitic Electric Energy",
+            SetupOutputVariable("Water Heater Off Cycle Parasitic Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).OffCycParaFuelEnergy,
                                 "System",
                                 "Sum",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Water Heater Parasitic",
                                 "Plant");
@@ -5220,20 +5230,20 @@ namespace WaterThermalTanks {
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Pump Electric Power",
+            SetupOutputVariable("Water Heater Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).PumpPower,
                                 "System",
                                 "Average",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name);
-            SetupOutputVariable("Water Heater Pump Electric Energy",
+            SetupOutputVariable("Water Heater Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).PumpEnergy,
                                 "System",
                                 "Sum",
                                 WaterHeaterDesuperheater(this->DesuperheaterNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "DHW",
                                 "Desuperheater Pump",
                                 "Plant");
@@ -5299,7 +5309,7 @@ namespace WaterThermalTanks {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
                 static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       Format_723,
                       NodeNum,
                       this->Node(NodeNum).Height,
@@ -5557,7 +5567,7 @@ namespace WaterThermalTanks {
         } // NodeNum
     }
 
-    void WaterThermalTankData::initialize(bool const FirstHVACIteration)
+    void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5579,11 +5589,11 @@ namespace WaterThermalTanks {
         static std::string const GetWaterThermalTankInput("GetWaterThermalTankInput");
         static std::string const SizeTankForDemand("SizeTankForDemandSide");
 
-        if (this->SetLoopIndexFlag && allocated(DataPlant::PlantLoop)) {
-
+        if (this->scanPlantLoopsFlag && allocated(DataPlant::PlantLoop)) {
             if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->Name,
                                                         this->TypeNum,
                                                         this->UseSide.loopNum,
                                                         this->UseSide.loopSideNum,
@@ -5598,23 +5608,13 @@ namespace WaterThermalTanks {
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
-                                                               DataGlobals::InitConvTemp,
-                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
-                                                               GetWaterThermalTankInput);
-                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
-                this->Mass = this->Volume * rho;
-                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
-                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
-                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
-                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
-                }
             }
             if ((this->UseInletNode > 0) && (this->HeatPumpNum > 0)) {
                 // this is a heat pump water heater, need a separate block because TypeOf_HeatPumpWtrHeater shows up on Branch
                 //  (input should probably have been the associated tank )
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(HPWaterHeater(this->HeatPumpNum).Name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        HPWaterHeater(this->HeatPumpNum).Name,
                                                         HPWaterHeater(this->HeatPumpNum).TypeNum,
                                                         this->UseSide.loopNum,
                                                         this->UseSide.loopSideNum,
@@ -5629,21 +5629,11 @@ namespace WaterThermalTanks {
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
-                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
-                                                               DataGlobals::InitConvTemp,
-                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
-                                                               GetWaterThermalTankInput);
-                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
-                this->Mass = this->Volume * rho;
-                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
-                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
-                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
-                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
-                }
             }
             if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(this->Name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->Name,
                                                         this->TypeNum,
                                                         this->SrcSide.loopNum,
                                                         this->SrcSide.loopSideNum,
@@ -5657,12 +5647,43 @@ namespace WaterThermalTanks {
                                                         _);
                 if (this->UseInletNode > 0) {
                     PlantUtilities::InterConnectTwoPlantLoopSides(
-                        this->UseSide.loopNum, this->UseSide.loopSideNum, this->SrcSide.loopNum, this->SrcSide.loopSideNum, this->TypeNum, true);
+                            this->UseSide.loopNum, this->UseSide.loopSideNum, this->SrcSide.loopNum, this->SrcSide.loopSideNum, this->TypeNum, true);
                 }
-
                 if (errFlag) {
                     ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
                 }
+            }
+            this->scanPlantLoopsFlag = false;
+        }
+
+        if (this->SetLoopIndexFlag && allocated(DataPlant::PlantLoop)) {
+            if ((this->UseInletNode > 0) && (this->HeatPumpNum == 0)) {
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                                                               DataGlobals::InitConvTemp,
+                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
+                                                               GetWaterThermalTankInput);
+                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
+                this->Mass = this->Volume * rho;
+                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
+                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
+                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
+                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
+                }
+            }
+            if ((this->UseInletNode > 0) && (this->HeatPumpNum > 0)) {
+                Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->UseSide.loopNum).FluidName,
+                                                               DataGlobals::InitConvTemp,
+                                                               DataPlant::PlantLoop(this->UseSide.loopNum).FluidIndex,
+                                                               GetWaterThermalTankInput);
+                this->PlantUseMassFlowRateMax = this->UseDesignVolFlowRate * rho;
+                this->Mass = this->Volume * rho;
+                this->UseSidePlantSizNum = DataPlant::PlantLoop(this->UseSide.loopNum).PlantSizNum;
+                if ((this->UseDesignVolFlowRateWasAutoSized) && (this->UseSidePlantSizNum == 0)) {
+                    ShowSevereError("InitWaterThermalTank: Did not find Sizing:Plant object for use side of plant thermal tank = " + this->Name);
+                    ShowFatalError("InitWaterThermalTank: Program terminated due to previous condition(s).");
+                }
+            }
+            if ((this->SourceInletNode > 0) && (this->DesuperheaterNum == 0) && (this->HeatPumpNum == 0)) {
                 Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->SrcSide.loopNum).FluidName,
                                                                DataGlobals::InitConvTemp,
                                                                DataPlant::PlantLoop(this->SrcSide.loopNum).FluidIndex,
@@ -5677,13 +5698,11 @@ namespace WaterThermalTanks {
             if (((this->SourceInletNode > 0) && (this->DesuperheaterNum > 0)) || (this->HeatPumpNum > 0)) {
                 this->SetLoopIndexFlag = false;
             }
-
             if (DataPlant::PlantFirstSizesOkayToFinalize) this->SetLoopIndexFlag = false;
             if (this->StandAlone) {
                 this->SizeStandAloneWaterHeater();
                 this->SetLoopIndexFlag = false;
             }
-
         } else if (this->SetLoopIndexFlag && !DataGlobals::AnyPlantInModel) {
             if (this->StandAlone) {
                 this->SizeStandAloneWaterHeater();
@@ -6220,7 +6239,7 @@ namespace WaterThermalTanks {
             // initialize flow rates at speed levels for variable-speed HPWH
             if ((HPWaterHeater(HPNum).bIsIHP) && (0 == HPWaterHeater(HPNum).NumofSpeed)) // use SCWH coil represents
             {
-                IntegratedHeatPump::SizeIHP(HPWaterHeater(HPNum).DXCoilNum); //
+                IntegratedHeatPump::SizeIHP(state, HPWaterHeater(HPNum).DXCoilNum); //
                 // IntegratedHeatPump::SimIHP(modBlankString, HPWaterHeater(HPNum).DXCoilNum,
                 //	0, EMP1, EMP2, EMP3, 0, 0.0, 1, 0.0, 0.0, 0.0, false, 0.0); //conduct the sizing operation in the IHP
                 int VSCoilID = IntegratedHeatPump::IntegratedHeatPumps(HPWaterHeater(HPNum).DXCoilNum).SCWHCoilIndex;
@@ -6231,7 +6250,7 @@ namespace WaterThermalTanks {
                 Real64 EMP1 = 4.0;
                 Real64 EMP2 = 0.0;
                 Real64 EMP3 = 0.0;
-                VariableSpeedCoils::SimVariableSpeedCoils(blankString,
+                VariableSpeedCoils::SimVariableSpeedCoils(state, blankString,
                                                           HPWaterHeater(HPNum).DXCoilNum,
                                                           0,
                                                           EMP1,
@@ -6336,7 +6355,7 @@ namespace WaterThermalTanks {
                 this->AlreadyRated = true;
             } else {
                 if (!DataGlobals::AnyPlantInModel || DataPlant::PlantFirstSizesOkayToReport || this->MaxCapacity > 0.0 || this->HeatPumpNum > 0) {
-                    this->CalcStandardRatings(OutputFiles::getSingleton());
+                    this->CalcStandardRatings(state);
                 }
             }
         }
@@ -8254,8 +8273,7 @@ namespace WaterThermalTanks {
                                 std::string IterNum;
                                 General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                 if (SolFla == -1) {
-                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                    strip(IterNum);
+                                    IterNum = fmt::to_string(MaxIte);
                                     if (!DataGlobals::WarmupFlag) {
                                         ++DesupHtr.IterLimitExceededNum1;
                                         if (DesupHtr.IterLimitExceededNum1 == 1) {
@@ -8372,8 +8390,7 @@ namespace WaterThermalTanks {
                                     std::string IterNum;
                                     General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
                                     if (SolFla == -1) {
-                                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                        strip(IterNum);
+                                        IterNum = fmt::to_string(MaxIte);
                                         if (!DataGlobals::WarmupFlag) {
                                             ++DesupHtr.IterLimitExceededNum2;
                                             if (DesupHtr.IterLimitExceededNum2 == 1) {
@@ -8491,7 +8508,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::CalcHeatPumpWaterHeater(bool const FirstHVACIteration)
+    void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8584,16 +8601,16 @@ namespace WaterThermalTanks {
                 int SpeedNum = 1;
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                    this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                     if (HeatPump.bIsIHP)
-                        VariableSpeedCoils::SimVariableSpeedCoils(
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
                             "", VSCoilNum, DataHVACGlobals::CycFanCycCoil, EMP1, EMP2, EMP3, 1, hpPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
                     else
-                        VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                        VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                                   VSCoilNum,
                                                                   DataHVACGlobals::CycFanCycCoil,
                                                                   EMP1,
@@ -8607,12 +8624,12 @@ namespace WaterThermalTanks {
                                                                   0.0,
                                                                   1.0);
                 } else {
-                    this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                    this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                     if (HeatPump.bIsIHP)
-                        VariableSpeedCoils::SimVariableSpeedCoils(
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
                             "", VSCoilNum, DataHVACGlobals::CycFanCycCoil, EMP1, EMP2, EMP3, 1, hpPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
                     else
-                        VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                        VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                                   VSCoilNum,
                                                                   DataHVACGlobals::CycFanCycCoil,
                                                                   EMP1,
@@ -8626,9 +8643,9 @@ namespace WaterThermalTanks {
                                                                   0.0,
                                                                   1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
                 }
 
@@ -8640,12 +8657,12 @@ namespace WaterThermalTanks {
                     {
                         if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                             if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                                Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                             }
-                            this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
-                            VariableSpeedCoils::SimVariableSpeedCoils("",
+                            this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                            VariableSpeedCoils::SimVariableSpeedCoils(state, "",
                                                                       VSCoilNum,
                                                                       DataHVACGlobals::CycFanCycCoil,
                                                                       EMP1,
@@ -8659,8 +8676,8 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                         } else {
-                            this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
-                            VariableSpeedCoils::SimVariableSpeedCoils("",
+                            this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                            VariableSpeedCoils::SimVariableSpeedCoils(state, "",
                                                                       VSCoilNum,
                                                                       DataHVACGlobals::CycFanCycCoil,
                                                                       EMP1,
@@ -8674,9 +8691,9 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                                Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                             }
                         }
                     }
@@ -8685,19 +8702,19 @@ namespace WaterThermalTanks {
             } else {
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    DXCoils::SimDXCoil(
+                    DXCoils::SimDXCoil(state,
                         HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                 } else {
-                    DXCoils::SimDXCoil(
+                    DXCoils::SimDXCoil(state,
                         HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
                 }
             }
@@ -8719,8 +8736,7 @@ namespace WaterThermalTanks {
             if (!DataGlobals::WarmupFlag && !DataGlobals::DoingSizing && !DataGlobals::KickOffSimulation) {
                 if ((HPSetPointTemp - DeadBandTempDiff) <= this->SetPointTemp) {
                     Real64 HPMinTemp = HPSetPointTemp - DeadBandTempDiff;
-                    std::string HPMinTempChar;
-                    ObjexxFCL::gio::write(HPMinTempChar, fmtLD) << HPMinTemp;
+                    const auto HPMinTempChar = fmt::to_string(HPMinTemp);
                     ++HeatPump.HPSetPointError;
                     //  add logic for warmup, DataGlobals::KickOffSimulation and doing sizing here
                     if (HeatPump.HPSetPointError == 1) {
@@ -8933,11 +8949,11 @@ namespace WaterThermalTanks {
                 hpPartLoadRatio = 1.0;
                 bIterSpeed = true; // prepare for iterating between speed levels
                 SpeedNum = 1;
-                this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 
                 if (HeatPump.bIsIHP) {
                     bIterSpeed = false; // don't iterate speed unless match conditions below
-                    IHPMode = IntegratedHeatPump::GetCurWorkMode(HeatPump.DXCoilNum);
+                    IHPMode = IntegratedHeatPump::GetCurWorkMode(state, HeatPump.DXCoilNum);
 
                     if (IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).CheckWHCall) {
                         int VSCoilNum;
@@ -8950,18 +8966,18 @@ namespace WaterThermalTanks {
                                 IntegratedHeatPump::IHPOperationMode::SCWHMatchWHMode;
                         }
 
-                        this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                        this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 
-                        VariableSpeedCoils::SimVariableSpeedCoils(
+                        VariableSpeedCoils::SimVariableSpeedCoils(state,
                             "", VSCoilNum, DataHVACGlobals::CycFanCycCoil, EMP1, EMP2, EMP3, 1, hpPartLoadRatio, SpeedNum, SpeedRatio, 0.0, 0.0, 1.0);
 
                         IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).CurMode = IHPMode;
-                        this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                        this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                     } else {
                         SpeedNum = IntegratedHeatPump::GetLowSpeedNumIHP(HeatPump.DXCoilNum);
 
-                        this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
-                        IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                        this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                        IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
                                                    DataHVACGlobals::CycFanCycCoil,
                                                    EMP1,
@@ -8992,7 +9008,7 @@ namespace WaterThermalTanks {
                         }
                     }
                 } else {
-                    VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                    VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
                                                               EMP1,
@@ -9044,8 +9060,7 @@ namespace WaterThermalTanks {
                     General::SolveRoot(Acc, MaxIte, SolFla, hpPartLoadRatio, boundPLRFunc, 0.0, 1.0, Par);
                     if (SolFla == -1) {
                         std::string IterNum;
-                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                        strip(IterNum);
+                        IterNum = fmt::to_string(MaxIte);
                         if (!DataGlobals::WarmupFlag) {
                             ++HeatPump.IterLimitExceededNum2;
                             if (HeatPump.IterLimitExceededNum2 == 1) {
@@ -9094,11 +9109,11 @@ namespace WaterThermalTanks {
                     SpeedRatio = 1.0;
                     SpeedNum = 1;
 
-                    this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                    this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 
                     if (HeatPump.bIsIHP) {
                         if (bIterSpeed) {
-                            IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                            IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                        HeatPump.DXCoilNum,
                                                        DataHVACGlobals::CycFanCycCoil,
                                                        EMP1,
@@ -9115,7 +9130,7 @@ namespace WaterThermalTanks {
                                                        1.0);
                         }
                     } else {
-                        VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                        VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                                   HeatPump.DXCoilNum,
                                                                   DataHVACGlobals::CycFanCycCoil,
                                                                   EMP1,
@@ -9146,9 +9161,9 @@ namespace WaterThermalTanks {
 
                     for (int i = LowSpeedNum; i <= MaxSpeedNum; ++i) {
                         SpeedNum = i;
-                        this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                        this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
                         if (HeatPump.bIsIHP) {
-                            IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                            IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                        HeatPump.DXCoilNum,
                                                        DataHVACGlobals::CycFanCycCoil,
                                                        EMP1,
@@ -9164,7 +9179,7 @@ namespace WaterThermalTanks {
                                                        false,
                                                        1.0);
                         } else {
-                            VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                            VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                                       HeatPump.DXCoilNum,
                                                                       DataHVACGlobals::CycFanCycCoil,
                                                                       EMP1,
@@ -9225,12 +9240,11 @@ namespace WaterThermalTanks {
                         int SolFla;
                         std::string IterNum;
                         auto boundPLRFunc = std::bind(
-                            &WaterThermalTanks::WaterThermalTankData::PLRResidualIterSpeed, this, std::placeholders::_1, std::placeholders::_2);
-                        General::SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, boundPLRFunc, 1.0e-10, 1.0, ParVS);
+                            &WaterThermalTanks::WaterThermalTankData::PLRResidualIterSpeed, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, boundPLRFunc, 1.0e-10, 1.0, ParVS);
 
                         if (SolFla == -1) {
-                            ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                            strip(IterNum);
+                            IterNum = fmt::to_string(MaxIte);
                             if (!DataGlobals::WarmupFlag) {
                                 ++HeatPump.IterLimitExceededNum1;
                                 if (HeatPump.IterLimitExceededNum1 == 1) {
@@ -9275,10 +9289,10 @@ namespace WaterThermalTanks {
                     }
 
                     hpPartLoadRatio = 1.0;
-                    this->SetVSHPWHFlowRates(HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+                    this->SetVSHPWHFlowRates(state, HeatPump, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 
                     if (HeatPump.bIsIHP) {
-                        IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                        IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                    HeatPump.DXCoilNum,
                                                    DataHVACGlobals::CycFanCycCoil,
                                                    EMP1,
@@ -9294,7 +9308,7 @@ namespace WaterThermalTanks {
                                                    false,
                                                    1.0);
                     } else {
-                        VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                        VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                                   HeatPump.DXCoilNum,
                                                                   DataHVACGlobals::CycFanCycCoil,
                                                                   EMP1,
@@ -9342,7 +9356,7 @@ namespace WaterThermalTanks {
 
         if (HeatPump.bIsIHP) {
             if (IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).CheckWHCall) {
-                IntegratedHeatPump::ClearCoils(HeatPump.DXCoilNum); // clear node info when checking the heating load
+                IntegratedHeatPump::ClearCoils(state, HeatPump.DXCoilNum); // clear node info when checking the heating load
             }
         }
 
@@ -9389,11 +9403,11 @@ namespace WaterThermalTanks {
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                    IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
                                                DataHVACGlobals::CycFanCycCoil,
                                                EMP1,
@@ -9409,11 +9423,11 @@ namespace WaterThermalTanks {
                                                false,
                                                1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                    IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
                                                DataHVACGlobals::CycFanCycCoil,
                                                EMP1,
@@ -9430,7 +9444,7 @@ namespace WaterThermalTanks {
                                                1.0);
                 } else {
                     //   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
-                    IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                    IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
                                                DataHVACGlobals::CycFanCycCoil,
                                                EMP1,
@@ -9446,11 +9460,11 @@ namespace WaterThermalTanks {
                                                false,
                                                1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    IntegratedHeatPump::SimIHP(HeatPump.DXCoilName,
+                    IntegratedHeatPump::SimIHP(state, HeatPump.DXCoilName,
                                                HeatPump.DXCoilNum,
                                                DataHVACGlobals::CycFanCycCoil,
                                                EMP1,
@@ -9466,9 +9480,9 @@ namespace WaterThermalTanks {
                                                false,
                                                1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
                 }
             } else {
@@ -9476,11 +9490,11 @@ namespace WaterThermalTanks {
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                    VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
                                                               EMP1,
@@ -9494,11 +9508,11 @@ namespace WaterThermalTanks {
                                                               0.0,
                                                               1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                    VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
                                                               EMP1,
@@ -9513,7 +9527,7 @@ namespace WaterThermalTanks {
                                                               1.0);
                 } else {
                     //   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
-                    VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                    VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
                                                               EMP1,
@@ -9527,11 +9541,11 @@ namespace WaterThermalTanks {
                                                               0.0,
                                                               1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
-                    VariableSpeedCoils::SimVariableSpeedCoils(HeatPump.DXCoilName,
+                    VariableSpeedCoils::SimVariableSpeedCoils(state, HeatPump.DXCoilName,
                                                               HeatPump.DXCoilNum,
                                                               DataHVACGlobals::CycFanCycCoil,
                                                               EMP1,
@@ -9545,9 +9559,9 @@ namespace WaterThermalTanks {
                                                               0.0,
                                                               1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
-                        Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                        Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
                 }
             }
@@ -9557,34 +9571,34 @@ namespace WaterThermalTanks {
             if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                 //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
-                    Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
-                DXCoils::SimDXCoil(
+                DXCoils::SimDXCoil(state,
                     HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
-                    Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
-                DXCoils::SimDXCoil(
+                DXCoils::SimDXCoil(state,
                     HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
             } else {
                 //   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
-                DXCoils::SimDXCoil(
+                DXCoils::SimDXCoil(state,
                     HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
-                    Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
-                DXCoils::SimDXCoil(
+                DXCoils::SimDXCoil(state,
                     HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
-                    Fans::SimulateFanComponents(HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
+                    Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
             }
         }
@@ -9701,7 +9715,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SetVSHPWHFlowRates(HeatPumpWaterHeaterData &HPWH, // heat pump coil
+    void WaterThermalTankData::SetVSHPWHFlowRates(EnergyPlusData &state, HeatPumpWaterHeaterData &HPWH, // heat pump coil
                                                   int const SpeedNum,            // upper speed number
                                                   Real64 const SpeedRatio,       // interpolation ration between upper and lower speed
                                                   Real64 const WaterDens,        // tank water density
@@ -9724,9 +9738,9 @@ namespace WaterThermalTanks {
         int HPWaterInletNode = HPWH.CondWaterInletNode;
         int DXCoilAirInletNode = HPWH.DXCoilAirInletNode;
         if (HPWH.bIsIHP) {
-            HPWH.OperatingWaterFlowRate = IntegratedHeatPump::GetWaterVolFlowRateIHP(HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
-            mdotAir = IntegratedHeatPump::GetAirMassFlowRateIHP(HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
-            HPWH.OperatingAirFlowRate = IntegratedHeatPump::GetAirVolFlowRateIHP(HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
+            HPWH.OperatingWaterFlowRate = IntegratedHeatPump::GetWaterVolFlowRateIHP(state, HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
+            mdotAir = IntegratedHeatPump::GetAirMassFlowRateIHP(state, HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
+            HPWH.OperatingAirFlowRate = IntegratedHeatPump::GetAirVolFlowRateIHP(state, HPWH.DXCoilNum, SpeedNum, SpeedRatio, true);
             DataLoopNode::Node(DXCoilAirInletNode).MassFlowRate = mdotAir;
             DataLoopNode::Node(DXCoilAirInletNode).MassFlowRateMaxAvail = mdotAir;
             DataLoopNode::Node(DXCoilAirInletNode).MassFlowRateMax = mdotAir;
@@ -9772,13 +9786,13 @@ namespace WaterThermalTanks {
         } // system fan will use the inlet node max avail.
 
         if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[HPWH.FanNum]->simulate(_, _, _, _);
+            HVACFan::fanObjs[HPWH.FanNum]->simulate(state, _, _, _, _);
         } else {
-            Fans::SimulateFanComponents(HPWH.FanName, FirstHVACIteration, HPWH.FanNum);
+            Fans::SimulateFanComponents(state, HPWH.FanName, FirstHVACIteration, HPWH.FanNum);
         }
     }
 
-    Real64 WaterThermalTankData::PLRResidualIterSpeed(Real64 const SpeedRatio, // speed ratio between two speed levels
+    Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state, Real64 const SpeedRatio, // speed ratio between two speed levels
                                                       Array1D<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
@@ -9809,10 +9823,10 @@ namespace WaterThermalTanks {
 
         auto &HPWH = HPWaterHeater(HPNum);
 
-        this->SetVSHPWHFlowRates(HPWH, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
+        this->SetVSHPWHFlowRates(state, HPWH, SpeedNum, SpeedRatio, RhoWater, MdotWater, FirstHVACIteration);
 
         if (HPWaterHeater(HPNum).bIsIHP) {
-            IntegratedHeatPump::SimIHP(HPWaterHeater(HPNum).DXCoilName,
+            IntegratedHeatPump::SimIHP(state, HPWaterHeater(HPNum).DXCoilName,
                                        HPWaterHeater(HPNum).DXCoilNum,
                                        DataHVACGlobals::CycFanCycCoil,
                                        EMP1,
@@ -9828,7 +9842,7 @@ namespace WaterThermalTanks {
                                        false,
                                        1.0);
         } else {
-            VariableSpeedCoils::SimVariableSpeedCoils(HPWaterHeater(HPNum).DXCoilName,
+            VariableSpeedCoils::SimVariableSpeedCoils(state, HPWaterHeater(HPNum).DXCoilName,
                                                       HPWaterHeater(HPNum).DXCoilNum,
                                                       DataHVACGlobals::CycFanCycCoil,
                                                       EMP1,
@@ -10473,7 +10487,7 @@ namespace WaterThermalTanks {
 
                 // assume can propagate rules for gas to other fuels.
                 bool FuelTypeIsLikeGas = false;
-                if (UtilityRoutines::SameString(this->FuelType, "Gas")) {
+                if (UtilityRoutines::SameString(this->FuelType, "NaturalGas")) {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Diesel")) {
                     FuelTypeIsLikeGas = true;
@@ -10481,9 +10495,9 @@ namespace WaterThermalTanks {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Coal")) {
                     FuelTypeIsLikeGas = true;
-                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#1")) {
+                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo1")) {
                     FuelTypeIsLikeGas = true;
-                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#2")) {
+                } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo2")) {
                     FuelTypeIsLikeGas = true;
                 } else if (UtilityRoutines::SameString(this->FuelType, "Propane")) {
                     FuelTypeIsLikeGas = true;
@@ -10498,7 +10512,7 @@ namespace WaterThermalTanks {
                 }
 
                 if (this->Sizing.NumberOfBedrooms == 1) {
-                    if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 20.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 2.5 * 1000.0; // 2.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -10508,7 +10522,7 @@ namespace WaterThermalTanks {
 
                 } else if (this->Sizing.NumberOfBedrooms == 2) {
                     if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 30.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 3.5 * 1000.0; // 3.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10516,7 +10530,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10524,7 +10538,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10534,7 +10548,7 @@ namespace WaterThermalTanks {
                     }
                 } else if (this->Sizing.NumberOfBedrooms == 3) {
                     if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10542,7 +10556,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10550,7 +10564,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10560,7 +10574,7 @@ namespace WaterThermalTanks {
                     }
                 } else if (this->Sizing.NumberOfBedrooms == 4) {
                     if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10568,7 +10582,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                         }
                     } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10576,7 +10590,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; // 38 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -10585,7 +10599,7 @@ namespace WaterThermalTanks {
                         }
                     }
                 } else if (this->Sizing.NumberOfBedrooms == 5) {
-                    if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -10593,7 +10607,7 @@ namespace WaterThermalTanks {
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; // 47 kBtu/hr
                     }
                 } else if (this->Sizing.NumberOfBedrooms >= 6) {
-                    if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                         if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                         if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                     } else if (FuelTypeIsLikeGas) {
@@ -11169,7 +11183,7 @@ namespace WaterThermalTanks {
                 } else if (SELECT_CASE_var == SizeEnum::ResidentialMin) {
                     // assume can propagate rules for gas to other fuels.
                     bool FuelTypeIsLikeGas = false;
-                    if (UtilityRoutines::SameString(this->FuelType, "Gas")) {
+                    if (UtilityRoutines::SameString(this->FuelType, "NaturalGas")) {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Diesel")) {
                         FuelTypeIsLikeGas = true;
@@ -11177,9 +11191,9 @@ namespace WaterThermalTanks {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Coal")) {
                         FuelTypeIsLikeGas = true;
-                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#1")) {
+                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo1")) {
                         FuelTypeIsLikeGas = true;
-                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOil#2")) {
+                    } else if (UtilityRoutines::SameString(this->FuelType, "FuelOilNo2")) {
                         FuelTypeIsLikeGas = true;
                     } else if (UtilityRoutines::SameString(this->FuelType, "Propane")) {
                         FuelTypeIsLikeGas = true;
@@ -11194,7 +11208,7 @@ namespace WaterThermalTanks {
                     }
 
                     if (this->Sizing.NumberOfBedrooms == 1) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 20.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 2.5 * 1000.0; // 2.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -11204,7 +11218,7 @@ namespace WaterThermalTanks {
 
                     } else if (this->Sizing.NumberOfBedrooms == 2) {
                         if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 30.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 3.5 * 1000.0; // 3.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11212,7 +11226,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11220,7 +11234,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11230,7 +11244,7 @@ namespace WaterThermalTanks {
                         }
                     } else if (this->Sizing.NumberOfBedrooms == 3) {
                         if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 40.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 4.5 * 1000.0; // 4.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11238,7 +11252,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11246,7 +11260,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11256,7 +11270,7 @@ namespace WaterThermalTanks {
                         }
                     } else if (this->Sizing.NumberOfBedrooms == 4) {
                         if (this->Sizing.NumberOfBathrooms <= 1.5) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11264,7 +11278,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 36.0 * kBtuPerHrToWatts; // 36 kBtu/hr
                             }
                         } else if ((this->Sizing.NumberOfBathrooms > 1.5) && (this->Sizing.NumberOfBathrooms < 3.0)) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 50.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11272,7 +11286,7 @@ namespace WaterThermalTanks {
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 38.0 * kBtuPerHrToWatts; // 38 kBtu/hr
                             }
                         } else if (this->Sizing.NumberOfBathrooms >= 3.0) {
-                            if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                            if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                                 if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                                 if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                             } else if (FuelTypeIsLikeGas) {
@@ -11281,7 +11295,7 @@ namespace WaterThermalTanks {
                             }
                         }
                     } else if (this->Sizing.NumberOfBedrooms == 5) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -11289,7 +11303,7 @@ namespace WaterThermalTanks {
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 47.0 * kBtuPerHrToWatts; // 47 kBtu/hr
                         }
                     } else if (this->Sizing.NumberOfBedrooms >= 6) {
-                        if (UtilityRoutines::SameString(this->FuelType, "Electric")) {
+                        if (UtilityRoutines::SameString(this->FuelType, "Electricity")) {
                             if (this->VolumeWasAutoSized) tmpTankVolume = 66.0 * GalTocubicMeters;
                             if (this->MaxCapacityWasAutoSized) tmpMaxCapacity = 5.5 * 1000.0; // 5.5 kW
                         } else if (FuelTypeIsLikeGas) {
@@ -11447,7 +11461,7 @@ namespace WaterThermalTanks {
         this->VolumeConsumed = this->VolFlowRate * SecInTimeStep;
     }
 
-    void WaterThermalTankData::CalcStandardRatings(OutputFiles &outputFiles)
+    void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11597,7 +11611,7 @@ namespace WaterThermalTanks {
 
                         Real64 RhoWater = Psychrometrics::RhoH2O(this->TankTemp);
                         auto &HPWH = HPWaterHeater(HPNum);
-                        this->SetVSHPWHFlowRates(
+                        this->SetVSHPWHFlowRates(state,
                             HPWH, VariableSpeedCoils::VarSpeedCoil(HPWaterHeater(HPNum).DXCoilNum).NormSpedLevel, 1.0, RhoWater, MdotWater, true);
                         //       simulate the HPWH coil/fan to find heating capacity
                         Real64 EMP1 = 0.0;
@@ -11606,11 +11620,11 @@ namespace WaterThermalTanks {
                         if (HPWaterHeater(HPNum).FanPlacement == DataHVACGlobals::BlowThru) {
                             //   simulate fan and DX coil twice
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
-                            VariableSpeedCoils::SimVariableSpeedCoils(VSCoilName,
+                            VariableSpeedCoils::SimVariableSpeedCoils(state, VSCoilName,
                                                                       VSCoilNum,
                                                                       DataHVACGlobals::CycFanCycCoil,
                                                                       EMP1,
@@ -11624,11 +11638,11 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
-                            VariableSpeedCoils::SimVariableSpeedCoils(VSCoilName,
+                            VariableSpeedCoils::SimVariableSpeedCoils(state, VSCoilName,
                                                                       VSCoilNum,
                                                                       DataHVACGlobals::CycFanCycCoil,
                                                                       EMP1,
@@ -11643,7 +11657,7 @@ namespace WaterThermalTanks {
                                                                       1.0);
                         } else {
                             //   simulate DX coil and fan twice to pass fan power (FanElecPower) to DX coil
-                            VariableSpeedCoils::SimVariableSpeedCoils(VSCoilName,
+                            VariableSpeedCoils::SimVariableSpeedCoils(state, VSCoilName,
                                                                       VSCoilNum,
                                                                       DataHVACGlobals::CycFanCycCoil,
                                                                       EMP1,
@@ -11657,11 +11671,11 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
-                            VariableSpeedCoils::SimVariableSpeedCoils(VSCoilName,
+                            VariableSpeedCoils::SimVariableSpeedCoils(state, VSCoilName,
                                                                       VSCoilNum,
                                                                       DataHVACGlobals::CycFanCycCoil,
                                                                       EMP1,
@@ -11675,9 +11689,9 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
                         }
 
@@ -11691,52 +11705,52 @@ namespace WaterThermalTanks {
                             if (FirstTimeFlag) { // first time DXCoils::DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and
                                                  // reset water inlet temp. If already sized, no harm.
                                 if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                    HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                    HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                                 } else {
-                                    Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                    Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                                 }
-                                DXCoils::SimDXCoil(
+                                DXCoils::SimDXCoil(state,
                                     HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                                 DataLoopNode::Node(HPWaterHeater(HPNum).CondWaterInletNode).Temp = this->TankTemp;
                             }
                             // ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy.
                             // PLR=1 here.
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
-                            DXCoils::SimDXCoil(
+                            DXCoils::SimDXCoil(state,
                                 HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
-                            DXCoils::SimDXCoil(
+                            DXCoils::SimDXCoil(state,
                                 HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                         } else {
                             if (FirstTimeFlag) { // first time DXCoils::DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and
                                                  // reset water inlet temp. If already sized, no harm.
-                                DXCoils::SimDXCoil(
+                                DXCoils::SimDXCoil(state,
                                     HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                                 DataLoopNode::Node(HPWaterHeater(HPNum).CondWaterInletNode).Temp = this->TankTemp;
                             }
                             // ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy.
                             // PLR=1 here.
-                            DXCoils::SimDXCoil(
+                            DXCoils::SimDXCoil(state,
                                 HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
-                            DXCoils::SimDXCoil(
+                            DXCoils::SimDXCoil(state,
                                 HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
-                                Fans::SimulateFanComponents(HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
+                                Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
                         }
 
@@ -11854,7 +11868,7 @@ namespace WaterThermalTanks {
             }
 
             static constexpr auto Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
-            print(outputFiles.eio,
+            print(state.files.eio,
                   Format_720,
                   this->Type,
                   this->Name,
@@ -11864,7 +11878,7 @@ namespace WaterThermalTanks {
                   EnergyFactor);
         } else {
             static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
-            print(outputFiles.eio,
+            print(state.files.eio,
                   Format_721,
                   HPWaterHeater(this->HeatPumpNum).Type,
                   HPWaterHeater(this->HeatPumpNum).Name,
@@ -11878,7 +11892,7 @@ namespace WaterThermalTanks {
         this->AlreadyRated = true;
     }
 
-    void WaterThermalTankData::ReportCWTankInits(OutputFiles &outputFiles)
+    void WaterThermalTankData::ReportCWTankInits(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11892,7 +11906,7 @@ namespace WaterThermalTanks {
 
 
         if (this->myOneTimeInitFlag) {
-            this->setupOutputVars();
+            this->setupOutputVars(ioFiles);
             this->myOneTimeInitFlag = false;
         }
 
@@ -11901,7 +11915,7 @@ namespace WaterThermalTanks {
         }
 
         static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
-        print(outputFiles.eio,
+        print(ioFiles.eio,
               Format_728,
               this->Type,
               this->Name,

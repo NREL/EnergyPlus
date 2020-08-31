@@ -47,6 +47,9 @@
 
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+
 using EnergyPlus::CommandLineInterface::ProcessArgs;
 
 int main(int argc, const char *argv[])
@@ -56,6 +59,9 @@ int main(int argc, const char *argv[])
     // https://github.com/NREL/EnergyPlus/wiki/Debugging-Tips
     unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
 #endif
-    ProcessArgs(argc, argv);
-    EnergyPlusPgm();
+
+    EnergyPlus::EnergyPlusData state;
+
+    ProcessArgs(state, argc, argv);
+    return EnergyPlusPgm(state);
 }

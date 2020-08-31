@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -86,7 +87,7 @@ namespace EIRPlantLoopHeatPumps {
         heatPumps.clear();
     }
 
-    void EIRPlantLoopHeatPump::simulate(const EnergyPlus::PlantLocation &calledFromLocation,
+    void EIRPlantLoopHeatPump::simulate(EnergyPlusData &EP_UNUSED(state), const EnergyPlus::PlantLocation &calledFromLocation,
                                         bool const FirstHVACIteration,
                                         Real64 &CurLoad,
                                         bool const RunFlag)
@@ -96,6 +97,9 @@ namespace EIRPlantLoopHeatPumps {
 
         // Call initialize to set flow rates, run flag, and entering temperatures
         this->running = RunFlag;
+
+        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
+        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
 
         if (this->waterSource) {
             this->setOperatingFlowRatesWSHP();
@@ -292,10 +296,6 @@ namespace EIRPlantLoopHeatPumps {
 
         Real64 const reportingInterval = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        // read inlet temperatures
-        this->loadSideInletTemp = DataLoopNode::Node(this->loadSideNodes.inlet).Temp;
-        this->sourceSideInletTemp = DataLoopNode::Node(this->sourceSideNodes.inlet).Temp;
-
         // ideally the plant is going to ensure that we don't have a runflag=true when the load is invalid, but
         // I'm not sure we can count on that so we will do one check here to make sure we don't calculate things badly
         if ((this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling && currentLoad >= 0.0) ||
@@ -350,7 +350,7 @@ namespace EIRPlantLoopHeatPumps {
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
     }
 
-    void EIRPlantLoopHeatPump::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         // This function does all one-time and begin-environment initialization
         std::string const routineName = EIRPlantLoopHeatPumps::__EQUIP__ + ':' + __FUNCTION__;
@@ -383,28 +383,28 @@ namespace EIRPlantLoopHeatPumps {
                 "Heat Pump Source Side Inlet Temperature", OutputProcessor::Unit::C, this->sourceSideInletTemp, "System", "Average", this->name);
             SetupOutputVariable(
                 "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
-            SetupOutputVariable("Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
+            SetupOutputVariable("Heat Pump Electricity Rate", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
             if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
-                SetupOutputVariable("Heat Pump Electric Energy",
+                SetupOutputVariable("Heat Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->powerEnergy,
                                     "System",
                                     "Sum",
                                     this->name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Cooling",
                                     "Heat Pump",
                                     "Plant");
             } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
-                SetupOutputVariable("Heat Pump Electric Energy",
+                SetupOutputVariable("Heat Pump Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->powerEnergy,
                                     "System",
                                     "Sum",
                                     this->name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "Heating",
                                     "Heat Pump",
                                     "Plant");
@@ -416,7 +416,8 @@ namespace EIRPlantLoopHeatPumps {
 
             // find this component on the plant
             bool thisErrFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(this->name,
+            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                    this->name,
                                                     this->plantTypeOfNum,
                                                     this->loadSideLocation.loopNum,
                                                     this->loadSideLocation.loopSideNum,
@@ -443,7 +444,8 @@ namespace EIRPlantLoopHeatPumps {
 
             thisErrFlag = false;
             if (this->waterSource) {
-                PlantUtilities::ScanPlantLoopsForObject(this->name,
+                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                                                        this->name,
                                                         this->plantTypeOfNum,
                                                         this->sourceSideLocation.loopNum,
                                                         this->sourceSideLocation.loopSideNum,

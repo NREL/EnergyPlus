@@ -62,9 +62,12 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace SZVAVModel {
 
@@ -74,7 +77,7 @@ namespace SZVAVModel {
     // parts of the simulation.
 
     // MODULE PARAMETER DEFINITIONS
-    // na
+    extern int const HCoil_Water;
 
     // DERIVED TYPE DEFINITIONS
     // na
@@ -90,7 +93,7 @@ namespace SZVAVModel {
 
     // Functions
 
-    void calcSZVAVModel(PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -104,7 +107,7 @@ namespace SZVAVModel {
 
     );
 
-    void calcSZVAVModel(FanCoilUnits::FanCoilData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, FanCoilUnits::FanCoilData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -118,7 +121,7 @@ namespace SZVAVModel {
 
     );
 
-    void calcSZVAVModel(UnitarySystems::UnitarySys &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, UnitarySystems::UnitarySys &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,

@@ -246,15 +246,24 @@ Output:Constructions,Materials;
 
 \subsection{Output:DaylightFactors}\label{outputdaylightfactors}
 
+This report content is added to the \textbf{eplusout.dfs} file.
+
 Daylight factors are ratios of interior illuminance at a specific location to exterior horizontal illuminance. In EnergyPlus, they are pre-calculated hourly for every shadow calculation day for every exterior window of a daylight zone. The pre-calculated daylight factors are interpolated between hours and for the actual sky conditions in the time-step calculation of the daylighting performance of daylight zones.
 
-EnergyPlus reports the daylight factors for four sky types (clear, turbid clear, intermediate, and overcast) at noon time (12:00pm) for each exterior windows (base window without shading) in the eio file when the daylight factors are first calculated. This new object can report all hourly pre-calculated daylight factors. Details of the report are shown in the Output Details document.
+EnergyPlus reports the daylight factors for four CIE sky types (clear, turbid clear, intermediate, and overcast) at noon time (12:00pm) for each exterior windows (base window without shading) in the \textbf{eio} file when the daylight factors are first calculated. This new object can report all hourly pre-calculated daylight factors. Details of the report are shown in the Output Details document.
 
 \subsubsection{Inputs}\label{inputs-4-027}
 
 \paragraph{Field: Reporting Days}\label{field-reporting-days}
 
-This field is used to select days to report the daylight factors. Two choices are ``SizingDays'' and ``All\hyperref[shadowcalculation]{ShadowCalculation}Days''. The SizingDays choice will output the daylight factors for only the sizing calculation days, while the All\hyperref[shadowcalculation]{ShadowCalculation}Days choice will output daylight factors for all shadow calculation days.
+This field is used to select days to report the daylight factors. Two choices are ``\textbf{SizingDays}'' and ``\textbf{AllShadowCalculationDays}''. The ``\textbf{SizingDays}'' choice will output the daylight factors for only the sizing calculation days, while the ``\textbf{AllShadowCalculationDays}'' choice will output daylight factors for all shadow calculation days.
+
+An example of this object follows.
+
+\begin{lstlisting}
+Output:DaylightFactors,
+  SizingDays;    !- Reporting Days
+\end{lstlisting}
 
 \subsection{Output:EnergyManagementSystem}\label{outputenergymanagementsystem}
 
@@ -483,8 +492,8 @@ Gas \tabularnewline
 Gasoline \tabularnewline
 Diesel \tabularnewline
 Coal \tabularnewline
-FuelOil\#1 \tabularnewline
-FuelOil\#2 \tabularnewline
+FuelOilNo1 \tabularnewline
+FuelOilNo2 \tabularnewline
 Propane \tabularnewline
 OtherFuel1 \tabularnewline
 OtherFuel2 \tabularnewline
@@ -658,8 +667,8 @@ Electricity:Facility & Diesel:Facility \tabularnewline
 
 DistrictCooling:Facility & DistrictHeating:Facility \tabularnewline
 Gas:Facility & Gasoline:Facility \tabularnewline
-Coal:Facility & FuelOil\#1:Facility \tabularnewline
-FuelOil\#2:Facility & Propane:Facility \tabularnewline
+Coal:Facility & FuelOilNo1:Facility \tabularnewline
+FuelOilNo2:Facility & Propane:Facility \tabularnewline
 ElectricityProduced:Facility & Steam:Facility \tabularnewline
 OtherFuel1:Facility & OtherFuel2:Facility \tabularnewline
 \bottomrule
@@ -1038,73 +1047,73 @@ The following pollution-emission-related outputs are available for environmental
 \item
   HVAC,Sum,Environmental Impact Coal Nuclear Low Level Waste Volume {[}m3{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 Source Energy {[}J{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 Source Energy {[}J{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 CO2 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 CO2 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 CO Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 CO Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 CH4 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 CH4 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 NOx Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 NOx Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 N2O Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 N2O Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 SO2 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 SO2 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 PM Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 PM Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 PM10 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 PM10 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 PM2.5 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 PM2.5 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 NH3 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 NH3 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 NMVOC Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 NMVOC Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 Hg Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 Hg Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 Pb Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 Pb Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 Water Consumption Volume {[}L{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 Water Consumption Volume {[}L{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 Nuclear High Level Waste Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 Nuclear High Level Waste Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#2 Nuclear Low Level Waste Volume {[}m3{]}
+  HVAC,Sum,Environmental Impact FuelOilNo2 Nuclear Low Level Waste Volume {[}m3{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 Source Energy {[}J{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 Source Energy {[}J{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 CO2 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 CO2 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 CO Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 CO Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 CH4 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 CH4 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 NOx Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 NOx Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 N2O Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 N2O Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 SO2 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 SO2 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 PM Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 PM Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 PM10 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 PM10 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 PM2.5 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 PM2.5 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 NH3 Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 NH3 Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 NMVOC Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 NMVOC Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 Hg Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 Hg Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 Pb Emissions Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 Pb Emissions Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 Water Consumption Volume {[}L{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 Water Consumption Volume {[}L{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 Nuclear High Level Waste Mass {[}kg{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 Nuclear High Level Waste Mass {[}kg{]}
 \item
-  HVAC,Sum,Environmental Impact Fuel Oil \#1 Nuclear Low Level Waste Volume {[}m3{]}
+  HVAC,Sum,Environmental Impact FuelOilNo1 Nuclear Low Level Waste Volume {[}m3{]}
 \item
   HVAC,Sum,Environmental Impact Propane Source Energy {[}J{]}
 \item
@@ -1291,9 +1300,9 @@ The following pollution-emission-related outputs are available for environmental
 
 \paragraph{Environmental Impact Natural Gas Source Energy {[}J{]}}\label{environmental-impact-natural-gas-source-energy-j}
 
-\paragraph{Environmental Impact Fuel Oil \#2 Source Energy {[}J{]}}\label{environmental-impact-fuel-oil-2-source-energy-j}
+\paragraph{Environmental Impact FuelOilNo2 Source Energy {[}J{]}}\label{environmental-impact-fuel-oil-2-source-energy-j}
 
-\paragraph{Environmental Impact Fuel Oil \#1 Source Energy {[}J{]}}\label{environmental-impact-fuel-oil-1-source-energy-j}
+\paragraph{Environmental Impact FuelOilNo1 Source Energy {[}J{]}}\label{environmental-impact-fuel-oil-1-source-energy-j}
 
 \paragraph{Environmental Impact Coal Source Energy {[}J{]}}\label{environmental-impact-coal-source-energy-j}
 
@@ -1313,9 +1322,9 @@ These outputs provide results for the source energy embodied in each type of fue
 
 \paragraph{Environmental Impact Natural Gas CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-co2-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-co2-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-co2-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-co2-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-co2-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal CO2 Emissions Mass {[}kg{]}}\label{environmental-impact-coal-co2-emissions-mass-kg}
 
@@ -1335,9 +1344,9 @@ These outputs provide results for the carbon dioxide reelases associated with co
 
 \paragraph{Environmental Impact Natural Gas CO Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-co-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 CO Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-co-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 CO Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-co-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 CO Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-co-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 CO Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-co-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal CO Emissions Mass {[}kg{]}}\label{environmental-impact-coal-co-emissions-mass-kg}
 
@@ -1357,9 +1366,9 @@ These outputs provide results for the carbon monoxide releases associated with c
 
 \paragraph{Environmental Impact Natural Gas CH4 Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-ch4-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 CH4 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-ch4-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 CH4 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-ch4-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 CH4 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-ch4-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 CH4 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-ch4-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal CH4 Emissions Mass {[}kg{]}}\label{environmental-impact-coal-ch4-emissions-mass-kg}
 
@@ -1379,9 +1388,9 @@ These outputs provide results for the methane releases associated with consumpti
 
 \paragraph{Environmental Impact Natural Gas NOx Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-nox-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 NOx Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nox-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 NOx Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nox-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 NOx Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nox-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 NOx Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nox-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal NOx Emissions Mass {[}kg{]}}\label{environmental-impact-coal-nox-emissions-mass-kg}
 
@@ -1401,9 +1410,9 @@ These outputs provide results for the various nitrogen oxide releases associated
 
 \paragraph{Environmental Impact Natural Gas N2O Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-n2o-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 N2O Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-n2o-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 N2O Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-n2o-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 N2O Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-n2o-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 N2O Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-n2o-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal N2O Emissions Mass {[}kg{]}}\label{environmental-impact-coal-n2o-emissions-mass-kg}
 
@@ -1423,9 +1432,9 @@ These outputs provide results for the nitrous oxide releases associated with con
 
 \paragraph{Environmental Impact Natural Gas SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-so2-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-so2-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-so2-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-so2-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-so2-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal SO2 Emissions Mass {[}kg{]}}\label{environmental-impact-coal-so2-emissions-mass-kg}
 
@@ -1445,9 +1454,9 @@ These outputs provide results for the sulphur dioxide releases associated with c
 
 \paragraph{Environmental Impact Natural Gas PM Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-pm-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 PM Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pm-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 PM Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pm-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 PM Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pm-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 PM Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pm-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal PM Emissions Mass {[}kg{]}}\label{environmental-impact-coal-pm-emissions-mass-kg}
 
@@ -1467,9 +1476,9 @@ These outputs provide results for particulate matter releases associated with co
 
 \paragraph{Environmental Impact Natural Gas PM10 Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-pm10-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 PM10 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pm10-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 PM10 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pm10-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 PM10 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pm10-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 PM10 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pm10-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal PM10 Emissions Mass {[}kg{]}}\label{environmental-impact-coal-pm10-emissions-mass-kg}
 
@@ -1489,9 +1498,9 @@ These outputs provide results for particulate matter of 10 microns or less relea
 
 \paragraph{Environmental Impact Natural Gas PM2.5 Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-pm2.5-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 PM2.5 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pm2.5-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 PM2.5 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pm2.5-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 PM2.5 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pm2.5-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 PM2.5 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pm2.5-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal PM2.5 Emissions Mass {[}kg{]}}\label{environmental-impact-coal-pm2.5-emissions-mass-kg}
 
@@ -1511,9 +1520,9 @@ These outputs provide results for particulate matter of 2.5 microns or less rele
 
 \paragraph{Environmental Impact Natural Gas NH3 Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-nh3-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 NH3 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nh3-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 NH3 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nh3-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 NH3 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nh3-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 NH3 Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nh3-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal NH3 Emissions Mass {[}kg{]}}\label{environmental-impact-coal-nh3-emissions-mass-kg}
 
@@ -1533,9 +1542,9 @@ These outputs provide results for ammonia releases associated with consumption o
 
 \paragraph{Environmental Impact Natural Gas NMVOC Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-nmvoc-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 NMVOC Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nmvoc-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 NMVOC Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nmvoc-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 NMVOC Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nmvoc-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 NMVOC Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nmvoc-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal NMVOC Emissions Mass {[}kg{]}}\label{environmental-impact-coal-nmvoc-emissions-mass-kg}
 
@@ -1555,9 +1564,9 @@ These outputs provide results for non-methane volatile organic compound releases
 
 \paragraph{Environmental Impact Natural Gas Hg Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-hg-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 Hg Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-hg-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 Hg Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-hg-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 Hg Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-hg-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 Hg Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-hg-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal Hg Emissions Mass {[}kg{]}}\label{environmental-impact-coal-hg-emissions-mass-kg}
 
@@ -1577,9 +1586,9 @@ These outputs provide results for mercury releases associated with consumption o
 
 \paragraph{Environmental Impact Natural Gas Pb Emissions Mass {[}kg{]}}\label{environmental-impact-natural-gas-pb-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 Pb Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pb-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 Pb Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-pb-emissions-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 Pb Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pb-emissions-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 Pb Emissions Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-pb-emissions-mass-kg}
 
 \paragraph{Environmental Impact Coal Pb Emissions Mass {[}kg{]}}\label{environmental-impact-coal-pb-emissions-mass-kg}
 
@@ -1599,9 +1608,9 @@ These outputs provide results for lead releases associated with consumption of e
 
 \paragraph{Environmental Impact Natural Gas Water Consumption Volume {[}L{]}}\label{environmental-impact-natural-gas-water-consumption-volume-l}
 
-\paragraph{Environmental Impact Fuel Oil \#2 Water Consumption Volume {[}L{]}}\label{environmental-impact-fuel-oil-2-water-consumption-volume-l}
+\paragraph{Environmental Impact FuelOilNo2 Water Consumption Volume {[}L{]}}\label{environmental-impact-fuel-oil-2-water-consumption-volume-l}
 
-\paragraph{Environmental Impact Fuel Oil \#1 Water Consumption Volume {[}L{]}}\label{environmental-impact-fuel-oil-1-water-consumption-volume-l}
+\paragraph{Environmental Impact FuelOilNo1 Water Consumption Volume {[}L{]}}\label{environmental-impact-fuel-oil-1-water-consumption-volume-l}
 
 \paragraph{Environmental Impact Coal Water Consumption Volume {[}L{]}}\label{environmental-impact-coal-water-consumption-volume-l}
 
@@ -1621,9 +1630,9 @@ These outputs provide results for water consumption or evaporation associated wi
 
 \paragraph{Nuclear High Level Waste From Natural Gas {[}kg{]}}\label{nuclear-high-level-waste-from-natural-gas-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#2 Nuclear High Level Waste Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nuclear-high-level-waste-mass-kg}
+\paragraph{Environmental Impact FuelOilNo2 Nuclear High Level Waste Mass {[}kg{]}}\label{environmental-impact-fuel-oil-2-nuclear-high-level-waste-mass-kg}
 
-\paragraph{Environmental Impact Fuel Oil \#1 Nuclear High Level Waste Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nuclear-high-level-waste-mass-kg}
+\paragraph{Environmental Impact FuelOilNo1 Nuclear High Level Waste Mass {[}kg{]}}\label{environmental-impact-fuel-oil-1-nuclear-high-level-waste-mass-kg}
 
 \paragraph{Environmental Impact Coal Nuclear High Level Waste Mass {[}kg{]}}\label{environmental-impact-coal-nuclear-high-level-waste-mass-kg}
 
@@ -1643,9 +1652,9 @@ These outputs provide results for high-level nuclear waste associated with consu
 
 \paragraph{Environmental Impact Natural Gas Nuclear Low Level Waste Volume {[}m3{]}}\label{environmental-impact-natural-gas-nuclear-low-level-waste-volume-m3}
 
-\paragraph{Environmental Impact Fuel Oil \#2 Nuclear Low Level Waste Volume {[}m3{]}}\label{environmental-impact-fuel-oil-2-nuclear-low-level-waste-volume-m3}
+\paragraph{Environmental Impact FuelOilNo2 Nuclear Low Level Waste Volume {[}m3{]}}\label{environmental-impact-fuel-oil-2-nuclear-low-level-waste-volume-m3}
 
-\paragraph{Environmental Impact Fuel Oil \#1 Nuclear Low Level Waste Volume {[}m3{]}}\label{environmental-impact-fuel-oil-1-nuclear-low-level-waste-volume-m3}
+\paragraph{Environmental Impact FuelOilNo1 Nuclear Low Level Waste Volume {[}m3{]}}\label{environmental-impact-fuel-oil-1-nuclear-low-level-waste-volume-m3}
 
 \paragraph{Environmental Impact Coal Nuclear Low Level Waste Volume {[}m3{]}}\label{environmental-impact-coal-nuclear-low-level-waste-volume-m3}
 
@@ -1817,73 +1826,73 @@ The following different output meters could appear in the standard meter output 
 \item
   Zone,Meter,CoalEmissions:Nuclear Low {[}m3{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:Source {[}J{]}
+  Zone,Meter,FuelOilNo2Emissions:Source {[}J{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:CO2 {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:CO2 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:CO {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:CO {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:CH4 {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:CH4 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:NOx {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:NOx {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:N2O {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:N2O {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:SO2 {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:SO2 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:PM {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:PM {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:PM10 {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:PM10 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:PM2.5 {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:PM2.5 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:NH3 {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:NH3 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:NMVOC {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:NMVOC {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:Hg {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:Hg {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:Pb {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:Pb {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:WaterEnvironmentalFactors {[}L{]}
+  Zone,Meter,FuelOilNo2Emissions:WaterEnvironmentalFactors {[}L{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:Nuclear High {[}kg{]}
+  Zone,Meter,FuelOilNo2Emissions:Nuclear High {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#2Emissions:Nuclear Low {[}m3{]}
+  Zone,Meter,FuelOilNo2Emissions:Nuclear Low {[}m3{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:Source {[}J{]}
+  Zone,Meter,FuelOilNo1Emissions:Source {[}J{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:CO2 {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:CO2 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:CO {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:CO {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:CH4 {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:CH4 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:NOx {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:NOx {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:N2O {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:N2O {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:SO2 {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:SO2 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:PM {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:PM {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:PM10 {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:PM10 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:PM2.5 {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:PM2.5 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:NH3 {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:NH3 {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:NMVOC {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:NMVOC {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:Hg {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:Hg {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:Pb {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:Pb {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:WaterEnvironmentalFactors {[}L{]}
+  Zone,Meter,FuelOilNo1Emissions:WaterEnvironmentalFactors {[}L{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:Nuclear High {[}kg{]}
+  Zone,Meter,FuelOilNo1Emissions:Nuclear High {[}kg{]}
 \item
-  Zone,Meter,FuelOil\#1Emissions:Nuclear Low {[}m3{]}
+  Zone,Meter,FuelOilNo1Emissions:Nuclear Low {[}m3{]}
 \item
   Zone,Meter,PropaneEmissions:Source {[}J{]}
 \item

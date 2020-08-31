@@ -128,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -4580,7 +4580,7 @@
 
   Output:Variable,*,Water Heater Part Load Ratio,hourly;
 
-  Output:Variable,*,Water Heater Electric Power,hourly;
+  Output:Variable,*,Water Heater Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Source Side Inlet Temperature,hourly;
 
@@ -4600,19 +4600,19 @@
 
   Output:Variable,*,Cooling Coil Total Water Heating Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Water Heating Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Water Heating Electricity Rate,hourly;
 
   Output:Variable,*,Water Heater Tank Temperature,hourly;
 
   Output:Variable,*,Water Heater Compressor Part Load Ratio,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
-  Output:Variable,*,Cooling Coil Crankcase Heater Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Crankcase Heater Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater On Cycle Ancillary Electric Power,hourly;
+  Output:Variable,*,Water Heater On Cycle Ancillary Electricity Rate,hourly;
 
-  Output:Variable,*,Water Heater Off Cycle Ancillary Electric Power,hourly;
+  Output:Variable,*,Water Heater Off Cycle Ancillary Electricity Rate,hourly;
 
   Output:VariableDictionary,Regular;
 

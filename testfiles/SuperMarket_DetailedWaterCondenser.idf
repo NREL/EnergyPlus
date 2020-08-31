@@ -135,7 +135,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -5613,7 +5613,7 @@
 
   Output:Variable,*,Zone Air Relative Humidity,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Energy,timestep;
+  Output:Variable,*,Cooling Coil Electricity Energy,timestep;
 
   Output:Variable,*,Water Heater Tank Temperature,timestep;
 
@@ -5655,21 +5655,21 @@
 
   Output:Variable,*,Cooling Tower Mass Flow Rate,timestep;
 
-  Output:Variable,*,Water Heater Electric Power,timestep;
+  Output:Variable,*,Water Heater Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Water Mass Flow Rate,timestep;
 
   Output:Variable,*,Refrigeration System Condenser Heat Transfer Rate,timestep;
 
-  Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration Compressor Rack Condenser Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration System Condenser Fan Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Condenser Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Refrigeration Compressor Rack Electric Power,timestep;
+  Output:Variable,*,Refrigeration Compressor Rack Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration Compressor Rack COP,timestep;
 
-  Output:Variable,*,Refrigeration System Total Compressor Electric Power,timestep;
+  Output:Variable,*,Refrigeration System Total Compressor Electricity Rate,timestep;
 
   Output:Variable,*,Refrigeration System Total Compressor Heat Transfer Rate,timestep;
 

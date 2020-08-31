@@ -51,7 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -65,6 +64,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -110,7 +110,7 @@ namespace SolarCollectors {
     {
         NumOfCollectors = 0;
         NumOfParameters = 0;
-        GetInputFlag = false;
+        GetInputFlag = true;
         Parameters.deallocate();
         Collector.deallocate();
         UniqueCollectorNames.clear();
@@ -148,7 +148,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the solar collector input from the input file and sets up the parameters and collector objects.
 
-        static bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
         int IOStatus;                         // Used in GetObjectItem
         int NumAlphas;                        // Number of Alphas for each GetObjectItem call
         int NumNumbers;                       // Number of Numbers for each GetObjectItem call
@@ -755,12 +755,12 @@ namespace SolarCollectors {
         }
     }
 
-    void CollectorData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CollectorData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
     {
-        this->initialize();
+        this->initialize(state.dataBranchInputManager);
 
         {
             auto const SELECT_CASE_var(this->TypeNum);
@@ -779,7 +779,7 @@ namespace SolarCollectors {
         this->report();
     }
 
-    void CollectorData::initialize()
+    void CollectorData::initialize(BranchInputManagerData &dataBranchInputManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -806,7 +806,7 @@ namespace SolarCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(
+                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitSolarCollector: Program terminated due to previous condition(s).");
@@ -1204,10 +1204,6 @@ namespace SolarCollectors {
 
         Real64 IAM;
 
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        std::string String; // Dummy string for converting numbers to strings
-
         // cut off IAM for angles greater than 60 degrees. (CR 7534)
         Real64 CutoffAngle = 60.0 * DataGlobals::DegToRadians;
         if (std::abs(IncidentAngle) > CutoffAngle) { // cut off, model curves not robust beyond cutoff
@@ -1223,12 +1219,9 @@ namespace SolarCollectors {
             if (IAM > 10.0) { // Greater than 10 is probably not a possibility
                 ShowSevereError("IAM Function: SolarCollectorPerformance:FlatPlate = " + this->Name +
                                 ":  Incident Angle Modifier is out of bounds due to bad coefficients.");
-                ObjexxFCL::gio::write(String, fmtLD) << this->iam1;
-                ShowContinueError("Coefficient 2 of Incident Angle Modifier =" + String);
-                ObjexxFCL::gio::write(String, fmtLD) << this->iam2;
-                ShowContinueError("Coefficient 3 of Incident Angle Modifier =" + String);
-                ObjexxFCL::gio::write(String, fmtLD) << IAM;
-                ShowContinueError("Calculated Incident Angle Modifier =" + String);
+                ShowContinueError(format("Coefficient 2 of Incident Angle Modifier = {}", this->iam1));
+                ShowContinueError(format("Coefficient 3 of Incident Angle Modifier = {}", this->iam2));
+                ShowContinueError(format("Calculated Incident Angle Modifier = {}", IAM));
                 ShowContinueError("Expected Incident Angle Modifier should be approximately 1.5 or less.");
                 ShowFatalError("Errors in SolarCollectorPerformance:FlatPlate input.");
             }

@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -3757,7 +3757,7 @@
 
   Output:Variable,*,Heat Exchanger Total Cooling Rate,hourly;
 
-  Output:Variable,*,Heat Exchanger Electric Power,hourly;
+  Output:Variable,*,Heat Exchanger Electricity Rate,hourly;
 
   Output:Variable,*,Heat Exchanger Sensible Effectiveness,hourly;
 
@@ -3799,9 +3799,9 @@
 
   Output:Variable,*,Humidifier Water Volume Flow Rate,hourly;
 
-  Output:Variable,*,Humidifier Electric Power,hourly;
+  Output:Variable,*,Humidifier Electricity Rate,hourly;
 
-!Output:Variable,*,Humidifier Gas USe Rate,hourly;
+!Output:Variable,*,Humidifier NaturalGas Rate,hourly;
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;

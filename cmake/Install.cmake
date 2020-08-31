@@ -300,8 +300,8 @@ endif()
 set(CPACK_RESOURCE_FILE_README "${PROJECT_SOURCE_DIR}/release/readme.html")
 
 install(FILES "${PROJECT_SOURCE_DIR}/bin/CurveFitTools/IceStorageCurveFitTool.xlsm" DESTINATION "PreProcess/HVACCurveFitTool/")
-install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-2-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-3-0-Energy+.idd" )
+install(FILES "${PROJECT_SOURCE_DIR}/idd/V9-3-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V9-4-0-Energy+.idd" )
 
 # Workflow stuff, takes about 40KB, so not worth it proposing to not install it
 install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/workflows/app_g_postprocess.py" DESTINATION "workflows/") # COMPONENT Workflows)
@@ -489,6 +489,49 @@ set(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CMakeCPackOptions.cmake")
 ##########################################################   D O C U M E N T A T I O N   #############################################################
 
 if ( BUILD_DOCS )
+
+  # If this isn't the case, then docs were already generated since added to the default make rule
+  if (BUILD_DOCS_ONLY_WITH_PACKAGE)
+
+    # Call the build of target docs explicitly here.
+    # Note: This is because you can't do `add_dependencies(package docs)` (https://gitlab.kitware.com/cmake/cmake/issues/8438)
+    # Adding another custom target to be added to the "ALL" one (so it runs) and make it depend on the actual "documentation" target doesn't work
+    # because it'll always run if you have enabled BUILD_DOCS, regardless of whether you are calling the target "package" or not
+    #  add_custom_target(run_documentation ALL)
+    #  add_dependencies(run_documentation documentation)
+    #message(FATAL_ERROR "CMAKE_COMMAND=${CMAKE_COMMAND}")
+
+    # +env will pass the current environment and will end up respecting the -j parameter
+    #                                 this ↓↓↓ here -- https://stackoverflow.com/a/41268443/531179
+    #install(CODE "execute_process(COMMAND +env \"${CMAKE_COMMAND}\" --build \"${PROJECT_BINARY_DIR}\" --target documentation)")
+    # Except it doesn't work with install(execute_process...
+
+    # Passing $(MAKE) doesn't work either, and isn't a great idea for cross platform support anyways
+    # install(CODE "execute_process(COMMAND ${MAKE} ${DOC_BUILD_FLAGS} -C \"${PROJECT_BINARY_DIR}\" documentation)")
+
+    # So instead, we just used the number of threads that are available. That's not ideal, since it ignores any "-j N" option passed by the user
+    # But LaTeX should run quickly enough to not be a major inconvenience.
+    # There no need to do that for Ninja for eg, so only do it for Make and MSVC
+
+    # flag -j to cmake --build was added at 3.12 (VERSION_GREATER_EQUAL need cmake >= 3.7, we apparently support 2.8...)
+    if(NOT(CMAKE_VERSION VERSION_LESS "3.12") AND ((CMAKE_GENERATOR MATCHES "Make") OR WIN32))
+      include(ProcessorCount)
+      ProcessorCount(N)
+      if(NOT N EQUAL 0)
+        set(DOC_BUILD_FLAGS "-j ${N}")
+      endif()
+    endif()
+    if(WIN32)
+      # Win32 is multi config, so you must specify a config when calling cmake.
+      # Let's just use Release, it won't have any effect on LaTeX anyways.
+      set(DOC_CONFIG_FLAG "--config Release")
+    endif()
+
+    # Getting these commands to work (especially with macro expansion) is tricky. Check the resulting `cmake_install.cmake` file in your build folder if need to debug this
+    install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" --build \"${PROJECT_BINARY_DIR}\" ${DOC_CONFIG_FLAG} ${DOC_BUILD_FLAGS} --target docs)"
+            COMPONENT Documentation)
+  endif()
+
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/Acknowledgments.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/AuxiliaryPrograms.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/EMSApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
@@ -503,9 +546,10 @@ if ( BUILD_DOCS )
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/PlantApplicationGuide.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/TipsAndTricksUsingEnergyPlus.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
   install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/UsingEnergyPlusForCompliance.pdf" DESTINATION "./Documentation" COMPONENT Documentation)
+  install(FILES "${PROJECT_BINARY_DIR}/doc/pdf/index.html" DESTINATION "./Documentation" COMPONENT Documentation)
 else()
   message(AUTHOR_WARNING "BUILD_DOCS isn't enabled, so package won't include the PDFs")
-endif ()
+endif()
 
 ##########################################################   S Y S T E M    L I B R A R I E S   ######################################################
 

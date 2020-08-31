@@ -15,7 +15,7 @@
 ! System:   None.
 ! Plant:    PLANT LOAD PROFILE with DistrictHeating and Pressure drop components.
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Plant Load Profile Example,  !- Name
@@ -400,7 +400,7 @@
 
   Output:Variable,*,Plant Loop Pressure Difference,Hourly;
 
-  Output:Variable,*,Pump Electric Power,Hourly;
+  Output:Variable,*,Pump Electricity Rate,Hourly;
 
   Output:Meter,Heating:DistrictHeating,Daily;
 

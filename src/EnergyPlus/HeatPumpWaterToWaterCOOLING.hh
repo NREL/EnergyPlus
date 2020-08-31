@@ -57,6 +57,8 @@
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 namespace HeatPumpWaterToWaterCOOLING {
 
@@ -152,7 +154,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         static PlantComponent *factory(const std::string& objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation,
@@ -160,7 +162,7 @@ namespace HeatPumpWaterToWaterCOOLING {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void initialize();
 

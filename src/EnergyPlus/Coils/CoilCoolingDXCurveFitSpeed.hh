@@ -56,6 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
 
 struct CoilCoolingDXCurveFitSpeedInputSpecification
 {
@@ -137,14 +139,14 @@ struct CoilCoolingDXCurveFitSpeed
 
     // rating data
     Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
-    Real64 RatedInletWetBulbTemp = 19.44;    // 19.44 or 67F
-    Real64 RatedInletAirHumRat = 0.01125;      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    Real64 RatedInletWetBulbTemp = 19.4444;    // 19.44 or 67F
+    Real64 RatedInletAirHumRat = 0.0111847;    // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
     Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
-    void size();
+    void size(EnergyPlusData &state);
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:

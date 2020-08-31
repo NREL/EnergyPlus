@@ -52,7 +52,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -60,16 +59,15 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/OutputFiles.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 #if defined(_WIN32) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -99,7 +97,6 @@ namespace General {
     // OTHER NOTES: none
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using DataHVACGlobals::Bisection;
     using DataHVACGlobals::HVACSystemRootFinding;
 
@@ -124,6 +121,37 @@ namespace General {
     // PUBLIC  ErfFunction
 
     // Functions
+    bool GetReportInput(true);
+    bool SurfVert(false);
+    bool SurfDet(false);
+    bool SurfDetWVert(false);
+    bool DXFReport(false);
+    bool DXFWFReport(false);
+    bool VRMLReport(false);
+    bool CostInfo(false);
+    bool ViewFactorInfo(false);
+    bool Constructions(false);
+    bool Materials(false);
+    bool LineRpt(false);
+    bool VarDict(false);
+    bool EMSoutput(false);
+    
+    void clear_state() {
+        GetReportInput = true;
+        SurfVert = false;
+        SurfDet = false;
+        SurfDetWVert = false;
+        DXFReport = false;
+        DXFWFReport = false;
+        VRMLReport = false;
+        CostInfo = false;
+        ViewFactorInfo = false;
+        Constructions = false;
+        Materials = false;
+        LineRpt = false;
+        VarDict = false;
+        EMSoutput = false;
+    }
 
     void SolveRoot(Real64 const Eps, // required absolute accuracy
                    int const MaxIte, // maximum number of allowed iterations
@@ -1765,7 +1793,7 @@ namespace General {
                            int &PMonth,
                            int &PDay,
                            int &PWeekDay,
-                           int &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                           WeatherManager::DateType &DateType, // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                            bool &ErrorsFound,
                            Optional_int PYear)
     {
@@ -1781,7 +1809,6 @@ namespace General {
         // the proper month and day for that date string.
 
         // Using/Aliasing
-        using namespace DataStringGlobals;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int FstNum;
@@ -1792,19 +1819,19 @@ namespace General {
         int TokenWeekday;
 
         FstNum = int(UtilityRoutines::ProcessNumber(String, errFlag));
-        DateType = -1;
+        DateType = WeatherManager::DateType::InvalidDate;
         if (!errFlag) {
             // Entered single number, do inverse JDay
             if (FstNum == 0) {
                 PMonth = 0;
                 PDay = 0;
-                DateType = 1;
+                DateType = WeatherManager::DateType::MonthDay;
             } else if (FstNum < 0 || FstNum > 366) {
                 ShowSevereError("Invalid Julian date Entered=" + String);
                 ErrorsFound = true;
             } else {
                 InvOrdinalDay(FstNum, PMonth, PDay, 0);
-                DateType = 1;
+                DateType = WeatherManager::DateType::LastDayInMonth;
             }
         } else {
             // Error when processing as number, try x/x
@@ -1815,10 +1842,10 @@ namespace General {
                 DetermineDateTokens(String, NumTokens, TokenDay, TokenMonth, TokenWeekday, DateType, ErrorsFound, TokenYear);
                 PYear = TokenYear;
             }
-            if (DateType == 1) {
+            if (DateType == WeatherManager::DateType::MonthDay) {
                 PDay = TokenDay;
                 PMonth = TokenMonth;
-            } else if (DateType == 2 || DateType == 3) {
+            } else if (DateType == WeatherManager::DateType::NthDayInMonth || DateType == WeatherManager::DateType::LastDayInMonth) {
                 // interpret as TokenDay TokenWeekday in TokenMonth
                 PDay = TokenDay;
                 PMonth = TokenMonth;
@@ -1832,7 +1859,7 @@ namespace General {
                              int &TokenDay,         // Value of numeric field found
                              int &TokenMonth,       // Value of Month field found (1=Jan, 2=Feb, etc)
                              int &TokenWeekday,     // Value of Weekday field found (1=Sunday, 2=Monday, etc), 0 if none
-                             int &DateType,         // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
+                             WeatherManager::DateType &DateType,         // DateType found (-1=invalid, 1=month/day, 2=nth day in month, 3=last day in month)
                              bool &ErrorsFound,     // Set to true if cannot process this string as a date
                              Optional_int TokenYear // Value of Year if one appears to be present and this argument is present
     )
@@ -1879,7 +1906,7 @@ namespace General {
         TokenDay = 0;
         TokenMonth = 0;
         TokenWeekday = 0;
-        DateType = -1;
+        DateType = WeatherManager::DateType::InvalidDate;
         InternalError = false;
         WkDayInMonth = false;
         if (present(TokenYear)) TokenYear = 0;
@@ -1936,7 +1963,7 @@ namespace General {
                     TokenMonth = UtilityRoutines::FindItemInList(Fields(1).substr(0, 3), Months, 12);
                     ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                     if (!InternalError) {
-                        DateType = 1;
+                        DateType = WeatherManager::DateType::MonthDay;
                     } else {
                         ErrorsFound = true;
                     }
@@ -1948,7 +1975,7 @@ namespace General {
                         TokenDay = NumField2;
                         ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
-                            DateType = 1;
+                            DateType = WeatherManager::DateType::MonthDay;
                         } else {
                             ErrorsFound = true;
                         }
@@ -1957,7 +1984,7 @@ namespace General {
                         TokenMonth = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Months, 12);
                         ValidateMonthDay(String, TokenDay, TokenMonth, InternalError);
                         if (!InternalError) {
-                            DateType = 1;
+                            DateType = WeatherManager::DateType::MonthDay;
                             NumTokens = 2;
                         } else {
                             ErrorsFound = true;
@@ -1979,12 +2006,12 @@ namespace General {
                             TokenMonth = UtilityRoutines::FindItemInList(Fields(3).substr(0, 3), Months, 12);
                             if (TokenMonth == 0) InternalError = true;
                         }
-                        DateType = 2;
+                        DateType = WeatherManager::DateType::NthDayInMonth;
                         NumTokens = 3;
                         if (TokenDay < 0 || TokenDay > 5) InternalError = true;
                     } else { // first field was not numeric....
                         if (Fields(1) == "LA") {
-                            DateType = 3;
+                            DateType = WeatherManager::DateType::LastDayInMonth;
                             NumTokens = 3;
                             TokenWeekday = UtilityRoutines::FindItemInList(Fields(2).substr(0, 3), Weekdays, 7);
                             if (TokenWeekday == 0) {
@@ -2003,7 +2030,7 @@ namespace General {
                     NumField1 = int(UtilityRoutines::ProcessNumber(Fields(1), errFlag));
                     NumField2 = int(UtilityRoutines::ProcessNumber(Fields(2), errFlag));
                     NumField3 = int(UtilityRoutines::ProcessNumber(Fields(3), errFlag));
-                    DateType = 1;
+                    DateType = WeatherManager::DateType::MonthDay;
                     // error detection later..
                     if (NumField1 > 100) {
                         if (present(TokenYear)) {
@@ -2027,7 +2054,7 @@ namespace General {
         }
 
         if (InternalError) {
-            DateType = -1;
+            DateType = WeatherManager::DateType::InvalidDate;
             ErrorsFound = true;
         }
     }
@@ -2277,8 +2304,7 @@ namespace General {
         // FUNCTION ARGUMENT DEFINITIONS:
 
         // FUNCTION PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt TStmpFmt("(I2.2,':',F3.0)");
-        static ObjexxFCL::gio::Fmt TStmpFmti("(I2.2,':',I2.2)");
+
         Real64 const FracToMin(60.0);
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -2292,8 +2318,6 @@ namespace General {
         Real64 ActualTimeE; // End of current interval (HVAC time step)
         int ActualTimeHrS;
         //  INTEGER ActualTimeHrE
-        std::string TimeStmpS; // Character representation of start of interval
-        std::string TimeStmpE; // Character representation of end of interval
         int ActualTimeMinS;
 
         //  ActualTimeS=INT(CurrentTime)+(SysTimeElapsed+(CurrentTime - INT(CurrentTime)))
@@ -2309,13 +2333,15 @@ namespace General {
             ++ActualTimeHrS;
             ActualTimeMinS = 0;
         }
-        ObjexxFCL::gio::write(TimeStmpS, TStmpFmti) << ActualTimeHrS << ActualTimeMinS;
+        const auto TimeStmpS = format("{:02}:{:02}", ActualTimeHrS, ActualTimeMinS);
+        auto minutes = ((ActualTimeE - static_cast<int>(ActualTimeE)) * FracToMin);
 
-        ObjexxFCL::gio::write(TimeStmpE, TStmpFmt) << int(ActualTimeE) << (ActualTimeE - int(ActualTimeE)) * FracToMin;
-        if (TimeStmpE[3] == ' ') TimeStmpE[3] = '0';
-        TimeStmpE[5] = ' ';
-        strip(TimeStmpE);
+        auto TimeStmpE = format(
+            "{:02}:{:2.0F}",
+            static_cast<int>(ActualTimeE),
+            minutes);
 
+        if (TimeStmpE[3] == ' ') { TimeStmpE[3] = '0'; }
         OutputString = TimeStmpS + " - " + TimeStmpE;
 
         return OutputString;
@@ -2429,7 +2455,8 @@ namespace General {
 
     // END SUBROUTINE SaveCompDesWaterFlow
 
-    void Invert3By3Matrix(Array2A<Real64> const A, // Input 3X3 Matrix
+    void Invert3By3Matrix(IOFiles &ioFiles,
+                          Array2A<Real64> const A, // Input 3X3 Matrix
                           Array2A<Real64> InverseA // Output 3X3 Matrix - Inverse Of A
     )
     {
@@ -2449,9 +2476,6 @@ namespace General {
 
         // REFERENCES:
         // na
-
-        // Using/Aliasing
-        using DataGlobals::OutputFileStandard;
 
         // Argument array dimensioning
         A.dim(3, 3);
@@ -2478,7 +2502,7 @@ namespace General {
                       A(1, 2) * A(2, 1) * A(3, 3) - A(1, 3) * A(2, 2) * A(3, 1);
 
         if (std::abs(Determinant) < .1E-12) {
-            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OutputFileStandard);
+            ShowFatalError("Determinant = [Zero] in Invert3By3Matrix", OptionalOutputFileRef{ioFiles.eso});
         }
 
         // Compute Inverse
@@ -2523,7 +2547,6 @@ namespace General {
         // Linear Correction based on the RegulaFalsi routine in EnergyPlus
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         // unused0909  use dataglobals, only: outputfiledebug
 
         // Locals
@@ -2715,7 +2738,6 @@ namespace General {
         // na
 
         // Using/Aliasing
-        using namespace DataPrecisionGlobals;
         using DataGlobals::CurrentTime;
         using DataGlobals::TimeStepZone;
         using DataHVACGlobals::SysTimeElapsed;
@@ -3205,32 +3227,18 @@ namespace General {
         int NumNames;
         int NumNumbers;
         int IOStat;
-        static bool SurfVert(false);
-        static bool SurfDet(false);
-        static bool SurfDetWVert(false);
-        static bool DXFReport(false);
         static std::string DXFOption1;
         static std::string DXFOption2;
-        static bool DXFWFReport(false);
         static std::string DXFWFOption1;
         static std::string DXFWFOption2;
-        static bool VRMLReport(false);
         static std::string VRMLOption1;
         static std::string VRMLOption2;
-        static bool CostInfo(false);
-        static bool ViewFactorInfo(false);
         static std::string ViewRptOption1;
-        static bool Constructions(false);
-        static bool Materials(false);
-        static bool LineRpt(false);
         static std::string LineRptOption1;
-        static bool VarDict(false);
-        static bool EMSoutput(false);
         static std::string VarDictOption1;
         static std::string VarDictOption2;
         //  LOGICAL,SAVE :: SchRpt = .FALSE.
         //  CHARACTER(len=MaxNameLength) :: SchRptOption
-        static bool GetReportInput(true);
 
         if (GetReportInput) {
 

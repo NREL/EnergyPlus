@@ -52,22 +52,20 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+struct ChillerIndirectAbsoprtionData;
+
 namespace ChillerIndirectAbsorption {
-
-    extern int const FlowModeNotSet;
-    extern int const ConstantFlow;
-    extern int const NotModulated;
-    extern int const LeavingSetPointModulated;
-
-    extern int NumIndirectAbsorbers; // number of Absorption Chillers specified in input
-
-    extern bool GetInput; // When TRUE, calls subroutine to read input file
 
     struct ReportVars
     {
@@ -150,7 +148,7 @@ namespace ChillerIndirectAbsorption {
         int SteamFluidIndex;                   // index to generator fluid type
         bool Available;                        // need an array of logicals--load identifiers of available equipment
         bool ON;                               // simulate the machine at it's operating part load ratio
-        int FlowMode;                          // one of 3 modes for component flow during operation
+        DataPlant::FlowMode FlowMode;          // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;           // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;             // true if setpoint warning issued
         int MinCondInletTempCtr;               // Low condenser temp warning message counter
@@ -206,7 +204,7 @@ namespace ChillerIndirectAbsorption {
               GeneratorDeltaTempWasAutoSized(true), SizFac(0.0), EvapInletNodeNum(0), EvapOutletNodeNum(0), CondInletNodeNum(0), CondOutletNodeNum(0),
               GeneratorInletNodeNum(0), GeneratorOutletNodeNum(0), GeneratorInputCurvePtr(0), PumpPowerCurvePtr(0), CapFCondenserTempPtr(0),
               CapFEvaporatorTempPtr(0), CapFGeneratorTempPtr(0), HeatInputFCondTempPtr(0), HeatInputFEvapTempPtr(0), ErrCount2(0),
-              GenHeatSourceType(0), SteamFluidIndex(0), Available(false), ON(false), FlowMode(FlowModeNotSet), ModulatedFlowSetToLoop(false),
+              GenHeatSourceType(0), SteamFluidIndex(0), Available(false), ON(false), FlowMode(DataPlant::FlowMode::NOTSET), ModulatedFlowSetToLoop(false),
               ModulatedFlowErrDone(false), MinCondInletTempCtr(0), MinCondInletTempIndex(0), MinGenInletTempCtr(0), MinGenInletTempIndex(0),
               CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
               GenLoopNum(0), GenLoopSideNum(0), GenBranchNum(0), GenCompNum(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0),
@@ -218,17 +216,17 @@ namespace ChillerIndirectAbsorption {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(ChillerIndirectAbsoprtionData &chillers, std::string const &objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
         void getSizingFactor(Real64 &sizFac) override;
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void initialize(bool RunFlag, Real64 MyLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
@@ -239,14 +237,21 @@ namespace ChillerIndirectAbsorption {
         void calculate(Real64 MyLoad, bool RunFlag);
     };
 
-    // Object Data
-    extern Array1D<IndirectAbsorberSpecs> IndirectAbsorber; // dimension to number of machines
-
-    void GetIndirectAbsorberInput();
-
-    void clear_state();
+    void GetIndirectAbsorberInput(ChillerIndirectAbsoprtionData &chillers);
 
 } // namespace ChillerIndirectAbsorption
+
+    struct ChillerIndirectAbsoprtionData :BaseGlobalStruct {
+        int NumIndirectAbsorbers = 0;
+        bool GetInput = true;
+        Array1D<ChillerIndirectAbsorption::IndirectAbsorberSpecs> IndirectAbsorber;
+        void clear_state() override
+        {
+            NumIndirectAbsorbers = 0;
+            GetInput = true;
+            IndirectAbsorber.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

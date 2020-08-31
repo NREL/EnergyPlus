@@ -1,7 +1,7 @@
-! EMSUserDefined5ZoneAirCooled.idf
+! PythonPluginUserDefined5ZoneAirCooled.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              User Defined component models using Energy Management System
+! Highlights:              User Defined component models using Python Plugin System
 !                          PlantComponent:UserDefined example of a constant COP chiller
 !                          Coil:UserDefined examples with chilled water and hot water coil systems that meet setpoint on leaving air node
 !                          AirTerminal:SingleDuct:UserDefined with VAV reheat air terminals that operate at full stop during heating (for zone mixing).
@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3704,8 +3704,8 @@
     Central Chiller Outlet Node,  !- Plant Connection 1 Outlet Node Name
     MeetsLoadWithNominalCapacityLowOutLimit,  !- Plant Connection 1 Loading Mode
     NeedsFlowIfLoopOn,       !- Plant Connection 1 Loop Flow Request Mode
-    Chiller model init programs,  !- Plant Connection 1 Initialization Program Calling Manager Name
-    Chiller model simulation programs,  !- Plant Connection 1 Simulation Program Calling Manager Name
+    Chiller Initialization,  !- Plant Connection 1 Initialization Program Calling Manager Name
+    Chiller Simulation,      !- Plant Connection 1 Simulation Program Calling Manager Name
     ,                        !- Plant Connection 2 Inlet Node Name
     ,                        !- Plant Connection 2 Outlet Node Name
     ,                        !- Plant Connection 2 Loading Mode
@@ -3730,73 +3730,22 @@
     ,                        !- Collection Outlet Water Storage Tank Name
     ;                        !- Ambient Zone Name
 
-  PythonPlugin:Instance,
-    Chiller model init programs,            !- Name
-    Yes,                                    !- Run During Warmup Days
-    PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
-    UserDefinedCoilInit;                    !- Plugin Class Name
 
   PythonPlugin:Instance,
-    Chiller model simulation programs,      !- Name
-    Yes,                                    !- Run During Warmup Days
+    Chiller Initialization,  !- Name
+    Yes,                     !- Run During Warmup Days
     PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
-    UserDefinedCoilSim;                    !- Plugin Class Name
+    InitChiller;             !- Plugin Class Name
 
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Chiller model simulation programs,  !- Name
-!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-!    ModelChillerModel;       !- Program Name 1
+  PythonPlugin:Instance,
+    Chiller Simulation,      !- Name
+    Yes,                     !- Run During Warmup Days
+    PythonPluginUserDefined5ZoneAirCooled,  !- Python Module Name
+    SimChiller;              !- Plugin Class Name
 
-!  EnergyManagementSystem:Program,
-!    ModelChillerModel,       !- Name
-!    Set dummy = CW_MyLoad,   !- Program Line 1
-!    Set dummy = CW_Tin,      !- Program Line 2
-!    Set dummy = CW_Mdot,     !- <none>
-!    If CW_MyLoad > (0 - 100),!- <none>
-!    Set CW_Tout             = CW_Tin,  !- <none>
-!    Set CW_Mdot_Request     = 0.0,  !- <none>
-!    Set Chiller_ElectEnergy = 0.0,  !- <none>
-!    RETURN,                  !- <none>
-!    ENDIF,                   !- <none>
-!    Set ABS_CW_MyLoad = @ABS CW_MyLoad,  !- <none>
-!    IF ABS_CW_MyLoad > Chiller_Cap_Max,  !- <none>
-!    Set Qdot = Chiller_Cap_Max,  !- <none>
-!    ELSE,                    !- <none>
-!    Set Qdot = ABS_CW_MyLoad,!- <none>
-!    ENDIF,                   !- <none>
-!    IF CW_Mdot == 0,         !- <none>
-!    Set Mdot = Chiller_Mdot_Max,  !- <none>
-!    SEt CW_Mdot_Request = Chiller_Mdot_Max,  !- <none>
-!    ELSE,                    !- <none>
-!    Set Mdot = CW_Mdot,      !- <none>
-!    ENDIF,                   !- <none>
-!    Set CW_Tout = CW_Tin - (Qdot / (Mdot * CW_Cp)),  !- <none>
-!    Set EIR     = 1 / 4.6,   !- <none>
-!    Set Chiller_power = Qdot * EIR,  !- <none>
-!    Set Chiller_ElectEnergy = Chiller_power * SystemTimestep * 3600;  !- <none>
-
-!  EnergyManagementSystem:ProgramCallingManager,
-!    Chiller model init programs,  !- Name
-!    UserDefinedComponentModel,  !- EnergyPlus Model Calling Point
-!    InitEvapChillerModel;    !- Program Name 1
-
-!  EnergyManagementSystem:Program,
-!    InitEvapChillerModel,    !- Name
-!    Set CWLoopExitTemp = 7.0,!- Program Line 1
-!    Set CWLoopDeltaTemp = 4.0,  !- Program Line 2
-!    Set CW_CP = @CPCW CWLoopExitTemp,  !- <none>
-!    Set CW_rho = @RhoH2O CWLoopExitTemp,  !- <none>
-!    Set Chiller_Vdot_Design = CWplant_Vdot_Design,  !- <none>
-!    Set Chiller_Mdot_Min = 0.0,  !- <none>
-!    Set Chiller_Mdot_Max = Chiller_Vdot_Design * CW_rho,  !- <none>
-!    Set Chiller_Cap = CW_CP * CW_rho * CWLoopDeltaTemp * CWplant_Vdot_Design,  !- <none>
-!    Set Chiller_Cap_Min = 0.0,  !- <none>
-!    Set Chiller_Cap_Max = Chiller_Cap,  !- <none>
-!    Set Chiller_Cap_Opt = 0.9 * Chiller_Cap;  !- <none>
-
-PythonPlugin:Variables,
-   ChillerGlobalVars,       !- Name
-   Chiller_ElectEnergy;     !- Variable Name 1
+  PythonPlugin:Variables,
+    ChillerGlobalVars,       !- Name
+    Chiller_ElectEnergy;     !- Variable Name 1
 
   PythonPlugin:OutputVariable,
     Chiller Electricity Consumption,    !- Name
@@ -3808,17 +3757,6 @@ PythonPlugin:Variables,
     HVAC,                               !- Group Type
     Cooling,                            !- End-Use Category
     Custom air cooled chiller;         !- End-Use Subcategory
-
-!  EnergyManagementSystem:MeteredOutputVariable,
-!    Chiller Electricity Consumption,  !- Name
-!    Chiller_ElectEnergy,     !- EMS Variable Name
-!    SystemTimestep,          !- Update Frequency
-!    ModelChillerModel,       !- EMS Program or Subroutine Name
-!    Electricity,             !- Resource Type
-!    HVAC,                    !- Group Type
-!    Cooling,                 !- End-Use Category
-!    Custom air cooled chiller,  !- End-Use Subcategory
-!    J;                       !- Units
 
   EnergyManagementSystem:MeteredOutputVariable,
     CWcoil1 tot cool Energy, !- Name
@@ -3855,16 +3793,6 @@ PythonPlugin:Variables,
 
 ! input data
 
-!  EnergyManagementSystem:InternalVariable,
-!    CW_Tin,                  !- Name
-!    Central Chiller,         !- Internal Data Index Key Name
-!    Inlet Temperature for Plant Connection 1;  !- Internal Data Type
-
-!  EnergyManagementSystem:InternalVariable,
-!    CW_Mdot,                 !- Name
-!    Central Chiller,         !- Internal Data Index Key Name
-!    Inlet Mass Flow Rate for Plant Connection 1;  !- Internal Data Type
-
   EnergyManagementSystem:InternalVariable,
     CW_Cp,                   !- Name
     Central Chiller,         !- Internal Data Index Key Name
@@ -3875,67 +3803,9 @@ PythonPlugin:Variables,
     Central Chiller,         !- Internal Data Index Key Name
     Inlet Density for Plant Connection 1;  !- Internal Data Type
 
-!  EnergyManagementSystem:InternalVariable,
-!    CW_MyLoad,               !- Name
-!    Central Chiller,         !- Internal Data Index Key Name
-!    Load Request for Plant Connection 1;  !- Internal Data Type
-
 ! sizing and inits
 
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Mdot_Min,        !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Minimum Mass Flow Rate;  !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Mdot_Max,        !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Maximum Mass Flow Rate;  !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Vdot_Design,     !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Design Volume Flow Rate; !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Cap_Min,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Minimum Loading Capacity;!- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Cap_Max,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Maximum Loading Capacity;!- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    Chiller_Cap_Opt,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    `Optimal Loading Capacity`;!- Actuated Component Control Type
-
-!  EnergyManagementSystem:InternalVariable,
-!    CWplant_Vdot_Design,     !- Name
-!    Chilled Water Loop,      !- Internal Data Index Key Name
-!    Plant Design Volume Flow Rate;  !- Internal Data Type
-
 ! model results
-
-!  EnergyManagementSystem:Actuator,
-!    CW_Tout,                 !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Outlet Temperature;      !- Actuated Component Control Type
-
-!  EnergyManagementSystem:Actuator,
-!    CW_Mdot_Request,         !- Name
-!    Central Chiller,         !- Actuated Component Unique Name
-!    Plant Connection 1,      !- Actuated Component Type
-!    Mass Flow Rate;          !- Actuated Component Control Type
 
   SetpointManager:Scheduled,
     Central Chiller Setpoint Manager,  !- Name
@@ -4022,7 +3892,7 @@ PythonPlugin:Variables,
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,hourly;
 
-  Output:Variable,*,Boiler Gas Rate,hourly;
+  Output:Variable,*,Boiler NaturalGas Rate,hourly;
 
   Output:Variable,*,Boiler Heating Rate,hourly;
 
@@ -4046,7 +3916,7 @@ PythonPlugin:Variables,
 
   Output:Variable,*,Main HW Coil Total Heating Rate,hourly;
 
-  Output:Variable,*,Chiller Electricity Consumption,hourly;
+  Output:Variable,Chiller Electricity Consumption,PythonPlugin:OutputVariable,hourly;
 
   Output:VariableDictionary,Regular;
 
@@ -4060,9 +3930,9 @@ PythonPlugin:Variables,
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -4074,9 +3944,9 @@ PythonPlugin:Variables,
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Plant,runperiod;
 
   Output:Meter:MeterFileOnly,MyGeneralLights,monthly;
 
@@ -4101,27 +3971,27 @@ PythonPlugin:Variables,
 
   Meter:Custom,
     MyGeneralLights,         !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     SPACE1-1 Lights 1,       !- Key Name 1
-    Lights Electric Energy,  !- Output Variable or Meter Name 1
+    Lights Electricity Energy,  !- Output Variable or Meter Name 1
     SPACE2-1 Lights 1,       !- Key Name 2
-    Lights Electric Energy,  !- Output Variable or Meter Name 2
+    Lights Electricity Energy,  !- Output Variable or Meter Name 2
     SPACE3-1 Lights 1,       !- Key Name 3
-    Lights Electric Energy,  !- Output Variable or Meter Name 3
+    Lights Electricity Energy,  !- Output Variable or Meter Name 3
     SPACE4-1 Lights 1,       !- Key Name 4
-    Lights Electric Energy,  !- Output Variable or Meter Name 4
+    Lights Electricity Energy,  !- Output Variable or Meter Name 4
     SPACE5-1 Lights 1,       !- Key Name 5
-    Lights Electric Energy;  !- Output Variable or Meter Name 5
+    Lights Electricity Energy;  !- Output Variable or Meter Name 5
 
   Meter:Custom,
     MyBuildingElectric,      !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     ,                        !- Key Name 1
     Electricity:Building;    !- Output Variable or Meter Name 1
 
   Meter:CustomDecrement,
     MyBuildingOther,         !- Name
-    Electricity,             !- Fuel Type
+    Electricity,             !- Resource Type
     Electricity:Building,    !- Source Meter Name
     ,                        !- Key Name 1
     MyGeneralLights;         !- Output Variable or Meter Name 1
@@ -5314,4 +5184,3 @@ PythonPlugin:Variables,
     Set HW_tempFall = ActualQdot/(Water_MdotRequest * Water_cp),  !- <none>
     Set Water_Tout = Water_Tinlet - HW_tempFall,  !- <none>
     Set tot_heat_Power = ActualQdot;  !- <none>
-

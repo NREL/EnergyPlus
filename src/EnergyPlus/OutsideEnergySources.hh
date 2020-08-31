@@ -58,6 +58,10 @@
 
 namespace EnergyPlus {
 
+// Forward declarations
+struct EnergyPlusData;
+struct BranchInputManagerData;
+
 namespace OutsideEnergySources {
 
     extern int NumDistrictUnits;
@@ -94,17 +98,17 @@ namespace OutsideEnergySources {
 
         static PlantComponent *factory(int objectType, std::string objectName);
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation,
                                  Real64 &MaxLoad,
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize(Real64 curLoad);
+        void initialize(BranchInputManagerData &dataBranchInputManager, Real64 curLoad);
 
         void calculate(bool runFlag, Real64 curLoad);
 

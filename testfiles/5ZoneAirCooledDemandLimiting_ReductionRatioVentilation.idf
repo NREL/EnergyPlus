@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Building,                !- Name
@@ -3126,23 +3126,23 @@
     ,                        !- Rotation Duration {minutes}
     OA Controller 1;         !- Controller Outdoor Air 1 Name
 
-  Output:Variable,*,Lights Electric Power,TIMESTEP;
+  Output:Variable,*,Lights Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Electric Equipment Electric Power,TIMESTEP;
+  Output:Variable,*,Electric Equipment Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Chiller Electric Power,TIMESTEP;
+  Output:Variable,*,Chiller Electricity Rate,TIMESTEP;
 
   Output:Variable,*,Demand Manager Meter Demand Power,TIMESTEP;
 
   Output:Variable,*,Demand Manager Scheduled Limit Power,TIMESTEP;
 
-  Output:Variable,*,Fan Electric Power,TIMESTEP;
+  Output:Variable,*,Fan Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Exterior Lights Electric Power,TIMESTEP;
+  Output:Variable,*,Exterior Lights Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Boiler Ancillary Electric Power,TIMESTEP;
+  Output:Variable,*,Boiler Ancillary Electricity Rate,TIMESTEP;
 
-  Output:Variable,*,Pump Electric Power,TIMESTEP;
+  Output:Variable,*,Pump Electricity Rate,TIMESTEP;
 
   Output:Variable,*,Air System Outdoor Air Mass Flow Rate,TIMESTEP;
 

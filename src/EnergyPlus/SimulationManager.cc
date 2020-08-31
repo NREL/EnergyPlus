@@ -64,12 +64,12 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataBranchNodeConnections.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -84,7 +84,6 @@ extern "C" {
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -104,6 +103,7 @@ extern "C" {
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
@@ -114,23 +114,24 @@ extern "C" {
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
-#include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -145,6 +146,7 @@ extern "C" {
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/api/datatransfer.h>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -180,17 +182,8 @@ namespace SimulationManager {
     using namespace WeatherManager;
     using namespace ExternalInterface;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     static std::string const BlankString;
-    static ObjexxFCL::gio::Fmt fmtLD("*");
-    static ObjexxFCL::gio::Fmt fmtA("(A)");
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
 
     // MODULE VARIABLE DECLARATIONS:
     bool RunPeriodsInInput(false);
@@ -203,11 +196,8 @@ namespace SimulationManager {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool PreP_Fatal(false);
+        bool WarningOut(true);
     } // namespace
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE SimulationManager
-
-    // MODULE SUBROUTINES:
 
     // Functions
     void clear_state()
@@ -215,9 +205,10 @@ namespace SimulationManager {
         RunPeriodsInInput = false;
         RunControlInInput = false;
         PreP_Fatal = false;
+        WarningOut = true;
     }
 
-    void ManageSimulation(OutputFiles &outputFiles)
+    void ManageSimulation(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -249,7 +240,6 @@ namespace SimulationManager {
         using DataEnvironment::TotRunDesPersDays;
         using DataHVACGlobals::TimeStepSys;
 
-        using BranchInputManager::InvalidBranchDefinitions;
         using BranchInputManager::ManageBranchInput;
         using BranchInputManager::TestBranchIntegrity;
         using BranchNodeConnections::CheckNodeConnections;
@@ -308,9 +298,9 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available; // an environment is available to process
-        static bool ErrorsFound(false);
-        static bool TerminalError(false);
+        bool Available; // an environment is available to process
+        bool ErrorsFound(false);
+        bool TerminalError(false);
         bool SimsDone;
         bool ErrFound;
         bool oneTimeUnderwaterBoundaryCheck = true;
@@ -318,8 +308,13 @@ namespace SimulationManager {
         int EnvCount;
 
 
+        state.files.outputControl.getInput();
+        ResultsFramework::resultsFramework->setupOutputOptions(state.files);
+
+        state.files.debug.ensure_open("OpenOutputFiles", state.files.outputControl.dbg);
+
         // CreateSQLiteDatabase();
-        sqlite = EnergyPlus::CreateSQLiteDatabase();
+        sqlite = EnergyPlus::CreateSQLiteDatabase(state.files);
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -341,9 +336,9 @@ namespace SimulationManager {
             (inputProcessor->getNumObjectsFound("RunPeriod") > 0 || inputProcessor->getNumObjectsFound("RunPeriod:CustomRange") > 0 || FullAnnualRun);
         AskForConnectionsReport = false; // set to false until sizing is finished
 
-        OpenOutputFiles();
-        GetProjectData(outputFiles);
-        CheckForMisMatchedEnvironmentSpecifications();
+        OpenOutputFiles(state.files);
+        GetProjectData(state);
+        CheckForMisMatchedEnvironmentSpecifications(state.files);
         CheckForRequestedReporting();
         SetPredefinedTables();
         SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -351,15 +346,15 @@ namespace SimulationManager {
         SetupTimePointers("Zone", TimeStepZone); // Set up Time pointer for HB/Zone Simulation
         SetupTimePointers("HVAC", TimeStepSys);
 
-        CheckIfAnyEMS();
+        CheckIfAnyEMS(state.files);
         CheckIfAnyPlant();
         CheckIfAnySlabs();
-        CheckIfAnyBasements();
+        CheckIfAnyBasements(state);
         CheckIfAnyIdealCondEntSetPoint();
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 
-        ManageBranchInput(); // just gets input and returns.
+        ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
@@ -377,7 +372,7 @@ namespace SimulationManager {
         }
 
         DoingSizing = true;
-        ManageSizing(OutputFiles::getSingleton());
+        ManageSizing(state);
 
         BeginFullSimFlag = true;
         SimsDone = false;
@@ -392,12 +387,12 @@ namespace SimulationManager {
         }
         Available = true;
 
-        if (InvalidBranchDefinitions) {
+        if (state.dataBranchInputManager.InvalidBranchDefinitions) {
             ShowFatalError("Preceding error(s) in Branch Input cause termination.");
         }
 
         DisplayString("Adjusting Air System Sizing");
-        SizingManager::ManageSystemSizingAdjustments();
+        SizingManager::ManageSystemSizingAdjustments(state);
 
         DisplayString("Adjusting Standard 62.1 Ventilation Sizing");
         SizingManager::ManageSystemVentilationAdjustments();
@@ -406,9 +401,9 @@ namespace SimulationManager {
         KickOffSimulation = true;
 
         ResetEnvironmentCounter();
-        SetupSimulation(outputFiles, ErrorsFound);
+        SetupSimulation(state, ErrorsFound);
 
-        CheckAndReadFaults();
+        CheckAndReadFaults(state);
 
         InitCurveReporting();
 
@@ -422,23 +417,23 @@ namespace SimulationManager {
         if (DoOutputReporting) {
             DisplayString("Reporting Surfaces");
 
-            ReportSurfaces();
+            ReportSurfaces(state.files);
 
-            SetupNodeVarsForReporting();
+            SetupNodeVarsForReporting(state.files);
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
             SystemReports::AllocateAndSetUpVentReports();
             if (EnergyPlus::PluginManagement::pluginManager) {
-                EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
+                EnergyPlus::PluginManagement::PluginManager::setupOutputVariables();
             }
-            UpdateMeterReporting(outputFiles);
+            UpdateMeterReporting(state.files);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
-            SetupPollutionCalculations();
-            InitDemandManagers();
-            TestBranchIntegrity(ErrFound);
+            SetupPollutionCalculations(state.files);
+            InitDemandManagers(state);
+            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(ErrFound);
+            TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -446,22 +441,25 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
             TestCompSetInletOutletNodes(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckControllerLists(ErrFound);
+            CheckControllerLists(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
-                ReportLoopConnections();
-                ReportAirLoopConnections();
-                ReportNodeConnections();
+                ReportLoopConnections(state.files);
+                ReportAirLoopConnections(state.files);
+                ReportNodeConnections(state.files);
                 // Debug reports
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
             CreateEnergyReportStructure();
             bool anyEMSRan;
-            ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
+            ManageEMS(state,
+                      emsCallFromSetupSimulation,
+                      anyEMSRan,
+                      ObjexxFCL::Optional_int_const()); // point to finish setup processing EMS, sensor ready now
 
-            ProduceRDDMDD();
+            ProduceRDDMDD(state);
 
             if (TerminalError) {
                 ShowFatalError("Previous Conditions cause program termination.");
@@ -484,7 +482,7 @@ namespace SimulationManager {
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
-            ManageHVACSizingSimulation(OutputFiles::getSingleton(), ErrorsFound);
+            ManageHVACSizingSimulation(state, ErrorsFound);
         }
 
         ShowMessage("Beginning Simulation");
@@ -496,8 +494,9 @@ namespace SimulationManager {
         WarmupFlag = true;
 
         while (Available) {
+            if (stopSimulation) break;
 
-            GetNextEnvironment(outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -532,7 +531,7 @@ namespace SimulationManager {
             EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            DayOfSimChr = "0";
+            state.dataGlobals.DayOfSimChr = "0";
             NumOfWarmupDays = 0;
             if (CurrentYearIsLeapYear) {
                 if (NumOfDayInEnvrn <= 366) {
@@ -547,20 +546,20 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
+            ManageEMS(state, DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                if (stopSimulation) break;
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++DayOfSim;
-                ObjexxFCL::gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-                strip(DayOfSimChr);
+                state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    DayOfSimChr = "0";
+                    state.dataGlobals.DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;
@@ -576,7 +575,7 @@ namespace SimulationManager {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
                     }
                     static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
-                    print(outputFiles.eio, Format_700, NumOfWarmupDays);
+                    print(state.files.eio, Format_700, NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
                     if (KindOfSim == ksRunPeriodWeather) {
@@ -588,18 +587,21 @@ namespace SimulationManager {
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + DayOfSimChr);
+                    DisplayString("Starting last  year of environment at:  " + state.dataGlobals.DayOfSimChr);
                     ResetTabularReports();
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+                    if (stopSimulation) break;
 
                     BeginHourFlag = true;
                     EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+                        if (stopSimulation) break;
+
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state, false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -612,7 +614,7 @@ namespace SimulationManager {
                         }
 
                         BeginTimeStepFlag = true;
-                        ExternalInterfaceExchangeVariables();
+                        ExternalInterfaceExchangeVariables(state);
 
                         // Set the End__Flag variables to true if necessary.  Note that
                         // each flag builds on the previous level.  EndDayFlag cannot be
@@ -631,11 +633,11 @@ namespace SimulationManager {
                             }
                         }
 
-                        ManageWeather();
+                        ManageWeather(state);
 
-                        ManageExteriorEnergyUse();
+                        ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-                        ManageHeatBalance(outputFiles);
+                        ManageHeatBalance(state);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
                             AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
@@ -658,7 +660,7 @@ namespace SimulationManager {
             } // ... End day loop.
 
             // Need one last call to send latest states to middleware
-            ExternalInterfaceExchangeVariables();
+            ExternalInterfaceExchangeVariables(state);
 
         } // ... End environment loop.
 
@@ -682,9 +684,9 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStartTime("Closeout Reporting=");
 #endif
-        SimCostEstimate();
+        SimCostEstimate(state);
 
-        ComputeTariff(); //     Compute the utility bills
+        ComputeTariff(state.files); //     Compute the utility bills
 
         EMSManager::checkForUnusedActuatorsAtEnd();
 
@@ -692,11 +694,11 @@ namespace SimulationManager {
 
         OpenOutputTabularFile();
 
-        WriteTabularReports(); //     Create the tabular reports at completion of each
+        WriteTabularReports(state); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports();
+        WriteTabularTariffReports(state.dataCostEstimateManager);
 
-        ComputeLifeCycleCostAndReport(); // must be after WriteTabularReports and WriteTabularTariffReports
+        ComputeLifeCycleCostAndReport(state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile();
 
@@ -705,7 +707,7 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStopTime("Closeout Reporting=");
 #endif
-        CloseOutputFiles(outputFiles);
+        CloseOutputFiles(state.files);
 
         // sqlite->createZoneExtendedOutput();
         CreateSQLiteZoneExtendedOutput();
@@ -721,7 +723,7 @@ namespace SimulationManager {
         }
     }
 
-    void GetProjectData(OutputFiles &outputFiles)
+    void GetProjectData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -754,7 +756,7 @@ namespace SimulationManager {
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(8);
+        Array1D_string Alphas(10);
         Array1D<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
@@ -764,14 +766,11 @@ namespace SimulationManager {
         int Num;
         int Which;
         bool ErrorsFound;
-        int Num1;
-        int NumA;
         int NumRunControl;
         static std::string VersionID;
         std::string CurrentModuleObject;
         bool CondFDAlgo;
         int Item;
-
 
         ErrorsFound = false;
 
@@ -1044,73 +1043,106 @@ namespace SimulationManager {
         EvenDuringWarmup = false;
         CurrentModuleObject = "Output:DebuggingData";
         NumDebugOut = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (NumDebugOut > 1) {
+            ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+        }
         if (NumDebugOut > 0) {
             inputProcessor->getObjectItem(CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat);
-            if (int(Number(1)) == 1) {
-                DebugOutput = true;
+            if (NumAlpha >= 1) {
+                DebugOutput = UtilityRoutines::SameString(Alphas(1), "Yes");
             }
-            if (int(Number(2)) == 1) {
-                EvenDuringWarmup = true;
+            if (NumAlpha >= 2) {
+                EvenDuringWarmup = UtilityRoutines::SameString(Alphas(2), "Yes");
             }
         }
 
-        CurrentModuleObject = "Output:Diagnostics";
-        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        for (Num1 = 1; Num1 <= Num; ++Num1) {
-            inputProcessor->getObjectItem(CurrentModuleObject, Num1, Alphas, NumAlpha, Number, NumNumber, IOStat);
-            for (NumA = 1; NumA <= NumAlpha; ++NumA) {
-                if (UtilityRoutines::SameString(Alphas(NumA), "DisplayExtraWarnings")) {
-                    DisplayExtraWarnings = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayAdvancedReportVariables")) {
-                    DisplayAdvancedReportVariables = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayAllWarnings")) {
-                    DisplayAllWarnings = true;
-                    DisplayExtraWarnings = true;
-                    DisplayUnusedObjects = true;
-                    DisplayUnusedSchedules = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayUnusedObjects")) {
-                    DisplayUnusedObjects = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayUnusedSchedules")) {
-                    DisplayUnusedSchedules = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayZoneAirHeatBalanceOffBalance")) {
-                    DisplayZoneAirHeatBalanceOffBalance = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DoNotMirrorDetachedShading")) {
-                    MakeMirroredDetachedShading = false;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DoNotMirrorAttachedShading")) {
-                    MakeMirroredAttachedShading = false;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreInteriorWindowTransmission")) {
-                    IgnoreInteriorWindowTransmission = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDuringWarmup")) {
-                    ReportDuringWarmup = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DisplayWeatherMissingDataWarnings")) {
-                    DisplayWeatherMissingDataWarnings = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreSolarRadiation")) {
-                    IgnoreSolarRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreBeamRadiation")) {
-                    IgnoreBeamRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "IgnoreDiffuseRadiation")) {
-                    IgnoreDiffuseRadiation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "DeveloperFlag")) {
-                    DeveloperFlag = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "TimingFlag")) {
-                    TimingFlag = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDetailedWarmupConvergence")) {
-                    ReportDetailedWarmupConvergence = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "ReportDuringHVACSizingSimulation")) {
-                    ReportDuringHVACSizingSimulation = true;
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "CreateMinimalSurfaceVariables")) {
-                    continue;
-                    //        CreateMinimalSurfaceVariables=.TRUE.
-                } else if (UtilityRoutines::SameString(Alphas(NumA), "CreateNormalSurfaceVariables")) {
-                    continue;
-                    //        IF (CreateMinimalSurfaceVariables) THEN
-                    //          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
-                    //             TRIM(Alphas(NumA))//'', prior set=true for this condition reverts to false.')
-                    //        ENDIF
-                    //        CreateMinimalSurfaceVariables=.FALSE.
-                } else if (!Alphas(NumA).empty()) {
-                    ShowWarningError("GetProjectData: " + CurrentModuleObject + "=\"" + Alphas(NumA) +
-                                     "\", Invalid value for field, entered value ignored.");
+        {
+            CurrentModuleObject = "Output:Diagnostics";
+            Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+            if (Num > 1) {
+                // Let it slide, but warn
+                // ErrorsFound = true;
+                ShowWarningError(CurrentModuleObject + ": More than 1 occurrence of this object found, only first will be used.");
+            }
+            auto const instances = inputProcessor->epJSON.find(CurrentModuleObject);
+
+            if (instances != inputProcessor->epJSON.end()) {
+                auto &instancesValue = instances.value();
+                for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                    auto const &fields = instance.value();
+                    auto const &thisObjectName = instance.key();
+                    inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
+
+                    auto diagnosticsExtensibles = fields.find("diagnostics");
+                    if (diagnosticsExtensibles != fields.end()) {
+                        auto diagnosticsExtensiblesArray = diagnosticsExtensibles.value();
+                        for (auto diagnosticsExtensible : diagnosticsExtensiblesArray) {
+
+                            // We want to avoid cryptic failures such as this one: "[json.exception.out_of_range.403] key 'key' not found"
+                            // Which happens if you put an "empty" entry in the extensible portion
+                            auto it = diagnosticsExtensible.find("key");
+                            if (it == diagnosticsExtensible.end()) {
+                                ShowWarningError(CurrentModuleObject + ": empty key found, consider removing it to avoid this warning.");
+                                continue;
+                            }
+                            std::string diagnosticName = *it;
+
+                            if (UtilityRoutines::SameString(diagnosticName, "DisplayExtraWarnings")) {
+                                DisplayExtraWarnings = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAdvancedReportVariables")) {
+                                DisplayAdvancedReportVariables = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayAllWarnings")) {
+                                DisplayAllWarnings = true;
+                                DisplayExtraWarnings = true;
+                                DisplayUnusedObjects = true;
+                                DisplayUnusedSchedules = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedObjects")) {
+                                DisplayUnusedObjects = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayUnusedSchedules")) {
+                                DisplayUnusedSchedules = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayZoneAirHeatBalanceOffBalance")) {
+                                DisplayZoneAirHeatBalanceOffBalance = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorDetachedShading")) {
+                                MakeMirroredDetachedShading = false;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DoNotMirrorAttachedShading")) {
+                                MakeMirroredAttachedShading = false;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringWarmup")) {
+                                ReportDuringWarmup = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DisplayWeatherMissingDataWarnings")) {
+                                DisplayWeatherMissingDataWarnings = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreSolarRadiation")) { // TODO: Not a valid key choice
+                                IgnoreSolarRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreBeamRadiation")) { // TODO: Not a valid key choice
+                                IgnoreBeamRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "IgnoreDiffuseRadiation")) { // TODO: Not a valid key choice
+                                IgnoreDiffuseRadiation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "DeveloperFlag")) { // TODO: Not a valid key choice
+                                DeveloperFlag = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "TimingFlag")) { // TODO: Not a valid key choice
+                                TimingFlag = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDetailedWarmupConvergence")) {
+                                ReportDetailedWarmupConvergence = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "ReportDuringHVACSizingSimulation")) {
+                                ReportDuringHVACSizingSimulation = true;
+                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateMinimalSurfaceVariables")) { // TODO: Not a valid key choice
+                                continue;
+                                //        CreateMinimalSurfaceVariables=.TRUE.
+                            } else if (UtilityRoutines::SameString(diagnosticName, "CreateNormalSurfaceVariables")) { // TODO: Not a valid key choice
+                                continue;
+                                //        IF (CreateMinimalSurfaceVariables) THEN
+                                //          CALL ShowWarningError('GetProjectData: '//TRIM(CurrentModuleObject)//'=''//  &
+                                //             TRIM(diagnosticName)//'', prior set=true for this condition reverts to false.')
+                                //        ENDIF
+                                //        CreateMinimalSurfaceVariables=.FALSE.
+                            } else if (!diagnosticName.empty()) {
+                                ShowWarningError("GetProjectData: " + CurrentModuleObject + "=\"" + diagnosticName +
+                                                 "\", Invalid value for field, entered value ignored.");
+                            }
+                        }
+                    }
+
+                    // Don't process the duplicate ones
+                    break;
                 }
             }
         }
@@ -1197,8 +1229,7 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    DataGlobals::DoCoilDirectSolutions =
-                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
+                    DataGlobals::DoCoilDirectSolutions = UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     HeatBalanceIntRadExchange::CarrollMethod =
@@ -1209,56 +1240,79 @@ namespace SimulationManager {
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
-                ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
+                bool overrideSystemTimestep(false);
+                bool overrideMaxAllowedDelTemp(false);
+                // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
+                // dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
+                state.dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
-                    }
-                    else if (overrideModeValue == "MODE01") {
+                    } else if (overrideModeValue == "MODE01") {
                         // Zone Time step (TimeStep object) will be set to one timestep per hour
                         overrideTimestep = true;
-                    }
-                    else if (overrideModeValue == "MODE02") {
+                    } else if (overrideModeValue == "MODE02") {
                         // Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
-                    }
-                    else if (overrideModeValue == "MODE03") {
+                    } else if (overrideModeValue == "MODE03") {
                         // Mode02 plus Minimum Number of Warmup Days will be set to 1
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
-                    }
-                    else if (overrideModeValue == "MODE04") {
+                    } else if (overrideModeValue == "MODE04") {
                         // Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
-                    }
-                    else if (overrideModeValue == "MODE05") {
-                        // Mode04 plus internal variable MaxZoneTempDiff will be set to 1.00
+                    } else if (overrideModeValue == "MODE05") {
+                        // Mode04 plus Minimun System Timestep will be set to 1hr
                         overrideTimestep = true;
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
+                    } else if (overrideModeValue == "MODE06") {
+                        // Mode05 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
                         overrideMaxZoneTempDiff = true;
-                    }
-                    else if (overrideModeValue == "ADVANCED") {
+                    } else if (overrideModeValue == "MODE07") {
+                        // Mode06 plus internal variable MaxAllowedDelTemp will be set to 0.1
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideSystemTimestep = true;
+                        overrideMaxZoneTempDiff = true;
+                        overrideMaxAllowedDelTemp = true;
+                    } else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
                         if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
                             DataConvergParams::MaxZoneTempDiff = fields.at("maxzonetempdiff");
-                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: " + RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 4));
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: " +
+                                             RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 4));
+                            advancedModeUsed = true;
+                        }
+                        if (fields.find("maxalloweddeltemp") != fields.end()) { // not required field, has default value
+                            DataHeatBalance::MaxAllowedDelTemp = fields.at("maxalloweddeltemp");
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxAllowedDelTemp set to: " +
+                                             RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
                             advancedModeUsed = true;
                         }
                         if (advancedModeUsed) {
-                            ShowContinueError("...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different than a simulation not using this mode.");
+                            ShowContinueError("...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different "
+                                              "than a simulation not using this mode.");
                         } else {
-                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
+                            ShowWarningError(
+                                "PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
                         }
-                    }
-                    else {
+                    } else {
                         ShowSevereError("Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
                     }
 
@@ -1270,20 +1324,39 @@ namespace SimulationManager {
                         DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                     }
                     if (overrideZoneAirHeatBalAlg) {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
                         DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
                     }
                     if (overrideMinNumWarmupDays) {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
                         DataHeatBalance::MinNumberOfWarmupDays = 1;
                     }
                     if (overrideBeginEnvResetSuppress) {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to SuppressAllBeginEnvironmentResets.");
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to "
+                                         "SuppressAllBeginEnvironmentResets.");
                         DataEnvironment::forceBeginEnvResetSuppress = true;
                     }
+                    if (overrideSystemTimestep) {
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, the minimum System TimeSteps has been changed to 1 hr.");
+                        int MinTimeStepSysOverrideValue = 60.0;
+                        if (MinTimeStepSysOverrideValue > MinutesPerTimeStep) {
+                            MinTimeStepSysOverrideValue = MinutesPerTimeStep;
+                        }
+                        MinTimeStepSys = MinTimeStepSysOverrideValue / 60.0;
+                        LimitNumSysSteps = int(TimeStepZone / MinTimeStepSys);
+                    }
                     if (overrideMaxZoneTempDiff) {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
                         DataConvergParams::MaxZoneTempDiff = 1.0;
+                    }
+                    if (overrideMaxAllowedDelTemp) {
+                        ShowWarningError(
+                            "Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxAllowedDelTemp will be set to 0.1 .");
+                        DataHeatBalance::MaxAllowedDelTemp = 0.1;
                     }
                 }
             }
@@ -1293,21 +1366,21 @@ namespace SimulationManager {
             ShowFatalError("Errors found getting Project Input");
         }
 
-        print(outputFiles.eio, "{}\n", "! <Version>, Version ID");
+        print(state.files.eio, "{}\n", "! <Version>, Version ID");
         static constexpr auto Format_721(" Version, {}\n");
-        print(outputFiles.eio, Format_721, VersionID);
+        print(state.files.eio, Format_721, VersionID);
 
-        print(outputFiles.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
+        print(state.files.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
         static constexpr auto Format_731(" Timesteps per Hour, {:2}, {:2}\n");
-        print(outputFiles.eio, Format_731, NumOfTimeStepInHour, MinutesPerTimeStep);
+        print(state.files.eio, Format_731, NumOfTimeStepInHour, MinutesPerTimeStep);
 
-        print(outputFiles.eio,
+        print(state.files.eio,
               "{}\n",
               "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant "
               "Iterations, Maximum Plant Iterations");
         MinInt = MinTimeStepSys * 60.0;
         static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
-        print(outputFiles.eio,
+        print(state.files.eio,
               Format_733,
               RoundSigDigits(MinInt),
               RoundSigDigits(MaxIter),
@@ -1348,15 +1421,15 @@ namespace SimulationManager {
             Alphas(6) = "No";
         }
 
-        print(outputFiles.eio,
+        print(state.files.eio,
               "{}\n",
               "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather "
               "Simulation, Do HVAC Sizing Simulation");
-        print(outputFiles.eio, " Simulation Control");
+        print(state.files.eio, " Simulation Control");
         for (Num = 1; Num <= 6; ++Num) {
-            print(outputFiles.eio, ", {}", Alphas(Num));
+            print(state.files.eio, ", {}", Alphas(Num));
         }
-        print(outputFiles.eio, "\n");
+        print(state.files.eio, "\n");
 
         // Performance Precision Tradeoffs
         if (DataGlobals::DoCoilDirectSolutions) {
@@ -1384,25 +1457,27 @@ namespace SimulationManager {
         } else {
             Alphas(7) = "No";
         }
-        Alphas(8) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff,3);
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1);
+        Alphas(9) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 3);
+        Alphas(10) = General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
-            "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
-            "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
-            "MaxZoneTempDiff";
-        print(outputFiles.eio, "{}\n", pptHeader);
-        print(outputFiles.eio, " Performance Precision Tradeoffs");
-        for (Num = 1; Num <= 8; ++Num) {
-            print(outputFiles.eio, ", {}", Alphas(Num));
+                                "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
+                                "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
+                                "Minimum System Timestep, MaxZoneTempDiff, MaxAllowedDelTemp";
+        print(state.files.eio, "{}\n", pptHeader);
+        print(state.files.eio, " Performance Precision Tradeoffs");
+        for (Num = 1; Num <= 10; ++Num) {
+            print(state.files.eio, ", {}", Alphas(Num));
         }
-        print(outputFiles.eio, "\n");
+        print(state.files.eio, "\n");
 
-        print(outputFiles.eio,
+        print(state.files.eio,
               "{}\n",
               "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
         // Formats
         static constexpr auto Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
 
-        print(outputFiles.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
+        print(state.files.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
 
         //  IF (DisplayExtraWarnings) THEN
         //    Write(OutputFileInits,740)
@@ -1421,38 +1496,41 @@ namespace SimulationManager {
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
         if (DataGlobals::createPerfLog) {
-            writeIntialPerfLogValues(overrideModeValue);
+            writeIntialPerfLogValues(state.files, overrideModeValue);
         }
     }
 
-    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue)
+    void writeIntialPerfLogValues(IOFiles &ioFiles, std::string const &currentOverrideModeValue)
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
-        UtilityRoutines::appendPerfLog("Program, Version, TimeStamp", DataStringGlobals::VerString); // this string already includes three portions and has commas
-        UtilityRoutines::appendPerfLog("Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
+        UtilityRoutines::appendPerfLog(ioFiles, "Program, Version, TimeStamp",
+                                       DataStringGlobals::VerString); // this string already includes three portions and has commas
+        UtilityRoutines::appendPerfLog(ioFiles, "Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
         if (HeatBalanceIntRadExchange::CarrollMethod) {
-            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "CarrollMRT");
+            UtilityRoutines::appendPerfLog(ioFiles, "Zone Radiant Exchange Algorithm", "CarrollMRT");
         } else {
-            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "ScriptF");
+            UtilityRoutines::appendPerfLog(ioFiles, "Zone Radiant Exchange Algorithm", "ScriptF");
         }
-        UtilityRoutines::appendPerfLog("Override Mode", currentOverrideModeValue);
-        UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
-        UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
-        UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
-     }
+        UtilityRoutines::appendPerfLog(ioFiles, "Override Mode", currentOverrideModeValue);
+        UtilityRoutines::appendPerfLog(ioFiles, "Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
+        UtilityRoutines::appendPerfLog(ioFiles, "Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog(ioFiles, "SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog(ioFiles, "Minimum System Timestep", General::RoundSigDigits(DataConvergParams::MinTimeStepSys * 60.0, 1));
+        UtilityRoutines::appendPerfLog(ioFiles, "MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
+        UtilityRoutines::appendPerfLog(ioFiles, "MaxAllowedDelTemp", General::RoundSigDigits(DataHeatBalance::MaxAllowedDelTemp, 4));
+    }
 
     std::string bool_to_string(bool logical)
     {
         if (logical) {
-            return("True");
+            return ("True");
         } else {
-            return("False");
+            return ("False");
         }
     }
 
-    void CheckForMisMatchedEnvironmentSpecifications()
+    void CheckForMisMatchedEnvironmentSpecifications(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1487,11 +1565,8 @@ namespace SimulationManager {
         NumRunPeriodDesign = inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileDays") +
                              inputProcessor->getNumObjectsFound("SizingPeriod:WeatherFileConditionType");
         NumSizingDays = NumDesignDays + NumRunPeriodDesign;
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
-            WeatherFileAttached = flags.exists();
-        }
+
+        WeatherFileAttached = FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName);
 
         if (RunControlInInput) {
             if (DoZoneSizing) {
@@ -1609,152 +1684,133 @@ namespace SimulationManager {
         }
     }
 
-    void OpenStreamFile(const std::string &fileName, int &unitNumber, std::ostream *&out_stream)
+    std::unique_ptr<std::ostream> OpenStreamFile(const std::string &fileName)
     {
-        int write_stat;
-        unitNumber = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(unitNumber, fileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
+        auto result = std::unique_ptr<std::ofstream>(new std::ofstream(fileName));
+        if (!result->good()) {
             ShowFatalError("OpenOutputFiles: Could not open file " + fileName + " for output (write).");
         }
-        out_stream = ObjexxFCL::gio::out_stream(unitNumber);
+        return result;
     }
 
-    void OpenOutputJsonFiles()
+    void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams)
     {
 
         //// timeSeriesAndTabularEnabled() will return true if only timeSeriesAndTabular is set, that's the only time we write to that file
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                OpenStreamFile(DataStringGlobals::outputJsonFileName, jsonOutputStreams.OutputFileJson, jsonOutputStreams.json_stream);
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                jsonOutputStreams.json_stream = OpenStreamFile(jsonOutputStreams.outputJsonFileName);
             }
-            if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                OpenStreamFile(DataStringGlobals::outputCborFileName, jsonOutputStreams.OutputFileCBOR, jsonOutputStreams.cbor_stream);
+            if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                jsonOutputStreams.cbor_stream = OpenStreamFile(jsonOutputStreams.outputCborFileName);
             }
-            if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                OpenStreamFile(DataStringGlobals::outputMsgPackFileName, jsonOutputStreams.OutputFileMsgPack, jsonOutputStreams.msgpack_stream);
+            if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                jsonOutputStreams.msgpack_stream = OpenStreamFile(jsonOutputStreams.outputMsgPackFileName);
             }
         }
         //// timeSeriesEnabled() will return true if timeSeries is set, so we can write meter reports
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
+        if (ResultsFramework::resultsFramework->timeSeriesEnabled()) {
             // Output detailed Zone time series file
-            if (ResultsFramework::OutputSchema->RIDetailedZoneTSData.rDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIDetailedZoneTSData.iDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSZoneJsonFileName, jsonOutputStreams.OutputFileTSZoneJson,
-                                   jsonOutputStreams.json_TSstream_Zone);
+            if (ResultsFramework::resultsFramework->RIDetailedZoneTSData.rDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIDetailedZoneTSData.iDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                    jsonOutputStreams.json_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSZoneCborFileName, jsonOutputStreams.OutputFileTSZoneCBOR,
-                                   jsonOutputStreams.cbor_TSstream_Zone);
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                    jsonOutputStreams.cbor_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSZoneMsgPackFileName, jsonOutputStreams.OutputFileTSZoneMsgPack,
-                                   jsonOutputStreams.msgpack_TSstream_Zone);
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                    jsonOutputStreams.msgpack_TSstream_Zone = OpenStreamFile(jsonOutputStreams.outputTSZoneMsgPackFileName);
                 }
             }
 
             // Output detailed HVAC time series file
-            if (ResultsFramework::OutputSchema->RIDetailedHVACTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIDetailedHVACTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSHvacJsonFileName, jsonOutputStreams.OutputFileTSHVACJson,
-                                   jsonOutputStreams.json_TSstream_HVAC);
+            if (ResultsFramework::resultsFramework->RIDetailedHVACTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIDetailedHVACTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                    jsonOutputStreams.json_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSHvacCborFileName, jsonOutputStreams.OutputFileTSHVACCBOR,
-                                   jsonOutputStreams.cbor_TSstream_HVAC);
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                    jsonOutputStreams.cbor_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSHvacMsgPackFileName, jsonOutputStreams.OutputFileTSHVACMsgPack,
-                                   jsonOutputStreams.msgpack_TSstream_HVAC);
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                    jsonOutputStreams.msgpack_TSstream_HVAC = OpenStreamFile(jsonOutputStreams.outputTSHvacMsgPackFileName);
                 }
             }
 
             // Output timestep time series file
-            if (ResultsFramework::OutputSchema->RITimestepTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RITimestepTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSJsonFileName, jsonOutputStreams.OutputFileTSJson, jsonOutputStreams.json_TSstream);
+            if (ResultsFramework::resultsFramework->RITimestepTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RITimestepTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                    jsonOutputStreams.json_TSstream = OpenStreamFile(jsonOutputStreams.outputTSJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSCborFileName, jsonOutputStreams.OutputFileTSCBOR, jsonOutputStreams.cbor_TSstream);
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                    jsonOutputStreams.cbor_TSstream = OpenStreamFile(jsonOutputStreams.outputTSCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputTSMsgPackFileName, jsonOutputStreams.OutputFileTSMsgPack,
-                                   jsonOutputStreams.msgpack_TSstream);
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                    jsonOutputStreams.msgpack_TSstream = OpenStreamFile(jsonOutputStreams.outputTSMsgPackFileName);
                 }
             }
 
             // Output hourly time series file
-            if (ResultsFramework::OutputSchema->RIHourlyTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIHourlyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputHRJsonFileName, jsonOutputStreams.OutputFileHRJson, jsonOutputStreams.json_HRstream);
+            if (ResultsFramework::resultsFramework->RIHourlyTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIHourlyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                    jsonOutputStreams.json_HRstream = OpenStreamFile(jsonOutputStreams.outputHRJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputHRCborFileName, jsonOutputStreams.OutputFileHRCBOR, jsonOutputStreams.cbor_HRstream);
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                    jsonOutputStreams.cbor_HRstream = OpenStreamFile(jsonOutputStreams.outputHRCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputHRMsgPackFileName, jsonOutputStreams.OutputFileHRMsgPack,
-                                   jsonOutputStreams.msgpack_HRstream);
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                    jsonOutputStreams.msgpack_HRstream = OpenStreamFile(jsonOutputStreams.outputHRMsgPackFileName);
                 }
             }
 
             // Output daily time series file
-            if (ResultsFramework::OutputSchema->RIDailyTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIDailyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputDYJsonFileName, jsonOutputStreams.OutputFileDYJson, jsonOutputStreams.json_DYstream);
+            if (ResultsFramework::resultsFramework->RIDailyTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIDailyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                    jsonOutputStreams.json_DYstream = OpenStreamFile(jsonOutputStreams.outputDYJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputDYCborFileName, jsonOutputStreams.OutputFileDYCBOR, jsonOutputStreams.cbor_DYstream);
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                    jsonOutputStreams.cbor_DYstream = OpenStreamFile(jsonOutputStreams.outputDYCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputDYMsgPackFileName, jsonOutputStreams.OutputFileDYMsgPack,
-                                   jsonOutputStreams.msgpack_DYstream);
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                    jsonOutputStreams.msgpack_DYstream = OpenStreamFile(jsonOutputStreams.outputDYMsgPackFileName);
                 }
             }
 
             // Output monthly time series file
-            if (ResultsFramework::OutputSchema->RIMonthlyTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIMonthlyTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputMNJsonFileName, jsonOutputStreams.OutputFileMNJson, jsonOutputStreams.json_MNstream);
+            if (ResultsFramework::resultsFramework->RIMonthlyTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIMonthlyTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                    jsonOutputStreams.json_MNstream = OpenStreamFile(jsonOutputStreams.outputMNJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputMNCborFileName, jsonOutputStreams.OutputFileMNCBOR, jsonOutputStreams.cbor_MNstream);
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                    jsonOutputStreams.cbor_MNstream = OpenStreamFile(jsonOutputStreams.outputMNCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputMNMsgPackFileName, jsonOutputStreams.OutputFileMNMsgPack,
-                                   jsonOutputStreams.msgpack_MNstream);
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                    jsonOutputStreams.msgpack_MNstream = OpenStreamFile(jsonOutputStreams.outputMNMsgPackFileName);
                 }
             }
 
             // Output run period time series file
-            if (ResultsFramework::OutputSchema->RIRunPeriodTSData.iDataFrameEnabled() ||
-                ResultsFramework::OutputSchema->RIRunPeriodTSData.rDataFrameEnabled()) {
-                if (ResultsFramework::OutputSchema->JSONEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputSMJsonFileName, jsonOutputStreams.OutputFileSMJson, jsonOutputStreams.json_SMstream);
+            if (ResultsFramework::resultsFramework->RIRunPeriodTSData.iDataFrameEnabled() ||
+                ResultsFramework::resultsFramework->RIRunPeriodTSData.rDataFrameEnabled()) {
+                if (ResultsFramework::resultsFramework->JSONEnabled()) {
+                    jsonOutputStreams.json_SMstream = OpenStreamFile(jsonOutputStreams.outputSMJsonFileName);
                 }
-                if (ResultsFramework::OutputSchema->CBOREnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputSMCborFileName, jsonOutputStreams.OutputFileSMCBOR, jsonOutputStreams.cbor_SMstream);
+                if (ResultsFramework::resultsFramework->CBOREnabled()) {
+                    jsonOutputStreams.cbor_SMstream = OpenStreamFile(jsonOutputStreams.outputSMCborFileName);
                 }
-                if (ResultsFramework::OutputSchema->MsgPackEnabled()) {
-                    OpenStreamFile(DataStringGlobals::outputSMMsgPackFileName, jsonOutputStreams.OutputFileSMMsgPack,
-                                   jsonOutputStreams.msgpack_SMstream);
+                if (ResultsFramework::resultsFramework->MsgPackEnabled()) {
+                    jsonOutputStreams.msgpack_SMstream = OpenStreamFile(jsonOutputStreams.outputSMMsgPackFileName);
                 }
             }
         }
     }
 
-    void OpenOutputFiles()
+    void OpenOutputFiles(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1789,57 +1845,25 @@ namespace SimulationManager {
         // DERIVED TYPE DEFINITIONS:
         // na
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int write_stat;
-
         // FLOW:
-        OutputFileStandard = GetNewUnitNumber();
         StdOutputRecordCount = 0;
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileStandard, DataStringGlobals::outputEsoFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-           ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEsoFileName + " for output (write).");
-        }
-        eso_stream = ObjexxFCL::gio::out_stream(OutputFileStandard);
-        ObjexxFCL::gio::write(OutputFileStandard, fmtA) << "Program Version," + VerString;
+        ioFiles.eso.ensure_open("OpenOutputFiles", ioFiles.outputControl.eso);
+        print(ioFiles.eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.open();
-        if (!OutputFiles::getSingleton().eio.good()) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().eio.fileName + " for output (write).");
-        }
-
-        print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
+        ioFiles.eio.ensure_open("OpenOutputFiles", ioFiles.outputControl.eio);
+        print(ioFiles.eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.open();
-        StdMeterRecordCount = 0;
-        if (!OutputFiles::getSingleton().mtr.good()) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().mtr.fileName + " for output (write).");
-        }
-        print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
+        ioFiles.mtr.ensure_open("OpenOutputFiles", ioFiles.outputControl.mtr);
+        print(ioFiles.mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
-        OutputFileBNDetails = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileBNDetails, DataStringGlobals::outputBndFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputBndFileName + " for output (write).");
-        }
-        ObjexxFCL::gio::write(OutputFileBNDetails, fmtA) << "Program Version," + VerString;
+        ioFiles.bnd.ensure_open("OpenOutputFiles", ioFiles.outputControl.bnd);
+        print(ioFiles.bnd, "Program Version,{}\n", VerString);
     }
 
-    void CloseOutputFiles(OutputFiles &outputFiles)
+    void CloseOutputFiles(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1896,7 +1920,6 @@ namespace SimulationManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
-        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1905,97 +1928,92 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EchoInputFile; // found unit number for 'eplusout.audit'
         std::string cEnvSetThreads;
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        EchoInputFile = FindUnitNumber(DataStringGlobals::outputAuditFileName);
+        ioFiles.audit.ensure_open("CloseOutputFiles", ioFiles.outputControl.audit);
+        constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable=" << NumOfRVariable_Setup;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Total)=" << NumTotalRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Actual)=" << NumOfRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Summed)=" << NumOfRVariable_Sum;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Meter)=" << NumOfRVariable_Meter;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable=" << NumOfIVariable_Setup;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Total)=" << NumTotalIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Actual)=" << NumOfIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Summed)=" << NumOfIVariable_Sum;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxRVariable=" << MaxRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxIVariable=" << MaxIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumEnergyMeters=" << NumEnergyMeters;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumVarMeterArrays=" << NumVarMeterArrays;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxUniqueKeyCount=" << maxUniqueKeyCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxNumberOfFigures=" << maxNumberOfFigures;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MAXHCArrayBounds=" << MAXHCArrayBounds;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxVerticesPerSurface=" << MaxVerticesPerSurface;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumReportList=" << NumReportList;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "InstMeterCacheSize=" << InstMeterCacheSize;
+        print(ioFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
+        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Total)", NumTotalRVariable);
+        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Actual)", NumOfRVariable);
+        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Summed)", NumOfRVariable_Sum);
+        print(ioFiles.audit, variable_fmt, "NumOfRVariable(Meter)", NumOfRVariable_Meter);
+        print(ioFiles.audit, variable_fmt, "NumOfIVariable", NumOfIVariable_Setup);
+        print(ioFiles.audit, variable_fmt, "NumOfIVariable(Total)", NumTotalIVariable);
+        print(ioFiles.audit, variable_fmt, "NumOfIVariable(Actual)", NumOfIVariable);
+        print(ioFiles.audit, variable_fmt, "NumOfIVariable(Summed)", NumOfIVariable_Sum);
+        print(ioFiles.audit, variable_fmt, "MaxRVariable", MaxRVariable);
+        print(ioFiles.audit, variable_fmt, "MaxIVariable", MaxIVariable);
+        print(ioFiles.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
+        print(ioFiles.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
+        print(ioFiles.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
+        print(ioFiles.audit, variable_fmt, "maxNumberOfFigures", maxNumberOfFigures);
+        print(ioFiles.audit, variable_fmt, "MAXHCArrayBounds", MAXHCArrayBounds);
+        print(ioFiles.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
+        print(ioFiles.audit, variable_fmt, "NumReportList", NumReportList);
+        print(ioFiles.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
         if (SutherlandHodgman) {
             if (SlaterBarsky) {
-                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman";
+                print(ioFiles.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
             } else {
-                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
+                print(ioFiles.audit, " {}\n", "ClippingAlgorithm=SutherlandHodgman");
             }
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=ConvexWeilerAtherton";
+            print(ioFiles.audit, "{}\n", "ClippingAlgorithm=ConvexWeilerAtherton");
         }
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumConsideredOutputVariables=" << NumConsideredOutputVariables;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxConsideredOutputVariables=" << MaxConsideredOutputVariables;
+        print(ioFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(ioFiles.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
+        print(ioFiles.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
 
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numActuatorsUsed=" << numActuatorsUsed;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSActuatorsAvailable=" << numEMSActuatorsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSActuatorsAvailable=" << maxEMSActuatorsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numInternalVariablesUsed=" << NumInternalVariablesUsed;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSInternalVarsAvailable=" << numEMSInternalVarsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSInternalVarsAvailable=" << maxEMSInternalVarsAvailable;
+        print(ioFiles.audit, variable_fmt, "numActuatorsUsed", numActuatorsUsed);
+        print(ioFiles.audit, variable_fmt, "numEMSActuatorsAvailable", numEMSActuatorsAvailable);
+        print(ioFiles.audit, variable_fmt, "maxEMSActuatorsAvailable", maxEMSActuatorsAvailable);
+        print(ioFiles.audit, variable_fmt, "numInternalVariablesUsed", NumInternalVariablesUsed);
+        print(ioFiles.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
+        print(ioFiles.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
 
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfNodeConnections=" << NumOfNodeConnections;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxNumOfNodeConnections=" << MaxNumOfNodeConnections;
+        print(ioFiles.audit, variable_fmt, "NumOfNodeConnections", NumOfNodeConnections);
+        print(ioFiles.audit, variable_fmt, "MaxNumOfNodeConnections", MaxNumOfNodeConnections);
 #ifdef EP_Count_Calls
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumShadow_Calls=" << NumShadow_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumShadowAtTS_Calls=" << NumShadowAtTS_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumClipPoly_Calls=" << NumClipPoly_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumInitSolar_Calls=" << NumInitSolar_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumAnisoSky_Calls=" << NumAnisoSky_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumDetPolyOverlap_Calls=" << NumDetPolyOverlap_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumCalcPerSolBeam_Calls=" << NumCalcPerSolBeam_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumDetShadowCombs_Calls=" << NumDetShadowCombs_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntSolarDist_Calls=" << NumIntSolarDist_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchange_Calls=" << NumIntRadExchange_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeZ_Calls=" << NumIntRadExchangeZ_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeMain_Calls=" << NumIntRadExchangeMain_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeOSurf_Calls=" << NumIntRadExchangeOSurf_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeISurf_Calls=" << NumIntRadExchangeISurf_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumMaxInsideSurfIterations=" << NumMaxInsideSurfIterations;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumCalcScriptF_Calls=" << NumCalcScriptF_Calls;
+        print(ioFiles.audit, variable_fmt, "NumShadow_Calls", NumShadow_Calls);
+        print(ioFiles.audit, variable_fmt, "NumShadowAtTS_Calls", NumShadowAtTS_Calls);
+        print(ioFiles.audit, variable_fmt, "NumClipPoly_Calls", NumClipPoly_Calls);
+        print(ioFiles.audit, variable_fmt, "NumInitSolar_Calls", NumInitSolar_Calls);
+        print(ioFiles.audit, variable_fmt, "NumAnisoSky_Calls", NumAnisoSky_Calls);
+        print(ioFiles.audit, variable_fmt, "NumDetPolyOverlap_Calls", NumDetPolyOverlap_Calls);
+        print(ioFiles.audit, variable_fmt, "NumCalcPerSolBeam_Calls", NumCalcPerSolBeam_Calls);
+        print(ioFiles.audit, variable_fmt, "NumDetShadowCombs_Calls", NumDetShadowCombs_Calls);
+        print(ioFiles.audit, variable_fmt, "NumIntSolarDist_Calls", NumIntSolarDist_Calls);
+        print(ioFiles.audit, variable_fmt, "NumIntRadExchange_Calls", NumIntRadExchange_Calls);
+        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeZ_Calls", NumIntRadExchangeZ_Calls);
+        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeMain_Calls", NumIntRadExchangeMain_Calls);
+        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeOSurf_Calls", NumIntRadExchangeOSurf_Calls);
+        print(ioFiles.audit, variable_fmt, "NumIntRadExchangeISurf_Calls", NumIntRadExchangeISurf_Calls);
+        print(ioFiles.audit, variable_fmt, "NumMaxInsideSurfIterations", NumMaxInsideSurfIterations);
+        print(ioFiles.audit, variable_fmt, "NumCalcScriptF_Calls", NumCalcScriptF_Calls);
 #endif
 
-        ObjexxFCL::gio::write(OutputFileStandard, EndOfDataFormat);
-        ObjexxFCL::gio::write(OutputFileStandard, fmtLD) << "Number of Records Written=" << StdOutputRecordCount;
+        print(ioFiles.eso, "{}\n", EndOfDataString);
         if (StdOutputRecordCount > 0) {
-            ObjexxFCL::gio::close(OutputFileStandard);
+            print(ioFiles.eso, variable_fmt, "Number of Records Written", StdOutputRecordCount);
+            ioFiles.eso.close();
         } else {
-            {
-                IOFlags flags;
-                flags.DISPOSE("DELETE");
-                ObjexxFCL::gio::close(OutputFileStandard, flags);
-            }
+            ioFiles.eso.del();
         }
-        eso_stream = nullptr;
 
         if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             print(
-                outputFiles.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
-            print(outputFiles.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);
+                ioFiles.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
+            print(ioFiles.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);
         }
         // Report number of threads to eio file
         static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
                                               "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
                                               "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
                                               "Parallel Sims");
-        print(outputFiles.eio, "{}\n", ThreadingHeader);
+        print(ioFiles.eio, "{}\n", ThreadingHeader);
         static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
         if (Threading) {
             if (iEnvSetThreads == 0) {
@@ -2014,7 +2032,7 @@ namespace SimulationManager {
                 cIDFSetThreads = RoundSigDigits(iIDFSetThreads);
             }
             if (lnumActiveSims) {
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       ThreadReport,
                       "Yes",
                       MaxNumberOfThreads,
@@ -2025,7 +2043,7 @@ namespace SimulationManager {
                       iNominalTotSurfaces,
                       inumActiveSims);
             } else {
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       ThreadReport,
                       "Yes",
                       MaxNumberOfThreads,
@@ -2038,33 +2056,30 @@ namespace SimulationManager {
             }
         } else { // no threading
             if (lnumActiveSims) {
-                print(outputFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", inumActiveSims);
+                print(ioFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", inumActiveSims);
             } else {
-                print(outputFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
+                print(ioFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
             }
         }
 
         // Close the Initialization Output File
-        print(outputFiles.eio, "{}\n", EndOfDataString);
-        outputFiles.eio.close();
+        print(ioFiles.eio, "{}\n", EndOfDataString);
+        ioFiles.eio.close();
 
         // Close the Meters Output File
-        print(outputFiles.mtr, "{}\n", EndOfDataString);
-        print(outputFiles.mtr, " Number of Records Written={:12}\n", StdMeterRecordCount);
+        print(ioFiles.mtr, "{}\n", EndOfDataString);
+        print(ioFiles.mtr, " Number of Records Written={:12}\n", StdMeterRecordCount);
         if (StdMeterRecordCount > 0) {
-            outputFiles.mtr.close();
+            ioFiles.mtr.close();
         } else {
-            outputFiles.mtr.del();
+            ioFiles.mtr.del();
         }
 
         // Close the External Shading Output File
-
-        if (OutputFileShadingFrac > 0) {
-            ObjexxFCL::gio::close(OutputFileShadingFrac);
-        }
+        ioFiles.shade.close();
     }
 
-    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2093,18 +2108,11 @@ namespace SimulationManager {
         using PlantPipingSystemsManager::CheckIfAnySlabs;
         using PlantPipingSystemsManager::SimulateGroundDomains;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static bool Available(false); // an environment is available to process
-        //  integer :: env_iteration=0
-        //  CHARACTER(len=32) :: cEnvChar
-
-        //  return  ! remove comment to do 'old way'
-
-        Available = true;
+        bool Available = true;
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2130,11 +2138,11 @@ namespace SimulationManager {
 
             BeginTimeStepFlag = true;
 
-            ManageWeather();
+            ManageWeather(state);
 
-            ManageExteriorEnergyUse();
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -2145,11 +2153,11 @@ namespace SimulationManager {
             //          ! do another timestep=1
             if (DeveloperFlag) DisplayString("Initializing Simulation - 2nd timestep 1:" + EnvironmentName);
 
-            ManageWeather();
+            ManageWeather(state);
 
-            ManageExteriorEnergyUse();
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state);
 
             //         do an end of day, end of environment time step
 
@@ -2158,23 +2166,23 @@ namespace SimulationManager {
             EndEnvrnFlag = true;
 
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
-            ManageWeather();
+            ManageWeather(state);
 
-            ManageExteriorEnergyUse();
+            ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state);
 
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(outputFiles, true);
+            SimulateGroundDomains(state, true);
         }
 
-        if (!ErrorsFound) SimCostEstimate(); // basically will get and check input
+        if (!ErrorsFound) SimCostEstimate(state); // basically will get and check input
         if (ErrorsFound) ShowFatalError("Previous conditions cause program termination.");
     }
 
-    void ReportNodeConnections()
+    void ReportNodeConnections(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2189,59 +2197,46 @@ namespace SimulationManager {
 
         // Using/Aliasing
         using namespace DataBranchNodeConnections;
-        using DataGlobals::OutputFileBNDetails;
         using DataLoopNode::NodeID;
         using DataLoopNode::NumOfNodes;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int Loop;
-        int Loop1;
-        int NumParents;
-        int NumNonParents;
-        int NumNonConnected;
-        std::string ChrOut;
-        bool ParentComponentFound;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_701("(A)");
-        static ObjexxFCL::gio::Fmt Format_702("('! <#',A,' Node Connections>,<Number of ',A,' Node Connections>')");
-        static ObjexxFCL::gio::Fmt Format_703(
-            "('! <',A,' Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,','<Node ConnectionType>,<Node FluidStream>')");
-        static ObjexxFCL::gio::Fmt Format_705("('! <#NonConnected Nodes>,<Number of NonConnected Nodes>',/,' #NonConnected Nodes,',A)");
-        static ObjexxFCL::gio::Fmt Format_706("('! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>')");
+        static constexpr auto Format_702("! <#{0} Node Connections>,<Number of {0} Node Connections>\n");
+        static constexpr auto Format_703(
+            "! <{} Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,<Node ConnectionType>,<Node FluidStream>\n");
 
         NonConnectedNodes.dimension(NumOfNodes, true);
 
-        NumParents = 0;
-        NumNonParents = 0;
-        for (Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
+        int NumNonParents = 0;
+        for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
             if (NodeConnections(Loop).ObjectIsParent) continue;
             ++NumNonParents;
         }
-        NumParents = NumOfNodeConnections - NumNonParents;
+        const auto NumParents = NumOfNodeConnections - NumNonParents;
         ParentNodeList.allocate(NumParents);
 
         //  Do Parent Objects
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_702) << "Parent"
-                                                    << "Parent";
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumParents;
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Parent Node Connections," + stripped(ChrOut);
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_703) << "Parent";
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, Format_702, "Parent");
+        print(ioFiles.bnd, " #Parent Node Connections,{}\n", NumParents);
+        print(ioFiles.bnd, Format_703, "Parent");
 
-        for (Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
             if (!NodeConnections(Loop).ObjectIsParent) continue;
             NonConnectedNodes(NodeConnections(Loop).NodeNumber) = false;
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << NodeConnections(Loop).FluidStream;
-            strip(ChrOut);
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Parent Node Connection," + NodeConnections(Loop).NodeName + ',' +
-                                                               NodeConnections(Loop).ObjectType + ',' + NodeConnections(Loop).ObjectName + ',' +
-                                                               NodeConnections(Loop).ConnectionType + ',' + ChrOut;
+            print(ioFiles.bnd,
+                  " Parent Node Connection,{},{},{},{},{}\n",
+                  NodeConnections(Loop).NodeName,
+                  NodeConnections(Loop).ObjectType,
+                  NodeConnections(Loop).ObjectName,
+                  NodeConnections(Loop).ConnectionType,
+                  NodeConnections(Loop).FluidStream);
             // Build ParentNodeLists
             if (UtilityRoutines::SameString(NodeConnections(Loop).ConnectionType, "Inlet") ||
                 UtilityRoutines::SameString(NodeConnections(Loop).ConnectionType, "Outlet")) {
-                ParentComponentFound = false;
-                for (Loop1 = 1; Loop1 <= NumOfActualParents; ++Loop1) {
+                bool ParentComponentFound = false;
+                for (int Loop1 = 1; Loop1 <= NumOfActualParents; ++Loop1) {
                     if (ParentNodeList(Loop1).CType != NodeConnections(Loop).ObjectType ||
                         ParentNodeList(Loop1).CName != NodeConnections(Loop).ObjectName)
                         continue;
@@ -2272,45 +2267,44 @@ namespace SimulationManager {
         }
 
         //  Do non-Parent Objects
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_702) << "Non-Parent"
-                                                    << "Non-Parent";
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumNonParents;
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Non-Parent Node Connections," + stripped(ChrOut);
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_703) << "Non-Parent";
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, Format_702, "Non-Parent");
+        print(ioFiles.bnd, " #Non-Parent Node Connections,{}\n", NumNonParents);
+        print(ioFiles.bnd, Format_703, "Non-Parent");
 
-        for (Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
+        for (int Loop = 1; Loop <= NumOfNodeConnections; ++Loop) {
             if (NodeConnections(Loop).ObjectIsParent) continue;
             NonConnectedNodes(NodeConnections(Loop).NodeNumber) = false;
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << NodeConnections(Loop).FluidStream;
-            strip(ChrOut);
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Non-Parent Node Connection," + NodeConnections(Loop).NodeName + ',' +
-                                                               NodeConnections(Loop).ObjectType + ',' + NodeConnections(Loop).ObjectName + ',' +
-                                                               NodeConnections(Loop).ConnectionType + ',' + ChrOut;
+            print(ioFiles.bnd,
+                  " Non-Parent Node Connection,{},{},{},{},{}\n",
+                  NodeConnections(Loop).NodeName,
+                  NodeConnections(Loop).ObjectType,
+                  NodeConnections(Loop).ObjectName,
+                  NodeConnections(Loop).ConnectionType,
+                  NodeConnections(Loop).FluidStream);
         }
 
-        NumNonConnected = 0;
-        for (Loop = 1; Loop <= NumOfNodes; ++Loop) {
+        int NumNonConnected = 0;
+        for (int Loop = 1; Loop <= NumOfNodes; ++Loop) {
             if (NonConnectedNodes(Loop)) ++NumNonConnected;
         }
 
         if (NumNonConnected > 0) {
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << NumNonConnected;
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_705) << stripped(ChrOut);
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_706);
-            for (Loop = 1; Loop <= NumOfNodes; ++Loop) {
+            print(ioFiles.bnd, "{}\n", "! ===============================================================");
+            static constexpr auto Format_705("! <#NonConnected Nodes>,<Number of NonConnected Nodes>\n #NonConnected Nodes,{}\n");
+            print(ioFiles.bnd, Format_705, NumNonConnected);
+            static constexpr auto Format_706("! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>");
+            print(ioFiles.bnd, "{}\n", Format_706);
+            for (int Loop = 1; Loop <= NumOfNodes; ++Loop) {
                 if (!NonConnectedNodes(Loop)) continue;
-                ObjexxFCL::gio::write(ChrOut, fmtLD) << Loop;
-                strip(ChrOut);
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " NonConnected Node," + ChrOut + ',' + NodeID(Loop);
+                print(ioFiles.bnd, " NonConnected Node,{},{}\n", Loop, NodeID(Loop));
             }
         }
 
         NonConnectedNodes.deallocate();
     }
 
-    void ReportLoopConnections()
+    void ReportLoopConnections(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2321,7 +2315,7 @@ namespace SimulationManager {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reports on the node connections in various parts of the
-        // HVAC syste: Component Sets, Air Loop, Plant and Condenser Loop, Supply and
+        // HVAC systen: Component Sets, Air Loop, Plant and Condenser Loop, Supply and
         // return air paths, controlled zones.
         // This information should be useful in diagnosing node connection input errors.
 
@@ -2335,67 +2329,50 @@ namespace SimulationManager {
         using namespace DataZoneEquipment;
         using DataErrorTracking::AbortProcessing; // used here to turn off Node Connection Error reporting
         using DataErrorTracking::AskForConnectionsReport;
-        using DataGlobals::OutputFileBNDetails;
         using DualDuct::ReportDualDuctConnections;
         using OutAirNodeManager::NumOutsideAirNodes;
         using OutAirNodeManager::OutsideAirNodeList;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static std::string const errstring("**error**");
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        std::string ChrOut;
-        std::string ChrOut2;
-        std::string ChrOut3;
-        std::string LoopString;
-        std::string ChrName;
-        int Count;
-        int Count1;
-        int LoopSideNum;
-        static bool WarningOut(true);
-        int NumOfControlledZones;
+        constexpr static auto errstring("**error**");
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('! <#Component Sets>,<Number of Component Sets>')");
-        static ObjexxFCL::gio::Fmt Format_701("(A)");
-        static ObjexxFCL::gio::Fmt Format_702("('! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,','<Component "
-                                   "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>')");
-        static ObjexxFCL::gio::Fmt Format_707("(1X,A)");
-        static ObjexxFCL::gio::Fmt Format_713("(A)");
-        static ObjexxFCL::gio::Fmt Format_720("('! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>')");
-        static ObjexxFCL::gio::Fmt Format_721("(A)");
-        static ObjexxFCL::gio::Fmt Format_722(
-            "('! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>')");
-        static ObjexxFCL::gio::Fmt Format_723("('! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,','<Zone Name>,<Heating "
-                                   "Priority>,<Cooling Priority>')");
+        static constexpr auto Format_700("! <#Component Sets>,<Number of Component Sets>");
+        static constexpr auto Format_702("! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,<Component "
+                                         "Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>");
+        static constexpr auto Format_720("! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>");
+        static constexpr auto Format_722(
+            "! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>");
+        static constexpr auto Format_723("! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,<Zone Name>,<Heating "
+                                         "Priority>,<Cooling Priority>");
 
         // Report outside air node names on the Branch-Node Details file
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>";
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumOutsideAirNodes;
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Outdoor Air Nodes," + stripped(ChrOut);
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", "! #Outdoor Air Nodes,<Number of Outdoor Air Nodes>");
+        print(ioFiles.bnd, " #Outdoor Air Nodes,{}\n", NumOutsideAirNodes);
         if (NumOutsideAirNodes > 0) {
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! <Outdoor Air Node>,<NodeNumber>,<Node Name>";
+            print(ioFiles.bnd, "{}\n", "! <Outdoor Air Node>,<NodeNumber>,<Node Name>");
         }
-        for (Count = 1; Count <= NumOutsideAirNodes; ++Count) {
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << OutsideAirNodeList(Count);
-            strip(ChrOut);
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Outdoor Air Node," + ChrOut + ',' + NodeID(OutsideAirNodeList(Count));
+        for (int Count = 1; Count <= NumOutsideAirNodes; ++Count) {
+            print(ioFiles.bnd, " Outdoor Air Node,{},{}\n", OutsideAirNodeList(Count), NodeID(OutsideAirNodeList(Count)));
         }
         // Component Sets
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_700);
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumCompSets;
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " #Component Sets," + stripped(ChrOut);
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_702);
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", Format_700);
+        print(ioFiles.bnd, " #Component Sets,{}\n", NumCompSets);
+        print(ioFiles.bnd, "{}\n", Format_702);
 
-        for (Count = 1; Count <= NumCompSets; ++Count) {
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << Count;
-            strip(ChrOut);
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " Component Set," + ChrOut + ',' + CompSets(Count).ParentCType + ',' +
-                                                               CompSets(Count).ParentCName + ',' + CompSets(Count).CType + ',' +
-                                                               CompSets(Count).CName + ',' + CompSets(Count).InletNodeName + ',' +
-                                                               CompSets(Count).OutletNodeName + ',' + CompSets(Count).Description;
+        for (int Count = 1; Count <= NumCompSets; ++Count) {
+            print(ioFiles.bnd,
+                  " Component Set,{},{},{},{},{},{},{},{}\n",
+                  Count,
+                  CompSets(Count).ParentCType,
+                  CompSets(Count).ParentCName,
+                  CompSets(Count).CType,
+                  CompSets(Count).CName,
+                  CompSets(Count).InletNodeName,
+                  CompSets(Count).OutletNodeName,
+                  CompSets(Count).Description);
 
             if (CompSets(Count).ParentCType == "UNDEFINED" || CompSets(Count).InletNodeName == "UNDEFINED" ||
                 CompSets(Count).OutletNodeName == "UNDEFINED") {
@@ -2427,8 +2404,8 @@ namespace SimulationManager {
             }
         }
 
-        for (Count = 1; Count <= NumCompSets; ++Count) {
-            for (Count1 = Count + 1; Count1 <= NumCompSets; ++Count1) {
+        for (int Count = 1; Count <= NumCompSets; ++Count) {
+            for (int Count1 = Count + 1; Count1 <= NumCompSets; ++Count1) {
                 if (CompSets(Count).CType != CompSets(Count1).CType) continue;
                 if (CompSets(Count).CName != CompSets(Count1).CName) continue;
                 if (CompSets(Count).InletNodeName != CompSets(Count1).InletNodeName) continue;
@@ -2448,427 +2425,409 @@ namespace SimulationManager {
             }
         }
         //  Plant Loops
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumPlantLoops;
-        strip(ChrOut);
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <# Plant Loops>,<Number of Plant Loops>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_707) << "#Plant Loops," + ChrOut;
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector "
-                                                       "Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector "
-                                                       "Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>";
-        for (Count = 1; Count <= NumPlantLoops; ++Count) {
-            for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", "! <# Plant Loops>,<Number of Plant Loops>");
+        print(ioFiles.bnd, " #Plant Loops,{}\n", NumPlantLoops);
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>");
+        print(
+            ioFiles.bnd, "{}\n", "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop "
+              "Name>,<Loop Type>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop "
+              "Type>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
+        for (int Count = 1; Count <= NumPlantLoops; ++Count) {
+            for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                 //  Plant Supply Side Loop
                 // Demandside and supplyside is parametrized in DataPlant
-                if (LoopSideNum == DemandSide) {
-                    LoopString = "Demand";
-                } else if (LoopSideNum == SupplySide) {
-                    LoopString = "Supply";
-                }
+                const auto LoopString = [&]() {
+                    if (LoopSideNum == DemandSide) {
+                        return "Demand";
+                    } else if (LoopSideNum == SupplySide) {
+                        return "Supply";
+                    } else {
+                        return "";
+                    }
+                }();
 
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                    << " Plant Loop," + PlantLoop(Count).Name + ',' + LoopString + ',' + PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn + ',' +
-                           PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
-                           PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
+                print(ioFiles.bnd,
+                      " Plant Loop,{},{},{},{},{},{}\n",
+                      PlantLoop(Count).Name,
+                      LoopString,
+                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
+                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
+                      PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
+                      PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
-                                                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
-                                                                       PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
-                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
-                        ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                        ChrOut2 = BlankString;
-                        ChrOut3 = BlankString;
+                    print(ioFiles.bnd,
+                          "   Plant Loop Connector,Splitter,{},{},{},{}\n",
+                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                          PlantLoop(Count).Name,
+                          LoopString,
+                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
+                    for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Branches,{},Splitter,{},",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
+
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
-                            ChrOut2 = errstring;
+                            print(ioFiles.bnd, "{},\n", errstring);
+                        } else {
+                            print(ioFiles.bnd,
+                                  "{},",
+                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
                         }
+
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
-                            ChrOut3 = errstring;
-                        }
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',';
-                        }
-                        if (ChrOut2 != errstring) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << PlantLoop(Count)
-                                               .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
-                                               .Name +
-                                           ',';
-                            }
+                            print(ioFiles.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
                         } else {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                            }
+                            print(ioFiles.bnd,
+                                  "{},{},{}\n",
+                                  PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                      .Name,
+                                  PlantLoop(Count).Name,
+                                  LoopString);
                         }
-                        if (ChrOut3 != errstring) {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                                << PlantLoop(Count)
-                                           .LoopSide(LoopSideNum)
-                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
-                                           .Name +
-                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
-                        } else {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
-                        }
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                            << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
-                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
-                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn + ',' +
-                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
-                                   LoopString;
+
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              PlantLoop(Count).Name,
+                              LoopString);
                     }
                 }
 
                 //  Plant Supply Side Mixer
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                        << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
-                               PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
-                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
-                        ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                        ChrOut2 = BlankString;
-                        ChrOut3 = BlankString;
+                    print(ioFiles.bnd,
+                          "   Plant Loop Connector,Mixer,{},{},{},{}\n",
+                          PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                          PlantLoop(Count).Name,
+                          LoopString,
+                          PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes); //',Supply,'//  &
+
+                    for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Branches,{},Mixer,{},",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
-                            ChrOut2 = errstring;
+                            print(ioFiles.bnd, "{},", errstring);
+                        } else {
+                            print(
+                                ioFiles.bnd,
+                                "{},",
+                                PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
                         }
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
-                            ChrOut3 = errstring;
-                        }
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',';
-                        }
-                        if (ChrOut2 != errstring) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << PlantLoop(Count)
-                                               .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
-                                               .Name +
-                                           ',';
-                            }
+                            print(ioFiles.bnd, "{},{},Supply\n", errstring, PlantLoop(Count).Name);
                         } else {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                            }
+                            print(ioFiles.bnd,
+                                  "{},{},{}\n",
+                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
+                                  PlantLoop(Count).Name,
+                                  LoopString);
                         }
-                        if (ChrOut3 != errstring) {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                                << PlantLoop(Count)
-                                           .LoopSide(LoopSideNum)
-                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
-                                           .Name +
-                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
-                        } else {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
-                        }
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1) +
-                                                                           ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut +
-                                                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              PlantLoop(Count).Name,
+                              LoopString);
                     }
                 }
             }
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << " Plant Loop Supply Connection," + PlantLoop(Count).Name + ',' +
-                                                               PlantLoop(Count).LoopSide(SupplySide).NodeNameOut + ',' +
-                                                               PlantLoop(Count).LoopSide(DemandSide).NodeNameIn;
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << " Plant Loop Return Connection," + PlantLoop(Count).Name + ',' +
-                                                               PlantLoop(Count).LoopSide(DemandSide).NodeNameOut + ',' +
-                                                               PlantLoop(Count).LoopSide(SupplySide).NodeNameIn;
+            print(ioFiles.bnd,
+                  " Plant Loop Supply Connection,{},{},{}\n",
+                  PlantLoop(Count).Name,
+                  PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
+                  PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+            print(ioFiles.bnd,
+                  " Plant Loop Return Connection,{},{},{}\n",
+                  PlantLoop(Count).Name,
+                  PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
+                  PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
         //  Condenser Loops
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumCondLoops;
-        strip(ChrOut);
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <# Condenser Loops>,<Number of Condenser Loops>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_707) << "#Condenser Loops," + ChrOut;
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector "
-                                                       "Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector "
-                                                       "Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-            << "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>";
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        print(ioFiles.bnd, "{}\n", "! <# Condenser Loops>,<Number of Condenser Loops>");
+        print(ioFiles.bnd, " #Condenser Loops,{}\n", NumCondLoops);
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop "
+              "Name>,<Loop Type>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop "
+              "Name>,<Loop Type>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>");
+        print(ioFiles.bnd,
+              "{}\n",
+              "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>");
 
-        for (Count = NumPlantLoops + 1; Count <= TotNumLoops; ++Count) {
-            for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
+        for (int Count = NumPlantLoops + 1; Count <= TotNumLoops; ++Count) {
+            for (int LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                 //  Plant Supply Side Loop
                 // Demandside and supplyside is parametrized in DataPlant
-                if (LoopSideNum == DemandSide) {
-                    LoopString = "Demand";
-                } else if (LoopSideNum == SupplySide) {
-                    LoopString = "Supply";
-                }
+                const auto LoopString = [&]() {
+                    if (LoopSideNum == DemandSide) {
+                        return "Demand";
+                    } else if (LoopSideNum == SupplySide) {
+                        return "Supply";
+                    } else {
+                        return "";
+                    }
+                }();
 
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                    << " Plant Loop," + PlantLoop(Count).Name + ',' + LoopString + ',' + PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn + ',' +
-                           PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
-                           PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
+                print(ioFiles.bnd,
+                      " Plant Loop,{},{},{},{},{},{}\n",
+                      PlantLoop(Count).Name,
+                      LoopString,
+                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameIn,
+                      PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut,
+                      PlantLoop(Count).LoopSide(LoopSideNum).BranchList,
+                      PlantLoop(Count).LoopSide(LoopSideNum).ConnectList);
                 //  Plant Supply Side Splitter
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
-                                                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
-                                                                       PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut);
-                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
-                        ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                        ChrOut2 = BlankString;
-                        ChrOut3 = BlankString;
+                    print(ioFiles.bnd,
+                          "   Plant Loop Connector,Splitter,{},{},{},{}\n",
+                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                          PlantLoop(Count).Name,
+                          LoopString,
+                          PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
+                    for (int Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Count1) {
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Branches,{},Splitter,{},",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name);
+
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn <= 0) {
-                            ChrOut2 = errstring;
+                            print(ioFiles.bnd, "{},", errstring);
+                        } else {
+                            print(ioFiles.bnd,
+                                  "{},",
+                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn).Name);
                         }
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1) <= 0) {
-                            ChrOut3 = errstring;
-                        }
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Splitter," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',';
-                        }
-                        if (ChrOut2 != errstring) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << PlantLoop(Count)
-                                               .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumIn)
-                                               .Name +
-                                           ',';
-                            }
+                            print(ioFiles.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
                         } else {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                            }
+
+                            print(ioFiles.bnd,
+                                  "{},{},{}\n",
+                                  PlantLoop(Count)
+                                      .LoopSide(LoopSideNum)
+                                      .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
+                                      .Name,
+                                  PlantLoop(Count).Name,
+                                  LoopString);
                         }
-                        if (ChrOut3 != errstring) {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                                << PlantLoop(Count)
-                                           .LoopSide(LoopSideNum)
-                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Splitter.BranchNumOut(Count1))
-                                           .Name +
-                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
-                        } else {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ',' + LoopString;
-                        }
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                            << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Splitter," +
-                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
-                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn + ',' +
-                                   PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1) + ',' + PlantLoop(Count).Name + ',' +
-                                   LoopString;
+
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Nodes,   {},Splitter,{},{},{},{},{}\n",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameIn,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Splitter.NodeNameOut(Count1),
+                              PlantLoop(Count).Name,
+                              LoopString);
                     }
                 }
 
                 //  Plant Supply Side Mixer
                 if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                        << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
-                               PlantLoop(Count).Name + ',' + LoopString + ',' + stripped(ChrOut); //',Supply,'//  &
-                    for (Count1 = 1; Count1 <= PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Count1) {
-                        ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                        ChrOut2 = BlankString;
-                        ChrOut3 = BlankString;
+                    const auto totalInletNodes = PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
+                    print(ioFiles.bnd,
+                          "   Plant Loop Connector,Mixer,{},{},{},{}\n",
+                          PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                          PlantLoop(Count).Name,
+                          LoopString,
+                          totalInletNodes); //',Supply,'//  &
+
+                    for (int Count1 = 1; Count1 <= totalInletNodes; ++Count1) {
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Branches,{},Mixer,{},",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name);
+
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1) <= 0) {
-                            ChrOut2 = errstring;
+                            print(ioFiles.bnd, "{},", errstring);
+                        } else {
+                            print(
+                                ioFiles.bnd,
+                                "{},",
+                                PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1)).Name);
                         }
                         if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut <= 0) {
-                            ChrOut3 = errstring;
-                        }
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                << "     Plant Loop Connector Branches," + stripped(ChrOut) + ",Mixer," +
-                                       PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',';
-                        }
-                        if (ChrOut2 != errstring) {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags)
-                                    << PlantLoop(Count)
-                                               .LoopSide(LoopSideNum)
-                                               .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumIn(Count1))
-                                               .Name +
-                                           ',';
-                            }
+                            print(ioFiles.bnd, "{},{},{}\n", errstring, PlantLoop(Count).Name, LoopString);
                         } else {
-                            {
-                                IOFlags flags;
-                                flags.ADVANCE("No");
-                                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713, flags) << ChrOut2 + ',';
-                            }
+                            print(ioFiles.bnd,
+                                  "{},{},{}\n",
+                                  PlantLoop(Count).LoopSide(LoopSideNum).Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut).Name,
+                                  PlantLoop(Count).Name,
+                                  LoopString);
                         }
-                        if (ChrOut3 != errstring) {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                                << PlantLoop(Count)
-                                           .LoopSide(LoopSideNum)
-                                           .Branch(PlantLoop(Count).LoopSide(LoopSideNum).Mixer.BranchNumOut)
-                                           .Name +
-                                       ',' + PlantLoop(Count).Name + ',' + LoopString;
-                        } else {
-                            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << ChrOut3 + ',' + PlantLoop(Count).Name + ",Supply";
-                        }
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "     Plant Loop Connector Nodes,   " + stripped(ChrOut) + ",Mixer," +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
-                                                                           PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1) +
-                                                                           ',' + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut +
-                                                                           ',' + PlantLoop(Count).Name + ',' + LoopString;
+                        print(ioFiles.bnd,
+                              "     Plant Loop Connector Nodes,   {},Mixer,{},{},{},{},{}\n",
+                              Count1,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name,
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameIn(Count1),
+                              PlantLoop(Count).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                              PlantLoop(Count).Name,
+                              LoopString);
                     }
                 }
             }
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << " Plant Loop Supply Connection," + PlantLoop(Count).Name + ',' +
-                                                               PlantLoop(Count).LoopSide(SupplySide).NodeNameOut + ',' +
-                                                               PlantLoop(Count).LoopSide(DemandSide).NodeNameIn;
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << " Plant Loop Return Connection," + PlantLoop(Count).Name + ',' +
-                                                               PlantLoop(Count).LoopSide(DemandSide).NodeNameOut + ',' +
-                                                               PlantLoop(Count).LoopSide(SupplySide).NodeNameIn;
+            print(ioFiles.bnd,
+                  " Plant Loop Supply Connection,{},{},{}\n",
+                  PlantLoop(Count).Name,
+                  PlantLoop(Count).LoopSide(SupplySide).NodeNameOut,
+                  PlantLoop(Count).LoopSide(DemandSide).NodeNameIn);
+            print(ioFiles.bnd,
+                  " Plant Loop Return Connection,{},{},{}\n",
+                  PlantLoop(Count).Name,
+                  PlantLoop(Count).LoopSide(DemandSide).NodeNameOut,
+                  PlantLoop(Count).LoopSide(SupplySide).NodeNameIn);
 
         } //  Plant Demand Side Loop
 
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-        NumOfControlledZones = 0;
-        for (Count = 1; Count <= NumOfZones; ++Count) {
+        print(ioFiles.bnd, "{}\n", "! ===============================================================");
+        int NumOfControlledZones = 0;
+        for (int Count = 1; Count <= NumOfZones; ++Count) {
             if (!allocated(ZoneEquipConfig)) continue;
             if (ZoneEquipConfig(Count).IsControlled) ++NumOfControlledZones;
         }
-        ObjexxFCL::gio::write(ChrOut, fmtLD) << NumOfControlledZones;
-        strip(ChrOut);
+
         if (NumOfControlledZones > 0) {
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <# Controlled Zones>,<Number of Controlled Zones>";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_707) << "#Controlled Zones," + ChrOut;
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone "
-                                                           "Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>,<# Return Nodes>";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet "
-                                                           "Node Name>,<SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet "
-                                                           "Node Name>";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                << "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>";
-            for (Count = 1; Count <= NumOfZones; ++Count) {
+            print(ioFiles.bnd, "{}\n", "! <# Controlled Zones>,<Number of Controlled Zones>");
+            print(ioFiles.bnd, " #Controlled Zones,{}\n", NumOfControlledZones);
+            print(ioFiles.bnd,
+                  "{}\n",
+                  "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<# Inlet Nodes>,<# Exhaust "
+                  "Nodes>,<# Return Nodes>");
+            print(ioFiles.bnd,
+                  "{}\n",
+                  "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating "
+                  "[DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>");
+            print(ioFiles.bnd, "{}\n", "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>");
+
+            for (int Count = 1; Count <= NumOfZones; ++Count) {
                 if (!ZoneEquipConfig(Count).IsControlled) continue;
-                ObjexxFCL::gio::write(ChrOut, fmtLD) << ZoneEquipConfig(Count).NumInletNodes;
-                ObjexxFCL::gio::write(ChrOut2, fmtLD) << ZoneEquipConfig(Count).NumExhaustNodes;
-                ObjexxFCL::gio::write(ChrOut3, fmtLD) << ZoneEquipConfig(Count).NumReturnNodes;
-                strip(ChrOut);
-                strip(ChrOut2);
-                strip(ChrOut3);
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
-                    << " Controlled Zone," + ZoneEquipConfig(Count).ZoneName + ',' + ZoneEquipConfig(Count).EquipListName + ',' +
-                           ZoneEquipConfig(Count).ControlListName + ',' + NodeID(ZoneEquipConfig(Count).ZoneNode) + ',' + ChrOut + ',' + ChrOut2 +
-                           ',' + ChrOut3;
-                for (Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                    strip(ChrOut);
-                    ChrName = NodeID(ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
+
+                print(ioFiles.bnd,
+                      " Controlled Zone,{},{},{},{},{},{},{}\n",
+                      ZoneEquipConfig(Count).ZoneName,
+                      ZoneEquipConfig(Count).EquipListName,
+                      ZoneEquipConfig(Count).ControlListName,
+                      NodeID(ZoneEquipConfig(Count).ZoneNode),
+                      ZoneEquipConfig(Count).NumInletNodes,
+                      ZoneEquipConfig(Count).NumExhaustNodes,
+                      ZoneEquipConfig(Count).NumReturnNodes);
+                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumInletNodes; ++Count1) {
+                    auto ChrName = NodeID(ZoneEquipConfig(Count).AirDistUnitHeat(Count1).InNode);
                     if (ChrName == "Undefined") ChrName = "N/A";
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Controlled Zone Inlet," + ChrOut + ',' + ZoneEquipConfig(Count).ZoneName +
-                                                                       ',' + NodeID(ZoneEquipConfig(Count).InletNode(Count1)) + ',' +
-                                                                       NodeID(ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode) + ',' + ChrName;
+                    print(ioFiles.bnd,
+                          "   Controlled Zone Inlet,{},{},{},{},{}\n",
+                          Count1,
+                          ZoneEquipConfig(Count).ZoneName,
+                          NodeID(ZoneEquipConfig(Count).InletNode(Count1)),
+                          NodeID(ZoneEquipConfig(Count).AirDistUnitCool(Count1).InNode),
+                          ChrName);
                 }
-                for (Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                    strip(ChrOut);
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Controlled Zone Exhaust," + ChrOut + ',' + ZoneEquipConfig(Count).ZoneName +
-                                                                       ',' + NodeID(ZoneEquipConfig(Count).ExhaustNode(Count1));
+                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumExhaustNodes; ++Count1) {
+                    print(ioFiles.bnd,
+                          "   Controlled Zone Exhaust,{},{},{}\n",
+                          Count1,
+                          ZoneEquipConfig(Count).ZoneName,
+                          NodeID(ZoneEquipConfig(Count).ExhaustNode(Count1)));
                 }
-                for (Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                    strip(ChrOut);
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Controlled Zone Return," + ChrOut + ',' + ZoneEquipConfig(Count).ZoneName +
-                                                                       ',' + NodeID(ZoneEquipConfig(Count).ReturnNode(Count1));
+                for (int Count1 = 1; Count1 <= ZoneEquipConfig(Count).NumReturnNodes; ++Count1) {
+                    print(ioFiles.bnd,
+                          "   Controlled Zone Return,{},{},{}\n",
+                          Count1,
+                          ZoneEquipConfig(Count).ZoneName,
+                          NodeID(ZoneEquipConfig(Count).ReturnNode(Count1)));
                 }
             }
 
             // Report Zone Equipment Lists to BND File
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_721) << "! ===============================================================";
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_720);
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << NumOfControlledZones;
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_721) << " #Zone Equipment Lists," + stripped(ChrOut);
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_722);
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_723);
+            print(ioFiles.bnd, "{}\n", "! ===============================================================");
+            print(ioFiles.bnd, "{}\n", Format_720);
+            print(ioFiles.bnd, " #Zone Equipment Lists,{}\n", NumOfControlledZones);
+            print(ioFiles.bnd, "{}\n", Format_722);
+            print(ioFiles.bnd, "{}\n", Format_723);
 
-            for (Count = 1; Count <= NumOfZones; ++Count) {
+            for (int Count = 1; Count <= NumOfZones; ++Count) {
                 // Zone equipment list array parallels controlled zone equipment array, so
                 // same index finds corresponding data from both arrays
                 if (!ZoneEquipConfig(Count).IsControlled) continue;
-                ObjexxFCL::gio::write(ChrOut, fmtLD) << Count;
-                ObjexxFCL::gio::write(ChrOut2, fmtLD) << ZoneEquipList(Count).NumOfEquipTypes;
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_721) << " Zone Equipment List," + stripped(ChrOut) + ',' + ZoneEquipList(Count).Name + ',' +
-                                                                   ZoneEquipConfig(Count).ZoneName + ',' + stripped(ChrOut2);
 
-                for (Count1 = 1; Count1 <= ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
-                    ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
-                    ObjexxFCL::gio::write(ChrOut2, fmtLD) << ZoneEquipList(Count).CoolingPriority(Count1);
-                    ObjexxFCL::gio::write(ChrOut3, fmtLD) << ZoneEquipList(Count).HeatingPriority(Count1);
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_721)
-                        << "   Zone Equipment Component," + stripped(ChrOut) + ',' + ZoneEquipList(Count).EquipType(Count1) + ',' +
-                               ZoneEquipList(Count).EquipName(Count1) + ',' + ZoneEquipConfig(Count).ZoneName + ',' + stripped(ChrOut2) + ',' +
-                               stripped(ChrOut3);
+                print(ioFiles.bnd,
+                      " Zone Equipment List,{},{},{},{}\n",
+                      Count,
+                      ZoneEquipList(Count).Name,
+                      ZoneEquipConfig(Count).ZoneName,
+                      ZoneEquipList(Count).NumOfEquipTypes);
+
+                for (int Count1 = 1; Count1 <= ZoneEquipList(Count).NumOfEquipTypes; ++Count1) {
+                    print(ioFiles.bnd,
+                          "   Zone Equipment Component,{},{},{},{},{},{}\n",
+                          Count1,
+                          ZoneEquipList(Count).EquipType(Count1),
+                          ZoneEquipList(Count).EquipName(Count1),
+                          ZoneEquipConfig(Count).ZoneName,
+                          ZoneEquipList(Count).CoolingPriority(Count1),
+                          ZoneEquipList(Count).HeatingPriority(Count1));
                 }
             }
         }
 
         // Report Dual Duct Dampers to BND File
-        ReportDualDuctConnections();
+        ReportDualDuctConnections(ioFiles);
 
         if (NumNodeConnectionErrors == 0) {
             ShowMessage("No node connection errors were found.");
         } else {
-            ObjexxFCL::gio::write(ChrOut, fmtLD) << NumNodeConnectionErrors;
-            strip(ChrOut);
             if (NumNodeConnectionErrors > 1) {
-                ShowMessage("There were " + ChrOut + " node connection errors noted.");
+                ShowMessage("There were " + std::to_string(NumNodeConnectionErrors) + " node connection errors noted.");
             } else {
-                ShowMessage("There was " + ChrOut + " node connection error noted.");
+                ShowMessage("There was " + std::to_string(NumNodeConnectionErrors) + " node connection error noted.");
             }
         }
 
         AskForConnectionsReport = false;
     }
 
-    void ReportParentChildren()
+    void ReportParentChildren(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2889,7 +2848,6 @@ namespace SimulationManager {
         // USE STATEMENTS:
         // na
         // Using/Aliasing
-        using DataGlobals::OutputFileDebug;
         using General::TrimSigDigits;
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
@@ -2920,7 +2878,7 @@ namespace SimulationManager {
         bool ErrorsFound;
 
         ErrorsFound = false;
-        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "Node Type,CompSet Name,Inlet Node,OutletNode";
+        print(ioFiles.debug, "{}\n", "Node Type,CompSet Name,Inlet Node,OutletNode");
         for (Loop = 1; Loop <= NumOfActualParents; ++Loop) {
             NumChildren = GetNumChildren(ParentNodeList(Loop).CType, ParentNodeList(Loop).CName);
             if (NumChildren > 0) {
@@ -2946,12 +2904,21 @@ namespace SimulationManager {
                                 ChildOutNodeName,
                                 ChildOutNodeNum,
                                 ErrorsFound);
-                if (Loop > 1) ObjexxFCL::gio::write(OutputFileDebug, "(1X,60('='))");
-                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " Parent Node," + ParentNodeList(Loop).CType + ':' + ParentNodeList(Loop).CName + ',' +
-                                                         ParentNodeList(Loop).InletNodeName + ',' + ParentNodeList(Loop).OutletNodeName;
+                if (Loop > 1) print(ioFiles.debug, "{}\n", std::string(60, '='));
+
+                print(ioFiles.debug,
+                      " Parent Node,{}:{},{},{}\n",
+                      ParentNodeList(Loop).CType,
+                      ParentNodeList(Loop).CName,
+                      ParentNodeList(Loop).InletNodeName,
+                      ParentNodeList(Loop).OutletNodeName);
                 for (Loop1 = 1; Loop1 <= NumChildren; ++Loop1) {
-                    ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "..ChildNode," + ChildCType(Loop1) + ':' + ChildCName(Loop1) + ',' + ChildInNodeName(Loop1) +
-                                                             ',' + ChildOutNodeName(Loop1);
+                    print(ioFiles.debug,
+                          "..ChildNode,{}:{},{},{}\n",
+                          ChildCType(Loop1),
+                          ChildCName(Loop1),
+                          ChildInNodeName(Loop1),
+                          ChildOutNodeName(Loop1));
                 }
                 ChildCType.deallocate();
                 ChildCName.deallocate();
@@ -2960,14 +2927,18 @@ namespace SimulationManager {
                 ChildInNodeNum.deallocate();
                 ChildOutNodeNum.deallocate();
             } else {
-                if (Loop > 1) ObjexxFCL::gio::write(OutputFileDebug, "(1X,60('='))");
-                ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " Parent Node (no children)," + ParentNodeList(Loop).CType + ':' + ParentNodeList(Loop).CName +
-                                                         ',' + ParentNodeList(Loop).InletNodeName + ',' + ParentNodeList(Loop).OutletNodeName;
+                if (Loop > 1) print(ioFiles.debug, "{}\n", std::string(60, '='));
+                print(ioFiles.debug,
+                      " Parent Node (no children),{}:{},{},{}\n",
+                      ParentNodeList(Loop).CType,
+                      ParentNodeList(Loop).CName,
+                      ParentNodeList(Loop).InletNodeName,
+                      ParentNodeList(Loop).OutletNodeName);
             }
         }
     }
 
-    void ReportCompSetMeterVariables()
+    void ReportCompSetMeterVariables(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2986,7 +2957,6 @@ namespace SimulationManager {
         // na
 
         // Using/Aliasing
-        using DataGlobals::OutputFileDebug;
         using namespace DataBranchNodeConnections;
         using namespace BranchNodeConnections;
         using namespace DataGlobalConstants;
@@ -3017,12 +2987,12 @@ namespace SimulationManager {
         Array1D_string EndUses;
         Array1D_string Groups;
 
-        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " CompSet,ComponentType,ComponentName,NumMeteredVariables";
-        ObjexxFCL::gio::write(OutputFileDebug, fmtA) << " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType";
+        print(ioFiles.debug, "{}\n", " CompSet,ComponentType,ComponentName,NumMeteredVariables");
+        print(ioFiles.debug, "{}\n", " RepVar,ReportIndex,ReportID,ReportName,Units,ResourceType,EndUse,Group,IndexType");
 
         for (Loop = 1; Loop <= NumCompSets; ++Loop) {
             NumVariables = GetNumMeteredVariables(CompSets(Loop).CType, CompSets(Loop).CName);
-            ObjexxFCL::gio::write(OutputFileDebug, "(1X,'CompSet,',A,',',A,',',I5)") << CompSets(Loop).CType << CompSets(Loop).CName << NumVariables;
+            print(ioFiles.debug, "CompSet, {}, {}, {:5}\n", CompSets(Loop).CType, CompSets(Loop).CName, NumVariables);
             if (NumVariables <= 0) continue;
             VarIndexes.dimension(NumVariables, 0);
             VarIDs.dimension(NumVariables, 0);
@@ -3045,11 +3015,18 @@ namespace SimulationManager {
                                 VarNames,
                                 VarIDs);
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
-                ObjexxFCL::gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")
-                    << VarIndexes(Loop1) << VarIDs(Loop1) << VarNames(Loop1) << unitEnumToString(unitsForVar(Loop1))
-                    << GetResourceTypeChar(ResourceTypes(Loop1)) << EndUses(Loop1) << Groups(Loop1)
-                    // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
-                    << static_cast<int>(IndexTypes(Loop1));
+                print(ioFiles.debug,
+                      "RepVar,{:5},{:5},{},[{}],{},{},{},{:5}\n",
+                      VarIndexes(Loop1),
+                      VarIDs(Loop1),
+                      VarNames(Loop1),
+                      unitEnumToString(unitsForVar(Loop1)),
+                      GetResourceTypeChar(ResourceTypes(Loop1)),
+                      EndUses(Loop1),
+                      Groups(Loop1)
+                      // TODO: Should call OutputProcessor::StandardTimeStepTypeKey(IndexTypes(Loop1)) to return "Zone" or "HVAC"
+                      ,
+                      static_cast<int>(IndexTypes(Loop1)));
             }
             VarIndexes.deallocate();
             IndexTypes.deallocate();
@@ -3080,11 +3057,6 @@ namespace SimulationManager {
         using FluidProperties::FluidIndex_PropoleneGlycol;
         using FluidProperties::FluidIndex_Water;
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //////////// hoisted into namespace ////////////////////////////////////////////////
-        // static bool PreP_Fatal( false ); // True if a preprocessor flags a fatal error
-        ////////////////////////////////////////////////////////////////////////////////////
-
         DoingInputProcessing = false;
 
         inputProcessor->preProcessorCheck(PreP_Fatal); // Check Preprocessor objects for warning, severe, etc errors.
@@ -3105,7 +3077,7 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 )
@@ -3189,20 +3161,20 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
 
     // FLOW:
     if (ResimExt) {
-        ManageExteriorEnergyUse();
+        ManageExteriorEnergyUse(state.exteriorEnergyUse);
 
         ++DemandManagerExtIterations;
     }
 
     if (ResimHB) {
         // Surface simulation
-        InitSurfaceHeatBalance();
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
-        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
+        InitSurfaceHeatBalance(state);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
+        HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation
         InitAirHeatBalance();
-        ManageRefrigeratedCaseRacks();
+        ManageRefrigeratedCaseRacks(state);
 
         ++DemandManagerHBIterations;
         ResimHVAC = true; // Make sure HVAC is resimulated too
@@ -3210,12 +3182,12 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
 
     if (ResimHVAC) {
         // HVAC simulation
-        ManageZoneAirUpdates(iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
-        CalcAirFlowSimple(0, ZoneAirMassFlow.EnforceZoneMassBalance);
-        ManageZoneAirUpdates(iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
-        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iPredictStep, false, UseZoneTimeStepHistory, 0.0);
-        SimHVAC();
+        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
+        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
+        CalcAirFlowSimple(state, 0, ZoneAirMassFlow.EnforceZoneMassBalance);
+        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
+        if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(state, iPredictStep, false, UseZoneTimeStepHistory, 0.0);
+        SimHVAC(state);
 
         ++DemandManagerHVACIterations;
     }

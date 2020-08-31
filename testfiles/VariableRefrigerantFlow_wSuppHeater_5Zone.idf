@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -3855,11 +3855,11 @@
 
   Output:Variable,*,Heating Coil Runtime Fraction,timestep;
 
-  Output:Variable,*,Fan Electric Power,timestep;
+  Output:Variable,*,Fan Electricity Rate,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Cooling Electric Power,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Cooling Electricity Rate,timestep;
 
-  Output:Variable,*,Zone VRF Air Terminal Heating Electric Power,timestep;
+  Output:Variable,*,Zone VRF Air Terminal Heating Electricity Rate,timestep;
 
   Output:Variable,*,Zone VRF Air Terminal Total Cooling Rate,timestep;
 

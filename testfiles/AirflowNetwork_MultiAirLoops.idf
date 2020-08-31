@@ -134,7 +134,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -154,7 +154,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   ZoneCapacitanceMultiplier:ResearchSpecial,
     Multiplier,              !- Name
@@ -3347,13 +3349,29 @@
 
   Output:Variable,*,AFN Node Temperature,timestep;
 
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Infiltration Latent Heat Loss Energy,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Gain Rate,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Gain Energy,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Loss Rate,timestep;
+
+  Output:Variable,*,AFN Zone Mixing Latent Heat Loss Energy,timestep;
+
   Output:Variable,Zn001:Wall001:Win001,AFN Linkage Node 1 to Node 2 Volume Flow Rate,timestep;
 
   Output:Variable,Zn001:Wall001:Win001,AFN Linkage Node 2 to Node 1 Volume Flow Rate,timestep;
 
-  Output:Variable,*,Heating Coil Gas Rate,timestep;
+  Output:Variable,*,Heating Coil NaturalGas Rate,timestep;
 
-  Output:Variable,*,Cooling Coil Electric Power,timestep;
+  Output:Variable,*,Cooling Coil Electricity Rate,timestep;
 
   Output:Variable,*,Zone Air Temperature,timestep;
 
@@ -3379,9 +3397,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -3391,9 +3409,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 
@@ -3940,8 +3958,6 @@
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
   Output:Diagnostics,
-    DisplayExtraWarnings;    !- Key 1
-
-  Output:Diagnostics,
-    DisplayUnusedSchedules;  !- Key 1
+    DisplayExtraWarnings,    !- Key 1
+    DisplayUnusedSchedules;  !- Key 2
 

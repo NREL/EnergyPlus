@@ -127,7 +127,8 @@ namespace OutputReportPredefined {
 
     extern int pdchDXCoolCoilNetCapSI; // Standard Rated (Net) Cooling Capacity [W]
     extern int pdchDXCoolCoilCOP;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-    extern int pdchDXCoolCoilSEERIP;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+    extern int pdchDXCoolCoilSEERUserIP;   // SEER value in IP unit at AHRI std. 210/240 conditionsand and user PLF curve [Btu/W-hr]
+    extern int pdchDXCoolCoilSEERStandardIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     extern int pdchDXCoolCoilEERIP;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     extern int pdchDXCoolCoilIEERIP;   // IEER value in IP unit at AHRI std. 340/360 conditions
 
@@ -197,6 +198,16 @@ namespace OutputReportPredefined {
     extern int pdchOpAzimuth;
     extern int pdchOpTilt;
     extern int pdchOpDir;
+    extern int pdstIntOpaque;
+    extern int pdchIntOpCons;
+    extern int pdchIntOpRefl;
+    extern int pdchIntOpUfactFilm;
+    extern int pdchIntOpUfactNoFilm;
+    extern int pdchIntOpGrArea;
+    extern int pdchIntOpNetArea;
+    extern int pdchIntOpAzimuth;
+    extern int pdchIntOpTilt;
+    extern int pdchIntOpDir;
     extern int pdstFen;
     extern int pdchFenCons;
     extern int pdchFenAreaOf1;
@@ -220,6 +231,12 @@ namespace OutputReportPredefined {
     extern int pdchDrUfactNoFilm;
     extern int pdchDrGrArea;
     extern int pdchDrParent;
+    extern int pdstIntDoor;
+    extern int pdchIntDrCons;
+    extern int pdchIntDrUfactFilm;
+    extern int pdchIntDrUfactNoFilm;
+    extern int pdchIntDrGrArea;
+    extern int pdchIntDrParent;
     extern int pdstIntFen;
     extern int pdchIntFenCons;
     extern int pdchIntFenAreaOf1;
@@ -796,8 +813,22 @@ namespace OutputReportPredefined {
     extern int pdchLeedPerfElDem;
     extern int pdchLeedPerfGasEneUse;
     extern int pdchLeedPerfGasDem;
-    extern int pdchLeedPerfAddFuelEneUse;
-    extern int pdchLeedPerfAddFuelDem;
+    extern int pdchLeedPerfGasolineEneUse;
+    extern int pdchLeedPerfGasolineDem;
+    extern int pdchLeedPerfDieselEneUse;
+    extern int pdchLeedPerfDieselDem;
+    extern int pdchLeedPerfCoalEneUse;
+    extern int pdchLeedPerfCoalDem;
+    extern int pdchLeedPerfFuelOil1EneUse;
+    extern int pdchLeedPerfFuelOil1Dem;
+    extern int pdchLeedPerfFuelOil2EneUse;
+    extern int pdchLeedPerfFuelOil2Dem;
+    extern int pdchLeedPerfPropaneEneUse;
+    extern int pdchLeedPerfPropaneDem;
+    extern int pdchLeedPerfOtherFuel1EneUse;
+    extern int pdchLeedPerfOtherFuel1Dem;
+    extern int pdchLeedPerfOtherFuel2EneUse;
+    extern int pdchLeedPerfOtherFuel2Dem;
     extern int pdchLeedPerfDisClEneUse;
     extern int pdchLeedPerfDisClDem;
     extern int pdchLeedPerfDisHtEneUse;
@@ -841,6 +872,69 @@ namespace OutputReportPredefined {
     extern int pdchLeedSchStPt11amWedCnt;
     extern int pdchLeedSchStPt11pmWednesday;
     extern int pdchLeedSchStPt11pmWedCnt;
+
+    extern int pdrThermalResilience;
+    extern int pdstHIHours;
+    extern int pdchHIHourSafe;
+    extern int pdchHIHourCaution;
+    extern int pdchHIHourExtremeCaution;
+    extern int pdchHIHourDanger;
+    extern int pdchHIHourExtremeDanger;
+
+    extern int pdstHIOccuHours;
+    extern int pdchHIOccuHourSafe;
+    extern int pdchHIOccuHourCaution;
+    extern int pdchHIOccuHourExtremeCaution;
+    extern int pdchHIOccuHourDanger;
+    extern int pdchHIOccuHourExtremeDanger;
+
+    extern int pdstHumidexHours;
+    extern int pdchHumidexHourLittle;
+    extern int pdchHumidexHourSome;
+    extern int pdchHumidexHourGreat;
+    extern int pdchHumidexHourDanger;
+    extern int pdchHumidexHourStroke;
+
+    extern int pdstHumidexOccuHours;
+    extern int pdchHumidexOccuHourLittle;
+    extern int pdchHumidexOccuHourSome;
+    extern int pdchHumidexOccuHourGreat;
+    extern int pdchHumidexOccuHourDanger;
+    extern int pdchHumidexOccuHourStroke;
+
+    extern int pdstHeatingSETHours;
+    extern int pdchHeatingSETHours;
+    extern int pdchHeatingSETOccuHours;
+    extern int pdchHeatingSETUnmetDuration;
+    extern int pdchHeatingSETUnmetTime;
+    extern int pdstCoolingSETHours;
+    extern int pdchCoolingSETHours;
+    extern int pdchCoolingSETOccuHours;
+    extern int pdchCoolingSETUnmetDuration;
+    extern int pdchCoolingSETUnmetTime;
+
+    extern int pdrCO2Resilience;
+    extern int pdstCO2Hours;
+    extern int pdchCO2HourSafe;
+    extern int pdchCO2HourCaution;
+    extern int pdchCO2HourHazard;
+    extern int pdstCO2OccuHours;
+    extern int pdchCO2OccuHourSafe;
+    extern int pdchCO2OccuHourCaution;
+    extern int pdchCO2OccuHourHazard;
+
+    extern int pdrVisualResilience;
+    extern int pdstIllumHours;
+    extern int pdchIllumHourDark;
+    extern int pdchIllumHourDim;
+    extern int pdchIllumHourAdequate;
+    extern int pdchIllumHourBright;
+    extern int pdstIllumOccuHours;
+    extern int pdchIllumOccuHourDark;
+    extern int pdchIllumOccuHourDim;
+    extern int pdchIllumOccuHourAdequate;
+    extern int pdchIllumOccuHourBright;
+
 
     // Internal data structures to store information provided by calls
 

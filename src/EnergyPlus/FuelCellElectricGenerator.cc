@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGenerators.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -64,16 +65,16 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -104,6 +105,7 @@ namespace FuelCellElectricGenerator {
     bool getFuelCellInputFlag(true);
     Array1D_bool CheckEquipName;
     Array1D<FCDataStruct> FuelCell; // dimension to number of machines
+    bool MyEnvrnFlag(true);
 
     void clear_state()
     {
@@ -111,13 +113,14 @@ namespace FuelCellElectricGenerator {
         getFuelCellInputFlag = true;
         CheckEquipName.deallocate();
         FuelCell.deallocate();
+        MyEnvrnFlag = true;
     }
 
-    PlantComponent *FCDataStruct::factory(std::string const &objectName)
+    PlantComponent *FCDataStruct::factory(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput();
+            getFuelCellInput(ioFiles);
             getFuelCellInputFlag = false;
         }
 
@@ -133,11 +136,11 @@ namespace FuelCellElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    PlantComponent *FCDataStruct::factory_exhaust(std::string const &objectName)
+    PlantComponent *FCDataStruct::factory_exhaust(IOFiles &ioFiles, std::string const &objectName)
     {
         // Process the input data
         if (getFuelCellInputFlag) {
-            getFuelCellInput();
+            getFuelCellInput(ioFiles);
             getFuelCellInputFlag = false;
         }
 
@@ -153,7 +156,8 @@ namespace FuelCellElectricGenerator {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void FCDataStruct::SimFuelCellGenerator(bool const RunFlag,  // simulate Generator when TRUE
+    void FCDataStruct::SimFuelCellGenerator(BranchInputManagerData &dataBranchInputManager,
+                                            bool const RunFlag,  // simulate Generator when TRUE
                                             Real64 const MyLoad, // demand on electric generator
                                             bool const FirstHVACIteration)
     {
@@ -166,13 +170,13 @@ namespace FuelCellElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        this->initialize();
+        this->initialize(dataBranchInputManager);
         this->CalcFuelCellGeneratorModel(RunFlag, MyLoad, FirstHVACIteration);
         this->CalcUpdateHeatRecovery(FirstHVACIteration);
         this->UpdateFuelCellGeneratorRecords();
     }
 
-    void getFuelCellInput()
+    void getFuelCellInput(IOFiles &ioFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Brent Griffith
@@ -364,10 +368,10 @@ namespace FuelCellElectricGenerator {
             }
         } // loop over NumFuelCellPMs
 
-        GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
+        GeneratorFuelSupply::GetGeneratorFuelSupplyInput(ioFiles);
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(ioFiles, FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure
@@ -1057,9 +1061,9 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.ACEnergyGen,
                             "System",
@@ -1092,7 +1096,7 @@ namespace FuelCellElectricGenerator {
                             "Sum",
                             this->Name,
                             _,
-                            "Gas",
+                            "NaturalGas",
                             "COGENERATION",
                             _,
                             "Plant");
@@ -1143,9 +1147,9 @@ namespace FuelCellElectricGenerator {
                                 this->Name);
 
             SetupOutputVariable(
-                "Generator Blower Electric Power", OutputProcessor::Unit::W, this->Report.BlowerPower, "System", "Average", this->Name);
+                "Generator Blower Electricity Rate", OutputProcessor::Unit::W, this->Report.BlowerPower, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Blower Electric Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable("Generator Blower Electricity Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable(
                 "Generator Blower Skin Heat Loss Rate", OutputProcessor::Unit::W, this->Report.BlowerSkinLoss, "System", "Average", this->Name);
@@ -1180,7 +1184,7 @@ namespace FuelCellElectricGenerator {
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Compressor Electric Power",
+            SetupOutputVariable("Generator Fuel Compressor Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.FuelCompressPower,
                                 "System",
@@ -1188,7 +1192,7 @@ namespace FuelCellElectricGenerator {
                                 this->Name);
 
             SetupOutputVariable(
-                "Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J, this->Report.FuelCompressEnergy, "System", "Sum", this->Name);
+                "Generator Fuel Compressor Electricity Energy", OutputProcessor::Unit::J, this->Report.FuelCompressEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
                                 OutputProcessor::Unit::W,
@@ -1218,14 +1222,14 @@ namespace FuelCellElectricGenerator {
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electric Power",
+            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.WaterPumpPower,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electric Energy",
+            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.WaterPumpEnergy,
                                 "System",
@@ -1291,7 +1295,7 @@ namespace FuelCellElectricGenerator {
             SetupOutputVariable("Generator Inverter Loss Power", OutputProcessor::Unit::W, this->Report.PCUlosses, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Generator Produced DC Electric Power", OutputProcessor::Unit::W, this->Report.DCPowerGen, "System", "Average", this->Name);
+                "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, this->Report.DCPowerGen, "System", "Average", this->Name);
 
             SetupOutputVariable(
                 "Generator DC Power Efficiency", OutputProcessor::Unit::None, this->Report.DCPowerEff, "System", "Average", this->Name);
@@ -1316,10 +1320,10 @@ namespace FuelCellElectricGenerator {
                 "Generator DC Storage Discharging Energy", OutputProcessor::Unit::J, this->Report.DrawnEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable(
-                "Generator Ancillary AC Electric Power", OutputProcessor::Unit::W, this->Report.ACancillariesPower, "System", "Average", this->Name);
+                "Generator Ancillary AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACancillariesPower, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Generator Ancillary AC Electric Energy", OutputProcessor::Unit::J, this->Report.ACancillariesEnergy, "System", "Sum", this->Name);
+                "Generator Ancillary AC Electricity Energy", OutputProcessor::Unit::J, this->Report.ACancillariesEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable("Generator Fuel Cell Model Iteration Count",
                                 OutputProcessor::Unit::None,
@@ -3103,7 +3107,7 @@ namespace FuelCellElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void FCDataStruct::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FCDataStruct::simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool FirstHVACIteration,
                                 Real64 &EP_UNUSED(CurLoad),
                                 bool EP_UNUSED(RunFlag))
@@ -3133,7 +3137,7 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::initialize() // index to specific fuel cell generator
+    void FCDataStruct::initialize(BranchInputManagerData &dataBranchInputManager) // index to specific fuel cell generator
     {
 
         // SUBROUTINE INFORMATION:
@@ -3153,7 +3157,8 @@ namespace FuelCellElectricGenerator {
         if (this->MyPlantScanFlag_Init && allocated(DataPlant::PlantLoop)) {
             bool errFlag = false;
 
-            PlantUtilities::ScanPlantLoopsForObject(this->NameExhaustHX,
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->NameExhaustHX,
                                                     DataPlant::TypeOf_Generator_FCExhaust,
                                                     this->CWLoopNum,
                                                     this->CWLoopSideNum,
@@ -3316,8 +3321,6 @@ namespace FuelCellElectricGenerator {
         // METHODOLOGY EMPLOYED:
         // This routine adds up the various skin losses and then
         //  sets the values in the ZoneIntGain structure
-
-        static bool MyEnvrnFlag(true);
 
         if (NumFuelCellGenerators == 0) return;
 

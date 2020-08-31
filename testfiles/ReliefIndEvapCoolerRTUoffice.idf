@@ -33,7 +33,7 @@
 !         The relief air that would have been dumped outside is fed into the secondary side of the
 !         indirect evaporative cooler.  Systems are set to Night Cycle during setup/setback.
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -7261,15 +7261,15 @@
 
   Output:Variable,*,Evaporative Cooler Water Volume,RunPeriod;
 
-  Output:Variable,*,Evaporative Cooler Electric Energy,runperiod;
+  Output:Variable,*,Evaporative Cooler Electricity Energy,runperiod;
 
-  Output:Variable,*,Zone Electric Equipment Electric Energy,runperiod;
+  Output:Variable,*,Zone Electric Equipment Electricity Energy,runperiod;
 
-  Output:Variable,*,Zone Lights Electric Energy,runperiod;
+  Output:Variable,*,Zone Lights Electricity Energy,runperiod;
 
-  Output:Variable,*,Cooling Coil Electric Energy,runperiod;
+  Output:Variable,*,Cooling Coil Electricity Energy,runperiod;
 
-  Output:Variable,*,Heating Coil Gas Energy,runperiod;
+  Output:Variable,*,Heating Coil NaturalGas Energy,runperiod;
 
   Output:Meter,InteriorLights:Electricity,runperiod;
 
@@ -7277,7 +7277,7 @@
 
   Output:Meter,Electricity:HVAC,runperiod;
 
-  Output:Meter,GAS:HVAC,runperiod;
+  Output:Meter,NaturalGas:HVAC,runperiod;
 
   Output:Meter,Fans:Electricity,runperiod;
 
@@ -7295,13 +7295,13 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

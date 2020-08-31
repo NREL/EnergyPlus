@@ -52,8 +52,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
-    
+    // Forward declarations
+    struct EnergyPlusData;
+    class IOFiles;
+
 namespace HeatBalanceAirManager {
 
     // Data
@@ -73,23 +75,23 @@ namespace HeatBalanceAirManager {
     // Functions
     void clear_state();
 
-    void ManageAirHeatBalance();
+    void ManageAirHeatBalance(EnergyPlusData &state);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirHeatBalanceInput();
+    void GetAirHeatBalanceInput(EnergyPlusData &state);
 
-    void GetAirFlowFlag(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors found
+    void GetAirFlowFlag(EnergyPlusData &state, bool &ErrorsFound); // Set to true if errors found
 
     void SetZoneMassConservationFlag(); // sets the zone air mass flow variables
 
-    void GetSimpleAirModelInputs(OutputFiles &outputFiles, bool &ErrorsFound); // IF errors found in input
+    void GetSimpleAirModelInputs(EnergyPlusData &state, bool &ErrorsFound); // IF errors found in input
 
     //*****************************************************************************************
     // This subroutine was moved from 'RoomAirManager' Module
 
-    void GetRoomAirModelParameters(OutputFiles &outputFiles, bool &errFlag); // True if errors found during this input routine
+    void GetRoomAirModelParameters(IOFiles &ioFiles, bool &errFlag); // True if errors found during this input routine
 
     // END of Get Input subroutines for the HBAir Module
     //******************************************************************************
@@ -101,13 +103,15 @@ namespace HeatBalanceAirManager {
 
     void InitSimpleMixingConvectiveHeatGains();
 
+    void initializeForExternalHVACManager(EnergyPlusData &state);
+
     // END Initialization Section of the Module
     //******************************************************************************
 
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcHeatBalanceAir();
+    void CalcHeatBalanceAir(EnergyPlusData &state);
 
     // END Algorithm Section of the Module
 

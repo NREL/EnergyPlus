@@ -106,7 +106,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Timestep,6;
 
@@ -414,6 +414,7 @@
     4,                       !- Temperature Calculation Requested After Layer Number
     1,                       !- Dimensions for the CTF Calculation
     0.1524,                  !- Tube Spacing {m}
+    0.0,                     !- Two-Dimensional Position of Interior Temperature Calculation Request
     CONCRETE - DRIED SAND AND GRAVEL 4 IN,  !- Outside Layer
     INS - EXPANDED EXT POLYSTYRENE R12 2 IN,  !- Layer 2
     GYP1,                    !- Layer 3
@@ -2193,7 +2194,7 @@
 
   Output:Variable,*,Fan Rise in Air Temperature,timestep;
 
-  Output:Variable,*,Fan Electric Energy,timestep;
+  Output:Variable,*,Fan Electricity Energy,timestep;
 
   Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
@@ -2209,9 +2210,9 @@
 
   Output:Variable,*,Zone Radiant HVAC Heating Energy,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Gas Rate,timestep;
+  Output:Variable,*,Zone Radiant HVAC NaturalGas Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Gas Energy,timestep;
+  Output:Variable,*,Zone Radiant HVAC NaturalGas Energy,timestep;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,timestep;
 
@@ -2219,7 +2220,7 @@
 
   Output:Meter,Electricity:*,hourly;
 
-  Output:Meter,Gas:*,hourly;
+  Output:Meter,NaturalGas:*,hourly;
 
   Output:VariableDictionary,Regular;
 
@@ -2243,9 +2244,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -2257,9 +2258,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator

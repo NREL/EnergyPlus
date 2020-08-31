@@ -127,7 +127,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:PACKAGEDTERMINALAIRCONDITIONER ===========
 
@@ -2518,7 +2518,7 @@
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Latent Cooling Rate,Hourly;
 
-  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electric Power,Hourly;
+  Output:Variable,*,Zone Packaged Terminal Air Conditioner Electricity Rate,Hourly;
 
   Output:Variable,*,Zone Packaged Terminal Air Conditioner Fan Part Load Ratio,Hourly;
 
@@ -2526,17 +2526,17 @@
 
   Output:Variable,*,Heating Coil Heating Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Power,Hourly;
+  Output:Variable,*,Heating Coil Electricity Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Electric Energy,Hourly;
+  Output:Variable,*,Heating Coil Electricity Energy,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Rate,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Rate,Hourly;
 
-  Output:Variable,*,Heating Coil Gas Energy,Hourly;
+  Output:Variable,*,Heating Coil NaturalGas Energy,Hourly;
 
   Output:Variable,*,Heating Coil Runtime Fraction,Hourly;
 
-  Output:Variable,*,Heating Coil Ancillary Gas Rate,Hourly;
+  Output:Variable,*,Heating Coil Ancillary NaturalGas Rate,Hourly;
 
   Output:Variable,Zone1PTACAirOutletNode,System Node Mass Flow Rate,Hourly;
 

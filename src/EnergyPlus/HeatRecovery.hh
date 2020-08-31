@@ -58,6 +58,9 @@
 
 namespace EnergyPlus {
 
+    // Forward declarations
+    struct EnergyPlusData;
+
 namespace HeatRecovery {
 
     // Using/Aliasing
@@ -214,6 +217,9 @@ namespace HeatRecovery {
         int UnBalancedErrCount;   // Counter for recurring warning message
         int UnBalancedErrIndex;   // Index to recurring warning message
         bool myEnvrnFlag;         // one-time-init flag
+        bool SensEffectivenessFlag; // flag for error message when sensible effectiveness is negative
+        bool LatEffectivenessFlag; // flag for error message when latent effectiveness is negative
+
 
         // Default Constructor
         HeatExchCond()
@@ -229,7 +235,8 @@ namespace HeatRecovery {
               SensHeatingEnergy(0.0), LatHeatingRate(0.0), LatHeatingEnergy(0.0), TotHeatingRate(0.0), TotHeatingEnergy(0.0), SensCoolingRate(0.0),
               SensCoolingEnergy(0.0), LatCoolingRate(0.0), LatCoolingEnergy(0.0), TotCoolingRate(0.0), TotCoolingEnergy(0.0), ElecUseEnergy(0.0),
               ElecUseRate(0.0), SensEffectiveness(0.0), LatEffectiveness(0.0), SupBypassMassFlow(0.0), SecBypassMassFlow(0.0), LowFlowErrCount(0),
-              LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true)
+              LowFlowErrIndex(0), UnBalancedErrCount(0), UnBalancedErrIndex(0), myEnvrnFlag(true), SensEffectivenessFlag(false),
+              LatEffectivenessFlag(false)
         {
         }
     };
@@ -519,7 +526,7 @@ namespace HeatRecovery {
 
     void clear_state();
 
-    void SimHeatRecovery(std::string const &CompName,                 // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode
@@ -534,11 +541,11 @@ namespace HeatRecovery {
 
     void GetHeatRecoveryInput();
 
-    void InitHeatRecovery(int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num);
 
-    void SizeHeatRecovery(int const ExchNum);
+    void SizeHeatRecovery(EnergyPlusData &state, int const ExchNum);
 
     void CalcAirToAirPlateHeatExch(int const ExNum,                        // number of the current heat exchanger being simulated
                                    bool const HXUnitOn,                    // flag to simulate heat exchager heat recovery

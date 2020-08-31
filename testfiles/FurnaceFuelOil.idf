@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.4;
 
   Building,
     NONE,                    !- Name
@@ -118,7 +118,9 @@
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
-  Output:DebuggingData,0,0;
+  Output:DebuggingData,
+    No,                      !- Report Debugging Data
+    No;                      !- Report During Warmup
 
   SimulationControl,
     No,                      !- Do Zone Sizing Calculation
@@ -1303,9 +1305,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:Facility,monthly;
+  Output:Meter:MeterFileOnly,FuelOilNo2:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:HVAC,monthly;
+  Output:Meter:MeterFileOnly,FuelOilNo2:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1315,9 +1317,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:Facility,runperiod;
+  Output:Meter:MeterFileOnly,FuelOilNo2:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,FuelOil#2:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,FuelOilNo2:HVAC,runperiod;
 
   Output:VariableDictionary,Regular;
 

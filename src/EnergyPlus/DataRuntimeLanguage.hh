@@ -68,10 +68,7 @@ namespace EnergyPlus {
 
 namespace DataRuntimeLanguage {
 
-    // Using/Aliasing
-
-    // Data
-    // module should be available to other modules and routines.
+    // Data module should be available to other modules and routines.
     // Thus, all variables in this module must be PUBLIC.
 
     // MODULE PARAMETER DEFINITIONS:
@@ -106,7 +103,7 @@ namespace DataRuntimeLanguage {
     extern int const OperatorGreaterThan;    // >
     extern int const OperatorRaiseToPower;   // ^
     extern int const OperatorLogicalAND;     // &&
-    extern int const OperatiorLogicalOR;     // ||
+    extern int const OperatorLogicalOR;     // ||
     // note there is an important check "> 15" to distinguish operators from functions
     //  so becareful if renumber these parameters.  Binary operator additions should get inserted here rather than appended
 
@@ -175,15 +172,39 @@ namespace DataRuntimeLanguage {
     // Curve and Table access function
     extern int const FuncCurveValue;
 
+    // Weather data query functions
+    extern int const FuncTodayIsRain;          // Access TodayIsRain(hour, timestep)
+    extern int const FuncTodayIsSnow;          // Access TodayIsSnow(hour, timestep)
+    extern int const FuncTodayOutDryBulbTemp;  // Access TodayOutDryBulbTemp(hour, timestep)
+    extern int const FuncTodayOutDewPointTemp; // Access TodayOutDewPointTemp(hour, timestep)
+    extern int const FuncTodayOutBaroPress;    // Access TodayOutBaroPress(hour, timestep)
+    extern int const FuncTodayOutRelHum;       // Access TodayOutRelHum(hour, timestep)
+    extern int const FuncTodayWindSpeed;       // Access TodayWindSpeed(hour, timestep)
+    extern int const FuncTodayWindDir;         // Access TodayWindDir(hour, timestep)
+    extern int const FuncTodaySkyTemp;         // Access TodaySkyTemp(hour, timestep)
+    extern int const FuncTodayHorizIRSky;      // Access TodayHorizIRSky(hour, timestep)
+    extern int const FuncTodayBeamSolarRad;    // Access TodayBeamSolarRad(hour, timestep)
+    extern int const FuncTodayDifSolarRad;     // Access TodayDifSolarRad(hour, timestep)
+    extern int const FuncTodayAlbedo;          // Access TodayAlbedo(hour, timestep)
+    extern int const FuncTodayLiquidPrecip;    // Access TodayLiquidPrecip(hour, timestep)
+
+    extern int const FuncTomorrowIsRain;          // Access TomorrowIsRain(hour, timestep)
+    extern int const FuncTomorrowIsSnow;          // Access TomorrowIsSnow(hour, timestep)
+    extern int const FuncTomorrowOutDryBulbTemp;  // Access TomorrowOutDryBulbTemp(hour, timestep)
+    extern int const FuncTomorrowOutDewPointTemp; // Access TomorrowOutDewPointTemp(hour, timestep)
+    extern int const FuncTomorrowOutBaroPress;    // Access TomorrowOutBaroPress(hour, timestep)
+    extern int const FuncTomorrowOutRelHum;       // Access TomorrowOutRelHum(hour, timestep)
+    extern int const FuncTomorrowWindSpeed;       // Access TomorrowWindSpeed(hour, timestep)
+    extern int const FuncTomorrowWindDir;         // Access TomorrowWindDir(hour, timestep)
+    extern int const FuncTomorrowSkyTemp;         // Access TomorrowSkyTemp(hour, timestep)
+    extern int const FuncTomorrowHorizIRSky;      // Access TomorrowHorizIRSky(hour, timestep)
+    extern int const FuncTomorrowBeamSolarRad;    // Access TomorrowBeamSolarRad(hour, timestep)
+    extern int const FuncTomorrowDifSolarRad;     // Access TomorrowDifSolarRad(hour, timestep)
+    extern int const FuncTomorrowAlbedo;          // Access TodayAlbedo(hour, timestep)
+    extern int const FuncTomorrowLiquidPrecip;    // Access TomorrowLiquidPrecip(hour, timestep)
+
     extern int const NumPossibleOperators; // total number of operators and built-in functions
 
-    // DERIVED TYPE DEFINITIONS:
-
-    // MODULE VARIABLE TYPE DECLARATIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS: na
-
-    // MODULE VARIABLE DECLARATIONS:
     extern Array1D_int EMSProgram;
 
     extern int NumProgramCallManagers;      // count of Erl program managers with calling points
@@ -221,7 +242,6 @@ namespace DataRuntimeLanguage {
 
     //######################################################################################################################################
 
-    extern int OutputEMSFileUnitNum;         // file lun handle for open EMS output file
     extern bool OutputEDDFile;               // set to true if user requests EDD output file be written
     extern bool OutputFullEMSTrace;          // how much to write out to trace, if true do verbose for each line
     extern bool OutputEMSErrors;             // how much to write out to trace, if true include Erl error messages
@@ -266,7 +286,7 @@ namespace DataRuntimeLanguage {
         int * IntValue;      // POINTER to the Integer value that is being accessed
 
         // Default Constructor
-        InternalVarsAvailableType() : PntrVarTypeUsed(0)
+        InternalVarsAvailableType() : PntrVarTypeUsed(0), RealValue(nullptr), IntValue(nullptr)
         {
         }
     };
