@@ -851,13 +851,13 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     humRat = 0.08;
     height = 1.0;
     isWindow = false;
-    ExpectedHconv = 5.6497;
+    ExpectedHconv = 2.16942;
     CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 5: Non-window, all ceiling diffuser correlation
     Hforced = 10.0;
-    ACH = 1.0;
+    ACH = 3.0;
     Tsurf = 23.0;
     Tair = 18.0;
     cosTilt = 1.0;
