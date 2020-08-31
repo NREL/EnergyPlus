@@ -538,6 +538,7 @@ SET( SRC
   SteamBaseboardRadiator.hh
   SteamCoils.cc
   SteamCoils.hh
+  StringUtilities.hh
   SurfaceGeometry.cc
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
