@@ -870,22 +870,28 @@ namespace HeatBalanceSurfaceManager {
         } // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
 
         // Zero out all of the radiant system heat balance coefficient arrays
-        RadSysTiHBConstCoef = 0.0;
-        RadSysTiHBToutCoef = 0.0;
-        RadSysTiHBQsrcCoef = 0.0;
-        RadSysToHBConstCoef = 0.0;
-        RadSysToHBTinCoef = 0.0;
-        RadSysToHBQsrcCoef = 0.0;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                RadSysTiHBConstCoef(SurfNum) = 0.0;
+                RadSysTiHBToutCoef(SurfNum) = 0.0;
+                RadSysTiHBQsrcCoef(SurfNum) = 0.0;
+                RadSysToHBConstCoef(SurfNum) = 0.0;
+                RadSysToHBTinCoef(SurfNum) = 0.0;
+                RadSysToHBQsrcCoef(SurfNum) = 0.0;
 
-        QRadSysSource = 0.0;
-        QPVSysSource = 0.0;
-        QHTRadSysSurf = 0.0;
-        QHWBaseboardSurf = 0.0;
-        QSteamBaseboardSurf = 0.0;
-        QElecBaseboardSurf = 0.0;
-        QCoolingPanelSurf = 0.0;
-        QPoolSurfNumerator = 0.0;
-        PoolHeatTransCoefs = 0.0;
+                QRadSysSource(SurfNum) = 0.0;
+                QPVSysSource(SurfNum) = 0.0;
+                QHTRadSysSurf(SurfNum) = 0.0;
+                QHWBaseboardSurf(SurfNum) = 0.0;
+                QSteamBaseboardSurf(SurfNum) = 0.0;
+                QElecBaseboardSurf(SurfNum) = 0.0;
+                QCoolingPanelSurf(SurfNum) = 0.0;
+                QPoolSurfNumerator(SurfNum) = 0.0;
+                PoolHeatTransCoefs(SurfNum) = 0.0;
+            } // ...end of Zone Surf loop
+        } // ...end of Zone loop
 
         if (ZoneSizingCalc) GatherComponentLoadsSurfAbsFact();
 
@@ -2162,49 +2168,74 @@ namespace HeatBalanceSurfaceManager {
         SumHmARaW = 0.0;
 
         // "Bulk" initializations of arrays sized to TotSurfaces
-        SUMH = 0;             // module level array
-        TempSurfIn = 23.0;    // module level array
-        TempSurfInTmp = 23.0; // module level array
-        HConvIn = 3.076;      // module level array
-        HcExtSurf = 0.0;
-        HAirExtSurf = 0.0;
-        HSkyExtSurf = 0.0;
-        HGrdExtSurf = 0.0;
-        TempSurfOut = 0.0;
-        TempSurfInRep = 0.0;
-        TempSurfInMovInsRep = 0.0;
-        QConvInReport = 0.0;
-        QdotConvInRep = 0.0;
-        QdotConvInRepPerArea = 0.0;
-        QRadNetSurfInReport = 0.0;
-        QdotRadNetSurfInRep = 0.0;
-        QdotRadNetSurfInRepPerArea = 0.0;
-        QRadSolarInReport = 0.0;
-        QdotRadSolarInRep = 0.0;
-        QdotRadSolarInRepPerArea = 0.0;
-        QRadLightsInReport = 0.0;
-        QdotRadLightsInRep = 0.0;
-        QdotRadLightsInRepPerArea = 0.0;
-        QRadIntGainsInReport = 0.0;
-        QdotRadIntGainsInRep = 0.0;
-        QdotRadIntGainsInRepPerArea = 0.0;
-        QRadHVACInReport = 0.0;
-        QdotRadHVACInRep = 0.0;
-        QdotRadHVACInRepPerArea = 0.0;
-        QConvOutReport = 0.0;
-        QdotConvOutRep = 0.0;
-        QdotConvOutRepPerArea = 0.0;
-        QRadOutReport = 0.0;
-        QdotRadOutRep = 0.0;
-        QdotRadOutRepPerArea = 0.0;
-        QAirExtReport = 0.0;
-        QHeatEmiReport = 0.0;
-        OpaqSurfInsFaceConduction = 0.0;
-        OpaqSurfInsFaceConductionFlux = 0.0;
-        OpaqSurfInsFaceConductionEnergy = 0.0;
-        OpaqSurfInsFaceBeamSolAbsorbed = 0.0;
-        TempEffBulkAir = 23.0;
-        TempTstatAir = 23.0;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            // Loop through zones...
+            TempEffBulkAir(zoneNum) = 23.0;
+            TempTstatAir(zoneNum) = 23.0;
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                SUMH(SurfNum) = 0;             // module level array
+                TempSurfIn(SurfNum) = 23.0;    // module level array
+                TempSurfInTmp(SurfNum) = 23.0; // module level array
+                HConvIn(SurfNum) = 3.076;      // module level array
+                HcExtSurf(SurfNum) = 0.0;
+                HAirExtSurf(SurfNum) = 0.0;
+                HSkyExtSurf(SurfNum) = 0.0;
+                HGrdExtSurf(SurfNum) = 0.0;
+                TempSurfOut(SurfNum) = 0.0;
+                TempSurfInRep(SurfNum) = 0.0;
+                TempSurfInMovInsRep(SurfNum) = 0.0;
+                QConvInReport(SurfNum) = 0.0;
+                QdotConvInRep(SurfNum) = 0.0;
+                QdotConvInRepPerArea(SurfNum) = 0.0;
+                QRadNetSurfInReport(SurfNum) = 0.0;
+                QdotRadNetSurfInRep(SurfNum) = 0.0;
+                QdotRadNetSurfInRepPerArea(SurfNum) = 0.0;
+                QRadSolarInReport(SurfNum) = 0.0;
+                QdotRadSolarInRep(SurfNum) = 0.0;
+                QdotRadSolarInRepPerArea(SurfNum) = 0.0;
+                QRadLightsInReport(SurfNum) = 0.0;
+                QdotRadLightsInRep(SurfNum) = 0.0;
+                QdotRadLightsInRepPerArea(SurfNum) = 0.0;
+                QRadIntGainsInReport(SurfNum) = 0.0;
+                QdotRadIntGainsInRep(SurfNum) = 0.0;
+                QdotRadIntGainsInRepPerArea(SurfNum) = 0.0;
+                QRadHVACInReport(SurfNum) = 0.0;
+                QdotRadHVACInRep(SurfNum) = 0.0;
+                QdotRadHVACInRepPerArea(SurfNum) = 0.0;
+                QConvOutReport(SurfNum) = 0.0;
+                QdotConvOutRep(SurfNum) = 0.0;
+                QdotConvOutRepPerArea(SurfNum) = 0.0;
+                QRadOutReport(SurfNum) = 0.0;
+                QdotRadOutRep(SurfNum) = 0.0;
+                QdotRadOutRepPerArea(SurfNum) = 0.0;
+                QAirExtReport(SurfNum) = 0.0;
+                QHeatEmiReport(SurfNum) = 0.0;
+                OpaqSurfInsFaceConduction(SurfNum) = 0.0;
+                OpaqSurfInsFaceConductionFlux(SurfNum) = 0.0;
+                OpaqSurfInsFaceConductionEnergy(SurfNum) = 0.0;
+                OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
+
+            }
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin >= 0) {
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    // Initialize window frame and divider temperatures
+                    SurfWinFrameTempSurfIn(SurfNum) = 23.0;
+                    SurfWinFrameTempSurfInOld(SurfNum) = 23.0;
+                    SurfWinFrameTempSurfOut(SurfNum) = 23.0;
+                    SurfWinDividerTempSurfIn(SurfNum) = 23.0;
+                    SurfWinDividerTempSurfInOld(SurfNum) = 23.0;
+                    SurfWinDividerTempSurfOut(SurfNum) = 23.0;
+
+                    // Initialize previous-timestep shading indicators
+                    SurfWinExtIntShadePrevTS(SurfNum) = 0;
+                    SurfWinShadingFlag(SurfNum) = NoShade;
+                } // end of Zone Surf array
+            }
+        } // end of Zone  array
 
         // "Bulk" initializations of temperature arrays with dimensions (TotSurface,MaxCTFTerms,2)
         TH = 23.0;  // module level array
@@ -2220,19 +2251,6 @@ namespace HeatBalanceSurfaceManager {
             QsrcHistM = 0.0;
         }
         CondFDRelaxFactor = CondFDRelaxFactorInput;
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            // Initialize window frame and divider temperatures
-            SurfWinFrameTempSurfIn(SurfNum) = 23.0;
-            SurfWinFrameTempSurfInOld(SurfNum) = 23.0;
-            SurfWinFrameTempSurfOut(SurfNum) = 23.0;
-            SurfWinDividerTempSurfIn(SurfNum) = 23.0;
-            SurfWinDividerTempSurfInOld(SurfNum) = 23.0;
-            SurfWinDividerTempSurfOut(SurfNum) = 23.0;
-
-            // Initialize previous-timestep shading indicators
-            SurfWinExtIntShadePrevTS(SurfNum) = 0;
-            SurfWinShadingFlag(SurfNum) = NoShade;
-        }
 
         // Perform other initializations that depend on the surface characteristics
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -2587,8 +2605,6 @@ namespace HeatBalanceSurfaceManager {
                 SurfWinBSDFBeamThetaRep(SurfNum) = 0.0;
                 SurfWinBSDFBeamPhiRep(SurfNum) = 0.0;
 
-
-
             }
         }
 
@@ -2632,6 +2648,10 @@ namespace HeatBalanceSurfaceManager {
             }
 
             if (NumOfTDDPipes > 0) {
+                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    SurfWinTransSolar(SurfNum) = 0.0;
+                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
+                }
                 for (auto &e : TDDPipe) {
                     e.TransSolBeam = 0.0;
                     e.TransSolDiff = 0.0;
@@ -2683,16 +2703,11 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-//            high_resolution_clock::time_point t1 = high_resolution_clock::now();
-
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
-//            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-//            DataGlobals::solar_timer += time_span.count();
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 

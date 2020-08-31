@@ -252,7 +252,6 @@ namespace DataGlobals {
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
-    double solar_timer(0.0);
     std::function<void(int const)> progressCallback;
     std::function<void(const std::string &)> messageCallback;
     std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
@@ -358,7 +357,6 @@ namespace DataGlobals {
         ioFiles.mtr.close();
         ioFiles.err_stream.reset();
         eplusRunningViaAPI = false;
-        solar_timer = 0;
     }
 
 } // namespace DataGlobals
