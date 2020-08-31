@@ -297,10 +297,10 @@ void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         this->normalMode.size(state);
-        if (this->hasAlternateMode == coilEnhancedMode) {
+        if (this->hasAlternateMode == DataHVACGlobals::coilEnhancedMode) {
             this->alternateMode.size(state);
         }
-        if (this->hasAlternateMode == coilSubcoolReheatMode) {
+        if (this->hasAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
             this->alternateMode.size(state);
             this->alternateMode2.size(state);
         }
