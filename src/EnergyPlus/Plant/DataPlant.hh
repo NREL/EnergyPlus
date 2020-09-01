@@ -242,6 +242,9 @@ namespace DataPlant {
     extern int const TypeOf_FourPipeBeamAirTerminal;
     extern int const TypeOf_HeatPumpEIRCooling;
     extern int const TypeOf_HeatPumpEIRHeating;
+    extern int const TypeOf_CoilLiqDesiccantDehum;
+    extern int const TypeOf_TS_PcmSimple; 
+
 
     extern Array1D<Real64> const ConvergenceHistoryARR;
     extern Real64 const sum_ConvergenceHistoryARR;

@@ -1467,8 +1467,9 @@ namespace PlantCondLoopOperation {
                         if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage") {
 
                             // Special case for ThermalStorage:Ice:XXXX objects which can only be dual (cf #6958)
-                            if ( ( (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:SIMPLE") ||
-                                   (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:DETAILED") ) &&
+                            if (((cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:SIMPLE") ||
+                                 (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:PCM:SIMPLE") ||
+                                 (cAlphaArgs(CompNumA - 3) == "THERMALSTORAGE:ICE:DETAILED")) &&
                                  (cAlphaArgs(CompNumA + 1) != "DUAL") ) {
 
                                 ShowWarningError("Equipment Operation Mode was reset to 'DUAL' for Component '" + cAlphaArgs(CompNumA - 2) +

@@ -65,10 +65,12 @@ namespace IceThermalStorage {
     // MODULE PARAMETER DEFINITIONS
     extern std::string const cIceStorageSimple;
     extern std::string const cIceStorageDetailed;
+    extern std::string const cPcmStorageSimple;
 
     // ITS numbers and FoundOrNot
     extern int NumSimpleIceStorage;
     extern int NumDetailedIceStorage;
+    extern int NumSimplePcmStorage;
     extern int TotalNumIceStorage;
 
     enum class IceStorageType
@@ -266,9 +268,104 @@ namespace IceThermalStorage {
         void setupOutputVars();
     };
 
+    struct SimplePcmStorageData : PlantComponent
+    {
+        std::string Name;         // User identifier
+        std::string PcmTSType;      // PCM Thermal Storage Type
+        enum ITSType PcmTSType_Num; // Storage Type as number (PcmOnCoilInternal,PcmOnCoilExternal)
+        int MapNum;               // Number to Map structure
+        int UratePtr;             // Charging/Discharging SchedulePtr: u value schedule
+        Real64 PcmTSNomCap;         // Design nominal capacity of Pcm Thermal Storage [J] (user input in GJ)
+        int PltInletNodeNum;      // Node number on the inlet side of the plant
+        int PltOutletNodeNum;     // Node number on the outlet side of the plant
+        // loop topology variables
+        int LoopNum;
+        int LoopSideNum;
+        int BranchNum;
+        int CompNum;
+        Real64 DesignMassFlowRate;
+        Real64 FreezeTemp; // check if needed or not 
+        bool ResetXForPcmTSFlag;
+        bool MyEnvrnFlag;
+        Real64 UAIceCh; // replace with new variable
+        Real64 UAIceDisCh; // replace with new variable
+        Real64 HLoss;
+        Real64 XCurPcmFrac;
+        Real64 PcmTSMassFlowRate;
+        Real64 PcmTSInletTemp;
+        Real64 PcmTSOutletTemp;
+        Real64 PcmTSOutletSetPointTemp;
+        Real64 PcmTSCoolingRate;
+        Real64 PcmTSCoolingEnergy;
+        bool CheckEquipName;
+
+        Real64 MyLoad;            // load requested by plant [W]
+        Real64 Urate;             // [fraction]
+        Real64 PcmFracRemain;     // Fraction of ice remaining in storage [fraction]
+        Real64 PcmTSChargingRate;   // [W]
+        Real64 PcmTSChargingEnergy; // [J]
+        Real64 PcmTSmdot;           // [kg/s]
+
+        // Duplicated reporting vars for now. Investigate diffs when time to remove.
+        Real64 PcmTSCoolingRate_rep;   // [W]
+        Real64 PcmTSCoolingEnergy_rep; // [J]
+
+        bool MyPlantScanFlag;
+        bool MyEnvrnFlag2;
+
+        Real64 OnsetTemp;
+        Real64 FinishTemp; 
+        Real64 OnsetUA;
+        Real64 FinishUA;
+
+        // Default Constructor
+        SimplePcmStorageData()
+            : MapNum(0), UratePtr(0), PcmTSNomCap(0.0), PltInletNodeNum(0), PltOutletNodeNum(0), LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0),
+              DesignMassFlowRate(0.0), FreezeTemp(0.0), ResetXForPcmTSFlag(false), MyEnvrnFlag(true), UAIceCh(0.0), UAIceDisCh(0.0), HLoss(0.0),
+              XCurPcmFrac(0.0), PcmTSMassFlowRate(0.0), PcmTSInletTemp(0.0), PcmTSOutletTemp(0.0), PcmTSOutletSetPointTemp(0.0), PcmTSCoolingRate(0.0),
+              PcmTSCoolingEnergy(0.0), CheckEquipName(true), MyLoad(0.0), Urate(0.0), PcmFracRemain(0.0), PcmTSChargingRate(0.0), PcmTSChargingEnergy(0.0), PcmTSmdot(0.0), PcmTSCoolingRate_rep(0.0), PcmTSCoolingEnergy_rep(0.0),
+              MyPlantScanFlag(true), MyEnvrnFlag2(true), OnsetTemp(0.0), FinishTemp(0.0), OnsetUA(10000), FinishUA(10000)
+        {
+        }
+
+        static PlantComponent *factory(std::string const &objectName);
+
+        void simulate(EnergyPlusData &EP_UNUSED(state),
+                      const PlantLocation &calledFromLocation,
+                      bool FirstHVACIteration,
+                      Real64 &CurLoad,
+                      bool RunFlag) override;
+
+        void InitSimplePcmStorage(BranchInputManagerData &dataBranchInputManager);
+
+        void CalcPcmStorageDormant();
+
+        void CalcPcmStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap);
+
+        void CalcPcmStorageDischarge(Real64 myLoad, bool RunFlag, Real64 MaxCap);
+
+        void CalcQpcmDischageMaxByNtu(Real64 &QpcmMin);
+
+        void CalcPcmStorageCharge();
+
+        //void CalcQpcmChargeMaxByChiller(Real64 &QiceMaxByChiller);
+
+        void CalcQpcmChargeMaxByNtu(Real64 chillerOutletTemp, Real64 &QpcmMaxByPcmTS);
+
+        //void CalcUAIce(Real64 XCurIceFrac_loc, Real64 &UAIceCh_loc, Real64 &UAIceDisCh_loc, Real64 &HLoss_loc);
+
+        void UpdateNode(Real64 myLoad, bool RunFlag);
+
+        void RecordOutput(Real64 myLoad, bool RunFlag);
+
+        void setupOutputVars();
+
+    };
+
     // Object Data
     extern Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
     extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
+    extern Array1D<SimplePcmStorageData> SimplePcmStorage; 
 
     // Static Functions
     void clear_state();
@@ -292,6 +389,8 @@ namespace IceThermalStorage {
     Real64 TempIPtoSI(Real64 Temp);
 
     void UpdateIceFractions();
+
+    
 
 } // namespace IceThermalStorage
 

@@ -81,7 +81,8 @@ namespace IceThermalStorage {
     // MODULE INFORMATION:
     //       AUTHOR         Pyeongchan Ihm
     //       DATE WRITTEN   April 2002
-    //       MODIFIED       Modified Refined model, added Simple model, by Guo Zhou, Oct 2002
+    //       MODIFIED       Add PCM storage model, by Jian Sun, Aug. 2020
+    //                      Modified Refined model, added Simple model, by Guo Zhou, Oct 2002
     //                      Remove chiller, make just a storage tank, Michael J. Witte, Sep 2005
     //                      Added detailed ice storage model, Rick Strand, Feb 2006
     //                      B. Griffith, Sept 2010, plant upgrades, fluid properties
@@ -100,6 +101,7 @@ namespace IceThermalStorage {
 
     std::string const cIceStorageSimple("ThermalStorage:Ice:Simple");
     std::string const cIceStorageDetailed("ThermalStorage:Ice:Detailed");
+    std::string const cPcmStorageSimple("ThermalStorage:Pcm:Simple");
 
     // ITS parameter
     Real64 const FreezTemp(0.0);       // Water freezing Temperature, 0[C]
@@ -119,6 +121,7 @@ namespace IceThermalStorage {
 
     int NumSimpleIceStorage(0);
     int NumDetailedIceStorage(0);
+    int NumSimplePcmStorage(0);
     int TotalNumIceStorage(0);
 
     bool getITSInput = true;
@@ -126,6 +129,7 @@ namespace IceThermalStorage {
     // Object Data
     Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
     Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
+    Array1D<SimplePcmStorageData> SimplePcmStorage;
 
     //*************************************************************************
 
@@ -135,9 +139,11 @@ namespace IceThermalStorage {
         getITSInput = true;
         NumSimpleIceStorage = 0;
         NumDetailedIceStorage = 0;
+        NumSimplePcmStorage = 0;
         TotalNumIceStorage = 0;
         SimpleIceStorage.deallocate();
         DetailedIceStorage.deallocate();
+        SimplePcmStorage.deallocate();
     }
 
     PlantComponent *SimpleIceStorageData::factory(std::string const &objectName)
@@ -179,6 +185,28 @@ namespace IceThermalStorage {
         // Shut up the compiler
         return nullptr; // LCOV_EXCL_LINE
     }
+
+    PlantComponent *SimplePcmStorageData::factory(std::string const &objectName)
+    {
+        // Process the input data for boilers if it hasn't been done already
+        if (getITSInput) {
+            GetIceStorageInput();
+            getITSInput = false;
+        }
+
+        // Now look for this particular pipe in the list
+        for (auto &PcmTS : SimplePcmStorage) {
+            if (PcmTS.Name == objectName) {
+                return &PcmTS;
+            }
+        }
+        // If we didn't find it, fatal
+        ShowFatalError("LocalSimpleIceStorageFactory: Error getting inputs for simple ice storage named: " + objectName); // LCOV_EXCL_LINE
+        // Shut up the compiler
+        return nullptr; // LCOV_EXCL_LINE
+    }
+
+
 
     void SimpleIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
                                         bool EP_UNUSED(FirstHVACIteration),
@@ -248,7 +276,7 @@ namespace IceThermalStorage {
 
         Real64 MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
         MyLoad = MyLoad2;
-
+        
         //     Set fraction of ice remaining in storage
         this->XCurIceFrac = this->IceFracRemain;
 
@@ -256,12 +284,14 @@ namespace IceThermalStorage {
         //************************************************************************
         //        IF( U .EQ. 0.0 ) THEN
         if ((MyLoad2 == 0.0) || (DemandMdot == 0.0)) {
+
             this->CalcIceStorageDormant();
 
             //***** Charging Process for ITS *****************************************
             //************************************************************************
             //        ELSE IF( U .GT. 0.0 ) THEN
         } else if (MyLoad2 < 0.0) {
+
 
             Real64 MaxCap;
             Real64 MinCap;
@@ -273,6 +303,7 @@ namespace IceThermalStorage {
             //************************************************************************
             //        ELSE IF( U .LT. 0.0 ) THEN
         } else if (MyLoad2 > 0.0) {
+
 
             Real64 MaxCap;
             Real64 MinCap;
@@ -723,6 +754,8 @@ namespace IceThermalStorage {
         // LOAD ARRAYS WITH SimpleIceStorage DATA
         NumSimpleIceStorage = inputProcessor->getNumObjectsFound(cIceStorageSimple); // by ZG
         NumDetailedIceStorage = inputProcessor->getNumObjectsFound(cIceStorageDetailed);
+        NumSimplePcmStorage = inputProcessor->getNumObjectsFound(cPcmStorageSimple); // 
+ 
 
         // Allocate SimpleIceStorage based on NumOfIceStorage
         SimpleIceStorage.allocate(NumSimpleIceStorage);
@@ -1062,14 +1095,127 @@ namespace IceThermalStorage {
 
         } // ...over detailed ice storage units
 
-        if ((NumSimpleIceStorage + NumDetailedIceStorage) <= 0) {
-            ShowSevereError("No Ice Storage Equipment found in GetIceStorage");
-            ErrorsFound = true;
-        }
+ //       if ((NumSimpleIceStorage + NumDetailedIceStorage) <= 0) {
+ //           ShowSevereError("No Ice Storage Equipment found in GetIceStorage");
+ //           ErrorsFound = true;
+ //       }
 
         if (ErrorsFound) {
             ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
         }
+
+        ErrorsFound = false; // Always need to reset this since there are multiple types of ice storage systems
+        
+                             
+        // Allocate SimplePcmStorage based on NumOfIceStorage --------------------------------------------
+        SimplePcmStorage.allocate(NumSimplePcmStorage);
+
+        DataIPShortCuts::cCurrentModuleObject = cPcmStorageSimple;
+        for (int iceNum = 1; iceNum <= NumSimplePcmStorage; ++iceNum) {
+
+            int NumAlphas;
+            int NumNums;
+            int IOStat;
+
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                          iceNum,
+                                          DataIPShortCuts::cAlphaArgs,
+                                          NumAlphas,
+                                          DataIPShortCuts::rNumericArgs,
+                                          NumNums,
+                                          IOStat,
+                                          _,
+                                          _,
+                                          _,
+                                          DataIPShortCuts::cNumericFieldNames);
+            UtilityRoutines::IsNameEmpty(DataIPShortCuts::cAlphaArgs(1), DataIPShortCuts::cCurrentModuleObject, ErrorsFound);
+
+            ++TotalNumIceStorage;
+            SimplePcmStorage(iceNum).MapNum = TotalNumIceStorage;
+
+            // PcmTS name
+            SimplePcmStorage(iceNum).Name = DataIPShortCuts::cAlphaArgs(1);
+
+            // Get Pcm Thermal Storage Type
+ //           SimplePcmStorage(iceNum).PcmTSType = DataIPShortCuts::cAlphaArgs(2);
+ //           if (UtilityRoutines::SameString(SimplePcmStorage(iceNum).PcmTSType, "IceOnCoilInternal")) {
+ //               SimplePcmStorage(iceNum).PcmTSType_Num = ITSType::IceOnCoilInternal;
+ //           } else if (UtilityRoutines::SameString(SimplePcmStorage(iceNum).PcmTSType, "IceOnCoilExternal")) {
+ //               SimplePcmStorage(iceNum).PcmTSType_Num = ITSType::IceOnCoilExternal;
+ //           } else {
+ //               ShowSevereError(DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+ //               ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
+ //               ErrorsFound = true;
+ //           }
+            
+
+            // Get and Verify ITS nominal Capacity (user input is in GJ, internal value in in J)
+            SimplePcmStorage(iceNum).PcmTSNomCap = DataIPShortCuts::rNumericArgs(1) * 1.e+09;
+            if (DataIPShortCuts::rNumericArgs(1) == 0.0) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
+                ShowContinueError("Invalid " + DataIPShortCuts::cNumericFieldNames(1) + '=' +
+                                  General::RoundSigDigits(DataIPShortCuts::rNumericArgs(1), 2));
+                ErrorsFound = true;
+            }
+            // Get ITS Parameters
+            SimplePcmStorage(iceNum).OnsetTemp = DataIPShortCuts::rNumericArgs(2);
+            SimplePcmStorage(iceNum).FinishTemp = DataIPShortCuts::rNumericArgs(3);
+            SimplePcmStorage(iceNum).OnsetUA = DataIPShortCuts::rNumericArgs(4);
+            SimplePcmStorage(iceNum).FinishUA = DataIPShortCuts::rNumericArgs(5);
+
+            // Get Plant Inlet Node Num
+            SimplePcmStorage(iceNum).PltInletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                                                           ErrorsFound,
+                                                                                           DataIPShortCuts::cCurrentModuleObject,
+                                                                                           DataIPShortCuts::cAlphaArgs(1),
+                                                                                           DataLoopNode::NodeType_Water,
+                                                                                           DataLoopNode::NodeConnectionType_Inlet,
+                                                                                           1,
+                                                                                           DataLoopNode::ObjectIsNotParent);
+
+            // Get Plant Outlet Node Num
+            SimplePcmStorage(iceNum).PltOutletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(4),
+                                                                                            ErrorsFound,
+                                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                                            DataLoopNode::NodeType_Water,
+                                                                                            DataLoopNode::NodeConnectionType_Outlet,
+                                                                                            1,
+                                                                                            DataLoopNode::ObjectIsNotParent);
+
+            // Test InletNode and OutletNode
+            BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                                               DataIPShortCuts::cAlphaArgs(1),
+                                               DataIPShortCuts::cAlphaArgs(3),
+                                               DataIPShortCuts::cAlphaArgs(4),
+                                               "Chilled Water Nodes");
+
+            // Initialize Report Variables
+            SimplePcmStorage(iceNum).MyLoad = 0.0;
+            SimplePcmStorage(iceNum).Urate = 0.0;
+            SimplePcmStorage(iceNum).PcmFracRemain = 1.0;
+            SimplePcmStorage(iceNum).PcmTSCoolingRate_rep = 0.0;
+            SimplePcmStorage(iceNum).PcmTSCoolingEnergy_rep = 0.0;
+            SimplePcmStorage(iceNum).PcmTSChargingRate = 0.0;
+            SimplePcmStorage(iceNum).PcmTSChargingEnergy = 0.0;
+            SimplePcmStorage(iceNum).PcmTSmdot = 0.0;
+            SimplePcmStorage(iceNum).PcmTSInletTemp = 0.0;
+            SimplePcmStorage(iceNum).PcmTSOutletTemp = 0.0;
+
+        } // IceNum
+
+        if ((NumSimpleIceStorage + NumDetailedIceStorage + NumSimplePcmStorage) <= 0) {
+            ShowSevereError("No Ice Storage Equipment found in GetIceStorage");
+            ErrorsFound = true;
+        }
+
+
+        if (ErrorsFound) {
+            ShowFatalError("Errors found in processing input for " + DataIPShortCuts::cCurrentModuleObject);
+        }
+
+        // -----------------------------------------------------------------------------------------------
+
     }
 
     void SimpleIceStorageData::setupOutputVars()
@@ -1816,6 +1962,7 @@ namespace IceThermalStorage {
             thisITS.IceFracRemain += thisITS.Urate * DataHVACGlobals::TimeStepSys;
             if (thisITS.IceFracRemain <= 0.001) thisITS.IceFracRemain = 0.0;
             if (thisITS.IceFracRemain > 1.0) thisITS.IceFracRemain = 1.0;
+           // std::cout << "********************************************** IceFracRemain =" << thisITS.IceFracRemain << endl;
         }
 
         for (auto &thisITS : DetailedIceStorage) {
@@ -1839,6 +1986,16 @@ namespace IceThermalStorage {
                 thisITS.IceFracOnCoil = thisITS.IceFracRemaining;
             }
         }
+
+        for (auto &thisPcmTS : SimplePcmStorage) {
+            thisPcmTS.PcmFracRemain += thisPcmTS.Urate * DataHVACGlobals::TimeStepSys;
+            if (thisPcmTS.PcmFracRemain <= 0.001) thisPcmTS.PcmFracRemain = 0.0;
+            if (thisPcmTS.PcmFracRemain > 1.0) thisPcmTS.PcmFracRemain = 1.0;
+
+           // std::cout << "********************************************** PcmFracRemain =" << thisPcmTS.PcmFracRemain << endl;
+        }
+        
+        
     }
 
     void DetailedIceStorageData::UpdateDetailedIceStorage()
@@ -1917,6 +2074,629 @@ namespace IceThermalStorage {
                 this->ParasiticElecRate = this->DischargeParaElecLoad * this->CompLoad;
                 this->ParasiticElecEnergy = this->DischargeParaElecLoad * this->ChargingEnergy;
             }
+        }
+    }
+
+    
+    // ********************************** PCM thermal storage *****************************************
+
+    void SimplePcmStorageData::simulate(
+        EnergyPlusData &state, const PlantLocation &calledFromLocation, bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool RunFlag)
+    {
+        std::string const RoutineName("SimplePcmStorageData::simulate");
+
+        // this was happening in PlantLoopEquip before
+        auto &thisComp(DataPlant::PlantLoop(calledFromLocation.loopNum)
+                           .LoopSide(calledFromLocation.loopSideNum)
+                           .Branch(calledFromLocation.branchNum)
+                           .Comp(calledFromLocation.compNum));
+
+        // If component setpoint based control is active for this equipment
+        // then reset CurLoad to original EquipDemand.
+        // Allow negative CurLoad.  For cold storage this means the storage should
+        // charge, for hot storage, this means the storage should discharge.
+        if (thisComp.CurOpSchemeType == DataPlant::CompSetPtBasedSchemeType) {
+            Real64 localCurLoad = thisComp.EquipDemand;
+            if (localCurLoad != 0) RunFlag = true;
+        }
+
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag) {
+            this->ResetXForPcmTSFlag = true;
+            this->MyEnvrnFlag = false;
+        }
+
+        if (!DataGlobals::BeginEnvrnFlag) {
+            this->MyEnvrnFlag = true;
+        }
+
+        this->InitSimplePcmStorage(state.dataBranchInputManager);
+
+        //------------------------------------------------------------------------
+        // FIRST PROCESS (MyLoad = 0.0 as IN)
+        // At this moment as first calling of ITS, ITS provide ONLY MaxCap/OptCap/MinCap.
+        //------------------------------------------------------------------------
+        // First process is in subroutine CalcIceStorageCapacity(MaxCap,MinCap,OptCap) shown bellow.
+
+        //------------------------------------------------------------------------
+        // SECOND PROCESS (MyLoad is provided by E+ based on MaxCap/OptCap/MinCap)
+        //------------------------------------------------------------------------
+        // Below routines are starting when second calling.
+        // After previous return, MyLoad is calculated based on MaxCap, OptCap, and MinCap.
+        // Then PlandSupplySideManager provides MyLoad to simulate Ice Thermal Storage.
+        // The process will be decided based on sign(+,-,0) of input U.
+
+        // MJW 19 Sep 2005 - New approach - calculate MyLoad locally from inlet node temp
+        //                   and outlet node setpoint until MyLoad that is passed in behaves well
+
+        // DSU? can we now use MyLoad? lets not yet to try to avoid scope creep
+
+        Real64 TempSetPt(0.0);
+        Real64 TempIn = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        {
+            auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+                TempSetPt = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+                TempSetPt = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
+            } else {
+                assert(false);
+            }
+        }
+        Real64 DemandMdot = this->DesignMassFlowRate;
+
+        Real64 Cp = FluidProperties::GetSpecificHeatGlycol(
+            DataPlant::PlantLoop(this->LoopNum).FluidName, TempIn, DataPlant::PlantLoop(this->LoopNum).FluidIndex, RoutineName);
+
+        Real64 MyLoad2 = (DemandMdot * Cp * (TempIn - TempSetPt));
+        MyLoad = MyLoad2;
+
+        //     Set fraction of ice remaining in storage
+        this->XCurPcmFrac = this->PcmFracRemain;
+
+        //***** Dormant Process for ITS *****************************************
+        //************************************************************************
+        //        IF( U .EQ. 0.0 ) THEN
+        if ((MyLoad2 == 0.0) || (DemandMdot == 0.0)) {
+         //   std::cout << "CalcPcmStorageDormant - OFF - OFF - OFF" << endl;
+
+            this->CalcPcmStorageDormant();
+
+            //***** Charging Process for ITS *****************************************
+            //************************************************************************
+            //        ELSE IF( U .GT. 0.0 ) THEN
+        } else if (MyLoad2 < 0.0) {
+         //   std::cout << "CalcPcmStorageCharge - Charge - Charge - Charge - Charge" << endl;
+
+            Real64 MaxCap;
+            Real64 MinCap;
+            Real64 OptCap;
+            this->CalcPcmStorageCapacity(MaxCap, MinCap, OptCap);
+            this->CalcPcmStorageCharge();
+
+            //***** Discharging Process for ITS *****************************************
+            //************************************************************************
+            //        ELSE IF( U .LT. 0.0 ) THEN
+        } else if (MyLoad2 > 0.0) {
+         //   std::cout << "CalcPcmStorageDischarge - Discharge  - Discharge - Discharge - Discharge - Discharge" << endl;
+
+            Real64 MaxCap;
+            Real64 MinCap;
+            Real64 OptCap;
+            this->CalcPcmStorageCapacity(MaxCap, MinCap, OptCap);
+            this->CalcPcmStorageDischarge(MyLoad, RunFlag, MaxCap);
+        } // Based on input of U value, deciding Dormant/Charge/Discharge process
+
+        // Update Node properties: mdot and Temperature
+        this->UpdateNode(MyLoad2, RunFlag);
+
+        // Update report variables.
+        this->RecordOutput(MyLoad2, RunFlag);
+    }
+
+    void SimplePcmStorageData::InitSimplePcmStorage(BranchInputManagerData &dataBranchInputManager)
+    {
+
+        bool errFlag;
+
+        if (this->MyPlantScanFlag) {
+            // Locate the storage on the plant loops for later usage
+            errFlag = false;
+            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                                                    this->Name,
+                                                    DataPlant::TypeOf_TS_PcmSimple,
+                                                    this->LoopNum,
+                                                    this->LoopSideNum,
+                                                    this->BranchNum,
+                                                    this->CompNum,
+                                                    errFlag,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _,
+                                                    _);
+            if (errFlag) {
+                ShowFatalError("InitSimplePcmStorage: Program terminated due to previous condition(s).");
+            }
+
+            this->setupOutputVars();
+            this->MyPlantScanFlag = false;
+        }
+
+        if (DataGlobals::BeginEnvrnFlag && this->MyEnvrnFlag2) {
+            this->DesignMassFlowRate = DataPlant::PlantLoop(this->LoopNum).MaxMassFlowRate;
+            // no design flow rates for model, assume min is zero and max is plant loop's max
+            PlantUtilities::InitComponentNodes(0.0,
+                                               this->DesignMassFlowRate,
+                                               this->PltInletNodeNum,
+                                               this->PltOutletNodeNum,
+                                               this->LoopNum,
+                                               this->LoopSideNum,
+                                               this->BranchNum,
+                                               this->CompNum);
+            if ((DataPlant::PlantLoop(this->LoopNum).CommonPipeType == DataPlant::CommonPipe_TwoWay) &&
+                (this->LoopSideNum == DataPlant::SupplySide)) {
+                // up flow priority of other components on the same branch as the Pcm tank
+                for (int compNum = 1;
+                     compNum <= DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).TotalComponents;
+                     ++compNum) {
+                    DataPlant::PlantLoop(this->LoopNum).LoopSide(DataPlant::SupplySide).Branch(this->BranchNum).Comp(compNum).FlowPriority =
+                        DataPlant::LoopFlowStatus_NeedyAndTurnsLoopOn;
+                }
+            }
+            this->MyLoad = 0.0;
+            this->Urate = 0.0;
+            this->PcmFracRemain = 1.0;
+            this->PcmTSCoolingRate = 0.0;
+            this->PcmTSCoolingEnergy_rep = 0.0;
+            this->PcmTSChargingRate = 0.0;
+            this->PcmTSChargingEnergy = 0.0;
+            this->PcmTSmdot = 0.0;
+            this->PcmTSInletTemp = 0.0;
+            this->PcmTSOutletTemp = 0.0;
+
+            this->MyEnvrnFlag2 = false;
+
+            //this->OnsetTemp =  9.5; // melting point lower boundary
+            //this->FinishTemp = 11; // melting point upper boundary
+            //this->OnsetUA = 20000; 
+            //this->FinishUA = 20000;
+        }
+
+        if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag2 = true;
+    }
+
+    void SimplePcmStorageData::setupOutputVars()
+    {
+        SetupOutputVariable("Pcm Thermal Storage Requested Load", OutputProcessor::Unit::W, this->MyLoad, "System", "Average", this->Name);
+
+        SetupOutputVariable("Pcm Thermal Storage End Fraction", OutputProcessor::Unit::None, this->PcmFracRemain, "Zone", "Average", this->Name);
+
+        SetupOutputVariable("Pcm Thermal Storage Mass Flow Rate", OutputProcessor::Unit::kg_s, this->PcmTSmdot, "System", "Average", this->Name);
+
+        SetupOutputVariable("Pcm Thermal Storage Inlet Temperature", OutputProcessor::Unit::C, this->PcmTSInletTemp, "System", "Average", this->Name);
+
+        SetupOutputVariable("Pcm Thermal Storage Outlet Temperature", OutputProcessor::Unit::C, this->PcmTSOutletTemp, "System", "Average", this->Name);
+
+        SetupOutputVariable(
+            "Pcm Thermal Storage Cooling Discharge Rate", OutputProcessor::Unit::W, this->PcmTSCoolingRate_rep, "System", "Average", this->Name);
+
+        SetupOutputVariable(
+            "Pcm Thermal Storage Cooling Discharge Energy", OutputProcessor::Unit::J, this->PcmTSCoolingEnergy_rep, "System", "Sum", this->Name);
+
+        SetupOutputVariable(
+            "Pcm Thermal Storage Cooling Charge Rate", OutputProcessor::Unit::W, this->PcmTSChargingRate, "System", "Average", this->Name);
+
+        SetupOutputVariable(
+            "Pcm Thermal Storage Cooling Charge Energy", OutputProcessor::Unit::J, this->PcmTSChargingEnergy, "System", "Sum", this->Name);
+    }
+
+    void SimplePcmStorageData::CalcPcmStorageDormant()
+    {
+        // Provide output results for ITS.
+        this->PcmTSMassFlowRate = 0.0; //[kg/s]
+
+        PlantUtilities::SetComponentFlowRate(
+            this->PcmTSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+
+        this->PcmTSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp; //[C]
+        this->PcmTSOutletTemp = this->PcmTSInletTemp;                            //[C]
+        {
+            auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+                this->PcmTSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+                this->PcmTSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
+            }
+        }
+        this->PcmTSCoolingRate = 0.0;   //[W]
+        this->PcmTSCoolingEnergy = 0.0; //[J]
+
+        this->Urate = 0.0; //[n/a]
+    }
+
+    void SimplePcmStorageData::CalcPcmStorageCharge()
+    {
+        //--------------------------------------------------------
+        // Initialize
+        Real64 OnsetTemp = this->OnsetTemp;                                                // move to global variable later
+        Real64 FinishTemp = this->FinishTemp;                                              // move to global variable later
+        Real64 Tfr = (1 - this->XCurPcmFrac) * OnsetTemp + this->XCurPcmFrac * FinishTemp; // FreezTemp;
+
+        //--------------------------------------------------------
+        // Below values for ITS are reported forCharging process.
+        this->PcmTSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
+
+        PlantUtilities::SetComponentFlowRate(
+            this->PcmTSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+
+        this->PcmTSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp; //[C]
+        this->PcmTSOutletTemp = this->PcmTSInletTemp;                            //[C]
+        {
+            auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+                this->PcmTSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+                this->PcmTSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
+            }
+        }
+        this->PcmTSCoolingRate = 0.0;   //[W]
+        this->PcmTSCoolingEnergy = 0.0; //[J]
+
+        // Initialize processed U values
+        this->Urate = 0.0;
+
+
+        // Chiller is remote now, so chiller out is inlet node temp
+        Real64 chillerOutletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        // Calculate Qpcm charge max by ITS with ChillerOutletTemp
+        Real64 QpcmMaxByNtu;
+        this->CalcQpcmChargeMaxByNtu(chillerOutletTemp, QpcmMaxByNtu);
+
+        // Set QpcmMax
+        Real64 QpcmMax = QpcmMaxByNtu; // 
+
+        //--------------------------------------------------------
+        // Calculate Umin,Umax,Uact
+        //--------------------------------------------------------
+        // Set Umin
+        // Calculate Umax based on real ITS Max Capacity and remained XCurIceFrac.
+        // Umax should be equal or larger than 0.02 for realistic purpose by Dion.
+        Real64 Umax = max(min(((1.0 - EpsLimitForCharge) * QpcmMax * TimeInterval / this->PcmTSNomCap), (1.0 - this->XCurPcmFrac - EpsLimitForX)), 0.0);
+
+        // Cannot charge more than the fraction that is left uncharged
+        Umax = min(Umax, (1.0 - this->PcmFracRemain) / DataHVACGlobals::TimeStepSys);
+        // First, check input U value.
+        // Based on Umax and Umin, if necessary to run E+, calculate proper Uact.
+        Real64 Uact;
+        if (Umax == 0.0) { //(No Capacity of ITS), ITS is OFF.
+            Uact = 0.0;
+
+        } else { // Umax non-zero
+            Uact = Umax;
+        } // Check Uact for Discharging Process
+
+        //--------------------------------------------------------
+        // Calcualte possible ITSChargingRate with Uact, Then error check
+        //--------------------------------------------------------
+        // Calculate possible ITSChargingRate with Uact
+        Real64 Qpcm = Uact * this->PcmTSNomCap / TimeInterval; //[W]
+        // If Qice is equal or less than 0.0, no need to calculate anymore.
+        if (Qpcm <= 0.0) {
+            this->Urate = 0.0; //[ratio]
+        }
+
+        // Calculate leaving water temperature
+        if ((Qpcm <= 0.0) || (this->XCurPcmFrac >= 1.0)) {
+            this->PcmTSOutletTemp = this->PcmTSInletTemp;
+            Qpcm = 0.0;
+            Uact = 0.0;
+        } else {
+            Real64 DeltaTemp = Qpcm / Psychrometrics::CPCW(this->PcmTSInletTemp) / this->PcmTSMassFlowRate;
+            this->PcmTSOutletTemp = this->PcmTSInletTemp + DeltaTemp;
+            // Limit leaving temp to be no greater than setpoint or freezing temp minus 1C
+            this->PcmTSOutletTemp = min(this->PcmTSOutletTemp, this->PcmTSOutletSetPointTemp, (Tfr - 1)); 
+            // Limit leaving temp to be no less than inlet temp
+            this->PcmTSOutletTemp = max(this->PcmTSOutletTemp, this->PcmTSInletTemp);
+            DeltaTemp = this->PcmTSOutletTemp - this->PcmTSInletTemp;
+            Qpcm = DeltaTemp * Psychrometrics::CPCW(this->PcmTSInletTemp) * this->PcmTSMassFlowRate;
+            Uact = Qpcm / (this->PcmTSNomCap / TimeInterval);
+        } // End of leaving temp checks
+
+        this->Urate = Uact;
+        this->PcmTSCoolingRate = -Qpcm;
+        this->PcmTSCoolingEnergy = this->PcmTSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        /*
+        std::cout << "Urate =" << Urate << endl;
+        std::cout << "PcmTSOutletTemp =" << PcmTSOutletTemp << endl;
+        std::cout << "PcmTSInletTemp =" << PcmTSInletTemp << endl;
+        std::cout << "Qpcm =" << Qpcm << endl;
+        std::cout << "this->PcmTSNomCap =" << this->PcmTSNomCap << endl;
+        std::cout << "TimeInterval =" << TimeInterval << endl;
+        */
+    }
+
+    void SimplePcmStorageData::CalcPcmStorageCapacity(Real64 &MaxCap, Real64 &MinCap, Real64 &OptCap)
+    {
+        //------------------------------------------------------------------------
+        // FIRST PROCESS (MyLoad = 0.0 as IN)
+        // At this moment as first calling of ITS, ITS provide ONLY MaxCap/OptCap/MinCap.
+        //------------------------------------------------------------------------
+
+        // Initialize Capacity
+        MaxCap = 0.0;
+        MinCap = 0.0;
+        OptCap = 0.0;
+
+        // XCurIceFrac is reset to 1.0 when first hour of day.
+        // Starting full is assumed, because most ice systems are fully charged overnight
+        if (this->ResetXForPcmTSFlag) {
+            this->XCurPcmFrac = 1.0;
+            this->PcmFracRemain = 1.0;
+            this->Urate = 0.0;
+            this->ResetXForPcmTSFlag = false;
+        }
+
+        Real64 QpcmMin;
+        this->CalcQpcmDischageMaxByNtu(QpcmMin);
+
+        // At the first call of ITS model, MyLoad is 0. After that proper MyLoad will be provided by E+.
+        // Therefore, Umin is decided between input U and ITS REAL(r64) capacity.
+        Real64 Umin = min(max((-(1.0 - EpsLimitForDisCharge) * QpcmMin * TimeInterval / this->PcmTSNomCap), (-this->XCurPcmFrac + EpsLimitForX)), 0.0);
+
+        // Calculate CoolingRate with Uact to provide E+.
+        Real64 Uact = Umin;
+        Real64 PcmTSCoolingRateMax = std::abs(Uact * this->PcmTSNomCap / TimeInterval);
+        Real64 PcmTSCoolingRateOpt = PcmTSCoolingRateMax;
+        Real64 PcmTSCoolingRateMin = 0.0;
+
+        // Define MaxCap, OptCap, and MinCap
+        MaxCap = PcmTSCoolingRateMax;
+        OptCap = PcmTSCoolingRateOpt;
+        MinCap = PcmTSCoolingRateMin;
+    }
+
+    void SimplePcmStorageData::CalcPcmStorageDischarge(Real64 const myLoad, // operating load
+                                                       bool const RunFlag,  // TRUE when ice storage operating
+                                                       Real64 const MaxCap  // Max possible discharge rate (positive value)
+    )
+    {
+        std::string const RoutineName("SimplePcmStorageData::CalcPcmStorageDischarge");
+
+        Real64 OnsetTemp = this->OnsetTemp;         // move to global variable later
+        Real64 FinishTemp = this->FinishTemp;          // move to global variable later
+        Real64 Tfr = (1 - this->XCurPcmFrac) * OnsetTemp + this->XCurPcmFrac * FinishTemp; // FreezTempIP;
+        
+
+
+        // Initialize processed Rate and Energy
+        this->PcmTSMassFlowRate = 0.0;
+        this->PcmTSCoolingRate = 0.0;
+        this->PcmTSCoolingEnergy = 0.0;
+
+        {
+            auto const SELECT_CASE_var1(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var1 == DataPlant::SingleSetPoint) {
+                this->PcmTSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var1 == DataPlant::DualSetPointDeadBand) {
+                this->PcmTSOutletSetPointTemp = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
+            }
+        }
+
+        // Initialize processed U values
+        this->Urate = 0.0;
+
+        // If no component demand or ITS OFF, then RETURN.
+        if (myLoad == 0 || !RunFlag) {
+            this->PcmTSMassFlowRate = 0.0;
+            this->PcmTSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+            this->PcmTSOutletTemp = this->PcmTSInletTemp;
+            this->PcmTSCoolingRate = 0.0;
+            this->PcmTSCoolingEnergy = 0.0;
+            return;
+        }
+
+        // If FlowLock(provided by PlantSupplyManager) is False(=0), that is, MyLoad is not changed.
+        // then based on MyLoad, new ITSMassFlowRate will be calculated.
+
+        //----------------------------
+        int loopNum = this->LoopNum;
+
+        Real64 CpFluid = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(loopNum).FluidName,
+                                                           DataLoopNode::Node(this->PltInletNodeNum).Temp,
+                                                           DataPlant::PlantLoop(loopNum).FluidIndex,
+                                                           RoutineName);
+
+        // Calculate Umyload based on MyLoad from E+
+        Real64 Umyload = -myLoad * TimeInterval / this->PcmTSNomCap;
+        // Calculate Umax and Umin
+        // Cannot discharge more than the fraction that is left
+        Real64 Umax = -this->PcmFracRemain / DataHVACGlobals::TimeStepSys;
+        // Calculate Umin based on returned MyLoad from E+.
+        Real64 Umin = min(Umyload, 0.0);
+        // Based on Umax and Umin, if necessary to run E+, calculate proper Uact
+        // U is negative here.
+        Real64 Uact = max(Umin, Umax);
+
+        // Set ITSInletTemp provided by E+
+        this->PcmTSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        // The first thing is to set the ITSMassFlowRate
+        this->PcmTSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
+
+        PlantUtilities::SetComponentFlowRate(
+            this->PcmTSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+
+        // Qpcm is calculate input U which is within boundary between Umin and Umax.
+        Real64 Qpcm = Uact * this->PcmTSNomCap / TimeInterval;
+        // Qpcm cannot exceed MaxCap calulated by CalcIceStorageCapacity
+        // Note Qice is negative here, MaxCap is positive
+        Qpcm = max(Qpcm, -MaxCap);
+
+        // Calculate leaving water temperature
+        if ((Qpcm >= 0.0) || (this->XCurPcmFrac <= 0.0) || (this->PcmTSMassFlowRate < DataBranchAirLoopPlant::MassFlowTolerance)) {
+            this->PcmTSOutletTemp = this->PcmTSInletTemp;
+            Qpcm = 0.0;
+            Uact = 0.0;
+        } else {
+            Real64 DeltaTemp = Qpcm / CpFluid / this->PcmTSMassFlowRate;
+            this->PcmTSOutletTemp = this->PcmTSInletTemp + DeltaTemp;
+            // Limit leaving temp to be no less than setpoint or freezing temp plus 1C
+            this->PcmTSOutletTemp = max(this->PcmTSOutletTemp, this->PcmTSOutletSetPointTemp, (Tfr + 1));
+            // Limit leaving temp to be no greater than inlet temp
+            this->PcmTSOutletTemp = min(this->PcmTSOutletTemp, this->PcmTSInletTemp);
+            DeltaTemp = this->PcmTSOutletTemp - this->PcmTSInletTemp;
+            Qpcm = DeltaTemp * CpFluid * this->PcmTSMassFlowRate;
+            Uact = Qpcm / (this->PcmTSNomCap / TimeInterval);
+        } // End of leaving temp checks
+
+        // Calculate reported U value
+        this->Urate = Uact;
+        // Calculate ITSCoolingEnergy [J]
+        this->PcmTSCoolingRate = -Qpcm;
+        this->PcmTSCoolingEnergy = this->PcmTSCoolingRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+    }
+
+    void SimplePcmStorageData::CalcQpcmChargeMaxByNtu(Real64 const chillerOutletTemp, // [degC]
+                                                      Real64 &QpcmMaxByPcmTS            // [W]
+    )
+    {
+        // Initilize
+        //Real64 OnsetTempIP = this->OnsetTemp *9.0/5.0 +32 ;   // move to global variable later
+        //Real64 FinishTempIP = this->FinishTemp*9.0/5.0 + 32; // move to global variable later
+        //Real64 TfrIP = (1 - this->XCurPcmFrac) * OnsetTempIP + this->XCurPcmFrac * FinishTempIP; // FreezTempIP;
+
+
+        Real64 OnsetTemp = this->OnsetTemp;                                                // move to global variable later
+        Real64 FinishTemp = this->FinishTemp;                                              // move to global variable later
+        Real64 Tfr = (1 - this->XCurPcmFrac) * OnsetTemp + this->XCurPcmFrac * FinishTemp; // FreezTemp;
+
+
+        Real64 OnsetUA = this->OnsetUA;                                                   // move to global variable later
+        Real64 FinishUA = this->FinishUA;                                                              // move to global variable later
+        Real64 UAfr = (1 - this->XCurPcmFrac) * OnsetUA + this->XCurPcmFrac * FinishUA;     // FreezUA;
+
+        Real64 PcmTSMassFlowRate_loc = this->DesignMassFlowRate;
+
+        // Set ITSInletTemp provided by E+
+        this->PcmTSInletTemp = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        // The first thing is to set the ITSMassFlowRate
+        this->PcmTSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
+
+        PlantUtilities::SetComponentFlowRate(
+            this->PcmTSMassFlowRate, this->PltInletNodeNum, this->PltOutletNodeNum, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum);
+
+        Real64 ChOutletTemp = chillerOutletTemp; // TempSItoIP(chillerOutletTemp); //[degF] = ConvertSItoIP[degC]
+        // Chiller outlet temp must be below freeze temp, or else no charge
+        if (ChOutletTemp >= Tfr) {
+            QpcmMaxByPcmTS = 0.0;
+        } else {
+            // Effectiveness-Ntu method 
+            Real64 Cmin = Psychrometrics::CPCW(this->PcmTSInletTemp) * PcmTSMassFlowRate_loc; // this->PcmTSMassFlowRate;
+            Real64 Ntu = UAfr / Cmin;
+            Real64 Effectiveness = 1 - exp(-Ntu);
+            QpcmMaxByPcmTS = Effectiveness * Cmin * (Tfr - ChOutletTemp);
+            /*
+            // Make ChillerInletTemp as almost same as ChillerOutletTemp(input data)
+            Real64 ChillerInletTemp = ChOutletTemp + 0.01;
+            // ChillerInletTemp cannot be greater than or equal to freeze temp
+            if (ChillerInletTemp >= Tfr) {
+                ChillerInletTemp = ChOutletTemp + (Tfr - ChOutletTemp) / 2;
+            }
+
+            Real64 LogTerm = (Tfr - ChOutletTemp) / (Tfr - ChillerInletTemp);
+            // Need to protect this from LogTerm <= 0 - not sure what it should do then
+            if (LogTerm <= 0.0) {
+                ChillerInletTemp = ChOutletTemp;
+                QiceMaxByITS = 0.0;
+            }
+            QiceMaxByITS = this->UAIceCh * (TempIPtoSI(ChillerInletTemp) - TempIPtoSI(ChOutletTemp)) / std::log(LogTerm);
+            */
+        }
+    }
+    
+    void SimplePcmStorageData::CalcQpcmDischageMaxByNtu(Real64 &QpcmMin)
+    {
+        // Initilize
+        Real64 OnsetTemp = this->OnsetTemp;                                              // move to global variable later
+        Real64 FinishTemp = this->FinishTemp;                                             // move to global variable later
+        Real64 Tfr = (1 - this->XCurPcmFrac) * OnsetTemp + this->XCurPcmFrac * FinishTemp; // FreezTempIP;
+        
+
+        Real64 OnsetUA = this->OnsetUA;   // move to global variable later
+        Real64 FinishUA = this->FinishUA;    // move to global variable later
+        Real64 UAfr = (1 - this->XCurPcmFrac) * OnsetUA + this->XCurPcmFrac * FinishUA; // FreezUA;
+
+        // Qice is minimized when ITSInletTemp and ITSOutletTemp is almost same due to LMTD method.
+        // Qice is maximized(=0) when ITSOutletTemp is almost same as FreezTemp(=0).
+
+        Real64 PcmTSInletTemp_loc = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        Real64 PcmTSOutletTemp_loc = 0.0;
+        Real64 PcmTSMassFlowRate_loc = this->DesignMassFlowRate;
+        this->PcmTSMassFlowRate = this->DesignMassFlowRate; //[kg/s]
+
+        {
+            auto const SELECT_CASE_var(DataPlant::PlantLoop(this->LoopNum).LoopDemandCalcScheme);
+            if (SELECT_CASE_var == DataPlant::SingleSetPoint) {
+                PcmTSOutletTemp_loc = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPoint;
+            } else if (SELECT_CASE_var == DataPlant::DualSetPointDeadBand) {
+                PcmTSOutletTemp_loc = DataLoopNode::Node(this->PltOutletNodeNum).TempSetPointHi;
+            } else {
+                assert(false);
+            }
+        }
+
+        // Chiller outlet temp must be below freeze temp, or else no charge
+        if (PcmTSOutletTemp_loc >= Tfr) {
+            QpcmMin = 0.0;
+        } else {
+            // Effectiveness-Ntu method
+            Real64 Cmin = Psychrometrics::CPCW(PcmTSInletTemp_loc) * PcmTSMassFlowRate_loc; // this->PcmTSMassFlowRate;
+            //Real64 Cmin = Psychrometrics::CPCW(this->PcmTSInletTemp) * this->PcmTSMassFlowRate;
+ //           std::cout << "CPCW =" << Psychrometrics::CPCW(this->PcmTSInletTemp) << endl;
+ //           std::cout << "PcmTSMassFlowRate = " << this->PcmTSMassFlowRate << endl;
+            Real64 Ntu = UAfr / Cmin;
+            Real64 Effectiveness = 1 - exp(-Ntu);
+            QpcmMin = Effectiveness * Cmin * (Tfr - PcmTSOutletTemp_loc);
+        }
+
+    }
+
+    void SimplePcmStorageData::UpdateNode(Real64 const myLoad, bool const RunFlag)
+    {
+
+        // Update Node Inlet & Outlet MassFlowRat
+        PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
+        if (myLoad == 0 || !RunFlag) {
+            // Update Outlet Conditions so that same as Inlet, so component can be bypassed if necessary
+            DataLoopNode::Node(this->PltOutletNodeNum).Temp = DataLoopNode::Node(this->PltInletNodeNum).Temp;
+        } else {
+            DataLoopNode::Node(this->PltOutletNodeNum).Temp = this->PcmTSOutletTemp;
+        }
+    }
+
+    void SimplePcmStorageData::RecordOutput(Real64 const myLoad, bool const RunFlag)
+    {
+        if (myLoad == 0 || !RunFlag) {
+            this->MyLoad = myLoad;
+            this->PcmTSCoolingRate_rep = 0.0;
+            this->PcmTSCoolingEnergy_rep = 0.0;
+            this->PcmTSChargingRate = 0.0;
+            this->PcmTSChargingEnergy = 0.0;
+            this->PcmTSmdot = 0.0;
+
+        } else {
+            this->MyLoad = myLoad;
+            if (this->PcmTSCoolingRate > 0.0) {
+                this->PcmTSCoolingRate_rep = this->PcmTSCoolingRate;
+                this->PcmTSCoolingEnergy_rep = this->PcmTSCoolingEnergy;
+                this->PcmTSChargingRate = 0.0;
+                this->PcmTSChargingEnergy = 0.0;
+            } else {
+                this->PcmTSCoolingRate_rep = 0.0;
+                this->PcmTSCoolingEnergy_rep = 0.0;
+                this->PcmTSChargingRate = -this->PcmTSCoolingRate;
+                this->PcmTSChargingEnergy = -this->PcmTSCoolingEnergy;
+            }
+            this->PcmTSmdot = this->PcmTSMassFlowRate;
         }
     }
 
