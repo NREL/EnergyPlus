@@ -6730,9 +6730,6 @@ namespace SolarShading {
         // window with horizontally-slatted blind into zone at current time (m2)
         static Array1D<Real64> WinTransDifSolarSky; // Factor for exterior sky diffuse solar transmitted through
         // window with horizontally-slatted blind into zone at current time (m2)
-        /////////// hoisted into namespace renamed to ////////////
-        // static bool MustAlloc( true ); // True when local arrays must be allocated
-        ////////////////////////
         Real64 TBmDenom; // TBmDenominator
 
         Real64 TBmBmShBlSc;       // Beam-beam transmittance for window with shade, blind, screen, or switchable glazing
@@ -9891,41 +9888,6 @@ namespace SolarShading {
         using General::POLYF;
         using ScheduleManager::GetCurrentScheduleValue;
 
-        // Locals
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        // int IShadingCtrl;         // Pointer to a window's shading control
-        // Real64 BeamSolarOnWindow; // Direct solar intensity on window (W/m2)
-        // Real64 SolarOnWindow;     // Direct plus diffuse solar intensity on window (W/m2)
-        // Real64 SkySolarOnWindow;  // Sky diffuse solar intensity on window (W/m2)
-        // int SchedulePtr;          // Schedule pointer
-        // Real64 HorizSolar;        // Horizontal direct plus diffuse solar intensity
-        // Real64 SetPoint;          // Control setpoint
-        // Real64 SetPoint2;         // Second control setpoint
-        // int ShType;               // 1 = interior shade is on,
-                                     // 2 = glass is switched to dark state,
-                                     // 3 = exterior shade is on,
-                                     // 4 = exterior screen is on,
-                                     // 6 = interior blind is on,
-                                     // 7 = exterior blind is on,
-                                     // 8 = between-glass shade is on,
-                                     // 9 = between-glass blind is on.
-                                     //  CHARACTER(len=32)  :: ShadingType     ! Type of shading (interior shade, interior blind, etc.)
-        // int ShadingType;          // Type of shading (interior shade, interior blind, etc.)
-        // bool SchedAllowsControl;  // True if control schedule is not specified or is specified and schedule value = 1
-        // bool GlareControlIsActive; // True if glare control is active
-        // int BlNum;                 // Blind number
-        // Real64 InputSlatAngle;     // Slat angle of associated Material:WindowBlind (rad)
-
         static Real64 ThetaBig(0.0);   // Larger of ThetaBlock1 and ThetaBlock2 	//Autodesk Used uninitialized in some runs
         static Real64 ThetaSmall(0.0); // Smaller of ThetaBlock1 and ThetaBlock2 //Autodesk Used uninitialized in some runs
         static Real64 ThetaMin(0.0);   // Minimum allowed slat angle, resp. (rad)  //Autodesk Used uninitialized in some runs
@@ -9999,17 +9961,27 @@ namespace SolarShading {
                                                      SurfWinGlazedFrac(ISurf);
 
                 // Window has shading control
-                int IShadingCtrl = Surface(ISurf).WindowShadingControlPtr;
-                int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType;
+                int IShadingCtrl = Surface(ISurf).WindowShadingControlPtr; // Pointer to a window's shading control
+                int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
                 SurfWinShadingFlag(ISurf) = ShadeOff; // Initialize shading flag to off
                 int IZone = Surface(ISurf).Zone;
                 // Setpoint for shading
-                Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint;
-                Real64 SetPoint2 = WindowShadingControl(IShadingCtrl).SetPoint2;
+                Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
+                Real64 SetPoint2 = WindowShadingControl(IShadingCtrl).SetPoint2; // Second control setpoint
+
 
                 // ShType = NoShade           ! =-1 (see DataHeatBalance)
                 // ShType = ShadeOff          ! =0
                 int ShType;
+                // 1 = interior shade is on,
+                // 2 = glass is switched to dark state,
+                // 3 = exterior shade is on,
+                // 4 = exterior screen is on,
+                // 6 = interior blind is on,
+                // 7 = exterior blind is on,
+                // 8 = between-glass shade is on,
+                // 9 = between-glass blind is on.
+                //  CHARACTER(len=32)  :: ShadingType     ! Type of shading (interior shade, interior blind, etc.)
                 if (ShadingType == WSC_ST_InteriorShade) ShType = IntShadeOn;            // =1
                 if (ShadingType == WSC_ST_SwitchableGlazing) ShType = SwitchableGlazing; // =2
                 if (ShadingType == WSC_ST_ExteriorShade) ShType = ExtShadeOn;            // =3
@@ -10019,7 +9991,7 @@ namespace SolarShading {
                 if (ShadingType == WSC_ST_BetweenGlassShade) ShType = BGShadeOn;         // =8
                 if (ShadingType == WSC_ST_BetweenGlassBlind) ShType = BGBlindOn;         // =9
 
-                bool SchedAllowsControl = true;
+                bool SchedAllowsControl = true; // True if control schedule is not specified or is specified and schedule value = 1
                 int SchedulePtr = WindowShadingControl(IShadingCtrl).Schedule;
                 if (SchedulePtr != 0) {
                     if (WindowShadingControl(IShadingCtrl).ShadingControlIsScheduled &&
@@ -10028,13 +10000,13 @@ namespace SolarShading {
                 }
 
                 Real64 GlareControlIsActive = (ZoneDaylight(IZone).TotalDaylRefPoints > 0 && SunIsUp &&
-                                        WindowShadingControl(IShadingCtrl).GlareControlIsActive);
+                                        WindowShadingControl(IShadingCtrl).GlareControlIsActive); // True if glare control is active
 
-                Real64 SolarOnWindow = 0.0;
-                Real64 BeamSolarOnWindow = 0.0;
-                Real64 HorizSolar = 0.0;
+                Real64 SolarOnWindow = 0.0; // Direct plus diffuse solar intensity on window (W/m2)
+                Real64 BeamSolarOnWindow = 0.0; // Direct solar intensity on window (W/m2)
+                Real64 HorizSolar = 0.0; // Horizontal direct plus diffuse solar intensity
                 if (SunIsUp) {
-                    Real64 SkySolarOnWindow = AnisoSkyMult(ISurf) * DifSolarRad;
+                    Real64 SkySolarOnWindow = AnisoSkyMult(ISurf) * DifSolarRad;  // Sky diffuse solar intensity on window (W/m2)
                     BeamSolarOnWindow = BeamSolarRad * CosIncAng(TimeStep, HourOfDay, ISurf) *
                                         SunlitFrac(TimeStep, HourOfDay, ISurf);
                     SolarOnWindow =
@@ -10254,7 +10226,7 @@ namespace SolarShading {
                     // Blind in place or may be in place due to glare control
                     int BlNum = SurfWinBlindNumber(ISurf);
                     if (BlNum > 0) {
-                        Real64 InputSlatAngle = Blind(BlNum).SlatAngle * DegToRadians;
+                        Real64 InputSlatAngle = Blind(BlNum).SlatAngle * DegToRadians; // Slat angle of associated Material:WindowBlind (rad)
                         Real64 ProfAng;            // Solar profile angle (rad)
                         Real64 SlatAng;            // Slat angle this time step (rad)
                         Real64 PermeabilityA;      // Intermediate variables in blind permeability calc
@@ -11927,13 +11899,12 @@ namespace SolarShading {
 
         // Loop over all zones doing initial distribution of diffuse solar to interior heat transfer surfaces
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
-//            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
+            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // Init Zone accumulators for debugging
             ZoneDifSolarTrans = 0.0;
             ZoneDifSolarDistAbsorbedTotl = 0.0;
             ZoneDifSolarDistReflectedTotl = 0.0;
             ZoneDifSolarDistTransmittedTotl = 0.0;
-            auto & thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             // Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
             for (int const DifTransSurfNum : thisEnclosure.SurfacePtr) {
                 // Skip surfaces that are not exterior, except for TDD_Diffusers
@@ -11966,9 +11937,6 @@ namespace SolarShading {
                 WinDifSolarDistTransmittedTotl = 0.0;
 
                 // Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
-//                int const firstSurfOpague = Zone(enclosureNum).SurfaceFirst;
-//                int const lastSurfOpague = Zone(enclosureNum).SurfaceLast;
-//                for (int HeatTransSurfNum = firstSurfOpague; HeatTransSurfNum <= lastSurfOpague; ++HeatTransSurfNum) {
                 for (int const HeatTransSurfNum : thisEnclosure.SurfacePtr) {
                     // Skip surfaces that are not heat transfer surfaces
                     // Skip tubular daylighting device domes

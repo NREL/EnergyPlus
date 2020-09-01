@@ -447,7 +447,6 @@ namespace DataSurfaces {
     std::vector<int> AllHTWindowSurfaceList;    // List of all window surfaces
     std::vector<int> AllSurfaceListReportOrder; // List of all surfaces - output reporting order
 
-
     // Surface Window Heat Balance
     Array1D<Real64> SurfWinTransSolar;                    // Exterior beam plus diffuse solar transmitted through window, or window plus shade/blind, into zone (W)
     Array1D<Real64> SurfWinBmSolar;                       // Exterior beam solar transmitted through window, or window plus blind, into zone (W)
@@ -478,10 +477,8 @@ namespace DataSurfaces {
     // Surface Window Energy
     Array1D<Real64> SurfWinTransSolarEnergy;              // Energy of WinTransSolar [J]
     Array1D<Real64> SurfWinBmSolarEnergy;                 // Energy of WinBmSolar [J]
-
     Array1D<Real64> SurfWinBmBmSolarEnergy;               // Beam-to-beam energy of WinBmSolar [J]
     Array1D<Real64> SurfWinBmDifSolarEnergy;              // Beam-to-diffuse energy of WinBmSolar [J]
-
     Array1D<Real64> SurfWinDifSolarEnergy;                // Energy of WinDifSolar [J]
     Array1D<Real64> SurfWinHeatGainRepEnergy;             // Energy of WinHeatGainRep [J]
     Array1D<Real64> SurfWinHeatLossRepEnergy;             // Energy of WinHeatLossRep [J]
@@ -538,7 +535,7 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinProfileAngHor;                  // Horizontal beam solar profile angle (degrees)
     Array1D<Real64> SurfWinProfileAngVert;                 // Vertical beam solar profile angle (degrees)
 
-    Array1D<int> SurfWinShadingFlag;                       // -1: window has no shading device
+    Array1D<int> SurfWinShadingFlag;                        // -1: window has no shading device
     Array1D<bool> SurfWinShadingFlagEMSOn;                  // EMS control flag, true if EMS is controlling ShadingFlag with ShadingFlagEMSValue
     Array1D<int> SurfWinShadingFlagEMSValue;                // EMS control value for Shading Flag
     Array1D<int> SurfWinStormWinFlag;                       // -1: Storm window not applicable; 0: Window has storm window but it is off 1: Window has storm window and it is on
@@ -1243,7 +1240,6 @@ namespace DataSurfaces {
         AWinSurfDiffBack.deallocate();
         AWinCFOverlap.deallocate();
         AirSkyRadSplit.deallocate();
-
         SUNCOSHR.dimension(24, 3, 0.0);
         ReflFacBmToDiffSolObs.deallocate();
         ReflFacBmToDiffSolGnd.deallocate();
@@ -1256,7 +1252,6 @@ namespace DataSurfaces {
         SurfSunlitFrac.deallocate();
         SurfSkySolarInc.clear();
         SurfGndSolarInc.clear();
-
         AllHTSurfaceList.clear();
         AllIZSurfaceList.clear();
         AllHTNonWindowSurfaceList.clear();

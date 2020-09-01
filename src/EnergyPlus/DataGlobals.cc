@@ -255,6 +255,7 @@ namespace DataGlobals {
     std::function<void(int const)> progressCallback;
     std::function<void(const std::string &)> messageCallback;
     std::function<void(EnergyPlus::Error e, const std::string &)> errorCallback;
+
     bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
