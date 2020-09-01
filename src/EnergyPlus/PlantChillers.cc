@@ -51,7 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -1219,7 +1218,6 @@ namespace PlantChillers {
         // 1. BLAST Users Manual
         // 2. CHILLER User Manual
 
-        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcElectricChillerModel");
         this->EvapMassFlowRate = 0.0;
         this->CondMassFlowRate = 0.0;
@@ -3000,7 +2998,6 @@ namespace PlantChillers {
         Real64 const ReferenceTemp(25.0); // Reference temperature by which lower heating
         // value is reported.  This should be subtracted
         // off of when calculated exhaust energies.
-        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcEngineDrivenChillerModel");
 
         // set module level inlet and outlet nodes
@@ -4786,7 +4783,6 @@ namespace PlantChillers {
         // 2. CHILLER User Manual
 
         Real64 const ExhaustCP(1.047); // Exhaust Gas Specific Heat
-        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcGTChillerModel");
         static std::string const RoutineNameHeatRecovery("ChillerHeatRecovery");
 
@@ -6221,7 +6217,6 @@ namespace PlantChillers {
         //                      Jun. 2016, Rongpeng Zhang, LBNL. Applied the chiller supply water temperature sensor fault model
         //                      Nov. 2016, Rongpeng Zhang, LBNL. Added Fouling Chiller fault
 
-        static ObjexxFCL::gio::Fmt OutputFormat("(F6.2)");
         static std::string const RoutineName("CalcConstCOPChillerModel");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

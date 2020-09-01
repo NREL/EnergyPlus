@@ -6289,7 +6289,6 @@ namespace HeatBalanceManager {
         FileLineCount = 0;
 
         NextLine = W5DataFile.readLine();
-        int ReadStat = 0;
         if (NextLine.eof) goto Label1000;
         ++FileLineCount;
         if (!has_prefixi(NextLine.data, "WINDOW5")) {
@@ -6875,11 +6874,6 @@ namespace HeatBalanceManager {
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 4) +
                                       ") in error (first 100 characters)=" + DataLine(4).substr(0, 100));
                     ErrorsFound = true;
-                }
-                {
-                    IOFlags flags;
-
-                    ReadStat = flags.ios();
                 }
                 if ((stringReader(DataLine(5).substr(5)) >> Rbvis).bad()) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Rbvis values.");

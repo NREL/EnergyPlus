@@ -56,7 +56,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/ArrayS.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
@@ -82,6 +81,7 @@
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -2427,11 +2427,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine reads the appropriate day of EPW weather data.
 
-        static ObjexxFCL::gio::Fmt const fmtA("(A)");
-        static std::string const fmtLD("*");
-        static ObjexxFCL::gio::Fmt const YMDHFmt("(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)");
-        static ObjexxFCL::gio::Fmt const YMDHFmt1("(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)");
-
         int WYear;
         int WMonth;
         int WDay;
@@ -2724,7 +2719,7 @@ namespace WeatherManager {
                     for (int i = 2; i <= NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(ioFiles.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            ObjexxFCL::gio::read(WeatherDataLine.data, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            stringReader(WeatherDataLine.data) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -2738,7 +2733,7 @@ namespace WeatherManager {
                     for (int i = 1; i <= 23 * NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(ioFiles.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            ObjexxFCL::gio::read(WeatherDataLine.data, fmtLD) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            stringReader(WeatherDataLine.data) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -3468,7 +3463,6 @@ namespace WeatherManager {
         EP_SIZE_CHECK(WCodesArr, 9); // NOLINT(misc-static-assert)
 
         static std::string const ValidDigits("0123456789");
-        static std::string const fmtLD("*");
         static std::string const fmt9I1("(9I1)");
 
         std::string::size_type Pos;
@@ -3483,9 +3477,10 @@ namespace WeatherManager {
             Real64 RDay;
             Real64 RHour;
             Real64 RMinute;
-            IOFlags flags;
-            ObjexxFCL::gio::read(Line, fmtLD, flags) >> RYear >> RMonth >> RDay >> RHour >> RMinute;
-            if (flags.err()) {
+            auto reader = stringReader(Line);
+            char comma{};
+            reader >> RYear >> comma >> RMonth >> comma >> RDay >> comma >> RHour >> comma >> RMinute;
+            if (reader.bad()) {
                 ShowSevereError("Invalid Date info in Weather Line");
                 ShowContinueError("Entire Data Line=" + SaveLine);
                 ShowFatalError("Error in Reading Weather Data");
@@ -3542,11 +3537,11 @@ namespace WeatherManager {
         // Now read more numerics with List Directed I/O (note there is another "character" field lurking)
         Real64 RField21;
         {
-            IOFlags flags;
-            ObjexxFCL::gio::read(Line, fmtLD, flags) >> DryBulb >> DewPoint >> RelHum >> AtmPress >> ETHoriz >> ETDirect >> IRHoriz >> GLBHoriz >>
+            auto reader = stringReader(Line);
+            reader >> DryBulb >> DewPoint >> RelHum >> AtmPress >> ETHoriz >> ETDirect >> IRHoriz >> GLBHoriz >>
                 DirectRad >> DiffuseRad >> GLBHorizIllum >> DirectNrmIllum >> DiffuseHorizIllum >> ZenLum >> WindDir >> WindSpeed >> TotalSkyCover >>
                 OpaqueSkyCover >> Visibility >> CeilHeight >> RField21;
-            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
         }
         for (int i = 1; i <= 21; ++i) {
             Pos = index(Line, ',');
@@ -3564,9 +3559,9 @@ namespace WeatherManager {
         if (Pos != std::string::npos) {
             if (Pos != 0) {
                 {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> PrecipWater;
-                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    auto reader = stringReader(Line.substr(0, Pos));
+                    reader >> PrecipWater;
+                    if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
             } else {
                 PrecipWater = 999.0;
@@ -3576,9 +3571,9 @@ namespace WeatherManager {
             if (Pos != std::string::npos) {
                 if (Pos != 0) {
                     {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> AerosolOptDepth;
-                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        auto reader = stringReader(Line.substr(0, Pos));
+                        reader >> AerosolOptDepth;
+                        if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                 } else {
                     AerosolOptDepth = 999.0;
@@ -3588,9 +3583,9 @@ namespace WeatherManager {
                 if (Pos != std::string::npos) {
                     if (Pos != 0) {
                         {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> SnowDepth;
-                            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                            auto reader = stringReader(Line.substr(0, Pos));
+                            reader >> SnowDepth;
+                            if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                     } else {
                         SnowDepth = 999.0;
@@ -3600,9 +3595,9 @@ namespace WeatherManager {
                     if (Pos != std::string::npos) {
                         if (Pos != 0) {
                             {
-                                IOFlags flags;
-                                ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> DaysSinceLastSnow;
-                                if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                auto reader = stringReader(Line.substr(0, Pos));
+                                reader >> DaysSinceLastSnow;
+                                if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                             }
                         } else {
                             DaysSinceLastSnow = 999.0;
@@ -3612,9 +3607,9 @@ namespace WeatherManager {
                         if (Pos != std::string::npos) {
                             if (Pos != 0) {
                                 {
-                                    IOFlags flags;
-                                    ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> Albedo;
-                                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                    auto reader = stringReader(Line.substr(0, Pos));
+                                    reader >> Albedo;
+                                    if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                 }
                             } else {
                                 Albedo = 999.0;
@@ -3624,9 +3619,9 @@ namespace WeatherManager {
                             if (Pos != std::string::npos) {
                                 if (Pos != 0) {
                                     {
-                                        IOFlags flags;
-                                        ObjexxFCL::gio::read(Line.substr(0, Pos), fmtLD, flags) >> LiquidPrecip;
-                                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                        auto reader = stringReader(Line.substr(0, Pos));
+                                        reader >> LiquidPrecip;
+                                        if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                     }
                                 } else {
                                     LiquidPrecip = 999.0;
@@ -3642,18 +3637,18 @@ namespace WeatherManager {
                         }
                     } else {
                         {
-                            IOFlags flags;
-                            ObjexxFCL::gio::read(Line, fmtLD, flags) >> DaysSinceLastSnow;
-                            if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                            auto reader = stringReader(Line);
+                            reader >> DaysSinceLastSnow;
+                            if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                         Albedo = 999.0;
                         LiquidPrecip = 999.0;
                     }
                 } else {
                     {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(Line, fmtLD, flags) >> SnowDepth;
-                        if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        auto reader = stringReader(Line);
+                        reader >> SnowDepth;
+                        if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                     DaysSinceLastSnow = 999.0;
                     Albedo = 999.0;
@@ -3661,9 +3656,9 @@ namespace WeatherManager {
                 }
             } else {
                 {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(Line, fmtLD, flags) >> AerosolOptDepth;
-                    if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    auto reader = stringReader(Line);
+                    reader >> AerosolOptDepth;
+                    if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
                 SnowDepth = 999.0;
                 DaysSinceLastSnow = 999.0;
@@ -3672,9 +3667,9 @@ namespace WeatherManager {
             }
         } else {
             {
-                IOFlags flags;
-                ObjexxFCL::gio::read(Line, fmtLD, flags) >> PrecipWater;
-                if (flags.err()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                auto reader = stringReader(Line);
+                reader >> PrecipWater;
+                if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
             }
             AerosolOptDepth = 999.0;
             SnowDepth = 999.0;
@@ -3701,7 +3696,18 @@ namespace WeatherManager {
                 for (Pos = 0; Pos < 9; ++Pos) {
                     if (!has(ValidDigits, PresWeathCodes[Pos])) PresWeathCodes[Pos] = '9';
                 }
-                ObjexxFCL::gio::read(PresWeathCodes, fmt9I1) >> WCodesArr;
+
+                // we are trying to read a string of 9 integers with no spaces, each
+                // into its own integer, like:
+                // "123456789"
+                // becomes
+                // std::vector<int>{1,2,3,4,5,6,7,8,9};
+                auto reader = stringReader(PresWeathCodes);
+                for (auto &value : WCodesArr) {
+                    char c[2]{}; // a string of 2 characters, init both to 0
+                    reader >> c[0]; // read next char into the first byte
+                    value = std::atoi(c); // convert this short string into the appropriate int to read
+                }
             } else {
                 ++Missed.WeathCodes;
                 WCodesArr = 9;
@@ -4893,7 +4899,6 @@ namespace WeatherManager {
         // incremented.  Finally, the header information for the report must
         // be sent to the output file.
 
-        static ObjexxFCL::gio::Fmt const A("(a)");
         static std::string const EnvironmentString(",5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]");
         static std::string const TimeStepString(
             ",8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType");
@@ -7108,8 +7113,6 @@ namespace WeatherManager {
         // This file reads the Ground Temps from the input file and puts them
         //  in a new variable.
 
-        static ObjexxFCL::gio::Fmt const Format_720("(' ',A,12(', ',F6.2))");
-
         // Initialize Site:GroundTemperature:BuildingSurface object
         siteBuildingSurfaceGroundTempsPtr = GroundTemperatureManager::GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
@@ -7147,8 +7150,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Ground Reflectances from the input file (optional) and
         // places them in the monthly array.
-
-        static ObjexxFCL::gio::Fmt const Format_720("(' Site:GroundReflectance',12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance";
         int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -7203,8 +7204,6 @@ namespace WeatherManager {
         // PURPOSE OF THIS SUBROUTINE:
         // This file reads the Snow Ground Reflectance Modifiers from the input file (optional) and
         // places them in the variables.
-
-        static ObjexxFCL::gio::Fmt const Format_721("(A,12(', ',F5.2))");
 
         DataIPShortCuts::cCurrentModuleObject = "Site:GroundReflectance:SnowModifier";
         int nObjs = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
@@ -7677,8 +7676,6 @@ namespace WeatherManager {
         // METHODOLOGY EMPLOYED:
         // File is positioned to the correct line, then backspaced.  This routine
         // reads in the line and processes as appropriate.
-
-        static ObjexxFCL::gio::Fmt const fmtLD("*");
 
         WeatherManager::DateType dateType;
         int NumHdArgs;
@@ -8843,8 +8840,6 @@ namespace WeatherManager {
         // either weather (*.EPW) file or reads monthly daily average outdoor air
         // drybulb temperature from STAT (*.stat) for use to autosize main water
         // temperature.
-
-        static ObjexxFCL::gio::Fmt const fmtA("(A)");
 
         Real64 MonthlyDailyDryBulbMin(200.0);               // monthly-daily minimum outside air dry-bulb temperature
         Real64 MonthlyDailyDryBulbMax(-200.0);              // monthly-daily maximum outside air dry-bulb temperature

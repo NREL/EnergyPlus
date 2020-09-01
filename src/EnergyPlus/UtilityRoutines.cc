@@ -61,11 +61,11 @@ extern "C" {
 // #include <ObjexxFCL/Array1.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include "IOFiles.hh"
+#include "StringUtilities.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -100,7 +100,6 @@ namespace EnergyPlus {
 
 namespace UtilityRoutines {
     bool outputErrorHeader(true);
-    ObjexxFCL::gio::Fmt fmtLD("*");
     std::string appendPerfLog_headerRow("");
     std::string appendPerfLog_valuesRow("");
 
@@ -145,19 +144,15 @@ namespace UtilityRoutines {
         std::string::size_type const StringLen(PString.length());
         ErrorFlag = false;
         if (StringLen == 0) return rProcessNumber;
-        int IoStatus(0);
+        bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::read(PString, fmtLD, flags) >> rProcessNumber;
-                IoStatus = flags.ios();
-            }
+            parseFailed = (stringReader(PString) >> rProcessNumber).bad();
             ErrorFlag = false;
         } else {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }
-        if (IoStatus != 0) {
+        if (parseFailed) {
             rProcessNumber = 0.0;
             ErrorFlag = true;
         }

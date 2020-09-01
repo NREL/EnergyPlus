@@ -53,7 +53,7 @@
 
 namespace EnergyPlus
 {
-  std::stringstream stringReader(std::string str) {
+  inline std::stringstream stringReader(std::string str) {
       std::stringstream result{std::move(str)};
       result.imbue(std::locale("C"));
       return result;

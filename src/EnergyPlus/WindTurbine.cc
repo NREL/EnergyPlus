@@ -52,7 +52,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -66,6 +65,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/StringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindTurbine.hh>
 
@@ -666,7 +666,7 @@ namespace WindTurbine {
                             if (lnPtr != 1) {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        ObjexxFCL::gio::read(lineIn.data.substr(0, lnPtr), "*") >> MonthWS(mon);
+                                        stringReader(lineIn.data.substr(0, lnPtr)) >> MonthWS(mon);
                                         lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field
