@@ -61,8 +61,8 @@
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletHumRatSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesAirOutletTempSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterDesWaterInletTempSizing.hh>
-#include <EnergyPlus/Autosizing/CoolingWaterflowSizing.hh>
 #include <EnergyPlus/Autosizing/CoolingWaterNumofTubesPerRowSizing.hh>
+#include <EnergyPlus/Autosizing/CoolingWaterflowSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirFlowSizing.hh>
 #include <EnergyPlus/Autosizing/HeatingAirflowUASizing.hh>
 #include <EnergyPlus/Autosizing/HeatingCapacitySizing.hh>
@@ -102,7 +102,6 @@
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -1707,7 +1706,9 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(WaterCoil(CoilNum).WaterCoilType_Num);
                     if (SELECT_CASE_var == WaterCoil_SimpleHeating) {
                         if (RptCoilHeaderFlag(1)) {
-                            print(state.files.eio, "{}", "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
+                            print(state.files.eio,
+                                  "{}",
+                                  "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
                             RptCoilHeaderFlag(1) = false;
                         }
                         PreDefTableEntry(pdchHeatCoilType, WaterCoil(CoilNum).Name, "Coil:Heating:Water");
@@ -2106,7 +2107,8 @@ namespace WaterCoils {
         }
     }
 
-    void SizeWaterCoil(EnergyPlusData& state, int const CoilNum) {
+    void SizeWaterCoil(EnergyPlusData &state, int const CoilNum)
+    {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -2132,7 +2134,6 @@ namespace WaterCoils {
         using General::SolveRoot;
         using General::TrimSigDigits;
         using PlantUtilities::RegisterPlantCompDesignFlow;
-        using ReportSizingManager::GetCoilDesFlowT;
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2198,12 +2199,12 @@ namespace WaterCoils {
                 } else {
                     CompType = cAllCoilTypes(Coil_CoolingWater); // Coil:Cooling:Water
                 }
-                bPRINT = false;       // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
-                                      // should print this!)
-                TempSize = AutoSize;  // get the autosized air volume flow rate for use in other calculations
+                bPRINT = false;      // do not print this sizing request since the autosized value is needed and this input may not be autosized (we
+                                     // should print this!)
+                TempSize = AutoSize; // get the autosized air volume flow rate for use in other calculations
                 bool errorsFound = false;
                 CoolingAirFlowSizer sizingCoolingAirFlow;
-                //sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                // sizingCoolingAirFlow.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingCoolingAirFlow.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 DataAirFlowUsedForSizing = sizingCoolingAirFlow.size(TempSize, errorsFound);
                 DataFlowUsedForSizing = DataAirFlowUsedForSizing;
@@ -2211,7 +2212,7 @@ namespace WaterCoils {
 
                 if (CurSysNum > 0 && CurOASysNum == 0) {
                     Real64 DesCoilExitHumRat(0.0); // fix coil sizing inconsistency
-                    GetCoilDesFlowT(CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
+                    DataSizing::GetCoilDesFlowT(CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp, DesCoilExitHumRat);
                     DataAirFlowUsedForSizing = DesCoilAirFlow;
                     DataFlowUsedForSizing = DesCoilAirFlow;
                     DataDesOutletAirTemp = DesCoilExitTemp;
@@ -2303,8 +2304,8 @@ namespace WaterCoils {
                 if (CurSysNum > 0) { // This call can be deleted at a future time and remove the if ( CurZoneEqNum > 0 ) check above. This will
                                      // change the order of the eio file.
                     if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
-                        bPRINT = false;       // no field for detailed water coil, should print this to eio anyway
-                        TempSize = AutoSize;  // coil report
+                        bPRINT = false;      // no field for detailed water coil, should print this to eio anyway
+                        TempSize = AutoSize; // coil report
                     } else {
                         bPRINT = true;
                         TempSize = WaterCoil(CoilNum).DesInletAirHumRat;
@@ -2349,8 +2350,8 @@ namespace WaterCoils {
                 DataWaterFlowUsedForSizing = WaterCoil(CoilNum).MaxWaterVolFlowRate;
 
                 if (WaterCoil(CoilNum).WaterCoilModel == CoilModel_Detailed) { // 'DETAILED FLAT FIN'
-                    bPRINT = false;       // do not print this sizing request since this coil does not have a design air flow rate input field (we
-                                          // should print this!)
+                    bPRINT = false; // do not print this sizing request since this coil does not have a design air flow rate input field (we
+                                    // should print this!)
                 } else {
                     bPRINT = true;
                 }
@@ -2359,7 +2360,7 @@ namespace WaterCoils {
                 std::string stringOverride = "Design Air Flow Rate [m3/s]";
                 if (DataGlobals::isEpJSON) stringOverride = "design_air_flow_rate [m3/s]";
                 sizingCoolingAirFlow2.overrideSizingString(stringOverride);
-                //sizingCoolingAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
+                // sizingCoolingAirFlow2.setHVACSizingIndexData(FanCoil(FanCoilNum).HVACSizingIndex);
                 sizingCoolingAirFlow2.initializeWithinEP(state, CompType, CompName, bPRINT, RoutineName);
                 WaterCoil(CoilNum).DesAirVolFlowRate = sizingCoolingAirFlow2.size(TempSize, errorsFound);
                 WaterCoil(CoilNum).DesAirMassFlowRate = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
@@ -2742,7 +2743,7 @@ namespace WaterCoils {
                         WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
                     }
                 }
-                //WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
+                // WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
                 WaterCoil(CoilNum).DesWaterHeatingCoilRate = DataCapacityUsedForSizing;
                 WaterCoil(DataCoilNum).InletWaterTemp = DesCoilWaterInTempSaved; // reset the Design Coil Inlet Water Temperature
 

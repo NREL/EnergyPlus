@@ -54,10 +54,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/AirTerminalUnit.hh>
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -78,7 +79,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -500,7 +500,8 @@ namespace FourPipeBeam {
         return termUnitSizingNum;
     }
 
-    void HVACFourPipeBeam::simulate(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
+    void HVACFourPipeBeam::simulate(EnergyPlusData &state,
+                                    bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                                     Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
     )
     {
@@ -737,7 +738,6 @@ namespace FourPipeBeam {
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
         using Psychrometrics::PsyCpAirFnW;
-        using ReportSizingManager::ReportSizingOutput;
         using namespace std::placeholders;
         using General::SolveRoot;
 
@@ -945,10 +945,10 @@ namespace FourPipeBeam {
                 DataSizing::FinalSysSizing(this->airLoopNum).MassFlowAtCoolPeak +=
                     (this->vDotDesignPrimAir - originalTermUnitSizeCoolVDot) * DataEnvironment::StdRhoAir;
 
-                ReportSizingOutput(this->unitType,
-                                   this->name,
-                                   "AirLoopHVAC Design Supply Air Flow Rate Adjustment [m3/s]",
-                                   (this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot));
+                BaseSizer::reportSizerOutput(this->unitType,
+                                             this->name,
+                                             "AirLoopHVAC Design Supply Air Flow Rate Adjustment [m3/s]",
+                                             (this->vDotDesignPrimAir - originalTermUnitSizeMaxVDot));
             } else {
                 ShowSevereError("Four pipe beam requires system sizing. Turn on system sizing.");
                 ShowFatalError("Program terminating due to previous errors");
@@ -990,16 +990,16 @@ namespace FourPipeBeam {
 
         // report final sizes if autosized
         if (this->vDotDesignPrimAirWasAutosized) {
-            ReportSizingOutput(this->unitType, this->name, "Supply Air Flow Rate [m3/s]", this->vDotDesignPrimAir);
+            BaseSizer::reportSizerOutput(this->unitType, this->name, "Supply Air Flow Rate [m3/s]", this->vDotDesignPrimAir);
         }
         if (this->vDotDesignCWWasAutosized) {
-            ReportSizingOutput(this->unitType, this->name, "Maximum Total Chilled Water Flow Rate [m3/s]", this->vDotDesignCW);
+            BaseSizer::reportSizerOutput(this->unitType, this->name, "Maximum Total Chilled Water Flow Rate [m3/s]", this->vDotDesignCW);
         }
         if (this->vDotDesignHWWasAutosized) {
-            ReportSizingOutput(this->unitType, this->name, "Maximum Total Hot Water Flow Rate [m3/s]", this->vDotDesignHW);
+            BaseSizer::reportSizerOutput(this->unitType, this->name, "Maximum Total Hot Water Flow Rate [m3/s]", this->vDotDesignHW);
         }
         if (this->totBeamLengthWasAutosized) {
-            ReportSizingOutput(this->unitType, this->name, "Zone Total Beam Length [m]", this->totBeamLength);
+            BaseSizer::reportSizerOutput(this->unitType, this->name, "Zone Total Beam Length [m]", this->totBeamLength);
         }
         // save the design water volume flow rate for use by the water loop sizing algorithms
         if (this->vDotDesignCW > 0.0 && this->beamCoolingPresent) {
@@ -1469,7 +1469,6 @@ namespace FourPipeBeam {
             SafeCopyPlantNode(this->hWInNodeNum, this->hWOutNodeNum);
             DataLoopNode::Node(this->hWOutNodeNum).Temp = this->hWTempOut;
         }
-
     }
 
     void HVACFourPipeBeam::report() // fill out local output variables for reporting
@@ -1498,7 +1497,7 @@ namespace FourPipeBeam {
         this->supAirHeatingEnergy = this->supAirHeatingRate * ReportingConstant;
 
         this->primAirFlow = this->mDotSystemAir / DataEnvironment::StdRhoAir;
-        
+
         this->CalcOutdoorAirVolumeFlowRate();
     }
 
@@ -1506,12 +1505,12 @@ namespace FourPipeBeam {
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->airLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->airLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) *
+                                       DataAirLoop::AirLoopFlow(this->airLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }
     }
-
 
 } // namespace FourPipeBeam
 

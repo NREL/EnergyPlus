@@ -56,6 +56,7 @@
 #include <EnergyPlus/Autosizing/SystemAirFlowSizing.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
@@ -69,7 +70,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HeatRecovery.hh>
@@ -79,7 +79,6 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -181,7 +180,8 @@ namespace HVACStandAloneERV {
         ControllerUniqueNames.clear();
     }
 
-    void SimStandAloneERV(EnergyPlusData &state, std::string const &CompName,   // name of the Stand Alone ERV unit
+    void SimStandAloneERV(EnergyPlusData &state,
+                          std::string const &CompName,   // name of the Stand Alone ERV unit
                           int const ZoneNum,             // number of zone being served unused1208
                           bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                           Real64 &SensLoadMet,           // net sensible load supplied by the ERV unit to the zone (W)
@@ -449,7 +449,8 @@ namespace HVACStandAloneERV {
                 // Set the SA Design Fan Volume Flow Rate
                 // get from fan module
                 errFlag = false;
-                SAFanVolFlowRate = GetFanDesignVolumeFlowRate(state, cFanTypes(SAFanTypeNum), StandAloneERV(StandAloneERVNum).SupplyAirFanName, errFlag);
+                SAFanVolFlowRate =
+                    GetFanDesignVolumeFlowRate(state, cFanTypes(SAFanTypeNum), StandAloneERV(StandAloneERVNum).SupplyAirFanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("... occurs in " + CurrentModuleObject + " =" + StandAloneERV(StandAloneERVNum).Name);
                     ErrorsFound = true;
@@ -501,7 +502,8 @@ namespace HVACStandAloneERV {
                 // Set the EA Design Fan Volume Flow Rate
                 // get from fan module
                 errFlag = false;
-                EAFanVolFlowRate = GetFanDesignVolumeFlowRate(state, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, errFlag);
+                EAFanVolFlowRate =
+                    GetFanDesignVolumeFlowRate(state, cFanTypes(EAFanTypeNum), StandAloneERV(StandAloneERVNum).ExhaustAirFanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("... occurs in " + CurrentModuleObject + " =" + StandAloneERV(StandAloneERVNum).Name);
                     ErrorsFound = true;
@@ -1187,7 +1189,8 @@ namespace HVACStandAloneERV {
         lAlphaBlanks.deallocate();
     }
 
-    void InitStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum,   // number of the current Stand Alone ERV unit being simulated
+    void InitStandAloneERV(EnergyPlusData &state,
+                           int const StandAloneERVNum,   // number of the current Stand Alone ERV unit being simulated
                            int const ZoneNum,            // number of zone being served unused1208
                            bool const FirstHVACIteration // TRUE if first HVAC iteration
     )
@@ -1297,8 +1300,8 @@ namespace HVACStandAloneERV {
             MyEnvrnFlag(StandAloneERVNum) = false;
             //   Initialize OA Controller on BeginEnvrnFlag
             if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
-                SimOAController(state,
-                    StandAloneERV(StandAloneERVNum).ControllerName, StandAloneERV(StandAloneERVNum).ControllerIndex, FirstHVACIteration, 0);
+                SimOAController(
+                    state, StandAloneERV(StandAloneERVNum).ControllerName, StandAloneERV(StandAloneERVNum).ControllerIndex, FirstHVACIteration, 0);
             }
         } // end one time inits
 
@@ -1324,8 +1327,8 @@ namespace HVACStandAloneERV {
             if (StandAloneERV(StandAloneERVNum).ControllerNameDefined) {
                 //     Initialize a flow rate for controller
                 Node(SupInletNode).MassFlowRate = StandAloneERV(StandAloneERVNum).MaxSupAirMassFlow;
-                SimOAController(state,
-                    StandAloneERV(StandAloneERVNum).ControllerName, StandAloneERV(StandAloneERVNum).ControllerIndex, FirstHVACIteration, 0);
+                SimOAController(
+                    state, StandAloneERV(StandAloneERVNum).ControllerName, StandAloneERV(StandAloneERVNum).ControllerIndex, FirstHVACIteration, 0);
             }
 
             if (GetCurrentScheduleValue(StandAloneERV(StandAloneERVNum).SupplyAirFanSchPtr) > 0 || (ZoneCompTurnFansOn && !ZoneCompTurnFansOff)) {
@@ -1591,7 +1594,8 @@ namespace HVACStandAloneERV {
         ZoneEqSizing(CurZoneEqNum).AirVolFlow = StandAloneERV(StandAloneERVNum).SupplyAirVolFlow;
     }
 
-    void CalcStandAloneERV(EnergyPlusData &state, int const StandAloneERVNum,    // Unit index in ERV data structure
+    void CalcStandAloneERV(EnergyPlusData &state,
+                           int const StandAloneERVNum,    // Unit index in ERV data structure
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            Real64 &SensLoadMet,           // sensible zone load met by unit (W)
                            Real64 &LatentMassLoadMet      // latent zone load met by unit (kg/s), dehumid = negative
@@ -1670,7 +1674,8 @@ namespace HVACStandAloneERV {
             HighHumCtrlFlag = false;
         }
 
-        SimHeatRecovery(state, StandAloneERV(StandAloneERVNum).HeatExchangerName,
+        SimHeatRecovery(state,
+                        StandAloneERV(StandAloneERVNum).HeatExchangerName,
                         FirstHVACIteration,
                         StandAloneERV(StandAloneERVNum).HeatExchangerIndex,
                         ContFanCycCoil,
@@ -1683,7 +1688,8 @@ namespace HVACStandAloneERV {
         StandAloneERV(StandAloneERVNum).ElecUseRate = AirToAirHXElecPower;
 
         if (StandAloneERV(StandAloneERVNum).SupplyAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            SimulateFanComponents(state, StandAloneERV(StandAloneERVNum).SupplyAirFanName,
+            SimulateFanComponents(state,
+                                  StandAloneERV(StandAloneERVNum).SupplyAirFanName,
                                   FirstHVACIteration,
                                   StandAloneERV(StandAloneERVNum).SupplyAirFanIndex,
                                   _,
@@ -1696,7 +1702,8 @@ namespace HVACStandAloneERV {
         }
 
         if (StandAloneERV(StandAloneERVNum).ExhaustAirFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-            SimulateFanComponents(state, StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
+            SimulateFanComponents(state,
+                                  StandAloneERV(StandAloneERVNum).ExhaustAirFanName,
                                   FirstHVACIteration,
                                   StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex); // why no Turn on off flags here?
             StandAloneERV(StandAloneERVNum).ElecUseRate += Fans::GetFanPower(StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex);
@@ -1848,7 +1855,8 @@ namespace HVACStandAloneERV {
 
     //        Utility subroutines/functions for the HeatingCoil Module
 
-    Real64 GetSupplyAirFlowRate(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    Real64 GetSupplyAirFlowRate(EnergyPlusData &state,
+                                std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                                 std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                                 bool &ErrorsFound               // set to true if problem
     )
@@ -1894,7 +1902,8 @@ namespace HVACStandAloneERV {
         return AirFlowRate;
     }
 
-    int GetSupplyAirInletNode(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    int GetSupplyAirInletNode(EnergyPlusData &state,
+                              std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                               std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                               bool &ErrorsFound               // set to true if problem
     )
@@ -1940,7 +1949,8 @@ namespace HVACStandAloneERV {
         return AirInletNode;
     }
 
-    int GetExhaustAirInletNode(EnergyPlusData &state, std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
+    int GetExhaustAirInletNode(EnergyPlusData &state,
+                               std::string const &ERVType,     // must be "ZoneHVAC:EnergyRecoveryVentilator"
                                std::string const &ERVCtrlName, // must match a controller name in the ERV data structure
                                bool &ErrorsFound               // set to true if problem
     )

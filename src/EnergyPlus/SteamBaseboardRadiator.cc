@@ -80,7 +80,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SteamBaseboardRadiator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -157,7 +156,7 @@ namespace SteamBaseboardRadiator {
     Array1D_bool MySizeFlag;
     Array1D_bool CheckEquipName;
     Array1D_bool SetLoopIndexFlag; // get loop number flag
-    bool GetInputFlag(true); // one time get input flag
+    bool GetInputFlag(true);       // one time get input flag
     bool MyOneTimeFlag(true);
     bool ZoneEquipmentListChecked(false);
 
@@ -165,7 +164,8 @@ namespace SteamBaseboardRadiator {
     Array1D<SteamBaseboardParams> SteamBaseboard;
     Array1D<SteamBaseboardNumericFieldData> SteamBaseboardNumericFields;
 
-    void clear_state() {
+    void clear_state()
+    {
         NumSteamBaseboards = 0;
         SteamIndex = 0;
         QBBSteamRadSource.clear();
@@ -185,7 +185,8 @@ namespace SteamBaseboardRadiator {
     }
     // Functions
 
-    void SimSteamBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimSteamBaseboard(EnergyPlusData &state,
+                           std::string const &EquipName,
                            int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
@@ -210,8 +211,8 @@ namespace SteamBaseboardRadiator {
         using ScheduleManager::GetCurrentScheduleValue;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int BaseboardNum;               // index of unit in baseboard array
-        Real64 QZnReq;                  // zone load not yet satisfied
+        int BaseboardNum; // index of unit in baseboard array
+        Real64 QZnReq;    // zone load not yet satisfied
         Real64 MaxSteamFlow;
         Real64 MinSteamFlow;
         static Real64 mdot(0.0);
@@ -266,7 +267,8 @@ namespace SteamBaseboardRadiator {
                     auto const SELECT_CASE_var(SteamBaseboard(BaseboardNum).EquipType);
 
                     if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
-                        ControlCompOutput(state, SteamBaseboard(BaseboardNum).EquipID,
+                        ControlCompOutput(state,
+                                          SteamBaseboard(BaseboardNum).EquipID,
                                           cCMO_BBRadiator_Steam,
                                           BaseboardNum,
                                           FirstHVACIteration,
@@ -345,7 +347,6 @@ namespace SteamBaseboardRadiator {
         using ScheduleManager::GetScheduleIndex;
         using namespace DataIPShortCuts;
         using namespace DataSizing;
-        using ReportSizingManager::ReportSizingOutput;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetSteamBaseboardInput:");
@@ -937,7 +938,6 @@ namespace SteamBaseboardRadiator {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::HeatingCapacitySizing;
         using General::RoundSigDigits;
-        using ReportSizingManager::ReportSizingOutput;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -990,10 +990,10 @@ namespace SteamBaseboardRadiator {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) {
                     if (SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0) {
-                        ReportSizingOutput(cCMO_BBRadiator_Steam,
-                                           SteamBaseboard(BaseboardNum).EquipID,
-                                           "User-Specified Maximum Water Flow Rate [m3/s]",
-                                           SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
+                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Steam,
+                                                     SteamBaseboard(BaseboardNum).EquipID,
+                                                     "User-Specified Maximum Water Flow Rate [m3/s]",
+                                                     SteamBaseboard(BaseboardNum).SteamVolFlowRateMax);
                     }
                 } else {
                     CheckZoneSizing(cCMO_BBRadiator_Steam, SteamBaseboard(BaseboardNum).EquipID);
@@ -1061,19 +1061,19 @@ namespace SteamBaseboardRadiator {
 
                     if (IsAutoSize) {
                         SteamBaseboard(BaseboardNum).SteamVolFlowRateMax = SteamVolFlowRateMaxDes;
-                        ReportSizingOutput(cCMO_BBRadiator_Steam,
-                                           SteamBaseboard(BaseboardNum).EquipID,
-                                           "Design Size Maximum Steam Flow Rate [m3/s]",
-                                           SteamVolFlowRateMaxDes);
+                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Steam,
+                                                     SteamBaseboard(BaseboardNum).EquipID,
+                                                     "Design Size Maximum Steam Flow Rate [m3/s]",
+                                                     SteamVolFlowRateMaxDes);
                     } else { // Hard size with sizing data
                         if (SteamBaseboard(BaseboardNum).SteamVolFlowRateMax > 0.0 && SteamVolFlowRateMaxDes > 0.0) {
                             SteamVolFlowRateMaxUser = SteamBaseboard(BaseboardNum).SteamVolFlowRateMax;
-                            ReportSizingOutput(cCMO_BBRadiator_Steam,
-                                               SteamBaseboard(BaseboardNum).EquipID,
-                                               "Design Size Maximum Steam Flow Rate [m3/s]",
-                                               SteamVolFlowRateMaxDes,
-                                               "User-Speicified Maximum Steam Flow Rate [m3/s]",
-                                               SteamVolFlowRateMaxUser);
+                            BaseSizer::reportSizerOutput(cCMO_BBRadiator_Steam,
+                                                         SteamBaseboard(BaseboardNum).EquipID,
+                                                         "Design Size Maximum Steam Flow Rate [m3/s]",
+                                                         SteamVolFlowRateMaxDes,
+                                                         "User-Speicified Maximum Steam Flow Rate [m3/s]",
+                                                         SteamVolFlowRateMaxUser);
                             if (DisplayExtraWarnings) {
                                 // Report difference between design size and user-specified values
                                 if ((std::abs(SteamVolFlowRateMaxDes - SteamVolFlowRateMaxUser) / SteamVolFlowRateMaxUser) >

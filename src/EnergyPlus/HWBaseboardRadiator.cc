@@ -80,7 +80,6 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -129,7 +128,6 @@ namespace HWBaseboardRadiator {
     using FluidProperties::GetSpecificHeatGlycol;
     using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
-    using ReportSizingManager::ReportSizingOutput;
 
     // Data
     // MODULE PARAMETER DEFINITIONS
@@ -160,7 +158,8 @@ namespace HWBaseboardRadiator {
 
     // Functions
 
-    void SimHWBaseboard(EnergyPlusData &state, std::string const &EquipName,
+    void SimHWBaseboard(EnergyPlusData &state,
+                        std::string const &EquipName,
                         int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
@@ -237,7 +236,8 @@ namespace HWBaseboardRadiator {
                 auto const SELECT_CASE_var(HWBaseboard(BaseboardNum).EquipType);
 
                 if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water) { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
-                    ControlCompOutput(state, HWBaseboard(BaseboardNum).EquipID,
+                    ControlCompOutput(state,
+                                      HWBaseboard(BaseboardNum).EquipID,
                                       cCMO_BBRadiator_Water,
                                       BaseboardNum,
                                       FirstHVACIteration,
@@ -1075,10 +1075,10 @@ namespace HWBaseboardRadiator {
                 }
                 if (!FlowAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0) {
-                        ReportSizingOutput(cCMO_BBRadiator_Water,
-                                           HWBaseboard(BaseboardNum).EquipID,
-                                           "User-Specified Maximum Water Flow Rate [m3/s]",
-                                           HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
+                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                                                     HWBaseboard(BaseboardNum).EquipID,
+                                                     "User-Specified Maximum Water Flow Rate [m3/s]",
+                                                     HWBaseboard(BaseboardNum).WaterVolFlowRateMax);
                     }
                 } else {
                     CheckZoneSizing(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID);
@@ -1099,19 +1099,19 @@ namespace HWBaseboardRadiator {
 
                     if (FlowAutoSize) {
                         HWBaseboard(BaseboardNum).WaterVolFlowRateMax = WaterVolFlowRateMaxDes;
-                        ReportSizingOutput(cCMO_BBRadiator_Water,
-                                           HWBaseboard(BaseboardNum).EquipID,
-                                           "Design Size Maximum Water Flow Rate [m3/s]",
-                                           WaterVolFlowRateMaxDes);
+                        BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                                                     HWBaseboard(BaseboardNum).EquipID,
+                                                     "Design Size Maximum Water Flow Rate [m3/s]",
+                                                     WaterVolFlowRateMaxDes);
                     } else { // Hard-sized with sizing data
                         if (HWBaseboard(BaseboardNum).WaterVolFlowRateMax > 0.0 && WaterVolFlowRateMaxDes > 0.0) {
                             WaterVolFlowRateMaxUser = HWBaseboard(BaseboardNum).WaterVolFlowRateMax;
-                            ReportSizingOutput(cCMO_BBRadiator_Water,
-                                               HWBaseboard(BaseboardNum).EquipID,
-                                               "Design Size Maximum Water Flow Rate [m3/s]",
-                                               WaterVolFlowRateMaxDes,
-                                               "User-Specified Maximum Water Flow Rate [m3/s]",
-                                               WaterVolFlowRateMaxUser);
+                            BaseSizer::reportSizerOutput(cCMO_BBRadiator_Water,
+                                                         HWBaseboard(BaseboardNum).EquipID,
+                                                         "Design Size Maximum Water Flow Rate [m3/s]",
+                                                         WaterVolFlowRateMaxDes,
+                                                         "User-Specified Maximum Water Flow Rate [m3/s]",
+                                                         WaterVolFlowRateMaxUser);
                             if (DisplayExtraWarnings) {
                                 if ((std::abs(WaterVolFlowRateMaxDes - WaterVolFlowRateMaxUser) / WaterVolFlowRateMaxUser) >
                                     AutoVsHardSizingThreshold) {
@@ -1181,7 +1181,7 @@ namespace HWBaseboardRadiator {
                     HWBaseboard(BaseboardNum).UA = 0.0;
                 }
                 // Report an UA value
-                ReportSizingOutput(
+                BaseSizer::reportSizerOutput(
                     cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
             }
         } else {
@@ -1236,7 +1236,8 @@ namespace HWBaseboardRadiator {
                 HWBaseboard(BaseboardNum).UA = 0.0;
             }
             // Report an UA value
-            ReportSizingOutput(cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
+            BaseSizer::reportSizerOutput(
+                cCMO_BBRadiator_Water, HWBaseboard(BaseboardNum).EquipID, "U-Factor times Area [W/C]", HWBaseboard(BaseboardNum).UA);
         }
         // save the design water flow rate for use by the water loop sizing algorithms
         RegisterPlantCompDesignFlow(HWBaseboard(BaseboardNum).WaterInletNode, HWBaseboard(BaseboardNum).WaterVolFlowRateMax);

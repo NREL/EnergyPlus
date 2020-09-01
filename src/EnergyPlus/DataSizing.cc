@@ -47,7 +47,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 namespace EnergyPlus {
 
@@ -858,6 +860,110 @@ namespace DataSizing {
         }
 
         firstPassFlag = false;
+    }
+
+    void GetCoilDesFlowT(int SysNum,           // central air system index
+                         Real64 CpAir,         // specific heat to be used in calculations [J/kgC]
+                         Real64 &DesFlow,      // returned design mass flow [kg/s]
+                         Real64 &DesExitTemp,  // returned design coil exit temperature [kg/s]
+                         Real64 &DesExitHumRat // returned design coil exit humidity ratio [kg/kg]
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Fred Buhl
+        //       DATE WRITTEN   September 2014
+        //       MODIFIED
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function calculates the coil design air flow rate and exit temperature depending on the
+        // cooling capacity control method
+
+        // METHODOLOGY EMPLOYED:
+        // energy and mass flow balance
+
+        // REFERENCES:
+        // na
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int DDAtSensPeak(0);
+        int TimeStepAtSensPeak(0);
+        int DDAtFlowPeak(0);
+        int TimeStepAtFlowPeak(0);
+        int CoolCapCtrl; // type of coil capacity control
+        int PeakLoadType;
+        int DDAtTotPeak(0);
+        int TimeStepAtTotPeak(0);
+        int TimeStepAtPeak(0);
+        Real64 ZoneCoolLoadSum(0); // sum of zone cooling loads at the peak [W]
+        Real64 AvgZoneTemp(0);     // average zone temperature [C]
+        Real64 AvgSupTemp(0.0);    // average supply temperature for bypass control [C]
+        Real64 TotFlow(0.0);       // total flow for bypass control [m3/s]
+        Real64 MixTemp(0.0);       // mixed air temperature at the peak [C]
+
+        CoolCapCtrl = SysSizInput(SysNum).CoolCapControl;
+        PeakLoadType = SysSizInput(SysNum).CoolingPeakLoadType;
+        DDAtSensPeak = SysSizPeakDDNum(SysNum).SensCoolPeakDD;
+        if (DDAtSensPeak > 0) {
+            TimeStepAtSensPeak = SysSizPeakDDNum(SysNum).TimeStepAtSensCoolPk(DDAtSensPeak);
+            DDAtFlowPeak = SysSizPeakDDNum(SysNum).CoolFlowPeakDD;
+            TimeStepAtFlowPeak = SysSizPeakDDNum(SysNum).TimeStepAtCoolFlowPk(DDAtFlowPeak);
+            DDAtTotPeak = SysSizPeakDDNum(SysNum).TotCoolPeakDD;
+            TimeStepAtTotPeak = SysSizPeakDDNum(SysNum).TimeStepAtTotCoolPk(DDAtTotPeak);
+
+            if (PeakLoadType == TotalCoolingLoad) {
+                TimeStepAtPeak = TimeStepAtTotPeak;
+            } else {
+                TimeStepAtPeak = TimeStepAtSensPeak;
+            }
+        } else {
+            if ((CoolCapCtrl == VT) || (CoolCapCtrl == Bypass)) {
+                ShowWarningError("GetCoilDesFlow: AirLoopHVAC=" + SysSizInput(SysNum).AirPriLoopName +
+                                 "has no time of peak cooling load for sizing.");
+                ShowContinueError("Using Central Cooling Capacity Control Method=VAV instead of Bypass or VT.");
+                CoolCapCtrl = VAV;
+            }
+        }
+
+        if (CoolCapCtrl == VAV) {
+            DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
+            DesFlow = FinalSysSizing(SysNum).MassFlowAtCoolPeak / DataEnvironment::StdRhoAir;
+            DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
+        } else if (CoolCapCtrl == OnOff) {
+            DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
+            DesFlow = DataAirFlowUsedForSizing;
+            DesExitHumRat = FinalSysSizing(SysNum).CoolSupHumRat;
+        } else if (CoolCapCtrl == VT) {
+            if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+                ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
+                AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
+            } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
+                ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
+                AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
+            }
+            DesExitTemp = max(FinalSysSizing(SysNum).CoolSupTemp,
+                              AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow));
+            DesFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+        } else if (CoolCapCtrl == Bypass) {
+            if (FinalSysSizing(SysNum).CoolingPeakLoadType == SensibleCoolingLoad) {
+                ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
+                AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
+            } else if (FinalSysSizing(SysNum).CoolingPeakLoadType == TotalCoolingLoad) {
+                ZoneCoolLoadSum = CalcSysSizing(SysNum).SumZoneCoolLoadSeq(TimeStepAtPeak);
+                AvgZoneTemp = CalcSysSizing(SysNum).CoolZoneAvgTempSeq(TimeStepAtPeak);
+            }
+            AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / (DataEnvironment::StdRhoAir * CpAir * FinalSysSizing(SysNum).DesCoolVolFlow);
+            TotFlow = FinalSysSizing(SysNum).DesCoolVolFlow;
+            MixTemp = CalcSysSizing(SysNum).MixTempAtCoolPeak;
+            DesExitTemp = FinalSysSizing(SysNum).CoolSupTemp;
+            if (MixTemp > DesExitTemp) {
+                DesFlow = TotFlow * max(0.0, min(1.0, ((MixTemp - AvgSupTemp) / (MixTemp - DesExitTemp))));
+            } else {
+                DesFlow = TotFlow;
+            }
+            DesExitHumRat = Psychrometrics::PsyWFnTdbRhPb(DesExitTemp, 0.9, DataEnvironment::StdBaroPress, "GetCoilDesFlowT");
+        }
     }
 
 } // namespace DataSizing

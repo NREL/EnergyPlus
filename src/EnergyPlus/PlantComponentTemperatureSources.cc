@@ -53,7 +53,9 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Autosizing/Base.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -62,14 +64,12 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -312,23 +312,23 @@ namespace PlantComponentTemperatureSources {
                 if (this->DesVolFlowRateWasAutoSized) {
                     this->DesVolFlowRate = tmpVolFlowRate;
                     if (DataPlant::PlantFinalSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "PlantComponent:TemperatureSource", this->Name, "Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                     if (DataPlant::PlantFirstSizesOkayToReport) {
-                        ReportSizingManager::ReportSizingOutput(
+                        BaseSizer::reportSizerOutput(
                             "PlantComponent:TemperatureSource", this->Name, "Initial Design Size Design Fluid Flow Rate [m3/s]", tmpVolFlowRate);
                     }
                 } else {
                     if (this->DesVolFlowRate > 0.0 && tmpVolFlowRate > 0.0) {
                         DesVolFlowRateUser = this->DesVolFlowRate;
                         if (DataPlant::PlantFinalSizesOkayToReport) {
-                            ReportSizingManager::ReportSizingOutput("PlantComponent:TemperatureSource",
-                                                                    this->Name,
-                                                                    "Design Size Design Fluid Flow Rate [m3/s]",
-                                                                    tmpVolFlowRate,
-                                                                    "User-Specified Design Fluid Flow Rate [m3/s]",
-                                                                    DesVolFlowRateUser);
+                            BaseSizer::reportSizerOutput("PlantComponent:TemperatureSource",
+                                                         this->Name,
+                                                         "Design Size Design Fluid Flow Rate [m3/s]",
+                                                         tmpVolFlowRate,
+                                                         "User-Specified Design Fluid Flow Rate [m3/s]",
+                                                         DesVolFlowRateUser);
                             if (DataGlobals::DisplayExtraWarnings) {
                                 if ((std::abs(tmpVolFlowRate - DesVolFlowRateUser) / DesVolFlowRateUser) > DataSizing::AutoVsHardSizingThreshold) {
                                     ShowMessage("SizePlantComponentTemperatureSource: Potential issue with equipment sizing for " + this->Name);
@@ -353,7 +353,7 @@ namespace PlantComponentTemperatureSources {
             }
             if (!this->DesVolFlowRateWasAutoSized && DataPlant::PlantFinalSizesOkayToReport) {
                 if (this->DesVolFlowRate > 0.0) {
-                    ReportSizingManager::ReportSizingOutput(
+                    BaseSizer::reportSizerOutput(
                         "PlantComponent:TemperatureSource", this->Name, "User-Specified Design Fluid Flow Rate [m3/s]", this->DesVolFlowRate);
                 }
             }
@@ -397,7 +397,8 @@ namespace PlantComponentTemperatureSources {
         DataLoopNode::Node(this->OutletNodeNum).Temp = this->OutletTemp;
     }
 
-    void WaterSourceSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void WaterSourceSpecs::simulate(EnergyPlusData &state,
+                                    const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool EP_UNUSED(FirstHVACIteration),
                                     Real64 &CurLoad,
                                     bool EP_UNUSED(RunFlag))

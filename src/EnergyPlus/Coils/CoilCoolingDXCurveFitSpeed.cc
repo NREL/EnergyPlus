@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #include <utility>
 
 #include <EnergyPlus/Autosizing/CoolingAirFlowSizing.hh>
@@ -54,21 +53,20 @@
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/ReportSizingManager.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification& input_data)
+void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCurveFitSpeedInputSpecification &input_data)
 {
     bool errorsFound(false);
     static const std::string routineName("CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec: ");
@@ -191,11 +189,11 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCur
     }
 }
 
-bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string& curveName,
+bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string &curveName,
                                               int &curveIndex,
                                               std::vector<int> validDims,
-                                              const std::string& routineName,
-                                              const std::string& fieldName,
+                                              const std::string &routineName,
+                                              const std::string &fieldName,
                                               Real64 const Var1,           // required 1st independent variable
                                               Optional<Real64 const> Var2, // 2nd independent variable
                                               Optional<Real64 const> Var3, // 3rd independent variable
@@ -212,12 +210,12 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string& curveName,
             return true;
         } else {
             // Verify Curve Object dimensions
-            bool errorFound = CurveManager::CheckCurveDims(curveIndex,        // Curve index
-                                                           std::move(validDims),         // Valid dimensions
-                                                           routineName,       // Routine name
-                                                           this->object_name, // Object Type
-                                                           this->name,        // Object Name
-                                                           fieldName);        // Field Name
+            bool errorFound = CurveManager::CheckCurveDims(curveIndex,           // Curve index
+                                                           std::move(validDims), // Valid dimensions
+                                                           routineName,          // Routine name
+                                                           this->object_name,    // Object Type
+                                                           this->name,           // Object Name
+                                                           fieldName);           // Field Name
 
             if (!errorFound) {
                 CurveManager::checkCurveIsNormalizedToOne(
@@ -228,49 +226,42 @@ bool CoilCoolingDXCurveFitSpeed::processCurve(const std::string& curveName,
     }
 }
 
-CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_to_find)
-    :
-      // model inputs
+CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string &name_to_find)
+    : // model inputs
       indexCapFT(0), indexCapFFF(0), indexEIRFT(0), indexEIRFFF(0), indexPLRFPLF(0), indexWHFT(0), indexSHRFT(0), indexSHRFFF(0),
 
       // speed class inputs
-      RatedAirMassFlowRate(0.0), // rated air mass flow rate at speed {kg/s}
+      RatedAirMassFlowRate(0.0),     // rated air mass flow rate at speed {kg/s}
       RatedCondAirMassFlowRate(0.0), // condenser air mass flow rate at speed {kg/s}
-      grossRatedSHR(0.0),             // rated sensible heat ratio at speed
-      RatedCBF(0.0),             // rated coil bypass factor at speed
-      RatedEIR(0.0),             // rated energy input ratio at speed {W/W}
-      ratedCOP(0.0),
-      rated_total_capacity(0.0),
-      rated_evap_fan_power_per_volume_flow_rate(0.0),
-      ratedWasteHeatFractionOfPowerInput(0.0),  // rated waste heat fraction of power input
-      evap_condenser_pump_power_fraction(0.0), 
-      evap_condenser_effectiveness(0.0),
+      grossRatedSHR(0.0),            // rated sensible heat ratio at speed
+      RatedCBF(0.0),                 // rated coil bypass factor at speed
+      RatedEIR(0.0),                 // rated energy input ratio at speed {W/W}
+      ratedCOP(0.0), rated_total_capacity(0.0), rated_evap_fan_power_per_volume_flow_rate(0.0),
+      ratedWasteHeatFractionOfPowerInput(0.0), // rated waste heat fraction of power input
+      evap_condenser_pump_power_fraction(0.0), evap_condenser_effectiveness(0.0),
 
-      FanOpMode(0),              // fan operating mode, constant or cycling fan
-      parentModeRatedGrossTotalCap(0.0),
-      parentModeRatedEvapAirFlowRate(0.0),
-      parentModeRatedCondAirFlowRate(0.0), 
-      parentOperatingMode(0),
+      FanOpMode(0), // fan operating mode, constant or cycling fan
+      parentModeRatedGrossTotalCap(0.0), parentModeRatedEvapAirFlowRate(0.0), parentModeRatedCondAirFlowRate(0.0), parentOperatingMode(0),
 
-      ambPressure(0.0),          // outdoor pressure {Pa}
-      PLR(0.0),                  // coil operating part load ratio
-      CondInletTemp(0.0),        // condenser inlet temperature {C}
-      AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
-                                 //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
+      ambPressure(0.0),   // outdoor pressure {Pa}
+      PLR(0.0),           // coil operating part load ratio
+      CondInletTemp(0.0), // condenser inlet temperature {C}
+      AirFF(0.0),         // ratio of air mass flow rate to rated air mass flow rate
+                          //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
 
       fullLoadPower(0.0),     // full load power at speed {W}
       fullLoadWasteHeat(0.0), // full load waste heat at speed {W}
       RTF(0.0),               // coil runtime fraction at speed
       AirMassFlow(0.0),       // coil inlet air mass flow rate {kg/s}
 
-        // other data members
+      // other data members
       evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), active_fraction_of_face_coil_area(0.0),
 
       // rating data
-      RatedInletAirTemp(26.6667),        // 26.6667C or 80F
-      RatedInletWetBulbTemp(19.4444),      // 19.44 or 67F
+      RatedInletAirTemp(26.6667),       // 26.6667C or 80F
+      RatedInletWetBulbTemp(19.4444),   // 19.44 or 67F
       RatedInletAirHumRat(0.0111847),   // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
-      RatedOutdoorAirTemp(35.0),         // 35 C or 95F
+      RatedOutdoorAirTemp(35.0),        // 35 C or 95F
       DryCoilOutletHumRatioMin(0.00001) // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
 {
@@ -354,7 +345,7 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     sizerCoolingCapacity.initializeWithinEP(state, CompType, CompName, PrintFlag, RoutineName);
     this->rated_total_capacity = sizerCoolingCapacity.size(this->rated_total_capacity, errorsFound);
 
-     //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
+    //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
@@ -379,11 +370,11 @@ void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
     if (this->indexSHRFT > 0 && this->indexSHRFFF > 0) {
         this->RatedCBF = 0.001;
     } else {
-    
-    this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
-                                      RatedInletAirHumRat,
-                                      Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
-                                      DataEnvironment::StdPressureSeaLevel);
+
+        this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
+                                          RatedInletAirHumRat,
+                                          Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
+                                          DataEnvironment::StdPressureSeaLevel);
     }
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
 }
@@ -406,9 +397,9 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
         return;
     }
 
-    Real64 hDelta;    // enthalpy difference across cooling coil
-    Real64 A0;  // ratio of UA to Cp
-    Real64 CBF; // adjusted coil bypass factor
+    Real64 hDelta; // enthalpy difference across cooling coil
+    Real64 A0;     // ratio of UA to Cp
+    Real64 CBF;    // adjusted coil bypass factor
     if (RatedCBF > 0.0) {
         A0 = -std::log(RatedCBF) * RatedAirMassFlowRate;
     } else {
@@ -573,8 +564,7 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     if (slopeAtConds <= 0.0) {
         // TODO: old dx coil protects against slopeAtConds < 0, but no = 0 - not sure why, 'cause that'll cause divide by zero
         ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
-        ShowContinueError("deltaT = " + General::RoundSigDigits(deltaT, 3) +
-            " and deltaHumRat = " + General::RoundSigDigits(deltaHumRat, 3));
+        ShowContinueError("deltaT = " + General::RoundSigDigits(deltaT, 3) + " and deltaHumRat = " + General::RoundSigDigits(deltaHumRat, 3));
         ShowFatalError("Errors found in calculating coil bypass factors");
     }
 
