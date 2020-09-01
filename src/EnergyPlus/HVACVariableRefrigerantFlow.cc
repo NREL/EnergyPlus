@@ -8610,7 +8610,7 @@ namespace HVACVariableRefrigerantFlow {
                                            Real64 &LoadMet,                   // load met by unit (W)
                                            Real64 &OnOffAirFlowRatio,         // ratio of ON air flow to average air flow
                                            Real64 &SuppHeatCoilLoad,          // supplemental heating coil load (W)
-                                           Optional<Real64> LatOutputProvided // delivered latent capacity (W)
+                                           Optional<Real64> LatOutputProvided // delivered latent capacity (kgWater/s)
     )
     {
 
@@ -8949,7 +8949,8 @@ namespace HVACVariableRefrigerantFlow {
             TempIn = DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp;
         }
         // latent heat vaporization/condensation used in moist air psychometrics
-        Real64 const H2OHtOfVap = PsyHfgAvgFnTdb2Tdb1(TempOut, TempIn);
+        // Real64 const H2OHtOfVap = PsyHfgAvgFnTdb2Tdb1(TempOut, TempIn);
+        Real64 const H2OHtOfVap = PsyHgAirFnWTdb(0.0, TempOut);
         // convert latent in kg/s to watts
         TotalConditioning = SensibleConditioning + (LatentConditioning * H2OHtOfVap);
 
