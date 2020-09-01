@@ -49,7 +49,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <chrono>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
@@ -374,7 +373,6 @@ namespace HeatBalanceSurfaceManager {
         using InternalHeatGains::ManageInternalHeatGains;
         // RJH DElight Modification Begin
         using namespace DElightManagerF;
-        using namespace std::chrono;
         // RJH DElight Modification End
 
         // Locals
@@ -795,7 +793,6 @@ namespace HeatBalanceSurfaceManager {
                 if (surface.HeatTransferAlgorithm != HeatTransferModel_CTF &&
                     surface.HeatTransferAlgorithm != HeatTransferModel_EMPD)
                     continue;
-                // if (surface.Class == SurfaceClass_Window) continue;
                 // Outside surface temp of "normal" windows not needed in Window5 calculation approach
                 // Window layer temperatures are calculated in CalcHeatBalanceInsideSurf
 
@@ -870,22 +867,28 @@ namespace HeatBalanceSurfaceManager {
         } // ...end of surfaces DO loop for initializing temperature history terms for the surface heat balances
 
         // Zero out all of the radiant system heat balance coefficient arrays
-        RadSysTiHBConstCoef = 0.0;
-        RadSysTiHBToutCoef = 0.0;
-        RadSysTiHBQsrcCoef = 0.0;
-        RadSysToHBConstCoef = 0.0;
-        RadSysToHBTinCoef = 0.0;
-        RadSysToHBQsrcCoef = 0.0;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                RadSysTiHBConstCoef(SurfNum) = 0.0;
+                RadSysTiHBToutCoef(SurfNum) = 0.0;
+                RadSysTiHBQsrcCoef(SurfNum) = 0.0;
+                RadSysToHBConstCoef(SurfNum) = 0.0;
+                RadSysToHBTinCoef(SurfNum) = 0.0;
+                RadSysToHBQsrcCoef(SurfNum) = 0.0;
 
-        QRadSysSource = 0.0;
-        QPVSysSource = 0.0;
-        QHTRadSysSurf = 0.0;
-        QHWBaseboardSurf = 0.0;
-        QSteamBaseboardSurf = 0.0;
-        QElecBaseboardSurf = 0.0;
-        QCoolingPanelSurf = 0.0;
-        QPoolSurfNumerator = 0.0;
-        PoolHeatTransCoefs = 0.0;
+                QRadSysSource(SurfNum) = 0.0;
+                QPVSysSource(SurfNum) = 0.0;
+                QHTRadSysSurf(SurfNum) = 0.0;
+                QHWBaseboardSurf(SurfNum) = 0.0;
+                QSteamBaseboardSurf(SurfNum) = 0.0;
+                QElecBaseboardSurf(SurfNum) = 0.0;
+                QCoolingPanelSurf(SurfNum) = 0.0;
+                QPoolSurfNumerator(SurfNum) = 0.0;
+                PoolHeatTransCoefs(SurfNum) = 0.0;
+            } // ...end of Zone Surf loop
+        } // ...end of Zone loop
 
         if (ZoneSizingCalc) GatherComponentLoadsSurfAbsFact();
 
@@ -2162,49 +2165,74 @@ namespace HeatBalanceSurfaceManager {
         SumHmARaW = 0.0;
 
         // "Bulk" initializations of arrays sized to TotSurfaces
-        SUMH = 0;             // module level array
-        TempSurfIn = 23.0;    // module level array
-        TempSurfInTmp = 23.0; // module level array
-        HConvIn = 3.076;      // module level array
-        HcExtSurf = 0.0;
-        HAirExtSurf = 0.0;
-        HSkyExtSurf = 0.0;
-        HGrdExtSurf = 0.0;
-        TempSurfOut = 0.0;
-        TempSurfInRep = 0.0;
-        TempSurfInMovInsRep = 0.0;
-        QConvInReport = 0.0;
-        QdotConvInRep = 0.0;
-        QdotConvInRepPerArea = 0.0;
-        QRadNetSurfInReport = 0.0;
-        QdotRadNetSurfInRep = 0.0;
-        QdotRadNetSurfInRepPerArea = 0.0;
-        QRadSolarInReport = 0.0;
-        QdotRadSolarInRep = 0.0;
-        QdotRadSolarInRepPerArea = 0.0;
-        QRadLightsInReport = 0.0;
-        QdotRadLightsInRep = 0.0;
-        QdotRadLightsInRepPerArea = 0.0;
-        QRadIntGainsInReport = 0.0;
-        QdotRadIntGainsInRep = 0.0;
-        QdotRadIntGainsInRepPerArea = 0.0;
-        QRadHVACInReport = 0.0;
-        QdotRadHVACInRep = 0.0;
-        QdotRadHVACInRepPerArea = 0.0;
-        QConvOutReport = 0.0;
-        QdotConvOutRep = 0.0;
-        QdotConvOutRepPerArea = 0.0;
-        QRadOutReport = 0.0;
-        QdotRadOutRep = 0.0;
-        QdotRadOutRepPerArea = 0.0;
-        QAirExtReport = 0.0;
-        QHeatEmiReport = 0.0;
-        OpaqSurfInsFaceConduction = 0.0;
-        OpaqSurfInsFaceConductionFlux = 0.0;
-        OpaqSurfInsFaceConductionEnergy = 0.0;
-        OpaqSurfInsFaceBeamSolAbsorbed = 0.0;
-        TempEffBulkAir = 23.0;
-        TempTstatAir = 23.0;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {
+            // Loop through zones...
+            TempEffBulkAir(zoneNum) = 23.0;
+            TempTstatAir(zoneNum) = 23.0;
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                SUMH(SurfNum) = 0;             // module level array
+                TempSurfIn(SurfNum) = 23.0;    // module level array
+                TempSurfInTmp(SurfNum) = 23.0; // module level array
+                HConvIn(SurfNum) = 3.076;      // module level array
+                HcExtSurf(SurfNum) = 0.0;
+                HAirExtSurf(SurfNum) = 0.0;
+                HSkyExtSurf(SurfNum) = 0.0;
+                HGrdExtSurf(SurfNum) = 0.0;
+                TempSurfOut(SurfNum) = 0.0;
+                TempSurfInRep(SurfNum) = 0.0;
+                TempSurfInMovInsRep(SurfNum) = 0.0;
+                QConvInReport(SurfNum) = 0.0;
+                QdotConvInRep(SurfNum) = 0.0;
+                QdotConvInRepPerArea(SurfNum) = 0.0;
+                QRadNetSurfInReport(SurfNum) = 0.0;
+                QdotRadNetSurfInRep(SurfNum) = 0.0;
+                QdotRadNetSurfInRepPerArea(SurfNum) = 0.0;
+                QRadSolarInReport(SurfNum) = 0.0;
+                QdotRadSolarInRep(SurfNum) = 0.0;
+                QdotRadSolarInRepPerArea(SurfNum) = 0.0;
+                QRadLightsInReport(SurfNum) = 0.0;
+                QdotRadLightsInRep(SurfNum) = 0.0;
+                QdotRadLightsInRepPerArea(SurfNum) = 0.0;
+                QRadIntGainsInReport(SurfNum) = 0.0;
+                QdotRadIntGainsInRep(SurfNum) = 0.0;
+                QdotRadIntGainsInRepPerArea(SurfNum) = 0.0;
+                QRadHVACInReport(SurfNum) = 0.0;
+                QdotRadHVACInRep(SurfNum) = 0.0;
+                QdotRadHVACInRepPerArea(SurfNum) = 0.0;
+                QConvOutReport(SurfNum) = 0.0;
+                QdotConvOutRep(SurfNum) = 0.0;
+                QdotConvOutRepPerArea(SurfNum) = 0.0;
+                QRadOutReport(SurfNum) = 0.0;
+                QdotRadOutRep(SurfNum) = 0.0;
+                QdotRadOutRepPerArea(SurfNum) = 0.0;
+                QAirExtReport(SurfNum) = 0.0;
+                QHeatEmiReport(SurfNum) = 0.0;
+                OpaqSurfInsFaceConduction(SurfNum) = 0.0;
+                OpaqSurfInsFaceConductionFlux(SurfNum) = 0.0;
+                OpaqSurfInsFaceConductionEnergy(SurfNum) = 0.0;
+                OpaqSurfInsFaceBeamSolAbsorbed(SurfNum) = 0.0;
+
+            }
+            int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+            int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+            if (firstSurfWin >= 0) {
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+                    // Initialize window frame and divider temperatures
+                    SurfWinFrameTempSurfIn(SurfNum) = 23.0;
+                    SurfWinFrameTempSurfInOld(SurfNum) = 23.0;
+                    SurfWinFrameTempSurfOut(SurfNum) = 23.0;
+                    SurfWinDividerTempSurfIn(SurfNum) = 23.0;
+                    SurfWinDividerTempSurfInOld(SurfNum) = 23.0;
+                    SurfWinDividerTempSurfOut(SurfNum) = 23.0;
+
+                    // Initialize previous-timestep shading indicators
+                    SurfWinExtIntShadePrevTS(SurfNum) = 0;
+                    SurfWinShadingFlag(SurfNum) = NoShade;
+                } // end of Zone Surf array
+            }
+        } // end of Zone  array
 
         // "Bulk" initializations of temperature arrays with dimensions (TotSurface,MaxCTFTerms,2)
         TH = 23.0;  // module level array
@@ -2220,19 +2248,6 @@ namespace HeatBalanceSurfaceManager {
             QsrcHistM = 0.0;
         }
         CondFDRelaxFactor = CondFDRelaxFactorInput;
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            // Initialize window frame and divider temperatures
-            SurfWinFrameTempSurfIn(SurfNum) = 23.0;
-            SurfWinFrameTempSurfInOld(SurfNum) = 23.0;
-            SurfWinFrameTempSurfOut(SurfNum) = 23.0;
-            SurfWinDividerTempSurfIn(SurfNum) = 23.0;
-            SurfWinDividerTempSurfInOld(SurfNum) = 23.0;
-            SurfWinDividerTempSurfOut(SurfNum) = 23.0;
-
-            // Initialize previous-timestep shading indicators
-            SurfWinExtIntShadePrevTS(SurfNum) = 0;
-            SurfWinShadingFlag(SurfNum) = NoShade;
-        }
 
         // Perform other initializations that depend on the surface characteristics
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
@@ -2330,7 +2345,6 @@ namespace HeatBalanceSurfaceManager {
         using namespace DataWindowEquivalentLayer;
         using SolarShading::SurfaceScheduledSolarInc;
         using SolarShading::WindowScheduledSolarAbs;
-        using namespace std::chrono;
 
         Real64 AbsExt;                                  // Absorptivity of outer most layer (or movable insulation if present)
         int ConstrNum;                                  // Index for the Construct derived type
@@ -2685,16 +2699,11 @@ namespace HeatBalanceSurfaceManager {
 
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
-//            high_resolution_clock::time_point t1 = high_resolution_clock::now();
-
             if (dataWindowManager.inExtWindowModel->isExternalLibraryModel() && dataWindowManager.winOpticalModel->isSimplifiedModel()) {
                 CalcInteriorSolarDistributionWCE(dataWindowComplexManager, dataWindowManager);
             } else {
                 CalcInteriorSolarDistribution(dataWindowEquivalentLayer);
             }
-//            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//            duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-//            DataGlobals::solar_timer += time_span.count();
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
 
@@ -3261,10 +3270,8 @@ namespace HeatBalanceSurfaceManager {
                                             TBlBmDif = InterpProfSlatAng(
                                                 ProfAng, SlatAng, SurfWinMovableSlats(SurfNum), Blind(BlNum).SolFrontBeamDiffTrans);
                                             SurfWinDividerQRadOutAbs(SurfNum) =
-                                                DividerAbs *
-                                                (DivIncSolarOutBm * (TBlBmBm + TBlBmDif) +
-                                                 DivIncSolarOutDif *
-                                                     InterpSlatAng(SlatAng, SurfWinMovableSlats(SurfNum), Blind(BlNum).SolFrontDiffDiffTrans));
+                                                DividerAbs * (DivIncSolarOutBm * (TBlBmBm + TBlBmDif) +
+                                                 DivIncSolarOutDif * InterpSlatAng(SlatAng, SurfWinMovableSlats(SurfNum), Blind(BlNum).SolFrontDiffDiffTrans));
                                             SurfWinDividerQRadInAbs(SurfNum) =
                                                 DividerAbs *
                                                 (DivIncSolarInBm * (TBlBmBm + TBlBmDif) +
@@ -3274,11 +3281,11 @@ namespace HeatBalanceSurfaceManager {
                                         } else if (ShadeFlag == ExtShadeOn) { // Exterior shade
 
                                             SurfWinDividerQRadOutAbs(SurfNum) = DividerAbs *
-                                                                                       dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
-                                                                                       (DivIncSolarOutBm + DivIncSolarOutDif);
+                                                    dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
+                                                    (DivIncSolarOutBm + DivIncSolarOutDif);
                                             SurfWinDividerQRadInAbs(SurfNum) = DividerAbs *
-                                                                                      dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
-                                                                                      (DivIncSolarInBm + DivIncSolarInDif);
+                                                    dataMaterial.Material(dataConstruction.Construct(ConstrNumSh).LayerPoint(1)).Trans *
+                                                    (DivIncSolarInBm + DivIncSolarInDif);
 
                                         } else if (ShadeFlag == ExtScreenOn) { // Exterior screen
                                             SurfWinDividerQRadOutAbs(SurfNum) =
@@ -3877,8 +3884,8 @@ namespace HeatBalanceSurfaceManager {
                 if (!Surface(SurfNum).HeatTransSurf) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
                 ITABSF(SurfNum) = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
-                Real64 HMovInsul = 0.0;
-                Real64 AbsInt;
+                Real64 HMovInsul = 0.0; // Conductance of movable insulation
+                Real64 AbsInt; // Solar absorptance of movable insulation
                 if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
                     if (Surface(SurfNum).MaterialMovInsulInt > 0)
                         EvalInsideMovableInsulation(SurfNum, HMovInsul, AbsInt);
@@ -3925,15 +3932,18 @@ namespace HeatBalanceSurfaceManager {
                 if (SurfWinFrameArea(SurfNum) > 0.0)
                     SUM1 += SurfWinFrameArea(SurfNum) * (1.0 + 0.5 * SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameEmis(SurfNum);
                 if (SurfWinDividerArea(SurfNum) > 0.0) {
-                    Real64 DividerThermAbs = SurfWinDividerEmis(SurfNum);
+                    Real64 DividerThermAbs = SurfWinDividerEmis(SurfNum); // Window divider thermal absorptance
                     // Suspended (between-glass) divider; relevant emissivity is inner glass emissivity
                     if (SurfWinDividerType(SurfNum) == Suspended) DividerThermAbs = dataConstruction.Construct(ConstrNum).InsideAbsorpThermal;
                     if (ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn) {
                         // Interior shade or blind in place
                         int ConstrNumSh = SurfWinShadedConstruction(SurfNum);
                         if (SurfWinHasShadeOrBlindLayer(SurfNum)) {
+                            // Shade layer material number
                             int MatNumSh = dataConstruction.Construct(ConstrNumSh).LayerPoint(dataConstruction.Construct(ConstrNumSh).TotLayers);
+                            // Shade or blind IR transmittance
                             Real64 TauShIR = dataMaterial.Material(MatNumSh).TransThermal;
+                            // Effective emissivity of shade or blind
                             Real64 EffShDevEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss(1);
                             if (ShadeFlag == IntBlindOn) {
                                 TauShIR = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
@@ -5646,36 +5656,6 @@ namespace HeatBalanceSurfaceManager {
         static std::string const Outside("Outside");
         static std::string const BlankString;
 
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-//        Real64 AbsThermSurf;     // Thermal absoptance of the exterior surface
-//        int ConstrNum;           // Construction index for the current surface
-//        Real64 HGround;          // "Convection" coefficient from ground to surface
-//        Real64 HMovInsul;        // "Convection" coefficient of movable insulation
-//        Real64 HSky;             // "Convection" coefficient from sky to surface
-//        Real64 HAir;             // "Convection" coefficient from air to surface (radiation)
-//        Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave  COP mod
-//        int RoughSurf;           // Roughness index of the exterior surface
-//        int SurfNum;             // Surface number DO loop counter
-//        int SrdSurfsNum;         // Surrounding surfaces list number
-//        int SrdSurfNum;          // Surrounding surface number DO loop counter
-//        Real64 SrdSurfTempAbs;   // Absolute temperature of a surrounding surface
-//        Real64 SrdSurfViewFac;   // View factor of a surrounding surface
-//        Real64 TempExt;          // Exterior temperature boundary condition
-//        int ZoneNum;             // Zone number the current surface is attached to
-//        int OPtr;
-//        Real64 RhoVaporSat;     // Local temporary saturated vapor density for checking
-//        bool MovInsulErrorFlag;
-//        Real64 TSurf;           // Absolute temperature of the outside surface of an exterior surface
-
-        // FUNCTION DEFINITIONS:
-        // na
-
         // FLOW:
         bool MovInsulErrorFlag = false; // Movable Insulation error flag
 
@@ -5716,10 +5696,10 @@ namespace HeatBalanceSurfaceManager {
 
                 // Initializations for this surface
                 int ConstrNum = Surface(SurfNum).Construction;
-                Real64 HMovInsul = 0.0;
-                Real64 HSky = 0.0;
-                Real64 HGround = 0.0;
-                Real64 HAir = 0.0;
+                Real64 HMovInsul = 0.0; // "Convection" coefficient of movable insulation
+                Real64 HSky = 0.0;      // "Convection" coefficient from sky to surface
+                Real64 HGround = 0.0;   // "Convection" coefficient from ground to surface
+                Real64 HAir = 0.0;      // "Convection" coefficient from air to surface (radiation)
                 HcExtSurf(SurfNum) = 0.0;
                 HAirExtSurf(SurfNum) = 0.0;
                 HSkyExtSurf(SurfNum) = 0.0;
@@ -5836,7 +5816,7 @@ namespace HeatBalanceSurfaceManager {
                         }
 
                         //  Allow for modification of TemperatureCoefficient with unitary sine wave.
-                        Real64 ConstantTempCoef;
+                        Real64 ConstantTempCoef; // Temperature Coefficient as input or modified using sine wave COP mod
                         if (OSC(OPtr).SinusoidalConstTempCoef) { // Sine wave C4
                             ConstantTempCoef = std::sin(2 * Pi * CurrentTime / OSC(OPtr).SinusoidPeriod);
                         } else {
@@ -6019,8 +5999,10 @@ namespace HeatBalanceSurfaceManager {
                         }
 
                         if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                        // Roughness index of the exterior surface
                         int RoughSurf = dataMaterial.Material(
                                 dataConstruction.Construct(ConstrNum).LayerPoint(1)).Roughness;
+                        // Thermal absoptance of the exterior surface
                         Real64 AbsThermSurf = dataMaterial.Material(
                                 dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpThermal;
 
@@ -6106,6 +6088,7 @@ namespace HeatBalanceSurfaceManager {
                                                                                       RhoVaporAirOut(SurfNum)) *
                                                                                      PsyCpAirFnW(OutHumRat));
                                     //  check for saturation conditions of air
+                                    // Local temporary saturated vapor density for checking
                                     Real64 RhoVaporSat = PsyRhovFnTdbRh(TempOutsideAirFD(SurfNum), 1.0,
                                                                  HBSurfManDrySurfCondFD);
                                     if (RhoVaporAirOut(SurfNum) > RhoVaporSat) RhoVaporAirOut(SurfNum) = RhoVaporSat;
@@ -6147,9 +6130,12 @@ namespace HeatBalanceSurfaceManager {
                         QRadLWOutSrdSurfs(SurfNum) = 0;
                         if (Surface(SurfNum).HasSurroundingSurfProperties) {
                             int SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+                            // Absolute temperature of the outside surface of an exterior surface
                             Real64 TSurf = TH(1, 1, SurfNum) + KelvinConv;
                             for (int SrdSurfNum = 1; SrdSurfNum <= SurroundingSurfsProperty(SrdSurfsNum).TotSurroundingSurface; SrdSurfNum++) {
+                                // View factor of a surrounding surface
                                 Real64 SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
+                                // Absolute temperature of a surrounding surface
                                 Real64 SrdSurfTempAbs = GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
                                 QRadLWOutSrdSurfs(SurfNum) += StefanBoltzmann * AbsThermSurf * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - pow_4(TSurf));
                             }

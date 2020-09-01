@@ -240,9 +240,9 @@ namespace DataGlobals {
     extern std::function<void(const std::string &)> messageCallback;
     extern std::function<void(EnergyPlus::Error, const std::string &)> errorCallback;
     extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
+
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    extern double solar_timer;
     void clear_state(EnergyPlus::IOFiles &ioFiles);
 
 } // namespace DataGlobals

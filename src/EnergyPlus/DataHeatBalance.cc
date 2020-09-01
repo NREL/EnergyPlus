@@ -655,14 +655,12 @@ namespace DataHeatBalance {
     // reflection from obstructions (W/m2)
     Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
 
-
     Array1D_int SurfWinBSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
     Array1D<Real64> SurfWinBSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
     Array1D<Real64> SurfWinBSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
     Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
     Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
-
 
     Array2D<Real64> FenLaySurfTempFront;            // Front surface temperatures of fenestration layers
     Array2D<Real64> FenLaySurfTempBack;             // Back surface temperatures of fenestration layers
