@@ -653,6 +653,6 @@ TEST_F(EnergyPlusFixture, CSV_CarriageReturns_Handling)
     EXPECT_EQ(TestArray.size(), expected_length );
 
     for (int i=0; i<TestArray.size(); i++ ){
-        EXPECT_FALSE(isnan(TestArray[i]));
+        EXPECT_FALSE(std::isnan(TestArray[i]));
     }
 }
