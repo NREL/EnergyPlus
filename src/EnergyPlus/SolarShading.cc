@@ -2634,25 +2634,21 @@ namespace SolarShading {
         Real64 DOTP;          // Dot product of C and D
 
         // Object Data
-        Vector AVec; // Vector from vertex 1 to vertex NVRS, both same surface
-        Vector BVec; // Vector from vertex 1 to vertex 2, both same surface
+        Vector AVec(0.0);
+        Vector BVec(0.0);
         Vector CVec(0.0); // Vector perpendicular to surface at vertex 1
-        Vector DVec; // Vector from vertex 2 of first surface to vertex 'n' of second surface
+        Vector DVec(0.0); // Vector from vertex 1 of first surface to vertex 'n' of second surface
 
         NVRS = Surface(NRS).Sides;
         NVBS = Surface(NBS).Sides;
 
         // SEE IF ANY VERTICES OF THE back surface ARE IN FRONT OF THE receiving surface
 
-        // AVec = Surface(NRS).Vertex(NVRS) - Surface(NRS).Vertex(1);
-        // BVec = Surface(NRS).Vertex(2) - Surface(NRS).Vertex(1);
-
-        for (N = 1; N <= NVRS; N++) {
-            AVec = Surface(NRS).Vertex(N);
-            BVec = Surface(NRS).Vertex((N + 1) % NVRS);
-            CVec = CVec + ( cross(AVec, BVec)/((double) NVRS) );
+        for (N = 2; N < NVRS; N++) {
+            AVec = Surface(NRS).Vertex(N)-Surface(NRS).Vertex(1);
+            BVec = Surface(NRS).Vertex((N + 1))-Surface(NRS).Vertex(1);
+            CVec += cross(AVec, BVec);
         }
-        // CVec = cross(BVec, AVec);
 
         for (N = 1; N <= NVBS; ++N) {
             DVec = Surface(NBS).Vertex(N) - Surface(NRS).Vertex(1);
