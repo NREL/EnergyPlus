@@ -135,7 +135,7 @@ namespace General {
     bool LineRpt(false);
     bool VarDict(false);
     bool EMSoutput(false);
-    
+
     void clear_state() {
         GetReportInput = true;
         SurfVert = false;
@@ -3656,20 +3656,6 @@ namespace General {
         return results;
     }
 
-    Real64 epexp(Real64 numerator, Real64 denominator, Real64 overflowReturn, Real64 defaultHigh)
-    {
-        if (denominator == 0.0) {
-            return overflowReturn;
-        } else {
-            Real64 x = numerator/denominator;
-            if (x < -70.0) {
-                return 0.0;
-            } else if (x > defaultHigh) {
-                return std::exp(defaultHigh);
-            }
-            return std::exp(x);
-        }
-    }
 } // namespace General
 
 } // namespace EnergyPlus
