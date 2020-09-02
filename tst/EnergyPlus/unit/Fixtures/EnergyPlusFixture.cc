@@ -48,9 +48,6 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
 
@@ -125,8 +122,6 @@ void EnergyPlusFixture::TearDown()
 {
 
     {
-        IOFlags flags;
-        flags.DISPOSE("DELETE");
         state.files.mtd.del();
         state.files.eso.del();
         state.files.err_stream.reset();

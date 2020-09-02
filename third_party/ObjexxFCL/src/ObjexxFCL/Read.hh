@@ -17,7 +17,6 @@
 #include <ObjexxFCL/Format.hh>
 #include <ObjexxFCL/Array.all.hh>
 #include <ObjexxFCL/ArrayS.all.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/MArray.all.hh>
 

@@ -123,9 +123,6 @@ set(src
   src/ObjexxFCL/Format.cc
   src/ObjexxFCL/Format.hh
   src/ObjexxFCL/FormattedIO.hh
-        src/ObjexxFCL/gio.hh
-  src/ObjexxFCL/gio_Fmt.fwd.hh
-  src/ObjexxFCL/gio_Fmt.hh
         src/ObjexxFCL/Index.cc
   src/ObjexxFCL/Index.fwd.hh
   src/ObjexxFCL/Index.hh
@@ -245,8 +242,6 @@ set( test_src
   tst/unit/environment.unit.cc
   tst/unit/floops.unit.cc
   tst/unit/Fmath.unit.cc
-  tst/unit/fmt.unit.cc
-  tst/unit/gio.unit.cc
         tst/unit/Index.unit.cc
   tst/unit/IndexRange.unit.cc
   tst/unit/IndexSlice.unit.cc
