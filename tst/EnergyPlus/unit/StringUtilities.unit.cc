@@ -45,64 +45,54 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef StringUtilities_hh_INCLUDED
-#define StringUtilities_hh_INCLUDED
+#include <gtest/gtest.h>
 
-#include <ObjexxFCL/src/ObjexxFCL/Array1S.hh>
-#include <sstream>
+#include <EnergyPlus/StringUtilities.hh>
 
-namespace EnergyPlus {
-inline std::stringstream stringReader(std::string str)
+#include "Fixtures/EnergyPlusFixture.hh"
+
+using namespace EnergyPlus;
+
+TEST_F(EnergyPlusFixture, readItem)
 {
-    std::stringstream result{std::move(str)};
-    result.imbue(std::locale("C"));
-    return result;
+  int i = 0;
+
+  // should read just 12
+  EXPECT_TRUE(EnergyPlus::readItem("12", i));
+  EXPECT_EQ(i, 12);
+
+  // should read until first number
+  EXPECT_TRUE(EnergyPlus::readItem("1234fgq", i));
+  EXPECT_EQ(i, 1234);
+
+  // should read nothing
+  EXPECT_FALSE(EnergyPlus::readItem("abc123", i));
+  EXPECT_EQ(i, 0);
 }
 
-
-template<typename Param> bool readListItem(std::istream &stream, Param &&param)
+TEST_F(EnergyPlusFixture, readList)
 {
-    if (stream.good()) {
-        stream >> param;
-        if (stream.good() && stream.peek() == ',') {
-            stream.get(); // eat comma
-        }
-    } else {
-        // the stream was not good, it was, perhaps EOF. So we need to
-        // set the fail bit here to say that we ran out of string
-        // and were unable to read the next bit of data
-        stream.setstate(std::ios_base::failbit);
-    }
+    int i{};
+    float f{};
+    char c{};
+    std::string s;
 
-    return !stream.fail();
+    // with commas
+    EXPECT_TRUE(EnergyPlus::readList("1,3.4,a,hello", i, f, c, s));
+    EXPECT_EQ(i, 1);
+    EXPECT_FLOAT_EQ(f, 3.4);
+    EXPECT_EQ(c, 'a');
+    EXPECT_EQ(s,"hello");
+
+    // without
+    EXPECT_TRUE(EnergyPlus::readList("bob q 1.5 10", s, c, f, i));
+    EXPECT_EQ(i, 10);
+    EXPECT_FLOAT_EQ(f, 1.5);
+    EXPECT_EQ(c, 'q');
+    EXPECT_EQ(s, "bob");
+
+    // with errors
+    EXPECT_FALSE(EnergyPlus::readList("bob;q;1.5;10", s, c, f, i));
+    EXPECT_FALSE(EnergyPlus::readList("1;3.4,a,hello", i, f, c, s));
+    EXPECT_FALSE(EnergyPlus::readList("a,hello", i, f, c, s));
 }
-
-template <typename Param> bool readItem(std::string input, Param &&param)
-{
-    auto stream = stringReader(std::move(input));
-    stream >> param;
-    return !stream.fail();
-}
-
-template <typename... Param> bool readList(std::string input, Param &&... param)
-{
-    // to do make this a C++17 fold expression when possible
-
-    auto reader = stringReader(std::move(input));
-    std::initializer_list<bool>{readListItem(reader, std::forward<Param>(param))...};
-    return !reader.fail();
-}
-
-} // namespace EnergyPlus
-
-namespace ObjexxFCL {
-// since this is a slice (reference) we want to bind to temporaries
-// so we're going to allow that where the one provided by Array1S.hh does not
-template <typename T> std::istream &operator>>(std::istream &stream, Array1S<T> &&a)
-{
-    // just pass on to the `&` version of this operator>>
-    return stream >> a;
-}
-} // namespace ObjexxFCL
-
-#endif
