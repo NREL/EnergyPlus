@@ -51,7 +51,7 @@
 #include <EnergyPlus/api/state.h>
 
 int errorsOccurred = 0;
-void errorHandler(const char * message) {
+void errorHandler(int errortype, const char * message) {
     errorsOccurred++;
 }
 

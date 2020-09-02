@@ -55,7 +55,8 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -290,7 +291,7 @@ private:
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
     std::ostringstream *json_stream;
     std::ostringstream *err_stream;
-    
+
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;

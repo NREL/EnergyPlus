@@ -1113,7 +1113,7 @@
 
   Output:Variable,*,Zone Unit Heater Heating Rate,hourly;
 
-  Output:Variable,*,Zone Unit Heater Fan Electric Power,hourly;
+  Output:Variable,*,Zone Unit Heater Fan Electricity Rate,hourly;
 
   Output:Variable,Zone1UnitHeatAirOutletNode,System Node Mass Flow Rate,hourly;
 
@@ -1149,9 +1149,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,monthly;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,monthly;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
 
@@ -1161,9 +1161,9 @@
 
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,runperiod;
 
-  Output:Meter:MeterFileOnly,Gas:HVAC,runperiod;
+  Output:Meter:MeterFileOnly,NaturalGas:HVAC,runperiod;
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
