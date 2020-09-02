@@ -89,7 +89,7 @@ template <typename... Param> bool readList(std::string input, Param &&... param)
     // to do make this a C++17 fold expression when possible
 
     auto reader = stringReader(std::move(input));
-    std::initializer_list<bool>{readListItem(reader, std::forward<Param>(param))...};
+    (void)std::initializer_list<bool>{readListItem(reader, std::forward<Param>(param))...};
     return !reader.fail();
 }
 
