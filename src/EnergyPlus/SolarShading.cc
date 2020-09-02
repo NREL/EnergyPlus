@@ -2602,6 +2602,9 @@ namespace SolarShading {
         //                                    correspond to how CHKBKS is called
         //                      Jan 2002, FW: change error message
         //       RE-ENGINEERED  Lawrie, Oct 2000
+        //       Re-engineered  Jinchao Yuan, Sep 2020: Revised the vector computation method 
+        //                                              to reliabily produce CVec, 
+        //                                              and simplified the warning messages.
 
         // PURPOSE OF THIS SUBROUTINE:
         // Determines whether a any vertices of the back surface are in front of the receiving surface;
@@ -2616,26 +2619,12 @@ namespace SolarShading {
         // Using/Aliasing
         using namespace Vectors;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int N;                // Loop Control (vertex counter)
         int NVRS;             // Number of vertices of the receiving surface
         int NVBS;             // Number of vertices of the back surface
         Real64 DOTP;          // Dot product of C and D
 
         // Object Data
-        Vector AVec(0.0);
-        Vector BVec(0.0);
         Vector CVec(0.0); // Vector perpendicular to surface at vertex 1
         Vector DVec(0.0); // Vector from vertex 1 of first surface to vertex 'n' of second surface
 
@@ -2645,10 +2634,10 @@ namespace SolarShading {
         // SEE IF ANY VERTICES OF THE back surface ARE IN FRONT OF THE receiving surface
 
         for (N = 2; N < NVRS; N++) {
-            AVec = Surface(NRS).Vertex(N)-Surface(NRS).Vertex(1);
-            BVec = Surface(NRS).Vertex((N + 1))-Surface(NRS).Vertex(1);
-            CVec += cross(AVec, BVec);
+            CVec += cross(Surface(NRS).Vertex(N) - Surface(NRS).Vertex(1), 
+                Surface(NRS).Vertex((N + 1)) - Surface(NRS).Vertex(1));
         }
+        CVec /= (NVRS>=3 ? NVRS : 3);
 
         for (N = 1; N <= NVBS; ++N) {
             DVec = Surface(NBS).Vertex(N) - Surface(NRS).Vertex(1);
@@ -2656,10 +2645,11 @@ namespace SolarShading {
             if (DOTP > 0.0009) {
                 ShowSevereError("Problem in interior solar distribution calculation (CHKBKS)");
                 ShowContinueError("   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface(NRS).ZoneName);
-                ShowContinueError("   because vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
+                ShowContinueError("   because one or more of vertices, e.g. Vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
                                   " is in front of receiving surface=" + Surface(NRS).Name);
                 ShowContinueError(format("   (Dot Product indicator={:20.4F})", DOTP));
-                ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead.");
+                ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details.");
+                if (!EnergyPlus::DataGlobals::DisplayExtraWarnings) break;
             }
         }
     }
@@ -2729,10 +2719,9 @@ namespace SolarShading {
 
         auto const &surface_R(Surface(NRS));
         auto const &vertex_R(surface_R.Vertex);
-        int NVRS_temp = Surface(NRS).Sides;
-        auto const vertex_R_2(vertex_R(1));
-        Vector const AVec(vertex_R(NVRS_temp) - vertex_R_2); // Vector from vertex 2 to vertex 1 of receiving surface
-        Vector const BVec(vertex_R(2) - vertex_R_2); // Vector from vertex 2 to vertex 3 of receiving surface
+        auto const vertex_R_2(vertex_R(2));
+        Vector const AVec(vertex_R(1) - vertex_R_2); // Vector from vertex 2 to vertex 1 of receiving surface
+        Vector const BVec(vertex_R(3) - vertex_R_2); // Vector from vertex 2 to vertex 3 of receiving surface
 
         Vector const CVec(cross(BVec, AVec)); // Vector perpendicular to surface at vertex 2
 
@@ -2747,9 +2736,9 @@ namespace SolarShading {
 
         if (DOTP > TolValue) {
 
-            auto const vertex_C_2(vertex_C(1));
-            Vector const AVec(vertex_C(NVSS) - vertex_C_2);
-            Vector const BVec(vertex_C(2) - vertex_C_2);
+            auto const vertex_C_2(vertex_C(2));
+            Vector const AVec(vertex_C(1) - vertex_C_2);
+            Vector const BVec(vertex_C(3) - vertex_C_2);
 
             Vector const CVec(cross(BVec, AVec));
 
