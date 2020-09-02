@@ -510,8 +510,8 @@ namespace PlantChillers {
 
     void ElectricChillerSpecs::setupOutputVariables()
     {
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Energy,
                             "System",
@@ -560,15 +560,15 @@ namespace PlantChillers {
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electric Energy",
+                SetupOutputVariable("Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "CHILLERS",
                                     _,
                                     "Plant");
@@ -2369,15 +2369,15 @@ namespace PlantChillers {
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electric Energy",
+                SetupOutputVariable("Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "CHILLERS",
                                     _,
                                     "Plant");
@@ -4151,15 +4151,15 @@ namespace PlantChillers {
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electric Energy",
+                SetupOutputVariable("Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "CHILLERS",
                                     _,
                                     "Plant");
@@ -5728,8 +5728,8 @@ namespace PlantChillers {
 
     void ConstCOPChillerSpecs::setupOutputVariables()
     {
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
-        SetupOutputVariable("Chiller Electric Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name, _, "ELECTRICITY", "Cooling", _, "Plant");
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Energy", OutputProcessor::Unit::J, this->Energy, "System", "Sum", this->Name, _, "ELECTRICITY", "Cooling", _, "Plant");
         SetupOutputVariable("Chiller Evaporator Cooling Rate", OutputProcessor::Unit::W, this->QEvaporator, "System", "Average", this->Name);
         SetupOutputVariable("Chiller Evaporator Cooling Energy",
                             OutputProcessor::Unit::J,
@@ -5768,15 +5768,15 @@ namespace PlantChillers {
         } else if (this->CondenserType == DataPlant::CondenserType::AIRCOOLED) {
         } else if (this->CondenserType == DataPlant::CondenserType::EVAPCOOLED) {
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
-                SetupOutputVariable("Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
-                SetupOutputVariable("Chiller Basin Heater Electric Energy",
+                SetupOutputVariable("Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->BasinHeaterConsumption,
                                     "System",
                                     "Sum",
                                     this->Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "CHILLERS",
                                     _,
                                     "Plant");

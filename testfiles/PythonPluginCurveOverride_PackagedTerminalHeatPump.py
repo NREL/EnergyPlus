@@ -11,39 +11,40 @@ class CurveOverwriteMGR(EnergyPlusPlugin):
         self.Pressure_handle = None
         self.OAT_handle = None
         self.CurveOverwrite_handle = None
+        self.psych = None
 
-        self.psych = self.api.functional.psychrometrics()
-
-    def on_end_of_zone_timestep_before_zone_reporting(self) -> int:
+    def on_end_of_zone_timestep_before_zone_reporting(self, state) -> int:
+        if not self.psych:
+            self.psych = self.api.functional.psychrometrics(state)
         # API is ready to execute
-        if self.api.exchange.api_data_fully_ready():
+        if self.api.exchange.api_data_fully_ready(state):
             # get handles if needed
             if self.need_to_get_handles:
-                self.CoilInletDBT_handle = self.api.exchange.get_variable_handle("System Node Temperature",
+                self.CoilInletDBT_handle = self.api.exchange.get_variable_handle(state, "System Node Temperature",
                                                                                  "Zone1PTHPFanOutletNode")
 
-                self.CoilInletW_handle = self.api.exchange.get_variable_handle("System Node Humidity Ratio",
+                self.CoilInletW_handle = self.api.exchange.get_variable_handle(state, "System Node Humidity Ratio",
                                                                                "Zone1PTHPFanOutletNode")
 
-                self.Pressure_handle = self.api.exchange.get_variable_handle("System Node Pressure",
+                self.Pressure_handle = self.api.exchange.get_variable_handle(state, "System Node Pressure",
                                                                              "Zone1PTHPOAInNode")
 
-                self.CurveOverwrite_handle = self.api.exchange.get_actuator_handle("Curve",
+                self.CurveOverwrite_handle = self.api.exchange.get_actuator_handle(state, "Curve",
                                                                                    "Curve Result",
                                                                                    "HPACCOOLCAPFT")
 
-                self.OAT_handle = self.api.exchange.get_variable_handle("System Node Temperature",
+                self.OAT_handle = self.api.exchange.get_variable_handle(state, "System Node Temperature",
                                                                         "Zone1PTHPOAInNode")
 
                 self.need_to_get_handles = False
 
             # calculations
-            TTmp = self.api.exchange.get_variable_value(self.CoilInletDBT_handle)
-            WTmp = self.api.exchange.get_variable_value(self.CoilInletW_handle)
-            PTmp = self.api.exchange.get_variable_value(self.Pressure_handle)
-            MyWB = self.psych.wet_bulb(TTmp, WTmp, PTmp)
+            TTmp = self.api.exchange.get_variable_value(state, self.CoilInletDBT_handle)
+            WTmp = self.api.exchange.get_variable_value(state, self.CoilInletW_handle)
+            PTmp = self.api.exchange.get_variable_value(state, self.Pressure_handle)
+            MyWB = self.psych.wet_bulb(state, TTmp, WTmp, PTmp)
             IVOnea = MyWB
-            OAT = self.api.exchange.get_variable_value(self.OAT_handle)
+            OAT = self.api.exchange.get_variable_value(state, self.OAT_handle)
             IVTwo = OAT
             IVThree = IVOnea * IVTwo
             C1 = 0.942567793
@@ -60,7 +61,7 @@ class CurveOverwriteMGR(EnergyPlusPlugin):
                         C6 * IVThree)
 
             CurveOverwrite = CurveInput
-            self.api.exchange.set_actuator_value(self.CurveOverwrite_handle, CurveOverwrite)
+            self.api.exchange.set_actuator_value(state, self.CurveOverwrite_handle, CurveOverwrite)
 
             return 0
         else:

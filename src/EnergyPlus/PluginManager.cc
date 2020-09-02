@@ -62,6 +62,8 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <nlohmann/json.hpp>
+
 namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
@@ -85,6 +87,7 @@ namespace PluginManagement {
     int (*EP_PyRun_SimpleString)(const char *) = nullptr;
     int (*EP_Py_FinalizeEx)() = nullptr;
     void (*EP_PyErr_Fetch)(PyObjectWrap **, PyObjectWrap **, PyObjectWrap **) = nullptr;
+    void (*EP_PyErr_NormalizeException)(PyObjectWrap **, PyObjectWrap **, PyObjectWrap **) = nullptr;
     PyObjectWrap (*EP_PyObject_Repr)(PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyUnicode_AsEncodedString)(PyObjectWrap, const char *, const char *) = nullptr;
     char *(*EP_PyBytes_AsString)(PyObjectWrap) = nullptr;
@@ -100,7 +103,10 @@ namespace PluginManagement {
     PyObjectWrap (*EP_PyObject_CallObject)(PyObjectWrap, PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyObject_GetAttrString)(PyObjectWrap, const char *) = nullptr;
     PyObjectWrap (*EP_PyObject_CallFunction)(PyObjectWrap, const char *) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallFunction3Args)(PyObjectWrap, const char *, PyObjectWrap, PyObjectWrap, PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyObject_CallMethod)(PyObjectWrap, const char *, const char *) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallMethod1Arg)(PyObjectWrap, const char *, const char *, PyObjectWrap) = nullptr;
+    PyObjectWrap (*EP_PyObject_CallMethod2ObjArg)(PyObjectWrap, PyObjectWrap, PyObjectWrap, PyObjectWrap) = nullptr;
     int (*EP_PyList_Check)(PyObjectWrap) = nullptr;
     unsigned long (*EP_PyList_Size)(PyObjectWrap) = nullptr;
     PyObjectWrap (*EP_PyList_GetItem)(PyObjectWrap, size_t) = nullptr;
@@ -108,6 +114,9 @@ namespace PluginManagement {
     int (*EP_PyLong_Check)(PyObjectWrap) = nullptr;
     long (*EP_PyLong_AsLong)(PyObjectWrap) = nullptr;
     void (*EP_Py_SetPythonHome)(const wchar_t *) = nullptr;
+    PyObjectWrap (*EP_Py_BuildValue)(const char *) = nullptr;
+    PyObjectWrap (*EP_PyLong_FromVoidPtr)(void *) = nullptr;
+    PyObjectWrap (*EP_PyString_FromString)(const char *) = nullptr;
 
     void checkWrapperDLLFunction(const char *err, std::string const &pyFuncName, bool &errFlag)
     {
@@ -181,6 +190,11 @@ namespace PluginManagement {
         *(void **)(&EP_PyErr_Fetch) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyErr_Fetch");
         if (!EP_PyErr_Fetch) {
             ShowSevereError("Could not load Python function: EP_Wrap_PyErr_Fetch");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyErr_NormalizeException) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyErr_NormalizeException");
+        if (!EP_PyErr_NormalizeException) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyErr_NormalizeException");
             dll_errors = true;
         }
         *(void **)(&EP_PyObject_Repr) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_Repr");
@@ -258,9 +272,24 @@ namespace PluginManagement {
             ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallFunction");
             dll_errors = true;
         }
+        *(void **)(&EP_PyObject_CallFunction3Args) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction3Args");
+        if (!EP_PyObject_CallFunction3Args) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallFunction3Args");
+            dll_errors = true;
+        }
         *(void **)(&EP_PyObject_CallMethod) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod");
         if (!EP_PyObject_CallMethod) {
             ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_CallMethod1Arg) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod1Arg");
+        if (!EP_PyObject_CallMethod1Arg) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod1Arg");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyObject_CallMethod2ObjArg) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod2ObjArg");
+        if (!EP_PyObject_CallMethod2ObjArg) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyObject_CallMethod2ObjArg");
             dll_errors = true;
         }
         *(void **)(&EP_PyList_Check) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyList_Check");
@@ -298,6 +327,21 @@ namespace PluginManagement {
             ShowSevereError("Could not load Python function: EP_Wrap_Py_SetPythonHome");
             dll_errors = true;
         }
+        *(void **)(&EP_Py_BuildValue) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_Py_BuildValue");
+        if (!EP_Py_BuildValue) {
+            ShowSevereError("Could not load Python function: EP_Wrap_Py_BuildValue");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyLong_FromVoidPtr) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyLong_FromVoidPtr");
+        if (!EP_PyLong_FromVoidPtr) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyLong_FromVoidPtr");
+            dll_errors = true;
+        }
+        *(void **)(&EP_PyString_FromString) = (void *)GetProcAddress((HINSTANCE)wrapperDLLHandle, "EP_Wrap_PyString_FromString");
+        if (!EP_PyString_FromString) {
+            ShowSevereError("Could not load Python function: EP_Wrap_PyString_FromString");
+            dll_errors = true;
+        }
 #else
         wrapperDLLHandle = dlopen(pythonWrapper.c_str(), RTLD_LAZY | RTLD_GLOBAL);
         if (!wrapperDLLHandle) {
@@ -327,6 +371,9 @@ namespace PluginManagement {
         *(void **)(&EP_PyErr_Fetch) = dlsym(wrapperDLLHandle, "EP_Wrap_PyErr_Fetch");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyErr_Fetch", dll_errors);
+        *(void **)(&EP_PyErr_NormalizeException) = dlsym(wrapperDLLHandle, "EP_Wrap_PyErr_NormalizeException");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyErr_NormalizeException", dll_errors);
         *(void **)(&EP_PyObject_Repr) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_Repr");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyObject_Repr", dll_errors);
@@ -372,9 +419,18 @@ namespace PluginManagement {
         *(void **)(&EP_PyObject_CallFunction) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallFunction", dll_errors);
+        *(void **)(&EP_PyObject_CallFunction3Args) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallFunction3Args");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallFunction3Args", dll_errors);
         *(void **)(&EP_PyObject_CallMethod) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod", dll_errors);
+        *(void **)(&EP_PyObject_CallMethod1Arg) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod1Arg");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod1Arg", dll_errors);
+        *(void **)(&EP_PyObject_CallMethod2ObjArg) = dlsym(wrapperDLLHandle, "EP_Wrap_PyObject_CallMethod2ObjArg");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyObject_CallMethod2ObjArg", dll_errors);
         *(void **)(&EP_PyList_Check) = dlsym(wrapperDLLHandle, "EP_Wrap_PyList_Check");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_PyList_Check", dll_errors);
@@ -396,6 +452,15 @@ namespace PluginManagement {
         *(void **)(&EP_Py_SetPythonHome) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_SetPythonHome");
         err = dlerror();
         checkWrapperDLLFunction(err, "EP_Wrap_Py_SetPythonHome", dll_errors);
+        *(void **)(&EP_Py_BuildValue) = dlsym(wrapperDLLHandle, "EP_Wrap_Py_BuildValue");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_Py_BuildValue", dll_errors);
+        *(void **)(&EP_PyLong_FromVoidPtr) = dlsym(wrapperDLLHandle, "EP_Wrap_PyLong_FromVoidPtr");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyLong_FromVoidPtr", dll_errors);
+        *(void **)(&EP_PyString_FromString) = dlsym(wrapperDLLHandle, "EP_Wrap_PyString_FromString");
+        err = dlerror();
+        checkWrapperDLLFunction(err, "EP_Wrap_PyString_FromString", dll_errors);
 #endif
         if (dll_errors) {
             ShowFatalError("Python DLL problem causes program termination");
@@ -434,7 +499,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
             if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
-                bool const didOneRun = plugin.run(iCalledFrom);
+                bool const didOneRun = plugin.run(state, iCalledFrom);
                 if (didOneRun) anyRan = true;
             }
         }
@@ -748,6 +813,7 @@ namespace PluginManagement {
         EP_PyRun_SimpleString = nullptr;
         EP_Py_FinalizeEx = nullptr;
         EP_PyErr_Fetch = nullptr;
+        EP_PyErr_NormalizeException = nullptr;
         EP_PyObject_Repr = nullptr;
         EP_PyUnicode_AsEncodedString = nullptr;
         EP_PyBytes_AsString = nullptr;
@@ -763,6 +829,7 @@ namespace PluginManagement {
         EP_PyObject_CallObject = nullptr;
         EP_PyObject_GetAttrString = nullptr;
         EP_PyObject_CallFunction = nullptr;
+        EP_PyObject_CallFunction3Args = nullptr;
         EP_PyObject_CallMethod = nullptr;
         EP_PyList_Check = nullptr;
         EP_PyList_Size = nullptr;
@@ -836,29 +903,37 @@ namespace PluginManagement {
                 auto const &fields = instance.value();
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
-                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                std::string workingDirFlagUC = "YES";
+                try {
+                    workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (workingDirFlagUC == "YES") {
                     PluginManager::addToPythonPath(".", false);
                 }
-                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                std::string inputFileDirFlagUC = "YES";
+                try {
+                    inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                } catch (nlohmann::json::out_of_range &e) {
+                    // defaulted to YES
+                }
                 if (inputFileDirFlagUC == "YES") {
                     std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
                     PluginManager::addToPythonPath(sanitizedInputFileDir, false);
                 }
-                if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
-                }
-                if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
-                }
-                if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
-                }
-                if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
-                }
-                if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
+                try {
+                    auto const vars = fields.at("py_search_paths");
+                    for (const auto &var : vars) {
+                        try {
+                            PluginManager::addToPythonPath(PluginManager::sanitizedPath(var.at("search_path")), true);
+                        } catch (nlohmann::json::out_of_range &e) {
+                            // empty entry
+                        }
+                    }
+                } catch (nlohmann::json::out_of_range& e) {
+                    // catch when no paths are passed
+                    // nothing to do here
                 }
             }
         }
@@ -1009,11 +1084,69 @@ namespace PluginManagement {
         PyObjectWrap *exc_value = nullptr;
         PyObjectWrap *exc_tb = nullptr;
         (*EP_PyErr_Fetch)(&exc_type, &exc_value, &exc_tb);
+        // Normalizing the exception is needed. Without it, our custom EnergyPlusException go through just fine
+        // but any ctypes built-in exception for eg will have wrong types
+        (*EP_PyErr_NormalizeException)(&exc_type, &exc_value, &exc_tb);
         PyObjectWrap str_exc_value = (*EP_PyObject_Repr)(exc_value); // Now a unicode object
         PyObjectWrap pyStr2 = (*EP_PyUnicode_AsEncodedString)(str_exc_value, "utf-8", "Error ~");
+        (*EP_Py_DECREF)(str_exc_value);
         char *strExcValue = (*EP_PyBytes_AsString)(pyStr2); // NOLINT(hicpp-signed-bitwise)
+        (*EP_Py_DECREF)(pyStr2);
         EnergyPlus::ShowContinueError("Python error description follows: ");
         EnergyPlus::ShowContinueError(strExcValue);
+
+        // See if we can get a full traceback.
+        // Calls into python, and does the same as capturing the exception in `e`
+        // then `print(traceback.format_exception(e.type, e.value, e.tb))`
+        PyObjectWrap pModuleName = (*EP_PyUnicode_DecodeFSDefault)("traceback");
+        PyObjectWrap pyth_module = (*EP_PyImport_Import)(pModuleName);
+        (*EP_Py_DECREF)(pModuleName);
+
+        if (pyth_module == nullptr) {
+            EnergyPlus::ShowFatalError("Cannot find 'traceback' module in reportPythonError(), this is weird");
+            return;
+        }
+
+        PyObjectWrap pyth_func = (*EP_PyObject_GetAttrString)(pyth_module, "format_exception");
+        (*EP_Py_DECREF)(pyth_module); // PyImport_Import returns a new reference, decrement it
+
+        if (pyth_func || (*EP_PyCallable_Check)(pyth_func)) {
+
+            PyObjectWrap pyth_val = (*EP_PyObject_CallFunction3Args)(pyth_func, "OOO", exc_type, exc_value, exc_tb);
+
+            // traceback.format_exception returns a list, so iterate on that
+            if (!pyth_val || !(*EP_PyList_Check)(pyth_val)) { // NOLINT(hicpp-signed-bitwise)
+                EnergyPlus::ShowFatalError("In reportPythonError(), traceback.format_exception did not return a list.");
+            }
+
+            unsigned long numVals = (*EP_PyList_Size)(pyth_val);
+            if (numVals == 0) {
+                EnergyPlus::ShowFatalError("No traceback available");
+                return;
+            }
+
+            EnergyPlus::ShowContinueError("Python traceback follows: ");
+
+            EnergyPlus::ShowContinueError("```");
+
+            for (unsigned long itemNum = 0; itemNum < numVals; itemNum++) {
+                PyObjectWrap item = (*EP_PyList_GetItem)(pyth_val, itemNum);
+                if ((*EP_PyUnicode_Check)(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
+                    std::string traceback_line = (*EP_PyUnicode_AsUTF8)(item);
+                    if (!traceback_line.empty() && traceback_line[traceback_line.length()-1] == '\n') {
+                        traceback_line.erase(traceback_line.length()-1);
+                    }
+                    EnergyPlus::ShowContinueError(" >>> " + traceback_line);
+                }
+                // PyList_GetItem returns a borrowed reference, do not decrement
+            }
+
+            EnergyPlus::ShowContinueError("```");
+
+            // PyList_Size returns a borrowed reference, do not decrement
+            (*EP_Py_DECREF)(pyth_val); // PyObject_CallFunction returns new reference, decrement
+        }
+        (*EP_Py_DECREF)(pyth_func); // PyObject_GetAttrString returns a new reference, decrement it
 #endif
     }
 
@@ -1138,38 +1271,58 @@ namespace PluginManagement {
                 std::string functionName = (*EP_PyUnicode_AsUTF8)(item);
                 if (functionName == this->sHookBeginNewEnvironment) {
                     this->bHasBeginNewEnvironment = true;
+                    this->pBeginNewEnvironment = (*EP_PyString_FromString)(functionName.c_str());
+                } else if (functionName == this->sHookBeginZoneTimestepBeforeSetCurrentWeather) {
+                    this->bHasBeginZoneTimestepBeforeSetCurrentWeather = true;
+                    this->pBeginZoneTimestepBeforeSetCurrentWeather = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterNewEnvironmentWarmUpIsComplete) {
                     this->bHasAfterNewEnvironmentWarmUpIsComplete = true;
+                    this->pAfterNewEnvironmentWarmUpIsComplete = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookBeginZoneTimestepBeforeInitHeatBalance) {
                     this->bHasBeginZoneTimestepBeforeInitHeatBalance = true;
+                    this->pBeginZoneTimestepBeforeInitHeatBalance = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookBeginZoneTimestepAfterInitHeatBalance) {
                     this->bHasBeginZoneTimestepAfterInitHeatBalance = true;
+                    this->pBeginZoneTimestepAfterInitHeatBalance = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookBeginTimestepBeforePredictor) {
                     this->bHasBeginTimestepBeforePredictor = true;
+                    this->pBeginTimestepBeforePredictor = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterPredictorBeforeHVACManagers) {
                     this->bHasAfterPredictorBeforeHVACManagers = true;
+                    this->pAfterPredictorBeforeHVACManagers = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterPredictorAfterHVACManagers) {
                     this->bHasAfterPredictorAfterHVACManagers = true;
+                    this->pAfterPredictorAfterHVACManagers = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookInsideHVACSystemIterationLoop) {
                     this->bHasInsideHVACSystemIterationLoop = true;
+                    this->pInsideHVACSystemIterationLoop = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfZoneTimestepBeforeZoneReporting) {
                     this->bHasEndOfZoneTimestepBeforeZoneReporting = true;
+                    this->pEndOfZoneTimestepBeforeZoneReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfZoneTimestepAfterZoneReporting) {
                     this->bHasEndOfZoneTimestepAfterZoneReporting = true;
+                    this->pEndOfZoneTimestepAfterZoneReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfSystemTimestepBeforeHVACReporting) {
                     this->bHasEndOfSystemTimestepBeforeHVACReporting = true;
+                    this->pEndOfSystemTimestepBeforeHVACReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfSystemTimestepAfterHVACReporting) {
                     this->bHasEndOfSystemTimestepAfterHVACReporting = true;
+                    this->pEndOfSystemTimestepAfterHVACReporting = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfZoneSizing) {
                     this->bHasEndOfZoneSizing = true;
+                    this->pEndOfZoneSizing = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookEndOfSystemSizing) {
                     this->bHasEndOfSystemSizing = true;
+                    this->pEndOfSystemSizing = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookAfterComponentInputReadIn) {
                     this->bHasAfterComponentInputReadIn = true;
+                    this->pAfterComponentInputReadIn = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookUserDefinedComponentModel) {
                     this->bHasUserDefinedComponentModel = true;
+                    this->pUserDefinedComponentModel = (*EP_PyString_FromString)(functionName.c_str());
                 } else if (functionName == this->sHookUnitarySystemSizing) {
                     this->bHasUnitarySystemSizing = true;
+                    this->pUnitarySystemSizing = (*EP_PyString_FromString)(functionName.c_str());
                 } else {
                     // the Python _detect_function worker is supposed to ignore any other functions so they don't show up at this point
                     // I don't think it's appropriate to warn here, so just ignore and move on
@@ -1187,91 +1340,134 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
         (*EP_Py_DECREF)(this->pClassInstance);
         (*EP_Py_DECREF)(this->pModule); // PyImport_Import returns a new reference, decrement it
+        if (this->bHasBeginNewEnvironment) (*EP_Py_DECREF)(this->pBeginNewEnvironment);
+        if (this->bHasAfterNewEnvironmentWarmUpIsComplete) (*EP_Py_DECREF)(this->pAfterNewEnvironmentWarmUpIsComplete);
+        if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) (*EP_Py_DECREF)(this->pBeginZoneTimestepBeforeInitHeatBalance);
+        if (this->bHasBeginZoneTimestepAfterInitHeatBalance) (*EP_Py_DECREF)(this->pBeginZoneTimestepAfterInitHeatBalance);
+        if (this->bHasBeginTimestepBeforePredictor) (*EP_Py_DECREF)(this->pBeginTimestepBeforePredictor);
+        if (this->bHasAfterPredictorBeforeHVACManagers) (*EP_Py_DECREF)(this->pAfterPredictorBeforeHVACManagers);
+        if (this->bHasAfterPredictorAfterHVACManagers) (*EP_Py_DECREF)(this->pAfterPredictorAfterHVACManagers);
+        if (this->bHasInsideHVACSystemIterationLoop) (*EP_Py_DECREF)(this->pInsideHVACSystemIterationLoop);
+        if (this->bHasEndOfZoneTimestepBeforeZoneReporting) (*EP_Py_DECREF)(this->pEndOfZoneTimestepBeforeZoneReporting);
+        if (this->bHasEndOfZoneTimestepAfterZoneReporting) (*EP_Py_DECREF)(this->pEndOfZoneTimestepAfterZoneReporting);
+        if (this->bHasEndOfSystemTimestepBeforeHVACReporting) (*EP_Py_DECREF)(this->pEndOfSystemTimestepBeforeHVACReporting);
+        if (this->bHasEndOfSystemTimestepAfterHVACReporting) (*EP_Py_DECREF)(this->pEndOfSystemTimestepAfterHVACReporting);
+        if (this->bHasEndOfZoneSizing) (*EP_Py_DECREF)(this->pEndOfZoneSizing);
+        if (this->bHasEndOfSystemSizing) (*EP_Py_DECREF)(this->pEndOfSystemSizing);
+        if (this->bHasAfterComponentInputReadIn) (*EP_Py_DECREF)(this->pAfterComponentInputReadIn);
+        if (this->bHasUserDefinedComponentModel) (*EP_Py_DECREF)(this->pUserDefinedComponentModel);
+        if (this->bHasUnitarySystemSizing) (*EP_Py_DECREF)(this->pUnitarySystemSizing);
 #endif
     }
 
 #if LINK_WITH_PYTHON == 1
-    bool PluginInstance::run(int iCalledFrom) const
+    bool PluginInstance::run(EnergyPlusData &state, int iCalledFrom) const
     {
         // returns true if a plugin actually ran
-        const char *functionName = nullptr;
+        PyObjectWrap pFunctionName = nullptr;
+        const char * functionName = nullptr;
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
+                pFunctionName = this->pBeginNewEnvironment;
                 functionName = this->sHookBeginNewEnvironment;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather) {
+            if (this->bHasBeginZoneTimestepBeforeSetCurrentWeather) {
+                pFunctionName = this->pBeginZoneTimestepBeforeSetCurrentWeather;
+                functionName = this->sHookBeginZoneTimestepBeforeSetCurrentWeather;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromZoneSizing) {
             if (this->bHasEndOfZoneSizing) {
+                pFunctionName = this->pEndOfZoneSizing;
                 functionName = this->sHookEndOfZoneSizing;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromSystemSizing) {
             if (this->bHasEndOfSystemSizing) {
+                pFunctionName = this->pEndOfSystemSizing;
                 functionName = this->sHookEndOfSystemSizing;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
             if (this->bHasAfterNewEnvironmentWarmUpIsComplete) {
+                pFunctionName = this->pAfterNewEnvironmentWarmUpIsComplete;
                 functionName = this->sHookAfterNewEnvironmentWarmUpIsComplete;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
             if (this->bHasBeginTimestepBeforePredictor) {
+                pFunctionName = this->pBeginTimestepBeforePredictor;
                 functionName = this->sHookBeginTimestepBeforePredictor;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeforeHVACManagers) {
             if (this->bHasAfterPredictorBeforeHVACManagers) {
+                pFunctionName = this->pAfterPredictorBeforeHVACManagers;
                 functionName = this->sHookAfterPredictorBeforeHVACManagers;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromAfterHVACManagers) {
             if (this->bHasAfterPredictorAfterHVACManagers) {
+                pFunctionName = this->pAfterPredictorAfterHVACManagers;
                 functionName = this->sHookAfterPredictorAfterHVACManagers;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromHVACIterationLoop) {
             if (this->bHasInsideHVACSystemIterationLoop) {
+                pFunctionName = this->pInsideHVACSystemIterationLoop;
                 functionName = this->sHookInsideHVACSystemIterationLoop;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
             if (this->bHasEndOfSystemTimestepBeforeHVACReporting) {
+                pFunctionName = this->pEndOfSystemTimestepBeforeHVACReporting;
                 functionName = this->sHookEndOfSystemTimestepBeforeHVACReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
             if (this->bHasEndOfSystemTimestepAfterHVACReporting) {
+                pFunctionName = this->pEndOfSystemTimestepAfterHVACReporting;
                 functionName = this->sHookEndOfSystemTimestepAfterHVACReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
             if (this->bHasEndOfZoneTimestepBeforeZoneReporting) {
+                pFunctionName = this->pEndOfZoneTimestepBeforeZoneReporting;
                 functionName = this->sHookEndOfZoneTimestepBeforeZoneReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
             if (this->bHasEndOfZoneTimestepAfterZoneReporting) {
+                pFunctionName = this->pEndOfZoneTimestepAfterZoneReporting;
                 functionName = this->sHookEndOfZoneTimestepAfterZoneReporting;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromComponentGetInput) {
             if (this->bHasAfterComponentInputReadIn) {
+                pFunctionName = this->pAfterComponentInputReadIn;
                 functionName = this->sHookAfterComponentInputReadIn;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromUserDefinedComponentModel) {
             if (this->bHasUserDefinedComponentModel) {
+                pFunctionName = this->pUserDefinedComponentModel;
                 functionName = this->sHookUserDefinedComponentModel;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromUnitarySystemSizing) {
             if (this->bHasUnitarySystemSizing) {
+                pFunctionName = this->pUnitarySystemSizing;
                 functionName = this->sHookUnitarySystemSizing;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
             if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) {
+                pFunctionName = this->pBeginZoneTimestepBeforeInitHeatBalance;
                 functionName = this->sHookBeginZoneTimestepBeforeInitHeatBalance;
             }
         } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
             if (this->bHasBeginZoneTimestepAfterInitHeatBalance) {
+                pFunctionName = this->pBeginZoneTimestepAfterInitHeatBalance;
                 functionName = this->sHookBeginZoneTimestepAfterInitHeatBalance;
             }
         }
 
         // leave if we didn't find a match
-        if (!functionName) {
+        if (!pFunctionName) {
             return false;
         }
 
         // then call the main function
-        PyObjectWrap pFunctionResponse = (*EP_PyObject_CallMethod)(this->pClassInstance, functionName, nullptr);
+        //static const PyObjectWrap oneArgObjFormat = (*EP_Py_BuildValue)("O");
+        PyObjectWrap pStateInstance = (*EP_PyLong_FromVoidPtr)((void*)&state);
+        PyObjectWrap pFunctionResponse = (*EP_PyObject_CallMethod2ObjArg)(this->pClassInstance, pFunctionName, pStateInstance, nullptr);
+        (*EP_Py_DECREF)(pStateInstance);
         if (!pFunctionResponse) {
             std::string const functionNameAsString(functionName); // only convert to string if an error occurs
             EnergyPlus::ShowSevereError("Call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
@@ -1301,7 +1497,7 @@ namespace PluginManagement {
         return true;
     }
 #else
-    bool PluginInstance::run(int EP_UNUSED(iCalledFrom)) const
+    bool PluginInstance::run(EnergyPlusData &EP_UNUSED(state), int EP_UNUSED(iCalledFrom)) const
     {
         return false;
     }
@@ -1310,6 +1506,8 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
+        if (path.empty()) return;
+
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if ((*EP_PyRun_SimpleString)(command.c_str()) == 0) {
             if (userDefinedPath) {
@@ -1578,12 +1776,12 @@ namespace PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::runSingleUserDefinedPlugin(int index)
+    void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &state, int index)
     {
-        plugins[index].run(DataGlobals::emsCallFromUserDefinedComponentModel);
+        plugins[index].run(state, DataGlobals::emsCallFromUserDefinedComponentModel);
     }
 #else
-    void PluginManager::runSingleUserDefinedPlugin(int EP_UNUSED(index))
+    void PluginManager::runSingleUserDefinedPlugin(EnergyPlusData &EP_UNUSED(state), int EP_UNUSED(index))
     {
     }
 #endif

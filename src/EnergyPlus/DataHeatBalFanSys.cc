@@ -240,6 +240,23 @@ namespace DataHeatBalFanSys {
     Array1D_int TempControlType;
     Array1D_int ComfortControlType;
 
+    Array1D<Real64> ZoneHeatIndex;
+    Array1D<Real64> ZoneHumidex;
+    Array1D_int ZoneNumOcc;
+    Array1D<std::vector<Real64>> ZoneHeatIndexHourBins;
+    Array1D<std::vector<Real64>> ZoneHumidexHourBins;
+    Array1D<std::vector<Real64>> ZoneHeatIndexOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneHumidexOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneCO2LevelHourBins;
+    Array1D<std::vector<Real64>> ZoneCO2LevelOccuHourBins;
+    Array1D<std::vector<Real64>> ZoneLightingLevelHourBins;
+    Array1D<std::vector<Real64>> ZoneLightingLevelOccuHourBins;
+
+    Array1D<Real64> ZoneOccPierceSET;
+    Array1D<Real64> ZoneOccPierceSETLastStep;
+    Array1D<std::vector<Real64>> ZoneLowSETHours; // LowSETHour, LowSETOccHour, LowSetLongestDur, LowSetLongestTimeStamp
+    Array1D<std::vector<Real64>> ZoneHighSETHours; //HighSETHour, HighSETOccHour, HighSetLongestDur, HighSetLongestTimeStamp
+
     // Object Data
     Array1D<ZoneComfortControlsFangerData> ZoneComfortControlsFanger;
 
@@ -360,6 +377,21 @@ namespace DataHeatBalFanSys {
         ZoneW1.deallocate();
         TempControlType.deallocate();
         ComfortControlType.deallocate();
+        ZoneHeatIndex.deallocate();
+        ZoneHumidex.deallocate();
+        ZoneNumOcc.deallocate();;
+        ZoneHeatIndexHourBins.deallocate();
+        ZoneHeatIndexOccuHourBins.deallocate();
+        ZoneHumidexHourBins.deallocate();
+        ZoneHumidexOccuHourBins.deallocate();
+        ZoneOccPierceSET.deallocate();
+        ZoneOccPierceSETLastStep.deallocate();
+        ZoneLowSETHours.deallocate();
+        ZoneHighSETHours.deallocate();
+        ZoneCO2LevelHourBins.deallocate();
+        ZoneCO2LevelOccuHourBins.deallocate();
+        ZoneLightingLevelHourBins.deallocate();
+        ZoneLightingLevelOccuHourBins.deallocate();
         ZoneComfortControlsFanger.deallocate();
     }
 

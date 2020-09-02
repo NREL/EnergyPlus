@@ -782,7 +782,7 @@ namespace DaylightingManager {
 
         // open a new file eplusout.dfs for saving the daylight factors
         if (CreateDFSReportFile) {
-            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients");
+            InputOutputFile &dfs = ioFiles.dfs.ensure_open("CalcDayltgCoefficients", ioFiles.outputControl.dfs);
             print(dfs, "{}\n", "This file contains daylight factors for all exterior windows of daylight zones.");
             print(dfs, "{}\n", "MonthAndDay,Zone Name,Window Name,Window State");
             print(dfs, "{}\n",
@@ -4596,7 +4596,7 @@ namespace DaylightingManager {
             DisplayString("ReturnFrom DElight DaylightCoefficients Calc");
             if (iErrorFlag != 0) {
                 // Open DElight Daylight Factors Error File for reading
-                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open();
+                auto iDElightErrorFile = ioFiles.outputDelightDfdmpFileName.try_open(ioFiles.outputControl.delightdfdmp);
 
                 // Sequentially read lines in DElight Daylight Factors Error File
                 // and process them using standard EPlus warning/error handling calls

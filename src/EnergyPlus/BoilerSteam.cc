@@ -203,7 +203,7 @@ namespace BoilerSteam {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 // Set to Electric to avoid errors when setting up output variables
-                thisBoiler.BoilerFuelTypeForOutputVariable = "Electric";
+                thisBoiler.BoilerFuelTypeForOutputVariable = "Electricity";
                 ErrorsFound = true;
                 FuelTypeError = false;
             }
@@ -424,21 +424,12 @@ namespace BoilerSteam {
                             "BOILERS",
                             _,
                             "Plant");
-        if (UtilityRoutines::SameString(this->BoilerFuelTypeForOutputVariable, "Electric")) {
-            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Power",
-                                OutputProcessor::Unit::W,
-                                this->FuelUsed,
-                                "System",
-                                "Average",
-                                this->Name);
-        } else {
-            SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
-                                OutputProcessor::Unit::W,
-                                this->FuelUsed,
-                                "System",
-                                "Average",
-                                this->Name);
-        }
+        SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->FuelUsed,
+                            "System",
+                            "Average",
+                            this->Name);
         SetupOutputVariable("Boiler " + this->BoilerFuelTypeForOutputVariable + " Energy",
                             OutputProcessor::Unit::J,
                             this->FuelConsumed,

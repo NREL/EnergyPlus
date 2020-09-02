@@ -55,7 +55,8 @@
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/IOFiles.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -150,7 +151,7 @@ protected:
 
     // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
     // delimiter can be passed in to this function. This allows for cross platform output string comparisons.
-    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = DataStringGlobals::NL);
+    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n");
 
     // This function reads all the lines in the supplied filePath. It puts each line into the vector.
     std::vector<std::string> read_lines_in_file(std::string const &filePath);
@@ -290,7 +291,7 @@ private:
     // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
     std::ostringstream *json_stream;
     std::ostringstream *err_stream;
-    
+
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;

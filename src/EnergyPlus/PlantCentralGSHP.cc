@@ -778,7 +778,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
     void WrapperSpecs::setupOutputVars()
     {
-        SetupOutputVariable("Chiller Heater System Cooling Electric Energy",
+        SetupOutputVariable("Chiller Heater System Cooling Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.TotElecCooling,
                             "System",
@@ -790,7 +790,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater System Heating Electric Energy",
+        SetupOutputVariable("Chiller Heater System Heating Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.TotElecHeating,
                             "System",
@@ -802,14 +802,14 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                             _,
                             "Plant");
 
-        SetupOutputVariable("Chiller Heater System Cooling Electric Power",
+        SetupOutputVariable("Chiller Heater System Cooling Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->Report.TotElecCoolingPwr,
                             "System",
                             "Average",
                             this->Name);
 
-        SetupOutputVariable("Chiller Heater System Heating Electric Power",
+        SetupOutputVariable("Chiller Heater System Heating Electricity Rate",
                             OutputProcessor::Unit::W,
                             this->Report.TotElecHeatingPwr,
                             "System",
@@ -921,28 +921,28 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cooling Electric Power Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable("Chiller Heater Cooling Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CoolingPower,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Heating Electric Power Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable("Chiller Heater Heating Electricity Rate Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::W,
                                     this->ChillerHeater(ChillerHeaterNum).Report.HeatingPower,
                                     "System",
                                     "Average",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Cooling Electric Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable("Chiller Heater Cooling Electricity Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::J,
                                     this->ChillerHeater(ChillerHeaterNum).Report.CoolingEnergy,
                                     "System",
                                     "Sum",
                                     this->ChillerHeater(ChillerHeaterNum).Name);
 
-                SetupOutputVariable("Chiller Heater Heating Electric Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
+                SetupOutputVariable("Chiller Heater Heating Electricity Energy Unit " + General::TrimSigDigits(ChillerHeaterNum) + "",
                                     OutputProcessor::Unit::J,
                                     this->ChillerHeater(ChillerHeaterNum).Report.HeatingEnergy,
                                     "System",
