@@ -2082,7 +2082,7 @@ namespace WindowManager {
         using DataHeatBalSurface::QdotConvOutRepPerArea;
         using DataHeatBalSurface::QdotRadOutRep;
         using DataHeatBalSurface::QdotRadOutRepPerArea;
-        using DataHeatBalSurface::QRadLWOutSrdSurfs;
+        using DataHeatBalSurface::SurfQRadLWOutSrdSurfs;
         using DataHeatBalSurface::QRadOutReport;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
@@ -2703,7 +2703,7 @@ namespace WindowManager {
         Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
         Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
-        QRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
+        SurfQRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
         QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
         QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
@@ -3582,7 +3582,7 @@ namespace WindowManager {
             if (SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
-                SurfWinSysSolAbsorptance(SurfNum) = (QRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
+                SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
                                                 (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {

@@ -3491,7 +3491,7 @@ namespace WindowComplexManager {
             if (SunIsUp) {
                 SurfWinSysSolTransmittance(SurfNum) =
                         SurfWinTransSolar(SurfNum) / (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
-                SurfWinSysSolAbsorptance(SurfNum) = (QRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
+                SurfWinSysSolAbsorptance(SurfNum) = (SurfWinQRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
                                                 (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
                 SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
@@ -3522,8 +3522,8 @@ namespace WindowComplexManager {
                 SurfaceWindow(SurfNum).ThetaFace(2 * k) = theta(2 * k);
 
                 // temperatures for reporting
-                FenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - KelvinConv;
-                FenLaySurfTempBack(k, SurfNum) = theta(2 * k) - KelvinConv;
+                SurfWinFenLaySurfTempFront(k, SurfNum) = theta(2 * k - 1) - KelvinConv;
+                SurfWinFenLaySurfTempBack(k, SurfNum) = theta(2 * k) - KelvinConv;
                 // thetas(k) = theta(k)
             }
         }

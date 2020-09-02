@@ -229,8 +229,8 @@ namespace WindowManager {
             SurfaceWindow(SurfNum).ThetaFace(2 * k) = dataWindowManager.thetas(2 * k);
 
             // temperatures for reporting
-            FenLaySurfTempFront(k, SurfNum) = dataWindowManager.thetas(2 * k - 1) - KelvinConv;
-            FenLaySurfTempBack(k, SurfNum) = dataWindowManager.thetas(2 * k) - KelvinConv;
+            SurfWinFenLaySurfTempFront(k, SurfNum) = dataWindowManager.thetas(2 * k - 1) - KelvinConv;
+            SurfWinFenLaySurfTempBack(k, SurfNum) = dataWindowManager.thetas(2 * k) - KelvinConv;
         }
     }
 

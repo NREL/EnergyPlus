@@ -548,7 +548,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalSurface::QdotRadOutRep.allocate(3);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
-    DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(3);
     DataHeatBalSurface::QAirExtReport.allocate(3);
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
@@ -2775,7 +2775,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalSurface::QdotRadOutRep.allocate(3);
     DataHeatBalSurface::QdotRadOutRepPerArea.allocate(3);
     DataHeatBalSurface::QRadOutReport.allocate(3);
-    DataHeatBalSurface::QRadLWOutSrdSurfs.allocate(3);
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(3);
     DataHeatBalSurface::QAirExtReport.allocate(3);
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
@@ -2799,7 +2799,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     WindowManager::CalcWindowHeatBalance(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager, surfNum2, DataHeatBalance::HConvIn(surfNum2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
-    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(state.dataWindowManager.thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(surfNum2));
+    EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(state.dataWindowManager.thetas(1))), DataHeatBalSurface::SurfQRadLWOutSrdSurfs(surfNum2));
     EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(surfNum2),3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)

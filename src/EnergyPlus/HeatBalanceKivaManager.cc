@@ -370,7 +370,7 @@ namespace HeatBalanceKivaManager {
         bcs->diffuseHorizontalFlux = DataEnvironment::DifSolarRad;
         bcs->skyEmissivity = pow4(DataEnvironment::SkyTempKelvin) / pow4(bcs->outdoorTemp);
 
-        bcs->slabAbsRadiation = DataHeatBalSurface::QRadSWInAbs(floorSurface) + // solar
+        bcs->slabAbsRadiation = DataHeatBalSurface::SurfOpaqQRadSWInAbs(floorSurface) + // solar
                                DataHeatBalance::QRadThermInAbs(floorSurface) + // internal gains
                                DataHeatBalFanSys::QHTRadSysSurf(floorSurface) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
                                DataHeatBalFanSys::QCoolingPanelSurf(floorSurface) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
@@ -389,7 +389,7 @@ namespace HeatBalanceKivaManager {
         Real64 TARadTotal = 0.0;
         Real64 TAConvTotal = 0.0;
         for (auto &wl : wallSurfaces) {
-            Real64 Q = DataHeatBalSurface::QRadSWInAbs(wl) + // solar
+            Real64 Q = DataHeatBalSurface::SurfOpaqQRadSWInAbs(wl) + // solar
                        DataHeatBalance::QRadThermInAbs(wl) + // internal gains
                        DataHeatBalFanSys::QHTRadSysSurf(wl) + DataHeatBalFanSys::QHWBaseboardSurf(floorSurface) +
                        DataHeatBalFanSys::QCoolingPanelSurf(wl) + DataHeatBalFanSys::QSteamBaseboardSurf(floorSurface) +
