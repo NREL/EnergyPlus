@@ -671,7 +671,7 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_EMS_Override)
 
 
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle("System Node Setpoint", "Temperature Minimum Setpoint", "Test node");
+    int hActuator = getActuatorHandle(&state, "System Node Setpoint", "Temperature Minimum Setpoint", "Test node");
     EXPECT_GT(hActuator, -1);
 
     // Both the EMS one and the Plugin one point to the same handle, which is the index into the DataRuntimeLanguage::EMSActuatorAvailable array
@@ -716,14 +716,14 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_Python_Python_Override)
 
 
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle("System Node Setpoint", "Temperature Minimum Setpoint", "Test node");
+    int hActuator = getActuatorHandle(&state, "System Node Setpoint", "Temperature Minimum Setpoint", "Test node");
     EXPECT_GT(hActuator, -1);
 
     // no error message until now
     EXPECT_TRUE(compare_err_stream("", true));
 
     // Then try to get the actuator handle a SECOND time
-    int hActuator2 = getActuatorHandle("System Node Setpoint", "Temperature Minimum Setpoint", "Test node");
+    int hActuator2 = getActuatorHandle(&state, "System Node Setpoint", "Temperature Minimum Setpoint", "Test node");
     EXPECT_GT(hActuator2, -1);
 
     // Both Plugin ones point to the same handle, which is the index into the DataRuntimeLanguage::EMSActuatorAvailable array
