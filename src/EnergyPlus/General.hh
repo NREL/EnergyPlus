@@ -408,7 +408,7 @@ namespace General {
         }
     }
 
-    //* Not currently used
+    /* Not currently used
     inline Real64 epexpOverflow(const Real64 numerator, const Real64 denominator, const Real64 maxInput=700.0)
     {
         if (denominator == 0.0) {
@@ -421,7 +421,7 @@ namespace General {
             return std::exp(x);
         }
     }
-    //*/
+    */
 
 } // namespace General
 
