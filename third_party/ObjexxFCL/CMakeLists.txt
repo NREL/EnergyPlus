@@ -96,9 +96,7 @@ set(src
   src/ObjexxFCL/CArrayA.hh
   src/ObjexxFCL/CArrayP.fwd.hh
   src/ObjexxFCL/CArrayP.hh
-  src/ObjexxFCL/char.constants.cc
-  src/ObjexxFCL/char.constants.hh
-  src/ObjexxFCL/char.functions.cc
+        src/ObjexxFCL/char.functions.cc
   src/ObjexxFCL/char.functions.hh
   src/ObjexxFCL/Chunk.hh
   src/ObjexxFCL/ChunkExponent.hh
