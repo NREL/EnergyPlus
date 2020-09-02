@@ -120,20 +120,16 @@ void EnergyPlusFixture::SetUp()
 
 void EnergyPlusFixture::TearDown()
 {
-
-    {
-        state.files.mtd.del();
-        state.files.eso.del();
-        state.files.err_stream.reset();
-        state.files.eio.del();
-        state.files.debug.del();
-        state.files.zsz.del();
-        state.files.ssz.del();
-        state.files.mtr.del();
-        state.files.bnd.del();
-        state.files.shade.del();
-    }
-
+    state.files.mtd.del();
+    state.files.eso.del();
+    state.files.err_stream.reset();
+    state.files.eio.del();
+    state.files.debug.del();
+    state.files.zsz.del();
+    state.files.ssz.del();
+    state.files.mtr.del();
+    state.files.bnd.del();
+    state.files.shade.del();
     clearAllStates(this->state);
 }
 

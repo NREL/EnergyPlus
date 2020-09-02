@@ -84,9 +84,7 @@ set(src
   src/ObjexxFCL/ArrayS.hh
   src/ObjexxFCL/ArrayTail.fwd.hh
   src/ObjexxFCL/ArrayTail.hh
-  src/ObjexxFCL/Backspace.cc
-  src/ObjexxFCL/Backspace.hh
-  src/ObjexxFCL/BArray.cc
+        src/ObjexxFCL/BArray.cc
   src/ObjexxFCL/BArray.fwd.hh
   src/ObjexxFCL/BArray.hh
   src/ObjexxFCL/bit.hh
@@ -117,12 +115,6 @@ set(src
   src/ObjexxFCL/environment.hh
   src/ObjexxFCL/floops.hh
   src/ObjexxFCL/Fmath.hh
-  src/ObjexxFCL/fmt.cc
-  src/ObjexxFCL/fmt.hh
-  src/ObjexxFCL/fmt.manipulators.hh
-  src/ObjexxFCL/Format.cc
-  src/ObjexxFCL/Format.hh
-  src/ObjexxFCL/FormattedIO.hh
         src/ObjexxFCL/Index.cc
   src/ObjexxFCL/Index.fwd.hh
   src/ObjexxFCL/Index.hh
@@ -133,10 +125,7 @@ set(src
   src/ObjexxFCL/IndexSlice.fwd.hh
   src/ObjexxFCL/IndexSlice.hh
   src/ObjexxFCL/InitializerSentinel.hh
-        src/ObjexxFCL/IOFlags.cc
-  src/ObjexxFCL/IOFlags.fwd.hh
-  src/ObjexxFCL/IOFlags.hh
-  src/ObjexxFCL/MArray.all.fwd.hh
+        src/ObjexxFCL/MArray.all.fwd.hh
   src/ObjexxFCL/MArray.all.hh
   src/ObjexxFCL/MArray.functions.hh
   src/ObjexxFCL/MArray.fwd.hh
@@ -170,16 +159,11 @@ set(src
         src/ObjexxFCL/ProxySentinel.hh
   src/ObjexxFCL/random.cc
   src/ObjexxFCL/random.hh
-  src/ObjexxFCL/Read.cc
-  src/ObjexxFCL/Read.fwd.hh
-  src/ObjexxFCL/Read.hh
-  src/ObjexxFCL/Reference.fwd.hh
+        src/ObjexxFCL/Reference.fwd.hh
   src/ObjexxFCL/Reference.hh
   src/ObjexxFCL/Required.fwd.hh
   src/ObjexxFCL/Required.hh
-  src/ObjexxFCL/Rewind.cc
-  src/ObjexxFCL/Rewind.hh
-  src/ObjexxFCL/rvalue_cast.hh
+        src/ObjexxFCL/rvalue_cast.hh
   src/ObjexxFCL/sbyte.fwd.hh
   src/ObjexxFCL/sbyte.hh
   src/ObjexxFCL/SetWrapper.fwd.hh
@@ -227,8 +211,7 @@ set( test_src
   tst/unit/Array6S.unit.cc
   tst/unit/ArrayInitializer.unit.cc
   tst/unit/ArrayS.unit.cc
-  tst/unit/Backspace.unit.cc
-  tst/unit/bit.unit.cc
+        tst/unit/bit.unit.cc
   tst/unit/byte.unit.cc
   tst/unit/CArray.unit.cc
   tst/unit/CArrayA.unit.cc
@@ -258,8 +241,7 @@ set( test_src
   tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc
         tst/unit/random.unit.cc
-  tst/unit/Read.unit.cc
-  tst/unit/Reference.Optional.unit.cc
+        tst/unit/Reference.Optional.unit.cc
   tst/unit/Reference.unit.cc
   tst/unit/Required.unit.cc
   tst/unit/Sticky.unit.cc
