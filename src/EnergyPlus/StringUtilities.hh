@@ -48,27 +48,56 @@
 #ifndef StringUtilities_hh_INCLUDED
 #define StringUtilities_hh_INCLUDED
 
-#include <sstream>
 #include <ObjexxFCL/src/ObjexxFCL/Array1S.hh>
+#include <sstream>
 
-namespace EnergyPlus
+namespace EnergyPlus {
+inline std::stringstream stringReader(std::string str)
 {
-  inline std::stringstream stringReader(std::string str) {
-      std::stringstream result{std::move(str)};
-      result.imbue(std::locale("C"));
-      return result;
-  }
+    std::stringstream result{std::move(str)};
+    result.imbue(std::locale("C"));
+    return result;
 }
 
-namespace ObjexxFCL{
+
+template<typename Param> bool readListItem(std::istream &stream, Param &&param)
+{
+    if (stream.good()) {
+        stream >> param;
+        if (stream.good() && stream.peek() == ',') {
+            stream.get(); // eat comma
+        }
+    }
+
+    return !stream.fail();
+}
+
+template <typename Param> bool readItem(std::string input, Param &&param)
+{
+    auto stream = stringReader(std::move(input));
+    stream >> param;
+    return !stream.fail();
+}
+
+template <typename... Param> bool readList(std::string input, Param &&... param)
+{
+    // to do make this a C++17 fold expression when possible
+
+    auto reader = stringReader(std::move(input));
+    std::initializer_list<bool>{readListItem(reader, std::forward<Param>(param))...};
+    return !reader.fail();
+}
+
+} // namespace EnergyPlus
+
+namespace ObjexxFCL {
 // since this is a slice (reference) we want to bind to temporaries
 // so we're going to allow that where the one provided by Array1S.hh does not
-template<typename T>
-std::istream &operator>>(std::istream &stream, Array1S<T> &&a)
+template <typename T> std::istream &operator>>(std::istream &stream, Array1S<T> &&a)
 {
     // just pass on to the `&` version of this operator>>
     return stream >> a;
 }
-}
+} // namespace ObjexxFCL
 
 #endif

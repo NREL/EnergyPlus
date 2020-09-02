@@ -2719,7 +2719,7 @@ namespace WeatherManager {
                     for (int i = 2; i <= NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(ioFiles.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            stringReader(WeatherDataLine.data) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            readList(WeatherDataLine.data, WYear, WMonth, WDay, WHour, WMinute);
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -2733,7 +2733,7 @@ namespace WeatherManager {
                     for (int i = 1; i <= 23 * NumIntervalsPerHour; ++i) {
                         WeatherDataLine.update(ioFiles.inputWeatherFile.readLine());
                         if (!WeatherDataLine.good) {
-                            stringReader(WeatherDataLine.data) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+                            readList(WeatherDataLine.data, WYear, WMonth, WDay, WHour, WMinute);
                             ShowFatalError(format("Error occurred on EPW while searching for first day, stopped at {}/{}/{} {}:{} IO Error='{}'",
                                                   WYear,
                                                   WMonth,
@@ -3477,10 +3477,9 @@ namespace WeatherManager {
             Real64 RDay;
             Real64 RHour;
             Real64 RMinute;
-            auto reader = stringReader(Line);
-            char comma{};
-            reader >> RYear >> comma >> RMonth >> comma >> RDay >> comma >> RHour >> comma >> RMinute;
-            if (reader.bad()) {
+
+            const bool succeeded = readList(Line, RYear, RMonth, RDay, RHour, RMinute);
+            if (!succeeded) {
                 ShowSevereError("Invalid Date info in Weather Line");
                 ShowContinueError("Entire Data Line=" + SaveLine);
                 ShowFatalError("Error in Reading Weather Data");
@@ -3537,11 +3536,30 @@ namespace WeatherManager {
         // Now read more numerics with List Directed I/O (note there is another "character" field lurking)
         Real64 RField21;
         {
-            auto reader = stringReader(Line);
-            reader >> DryBulb >> DewPoint >> RelHum >> AtmPress >> ETHoriz >> ETDirect >> IRHoriz >> GLBHoriz >>
-                DirectRad >> DiffuseRad >> GLBHorizIllum >> DirectNrmIllum >> DiffuseHorizIllum >> ZenLum >> WindDir >> WindSpeed >> TotalSkyCover >>
-                OpaqueSkyCover >> Visibility >> CeilHeight >> RField21;
-            if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            const bool succeeded = readList(Line,
+                                            DryBulb,
+                                            DewPoint,
+                                            RelHum,
+                                            AtmPress,
+                                            ETHoriz,
+                                            ETDirect,
+                                            IRHoriz,
+                                            GLBHoriz,
+                                            DirectRad,
+                                            DiffuseRad,
+                                            GLBHorizIllum,
+                                            DirectNrmIllum,
+                                            DiffuseHorizIllum,
+                                            ZenLum,
+                                            WindDir,
+                                            WindSpeed,
+                                            TotalSkyCover,
+                                            OpaqueSkyCover,
+                                            Visibility,
+                                            CeilHeight,
+                                            RField21);
+
+            if (!succeeded) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
         }
         for (int i = 1; i <= 21; ++i) {
             Pos = index(Line, ',');
@@ -3558,10 +3576,8 @@ namespace WeatherManager {
         Pos = index(Line, ',');
         if (Pos != std::string::npos) {
             if (Pos != 0) {
-                {
-                    auto reader = stringReader(Line.substr(0, Pos));
-                    reader >> PrecipWater;
-                    if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                if (!readItem(Line.substr(0, Pos), PrecipWater)) {
+                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
             } else {
                 PrecipWater = 999.0;
@@ -3570,10 +3586,8 @@ namespace WeatherManager {
             Pos = index(Line, ',');
             if (Pos != std::string::npos) {
                 if (Pos != 0) {
-                    {
-                        auto reader = stringReader(Line.substr(0, Pos));
-                        reader >> AerosolOptDepth;
-                        if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    if (!readItem(Line.substr(0, Pos), AerosolOptDepth)) {
+                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                 } else {
                     AerosolOptDepth = 999.0;
@@ -3582,10 +3596,8 @@ namespace WeatherManager {
                 Pos = index(Line, ',');
                 if (Pos != std::string::npos) {
                     if (Pos != 0) {
-                        {
-                            auto reader = stringReader(Line.substr(0, Pos));
-                            reader >> SnowDepth;
-                            if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        if (!readItem(Line.substr(0, Pos), SnowDepth)) {
+                            ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                     } else {
                         SnowDepth = 999.0;
@@ -3594,10 +3606,8 @@ namespace WeatherManager {
                     Pos = index(Line, ',');
                     if (Pos != std::string::npos) {
                         if (Pos != 0) {
-                            {
-                                auto reader = stringReader(Line.substr(0, Pos));
-                                reader >> DaysSinceLastSnow;
-                                if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                            if (!readItem(Line.substr(0, Pos), DaysSinceLastSnow)) {
+                                ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                             }
                         } else {
                             DaysSinceLastSnow = 999.0;
@@ -3606,10 +3616,8 @@ namespace WeatherManager {
                         Pos = index(Line, ',');
                         if (Pos != std::string::npos) {
                             if (Pos != 0) {
-                                {
-                                    auto reader = stringReader(Line.substr(0, Pos));
-                                    reader >> Albedo;
-                                    if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                if (!readItem(Line.substr(0, Pos), Albedo)) {
+                                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                 }
                             } else {
                                 Albedo = 999.0;
@@ -3618,10 +3626,8 @@ namespace WeatherManager {
                             Pos = index(Line, ',');
                             if (Pos != std::string::npos) {
                                 if (Pos != 0) {
-                                    {
-                                        auto reader = stringReader(Line.substr(0, Pos));
-                                        reader >> LiquidPrecip;
-                                        if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                                    if (!readItem(Line.substr(0, Pos), LiquidPrecip)) {
+                                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                                     }
                                 } else {
                                     LiquidPrecip = 999.0;
@@ -3636,29 +3642,23 @@ namespace WeatherManager {
                             LiquidPrecip = 999.0;
                         }
                     } else {
-                        {
-                            auto reader = stringReader(Line);
-                            reader >> DaysSinceLastSnow;
-                            if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                        if (!readItem(Line, DaysSinceLastSnow)) {
+                            ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                         }
                         Albedo = 999.0;
                         LiquidPrecip = 999.0;
                     }
                 } else {
-                    {
-                        auto reader = stringReader(Line);
-                        reader >> SnowDepth;
-                        if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                    if (!readItem(Line, SnowDepth)) {
+                        ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                     }
                     DaysSinceLastSnow = 999.0;
                     Albedo = 999.0;
                     LiquidPrecip = 999.0;
                 }
             } else {
-                {
-                    auto reader = stringReader(Line);
-                    reader >> AerosolOptDepth;
-                    if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+                if (!readItem(Line, AerosolOptDepth)) {
+                    ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
                 }
                 SnowDepth = 999.0;
                 DaysSinceLastSnow = 999.0;
@@ -3666,10 +3666,8 @@ namespace WeatherManager {
                 LiquidPrecip = 999.0;
             }
         } else {
-            {
-                auto reader = stringReader(Line);
-                reader >> PrecipWater;
-                if (reader.bad()) ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
+            if (!readItem(Line, PrecipWater)) {
+                ErrorInterpretWeatherDataLine(WYear, WMonth, WDay, WHour, WMinute, SaveLine, Line);
             }
             AerosolOptDepth = 999.0;
             SnowDepth = 999.0;

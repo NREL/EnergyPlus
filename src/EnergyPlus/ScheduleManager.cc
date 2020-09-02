@@ -3445,7 +3445,7 @@ namespace ScheduleManager {
         } else if (Pos == 0) {
             RetHH = 0;
         } else {
-            const bool readFailed = (stringReader(String.substr(0, Pos)) >> rRetHH).bad();
+            const bool readFailed = !readItem(String.substr(0, Pos), rRetHH);
             RetHH = int(rRetHH);
             if (double(RetHH) != rRetHH || readFailed || rRetHH < 0.0) {
                 if (double(RetHH) != rRetHH && rRetHH >= 0.0) {
@@ -3464,7 +3464,7 @@ namespace ScheduleManager {
         }
 
         String.erase(0, Pos + 1);
-        const bool readFailed = (stringReader(String) >> rRetMM).bad();
+        const bool readFailed = !readItem(String, rRetMM);
         RetMM = int(rRetMM);
         if (double(RetMM) != rRetMM || readFailed || rRetMM < 0.0) {
             if (double(RetMM) != rRetMM && rRetMM >= 0.0) {

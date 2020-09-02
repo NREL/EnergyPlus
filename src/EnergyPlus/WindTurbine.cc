@@ -666,7 +666,7 @@ namespace WindTurbine {
                             if (lnPtr != 1) {
                                 if ((lnPtr == std::string::npos) || (!stripped(lineIn.data.substr(0, lnPtr)).empty())) {
                                     if (lnPtr != std::string::npos) {
-                                        stringReader(lineIn.data.substr(0, lnPtr)) >> MonthWS(mon);
+                                        readItem(lineIn.data.substr(0, lnPtr), MonthWS(mon));
                                         lineIn.data.erase(0, lnPtr + 1);
                                     }
                                 } else { // blank field

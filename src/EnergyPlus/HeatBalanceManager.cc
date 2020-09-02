@@ -6306,7 +6306,7 @@ namespace HeatBalanceManager {
         }
 
         // Get window name and check for match
-        stringReader(DataLine(4).substr(19)) >> W5Name;
+        readItem(DataLine(4).substr(19), W5Name);
         WindowNameInW5DataFile = UtilityRoutines::MakeUPPERCase(W5Name);
         if (DesiredConstructionName != WindowNameInW5DataFile) {
             // Doesn't match; read through file until next window entry is found
@@ -6327,7 +6327,7 @@ namespace HeatBalanceManager {
             NextLine = W5DataFile.readLine();
             if (NextLine.eof) goto Label1000;
             ++FileLineCount;
-            stringReader(NextLine.data.substr(19)) >> NGlSys;
+            readItem(NextLine.data.substr(19), NGlSys);
             if (NGlSys <= 0 || NGlSys > 2) {
                 ShowFatalError("Construction=" + DesiredConstructionName + " from the Window5 data file cannot be used: it has " +
                                TrimSigDigits(NGlSys) + " glazing systems; only 1 or 2 are allowed.");
@@ -6340,10 +6340,15 @@ namespace HeatBalanceManager {
                 if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
 
-                auto reader = stringReader(NextLine.data.substr(19));
-                reader >> WinHeight(IGlSys) >> WinWidth(IGlSys) >> NGlass(IGlSys) >> UValCenter(IGlSys) >> SCCenter(IGlSys) >> SHGCCenter(IGlSys) >>
-                    TVisCenter(IGlSys);
-                if (reader.bad()) {
+                const auto succeeded = readList(NextLine.data.substr(19),
+                                                WinHeight(IGlSys),
+                                                WinWidth(IGlSys),
+                                                NGlass(IGlSys),
+                                                UValCenter(IGlSys),
+                                                SCCenter(IGlSys),
+                                                SHGCCenter(IGlSys),
+                                                TVisCenter(IGlSys));
+                if (!succeeded) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of glazing system values. For glazing system=" +
                                     TrimSigDigits(IGlSys));
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
@@ -6391,14 +6396,14 @@ namespace HeatBalanceManager {
             MullionWidth = 0.0;
             MullionOrientation = "Vertical";
             if (NGlSys == 2) {
-                if ((stringReader(DataLine(10).substr(19)) >> MullionWidth).bad()) {
+                if (!readItem(DataLine(10).substr(19), MullionWidth)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Width.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 10) +
                                       ") in error (first 100 characters)=" + DataLine(10).substr(0, 100));
                     ErrorsFound = true;
                 }
                 MullionWidth *= 0.001;
-                if ((stringReader(DataLine(10).substr(88)) >> MullionOrientation).bad()) {
+                if (!readItem(DataLine(10).substr(88), MullionOrientation)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Mullion Orientation.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 10) +
                                       ") in error (first 100 characters)=" + DataLine(10).substr(0, 100));
@@ -6416,10 +6421,16 @@ namespace HeatBalanceManager {
             FrameSolAbsorp = 0.0;
             FrameVisAbsorp = 0.0;
             FrameEmis = 0.0;
-            auto reader = stringReader(DataLine(11).substr(19));
-            reader >> FrameWidth >> FrameProjectionOut >> FrameProjectionIn >> FrameConductance >> FrEdgeToCenterGlCondRatio >> FrameSolAbsorp >>
-                FrameVisAbsorp >> FrameEmis;
-            if (reader.bad()) {
+            const bool succeeded = readList(DataLine(11).substr(19),
+                                            FrameWidth,
+                                            FrameProjectionOut,
+                                            FrameProjectionIn,
+                                            FrameConductance,
+                                            FrEdgeToCenterGlCondRatio,
+                                            FrameSolAbsorp,
+                                            FrameVisAbsorp,
+                                            FrameEmis);
+            if (!succeeded) {
                 ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of frame data values.");
                 ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + DataLine(11).substr(0, 100));
                 ErrorsFound = true;
@@ -6461,11 +6472,20 @@ namespace HeatBalanceManager {
                 NextLine = W5DataFile.readLine();
                 if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
-                auto dividerReader = stringReader(NextLine.data.substr(19));
-                dividerReader >> DividerWidth(IGlSys) >> DividerProjectionOut(IGlSys) >>
-                        DividerProjectionIn(IGlSys) >> DividerConductance(IGlSys) >> DivEdgeToCenterGlCondRatio(IGlSys) >> DividerSolAbsorp(IGlSys) >>
-                        DividerVisAbsorp(IGlSys) >> DividerEmis(IGlSys) >> DividerType(IGlSys) >> HorDividers(IGlSys) >> VertDividers(IGlSys);
-                if (dividerReader.bad()) {
+
+                const bool dividerReadSucceeded = readList(NextLine.data.substr(19),
+                                                           DividerWidth(IGlSys),
+                                                           DividerProjectionOut(IGlSys),
+                                                           DividerProjectionIn(IGlSys),
+                                                           DividerConductance(IGlSys),
+                                                           DivEdgeToCenterGlCondRatio(IGlSys),
+                                                           DividerSolAbsorp(IGlSys),
+                                                           DividerVisAbsorp(IGlSys),
+                                                           DividerEmis(IGlSys),
+                                                           DividerType(IGlSys),
+                                                           HorDividers(IGlSys),
+                                                           VertDividers(IGlSys));
+                if (!dividerReadSucceeded) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of divider data values. For Glazing System=" +
                                     TrimSigDigits(IGlSys));
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 11) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
@@ -6615,12 +6635,20 @@ namespace HeatBalanceManager {
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
 
-                    stringReader(NextLine.data.substr(25)) >> dataMaterial.Material(MaterNum).Thickness >>
-                        dataMaterial.Material(MaterNum).Conductivity >> dataMaterial.Material(MaterNum).Trans >>
-                        dataMaterial.Material(MaterNum).ReflectSolBeamFront >> dataMaterial.Material(MaterNum).ReflectSolBeamBack >>
-                        dataMaterial.Material(MaterNum).TransVis >> dataMaterial.Material(MaterNum).ReflectVisBeamFront >>
-                        dataMaterial.Material(MaterNum).ReflectVisBeamBack >> dataMaterial.Material(MaterNum).TransThermal >>
-                        dataMaterial.Material(MaterNum).AbsorpThermalFront >> dataMaterial.Material(MaterNum).AbsorpThermalBack >> LayerName;
+                    readList(NextLine.data.substr(25),
+                             dataMaterial.Material(MaterNum).Thickness,
+                             dataMaterial.Material(MaterNum).Conductivity,
+                             dataMaterial.Material(MaterNum).Trans,
+                             dataMaterial.Material(MaterNum).ReflectSolBeamFront,
+                             dataMaterial.Material(MaterNum).ReflectSolBeamBack,
+                             dataMaterial.Material(MaterNum).TransVis,
+                             dataMaterial.Material(MaterNum).ReflectVisBeamFront,
+                             dataMaterial.Material(MaterNum).ReflectVisBeamBack,
+                             dataMaterial.Material(MaterNum).TransThermal,
+                             dataMaterial.Material(MaterNum).AbsorpThermalFront,
+                             dataMaterial.Material(MaterNum).AbsorpThermalBack,
+                             LayerName);
+
                     dataMaterial.Material(MaterNum).Thickness *= 0.001;
                     if (dataMaterial.Material(MaterNum).Thickness <= 0.0) {
                     }
@@ -6651,7 +6679,7 @@ namespace HeatBalanceManager {
                     MaterNumSysGap(IGap, IGlSys) = MaterNum;
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    stringReader(NextLine.data.substr(23)) >> dataMaterial.Material(MaterNum).Thickness >> NumGases(IGap, IGlSys);
+                    readList(NextLine.data.substr(23), dataMaterial.Material(MaterNum).Thickness, NumGases(IGap, IGlSys));
                     if (NGlSys == 1) {
                         dataMaterial.Material(MaterNum).Name = "W5:" + DesiredConstructionName + ":GAP" + NumName(IGap);
                     } else {
@@ -6674,9 +6702,13 @@ namespace HeatBalanceManager {
                     for (IGas = 1; IGas <= NumGases(IGap, IGlSys); ++IGas) {
                         NextLine = W5DataFile.readLine();
                         ++FileLineCount;
-                        stringReader(NextLine.data.substr(19)) >> GasName(IGas) >> dataMaterial.Material(MaterNum).GasFract(IGas) >>
-                            dataMaterial.Material(MaterNum).GasWght(IGas) >> dataMaterial.Material(MaterNum).GasCon(_, IGas) >> dataMaterial.Material(MaterNum).GasVis(_, IGas) >>
-                            dataMaterial.Material(MaterNum).GasCp(_, IGas);
+                        readList(NextLine.data.substr(19),
+                                 GasName(IGas),
+                                 dataMaterial.Material(MaterNum).GasFract(IGas),
+                                 dataMaterial.Material(MaterNum).GasWght(IGas),
+                                 dataMaterial.Material(MaterNum).GasCon(_, IGas),
+                                 dataMaterial.Material(MaterNum).GasVis(_, IGas),
+                                 dataMaterial.Material(MaterNum).GasCp(_, IGas));
                         // Nominal resistance of gap at room temperature (based on first gas in mixture)
                         NominalR(MaterNum) =
                             dataMaterial.Material(MaterNum).Thickness /
@@ -6801,7 +6833,7 @@ namespace HeatBalanceManager {
                 NextLine = W5DataFile.readLine();
                 if (NextLine.eof) goto Label1000;
                 ++FileLineCount;
-                if ((stringReader(NextLine.data.substr(5)) >> Tsol).bad()) {
+                if (!readItem(NextLine.data.substr(5), Tsol)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of TSol values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
                     ErrorsFound = true;
@@ -6813,7 +6845,7 @@ namespace HeatBalanceManager {
                 for (IGlass = 1; IGlass <= NGlass(IGlSys); ++IGlass) {
                     NextLine = W5DataFile.readLine();
                     ++FileLineCount;
-                    if ((stringReader(NextLine.data.substr(5)) >> AbsSol(_, IGlass)).bad()) {
+                    if (!readItem(NextLine.data.substr(5), AbsSol(_, IGlass))) {
                         ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of AbsSol values. For Glass=" +
                                         TrimSigDigits(IGlass));
                         ShowContinueError("Line (~" + TrimSigDigits(FileLineCount) + ") in error (first 100 characters)=" + NextLine.data.substr(0, 100));
@@ -6830,7 +6862,7 @@ namespace HeatBalanceManager {
                     DataLine(ILine) = NextLine.data;
                 }
 
-                if ((stringReader(DataLine(1).substr(5)) >> Rfsol).bad()) {
+                if (!readItem(DataLine(1).substr(5), Rfsol)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of RfSol values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 1) +
                                       ") in error (first 100 characters)=" + DataLine(1).substr(0, 100));
@@ -6842,7 +6874,7 @@ namespace HeatBalanceManager {
                     ErrorsFound = true;
                 }
 
-                if ((stringReader(DataLine(2).substr(5)) >> Rbsol).bad()) {
+                if (!readItem(DataLine(2).substr(5), Rbsol)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of RbSol values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 2) +
                                       ") in error (first 100 characters)=" + DataLine(2).substr(0, 100));
@@ -6853,7 +6885,7 @@ namespace HeatBalanceManager {
                                       ") in error (first 100 characters)=" + DataLine(2).substr(0, 100));
                     ErrorsFound = true;
                 }
-                if ((stringReader(DataLine(3).substr(5)) >> Tvis).bad()) {
+                if (!readItem(DataLine(3).substr(5), Tvis)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Tvis values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 3) +
                                       ") in error (first 100 characters)=" + DataLine(3).substr(0, 100));
@@ -6864,7 +6896,7 @@ namespace HeatBalanceManager {
                                       ") in error (first 100 characters)=" + DataLine(3).substr(0, 100));
                     ErrorsFound = true;
                 }
-                if ((stringReader(DataLine(4).substr(5)) >> Rfvis).bad()) {
+                if (!readItem(DataLine(4).substr(5), Rfvis)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Rfvis values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 4) +
                                       ") in error (first 100 characters)=" + DataLine(4).substr(0, 100));
@@ -6875,7 +6907,7 @@ namespace HeatBalanceManager {
                                       ") in error (first 100 characters)=" + DataLine(4).substr(0, 100));
                     ErrorsFound = true;
                 }
-                if ((stringReader(DataLine(5).substr(5)) >> Rbvis).bad()) {
+                if (!readItem(DataLine(5).substr(5), Rbvis)) {
                     ShowSevereError("HeatBalanceManager: SearchWindow5DataFile: Error in Read of Rbvis values.");
                     ShowContinueError("Line (~" + TrimSigDigits(FileLineCount + 5) +
                                       ") in error (first 100 characters)=" + DataLine(5).substr(0, 100));

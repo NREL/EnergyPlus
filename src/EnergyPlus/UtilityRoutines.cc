@@ -146,7 +146,7 @@ namespace UtilityRoutines {
         if (StringLen == 0) return rProcessNumber;
         bool parseFailed = false;
         if (PString.find_first_not_of(ValidNumerics) == std::string::npos) {
-            parseFailed = (stringReader(PString) >> rProcessNumber).bad();
+            parseFailed = !readItem(PString, rProcessNumber);
             ErrorFlag = false;
         } else {
             rProcessNumber = 0.0;
