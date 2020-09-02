@@ -45,100 +45,59 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef BaseboardElectric_hh_INCLUDED
-#define BaseboardElectric_hh_INCLUDED
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
-// EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include <memory>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct BaseboardElectricData;
+    EnergyPlusData::EnergyPlusData() {
+        // todo, try to eliminate the need for the singleton
+        IOFiles::setSingleton(&files);
+        this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
+        this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
+        this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
+    }
 
-namespace BaseboardElectric {
+    void EnergyPlusData::clear_state() {
+        dataAirLoopHVACDOAS->clear_state();
+        dataBaseboardElectric->clear_state();
+        dataBaseboardRadiator->clear_state();
+        dataBoilers.clear_state();
+        dataBranchInputManager.clear_state();
+        dataSteamBoilers.clear_state();
+        dataChilledCeilingPanelSimple.clear_state();
+        dataChillerAbsorbers.clear_state();
+        dataChillerElectricEIR.clear_state();
+        dataChillerExhaustAbsorption.clear_state();
+        dataChillerGasAbsorption.clear_state();
+        dataChillerIndirectAbsorption.clear_state();
+        dataChillerReformulatedEIR.clear_state();
+        dataConvectionCoefficients.clear_state();
+        dataCondenserLoopTowers.clear_state();
+        dataCostEstimateManager.clear_state();
+        dataCoolTower.clear_state();
+        dataCTElectricGenerator.clear_state();
+        dataCrossVentMgr.clear_state();
+        dataGlobals.clear_state();
+        exteriorEnergyUse.clear_state();
+        fans.clear_state();
+        //outputReportTabular.clear_state();
+        pipes.clear_state();
+        dataPlantChillers.clear_state();
+        dataWaterUse.clear_state();
+        dataWindowAC.clear_state();
+        dataWindowComplexManager.clear_state();
+        dataWindowEquivalentLayer.clear_state();
+        dataWindowManager.clear_state();
+        dataWindTurbine.clear_state();
+        dataZoneAirLoopEquipmentManager.clear_state();
+        dataZoneContaminantPredictorCorrector.clear_state();
+        dataZoneDehumidifier.clear_state();
+        dataZoneEquipmentManager.clear_state();
+        dataZonePlenum.clear_state();
+        dataZoneTempPredictorCorrector.clear_state();
+    }
 
-    struct BaseboardParams
-    {
-        // Members
-        std::string EquipName;
-        std::string EquipType;
-        std::string Schedule;
-        int SchedPtr;
-        Real64 NominalCapacity;
-        Real64 BaseboardEfficiency;
-        Real64 AirInletTemp;
-        Real64 AirInletHumRat;
-        Real64 AirOutletTemp;
-        Real64 Power;
-        Real64 Energy;
-        Real64 ElecUseLoad;
-        Real64 ElecUseRate;
-        int ZonePtr;                  // point to the zone where the basebaord is located
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        bool MySizeFlag;
-        bool CheckEquipName;
-
-        // Default Constructor
-        BaseboardParams()
-            : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
-              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
-              CheckEquipName(true)
-        {
-        }
-    };
-
-    struct BaseboardNumericFieldData
-    {
-        // Members
-        Array1D_string FieldNames;
-
-        // Default Constructor
-        BaseboardNumericFieldData() = default;
-    };
-
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
-
-    void GetBaseboardInput(EnergyPlusData &state);
-
-    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNum);
-
-    void SizeElectricBaseboard(EnergyPlusData &state, int BaseboardNum);
-
-    void SimElectricConvective(EnergyPlusData &state, int BaseboardNum, Real64 LoadMet);
-
-} // namespace BaseboardElectric
-
-    struct BaseboardElectricData : BaseGlobalStruct {
-        int NumBaseboards;
-        bool getInputFlag;
-        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
-        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
-        bool MyOneTimeFlag = true;
-        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
-
-        void clear_state() override
-        {
-            NumBaseboards = 0;
-            getInputFlag = true;
-            Baseboard.deallocate();
-            BaseboardNumericFields.deallocate();
-            MyOneTimeFlag = true;
-            ZoneEquipmentListChecked = false;
-        }
-        // Default Constructor
-        BaseboardElectricData()
-            : NumBaseboards(0), getInputFlag(true) {}
-    };
-
-} // namespace EnergyPlus
-
-#endif
+}
