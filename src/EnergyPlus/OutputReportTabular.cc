@@ -6528,6 +6528,10 @@ namespace OutputReportTabular {
         // sensible heat gain report totals
         static Real64 totalHvacHt(0.0);
         static Real64 totalHvacCl(0.0);
+
+        static Real64 totalZoneEqHt(0.0);
+        static Real64 totalZoneEqCl(0.0);
+
         static Real64 totalHvacATUHt(0.0);
         static Real64 totalHvacATUCl(0.0);
         static Real64 totalSurfHt(0.0);
@@ -6782,6 +6786,10 @@ namespace OutputReportTabular {
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             totalHvacHt += ZonePreDefRep(iZone).SHGSAnHvacHt;
             totalHvacCl += ZonePreDefRep(iZone).SHGSAnHvacCl;
+
+            totalZoneEqHt += ZonePreDefRep(iZone).SHGSAnZoneEqHt;
+            totalZoneEqCl += ZonePreDefRep(iZone).SHGSAnZoneEqCl;
+
             totalHvacATUHt += ZonePreDefRep(iZone).SHGSAnHvacATUHt;
             totalHvacATUCl += ZonePreDefRep(iZone).SHGSAnHvacATUCl;
             totalSurfHt += ZonePreDefRep(iZone).SHGSAnSurfHt;
@@ -6801,8 +6809,12 @@ namespace OutputReportTabular {
         }
         // PreDefTableEntry( pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
         // PreDefTableEntry( pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
-        PreDefTableEntry(pdchSHGSAnHvacHt, "Total Facility", (totalHvacHt - totalHvacATUHt) * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnHvacCl, "Total Facility", (totalHvacCl - totalHvacATUCl) * convertJtoGJ, 3);
+        // PreDefTableEntry(pdchSHGSAnHvacHt, "Total Facility", (totalHvacHt - totalHvacATUHt) * convertJtoGJ, 3);
+        // PreDefTableEntry(pdchSHGSAnHvacCl, "Total Facility", (totalHvacCl - totalHvacATUCl) * convertJtoGJ, 3);
+
+        PreDefTableEntry(pdchSHGSAnHvacHt, "Total Facility", totalZoneEqHt * convertJtoGJ, 3);
+        PreDefTableEntry(pdchSHGSAnHvacCl, "Total Facility", totalZoneEqCl * convertJtoGJ, 3);
+
         PreDefTableEntry(pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * convertJtoGJ, 3);
         PreDefTableEntry(pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * convertJtoGJ, 3);
         PreDefTableEntry(pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * convertJtoGJ, 3);
