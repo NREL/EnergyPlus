@@ -316,9 +316,9 @@ void CoilCoolingDX::oneTimeInit() {
                         this->name,
                         _,
                         "Electricity",
-                        "DHW",
+                        "Cooling",
                         _,
-                        "Plant");
+                        "System");
    // Ported from variable speed coil
     SetupOutputVariable("Cooling Coil Air Mass Flow Rate",
                         OutputProcessor::Unit::kg_s,
