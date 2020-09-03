@@ -1551,7 +1551,6 @@ namespace HeatRecovery {
                                 } else {
                                     // need call to EMS to check node
                                     CheckIfNodeSetPointManagedByEMS(ExchCond(ExchNum).SecOutletNode, iHumidityRatioMaxSetPoint, LocalWarningError);
-                                    // TODO: What should be do here?
                                     DataLoopNode::NodeSetpointCheck(ExchCond(ExchNum).SecOutletNode).needsSetpointChecking = false;
                                     if (LocalWarningError) {
                                         ShowWarningError("Missing optional HumRatMax setpoint for " + cHXTypes(ExchCond(ExchNum).ExchTypeNum) +
