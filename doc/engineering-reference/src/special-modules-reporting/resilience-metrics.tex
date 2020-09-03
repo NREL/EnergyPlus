@@ -10,7 +10,7 @@ The following metrics are added in EnergyPlus as optional report variables and s
 
 The heat index (HI) is an index that combines air temperature and relative humidity (Steadman 1979), in shaded areas, to posit a human-perceived equivalent temperature, as how hot it would feel if the humidity were some other value in the shade. The HI measures the temperature feels like to the human body when relative humidity is combined with the air temperature. HI is widely used in the United States. The Occupational Safety and Health Administration (OSHA) uses HI as an indicator to assess heat stress [2]. This has important considerations for the human body's comfort.  When the body gets too hot, it begins to perspire or sweat to cool itself off.  If the perspiration is not able to evaporate, the body cannot regulate its temperature. When the atmospheric moisture content (i.e. relative humidity) is high, the rate of evaporation from the body decreases.  In other words, the human body feels warmer in humid conditions.  The opposite is true when the relative humidity decreases because the rate of perspiration increases.  
 
-Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA) is used to look up the heat index by temperature ($°C$) and relative humidity (\%) [3]. The HI effects on human health are categorized at five levels: Safe, Caution, Extreme caution, Danger and Extreme danger, defined in Table ~\ref{table:heat-index-chart} and color coded in Figure ~\ref{fig:heat-index-lookup-table}.
+Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA) is used to look up the heat index by temperature (\si{\celsius}) and relative humidity (\%) [3]. The HI effects on human health are categorized at five levels: Safe, Caution, Extreme caution, Danger and Extreme danger, defined in Table ~\ref{table:heat-index-chart} and color coded in Figure ~\ref{fig:heat-index-lookup-table}.
 
 \begin{figure}[hbtp] 
 \centering
@@ -24,11 +24,11 @@ Table 1 developed by U.S. National Oceanic and Atmospheric Administration (NOAA)
 \begin{tabular}{ |p{1in}|p{1in}|p{2in}|  }
 \hline
     \textbf{Heat Index in Celsius} & \textbf{Heat Index in Fahrenheit} & \textbf{Heat Index Level} \\ \hline 
-    Less than 26.7 °C & Less than 80 °F & Safe: no risk of heat hazard \\ \hline
-    26.7 °C - 32.2 °C & 80–90 °F & Caution: fatigue is possible with prolonged exposure and activity. Continuing activity could result in heat cramps. \\ \hline
-    32.2 °C - 39.4 °C & 90–103 °F & Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke. \\ \hline
-    39.4 °C - 51.7 °C & 103–125 °F & Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity. \\ \hline
-    over 51.7 °C & over 125 °F & Extreme danger: heat stroke is imminent. \\ \hline
+    Less than \SI{26.7}{\celsius} & Less than 80 °F & Safe: no risk of heat hazard \\ \hline
+    \SI{26.7}{\celsius} - \SI{32.2}{\celsius} & 80–90 °F & Caution: fatigue is possible with prolonged exposure and activity. Continuing activity could result in heat cramps. \\ \hline
+    \SI{32.2}{\celsius} - \SI{39.4}{\celsius}& 90–103 °F & Extreme caution: heat cramps and heat exhaustion are possible. Continuing activity could result in heat stroke. \\ \hline
+    \SI{39.4}{\celsius} - \SI{51.7}{\celsius} & 103–125 °F & Danger: heat cramps and heat exhaustion are likely; heat stroke is probable with continued activity. \\ \hline
+    over \SI{51.7}{\celsius} & over 125 °F & Extreme danger: heat stroke is imminent. \\ \hline
 \end{tabular}
 \end{table}
 
@@ -123,9 +123,9 @@ Where,
 
 $H$ = the Humidex,
 
-$T_{air}$ = the air temperature in $°C$,
+$T_{air}$ = the air temperature in \si{\celsius},
 
-$T_{dew}$ = the dew-point temperature in $°C$,
+$T_{dew}$ = the dew-point temperature in \si{\celsius},
 
 $exp$ = 2.71828.
 
@@ -139,9 +139,9 @@ LEED Pilot Credit IPpc100 - Passive Survivability and Back-up Power During Disru
 LEED Passive Survivability defines the Thermal Safety Temperatures for Path 2 using the SET:
 
 \begin{itemize}
-\item Cooling: Not to exceed 9 °F SET-days (216 °F SET-hours) above 86 °F for residential buildings. (SI Metric: Not to exceed 5°C SET-days (120 °C SET-hours) above 30 °C SET for residential buildings.)
-\item Cooling: Not to exceed 18 °F SET-days (432 °F SET-hours) above 86 °F SET for non-residential buildings. (SI etric: Not to exceed 10 °C SET-days (240 °C SET-hours) above 30 °C SET for non-residential buildings.)
-\item Heating: Not to exceed 9 °F SET-days (216 °F SET-hours for all buildings. (SI Metric: Not to exceed 5 °C SET-days (120 °C SET-hours) below 12 °C SET-hours for all buildings.)
+\item Cooling: Not to exceed 9 °F SET-days (216 °F SET-hours) above 86 °F for residential buildings. (SI Metric: Not to exceed \SI{5}{\celsius} SET-days (\SI{120}{\celsius} SET-hours) above \SI{30}{\celsius} SET for residential buildings.)
+\item Cooling: Not to exceed 18 °F SET-days (432 °F SET-hours) above 86 °F SET for non-residential buildings. (SI etric: Not to exceed \SI{10}{\celsius} SET-days (\SI{240}{\celsius} SET-hours) above \SI{30}{\celsius} SET for non-residential buildings.)
+\item Heating: Not to exceed 9 °F SET-days (216 °F SET-hours for all buildings. (SI Metric: Not to exceed \SI{5}{\celsius} SET-days (\SI{120}{\celsius} SET-hours) below \SI{12}{\celsius} SET-hours for all buildings.)
 \end{itemize}
 
 EnergyPlus calculates and reports SET as a time-step report variable when Pierce method is chosen as the People's thermal comfort model. The aggregated the SET-Hours and the SET-OccupantHours (at zone level) for both cooling and heating are reported under the Annual Thermal Resilience Summary. The tables also include the longest continuous unmet time duration in hours and the start time of their occurrences (first occurrence if multiple time slots have the same duration).
