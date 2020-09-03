@@ -654,9 +654,10 @@ namespace DataHeatBalance {
     Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
     // reflection from obstructions (W/m2)
     Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-    Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
-    Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
-    Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
+
+    Array1D_int SurfWinBSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
+    Array1D<Real64> SurfWinBSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
+    Array1D<Real64> SurfWinBSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
     Array1D<Real64> QRadSWwinAbsTot;   // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
     Array2D<Real64> QRadSWwinAbsLayer; // Exterior beam plus diffuse solar absorbed in glass layers of window (W)
@@ -1005,9 +1006,9 @@ namespace DataHeatBalance {
         QRadSWOutIncBmToDiffReflObs.deallocate();
         QRadSWOutIncSkyDiffReflObs.deallocate();
         CosIncidenceAngle.deallocate();
-        BSDFBeamDirectionRep.deallocate();
-        BSDFBeamThetaRep.deallocate();
-        BSDFBeamPhiRep.deallocate();
+        SurfWinBSDFBeamDirectionRep.deallocate();
+        SurfWinBSDFBeamThetaRep.deallocate();
+        SurfWinBSDFBeamPhiRep.deallocate();
         QRadSWwinAbsTot.deallocate();
         QRadSWwinAbsLayer.deallocate();
         FenLaySurfTempFront.deallocate();
@@ -1928,7 +1929,6 @@ namespace DataHeatBalance {
         using DataSurfaces::ModelAsDiffuse;
         using DataSurfaces::ModelAsDirectBeam;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceWindow;
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1985,7 +1985,7 @@ namespace DataHeatBalance {
                 ShowFatalError("Syntax error, optional arguments Theta and Phi must be present when optional ScreenNumber is used.");
             }
         } else {
-            ScNum = SurfaceWindow(SurfaceNum).ScreenNumber;
+            ScNum = DataSurfaces::SurfWinScreenNumber(SurfaceNum);
         }
 
         if (present(Theta)) {
@@ -2387,7 +2387,6 @@ namespace DataHeatBalance {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::TotSurfaces;
 
         // Locals
@@ -2415,16 +2414,16 @@ namespace DataHeatBalance {
             if (Surface(loopSurfNum).Class != SurfaceClass_Window) continue;
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
-            if (SurfaceWindow(loopSurfNum).ShadedConstruction == 0) continue;
+            if (DataSurfaces::SurfWinShadedConstruction(loopSurfNum) == 0) continue;
 
-            ConstrNum = SurfaceWindow(loopSurfNum).ShadedConstruction;
+            ConstrNum = DataSurfaces::SurfWinShadedConstruction(loopSurfNum);
             if (dataConstruction.Construct(ConstrNum).TypeIsWindow) {
                 NumLayers = dataConstruction.Construct(ConstrNum).TotLayers;
                 for (Layer = 1; Layer <= NumLayers; ++Layer) {
                     MaterNum = dataConstruction.Construct(ConstrNum).LayerPoint(Layer);
                     if (MaterNum == 0) continue;
                     if (dataMaterial.Material(MaterNum).Group == Shade || dataMaterial.Material(MaterNum).Group == WindowBlind)
-                        SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer = true;
+                        DataSurfaces::SurfWinHasShadeOrBlindLayer(loopSurfNum) = true;
                 }
             }
         }
