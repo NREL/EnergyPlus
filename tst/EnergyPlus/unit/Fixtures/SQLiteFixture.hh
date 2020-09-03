@@ -78,9 +78,9 @@ protected:
         ss = std::make_shared<std::ostringstream>();
         // Make sure CreateSQLiteDatabase() is not called anywhere during the test in EP code
         // By default, set the SQLite location to memory
-        // std::string sql_filepath(":memory:");
+        std::string sql_filepath(":memory:");
         // Alternatively, when debugging a test, change outpath to the location on disk so you can query the database manually after test ran
-        std::string sql_filepath("/home/julien/Downloads/ep.sql");
+        // std::string sql_filepath("/path/on/disk/to/eplusout.sql");
         ASSERT_NO_THROW(EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite(ss, sql_filepath, "std::ostringstream", true, true)));
         ASSERT_TRUE(EnergyPlus::sqlite->writeOutputToSQLite());
         ASSERT_TRUE(EnergyPlus::sqlite->writeTabularDataToSQLite());
