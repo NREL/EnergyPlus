@@ -2645,8 +2645,8 @@ namespace SolarShading {
             if (DOTP > 0.0009) {
                 ShowSevereError("Problem in interior solar distribution calculation (CHKBKS)");
                 ShowContinueError("   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface(NRS).ZoneName);
-                ShowContinueError("   because one or more of vertices, e.g. Vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
-                                  " is in front of receiving surface=" + Surface(NRS).Name);
+                ShowContinueError("   because one or more of vertices, such as Vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
+                                  ", is in front of receiving surface=" + Surface(NRS).Name);
                 ShowContinueError(format("   (Dot Product indicator={:20.4F})", DOTP));
                 ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details.");
                 if (!EnergyPlus::DataGlobals::DisplayExtraWarnings) break;
