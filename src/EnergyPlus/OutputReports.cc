@@ -683,10 +683,10 @@ void DXFOut(IOFiles &ioFiles,
             if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
 
@@ -992,10 +992,10 @@ void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
             if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1193,10 +1193,10 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
             if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
             if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
             if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfaceWindow(surf).OriginalClass == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1523,7 +1523,7 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                     if ((Surface(surf).Class == SurfaceClass_Window) || (Surface(surf).Class == SurfaceClass_TDD_Dome)) {
                         // SurfaceClass_Window also covers glass doors and TDD:Diffusers
                         cNominalU = "N/A";
-                        if (SurfaceWindow(surf).SolarDiffusing) {
+                        if (SurfWinSolarDiffusing(surf)) {
                             SolarDiffusing = "Yes";
                         } else {
                             SolarDiffusing = "No";
@@ -1666,8 +1666,8 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                         }
                         *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                    << "Frame," << Surface(surf).Name << "," << AlgoName << ",";
-                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfaceWindow(surf).FrameArea, 2) << ","
-                                   << RoundSigDigits(SurfaceWindow(surf).FrameArea / Surface(surf).Multiplier, 2) << ",*"
+                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfWinFrameArea(surf), 2) << ","
+                                   << RoundSigDigits(SurfWinFrameArea(surf) / Surface(surf).Multiplier, 2) << ",*"
                                    << ",N/A"
                                    << ",N/A," << RoundSigDigits(FrameDivider(fd).FrameWidth, 2) << ",N/A" << '\n';
                     }
@@ -1679,8 +1679,8 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                             *eiostream << "Frame/Divider Surface," << FrameDivider(fd).Name << ","
                                        << "Divider:Suspended," << Surface(surf).Name << ",,";
                         }
-                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfaceWindow(surf).DividerArea, 2) << ","
-                                   << RoundSigDigits(SurfaceWindow(surf).DividerArea / Surface(surf).Multiplier, 2) << ",*"
+                        *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfWinDividerArea(surf), 2) << ","
+                                   << RoundSigDigits(SurfWinDividerArea(surf) / Surface(surf).Multiplier, 2) << ",*"
                                    << ",N/A"
                                    << ",N/A," << RoundSigDigits(FrameDivider(fd).DividerWidth, 2) << ",N/A" << '\n';
                     }
