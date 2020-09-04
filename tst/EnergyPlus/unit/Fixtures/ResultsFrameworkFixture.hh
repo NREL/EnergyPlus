@@ -45,99 +45,46 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef BaseboardElectric_hh_INCLUDED
-#define BaseboardElectric_hh_INCLUDED
+#ifndef ResultsFrameworkFixture_hh_INCLUDED
+#define ResultsFrameworkFixture_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+// Google test headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/Data/BaseData.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/EnergyPlus.hh>
+#include "EnergyPlusFixture.hh"
+#include <EnergyPlus/ResultsFramework.hh>
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct BaseboardElectricData;
+class ResultsFrameworkFixture : public EnergyPlusFixture
+{
+protected:
+    using json = nlohmann::json;
 
-namespace BaseboardElectric {
-
-    struct BaseboardParams
+    static void SetUpTestCase()
     {
-        // Members
-        std::string EquipName;
-        std::string EquipType;
-        std::string Schedule;
-        int SchedPtr;
-        Real64 NominalCapacity;
-        Real64 BaseboardEfficiency;
-        Real64 AirInletTemp;
-        Real64 AirInletHumRat;
-        Real64 AirOutletTemp;
-        Real64 Power;
-        Real64 Energy;
-        Real64 ElecUseLoad;
-        Real64 ElecUseRate;
-        int ZonePtr;                  // point to the zone where the basebaord is located
-        int HeatingCapMethod;         // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea,
-                                      // FracOfAutosizedHeatingCapacity)
-        Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2}
-        bool MySizeFlag;
-        bool CheckEquipName;
-
-        // Default Constructor
-        BaseboardParams()
-            : SchedPtr(0), NominalCapacity(0.0), BaseboardEfficiency(0.0), AirInletTemp(0.0), AirInletHumRat(0.0), AirOutletTemp(0.0), Power(0.0),
-              Energy(0.0), ElecUseLoad(0.0), ElecUseRate(0.0), ZonePtr(0), HeatingCapMethod(0.0), ScaledHeatingCapacity(0.0), MySizeFlag(true),
-              CheckEquipName(true)
-        {
-        }
-    };
-
-    struct BaseboardNumericFieldData
+        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    }
+    static void TearDownTestCase()
     {
-        // Members
-        Array1D_string FieldNames;
+    }
 
-        // Default Constructor
-        BaseboardNumericFieldData() = default;
-    };
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp(); // Sets up individual test cases.
+    }
 
-    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int ActualZoneNum, int ControlledZoneNum, Real64 &PowerMet, int &CompIndex);
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+    }
 
-    void GetBaseboardInput(EnergyPlusData &state);
-
-    void InitBaseboard(EnergyPlusData &state, int BaseboardNum, int ControlledZoneNum);
-
-    void SizeElectricBaseboard(EnergyPlusData &state, int BaseboardNum);
-
-    void SimElectricConvective(EnergyPlusData &state, int BaseboardNum, Real64 LoadMet);
-
-} // namespace BaseboardElectric
-
-    struct BaseboardElectricData : BaseGlobalStruct {
-        int NumBaseboards;
-        bool getInputFlag;
-        Array1D<BaseboardElectric::BaseboardParams> Baseboard;
-        Array1D<BaseboardElectric::BaseboardNumericFieldData> BaseboardNumericFields;
-        bool MyOneTimeFlag = true;
-        bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
-
-        void clear_state() override
-        {
-            NumBaseboards = 0;
-            getInputFlag = true;
-            Baseboard.deallocate();
-            BaseboardNumericFields.deallocate();
-            MyOneTimeFlag = true;
-            ZoneEquipmentListChecked = false;
-        }
-        // Default Constructor
-        BaseboardElectricData()
-            : NumBaseboards(0), getInputFlag(true) {}
-    };
+    std::string & convertToMonth(std::string &datetime)
+    {
+        return ResultsFramework::CSVWriter::convertToMonth(datetime);
+    }
+};
 
 } // namespace EnergyPlus
 

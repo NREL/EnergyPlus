@@ -3363,6 +3363,8 @@
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
 
+  Output:Variable,*,Zone Air Terminal Primary Damper Position,hourly;
+
   Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
 
   Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
