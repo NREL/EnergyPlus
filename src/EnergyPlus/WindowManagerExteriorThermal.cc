@@ -455,9 +455,9 @@ namespace WindowManager {
         auto swRadiation = surface.getSWIncident(t_SurfNum);
         if (swRadiation > 0) {
 
-            auto absCoeff = QRadSWwinAbs(t_Index, t_SurfNum) / swRadiation;
+            auto absCoeff = SurfWinQRadSWwinAbs(t_Index, t_SurfNum) / swRadiation;
             if ((2 * t_Index - 1) == m_TotLay) {
-                absCoeff += QRadThermInAbs(t_SurfNum) / swRadiation;
+                absCoeff += SurfQRadThermInAbs(t_SurfNum) / swRadiation;
             }
 
             aSolidLayer->setSolarAbsorptance(absCoeff);

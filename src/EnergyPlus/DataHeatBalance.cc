@@ -644,29 +644,26 @@ namespace DataHeatBalance {
     Array1D<Real64> ZnOpqSurfExtFaceCondGnRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondGainRep [J]
     Array1D<Real64> ZnOpqSurfExtFaceCondLsRepEnrg;  // Energy of ZoneOpaqSurfInsFaceCondLossRep [J]
 
+    Array1D<Real64> SurfQRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
+    Array1D<Real64> SurfQRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
+    Array1D<Real64> SurfBmIncInsSurfIntensRep;          // Beam sol irrad from ext wins on inside of surface (W/m2)
+    Array1D<Real64> SurfBmIncInsSurfAmountRep;          // Beam sol amount from ext wins incident on inside of surface (W)
+    Array1D<Real64> SurfIntBmIncInsSurfIntensRep;       // Beam sol irrad from int wins on inside of surface (W/m2)
+    Array1D<Real64> SurfIntBmIncInsSurfAmountRep;       // Beam sol amount from int wins incident on inside of surface (W)
+    Array1D<Real64> SurfQRadSWOutIncidentSkyDiffuse;    // Exterior sky diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncidentGndDiffuse;    // Exterior ground diffuse solar incident on surface (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflGnd;    // Exterior diffuse solar incident from beam to diffuse reflection from ground (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflGnd;     // Exterior diffuse solar incident from sky diffuse reflection from ground (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToBmReflObs;      // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncBmToDiffReflObs;    // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
+    Array1D<Real64> SurfQRadSWOutIncSkyDiffReflObs;     // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
+    Array1D<Real64> SurfCosIncidenceAngle;              // Cosine of beam solar incidence angle (for reporting)
 
-    Array1D<Real64> QRadThermInAbs;                 // Thermal radiation absorbed on inside surfaces
-    Array2D<Real64> QRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
-    Array2D<Real64> InitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
-    Array1D<Real64> QRadSWOutIncident;              // Exterior beam plus diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncidentBeam;          // Exterior beam solar incident on surface (W/m2)
-    Array1D<Real64> BmIncInsSurfIntensRep;          // Beam sol irrad from ext wins on inside of surface (W/m2)
-    Array1D<Real64> BmIncInsSurfAmountRep;          // Beam sol amount from ext wins incident on inside of surface (W)
-    Array1D<Real64> IntBmIncInsSurfIntensRep;       // Beam sol irrad from int wins on inside of surface (W/m2)
-    Array1D<Real64> IntBmIncInsSurfAmountRep;       // Beam sol amount from int wins incident on inside of surface (W)
-    Array1D<Real64> QRadSWOutIncidentSkyDiffuse;    // Exterior sky diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncidentGndDiffuse;    // Exterior ground diffuse solar incident on surface (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToDiffReflGnd;    // Exterior diffuse solar incident from beam to diffuse reflection from ground (W/m2)
-    Array1D<Real64> QRadSWOutIncSkyDiffReflGnd;     // Exterior diffuse solar incident from sky diffuse reflection from ground (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToBmReflObs;      // Exterior beam solar incident from beam-to-beam reflection from obstructions (W/m2)
-    Array1D<Real64> QRadSWOutIncBmToDiffReflObs;    // Exterior diffuse solar incident from beam-to-diffuse reflection from obstructions (W/m2)
-    Array1D<Real64> QRadSWOutIncSkyDiffReflObs;     // Exterior diffuse solar incident from sky diffuse reflection from obstructions (W/m2)
-    Array1D<Real64> CosIncidenceAngle;              // Cosine of beam solar incidence angle (for reporting)
-
-
-    Array1D<Real64> SurfSWInAbsTotalReport;                // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
-    Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;       // energy of BmIncInsSurfAmountRep [J]
-    Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy;     // energy of IntBmIncInsSurfAmountRep [J]
+    Array1D<Real64> SurfSWInAbsTotalReport;             // Report - Total interior/exterior shortwave absorbed on inside of surface (W)
+    Array1D<Real64> SurfBmIncInsSurfAmountRepEnergy;    // energy of BmIncInsSurfAmountRep [J]
+    Array1D<Real64> SurfIntBmIncInsSurfAmountRepEnergy; // energy of IntBmIncInsSurfAmountRep [J]
+    Array1D<Real64> SurfInitialDifSolInAbsReport;      // Report - Initial transmitted diffuse solar absorbed on inside of surface (W)
 
     Array1D_int SurfWinBSDFBeamDirectionRep;               // BSDF beam direction number for given complex fenestration state (for reporting) []
     Array1D<Real64> SurfWinBSDFBeamThetaRep;               // BSDF beam Theta angle (for reporting) [rad]
@@ -678,10 +675,11 @@ namespace DataHeatBalance {
     Array1D<Real64> SurfWinQRadSWwinAbsTotEnergy;          // Energy of QRadSWwinAbsTot [J]
     Array1D<Real64> SurfWinSWwinAbsTotalReport;            // Report - Total interior/exterior shortwave absorbed in all glass layers of window (W)
     Array1D<Real64> SurfWinInitialDifSolInTransReport;     // Report - Initial transmitted diffuse solar transmitted out through inside of window surface (W)
+    Array2D<Real64> SurfWinQRadSWwinAbs;                   // Short wave radiation absorbed in window glass layers
+    Array2D<Real64> SurfWinInitialDifSolwinAbs;            // Initial diffuse solar absorbed in window glass layers from inside(W/m2)
 
     Array1D<Real64> SurfOpaqSWOutAbsTotalReport;           // Report - Total exterior shortwave/solar absorbed on outside of surface (W)
     Array1D<Real64> SurfOpaqSWOutAbsEnergyReport;          // Report - Total exterior shortwave/solar absorbed on outside of surface (j)
-    Array1D<Real64> SurfInitialDifSolInAbsReport;      // Report - Initial transmitted diffuse solar absorbed on inside of surface (W)
 
     Array1D<Real64> NominalR;                       // Nominal R value of each material -- used in matching interzone surfaces
     Array1D<Real64> NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
@@ -981,30 +979,7 @@ namespace DataHeatBalance {
         ZoneOpaqSurfExtFaceCond.deallocate();
         ZoneOpaqSurfExtFaceCondGainRep.deallocate();
         ZoneOpaqSurfExtFaceCondLossRep.deallocate();
-        QRadThermInAbs.deallocate();
-        QRadSWwinAbs.deallocate();
-        InitialDifSolwinAbs.deallocate();
-        QRadSWOutIncident.deallocate();
-        QRadSWOutIncidentBeam.deallocate();
-        BmIncInsSurfIntensRep.deallocate();
-        BmIncInsSurfAmountRep.deallocate();
-        IntBmIncInsSurfIntensRep.deallocate();
-        IntBmIncInsSurfAmountRep.deallocate();
-        QRadSWOutIncidentSkyDiffuse.deallocate();
-        QRadSWOutIncidentGndDiffuse.deallocate();
-        QRadSWOutIncBmToDiffReflGnd.deallocate();
-        QRadSWOutIncSkyDiffReflGnd.deallocate();
-        QRadSWOutIncBmToBmReflObs.deallocate();
-        QRadSWOutIncBmToDiffReflObs.deallocate();
-        QRadSWOutIncSkyDiffReflObs.deallocate();
-        CosIncidenceAngle.deallocate();
-        SurfWinBSDFBeamDirectionRep.deallocate();
-        SurfWinBSDFBeamThetaRep.deallocate();
-        SurfWinBSDFBeamPhiRep.deallocate();
-        SurfWinQRadSWwinAbsTot.deallocate();
-        SurfWinQRadSWwinAbsLayer.deallocate();
-        SurfWinFenLaySurfTempFront.deallocate();
-        SurfWinFenLaySurfTempBack.deallocate();
+
         ZoneTransSolarEnergy.deallocate();
         ZoneWinHeatGainRepEnergy.deallocate();
         ZoneWinHeatLossRepEnergy.deallocate();
@@ -1016,15 +991,44 @@ namespace DataHeatBalance {
         ZnOpqSurfInsFaceCondLsRepEnrg.deallocate();
         ZnOpqSurfExtFaceCondGnRepEnrg.deallocate();
         ZnOpqSurfExtFaceCondLsRepEnrg.deallocate();
+
+        SurfQRadThermInAbs.deallocate();
+        SurfQRadSWOutIncident.deallocate();
+        SurfQRadSWOutIncidentBeam.deallocate();
+        SurfBmIncInsSurfIntensRep.deallocate();
+        SurfBmIncInsSurfAmountRep.deallocate();
+        SurfIntBmIncInsSurfIntensRep.deallocate();
+        SurfIntBmIncInsSurfAmountRep.deallocate();
         SurfBmIncInsSurfAmountRepEnergy.deallocate();
         SurfIntBmIncInsSurfAmountRepEnergy.deallocate();
+        SurfInitialDifSolInAbsReport.deallocate();
+        SurfSWInAbsTotalReport.deallocate();
+
+        SurfQRadSWOutIncidentSkyDiffuse.deallocate();
+        SurfQRadSWOutIncidentGndDiffuse.deallocate();
+        SurfQRadSWOutIncBmToDiffReflGnd.deallocate();
+        SurfQRadSWOutIncSkyDiffReflGnd.deallocate();
+        SurfQRadSWOutIncBmToBmReflObs.deallocate();
+        SurfQRadSWOutIncBmToDiffReflObs.deallocate();
+        SurfQRadSWOutIncSkyDiffReflObs.deallocate();
+        SurfCosIncidenceAngle.deallocate();
+
+        SurfWinBSDFBeamDirectionRep.deallocate();
+        SurfWinBSDFBeamThetaRep.deallocate();
+        SurfWinBSDFBeamPhiRep.deallocate();
+        SurfWinQRadSWwinAbsTot.deallocate();
+        SurfWinQRadSWwinAbsLayer.deallocate();
+        SurfWinFenLaySurfTempFront.deallocate();
+        SurfWinFenLaySurfTempBack.deallocate();
+        SurfWinQRadSWwinAbs.deallocate();
+        SurfWinInitialDifSolwinAbs.deallocate();
         SurfWinQRadSWwinAbsTotEnergy.deallocate();
         SurfWinSWwinAbsTotalReport.deallocate();
-        SurfInitialDifSolInAbsReport.deallocate();
         SurfWinInitialDifSolInTransReport.deallocate();
-        SurfSWInAbsTotalReport.deallocate();
+
         SurfOpaqSWOutAbsTotalReport.deallocate();
         SurfOpaqSWOutAbsEnergyReport.deallocate();
+
         NominalR.deallocate();
         NominalRforNominalUCalculation.deallocate();
         NominalU.deallocate();

@@ -116,7 +116,7 @@ namespace TranspiredCollector {
     using DataGlobals::DegToRadians;
     using DataGlobals::KelvinConv;
     using DataGlobals::SecInHour;
-    using DataHeatBalance::QRadSWOutIncident;
+    using DataHeatBalance::SurfQRadSWOutIncident;
     using DataVectorTypes::Vector;
 
     // Data
@@ -1117,7 +1117,7 @@ namespace TranspiredCollector {
 
         //		Isc = sum( QRadSWOutIncident( UTSC( UTSCNum ).SurfPtrs ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum;
         ////Autodesk:F2C++ Array subscript usage: Replaced by below
-        Isc = sum_product_sub(QRadSWOutIncident, Surface, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
+        Isc = sum_product_sub(SurfQRadSWOutIncident, Surface, &SurfaceData::Area, UTSC(UTSCNum).SurfPtrs) /
               AreaSum; // Autodesk:F2C++ Functions handle array subscript usage
         //		Tso = sum( TH( UTSC( UTSCNum ).SurfPtrs, 1, 1 ) * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / AreaSum; //Autodesk:F2C++ Array
         // subscript usage: Replaced by below

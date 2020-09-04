@@ -519,9 +519,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
-    DataHeatBalance::QRadSWwinAbs.allocate(1, 3);
-    DataHeatBalance::QRadThermInAbs.allocate(3);
-    DataHeatBalance::QRadSWOutIncident.allocate(3);
+    DataHeatBalance::SurfWinQRadSWwinAbs.allocate(1, 3);
+    DataHeatBalance::SurfQRadThermInAbs.allocate(3);
+    DataHeatBalance::SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
@@ -552,9 +552,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     DataHeatBalSurface::QAirExtReport.allocate(3);
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
-    DataHeatBalance::QRadSWOutIncident = 0.0;
-    DataHeatBalance::QRadSWwinAbs = 0.0;
-    DataHeatBalance::QRadThermInAbs = 0.0;
+    DataHeatBalance::SurfQRadSWOutIncident = 0.0;
+    DataHeatBalance::SurfWinQRadSWwinAbs = 0.0;
+    DataHeatBalance::SurfQRadThermInAbs = 0.0;
 
     DataHeatBalFanSys::QHTRadSysSurf = 0.0;
     DataHeatBalFanSys::QHWBaseboardSurf = 0.0;
@@ -2746,9 +2746,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalFanSys::QHWBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QSteamBaseboardSurf.allocate(3);
     DataHeatBalFanSys::QElecBaseboardSurf.allocate(3);
-    DataHeatBalance::QRadSWwinAbs.allocate(1, 3);
-    DataHeatBalance::QRadThermInAbs.allocate(3);
-    DataHeatBalance::QRadSWOutIncident.allocate(3);
+    DataHeatBalance::SurfWinQRadSWwinAbs.allocate(1, 3);
+    DataHeatBalance::SurfQRadThermInAbs.allocate(3);
+    DataHeatBalance::SurfQRadSWOutIncident.allocate(3);
     DataSurfaces::SurfWinTransSolar.allocate(3);
     DataHeatBalance::ZoneWinHeatGain.allocate(1);
     DataHeatBalance::ZoneWinHeatGainRep.allocate(1);
@@ -2779,9 +2779,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     DataHeatBalSurface::QAirExtReport.allocate(3);
     DataHeatBalSurface::QHeatEmiReport.allocate(3);
 
-    DataHeatBalance::QRadSWOutIncident = 0.0;
-    DataHeatBalance::QRadSWwinAbs = 0.0;
-    DataHeatBalance::QRadThermInAbs = 0.0;
+    DataHeatBalance::SurfQRadSWOutIncident = 0.0;
+    DataHeatBalance::SurfWinQRadSWwinAbs = 0.0;
+    DataHeatBalance::SurfQRadThermInAbs = 0.0;
 
     DataHeatBalFanSys::QHTRadSysSurf = 0.0;
     DataHeatBalFanSys::QHWBaseboardSurf = 0.0;

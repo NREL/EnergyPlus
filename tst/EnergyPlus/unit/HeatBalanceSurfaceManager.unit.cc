@@ -3110,9 +3110,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     DataHeatBalance::ZoneBmSolFrIntWinsRep(1) = 10.0;
     DataEnvironment::SunIsUp = false;
     InitIntSolarDistribution();
-    EXPECT_EQ(0.0, DataHeatBalance::IntBmIncInsSurfIntensRep(1));
+    EXPECT_EQ(0.0, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1));
     DataEnvironment::SunIsUp = true;
     InitIntSolarDistribution();
-    EXPECT_NEAR(1.666667, DataHeatBalance::IntBmIncInsSurfIntensRep(1), 0.00001);
+    EXPECT_NEAR(1.666667, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
 } // namespace EnergyPlus

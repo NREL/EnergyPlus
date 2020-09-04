@@ -979,9 +979,9 @@ namespace SolarCollectors {
         Real64 incidentAngleModifier; // Net incident angle modifier combining beam, sky, and ground radiation
 
         // Calculate incident angle modifier
-        if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) {
+        if (DataHeatBalance::SurfQRadSWOutIncident(SurfNum) > 0.0) {
             // Equivalent incident angle of sky radiation (radians)
-            Real64 ThetaBeam = std::acos(DataHeatBalance::CosIncidenceAngle(SurfNum));
+            Real64 ThetaBeam = std::acos(DataHeatBalance::SurfCosIncidenceAngle(SurfNum));
 
             // Calculate equivalent incident angles for sky and ground radiation according to Brandemuehl and Beckman (1980)
             // Surface tilt angle (degrees)
@@ -993,10 +993,10 @@ namespace SolarCollectors {
             // Equivalent incident angle of ground radiation (radians)
             Real64 ThetaGnd = (90.0 - 0.5788 * tilt + 0.002693 * pow_2(tilt)) * DataGlobals::DegToRadians;
 
-            incidentAngleModifier = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaBeam) +
-                                     DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaSky) +
-                                     DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaGnd)) /
-                                    DataHeatBalance::QRadSWOutIncident(SurfNum);
+            incidentAngleModifier = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaBeam) +
+                                     DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaSky) +
+                                     DataHeatBalance::SurfQRadSWOutIncidentGndDiffuse(SurfNum) * SolarCollectors::Parameters(ParamNum).IAM(ThetaGnd)) /
+                                    DataHeatBalance::SurfQRadSWOutIncident(SurfNum);
         } else {
             incidentAngleModifier = 0.0;
         }
@@ -1099,7 +1099,7 @@ namespace SolarCollectors {
 
                 // Calculate fluid heat gain (or loss)
                 // Heat loss is possible if there is no incident radiation and fluid is still flowing.
-                Q = (FRTAN * incidentAngleModifier * DataHeatBalance::QRadSWOutIncident(SurfNum) +
+                Q = (FRTAN * incidentAngleModifier * DataHeatBalance::SurfQRadSWOutIncident(SurfNum) +
                      FRULpTest * (inletTemp - DataSurfaces::Surface(SurfNum).OutDryBulbTemp)) *
                     area * FlowMod;
 
@@ -1115,9 +1115,9 @@ namespace SolarCollectors {
                     Q = massFlowRate * Cp * (outletTemp - inletTemp);
                 }
 
-                if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) { // Calculate thermal efficiency
+                if (DataHeatBalance::SurfQRadSWOutIncident(SurfNum) > 0.0) { // Calculate thermal efficiency
                     // NOTE: Efficiency can be > 1 if Q > QRadSWOutIncident because of favorable delta T, i.e. warm outdoor temperature
-                    efficiency = Q / (DataHeatBalance::QRadSWOutIncident(SurfNum) * area); // Q has units of W; QRadSWOutIncident has units of W/m2
+                    efficiency = Q / (DataHeatBalance::SurfQRadSWOutIncident(SurfNum) * area); // Q has units of W; QRadSWOutIncident has units of W/m2
                 } else {
                     efficiency = 0.0;
                 }
@@ -1130,7 +1130,7 @@ namespace SolarCollectors {
                 Real64 A = -FRULT;
                 Real64 B = -FRUL + 2.0 * FRULT * DataSurfaces::Surface(SurfNum).OutDryBulbTemp;
                 Real64 C = -FRULT * pow_2(DataSurfaces::Surface(SurfNum).OutDryBulbTemp) + FRUL * DataSurfaces::Surface(SurfNum).OutDryBulbTemp -
-                           FRTAN * incidentAngleModifier * DataHeatBalance::QRadSWOutIncident(SurfNum);
+                           FRTAN * incidentAngleModifier * DataHeatBalance::SurfQRadSWOutIncident(SurfNum);
                 Real64 qEquation = (pow_2(B) - 4.0 * A * C);
                 if (qEquation < 0.0) {
                     if (this->ErrIndex == 0) {
@@ -1147,7 +1147,7 @@ namespace SolarCollectors {
                 }
                 if (FRULT == 0.0 || qEquation < 0.0) { // Linear, 1st order solution
                     outletTemp = DataSurfaces::Surface(SurfNum).OutDryBulbTemp -
-                                 FRTAN * incidentAngleModifier * DataHeatBalance::QRadSWOutIncident(SurfNum) / FRUL;
+                                 FRTAN * incidentAngleModifier * DataHeatBalance::SurfQRadSWOutIncident(SurfNum) / FRUL;
                 } else { // Quadratic, 2nd order solution
                     outletTemp = (-B + std::sqrt(qEquation)) / (2.0 * A);
                 }
@@ -1272,7 +1272,7 @@ namespace SolarCollectors {
 
         // Calculate transmittance-absorptance product of the system
         // Incident angle of beam radiation (radians)
-        Real64 ThetaBeam = std::acos(DataHeatBalance::CosIncidenceAngle(SurfNum));
+        Real64 ThetaBeam = std::acos(DataHeatBalance::SurfCosIncidenceAngle(SurfNum));
         this->CalcTransAbsorProduct(ThetaBeam);
 
         Real64 inletTemp = this->InletTemp;
@@ -1315,12 +1315,12 @@ namespace SolarCollectors {
             Real64 ap = SolarCollectors::Parameters(ParamNum).ThermalMass * area;
             a1 = -area * (hConvCoefA2W + this->UTopLoss) / ap;
             a2 = area * hConvCoefA2W / ap;
-            a3 = area * (this->TauAlpha * DataHeatBalance::QRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir) / ap;
+            a3 = area * (this->TauAlpha * DataHeatBalance::SurfQRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir) / ap;
         } else {
             AbsPlateMassFlag = false;
             a1 = -area * (hConvCoefA2W + this->UTopLoss);
             a2 = area * hConvCoefA2W;
-            a3 = area * (this->TauAlpha * DataHeatBalance::QRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir);
+            a3 = area * (this->TauAlpha * DataHeatBalance::SurfQRadSWOutIncident(SurfNum) + this->UTopLoss * TempOutdoorAir);
         }
 
         // thermal mass of the collector water [J/K]
@@ -1354,8 +1354,8 @@ namespace SolarCollectors {
         this->TempOfAbsPlate = TempAbsPlate;
 
         Real64 efficiency = 0.0; // Thermal efficiency of solar energy conversion
-        if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) {
-            efficiency = (this->HeatGainRate + this->StoredHeatRate) / (DataHeatBalance::QRadSWOutIncident(SurfNum) * area);
+        if (DataHeatBalance::SurfQRadSWOutIncident(SurfNum) > 0.0) {
+            efficiency = (this->HeatGainRate + this->StoredHeatRate) / (DataHeatBalance::SurfQRadSWOutIncident(SurfNum) * area);
             if (efficiency < 0.0) efficiency = 0.0;
         }
         this->Efficiency = efficiency;
@@ -1470,7 +1470,7 @@ namespace SolarCollectors {
         int SurfNum = this->Surface;
         int ParamNum = this->Parameters;
 
-        if (DataHeatBalance::QRadSWOutIncident(SurfNum) > 0.0) {
+        if (DataHeatBalance::SurfQRadSWOutIncident(SurfNum) > 0.0) {
 
             // cover system transmittance and reflectance from outer to inner cover
             this->CalcTransRefAbsOfCover(IncidAngle, TransSys, ReflSys, AbsCover1, AbsCover2);
@@ -1485,25 +1485,25 @@ namespace SolarCollectors {
             CoversAbsBeam(2) = AbsCover2;
 
             // calc total solar radiation weighted transmittance-absorptance product
-            TuaAlpha = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * this->TauAlphaBeam +
-                        DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * this->TauAlphaSkyDiffuse +
-                        DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * this->TauAlphaGndDiffuse) /
-                       DataHeatBalance::QRadSWOutIncident(SurfNum);
+            TuaAlpha = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * this->TauAlphaBeam +
+                        DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * this->TauAlphaSkyDiffuse +
+                        DataHeatBalance::SurfQRadSWOutIncidentGndDiffuse(SurfNum) * this->TauAlphaGndDiffuse) /
+                       DataHeatBalance::SurfQRadSWOutIncident(SurfNum);
 
             if (SolarCollectors::Parameters(ParamNum).NumOfCovers == 1) {
                 // calc total solar radiation weighted cover absorptance
-                this->CoverAbs(1) = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(1) +
-                                     DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(1) +
-                                     DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(1)) /
-                                    DataHeatBalance::QRadSWOutIncident(SurfNum);
+                this->CoverAbs(1) = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(1) +
+                                     DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(1) +
+                                     DataHeatBalance::SurfQRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(1)) /
+                                    DataHeatBalance::SurfQRadSWOutIncident(SurfNum);
 
             } else if (SolarCollectors::Parameters(ParamNum).NumOfCovers == 2) {
                 // Num = 1 represents outer cover and Num = 2 represents inner cover
                 for (int Num = 1; Num <= SolarCollectors::Parameters(ParamNum).NumOfCovers; ++Num) {
-                    this->CoverAbs(Num) = (DataHeatBalance::QRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(Num) +
-                                           DataHeatBalance::QRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(Num) +
-                                           DataHeatBalance::QRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(Num)) /
-                                          DataHeatBalance::QRadSWOutIncident(SurfNum);
+                    this->CoverAbs(Num) = (DataHeatBalance::SurfQRadSWOutIncidentBeam(SurfNum) * CoversAbsBeam(Num) +
+                                           DataHeatBalance::SurfQRadSWOutIncidentSkyDiffuse(SurfNum) * this->CoversAbsSkyDiffuse(Num) +
+                                           DataHeatBalance::SurfQRadSWOutIncidentGndDiffuse(SurfNum) * this->CoversAbsGndDiffuse(Num)) /
+                                          DataHeatBalance::SurfQRadSWOutIncident(SurfNum);
                 }
             }
 
@@ -1771,19 +1771,19 @@ namespace SolarCollectors {
         {
             auto const SELECT_CASE_var(NumCovers);
             if (SELECT_CASE_var == 1) {
-                tempnom = this->CoverAbs(1) * DataHeatBalance::QRadSWOutIncident(SurfNum) + TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) +
+                tempnom = this->CoverAbs(1) * DataHeatBalance::SurfQRadSWOutIncident(SurfNum) + TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) +
                           TempAbsPlate * (hConvCoefA2C + hRadCoefA2C);
                 tempdenom = (hConvCoefC2O + hRadCoefC2O) + (hConvCoefA2C + hRadCoefA2C);
                 TempOuterCover = tempnom / tempdenom;
             } else if (SELECT_CASE_var == 2) {
                 for (int Num = 1; Num <= NumCovers; ++Num) {
                     if (Num == 1) {
-                        tempnom = this->CoverAbs(Num) * DataHeatBalance::QRadSWOutIncident(SurfNum) + TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) +
+                        tempnom = this->CoverAbs(Num) * DataHeatBalance::SurfQRadSWOutIncident(SurfNum) + TempOutdoorAir * (hConvCoefC2O + hRadCoefC2O) +
                                   TempInnerCover * (hConvCoefC2C + hRadCoefC2C);
                         tempdenom = (hConvCoefC2O + hRadCoefC2O) + (hConvCoefC2C + hRadCoefC2C);
                         TempOuterCover = tempnom / tempdenom;
                     } else if (Num == 2) {
-                        tempnom = this->CoverAbs(Num) * DataHeatBalance::QRadSWOutIncident(SurfNum) + TempAbsPlate * (hConvCoefA2C + hRadCoefA2C) +
+                        tempnom = this->CoverAbs(Num) * DataHeatBalance::SurfQRadSWOutIncident(SurfNum) + TempAbsPlate * (hConvCoefA2C + hRadCoefA2C) +
                                   TempOuterCover * (hConvCoefC2C + hRadCoefC2C);
                         tempdenom = (hConvCoefC2C + hRadCoefC2C + hConvCoefA2C + hRadCoefA2C);
                         TempInnerCover = tempnom / tempdenom;

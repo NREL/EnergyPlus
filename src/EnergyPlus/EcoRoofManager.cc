@@ -455,7 +455,7 @@ namespace EcoRoofManager {
             if (dataConstruction.Construct(ConstrNum).CTFCross(0) > 0.01) {
                 QuickConductionSurf = true;
                 F1temp = dataConstruction.Construct(ConstrNum).CTFCross(0) / (dataConstruction.Construct(ConstrNum).CTFInside(0) + HConvIn(SurfNum));
-                Qsoilpart1 = -CTFConstOutPart(SurfNum) + F1temp * (CTFConstInPart(SurfNum) + SurfOpaqQRadSWInAbs(SurfNum) + QRadThermInAbs(SurfNum) +
+                Qsoilpart1 = -CTFConstOutPart(SurfNum) + F1temp * (CTFConstInPart(SurfNum) + SurfOpaqQRadSWInAbs(SurfNum) + SurfQRadThermInAbs(SurfNum) +
                                                                    dataConstruction.Construct(ConstrNum).CTFSourceIn(0) * QsrcHist(SurfNum, 1) +
                                                                    HConvIn(SurfNum) * MAT(ZoneNum) + SurfNetLWRadToSurf(SurfNum));
             } else {

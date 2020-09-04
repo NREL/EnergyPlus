@@ -110,7 +110,7 @@ namespace HeatBalFiniteDiffManager {
     using DataEnvironment::IsRain;
     using DataEnvironment::SkyTemp;
     using DataHeatBalance::Air;
-    using DataHeatBalance::QRadThermInAbs;
+    using DataHeatBalance::SurfQRadThermInAbs;
     using DataHeatBalance::RegularMaterial;
     using DataHeatBalance::TotConstructs;
     using DataHeatBalance::TotMaterials;
@@ -2105,7 +2105,7 @@ namespace HeatBalFiniteDiffManager {
             QElecBaseboardSurf(Surf)); // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
         Real64 const QCoolingPanelSurfFD(
             QCoolingPanelSurf(Surf));                     // Current radiant heat flux at a surface due to the presence of simple cooling panels
-        Real64 const QRadThermInFD(QRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
+        Real64 const QRadThermInFD(SurfQRadThermInAbs(Surf)); // Thermal radiation absorbed on inside surfaces
 
         // Boundary Conditions from Simulation for Interior
         Real64 hconvi(HConvInFD(Surf));

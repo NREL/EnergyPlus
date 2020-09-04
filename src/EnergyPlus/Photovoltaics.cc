@@ -816,7 +816,7 @@ namespace Photovoltaics {
 
         // Using/Aliasing
         using DataGlobals::SecInHour;
-        using DataHeatBalance::QRadSWOutIncident;
+        using DataHeatBalance::SurfQRadSWOutIncident;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -841,7 +841,7 @@ namespace Photovoltaics {
 
         ThisSurf = PVarray(thisPV).SurfacePtr;
 
-        if (QRadSWOutIncident(ThisSurf) > MinIrradiance) {
+        if (SurfQRadSWOutIncident(ThisSurf) > MinIrradiance) {
 
             // get efficiency
             {
@@ -864,7 +864,7 @@ namespace Photovoltaics {
 
             PVarray(thisPV).Report.DCPower =
                 PVarray(thisPV).SimplePVModule.AreaCol * Eff *
-                QRadSWOutIncident(ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
+                        SurfQRadSWOutIncident(ThisSurf); // active solar cellsurface net area | solar conversion efficiency | solar incident
 
             // store sink term in appropriate place for surface heat transfer itegration
             PVarray(thisPV).SurfaceSink = PVarray(thisPV).Report.DCPower;
@@ -964,9 +964,9 @@ namespace Photovoltaics {
         using DataEnvironment::Elevation;
         using DataEnvironment::SOLCOS;
         using DataGlobals::DegToRadians;
-        using DataHeatBalance::CosIncidenceAngle;
-        using DataHeatBalance::QRadSWOutIncident;
-        using DataHeatBalance::QRadSWOutIncidentBeam;
+        using DataHeatBalance::SurfCosIncidenceAngle;
+        using DataHeatBalance::SurfQRadSWOutIncident;
+        using DataHeatBalance::SurfQRadSWOutIncidentBeam;
         using DataHeatBalSurface::SurfTempSurfOut;
         using DataSurfaces::Surface;
         using TranspiredCollector::GetUTSCTsColl;
@@ -991,9 +991,9 @@ namespace Photovoltaics {
         ThisSurf = PVarray(PVnum).SurfacePtr;
 
         //   get input from elsewhere in Energyplus for the current point in the simulation
-        PVarray(PVnum).SNLPVinto.IcBeam = QRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
-        PVarray(PVnum).SNLPVinto.IcDiffuse = QRadSWOutIncident(ThisSurf) - QRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
-        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(CosIncidenceAngle(ThisSurf)) / DegToRadians;    // (deg) from dataHeatBalance
+        PVarray(PVnum).SNLPVinto.IcBeam = SurfQRadSWOutIncidentBeam(ThisSurf);                                  //(W/m2)from DataHeatBalance
+        PVarray(PVnum).SNLPVinto.IcDiffuse = SurfQRadSWOutIncident(ThisSurf) - SurfQRadSWOutIncidentBeam(ThisSurf); //(W/ m2)(was kJ/hr m2)
+        PVarray(PVnum).SNLPVinto.IncidenceAngle = std::acos(SurfCosIncidenceAngle(ThisSurf)) / DegToRadians;    // (deg) from dataHeatBalance
         PVarray(PVnum).SNLPVinto.ZenithAngle = std::acos(SOLCOS(3)) / DegToRadians;                         //(degrees),
         PVarray(PVnum).SNLPVinto.Tamb = Surface(ThisSurf).OutDryBulbTemp;                                   //(deg. C)
         PVarray(PVnum).SNLPVinto.WindSpeed = Surface(ThisSurf).WindSpeed;                                   // (m/s)
@@ -1220,7 +1220,7 @@ namespace Photovoltaics {
         using DataGlobals::SecInHour;
         using DataGlobals::TimeStep;
         using DataGlobals::TimeStepZone;
-        using DataHeatBalance::QRadSWOutIncident;
+        using DataHeatBalance::SurfQRadSWOutIncident;
         using DataHVACGlobals::SysTimeElapsed;
         using DataHVACGlobals::TimeStepSys;
         using DataSurfaces::Surface;
@@ -1268,9 +1268,9 @@ namespace Photovoltaics {
             PVarray(PVnum).TRNSYSPVcalc.TimeElapsed = TimeElapsed;
         }
 
-        if (any_gt(QRadSWOutIncident, 0.0)) {
+        if (any_gt(SurfQRadSWOutIncident, 0.0)) {
             //  Determine the amount of radiation incident on each PV
-            PVarray(PVnum).TRNSYSPVcalc.Insolation = QRadSWOutIncident(PVarray(PVnum).SurfacePtr); //[W/m2]
+            PVarray(PVnum).TRNSYSPVcalc.Insolation = SurfQRadSWOutIncident(PVarray(PVnum).SurfacePtr); //[W/m2]
         } else {
             PVarray(PVnum).TRNSYSPVcalc.Insolation = 0.0;
         }

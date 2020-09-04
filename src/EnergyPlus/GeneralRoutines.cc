@@ -1039,7 +1039,7 @@ void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoef
     // USE DataLoopNode    , ONLY: Node
     using ConvectionCoefficients::InitExteriorConvectionCoeff;
     using DataGlobals::BeginEnvrnFlag;
-    using DataHeatBalance::QRadSWOutIncident;
+    using DataHeatBalance::SurfQRadSWOutIncident;
     using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceData;
@@ -1217,7 +1217,7 @@ void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoef
     //	Tso = sum( TH( 1, 1, SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
     Tso = sum_product_sub(TH(1, 1, _), Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
     //	Isc = sum( QRadSWOutIncident( SurfPtrARR ) * Surface( SurfPtrARR ).Area ) / A; //Autodesk:F2C++ Array subscript usage: Replaced by below
-    Isc = sum_product_sub(QRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
+    Isc = sum_product_sub(SurfQRadSWOutIncident, Surface, &SurfaceData::Area, SurfPtrARR) / A; // Autodesk:F2C++ Functions handle array subscript usage
 
     TmeanK = 0.5 * (TmpTsBaf + Tso) + KelvinConv;
 
