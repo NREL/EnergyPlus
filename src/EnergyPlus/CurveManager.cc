@@ -2212,6 +2212,11 @@ namespace CurveManager {
                 // see https://stackoverflow.com/a/16575025/1344457
                 char *pEnd;
                 double ret = std::strtod(&str[0], &pEnd);
+                if (*pEnd == '\r'){
+                    std::string st = str;
+                    st.pop_back();
+                    ret = std::strtod(&st[0], &pEnd);
+                }
                 if (*pEnd || str.size() == 0) {
                     return std::numeric_limits<double>::quiet_NaN();
                 } else {
