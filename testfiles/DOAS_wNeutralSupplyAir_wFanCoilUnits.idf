@@ -4563,7 +4563,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTPUT:METER:METERFILEONLY ===========
 
-  Output:Meter:MeterFileOnly,Gas:Facility,Hourly;
+  Output:Meter:MeterFileOnly,NaturalGas:Facility,Hourly;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,Hourly;
 

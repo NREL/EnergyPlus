@@ -1299,14 +1299,14 @@ namespace VentilatedSlab {
                                 "System",
                                 "Average",
                                 VentSlab(Item).Name);
-            SetupOutputVariable("Zone Ventilated Slab Fan Electric Power",
+            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 VentSlab(Item).ElecFanPower,
                                 "System",
                                 "Average",
                                 VentSlab(Item).Name);
             //! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Ventilated Slab Fan Electric Energy",
+            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VentSlab(Item).ElecFanEnergy,
                                 "System",
@@ -4592,22 +4592,22 @@ namespace VentilatedSlab {
             Area = Surface(SurfNum).Area;
 
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfaceWindow(SurfNum).DividerArea;
+                    Area += SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(SurfNum).FrameTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                                  SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(SurfNum).DividerTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                                  SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

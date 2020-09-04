@@ -53,6 +53,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDaylighting.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -70,10 +72,12 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ThermalComfort.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -264,21 +268,24 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_ComputeIntThermalAbsorpFacto
     DataHeatBalance::TotConstructs = 1;
 
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalance::Zone(1).SurfaceFirst = 1;
+    DataHeatBalance::Zone(1).SurfaceLast = 1;
+    DataHeatBalance::Zone(1).WindowSurfaceFirst = 1;
+    DataHeatBalance::Zone(1).WindowSurfaceLast = 1;
     DataSurfaces::Surface.allocate(DataSurfaces::TotSurfaces);
     DataSurfaces::SurfaceWindow.allocate(DataSurfaces::TotSurfaces);
+    SurfaceGeometry::AllocateSurfaceWindows(DataSurfaces::TotSurfaces);
     dataConstruction.Construct.allocate(DataHeatBalance::TotConstructs);
     dataMaterial.Material.allocate(DataHeatBalance::TotMaterials);
 
     DataSurfaces::Surface(1).HeatTransSurf = true;
     DataSurfaces::Surface(1).Construction = 1;
-    DataSurfaces::SurfaceWindow(1).ShadingFlag = 0;
+    DataSurfaces::SurfWinShadingFlag(1) = 0;
     dataConstruction.Construct(1).InsideAbsorpThermal = 0.9;
     dataConstruction.Construct(1).TransDiff = 0.0;
     DataSurfaces::Surface(1).MaterialMovInsulInt = 1;
     dataMaterial.Material(1).AbsorpThermal = 0.2;
     dataMaterial.Material(1).AbsorpSolar = 0.5;
-
-    DataGlobals::NumOfZones = 0; // Reset this to skip part of the code in the unit tested routine
 
     DataSurfaces::Surface(1).SchedMovInsulInt = -1; // According to schedule manager protocol, an index of -1 returns a 1.0 value for the schedule
     dataMaterial.Material(1).Resistance = 1.25;
@@ -2607,6 +2614,172 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInterzoneRadFactorCalc)
     EXPECT_FALSE(DataHeatBalSurface::RecDifShortFromZ(2));
 }
 
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestResilienceMetricReport)
+{
+
+    int NumOfZones = 1;
+    DataGlobals::KindOfSim = DataGlobals::ksRunPeriodWeather;
+    OutputReportTabular::displayThermalResilienceSummary = true;
+    DataEnvironment::Month = 7;
+    DataEnvironment::DayOfMonth = 1;
+
+    DataGlobals::TimeStep = 1;
+    DataGlobals::TimeStepZone = 1;
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    DataGlobals::NumOfZones = 1;
+    DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
+    DataHeatBalFanSys::ZTAV.dimension(NumOfZones, 0.0);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.dimension(NumOfZones, 0.0);
+
+    DataHeatBalFanSys::ZoneHeatIndex.dimension(NumOfZones, 0.0);
+    DataHeatBalFanSys::ZoneHumidex.dimension(NumOfZones, 0.0);
+    DataHeatBalFanSys::ZoneNumOcc.dimension(NumOfZones, 0);
+    DataHeatBalFanSys::ZoneHeatIndexHourBins.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneHumidexHourBins.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneHeatIndexOccuHourBins.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneHumidexOccuHourBins.allocate(NumOfZones);
+
+    DataHeatBalance::TotPeople = 1;
+    DataHeatBalance::People.allocate(DataHeatBalance::TotPeople);
+    DataHeatBalance::People(1).ZonePtr = 1;
+    DataHeatBalance::People(1).Pierce = true;
+    DataHeatBalance::People(1).NumberOfPeople = 2;
+    DataHeatBalance::People(1).NumberOfPeoplePtr = 1;
+    ScheduleManager::Schedule.allocate(1);
+
+    EnergyPlus::ThermalComfort::ThermalComfortData.allocate(DataHeatBalance::TotPeople);
+    DataHeatBalFanSys::ZoneOccPierceSET.dimension(NumOfZones, 0);
+    DataHeatBalFanSys::ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);
+    DataHeatBalFanSys::ZoneLowSETHours.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneHighSETHours.allocate(NumOfZones);
+
+    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 31;
+    ScheduleManager::Schedule(1).CurrentValue = 0;
+
+    // Heat Index Case 1: Zone T < 80 F;
+    DataGlobals::HourOfDay = 1;
+    DataHeatBalFanSys::ZTAV(1) = 25;
+    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.00988; // RH = 50%
+    CalcThermalResilience();
+    ReportThermalResilience();
+    EXPECT_NEAR(25, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
+    EXPECT_NEAR(28, DataHeatBalFanSys::ZoneHumidex(1), 1);
+
+    // Heat Index Case 2: Zone RH > 85, 80 < T < 87 F;
+    DataGlobals::HourOfDay = 2;
+    DataHeatBalFanSys::ZTAV(1) = 27;
+    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.02035; // RH = 90%
+    CalcThermalResilience();
+    ReportThermalResilience();
+    EXPECT_NEAR(31, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
+    EXPECT_NEAR(39, DataHeatBalFanSys::ZoneHumidex(1), 1);
+
+    // Heat Index Case 3: < Zone RH > 85, 80 < T < 87 F;
+    DataGlobals::HourOfDay = 3;
+    DataHeatBalFanSys::ZTAV(1) = 27;
+    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.0022; // RH = 10%
+    CalcThermalResilience();
+    ReportThermalResilience();
+    EXPECT_NEAR(26, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
+    EXPECT_NEAR(23, DataHeatBalFanSys::ZoneHumidex(1), 1);
+
+    // Heat Index Case 4: Rothfusz regression, other than the above conditions;
+    DataGlobals::HourOfDay = 4;
+    DataHeatBalFanSys::ZTAV(1) = 30;
+    DataHeatBalFanSys::ZoneAirHumRatAvg(1) = 0.01604; // RH = 60%
+    CalcThermalResilience();
+    ReportThermalResilience();
+    EXPECT_NEAR(33, DataHeatBalFanSys::ZoneHeatIndex(1), 0.5);
+    EXPECT_NEAR(38, DataHeatBalFanSys::ZoneHumidex(1), 1);
+
+    // Test categorization of the first 4 hours.
+    EXPECT_EQ(2, DataHeatBalFanSys::ZoneHeatIndexHourBins(1)[0]); // Safe: Heat Index <= 80 °F (32.2 °C).
+    EXPECT_EQ(1, DataHeatBalFanSys::ZoneHeatIndexHourBins(1)[1]); // Caution: (80, 90 °F] / (26.7, 32.2 °C]
+    EXPECT_EQ(1, DataHeatBalFanSys::ZoneHeatIndexHourBins(1)[2]); // Extreme Caution (90, 105 °F] / (32.2, 40.6 °C]
+    EXPECT_EQ(0, DataHeatBalFanSys::ZoneHeatIndexHourBins(1)[3]);
+    EXPECT_EQ(0, DataHeatBalFanSys::ZoneHeatIndexOccuHourBins(1)[0]); // # of People = 0
+
+    EXPECT_EQ(2, DataHeatBalFanSys::ZoneHumidexHourBins(1)[0]); // Humidex <= 29
+    EXPECT_EQ(2, DataHeatBalFanSys::ZoneHumidexHourBins(1)[1]); // Humidex (29, 40]
+    EXPECT_EQ(0, DataHeatBalFanSys::ZoneHumidexOccuHourBins(1)[0]); // # of People = 0
+
+    // Test SET-hours calculation - No occupant
+    EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours
+    EXPECT_EQ(0, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours
+
+    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    ScheduleManager::Schedule(1).CurrentValue = 1;
+    for (int hour = 5; hour <= 7; hour++) {
+        DataGlobals::HourOfDay = hour;
+//        CalcThermalResilience();
+        ReportThermalResilience();
+    }
+    // Test SET-hours calculation - Heating unmet
+    EXPECT_EQ(3, DataHeatBalFanSys::ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * 3 Hours
+    EXPECT_EQ(6, DataHeatBalFanSys::ZoneLowSETHours(1)[1]); // SET OccupantHours = (12.2 - 11.2) * 3 Hours * 2 OCC
+
+    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 32;
+    for (int hour = 8; hour <= 10; hour++) {
+        DataGlobals::HourOfDay = hour;
+        ReportThermalResilience();
+    }
+    // Test SET-hours calculation - Cooling unmet
+    EXPECT_EQ(6, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours = (32 - 30) * 3 Hours
+    EXPECT_EQ(12, DataHeatBalFanSys::ZoneHighSETHours(1)[1]); // SET OccupantHours = (32 - 30) * 3 Hours * 2 OCC
+
+    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 25;
+    for (int hour = 11; hour <= 12; hour++) {
+        DataGlobals::HourOfDay = hour;
+        ReportThermalResilience();
+    }
+    EnergyPlus::ThermalComfort::ThermalComfortData(1).PierceSET = 11.2;
+    for (int hour = 13; hour <= 18; hour++) {
+        DataGlobals::HourOfDay = hour;
+        ReportThermalResilience();
+    }
+    ScheduleManager::Schedule(1).CurrentValue = 0;
+    for (int hour = 18; hour <= 20; hour++) {
+        DataGlobals::HourOfDay = hour;
+        ReportThermalResilience();
+    }
+
+    // Test SET longest duration calculation
+    // Cooling Unmet Duration: Hour 1 - 4 (no occupants), Hour 8 - 10;
+    // Heating Unmet Duration: Hour 5 - 7, Hour 13 - 18, Hour 18 - 20 (no occupants);
+    EXPECT_EQ(9, DataHeatBalFanSys::ZoneLowSETHours(1)[0]); // SET Hours = (12.2 - 11.2) * (3 + 6) Hours
+    EXPECT_EQ(6, DataHeatBalFanSys::ZoneHighSETHours(1)[0]); // SET Hours = SET Hours = (32 - 30) * 3 Hours
+    EXPECT_EQ(6, DataHeatBalFanSys::ZoneLowSETHours(1)[2]); // Longest Heating SET Unmet Duration
+    EXPECT_EQ(3, DataHeatBalFanSys::ZoneHighSETHours(1)[2]); //  Longest Cooling SET Unmet Duration
+
+    DataHeatBalFanSys::ZoneCO2LevelHourBins.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneCO2LevelOccuHourBins.allocate(NumOfZones);
+    DataContaminantBalance::ZoneAirCO2Avg.allocate(NumOfZones);
+    DataContaminantBalance::Contaminant.CO2Simulation = true;
+    ScheduleManager::Schedule(1).CurrentValue = 1;
+    OutputReportTabular::displayCO2ResilienceSummary = true;
+    DataContaminantBalance::ZoneAirCO2Avg(1) = 1100;
+    ReportCO2Resilience();
+    EXPECT_EQ(1, DataHeatBalFanSys::ZoneCO2LevelHourBins(1)[1]);
+    EXPECT_EQ(2, DataHeatBalFanSys::ZoneCO2LevelOccuHourBins(1)[1]);
+
+    DataHeatBalFanSys::ZoneLightingLevelHourBins.allocate(NumOfZones);
+    DataHeatBalFanSys::ZoneLightingLevelOccuHourBins.allocate(NumOfZones);
+    DataDaylighting::ZoneDaylight.allocate(NumOfZones);
+    DataDaylighting::ZoneDaylight(1).DaylightMethod = DataDaylighting::SplitFluxDaylighting;
+    DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt.allocate(1);
+    DataDaylighting::ZoneDaylight(1).IllumSetPoint.allocate(1);
+    DataDaylighting::ZoneDaylight(1).ZonePowerReductionFactor = 0.5;
+    DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1) = 300;
+    DataDaylighting::ZoneDaylight(1).IllumSetPoint(1) = 400;
+    OutputReportTabular::displayVisualResilienceSummary = true;
+
+    ReportVisualResilience();
+    EXPECT_EQ(1, DataHeatBalFanSys::ZoneLightingLevelHourBins(1)[2]);
+    EXPECT_EQ(2, DataHeatBalFanSys::ZoneLightingLevelOccuHourBins(1)[2]);
+
+}
+
 TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
 {
 
@@ -2942,5 +3115,4 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     InitIntSolarDistribution();
     EXPECT_NEAR(1.666667, DataHeatBalance::IntBmIncInsSurfIntensRep(1), 0.00001);
 }
-
 } // namespace EnergyPlus

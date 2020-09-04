@@ -1055,13 +1055,13 @@ namespace OutdoorAirUnit {
                                 "System",
                                 "Average",
                                 OutAirUnit(OAUnitNum).Name);
-            SetupOutputVariable("Zone Outdoor Air Unit Fan Electric Power",
+            SetupOutputVariable("Zone Outdoor Air Unit Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 OutAirUnit(OAUnitNum).ElecFanRate,
                                 "System",
                                 "Average",
                                 OutAirUnit(OAUnitNum).Name);
-            SetupOutputVariable("Zone Outdoor Air Unit Fan Electric Energy",
+            SetupOutputVariable("Zone Outdoor Air Unit Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 OutAirUnit(OAUnitNum).ElecFanEnergy,
                                 "System",

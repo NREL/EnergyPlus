@@ -54,6 +54,12 @@
 #include <EnergyPlus/api/state.h>
 
 #ifdef __cplusplus
+
+#include <functional>
+#include <string>
+
+ENERGYPLUSLIB_API void registerErrorCallback(EnergyPlusState state, std::function<void(EnergyPlus::Error, const std::string &)> f);
+
 extern "C" {
 #endif
 
@@ -88,16 +94,16 @@ ENERGYPLUSLIB_API void initializeFunctionalAPI(EnergyPlusState state);
 ///          problems if the API ever changes.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
 ENERGYPLUSLIB_API const char * apiVersionFromEPlus(EnergyPlusState state);
+
 /// \brief Allows a user to register an error callback function.
 /// \details If a user script registers a callback function here, then when EnergyPlus is sending an error message to
 ///          the error file, it will also send it here.  The user function will then have the ability to act on the
 ///          error message if needed.
 /// \param[in] state An active EnergyPlusState instance created with `stateNew`.
-/// \param[in] f A function that accepts an error string, and will be called by EnergyPlus when an error is emitted.
+/// \param[in] f A function that accepts an integer error level and an error string, and will be called by EnergyPlus when an error is emitted.
 /// \remark A future version of this method will enable additional functionality including an argument indicating the
 ///         error type, and allowing the return value from this callback to determine how EnergyPlus should behave.
-ENERGYPLUSLIB_API void registerErrorCallback(EnergyPlusState state, void (*f)(const char * errorMessage));
-
+ENERGYPLUSLIB_API void registerErrorCallback(EnergyPlusState state, void (*f)(int, const char * errorMessage));
 
 /// \brief This typedef is a convenient pointer to an internal glycol property class inside EnergyPlus.
 /// \details In a default EnergyPlus simulation, pure water properties are available directly.  To access properties of

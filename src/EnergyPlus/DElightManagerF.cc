@@ -70,6 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -216,7 +217,7 @@ namespace DElightManagerF {
         int iNumWndoConsts = 0;
 
         // Open a file for writing DElight input from EnergyPlus data
-        auto delightInFile = ioFiles.delightIn.open("DElightInputGenerator");
+        auto delightInFile = ioFiles.delightIn.open("DElightInputGenerator", ioFiles.outputControl.delightin);
 
         // Start of DElight input file
         print(delightInFile, Format_901, CurrentDateTime);

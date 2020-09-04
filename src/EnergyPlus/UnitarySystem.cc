@@ -6963,7 +6963,7 @@ namespace UnitarySystems {
                                     "System",
                                     "Average",
                                     unitarySys[sysNum].Name);
-                SetupOutputVariable("Unitary System Ancillary Electric Power",
+                SetupOutputVariable("Unitary System Ancillary Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     unitarySys[sysNum].m_TotalAuxElecPower,
                                     "System",
@@ -7019,14 +7019,14 @@ namespace UnitarySystems {
                                     unitarySys[sysNum].Name);
 
                 if (unitarySys[sysNum].m_HeatCoilExists) {
-                    SetupOutputVariable("Unitary System Heating Ancillary Electric Energy",
+                    SetupOutputVariable("Unitary System Heating Ancillary Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         unitarySys[sysNum].m_HeatingAuxElecConsumption,
                                         "System",
                                         "Sum",
                                         unitarySys[sysNum].Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "Heating",
                                         _,
                                         "System");
@@ -7048,24 +7048,24 @@ namespace UnitarySystems {
                                             "Average",
                                             unitarySys[sysNum].Name);
                     } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_MultiSpeedCooling || (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling)) {
-                        SetupOutputVariable("Unitary System Cooling Ancillary Electric Energy",
+                        SetupOutputVariable("Unitary System Cooling Ancillary Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             unitarySys[sysNum].m_CoolingAuxElecConsumption,
                                             "System",
                                             "Sum",
                                             unitarySys[sysNum].Name,
                                             _,
-                                            "Electric",
+                                            "Electricity",
                                             "Cooling",
                                             _,
                                             "System");
-                        SetupOutputVariable("Unitary System Electric Power",
+                        SetupOutputVariable("Unitary System Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             unitarySys[sysNum].m_ElecPower,
                                             "System",
                                             "Average",
                                             unitarySys[sysNum].Name);
-                        SetupOutputVariable("Unitary System Electric Energy",
+                        SetupOutputVariable("Unitary System Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             unitarySys[sysNum].m_ElecPowerConsumption,
                                             "System",

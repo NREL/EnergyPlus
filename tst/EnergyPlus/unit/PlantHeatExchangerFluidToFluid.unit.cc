@@ -1135,7 +1135,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
                         }
                     }
 
-                    WeatherManager::ManageWeather(state.files);
+                    WeatherManager::ManageWeather(state);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 
@@ -2226,7 +2226,7 @@ TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
                         }
                     }
 
-                    WeatherManager::ManageWeather(state.files);
+                    WeatherManager::ManageWeather(state);
 
                     HeatBalanceManager::ManageHeatBalance(state);
 

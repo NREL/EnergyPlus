@@ -2933,7 +2933,6 @@ namespace HVACManager {
         using DataHeatBalance::Zone;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
-        using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
         using ScheduleManager::CheckScheduleValue;
         using ScheduleManager::GetCurrentScheduleValue;
@@ -3022,7 +3021,7 @@ namespace HVACManager {
                         }
                     }
                     for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                        if (SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_ReturnAir) {
+                        if (DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
                             ShowWarningError("For zone=" + Zone(ZoneNum).Name +
                                              " return air heat gain from air flow windows will be applied to the zone air.");
                             ShowContinueError("  This zone has no return air or is served by an on/off HVAC system.");

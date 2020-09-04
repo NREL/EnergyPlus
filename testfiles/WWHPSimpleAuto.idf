@@ -2400,7 +2400,7 @@
 
   Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,Heat Pump Electric Power,timestep;
+  Output:Variable,*,Heat Pump Electricity Rate,timestep;
 
   Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep;
 

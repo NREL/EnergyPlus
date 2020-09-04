@@ -71,6 +71,7 @@
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -235,7 +236,7 @@ namespace EMSManager {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
             if (OutputEDDFile) {
                 // open up output file for EMS EDD file  EMS Data and Debug
-                ioFiles.edd.ensure_open("CheckIFAnyEMS");
+                ioFiles.edd.ensure_open("CheckIFAnyEMS", ioFiles.outputControl.edd);
             }
         } else {
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
@@ -961,6 +962,8 @@ namespace EMSManager {
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginNewEvironment;
+                    } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFORESETCURRENTWEATHER") {
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginZoneTimestepBeforeSetCurrentWeather;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
@@ -1804,7 +1807,6 @@ namespace EMSManager {
         using DataSurfaces::ExternalEnvironment;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::TotSurfaces;
         using DataSurfaces::WindowShadingControl;
         using DataSurfaces::WSC_ST_SwitchableGlazing;
@@ -1832,32 +1834,32 @@ namespace EMSManager {
             if (Surface(loopSurfNum).ExtBoundCond != ExternalEnvironment) continue;
             if (!Surface(loopSurfNum).HasShadeControl) continue;
 
-            if (SurfaceWindow(loopSurfNum).HasShadeOrBlindLayer) {
+            if (DataSurfaces::SurfWinHasShadeOrBlindLayer(loopSurfNum)) {
                 SetupEMSActuator("Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
                                  "[ShadeStatus]",
-                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSOn,
-                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSValue);
-                if (SurfaceWindow(loopSurfNum).MovableSlats) {
+                                 DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
+                                 DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
+                if (DataSurfaces::SurfWinMovableSlats(loopSurfNum)) {
                     SetupEMSActuator("Window Shading Control",
                                      Surface(loopSurfNum).Name,
                                      "Slat Angle",
                                      "[degrees]",
-                                     SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSon,
-                                     SurfaceWindow(loopSurfNum).SlatAngThisTSDegEMSValue);
+                                     DataSurfaces::SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
+                                     DataSurfaces::SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
             } else if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType == WSC_ST_ExteriorScreen) {
                 SetupEMSActuator("Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
                                  "[ShadeStatus]",
-                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSOn,
-                                 SurfaceWindow(loopSurfNum).ShadingFlagEMSValue);
+                                 DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
+                                 DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
                 if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
-                                    dataConstruction.Construct(SurfaceWindow(loopSurfNum).ShadedConstruction).Name + "', surface name = '" +
+                                    dataConstruction.Construct(DataSurfaces::SurfWinShadedConstruction(loopSurfNum)).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");
                     ShowContinueError("...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");

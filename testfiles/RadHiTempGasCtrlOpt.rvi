@@ -6,8 +6,8 @@ Zone Air System Sensible Cooling Energy
 Zone Air System Sensible Heating Energy
 Zone Radiant HVAC Heating Rate
 Zone Radiant HVAC Heating Energy
-Zone Radiant HVAC Gas Rate
-Zone Radiant HVAC Gas Energy
+Zone Radiant HVAC NaturalGas Rate
+Zone Radiant HVAC NaturalGas Energy
 Zone Thermal Comfort Fanger Model PMV
 Zone Thermal Comfort Pierce Model Thermal Sensation Index
 Zone Thermal Comfort KSU Model Thermal Sensation Vote

@@ -417,7 +417,7 @@ namespace EarthTube {
                                         "System",
                                         "State",
                                         Zone(EarthTubeSys(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Earth Tube Fan Electric Energy",
+                    SetupOutputVariable("Earth Tube Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRptET(EarthTubeSys(Loop).ZonePtr).EarthTubeFanElec,
                                         "System",
@@ -428,7 +428,7 @@ namespace EarthTube {
                                         _,
                                         _,
                                         "Building");
-                    SetupOutputVariable("Earth Tube Fan Electric Power",
+                    SetupOutputVariable("Earth Tube Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRptET(EarthTubeSys(Loop).ZonePtr).EarthTubeFanElecPower,
                                         "System",

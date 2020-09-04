@@ -169,7 +169,6 @@ namespace HeatBalanceManager {
     using DataSurfaces::FrameDividerProperties;
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::StormWindow;
-    using DataSurfaces::SurfaceWindow;
     using DataSurfaces::Suspended;
     using DataSurfaces::TotStormWin;
     using DataSurfaces::TotSurfaces;
@@ -5231,9 +5230,9 @@ namespace HeatBalanceManager {
             MaxLoadZoneRpt = 0.0;
             CountWarmupDayPoints = 0;
 
-            for (auto &e : SurfaceWindow) {
-                e.ThetaFace = 296.15;
-                e.EffInsSurfTemp = 23.0;
+            for (SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
+                DataSurfaces::SurfaceWindow(SurfNum).ThetaFace = 296.15;
+                DataSurfaces::SurfWinEffInsSurfTemp(SurfNum) = 23.0;
             }
         }
 
@@ -5250,7 +5249,7 @@ namespace HeatBalanceManager {
                 StormWinChangeThisDay = false;
                 for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
                     SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-                    SurfaceWindow(SurfNum).StormWinFlagPrevDay = SurfaceWindow(SurfNum).StormWinFlag;
+                    DataSurfaces::SurfWinStormWinFlagPrevDay(SurfNum) = DataSurfaces::SurfWinStormWinFlag(SurfNum);
                 }
                 ChangeSet = true;
             }
@@ -5488,6 +5487,23 @@ namespace HeatBalanceManager {
         TempZoneRptStdDev.allocate(NumOfTimeStepInHour * 24);
         LoadZoneRptStdDev.allocate(NumOfTimeStepInHour * 24);
         // MassConservation.allocate( NumOfZones );
+
+        ZoneHeatIndex.dimension(NumOfZones, 0.0);
+        ZoneHumidex.dimension(NumOfZones, 0.0);
+        ZoneNumOcc.dimension(NumOfZones, 0);
+        ZoneHeatIndexHourBins.allocate(NumOfZones);
+        ZoneHumidexHourBins.allocate(NumOfZones);
+        ZoneHeatIndexOccuHourBins.allocate(NumOfZones);
+        ZoneHumidexOccuHourBins.allocate(NumOfZones);
+        ZoneCO2LevelHourBins.allocate(NumOfZones);
+        ZoneCO2LevelOccuHourBins.allocate(NumOfZones);
+        ZoneLightingLevelHourBins.allocate(NumOfZones);
+        ZoneLightingLevelOccuHourBins.allocate(NumOfZones);
+
+        ZoneOccPierceSET.dimension(NumOfZones, 0);
+        ZoneOccPierceSETLastStep.dimension(NumOfZones, 0);
+        ZoneLowSETHours.allocate(NumOfZones);
+        ZoneHighSETHours.allocate(NumOfZones);
 
         CountWarmupDayPoints = 0;
     }
@@ -5988,7 +6004,7 @@ namespace HeatBalanceManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SurfNum;
 
-        ioFiles.shade.ensure_open("OpenOutputFiles");
+        ioFiles.shade.ensure_open("OpenOutputFiles", ioFiles.outputControl.extshd);
         print(ioFiles.shade, "Surface Name,");
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             print(ioFiles.shade, "{},", Surface(SurfNum).Name);
@@ -7066,6 +7082,8 @@ namespace HeatBalanceManager {
         // REFERENCES:na
         // Using/Aliasing
         using General::BetweenDates;
+        using DataSurfaces::SurfWinStormWinFlag;
+        using DataSurfaces::SurfWinStormWinFlagPrevDay;
 
         // Locals
         // SUBROUTINE PARAMETER DEFINITIONS:na
@@ -7087,7 +7105,7 @@ namespace HeatBalanceManager {
 
         for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
             SurfNum = StormWindow(StormWinNum).BaseWindowNum;
-            SurfaceWindow(SurfNum).StormWinFlagPrevDay = SurfaceWindow(SurfNum).StormWinFlag;
+            SurfWinStormWinFlagPrevDay(SurfNum) = SurfWinStormWinFlag(SurfNum);
             DateOff = StormWindow(StormWinNum).DateOff - 1;
             // Note: Dateon = Dateoff is not allowed and will have produced an error in getinput.
             if (DateOff == 0) DateOff = 366;
@@ -7096,9 +7114,9 @@ namespace HeatBalanceManager {
             } else {
                 StormWinFlag = 0;
             }
-            SurfaceWindow(SurfNum).StormWinFlag = StormWinFlag;
-            if (BeginSimFlag) SurfaceWindow(SurfNum).StormWinFlagPrevDay = StormWinFlag;
-            if (SurfaceWindow(SurfNum).StormWinFlag != SurfaceWindow(SurfNum).StormWinFlagPrevDay) StormWinChangeThisDay = true;
+            SurfWinStormWinFlag(SurfNum) = StormWinFlag;
+            if (BeginSimFlag) SurfWinStormWinFlagPrevDay(SurfNum) = StormWinFlag;
+            if (SurfWinStormWinFlag(SurfNum) != SurfWinStormWinFlagPrevDay(SurfNum)) StormWinChangeThisDay = true;
         }
     }
 

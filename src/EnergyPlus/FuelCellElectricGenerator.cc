@@ -1061,9 +1061,9 @@ namespace FuelCellElectricGenerator {
 
     void FCDataStruct::setupOutputVars()
     {
-        SetupOutputVariable("Generator Produced Electric Power", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
+        SetupOutputVariable("Generator Produced AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACPowerGen, "System", "Average", this->Name);
 
-        SetupOutputVariable("Generator Produced Electric Energy",
+        SetupOutputVariable("Generator Produced AC Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Report.ACEnergyGen,
                             "System",
@@ -1096,7 +1096,7 @@ namespace FuelCellElectricGenerator {
                             "Sum",
                             this->Name,
                             _,
-                            "Gas",
+                            "NaturalGas",
                             "COGENERATION",
                             _,
                             "Plant");
@@ -1147,9 +1147,9 @@ namespace FuelCellElectricGenerator {
                                 this->Name);
 
             SetupOutputVariable(
-                "Generator Blower Electric Power", OutputProcessor::Unit::W, this->Report.BlowerPower, "System", "Average", this->Name);
+                "Generator Blower Electricity Rate", OutputProcessor::Unit::W, this->Report.BlowerPower, "System", "Average", this->Name);
 
-            SetupOutputVariable("Generator Blower Electric Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
+            SetupOutputVariable("Generator Blower Electricity Energy", OutputProcessor::Unit::J, this->Report.BlowerEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable(
                 "Generator Blower Skin Heat Loss Rate", OutputProcessor::Unit::W, this->Report.BlowerSkinLoss, "System", "Average", this->Name);
@@ -1184,7 +1184,7 @@ namespace FuelCellElectricGenerator {
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Compressor Electric Power",
+            SetupOutputVariable("Generator Fuel Compressor Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.FuelCompressPower,
                                 "System",
@@ -1192,7 +1192,7 @@ namespace FuelCellElectricGenerator {
                                 this->Name);
 
             SetupOutputVariable(
-                "Generator Fuel Compressor Electric Energy", OutputProcessor::Unit::J, this->Report.FuelCompressEnergy, "System", "Sum", this->Name);
+                "Generator Fuel Compressor Electricity Energy", OutputProcessor::Unit::J, this->Report.FuelCompressEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable("Generator Fuel Compressor Skin Heat Loss Rate",
                                 OutputProcessor::Unit::W,
@@ -1222,14 +1222,14 @@ namespace FuelCellElectricGenerator {
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electric Power",
+            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 this->Report.WaterPumpPower,
                                 "System",
                                 "Average",
                                 this->Name);
 
-            SetupOutputVariable("Generator Fuel Reformer Water Pump Electric Energy",
+            SetupOutputVariable("Generator Fuel Reformer Water Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 this->Report.WaterPumpEnergy,
                                 "System",
@@ -1295,7 +1295,7 @@ namespace FuelCellElectricGenerator {
             SetupOutputVariable("Generator Inverter Loss Power", OutputProcessor::Unit::W, this->Report.PCUlosses, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Generator Produced DC Electric Power", OutputProcessor::Unit::W, this->Report.DCPowerGen, "System", "Average", this->Name);
+                "Generator Produced DC Electricity Rate", OutputProcessor::Unit::W, this->Report.DCPowerGen, "System", "Average", this->Name);
 
             SetupOutputVariable(
                 "Generator DC Power Efficiency", OutputProcessor::Unit::None, this->Report.DCPowerEff, "System", "Average", this->Name);
@@ -1320,10 +1320,10 @@ namespace FuelCellElectricGenerator {
                 "Generator DC Storage Discharging Energy", OutputProcessor::Unit::J, this->Report.DrawnEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable(
-                "Generator Ancillary AC Electric Power", OutputProcessor::Unit::W, this->Report.ACancillariesPower, "System", "Average", this->Name);
+                "Generator Ancillary AC Electricity Rate", OutputProcessor::Unit::W, this->Report.ACancillariesPower, "System", "Average", this->Name);
 
             SetupOutputVariable(
-                "Generator Ancillary AC Electric Energy", OutputProcessor::Unit::J, this->Report.ACancillariesEnergy, "System", "Sum", this->Name);
+                "Generator Ancillary AC Electricity Energy", OutputProcessor::Unit::J, this->Report.ACancillariesEnergy, "System", "Sum", this->Name);
 
             SetupOutputVariable("Generator Fuel Cell Model Iteration Count",
                                 OutputProcessor::Unit::None,

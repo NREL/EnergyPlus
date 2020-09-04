@@ -84,6 +84,8 @@ SET( SRC
   DXFEarClipping.cc
   DXFEarClipping.hh
   Data/BaseData.hh
+  Data/CommonIncludes.hh
+  Data/EnergyPlusData.cc
   Data/EnergyPlusData.hh
   DataAirLoop.cc
   DataAirLoop.hh
@@ -489,8 +491,8 @@ SET( SRC
   ReportCoilSelection.hh
   ReportSizingManager.cc
   ReportSizingManager.hh
-  ResultsSchema.cc
-  ResultsSchema.hh
+  ResultsFramework.cc
+  ResultsFramework.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
   RoomAirModelAirflowNetwork.cc
