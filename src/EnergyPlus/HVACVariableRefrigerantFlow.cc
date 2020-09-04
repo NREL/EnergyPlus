@@ -2323,7 +2323,7 @@ namespace HVACVariableRefrigerantFlow {
             if (!lAlphaFieldBlanks(39)) {
                 // A39; \field Fuel type, Validate fuel type input
                 bool FuelTypeError(false);
-                UtilityRoutines::ValidateFuelType(cAlphaArgs(39), VRF(VRFNum).FuelType, FuelTypeError);
+                UtilityRoutines::ValidateFuelTypeWithAssignResourceTypeNum(cAlphaArgs(39), VRF(VRFNum).FuelType, VRF(VRFNum).FuelTypeNum, FuelTypeError);
                 if (FuelTypeError) {
                     ShowSevereError(cCurrentModuleObject + ", \"" + VRF(VRFNum).Name + "\", " + cAlphaFieldNames(39) +
                                     " not found = " + cAlphaArgs(39));
@@ -4834,7 +4834,7 @@ namespace HVACVariableRefrigerantFlow {
             }
 
             if (VRF(NumCond).DefrostStrategy == Resistive ||
-                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelType == "Electricity")) {
+                (VRF(NumCond).DefrostStrategy == ReverseCycle && VRF(NumCond).FuelTypeNum == DataGlobalConstants::iRT_Electricity)) {
                 SetupOutputVariable("VRF Heat Pump Defrost Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     VRF(NumCond).DefrostPower,
