@@ -11303,18 +11303,18 @@ namespace OutputReportTabular {
 
     void WriteResilienceBinsTable(int const columnNum,
                                   std::vector<int> const &columnHead,
-                                  Array1D<std::vector<double>> const &ZoneBins)
+                                  Array1D<std::vector<Real64>> const &ZoneBins)
     {
-        std::vector<double> columnMax(columnNum, 0);
-        std::vector<double> columnMin(columnNum, 0);
-        std::vector<double> columnSum(columnNum, 0);
+        std::vector<Real64> columnMax(columnNum, 0);
+        std::vector<Real64> columnMin(columnNum, 0);
+        std::vector<Real64> columnSum(columnNum, 0);
         for (int j = 0; j < columnNum; j++) {
             columnMin[j] = ZoneBins(1)[j];
         }
         for (int i = 1; i <= NumOfZones; ++i) {
             std::string ZoneName = Zone(i).Name;
             for (int j = 0; j < columnNum; j++) {
-                double curValue = ZoneBins(i)[j];
+                Real64 curValue = ZoneBins(i)[j];
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
@@ -11332,17 +11332,17 @@ namespace OutputReportTabular {
 
     void WriteSETHoursTable(int const columnNum,
                             std::vector<int> const &columnHead,
-                            Array1D<std::vector<double>> const &ZoneBins)
+                            Array1D<std::vector<Real64>> const &ZoneBins)
     {
-        std::vector<double> columnMax(columnNum - 1, 0);
-        std::vector<double> columnMin(columnNum - 1, 0);
-        std::vector<double> columnSum(columnNum - 1, 0);
+        std::vector<Real64> columnMax(columnNum - 1, 0);
+        std::vector<Real64> columnMin(columnNum - 1, 0);
+        std::vector<Real64> columnSum(columnNum - 1, 0);
         for (int j = 0; j < columnNum - 1; j++) {
             columnMin[j] = ZoneBins(1)[j];
         }
         for (int i = 1; i <= NumOfZones; ++i) {
             for (int j = 0; j < columnNum - 1; j++) {
-                double curValue = ZoneBins(i)[j];
+                Real64 curValue = ZoneBins(i)[j];
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
