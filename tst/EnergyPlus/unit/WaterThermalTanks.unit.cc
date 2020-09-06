@@ -3836,14 +3836,14 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  ,                        !- Heater Minimum Capacity {W}",
         "  0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
         "  0,                       !- Heater Ignition Delay {s}",
-        "  NaturalGas,              !- Heater Fuel Type",
+        "  Steam,              !- Heater Fuel Type",
         "  0.8,                     !- Heater Thermal Efficiency",
         "  ,                        !- Part Load Factor Curve Name",
         "  20,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
-        "  NaturalGas,              !- Off Cycle Parasitic Fuel Type",
+        "  Steam,              !- Off Cycle Parasitic Fuel Type",
         "  0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
         "  0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
-        "  NaturalGas,              !- On Cycle Parasitic Fuel Type",
+        "  Steam,              !- On Cycle Parasitic Fuel Type",
         "  0,                       !- On Cycle Parasitic Heat Fraction to Tank",
         "  Zone,                    !- Ambient Temperature Indicator",
         "  ,                        !- Ambient Temperature Schedule Name",
@@ -4241,9 +4241,9 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         
         // ValidateFuelType tests for WaterHeater:Mixed
         WaterThermalTanks::getWaterHeaterMixedInputs();
-        EXPECT_EQ(HPWHTank.FuelType, "NaturalGas");
-        EXPECT_EQ(HPWHTank.OffCycParaFuelType, "NaturalGas");
-        EXPECT_EQ(HPWHTank.OnCycParaFuelType, "NaturalGas");
+        EXPECT_EQ(HPWHTank.FuelType, "Steam");
+        EXPECT_EQ(HPWHTank.OffCycParaFuelType, "Steam");
+        EXPECT_EQ(HPWHTank.OnCycParaFuelType, "Steam");
     }
 
     ++HPWaterHeaterNum;

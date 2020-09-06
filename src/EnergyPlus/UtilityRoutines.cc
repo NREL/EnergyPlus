@@ -473,7 +473,8 @@ namespace UtilityRoutines {
 
     bool ValidateFuelType(std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound)
+                          bool &FuelTypeErrorsFound,
+                          bool const &AllowSteamAndDistrict)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -515,7 +516,19 @@ namespace UtilityRoutines {
             FuelTypeOutput = "OtherFuel2";
 
         } else {
-            FuelTypeErrorsFound = true;
+            if (AllowSteamAndDistrict) {
+                if (SELECT_CASE_var == "STEAM") {
+                    FuelTypeOutput = "Steam";
+                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+                    FuelTypeOutput = "DistrictHeating";
+                } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
+                    FuelTypeOutput = "DistrictCooling";
+                } else {
+                    FuelTypeErrorsFound = true;
+                }
+            } else {
+                FuelTypeErrorsFound = true;
+            }
         }
 
         return FuelTypeErrorsFound;

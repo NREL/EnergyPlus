@@ -2329,22 +2329,16 @@ namespace WaterThermalTanks {
             Tank.IgnitionDelay = DataIPShortCuts::rNumericArgs(7); // Not yet implemented
 
             // Validate Heater Fuel Type
-            bool FuelTypeFirstPass(false);
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(4), Tank.FuelType, FuelTypeFirstPass);
-            if (FuelTypeFirstPass) {
-                auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(4));
-                if (SELECT_CASE_var == "STEAM") {
-                    Tank.FuelType = "Steam";
-                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                    Tank.FuelType = "DistrictHeating";
-                } else {
-                    ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
-                                    ":  Invalid Heater Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(4));
-                    // Set to Electric to avoid errors when setting up output variables
-                    Tank.FuelType = "Electricity";
-                    ErrorsFound = true;
-                }
-                FuelTypeFirstPass = false;
+            bool FuelTypeError(false);
+            bool AllowSteamAndDistrict(true);
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(4), Tank.FuelType, FuelTypeError, AllowSteamAndDistrict);
+            if (FuelTypeError) {
+                ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
+                                ":  Invalid Heater Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(4));
+                // Set to Electric to avoid errors when setting up output variables
+                Tank.FuelType = "Electricity";
+                ErrorsFound = true;
+                FuelTypeError = false;
             }
 
             if (DataIPShortCuts::rNumericArgs(8) > 0.0) {
@@ -2383,15 +2377,11 @@ namespace WaterThermalTanks {
             Tank.OffCycParaLoad = DataIPShortCuts::rNumericArgs(9);
 
             // Validate Off-Cycle Parasitic Fuel Type
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(6), Tank.OffCycParaFuelType, FuelTypeFirstPass);
-            if (FuelTypeFirstPass) {
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(6), Tank.OffCycParaFuelType, FuelTypeError, AllowSteamAndDistrict);
+            if (FuelTypeError) {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(6));
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank.OffCycParaFuelType = Tank.FuelType;
-                } else if (SELECT_CASE_var == "STEAM") {
-                    Tank.OffCycParaFuelType = "Steam";
-                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                    Tank.OffCycParaFuelType = "DistrictHeating";
                 } else {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid Off-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(6));
@@ -2399,7 +2389,7 @@ namespace WaterThermalTanks {
                     Tank.OffCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
-                FuelTypeFirstPass = false;
+                FuelTypeError = false;
             }
 
             Tank.OffCycParaFracToTank = DataIPShortCuts::rNumericArgs(10);
@@ -2407,15 +2397,11 @@ namespace WaterThermalTanks {
             Tank.OnCycParaLoad = DataIPShortCuts::rNumericArgs(11);
 
             // Validate On-Cycle Parasitic Fuel Type
-            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(7), Tank.OnCycParaFuelType, FuelTypeFirstPass);
-            if (FuelTypeFirstPass) {
+            UtilityRoutines::ValidateFuelType(DataIPShortCuts::cAlphaArgs(7), Tank.OnCycParaFuelType, FuelTypeError, AllowSteamAndDistrict);
+            if (FuelTypeError) {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(7));
                 if (SELECT_CASE_var.empty()) { // If blank, default to Fuel Type for heater
                     Tank.OnCycParaFuelType = Tank.FuelType;
-                } else if (SELECT_CASE_var == "STEAM") {
-                    Tank.OnCycParaFuelType = "Steam";
-                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
-                    Tank.OnCycParaFuelType = "DistrictHeating";
                 } else {
                     ShowSevereError(DataIPShortCuts::cCurrentModuleObject + " = " + DataIPShortCuts::cAlphaArgs(1) +
                                     ":  Invalid On-Cycle Parasitic Fuel Type entered=" + DataIPShortCuts::cAlphaArgs(7));
@@ -2423,7 +2409,7 @@ namespace WaterThermalTanks {
                     Tank.OnCycParaFuelType = "Electricity";
                     ErrorsFound = true;
                 }
-                FuelTypeFirstPass = false;
+                FuelTypeError = false;
             }
 
             Tank.OnCycParaFracToTank = DataIPShortCuts::rNumericArgs(12);
