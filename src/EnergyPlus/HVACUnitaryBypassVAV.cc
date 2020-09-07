@@ -1810,7 +1810,9 @@ namespace HVACUnitaryBypassVAV {
                         // need call to EMS to check node
                         EMSSetPointCheck = false;
                         EMSManager::CheckIfNodeSetPointManagedByEMS(OutNode, EMSManager::iHumidityRatioMaxSetPoint, EMSSetPointCheck);
+                        bool foundControl = DataLoopNode::NodeSetpointCheck(OutNode).needsSetpointChecking = false;
                         if (EMSSetPointCheck) {
+                            // There is no plugin anyways, so we now we have a bad condition.
                             ShowWarningError("Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
                             ShowContinueError("Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node "
                                               "of the unitary system.");
@@ -1818,6 +1820,19 @@ namespace HVACUnitaryBypassVAV {
                                 "Or use an EMS Actuator to place a maximum humidity setpoint at the air outlet node of the unitary system.");
                             ShowContinueError("Setting Dehumidification Control Type to None and simulation continues.");
                             CBVAV(CBVAVNum).DehumidControlType = 0;
+                        } else if (!foundControl) {
+                            // Couldn't find a control, but no error? There are some plugins, so adjust warning message accordingly
+                            ShowWarningError("Unitary System:VAV:ChangeOverBypass = " + CBVAV(CBVAVNum).Name);
+                            ShowContinueError("Use SetpointManager:SingleZone:Humidity:Maximum to place a humidity setpoint at the air outlet node "
+                                              "of the unitary system.");
+                            ShowContinueError(
+                                "Or make sure you do actuate the value via an EMS Actuator or Python Actuator to place a maximum humidity setpoint");
+                            ShowContinueError(
+                                "at the air outlet node of the unitary system, or it will behave as if Dehumidification Control Type = None.");
+                            // We do not change the DehumidControlType. There might be a PythonPlugin that will later actuate the HumRatMax
+                            // All checks later are in the following form, and HumRatMax will be > 0 only if actually actuated (otherwise it's
+                            // SensedNodeFlagValue = -999), so it's fine:
+                            // `CBVAV(CBVAVNum).DehumidControlType == DehumidControl_Multimode) && DataLoopNode::Node(OutletNode).HumRatMax > 0.0)`
                         }
                     }
                 }
@@ -3401,7 +3416,7 @@ namespace HVACUnitaryBypassVAV {
         LoadMet = DataLoopNode::Node(OutletNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRat) -
                                                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, MinHumRat));
 
-        // calculate OA fraction used for zone OA volume flow rate calc 
+        // calculate OA fraction used for zone OA volume flow rate calc
         DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac = 0.0;
         if (DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).MassFlowRate > 0.0) {
             DataAirLoop::AirLoopFlow(CBVAV(CBVAVNum).AirLoopNumber).OAFrac =

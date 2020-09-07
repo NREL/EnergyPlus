@@ -1499,6 +1499,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->CHWOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        DataLoopNode::NodeSetpointCheck(this->CHWOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->CoolSetPointErrDone) {
                                 ShowWarningError("Missing temperature setpoint on cooling side for CentralHeatPumpSystem named " + this->Name);
@@ -1528,6 +1529,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                         // need call to EMS to check node
                         bool FatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->HWOutletNodeNum, EMSManager::iTemperatureSetPoint, FatalError);
+                        DataLoopNode::NodeSetpointCheck(this->HWOutletNodeNum).needsSetpointChecking = false;
                         if (FatalError) {
                             if (!this->HeatSetPointErrDone) {
                                 ShowWarningError("Missing temperature setpoint on heating side for CentralHeatPumpSystem named " + this->Name);
