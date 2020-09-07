@@ -428,21 +428,21 @@ namespace PackagedThermalStorageCoil {
 
     void GetTESCoilInput(EnergyPlusData &state);
 
-    void InitTESCoil(BranchInputManagerData &dataBranchInputManager, int &TESCoilNum);
+    void InitTESCoil(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, int &TESCoilNum);
 
-    void SizeTESCoil(int &TESCoilNum);
+    void SizeTESCoil(EnergyPlusData &state, int &TESCoilNum);
 
     void CalcTESCoilOffMode(int const TESCoilNum);
 
-    void CalcTESCoilCoolingOnlyMode(int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingOnlyMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
 
-    void CalcTESCoilCoolingAndChargeMode(int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingAndChargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
 
-    void CalcTESCoilCoolingAndDischargeMode(int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
+    void CalcTESCoilCoolingAndDischargeMode(EnergyPlusData &state, int const TESCoilNum, int const FanOpMode, Real64 const PartLoadRatio);
 
-    void CalcTESCoilChargeOnlyMode(int const TESCoilNum);
+    void CalcTESCoilChargeOnlyMode(EnergyPlusData &state, int const TESCoilNum);
 
-    void CalcTESCoilDischargeOnlyMode(int const TESCoilNum, Real64 const PartLoadRatio);
+    void CalcTESCoilDischargeOnlyMode(EnergyPlusData &state, int const TESCoilNum, Real64 const PartLoadRatio);
 
     void UpdateTEStorage(int const TESCoilNum);
 
@@ -468,11 +468,13 @@ namespace PackagedThermalStorageCoil {
                                       int &LatPLRFail,
                                       int &LatPLRFailIndex);
 
-    Real64 TESCoilResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilResidualFunction(EnergyPlusData &state,
+                                   Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
-    Real64 TESCoilHumRatResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 TESCoilHumRatResidualFunction(EnergyPlusData &state,
+                                         Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 

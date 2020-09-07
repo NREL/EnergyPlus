@@ -817,7 +817,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineIdealCondEntSetPointManager // derived type for SetpointManager:CondenserEnteringReset:Ideal data
@@ -1048,7 +1048,7 @@ namespace SetPointManager {
 
     void InitSetPointManagers();
 
-    void SimSetPointManagers();
+    void SimSetPointManagers(EnergyPlusData &state);
 
     void UpdateSetPointManagers();
 

@@ -557,7 +557,7 @@ namespace SystemAvailabilityManager {
 
     void ManageHybridVentilation(EnergyPlusData &state);
 
-    void GetHybridVentilationInputs();
+    void GetHybridVentilationInputs(EnergyPlusData &state);
 
     void InitHybridVentSysAvailMgr();
 
@@ -566,7 +566,7 @@ namespace SystemAvailabilityManager {
                                    Optional_int_const PriAirSysNum = _ // number of the primary air system affected by this Avail. Manager
     );
 
-    bool GetHybridVentilationControlStatus(EnergyPlusData &EP_UNUSED(state), int const ZoneNum); // Index of zone
+    bool GetHybridVentilationControlStatus(EnergyPlusData &state, int const ZoneNum); // Index of zone
 
 } // namespace SystemAvailabilityManager
 
