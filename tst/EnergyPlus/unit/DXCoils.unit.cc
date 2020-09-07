@@ -1328,6 +1328,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
     DXCoil(1).FuelType = "NaturalGas";
+    DXCoil(1).FuelTypeNum = DataGlobalConstants::iRT_Natural_Gas;
     DXCoil(1).MSHPHeatRecActive = false;
 
     OutDryBulbTemp = 35;
