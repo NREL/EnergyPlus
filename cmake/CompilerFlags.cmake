@@ -9,6 +9,7 @@ endif()
 
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
+ADD_DEFINITIONS("-DBOOST_NO_AUTO_PTR")
 
 SET(CMAKE_CXX_STANDARD 17)
 
