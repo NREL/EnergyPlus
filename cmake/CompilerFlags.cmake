@@ -12,13 +12,6 @@ ADD_DEFINITIONS("-DXML_STATIC")
 
 SET(CMAKE_CXX_STANDARD 17)
 
-IF ( MSVC )
-    # Re-enable deprecated std::binary_function and std::unary_function
-    # required by older boost.
-    # TODO update boost in kiva project and remove this flag
-    ADD_DEFINITIONS("-D_HAS_AUTO_PTR_ETC=1")
-ENDIF()
-
 IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++ (VS 2013)
 
     # COMPILER FLAGS

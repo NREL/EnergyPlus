@@ -508,7 +508,7 @@ namespace DataRuntimeLanguage {
 
     // EMS Actuator fast duplicate check lookup support
     typedef std::tuple<std::string, std::string, std::string> EMSActuatorKey;
-    struct EMSActuatorKey_hash : public std::unary_function<EMSActuatorKey, std::size_t>
+    struct EMSActuatorKey_hash
     {
         inline static void hash_combine(std::size_t &seed, std::string const &s)
         {
