@@ -989,6 +989,8 @@ namespace EvaporativeCoolers {
                         } else {
                             localSetPointCheck = false;
                             CheckIfNodeSetPointManagedByEMS(ControlNode, iTemperatureSetPoint, localSetPointCheck);
+                            DataLoopNode::NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
+                            // Let it slide apparently
                             if (localSetPointCheck) {
                                 ShowSevereError("Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).EvapCoolerName);
                                 ShowContinueError(" use a Setpoint Manager to establish a setpoint at the unit control node.");

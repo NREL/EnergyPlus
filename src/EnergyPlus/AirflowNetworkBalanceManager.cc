@@ -187,7 +187,6 @@ namespace AirflowNetworkBalanceManager {
     using DataSurfaces::SurfaceClass_Door;
     using DataSurfaces::SurfaceClass_GlassDoor;
     using DataSurfaces::SurfaceClass_Window;
-    using DataSurfaces::SurfaceWindow;
     using DataSurfaces::TotSurfaces;
     using DataSurfaces::WorldCoordSystem;
     using DataZoneEquipment::ZoneEquipConfig;
@@ -1548,6 +1547,7 @@ namespace AirflowNetworkBalanceManager {
         using DataLoopNode::NodeConnectionType_Inlet;
         using DataLoopNode::NodeType_Air;
         using DataLoopNode::ObjectIsParent;
+        using DataSurfaces::SurfWinOriginalClass;
         using HVACHXAssistedCoolingCoil::VerifyHeatExchangerParent;
         using MixedAir::GetOAMixerNumber;
         using NodeInputManager::GetOnlySingleNode;
@@ -3200,8 +3200,8 @@ namespace AirflowNetworkBalanceManager {
         // Assign occupant ventilation control number from zone to surface
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             j = MultizoneSurfaceData(i).SurfNum;
-            if (SurfaceWindow(j).OriginalClass == SurfaceClass_Window || SurfaceWindow(j).OriginalClass == SurfaceClass_Door ||
-                SurfaceWindow(j).OriginalClass == SurfaceClass_GlassDoor) {
+            if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
+                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor) {
                 for (n = 1; n <= AirflowNetworkNumOfZones; ++n) {
                     if (MultizoneZoneData(n).ZoneNum == Surface(j).Zone) {
                         if (MultizoneZoneData(n).OccupantVentilationControlNum > 0 && MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) {
@@ -4177,15 +4177,15 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError("10 deg of being horizontal. Airflows through large horizontal openings are poorly");
                         ShowContinueError("modeled in the AirflowNetwork model resulting in only one-way airflow.");
                     }
-                    if (!(SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_Window ||
-                          SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_GlassDoor ||
-                          SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_Door)) {
+                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door)) {
                         ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
-                    if (SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_Door ||
-                        SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_GlassDoor) {
+                    if (SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                        SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor) {
                         if (MultizoneCompDetOpeningData(AirflowNetworkCompData(compnum).TypeNum).LVOType == 2) {
                             ShowSevereError(RoutineName +
                                             "AirflowNetworkComponent: The opening with horizontally pivoted type must be assigned to a "
@@ -4205,9 +4205,9 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError("AirflowNetwork:Multizone:Component:SimpleOpening = " + AirflowNetworkCompData(compnum).Name);
                         ErrorsFound = true;
                     }
-                    if (!(SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_Window ||
-                          SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_GlassDoor ||
-                          SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_Door)) {
+                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door)) {
                         ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
@@ -4250,9 +4250,9 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError("with the object of AirflowNetwork:Multizone:Component:HorizontalOpening = " +
                                           AirflowNetworkCompData(compnum).Name);
                     }
-                    if (!(SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_Window ||
-                          SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_GlassDoor ||
-                          SurfaceWindow(MultizoneSurfaceData(count).SurfNum).OriginalClass == SurfaceClass_Door)) {
+                    if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door)) {
                         ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
@@ -5155,19 +5155,19 @@ namespace AirflowNetworkBalanceManager {
                 }
                 SetupOutputVariable("AFN Surface Venting Window or Door Opening Modulation Multiplier",
                                     OutputProcessor::Unit::None,
-                                    SurfaceWindow(SurfNum).VentingOpenFactorMultRep,
+                                    DataSurfaces::SurfWinVentingOpenFactorMultRep(SurfNum),
                                     "System",
                                     "Average",
                                     Surface(SurfNum).Name);
                 SetupOutputVariable("AFN Surface Venting Inside Setpoint Temperature",
                                     OutputProcessor::Unit::C,
-                                    SurfaceWindow(SurfNum).InsideTempForVentingRep,
+                                    DataSurfaces::SurfWinInsideTempForVentingRep(SurfNum),
                                     "System",
                                     "Average",
                                     Surface(SurfNum).Name);
                 SetupOutputVariable("AFN Surface Venting Availability Status",
                                     OutputProcessor::Unit::None,
-                                    SurfaceWindow(SurfNum).VentingAvailabilityRep,
+                                    DataSurfaces::SurfWinVentingAvailabilityRep(SurfNum),
                                     "System",
                                     "Average",
                                     Surface(SurfNum).Name);
@@ -5657,6 +5657,8 @@ namespace AirflowNetworkBalanceManager {
         using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
+        using DataSurfaces::SurfWinOriginalClass;
+        using DataSurfaces::SurfWinVentingOpenFactorMultRep;
         using General::SolveRoot;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -5758,8 +5760,8 @@ namespace AirflowNetworkBalanceManager {
             if (i > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) continue;
             if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = MultizoneSurfaceData(i).SurfNum;
-            if (SurfaceWindow(j).OriginalClass == SurfaceClass_Window || SurfaceWindow(j).OriginalClass == SurfaceClass_Door ||
-                SurfaceWindow(j).OriginalClass == SurfaceClass_GlassDoor) {
+            if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
+                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FreeOperation) {
                         if (MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::ForceChange) {
@@ -5779,7 +5781,7 @@ namespace AirflowNetworkBalanceManager {
                 MultizoneSurfaceData(i).OpenFactor *= MultizoneSurfaceData(i).WindModifier;
                 if (MultizoneSurfaceData(i).HybridVentClose) {
                     MultizoneSurfaceData(i).OpenFactor = 0.0;
-                    if (SurfaceWindow(j).VentingOpenFactorMultRep > 0.0) SurfaceWindow(j).VentingOpenFactorMultRep = 0.0;
+                    if (SurfWinVentingOpenFactorMultRep(j) > 0.0) SurfWinVentingOpenFactorMultRep(j) = 0.0;
                 }
                 if (AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_DOP ||
                     AirflowNetworkCompData(AirflowNetworkLinkageData(i).CompNum).CompTypeNum == CompTypeNum_SOP ||
@@ -5835,8 +5837,8 @@ namespace AirflowNetworkBalanceManager {
             for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
                 if (i > AirflowNetworkNumOfSurfaces - NumOfLinksIntraZone) continue;
                 j = MultizoneSurfaceData(i).SurfNum;
-                if (SurfaceWindow(j).OriginalClass == SurfaceClass_Window || SurfaceWindow(j).OriginalClass == SurfaceClass_Door ||
-                    SurfaceWindow(j).OriginalClass == SurfaceClass_GlassDoor) {
+                if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
+                    SurfWinOriginalClass(j) == SurfaceClass_GlassDoor) {
                     if (MultizoneSurfaceData(i).HybridCtrlGlobal) {
                         MultizoneSurfaceData(i).OpenFactor = GlobalOpenFactor;
                     }
@@ -9202,7 +9204,9 @@ namespace AirflowNetworkBalanceManager {
         // as determined by the venting control method.
 
         // Using/Aliasing
-        using DataSurfaces::SurfaceWindow;
+        using DataSurfaces::SurfWinInsideTempForVentingRep;
+        using DataSurfaces::SurfWinVentingAvailabilityRep;
+        using DataSurfaces::SurfWinVentingOpenFactorMultRep;
         using ScheduleManager::GetCurrentScheduleValue;
         using ThermalComfort::ThermalComfortData;
 
@@ -9230,21 +9234,21 @@ namespace AirflowNetworkBalanceManager {
             OpenFactor = MultizoneSurfaceData(i).EMSOpenFactor;
             SurfNum = MultizoneSurfaceData(i).SurfNum;
             if (MultizoneSurfaceData(i).Factor > 0.0) {
-                SurfaceWindow(SurfNum).VentingOpenFactorMultRep = OpenFactor / MultizoneSurfaceData(i).Factor;
+                SurfWinVentingOpenFactorMultRep(SurfNum) = OpenFactor / MultizoneSurfaceData(i).Factor;
             } else {
-                SurfaceWindow(SurfNum).VentingOpenFactorMultRep = OpenFactor;
+                SurfWinVentingOpenFactorMultRep(SurfNum) = OpenFactor;
             }
             return;
         }
 
         SurfNum = MultizoneSurfaceData(i).SurfNum;
 
-        SurfaceWindow(SurfNum).VentingOpenFactorMultRep = -1.0;
+        SurfWinVentingOpenFactorMultRep(SurfNum) = -1.0;
 
         // Get venting temperature and venting strategy for exterior window or door
         // and determine whether venting is allowed
 
-        SurfaceWindow(SurfNum).VentingAvailabilityRep = 1.0;
+        SurfWinVentingAvailabilityRep(SurfNum) = 1.0;
         VentingAllowed = true;
         IZ = MultizoneSurfaceData(i).NodeNums[0];
         // Revise for RoomAirflowNetwork model
@@ -9260,7 +9264,7 @@ namespace AirflowNetworkBalanceManager {
                 VentingSchVal = GetCurrentScheduleValue(MultizoneSurfaceData(i).VentingSchNum);
                 if (VentingSchVal <= 0.0) {
                     VentingAllowed = false;
-                    SurfaceWindow(SurfNum).VentingAvailabilityRep = 0.0;
+                    SurfWinVentingAvailabilityRep(SurfNum) = 0.0;
                 }
             }
         } else {
@@ -9271,12 +9275,12 @@ namespace AirflowNetworkBalanceManager {
                 VentingSchVal = GetCurrentScheduleValue(MultizoneZoneData(IZ).VentingSchNum);
                 if (VentingSchVal <= 0.0) {
                     VentingAllowed = false;
-                    SurfaceWindow(SurfNum).VentingAvailabilityRep = 0.0;
+                    SurfWinVentingAvailabilityRep(SurfNum) = 0.0;
                 }
             }
         }
 
-        SurfaceWindow(SurfNum).InsideTempForVentingRep = VentTemp;
+        SurfWinInsideTempForVentingRep(SurfNum) = VentTemp;
         OpenFactor = 0.0;
 
         // Venting based on inside-outside air temperature difference
@@ -9289,7 +9293,7 @@ namespace AirflowNetworkBalanceManager {
             }
             if (ANZT(ZoneNum) > Tamb && ANZT(ZoneNum) > VentTemp) {
                 OpenFactor = MultizoneSurfaceData(i).Factor;
-                SurfaceWindow(SurfNum).VentingOpenFactorMultRep = 1.0;
+                SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
                 // Modulation of OpenFactor
                 if (MultizoneSurfaceData(i).IndVentControl) {
                     LimValVentOpenFacMult = MultizoneSurfaceData(i).ModulateFactor;
@@ -9312,11 +9316,11 @@ namespace AirflowNetworkBalanceManager {
                             ((UpperValInOutTempDiff - DelTemp) / (UpperValInOutTempDiff - LowerValInOutTempDiff)) * (1 - LimValVentOpenFacMult);
                     }
                     OpenFactor *= OpenFactorMult;
-                    SurfaceWindow(SurfNum).VentingOpenFactorMultRep = OpenFactorMult;
+                    SurfWinVentingOpenFactorMultRep(SurfNum) = OpenFactorMult;
                 }
             } else {
                 OpenFactor = 0.0;
-                SurfaceWindow(SurfNum).VentingOpenFactorMultRep = -1.0;
+                SurfWinVentingOpenFactorMultRep(SurfNum) = -1.0;
             }
         }
 
@@ -9341,7 +9345,7 @@ namespace AirflowNetworkBalanceManager {
                     LowerValInOutEnthalDiff = MultizoneZoneData(IZ).LowValueEnth;
                     UpperValInOutEnthalDiff = MultizoneZoneData(IZ).UpValueEnth;
                 }
-                SurfaceWindow(SurfNum).VentingOpenFactorMultRep = 1.0;
+                SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
 
                 if (LimValVentOpenFacMult != 1.0) {
                     DelEnthal = ZoneAirEnthalpy - OutEnthalpy;
@@ -9355,11 +9359,11 @@ namespace AirflowNetworkBalanceManager {
                                                         (1 - LimValVentOpenFacMult);
                     }
                     OpenFactor *= OpenFactorMult;
-                    SurfaceWindow(SurfNum).VentingOpenFactorMultRep = OpenFactorMult;
+                    SurfWinVentingOpenFactorMultRep(SurfNum) = OpenFactorMult;
                 }
             } else {
                 OpenFactor = 0.0;
-                SurfaceWindow(SurfNum).VentingOpenFactorMultRep = -1.0;
+                SurfWinVentingOpenFactorMultRep(SurfNum) = -1.0;
             }
         }
 
@@ -9368,7 +9372,7 @@ namespace AirflowNetworkBalanceManager {
 
         if (VentCtrlNum == VentControlType::Const && VentingAllowed) { // Constant
             OpenFactor = MultizoneSurfaceData(i).Factor;
-            SurfaceWindow(SurfNum).VentingOpenFactorMultRep = 1.0;
+            SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
         }
 
         if (VentCtrlNum == VentControlType::ASH55) {
@@ -9377,7 +9381,7 @@ namespace AirflowNetworkBalanceManager {
                 if (PeopleInd > 0 && ThermalComfortData(PeopleInd).ThermalComfortAdaptiveASH5590 != -1) {
                     if (ThermalComfortData(PeopleInd).ThermalComfortOpTemp > ThermalComfortData(PeopleInd).TComfASH55) {
                         OpenFactor = MultizoneSurfaceData(i).Factor;
-                        SurfaceWindow(SurfNum).VentingOpenFactorMultRep = 1.0;
+                        SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
                     } else {
                         OpenFactor = 0.0;
                     }
@@ -9395,7 +9399,7 @@ namespace AirflowNetworkBalanceManager {
                 if (PeopleInd > 0 && ThermalComfortData(PeopleInd).ThermalComfortAdaptiveCEN15251CatI != -1) {
                     if (ThermalComfortData(PeopleInd).ThermalComfortOpTemp > ThermalComfortData(PeopleInd).TComfCEN15251) {
                         OpenFactor = MultizoneSurfaceData(i).Factor;
-                        SurfaceWindow(SurfNum).VentingOpenFactorMultRep = 1.0;
+                        SurfWinVentingOpenFactorMultRep(SurfNum) = 1.0;
                     } else {
                         OpenFactor = 0.0;
                     }
@@ -9411,7 +9415,7 @@ namespace AirflowNetworkBalanceManager {
 
         if (VentCtrlNum == VentControlType::NoVent) { // Novent
             OpenFactor = 0.0;
-            SurfaceWindow(SurfNum).VentingOpenFactorMultRep = -1.0;
+            SurfWinVentingOpenFactorMultRep(SurfNum) = -1.0;
         }
     }
 
@@ -10496,9 +10500,9 @@ namespace AirflowNetworkBalanceManager {
                                 if (ControlType == GlobalCtrlType) {
                                     MultizoneSurfaceData(ANSurfaceNum).HybridCtrlGlobal = true;
                                     if (HybridVentSysAvailMaster(SysAvailNum) == ActualZoneNum) {
-                                        if ((SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_Window ||
-                                             SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_Door ||
-                                             SurfaceWindow(SurfNum).OriginalClass == SurfaceClass_GlassDoor) &&
+                                        if ((DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass_Window ||
+                                             DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass_Door ||
+                                             DataSurfaces::SurfWinOriginalClass(SurfNum) == SurfaceClass_GlassDoor) &&
                                             Surface(SurfNum).ExtBoundCond == ExternalEnvironment) {
                                             MultizoneSurfaceData(ANSurfaceNum).HybridCtrlMaster = true;
                                             Found = true;
