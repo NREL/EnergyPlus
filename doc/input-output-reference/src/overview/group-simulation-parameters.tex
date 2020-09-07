@@ -1056,7 +1056,7 @@ System & Allowed Coil \tabularnewline
 \midrule
 \endfirsthead
 
-AirLoopHVAC:UnitarySystem & Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed\tabularnewline
+AirLoopHVAC:UnitarySystem & Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed, Coil:Cooling:DX\tabularnewline
 AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, Coil:Heating:Gas:MultiStage, Coil:Cooling:DX:MultiSpeed\tabularnewline
 CoilSystem:Cooling:DX & Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed \tabularnewline
 CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpeed \tabularnewline
@@ -1065,6 +1065,13 @@ CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpe
 \end{longtable}
 
 Note: The choice of Load in the Control Type of the AirLoopHVAC:UnitarySystem object is required for all coils listed in the above table.
+In addition, when Coil:Cooling:DX is specified under AirLoopHVAC:UnitarySystem, the following coil configurations are supported for Direct Solution:
+
+	Single speed mode at Nominal Speed Number = 1 in the Coil:Cooling:DX:CurveFit:OperatingMode
+
+	Multi speed mode at Nominal Speed Number > 1 in the Coil:Cooling:DX:CurveFit:OperatingMode
+
+	Single speed SubcoolReheat mode. The SubcoolReheat mode requires all inputs of 3 fields in the Coil:Cooling:DX:CurveFit:Performance: Base Operating Mode, Alternative Operating Mode 1, and Alternative Operating Mode 2.
 
 \paragraph{Field: Zone Radiant Exchange Algorithm}\label{zone-radiant-exchange-algorithm}
 
