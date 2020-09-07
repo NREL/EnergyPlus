@@ -116,7 +116,14 @@ namespace EMSManager {
 
     void UpdateEMSTrendVariables();
 
-    void CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
+    std::string controlTypeName(int const SetPointType); // Maps int to the std::string equivalent
+                                                         // (eg iTemperatureSetPoint => "Temperature Setpoint")
+
+    bool CheckIfNodeSetPointManaged(int const NodeNum, // index of node being checked.
+                                    int const SetPointType,
+                                    bool byHandle = false);
+
+    bool CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
                                          int const SetPointType,
                                          bool &ErrorFlag);
 
@@ -140,6 +147,8 @@ namespace EMSManager {
     void SetupZoneInfoAsInternalDataAvail();
 
     void checkForUnusedActuatorsAtEnd();
+
+    void checkSetpointNodesAtEnd();
 
 } // namespace EMSManager
 
