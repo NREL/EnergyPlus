@@ -27,7 +27,6 @@
 //
 // (4) Use of EnergyPlus(TM) Name. If Licensee (i) distributes the software in stand-alone form
 //     without changes from the version obtained under this License, or (ii) Licensee makes a
-//     without changes from the version obtained under this License, or (ii) Licensee makes a
 //     reference solely to the software portion of its product, Licensee must refer to the
 //     software as "EnergyPlus version X" software, where "X" is the version number Licensee
 //     obtained under this License and may not use a different name for the software. Except as
