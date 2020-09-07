@@ -97,7 +97,7 @@ namespace FourPipeBeam {
 
     public: // Methods		MARK ANY THAT DON'T ALTER STATE const !!!
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
-        static std::shared_ptr<AirTerminalUnit> fourPipeBeamFactory(int objectType, std::string objectName);
+        static std::shared_ptr<AirTerminalUnit> fourPipeBeamFactory(EnergyPlusData &state, std::string objectName);
         void simulate(EnergyPlusData &state,
                       bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                       Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
@@ -113,24 +113,25 @@ namespace FourPipeBeam {
 
     private: // Methods
         void
-        init(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
+        init(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
         );
 
-        void set_size();
+        void set_size(EnergyPlusData &state);
 
-        Real64 residualSizing(Real64 const airFlow // primary supply air flow rate in kg/s
+        Real64 residualSizing(EnergyPlusData &state, Real64 const airFlow // primary supply air flow rate in kg/s
         );
 
-        void control(bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+        void control(EnergyPlusData &state,
+                     bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &NonAirSysOutput        // convective cooling by the beam system [W]
         );
 
-        void calc();
+        void calc(EnergyPlusData &state);
 
-        Real64 residualCooling(Real64 const cWaterFlow // chilled water flow rate in kg/s
+        Real64 residualCooling(EnergyPlusData &state, Real64 const cWaterFlow // chilled water flow rate in kg/s
         );
 
-        Real64 residualHeating(Real64 const hWaterFlow // hot water flow rate in kg/s
+        Real64 residualHeating(EnergyPlusData &state, Real64 const hWaterFlow // hot water flow rate in kg/s
         );
 
         void update() const;

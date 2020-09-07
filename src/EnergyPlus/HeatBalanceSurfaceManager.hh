@@ -62,7 +62,7 @@ namespace EnergyPlus {
     struct ConvectionCoefficientsData;
     struct EnergyPlusData;
     struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData; 
+    struct WindowEquivalentLayerData;
     struct WindowManagerData;
     struct ZoneTempPredictorCorrectorData;
 
@@ -153,7 +153,8 @@ namespace HeatBalanceSurfaceManager {
 
     // Formerly EXTERNAL SUBROUTINES (heavily related to HeatBalanceSurfaceManager) but now moved into namespace HeatBalanceSurfaceManager
 
-    void CalcHeatBalanceOutsideSurf(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcHeatBalanceOutsideSurf(EnergyPlusData &state,
+                                    ConvectionCoefficientsData &dataConvectionCoefficients,
                                     IOFiles &ioFiles,
                                     Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
@@ -162,7 +163,8 @@ namespace HeatBalanceSurfaceManager {
     void CalcHeatBalanceInsideSurf(EnergyPlusData& state,
                                    Optional_int_const ZoneToResimulate = _); // if passed in, then only calculate surfaces that have this zone
 
-    void CalcHeatBalanceInsideSurf2(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcHeatBalanceInsideSurf2(EnergyPlusData &state,
+                                    ConvectionCoefficientsData &dataConvectionCoefficients,
                                     WindowComplexManagerData &dataWindowComplexManager,
                                     WindowEquivalentLayerData &dataWindowEquivalentLayer,
                                     WindowManagerData &dataWindowManager,
@@ -173,7 +175,8 @@ namespace HeatBalanceSurfaceManager {
                                     const std::vector<int> &HTWindowSurfs,    // Window heat transfer surfaces to simulate
                                     Optional_int_const ZoneToResimulate = _);
 
-    void CalcHeatBalanceInsideSurf2CTFOnly(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcHeatBalanceInsideSurf2CTFOnly(EnergyPlusData &state,
+                                           ConvectionCoefficientsData &dataConvectionCoefficients,
                                            WindowComplexManagerData &dataWindowComplexManager,
                                            WindowEquivalentLayerData &dataWindowEquivalentLayer,
                                            WindowManagerData &dataWindowManager,
@@ -196,7 +199,7 @@ namespace HeatBalanceSurfaceManager {
                              bool &ErrorFlag         // Error flag for movable insulation problem
     );
 
-    void CalcExteriorVentedCavity(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const SurfNum); // index of surface
+    void CalcExteriorVentedCavity(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles, int const SurfNum); // index of surface
 
     void GatherComponentLoadsSurfAbsFact();
 

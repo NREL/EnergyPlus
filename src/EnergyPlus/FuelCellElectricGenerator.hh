@@ -541,9 +541,9 @@ namespace FuelCellElectricGenerator {
         {
         }
 
-        static PlantComponent *factory(IOFiles &ioFiles, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        static PlantComponent *factory_exhaust(IOFiles &ioFiles, std::string const &objectName);
+        static PlantComponent *factory_exhaust(EnergyPlusData &state, std::string const &objectName);
 
         void initialize(BranchInputManagerData &dataBranchInputManager);
 
@@ -567,9 +567,9 @@ namespace FuelCellElectricGenerator {
 
         void FigureAuxilHeatGasHeatCap(Real64 FluidTemp, Real64 &Cp);
 
-        void FigureACAncillaries(Real64 &PacAncill);
+        void FigureACAncillaries(EnergyPlusData &state, Real64 &PacAncill);
 
-        void FigurePowerConditioningLosses(Real64 Pdemand, Real64 &PpcuLosses);
+        void FigurePowerConditioningLosses(EnergyPlusData &state, Real64 Pdemand, Real64 &PpcuLosses);
 
         void FigureTransientConstraints(Real64 &Pel,       // DC power control setting for power module
                                         bool &Constrained, // true if transient constraints kick in (TODO: never used anywhere)
@@ -588,7 +588,7 @@ namespace FuelCellElectricGenerator {
 
         void CalcFuelCellGenHeatRecovery();
 
-        void CalcFuelCellGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcFuelCellGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
         void CalcUpdateHeatRecovery(bool FirstHVACIteration);
 
@@ -599,7 +599,8 @@ namespace FuelCellElectricGenerator {
                                          Real64 &PgridOverage // electricity that can't be stored and needs to go out
         );
 
-        void SimFuelCellGenerator(BranchInputManagerData &dataBranchInputManager,
+        void SimFuelCellGenerator(EnergyPlusData &state,
+                                  BranchInputManagerData &dataBranchInputManager,
                                   bool RunFlag,  // simulate Generator when TRUE
                                   Real64 MyLoad, // demand on electric generator
                                   bool FirstHVACIteration);
@@ -609,7 +610,7 @@ namespace FuelCellElectricGenerator {
 
     void clear_state();
 
-    void getFuelCellInput(IOFiles &ioFiles);
+    void getFuelCellInput(EnergyPlusData &state, IOFiles &ioFiles);
 
     void FigureFuelCellZoneGains();
 

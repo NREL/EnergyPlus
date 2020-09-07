@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, CheckActuatorInit)
 
     ASSERT_TRUE(process_idf(idf_objects));
     OutAirNodeManager::SetOutAirNodes();
-    EMSManager::GetEMSInput(state.files);
+    EMSManager::GetEMSInput(state, state.files);
 
     // now check that Erl variable is Null
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(1).Value.Type, DataRuntimeLanguage::ValueNull);
@@ -914,7 +914,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     ErlValueType ReturnValue;
     bool seriousErrorFound = false;
     EMSManager::FinishProcessingUserInput = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(state,
         ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack)).Instruction(1).Argument2,
         seriousErrorFound); // we just check the logic and don't throw the fatal errors.
     EXPECT_TRUE(seriousErrorFound);
@@ -923,7 +923,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable2)
     EMSManager::ManageEMS(state, DataGlobals::emsCallFromBeginTimestepBeforePredictor, anyRan, ObjexxFCL::Optional_int_const());
     // now check that it worked, should stay false
     seriousErrorFound = false;
-    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(
+    ReturnValue = RuntimeLanguageProcessor::EvaluateExpression(state,
         ErlStack(UtilityRoutines::FindItemInList("SETNODESETPOINTTEST", ErlStack)).Instruction(1).Argument2, seriousErrorFound);
     EXPECT_FALSE(seriousErrorFound);
 }
@@ -1087,7 +1087,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EMSManager::CheckIfAnyEMS(state.files); // get EMS input
     EMSManager::FinishProcessingUserInput = true;
     bool ErrorsFound(false);
-    CurveManager::GetCurveInputData(ErrorsFound); // process curve for use with EMS
+    CurveManager::GetCurveInputData(state, ErrorsFound); // process curve for use with EMS
     EXPECT_FALSE(ErrorsFound);
 
     bool anyRan;

@@ -175,7 +175,7 @@ namespace PhotovoltaicThermalCollectors {
 
         void control();
 
-        void calculate(ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles);
+        void calculate(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles);
 
         void update();
     };

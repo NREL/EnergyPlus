@@ -115,15 +115,15 @@ namespace ChillerElectricEIR {
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    PlantComponent *ElectricEIRChillerSpecs::factory(ChillerElectricEIRData &chillers, std::string const &objectName)
+    PlantComponent *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (chillers.getInputFlag) {
-            GetElectricEIRChillerInput(chillers);
-            chillers.getInputFlag = false;
+        if (state.dataChillerElectricEIR.getInputFlag) {
+            GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
+            state.dataChillerElectricEIR.getInputFlag = false;
         }
         // Now look for this particular object in the list
-        for (auto &obj : chillers.ElectricEIRChiller) {
+        for (auto &obj : state.dataChillerElectricEIR.ElectricEIRChiller) {
             if (obj.Name == objectName) {
                 return &obj;
             }
@@ -149,7 +149,7 @@ namespace ChillerElectricEIR {
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
-            this->calculate(CurLoad, RunFlag);
+            this->calculate(state, CurLoad, RunFlag);
             this->update(CurLoad, RunFlag);
 
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
@@ -214,7 +214,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers)
+    void GetElectricEIRChillerInput(EnergyPlusData &state, ChillerElectricEIRData &chillers)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Raustad, FSEC
@@ -264,21 +264,21 @@ namespace ChillerElectricEIR {
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
 
             //   Performance curves
-            thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
+            thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(2));
             if (thisChiller.ChillerCapFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + " \"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 ErrorsFound = true;
             }
 
-            thisChiller.ChillerEIRFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(3));
+            thisChiller.ChillerEIRFTIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(3));
             if (thisChiller.ChillerEIRFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
-            thisChiller.ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
+            thisChiller.ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(4));
             if (thisChiller.ChillerEIRFPLRIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
@@ -635,7 +635,7 @@ namespace ChillerElectricEIR {
 
             //   Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
             if (thisChiller.ChillerCapFTIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerCapFTIndex,
+                Real64 CurveVal = CurveManager::CurveValue(state, thisChiller.ChillerCapFTIndex,
                                                            thisChiller.TempRefEvapOut,
                                                            thisChiller.TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -647,7 +647,7 @@ namespace ChillerElectricEIR {
             }
 
             if (thisChiller.ChillerEIRFTIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerEIRFTIndex,
+                Real64 CurveVal = CurveManager::CurveValue(state, thisChiller.ChillerEIRFTIndex,
                                                            thisChiller.TempRefEvapOut,
                                                            thisChiller.TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -659,7 +659,7 @@ namespace ChillerElectricEIR {
             }
 
             if (thisChiller.ChillerEIRFPLRIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerEIRFPLRIndex, 1.0);
+                Real64 CurveVal = CurveManager::CurveValue(state, thisChiller.ChillerEIRFPLRIndex, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
@@ -673,7 +673,7 @@ namespace ChillerElectricEIR {
                 bool FoundNegValue = false;
                 Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
                 for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                    Real64 CurveValTmp = CurveManager::CurveValue(thisChiller.ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
+                    Real64 CurveValTmp = CurveManager::CurveValue(state, thisChiller.ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
@@ -1508,7 +1508,8 @@ namespace ChillerElectricEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->IPLVFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(state.files,
+                StandardRatings::CalcChillerIPLV(state,
+                                                 state.files,
                                                  this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricEIR,
                                                  this->RefCap,
@@ -1535,7 +1536,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag)
+    void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -1788,7 +1789,7 @@ namespace ChillerElectricEIR {
         }
 
         // Get capacity curve info with respect to CW setpoint and entering condenser water temps
-        this->ChillerCapFT = CurveManager::CurveValue(this->ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
+        this->ChillerCapFT = CurveManager::CurveValue(state, this->ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
 
         if (this->ChillerCapFT < 0) {
             if (this->ChillerCapFTError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 &&
@@ -2077,7 +2078,7 @@ namespace ChillerElectricEIR {
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
         }
 
-        this->ChillerEIRFT = CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
+        this->ChillerEIRFT = CurveManager::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
         if (this->ChillerEIRFT < 0.0) {
             if (this->ChillerEIRFTError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 &&
                 !DataGlobals::WarmupFlag) {
@@ -2099,7 +2100,7 @@ namespace ChillerElectricEIR {
             this->ChillerEIRFT = 0.0;
         }
 
-        this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, PartLoadRat);
+        this->ChillerEIRFPLR = CurveManager::CurveValue(state, this->ChillerEIRFPLRIndex, PartLoadRat);
         if (this->ChillerEIRFPLR < 0.0) {
             if (this->ChillerEIRFPLRError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 &&
                 !DataGlobals::WarmupFlag) {
