@@ -721,6 +721,7 @@ namespace ChillerGasAbsorption {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
                     EMSManager::CheckIfNodeSetPointManagedByEMS(this->ChillSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    DataLoopNode::NodeSetpointCheck(this->ChillSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->ChillSetPointErrDone) {
                             ShowWarningError("Missing temperature setpoint on cool side for chiller heater named " + this->Name);
@@ -752,6 +753,7 @@ namespace ChillerGasAbsorption {
                     // need call to EMS to check node
                     errFlag = false; // but not really fatal yet, but should be.
                     EMSManager::CheckIfNodeSetPointManagedByEMS(this->HeatSupplyNodeNum, EMSManager::iTemperatureSetPoint, errFlag);
+                    DataLoopNode::NodeSetpointCheck(this->HeatSupplyNodeNum).needsSetpointChecking = false;
                     if (errFlag) {
                         if (!this->HeatSetPointErrDone) {
                             ShowWarningError("Missing temperature setpoint on heat side for chiller heater named " + this->Name);

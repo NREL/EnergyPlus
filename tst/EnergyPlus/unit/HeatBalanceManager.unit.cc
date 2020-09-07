@@ -1583,7 +1583,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win1ConstNum);
-    Real64 transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
+    Real64 transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_GT(transSol, 0.8);
     Real64 refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_GT(refPtIllum, 3000.0);
@@ -1598,7 +1598,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     HeatBalanceManager::ManageHeatBalance(state);
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", dataConstruction.Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
-    transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
+    transSol = DataSurfaces::SurfWinSysSolTransmittance(winSurfNum);
     EXPECT_LT(transSol, 0.2);
     refPtIllum = DataDaylighting::ZoneDaylight(1).DaylIllumAtRefPt(1);
     EXPECT_LT(refPtIllum, 1000.0);
