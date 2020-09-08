@@ -912,6 +912,8 @@ namespace WaterThermalTanks {
 
     void clear_state();
 
+    void SetTankVolume(std::string sType, std::string sName, const Real64 dVolume); 
+
 } // namespace WaterThermalTanks
 
 } // namespace EnergyPlus

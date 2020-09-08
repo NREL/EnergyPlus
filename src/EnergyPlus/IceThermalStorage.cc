@@ -2700,6 +2700,36 @@ namespace IceThermalStorage {
         }
     }
 
+    void SetIceStoreNormCapacity(std::string sType, std::string sName, const Real64 dNormCapacity)
+    {
+        int IndexNum = 0; 
+
+        if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Simple")) 
+        {
+            IndexNum = UtilityRoutines::FindItemInList(sName, SimpleIceStorage);
+
+            if (IndexNum != 0) {
+                SimpleIceStorage(IndexNum).ITSNomCap = dNormCapacity; 
+            }
+        } 
+        else if (UtilityRoutines::SameString(sType, "ThermalStorage:Ice:Detailed")) {
+
+            IndexNum = UtilityRoutines::FindItemInList(sName, DetailedIceStorage);
+
+            if (IndexNum != 0) {
+                DetailedIceStorage(IndexNum).NomCapacity = dNormCapacity;
+            }
+        } 
+        else if (UtilityRoutines::SameString(sType, "ThermalStorage:Pcm:Simple")) {
+
+            IndexNum = UtilityRoutines::FindItemInList(sName, SimplePcmStorage);
+
+            if (IndexNum != 0) {
+                SimplePcmStorage(IndexNum).PcmTSNomCap = dNormCapacity;
+            }
+        }
+    }
+
 } // namespace IceThermalStorage
 
 } // namespace EnergyPlus

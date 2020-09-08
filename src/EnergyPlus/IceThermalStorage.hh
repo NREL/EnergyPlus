@@ -390,6 +390,8 @@ namespace IceThermalStorage {
 
     void UpdateIceFractions();
 
+    void SetIceStoreNormCapacity(std::string sType, std::string sName, const Real64 dNormCapacity); 
+
     
 
 } // namespace IceThermalStorage

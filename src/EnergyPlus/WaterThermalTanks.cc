@@ -11970,6 +11970,15 @@ namespace WaterThermalTanks {
         }
     }
 
+    void SetTankVolume(std::string sType, std::string sName, const Real64 dVolume)
+    {
+        const int IndexNum = UtilityRoutines::FindItemInList(sName, WaterThermalTank);
+
+        if (IndexNum != 0) {
+            WaterThermalTank(IndexNum).Volume = dVolume;
+        }
+    }
+
 } // namespace WaterThermalTanks
 
 } // namespace EnergyPlus

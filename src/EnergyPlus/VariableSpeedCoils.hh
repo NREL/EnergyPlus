@@ -374,6 +374,15 @@ namespace VariableSpeedCoils {
         Real64 GridHighBound;      // value below which, apply grid responsive control
         Real64 GridMaxSpeed;      // maximum speed level when apply grid responsive control
         int GridLoadCtrlMode;     //control sensible or latent load during grid responsive control
+        std::string StorageType; //storage type related to the coil
+        std::string StorageName; //name of the storage object
+        Real64 PeakStoreHours; //hours to store the peak capacity
+        bool StoreMoisture; //whether to store latent capacity = true; false = store sensible capacity
+        Real64 StoreDiff; //differential during storag, i.e. temperature difference, humidity differenc, etc
+        std::string RecoveryUnitType; // type of the reconvery unit
+        std::string RecoveryUnitName; // name of the recovery unit
+        Real64 RecoveryCapacityRatio;// nominal capacity ratio of the recovery unit to the main VS coil
+
         // Default Constructor
         VariableSpeedCoilData();
     };

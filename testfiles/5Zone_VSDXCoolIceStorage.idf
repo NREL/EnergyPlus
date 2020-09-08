@@ -154,7 +154,19 @@
     DX Cooling Coil 1 Outlet Node,  !- Fan Inlet Node Name
     VAV Sys 1 Outlet Node,      !- Fan Outlet Node Name
     DX Cooling Coil 1 Outlet Node;  !- Setpoint Node or NodeList Name
-   
+	
+  ThermalStorage:Cooling:Pair,
+    CoolingStorePair,     !- Name
+    Coil:Cooling:DX:VariableSpeed, !- Cooling Coil Object Type
+    DX Cooling Coil 1,    !- Cooling Coil Name
+    ThermalStorage:Ice:Detailed,  !- Tank Object Type
+    Ice Tank,                !- Tank Name   
+    4.0,                     !-Maximum Peak Operation Hours
+    0.0,                     !-temperature change	
+    TOTAL,                   ! - load met type
+	Chiller:Electric,        ! - recovery unit type
+	Central Chiller,         ! - recovery unit name
+	0.5;                     ! - recovery unit ratio to the main cooling coil
   
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:VARIABLESPEED ===========
 
@@ -164,8 +176,8 @@
     DX Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
     10.0,                    !- Number of Speeds {dimensionless}
     10.0,                    !- Nominal Speed Level {dimensionless}
-    32000,                   !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
-    1.7,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    autosize,                   !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+    autosize,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
     0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
     0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
     HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
@@ -180,11 +192,11 @@
     ,                        !- Basin Heater Capacity {W/K}
     ,                        !- Basin Heater Setpoint Temperature {C}
     ,                        !- Basin Heater Operating Schedule Name
-	,				 		 ! - grid signal schedule
-	,				     	 ! - Low bound to apply grid responsive control
-	,                  		 ! - High boundar to apply grid responsive control
-	,                     	 ! - max speed when appy grid responsive control
-	,				 		 ! - load matched during grid responsive operation
+	GRIDSUMMER,				 ! - grid signal schedule
+	10.0,				     ! - Low bound to apply grid responsive control
+	10000.0,                   ! - High boundar to apply grid responsive control
+	0.0,                     ! - max speed when appy grid responsive control
+	Sensible,				 ! - load matched during grid responsive operation
     1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
     4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
@@ -285,6 +297,66 @@
     HPACCoolCapFFF,          !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
     HPACCOOLEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
     HPACCOOLEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
+	
+!*********** grid electricity price signal *********************** 
+
+  Schedule:Compact,
+	GRIDSUMMER, 			!- Name
+	Any Number, 			!- Schedule Type Limits Name
+	Through: 4/30,			!-
+	For: AllDays,			!-
+	Interpolate: Linear,	!- Interpolate between two values
+	Until: 24:00, 1000.0,		!-
+	Through: 10/31,			!-
+	For: Weekdays SummerDesignDay,			!-
+	Interpolate: Linear,	!- Interpolate between two values
+	Until: 6:00, 5.6,		!-
+	Until: 7:00, 7.0,		!-
+	Until: 8:00, 8.3,		!-
+	Until: 9:00, 9.0,		!-
+	Until: 10:00, 9.7,		!-
+	Until: 11:00, 10.6,		!-
+	Until: 12:00, 11.4,		!-
+	Until: 13:00, 11.8,		!-
+	Until: 14:00, 12.2,		!-
+	Until: 15:00, 13.2,		!-
+	Until: 16:00, 14.2,		!-
+	Until: 17:00, 12.7,		!-
+	Until: 18:00, 11.1,		!-
+	Until: 20:00, 11.1,		!-
+	Until: 21:00, 9.7,		!-
+	Until: 22:00, 8.3,		!-
+	Until: 23:00, 7.0,		!-
+	Until: 24:00, 5.6,		!-
+	For: Weekends Holidays,	!-
+	Interpolate: Linear,	!- Interpolate between two values
+	Until: 6:00, 5.6,		!-
+	Until: 7:00, 7.0,		!-
+	Until: 8:00, 8.3,		!-
+	Until: 9:00, 9.0,		!-
+	Until: 10:00, 9.7,		!-
+	Until: 11:00, 10.6,		!-
+	Until: 12:00, 11.4,		!-
+	Until: 13:00, 11.8,		!-
+	Until: 14:00, 12.2,		!-
+	Until: 15:00, 13.2,		!-
+	Until: 16:00, 14.2,		!-
+	Until: 17:00, 12.7,		!-
+	Until: 18:00, 11.1,		!-
+	Until: 20:00, 11.1,		!-
+	Until: 21:00, 9.7,		!-
+	Until: 22:00, 8.3,		!-
+	Until: 23:00, 7.0,		!-
+	Until: 24:00, 5.6,		!-
+	For: AllOtherDays,		!-
+	Until: 24:00, 1000.0,		!-
+	Through: 12/31,			!-
+	For: AllDays,			!-
+	Interpolate: Linear,	!- Interpolate between two values
+	Until: 24:00, 1000.0,		!-
+	For: AllOtherDays,		!-
+	Until: 24:00, 1000.0;		!-
+	
 	
 	
   Curve:Biquadratic,
@@ -3620,6 +3692,8 @@
   Output:Variable,*,Heating Coil Heating Rate,hourly;
 
   Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
+  
+  Output:Variable,*,Cooling Coil Upper Speed Level,hourly;
 
   Output:Variable,*,Plant Supply Side Outlet Temperature,hourly;
 
