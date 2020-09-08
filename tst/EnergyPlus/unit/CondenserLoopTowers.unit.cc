@@ -501,14 +501,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
     state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
@@ -893,14 +893,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -1324,14 +1324,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -1739,14 +1739,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -2223,14 +2223,14 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
@@ -2650,7 +2650,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
@@ -2659,7 +2659,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     SimulationManager::SetupSimulation(state, ErrorsFound);
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
     // check the low speed nominal capacity field is autosized
     EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCapWasAutoSized);
     // check user input value for high speed nominal capacity
@@ -3038,7 +3038,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
@@ -3430,7 +3430,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
@@ -3448,7 +3448,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     DataGlobals::KickOffSimulation = true;
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
 
@@ -3903,7 +3903,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     createFacilityElectricPowerServiceObject();
     OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager);
 
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
@@ -3916,7 +3916,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
     auto &VSTower = state.dataCondenserLoopTowers.towers(1);
 
     DataPlant::PlantFirstSizesOkayToFinalize = true;

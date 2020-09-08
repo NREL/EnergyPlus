@@ -329,9 +329,9 @@ namespace PlantChillers {
         {
         }
 
-        static EngineDrivenChillerSpecs *factory(PlantChillersData &chillers, std::string const &chillerName);
+        static EngineDrivenChillerSpecs *factory(EnergyPlusData &state, std::string const &chillerName);
 
-        static void getInput(PlantChillersData &chillers);
+        static void getInput(EnergyPlusData &state, PlantChillersData &chillers);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -341,7 +341,8 @@ namespace PlantChillers {
 
         void size() override;
 
-        void calculate(Real64 &MyLoad,   // operating load
+        void calculate(EnergyPlusData &state,
+                       Real64 &MyLoad,   // operating load
                        bool RunFlag,     // TRUE when chiller operating
                        int EquipFlowCtrl // Flow control mode for the equipment
         );
