@@ -8535,7 +8535,8 @@ namespace UnitarySystems {
                                                       CompressorONFlag);
                         PartLoadRatio = CoolPLR;
                     } else if (DataGlobals::DoCoilDirectSolutions && CoolingLoad &&
-                               this->m_CoolingCoilSubType_Num == DataHVACGlobals::CoilDX_Cooling && this->m_NumOfSpeedCooling == 1) {
+                               this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling && this->m_NumOfSpeedCooling == 1 &&
+                               coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
                         HeatPLR = 0.0;
                         this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                       FirstHVACIteration,
