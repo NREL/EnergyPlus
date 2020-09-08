@@ -153,12 +153,12 @@ namespace CTElectricGenerator {
         void InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
                               bool RunFlag, bool FirstHVACIteration);
 
-        void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcCTGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        static PlantComponent *factory(CTElectricGeneratorData &dataCTElectricGenerator, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetCTGeneratorInput(CTElectricGeneratorData &dataCTElectricGenerator);
+    void GetCTGeneratorInput(EnergyPlusData &state);
 
 } // namespace CTElectricGenerator
 

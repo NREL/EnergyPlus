@@ -182,7 +182,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
@@ -411,7 +411,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
@@ -603,7 +603,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     std::string const idf_objects = delimited_string({
         "  Zone,",
         "    SPACE2-1;                !- Name",
-        
+
         "ZoneHVAC:EquipmentConnections,",
         "    SPACE2-1,                !- Zone Name",
         "    SPACE2-1 Equipment,      !- Zone Conditioning Equipment List Name",
@@ -611,7 +611,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    SPACE2-1 ATU Sec Node,   !- Zone Air Exhaust Node or NodeList Name",
         "    SPACE2-1 Air Node,       !- Zone Air Node Name",
         "    SPACE2-1 Return Node;    !- Zone Return Air Node Name",
-        
+
         "ZoneHVAC:EquipmentList,",
         "    SPACE2-1 Equipment,      !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
@@ -625,7 +625,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    SPACE2-1 In Node,        !- Air Distribution Unit Outlet Node Name",
         "    AirTerminal:SingleDuct:SeriesPIU:Reheat,  !- Air Terminal Object Type",
         "    SPACE2-1 Series PIU Reheat;           !- Air Terminal Name",
-        
+
         "AirTerminal:SingleDuct:SeriesPIU:Reheat,",
         "    SPACE2-1 Series PIU Reheat,     !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -643,7 +643,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    0.0,                     !- Maximum Hot Water or Steam Flow Rate {m3/s}",
         "    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
         "    0.0001;                  !- Convergence Tolerance",
-        
+
         "Fan:ConstantVolume,",
         "    SPACE2-1 PIU Fan,        !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -654,13 +654,13 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    1.0,                     !- Motor In Airstream Fraction",
         "    SPACE2-1 ATU Fan Inlet Node,   !- Air Inlet Node Name",
         "    SPACE2-1 Zone Coil Air In Node;  !- Air Outlet Node Name",
-        
+
         "AirLoopHVAC:ZoneMixer,",
         "    SPACE2-1 PIU Mixer,      !- Name",
         "    SPACE2-1 ATU Fan Inlet Node,  !- Outlet Node Name",
         "    SPACE2-1 ATU In Node,    !- Inlet 1 Node Name",
         "    SPACE2-1 ATU Sec Node;   !- Inlet 2 Node Name",
-        
+
         "Coil:Heating:Electric,",
         "    SPACE2-1 Zone Coil,      !- Name",
         "    ,                        !- Availability Schedule Name",
@@ -668,7 +668,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
         "    2000,                    !- Nominal Capacity",
         "    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
         "    SPACE2-1 In Node;        !- Air Outlet Node Name",
-        
+
         });
 
     ASSERT_TRUE(process_idf(idf_objects));
@@ -692,7 +692,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
     state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);

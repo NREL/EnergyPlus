@@ -195,16 +195,16 @@ protected:
         DataSizing::NumSysSizInput = 1;
         DataSizing::SysSizInput.allocate(1);
         DataSizing::SysSizInput(1).AirLoopNum = 1;
-        CurveManager::NumCurves = 10;
-        CurveManager::PerfCurve.allocate(10);
-        CurveManager::PerfCurve(1).InterpolationType = EvaluateCurveToLimits;
-        CurveManager::PerfCurve(1).CurveType = CurveManager::Linear;
-        CurveManager::PerfCurve(1).Coeff1 = 1.0;
-        CurveManager::PerfCurve(1).CurveMax = 1.0;
-        CurveManager::PerfCurve(2).InterpolationType = EvaluateCurveToLimits;
-        CurveManager::PerfCurve(2).CurveType = CurveManager::Linear;
-        CurveManager::PerfCurve(2).Coeff1 = 1.0;
-        CurveManager::PerfCurve(2).CurveMax = 1.0;
+        state.dataCurveManager->NumCurves = 10;
+        state.dataCurveManager->PerfCurve.allocate(10);
+        state.dataCurveManager->PerfCurve(1).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        state.dataCurveManager->PerfCurve(1).CurveType = CurveTypeEnum::Linear;
+        state.dataCurveManager->PerfCurve(1).Coeff1 = 1.0;
+        state.dataCurveManager->PerfCurve(1).CurveMax = 1.0;
+        state.dataCurveManager->PerfCurve(2).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+        state.dataCurveManager->PerfCurve(2).CurveType = CurveTypeEnum::Linear;
+        state.dataCurveManager->PerfCurve(2).Coeff1 = 1.0;
+        state.dataCurveManager->PerfCurve(2).CurveMax = 1.0;
 
         int NumAirLoops = DataHVACGlobals::NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
         DataAirSystems::PrimaryAirSystem.allocate(NumAirLoops);
@@ -2254,7 +2254,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
 
     // Read in IDF
     ProcessScheduleInput(state.files);                    // read schedules
-    CurveManager::GetCurveInput();             // read curves
+    CurveManager::GetCurveInput(state);             // read curves
     FluidProperties::GetFluidPropertiesData(); // read refrigerant properties
 
     // set up ZoneEquipConfig data
@@ -2330,7 +2330,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
         DataEnvironment::OutDryBulbTemp = 10.35;
 
         // Run
-        VRF(VRFCond).VRFHR_OU_HR_Mode(h_IU_evap_in,
+        VRF(VRFCond).VRFHR_OU_HR_Mode(state,
+                                      h_IU_evap_in,
                                       h_comp_out,
                                       Q_c_TU_PL,
                                       Q_h_TU_PL,
@@ -2397,7 +2398,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CompSpd(Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    VRF(VRFCond).VRFOU_CompSpd(state, Q_req, FlagEvapMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(1295, CompSpdActual, 5);
@@ -2415,7 +2416,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CompSpd(Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
+    VRF(VRFCond).VRFOU_CompSpd(state, Q_req, FlagCondMode, T_suction, T_discharge, h_IU_evap_in, h_comp_in, CompSpdActual);
 
     // Test
     EXPECT_NEAR(950, CompSpdActual, 5);
@@ -2437,7 +2438,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 Ncomp;                       // Compressor power [W]
 
     // Run
-    VRF(VRFCond).VRFOU_CompCap(CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
+    VRF(VRFCond).VRFOU_CompCap(state, CompSpdActual, T_suction, T_discharge, h_IU_evap_in, h_comp_in, Q_c_tot, Ncomp);
 
     // Test
     EXPECT_NEAR(6990, Q_c_tot, 10);
@@ -2465,7 +2466,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     Real64 CompSpdActual;               // Actual compressor running speed [rps]
 
     // Run
-    VRF(VRFCond).VRFOU_CalcCompH(
+    VRF(VRFCond).VRFOU_CalcCompH(state,
         TU_load, T_suction, T_discharge, Pipe_h_out_ave, IUMaxCondTemp, MinOutdoorUnitTe, Tfs, Pipe_Q, OUEvapHeatExtract, CompSpdActual, Ncomp);
 
     // Test
@@ -2732,8 +2733,8 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Array1D<Real64> Par;
 
     // Allocate
-    NumCurves = 1; // CurveManager::NumCurves
-    PerfCurve.allocate(NumCurves);
+    state.dataCurveManager->NumCurves = 1; // CurveManager::NumCurves
+    state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
     NumPar = 3;
     Par.allocate(NumPar);
@@ -2744,26 +2745,26 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_CompResidual)
     Par(3) = CurveNum;
 
     // Inputs: parameters
-    PerfCurve(CurveNum).CurveType = CurveManager::BiQuadratic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
-    PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
-    PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
-    PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
-    PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
-    PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
-    PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
-    PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
-    PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
-    PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
+    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::BiQuadratic;
+    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 724.71125;  // Coefficient1 Constant
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = -21.867868; // Coefficient2 x
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = 0.52480042; // Coefficient3 x**2
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = -17.043566; // Coefficient4 y
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = -.40346383; // Coefficient5 y**2
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.29573589; // Coefficient6 x*y
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 15;        // Minimum Value of x
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 65;        // Maximum Value of x
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Min = -30;       // Minimum Value of y
+    state.dataCurveManager->PerfCurve(CurveNum).Var2Max = 15;        // Maximum Value of y
 
     // Run and Check
-    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(Te, Par);
+    double CompResidual = HVACVariableRefrigerantFlow::CompResidual_FluidTCtrl(state, Te, Par);
     EXPECT_NEAR(1.652, CompResidual, 0.005);
 
     // Clean up
-    PerfCurve.deallocate();
+    state.dataCurveManager->PerfCurve.deallocate();
     Par.deallocate();
 }
 
@@ -3719,7 +3720,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand.allocate(1);
 
     ProcessScheduleInput(state.files);   // read schedules
-    GetCurveInput();          // read curves
+    GetCurveInput(state);          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -3824,13 +3825,13 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     Real64 InputPowerMultiplier = 0.90 - 36.45 * OutdoorCoildw;
     // setup curve results
     Real64 InletAirDryBulbC = DXCoils::DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
-    Real64 OATatHeatCapBoundary = CurveValue(VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
-    Real64 OATatHeatEIRBoundary = CurveValue(VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
-    Real64 TotHeatCapTempModFacLo = CurveValue(VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
-    Real64 TotHeatEIRTempModFacLo = CurveValue(VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
-    Real64 TotHeatCapTempModFacHi = CurveValue(VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
-    Real64 TotHeatEIRTempModFacHi = CurveValue(VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
-    Real64 EIRFPLRModFac = CurveValue(VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR));
+    Real64 OATatHeatCapBoundary = CurveValue(state, VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 OATatHeatEIRBoundary = CurveValue(state, VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    Real64 TotHeatCapTempModFacLo = CurveValue(state, VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacLo = CurveValue(state, VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    Real64 TotHeatCapTempModFacHi = CurveValue(state, VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    Real64 TotHeatEIRTempModFacHi = CurveValue(state, VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    Real64 EIRFPLRModFac = CurveValue(state, VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR));
     Real64 TotalCondHeatingCapacityLo =
         VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
     Real64 ElecHeatingPowerLo =
@@ -3895,13 +3896,13 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
 
     outWB = Node(VRF(VRFCond).CondenserNodeNum).OutAirWetBulb;                // no defrost adjustment to OA WB
     InletAirDryBulbC = DXCoils::DXCoilHeatInletAirDBTemp(DXHeatingCoilIndex); // load weighted average but only 1 coil here
-    OATatHeatCapBoundary = CurveValue(VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
-    OATatHeatEIRBoundary = CurveValue(VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
-    TotHeatCapTempModFacLo = CurveValue(VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
-    TotHeatEIRTempModFacLo = CurveValue(VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
-    TotHeatCapTempModFacHi = CurveValue(VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
-    TotHeatEIRTempModFacHi = CurveValue(VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
-    EIRFPLRModFac = CurveValue(VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
+    OATatHeatCapBoundary = CurveValue(state, VRF(VRFCond).HeatBoundaryCurvePtr, InletAirDryBulbC);
+    OATatHeatEIRBoundary = CurveValue(state, VRF(VRFCond).EIRHeatBoundaryCurvePtr, InletAirDryBulbC);
+    TotHeatCapTempModFacLo = CurveValue(state, VRF(VRFCond).HeatCapFT, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacLo = CurveValue(state, VRF(VRFCond).HeatEIRFT, InletAirDryBulbC, outWB);
+    TotHeatCapTempModFacHi = CurveValue(state, VRF(VRFCond).HeatCapFTHi, InletAirDryBulbC, outWB);
+    TotHeatEIRTempModFacHi = CurveValue(state, VRF(VRFCond).HeatEIRFTHi, InletAirDryBulbC, outWB);
+    EIRFPLRModFac = CurveValue(state, VRF(VRFCond).HeatEIRFPLR1, max(VRF(VRFCond).MinPLR, VRF(VRFCond).VRFCondPLR)); // EIRFPLR1 is used when PLR <= 1
     TotalCondHeatingCapacityLo = VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacLo * HeatingCapacityMultiplier;
     ElecHeatingPowerLo = VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFacLo * TotHeatEIRTempModFacLo * EIRFPLRModFac * InputPowerMultiplier;
     TotalCondHeatingCapacityHi = VRF(VRFCond).HeatingCapacity * HeatCombinationRatio(VRFCond) * TotHeatCapTempModFacHi * HeatingCapacityMultiplier;
@@ -3985,12 +3986,12 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     // test that correct performance curve is used (i.e., lo or hi performance curves based on OAT)
     int DXCoolingCoilIndex = 1;
     Real64 InletAirWetBulbC = DXCoils::DXCoilCoolInletAirWBTemp(DXCoolingCoilIndex); // load weighted average but only 1 coil here
-    Real64 OATatCoolCapBoundary = CurveValue(VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
-    Real64 OATatCoolEIRBoundary = CurveValue(VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
-    Real64 TotCoolCapTempModFacLo = CurveValue(VRF(VRFCond).CoolCapFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolEIRTempModFacLo = CurveValue(VRF(VRFCond).CoolEIRFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolCapTempModFacHi = CurveValue(VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
-    Real64 TotCoolEIRTempModFacHi = CurveValue(VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 OATatCoolCapBoundary = CurveValue(state, VRF(VRFCond).CoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 OATatCoolEIRBoundary = CurveValue(state, VRF(VRFCond).EIRCoolBoundaryCurvePtr, InletAirWetBulbC);
+    Real64 TotCoolCapTempModFacLo = CurveValue(state, VRF(VRFCond).CoolCapFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacLo = CurveValue(state, VRF(VRFCond).CoolEIRFT, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolCapTempModFacHi = CurveValue(state, VRF(VRFCond).CoolCapFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
+    Real64 TotCoolEIRTempModFacHi = CurveValue(state, VRF(VRFCond).CoolEIRFTHi, InletAirWetBulbC, Node(VRF(VRFCond).CondenserNodeNum).Temp);
     Real64 TotalCondCoolingCapacityLo = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacLo;
     Real64 ElecCoolingPowerLo = VRF(VRFCond).RatedCoolingPower * TotCoolCapTempModFacLo * TotCoolEIRTempModFacLo;
     Real64 TotalCondCoolingCapacityHi = VRF(VRFCond).CoolingCapacity * CoolCombinationRatio(VRFCond) * TotCoolCapTempModFacHi;
@@ -4708,7 +4709,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_GetInputFailers)
     ZoneSysEnergyDemand.allocate(1);
 
     ProcessScheduleInput(state.files);   // read schedules
-    GetCurveInput();          // read curves
+    GetCurveInput(state);          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -5564,13 +5565,13 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
     DummyArray = 0.0;
     ScheduleManager::GetScheduleValuesForDay(1, DummyArray, 58, 3);
 
-    CurveManager::GetCurveInput();                // read curves
+    CurveManager::GetCurveInput(state);                // read curves
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager);
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
@@ -6436,7 +6437,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput();                // read curves
+    CurveManager::GetCurveInput(state);                // read curves
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
@@ -6499,7 +6500,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
 
     int VRFCond = 1;
     VRF.allocate(1);
@@ -6585,7 +6586,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
     TerminalUnitList(1).TotalHeatLoad(5) = 0.0;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
 
     EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
     EXPECT_DOUBLE_EQ(VRF(VRFCond).ElecHeatingPower, 0.0);
@@ -6619,7 +6620,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
     TerminalUnitList(1).TotalCoolLoad(5) = 1000.0;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 5000.0);
@@ -6650,7 +6651,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
     TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6693,7 +6694,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     // set heat recovery time constant to non-zero value (means mode change will degrade performance)
     VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
     // last operating mode was heating
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6722,7 +6723,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.75 - CalcVRFCondenser saves last time stamp for use in exponential curve, increment by
                                                            // 1 time step to get same answer
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -6745,7 +6746,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
     LastModeCooling(VRFCond) = false;
     LastModeHeating(VRFCond) = true;
 
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
 
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
 
@@ -6755,7 +6756,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.25
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -6763,7 +6764,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.5
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -6771,7 +6772,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest)
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.75
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
@@ -11157,7 +11158,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
 
     ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -12888,7 +12889,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 
     ZoneSysEnergyDemand.allocate(1);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -13043,7 +13044,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    CurveManager::GetCurveInput();
+    CurveManager::GetCurveInput(state);
 
     int VRFCond = 1;
     VRF.allocate(1);
@@ -13123,7 +13124,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     TerminalUnitList(1).HRCoolRequest = false;
     TerminalUnitList(1).TotalHeatLoad = 0.0;
     TerminalUnitList(1).HRHeatRequest = false;
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
 
     // increment time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
@@ -13160,7 +13161,7 @@ TEST_F(EnergyPlusFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
     // VRF(VRFCond).HRHeatEIRTC = 0.0; // (default)
     // last operating mode was heating
-    CalcVRFCondenser(VRFCond);
+    CalcVRFCondenser(state, VRFCond);
     EXPECT_TRUE(VRF(VRFCond).ModeChange);
     EXPECT_FALSE(VRF(VRFCond).HRModeChange);
     EXPECT_EQ(VRF(VRFCond).OperatingMode, 2); // ModeHeatingOnly
@@ -13630,7 +13631,7 @@ TEST_F(EnergyPlusFixture, VRF_BlowthroughFanPlacement_InputTest)
 
     bool ErrorsFound(false);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -14219,7 +14220,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     Real64 maxEIRfLowPLRXInput(0.0);
     bool ErrorsFound(false);
     ProcessScheduleInput(state.files);
-    GetCurveInput();
+    GetCurveInput(state);
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
@@ -14229,12 +14230,12 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_TRUE(ErrorsFound);
     // set pointer to components
     auto &thisVRF(VRF(1));
-    auto &thisCoolEIRFPLR(PerfCurve(thisVRF.CoolEIRFPLR1));
-    auto &thisHeatEIRFPLR(PerfCurve(thisVRF.HeatEIRFPLR1));
+    auto &thisCoolEIRFPLR(state.dataCurveManager->PerfCurve(thisVRF.CoolEIRFPLR1));
+    auto &thisHeatEIRFPLR(state.dataCurveManager->PerfCurve(thisVRF.HeatEIRFPLR1));
     // check user input VRF Minimum PLR
     EXPECT_EQ(0.15, thisVRF.MinPLR);
     // EIRFPLR curve minimum PLR value specified
-    CurveManager::GetCurveMinMaxValues(thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    CurveManager::GetCurveMinMaxValues(state, thisVRF.CoolEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.25, thisCoolEIRFPLR.Var1Min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
     EXPECT_EQ(1.00, thisCoolEIRFPLR.Var1Max);
@@ -14242,7 +14243,7 @@ TEST_F(EnergyPlusFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     EXPECT_GT(thisCoolEIRFPLR.Var1Min, thisVRF.MinPLR); // expect warning message
     minEIRfLowPLRXInput = 0.0;
     maxEIRfLowPLRXInput = 0.0;
-    CurveManager::GetCurveMinMaxValues(thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
+    CurveManager::GetCurveMinMaxValues(state, thisVRF.HeatEIRFPLR1, minEIRfLowPLRXInput, maxEIRfLowPLRXInput);
     EXPECT_EQ(0.25, thisHeatEIRFPLR.Var1Min);
     EXPECT_EQ(0.25, minEIRfLowPLRXInput); // getinput checks this
     EXPECT_EQ(1.00, thisHeatEIRFPLR.Var1Max);
@@ -14934,7 +14935,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     DataGlobals::MinutesPerTimeStep = 60;
     DataSizing::ZoneEqSizing.allocate(1);
 
-    CurveManager::GetCurveInput();                // read curves
+    CurveManager::GetCurveInput(state);                // read curves
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
