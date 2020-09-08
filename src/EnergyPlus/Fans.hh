@@ -275,17 +275,17 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(FansData &fans, int const FanNum);
+    void SimSimpleFan(EnergyPlusData &state, FansData &fans, int const FanNum);
 
-    void SimVariableVolumeFan(FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
     void SimZoneExhaustFan(FansData &fans, int const FanNum);
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(FansData &fans, int const FanNum);
+    void SimComponentModelFan(EnergyPlusData &state, FansData &fans, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -371,7 +371,8 @@ namespace Fans {
                     Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     );
 
-    Real64 CalFaultyFanAirFlowReduction(std::string const &FanName,          // Name of the Fan
+    Real64 CalFaultyFanAirFlowReduction(EnergyPlusData &state,
+                                        std::string const &FanName,          // Name of the Fan
                                         Real64 const FanDesignAirFlowRate,   // Fan Design Volume Flow Rate [m3/s]
                                         Real64 const FanDesignDeltaPress,    // Fan Design Delta Pressure [Pa]
                                         Real64 const FanFaultyDeltaPressInc, // Increase of Fan Delta Pressure in the Faulty Case [Pa]

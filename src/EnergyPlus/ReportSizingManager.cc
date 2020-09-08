@@ -2092,7 +2092,7 @@ namespace ReportSizingManager {
                                 }
                                 CoilInWetBulb = PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine);
                                 if (DataTotCapCurveIndex > 0) {
-                                    TotCapTempModFac = CurveValue(DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                    TotCapTempModFac = CurveValue(state, DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                                 } else if (DataTotCapCurveValue > 0) {
                                     TotCapTempModFac = DataTotCapCurveValue;
                                 } else {
@@ -3300,7 +3300,7 @@ namespace ReportSizingManager {
                                 }
                             }
                             if (DataTotCapCurveIndex > 0) {
-                                TotCapTempModFac = CurveValue(DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
+                                TotCapTempModFac = CurveValue(state, DataTotCapCurveIndex, CoilInWetBulb, OutTemp);
                             } else {
                                 TotCapTempModFac = 1.0;
                             }

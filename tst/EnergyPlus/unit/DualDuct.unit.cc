@@ -349,7 +349,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_GetInputs)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DualDuct::GetDualDuctInput();
 
     //dual duct  VAV air terminal get input test
@@ -450,7 +450,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DualDuct::GetDualDuctInput();
 
     auto &thisDDAirTerminal = DualDuct::dd_airterminal(DDNum);
@@ -477,7 +477,7 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(HotInNode).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(HotInNode).Temp, DataLoopNode::Node(HotInNode).HumRat);
 
     // test with heating load and turndown fraction schedule value set 1.0
-    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; // 
+    DualDuct::dd_airterminal(DDNum).ZoneTurndownMinAirFracSchPtr = 1; //
     DataLoopNode::Node(OutNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRate = SysMaxMassFlowRes;
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;

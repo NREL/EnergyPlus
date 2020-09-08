@@ -122,7 +122,7 @@ namespace ZoneAirLoopEquipmentManager {
 
         // Beginning of Code
 
-        GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+        GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
 
         // Find the correct Zone Air Distribution Unit Equipment
         if (CompIndex == 0) {
@@ -154,7 +154,7 @@ namespace ZoneAirLoopEquipmentManager {
         InitZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager, AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
     }
 
-    void GetZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
+    void GetZoneAirLoopEquipment(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -378,7 +378,7 @@ namespace ZoneAirLoopEquipmentManager {
                                                        "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam")) {
                     AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompUnitNum) = SingleDuctConstVolFourPipeBeam;
                     AirDistUnit(AirDistUnitNum).airTerminalPtr =
-                        FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(SingleDuctConstVolFourPipeBeam, AirDistUnit(AirDistUnitNum).EquipName(1));
+                        FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(state, AirDistUnit(AirDistUnitNum).EquipName(1));
                     if (AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) {
                         ShowSevereError("Error found in " + CurrentModuleObject + " = " + AirDistUnit(AirDistUnitNum).Name);
                         ShowContinueError("Simple duct leakage model not available for " + cAlphaFields(3) + " = " +
@@ -745,7 +745,7 @@ namespace ZoneAirLoopEquipmentManager {
                                               AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctATMixer) {
-                    GetATMixers(state.dataZoneAirLoopEquipmentManager); // Needed here if mixer used only with unitarysystem which gets its input late
+                    GetATMixers(state, state.dataZoneAirLoopEquipmentManager); // Needed here if mixer used only with unitarysystem which gets its input late
                     ProvideSysOutput = false;
 
                 } else {
