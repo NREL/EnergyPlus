@@ -979,6 +979,9 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                            } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Dehumidification:LiquidDesiccant")) {
+                                this_comp.TypeOf_Num = TypeOf_CoilLiqDesiccantDehum;
+                                this_comp.CurOpSchemeType = DemandOpSchemeType;
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:Water:DetailedGeometry")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterDetailedFlatCooling;
@@ -1210,6 +1213,9 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(state, CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Pcm:Simple")) {
+                                this_comp.TypeOf_Num = TypeOf_TS_PcmSimple;
+                                this_comp.compPtr = IceThermalStorage::SimplePcmStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Detailed")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(state, CompNames(CompNum));
@@ -2872,6 +2878,8 @@ namespace EnergyPlus {
                                         ShouldBeACTIVE = true;
                                     } else if (SELECT_CASE_var == TypeOf_CoilWaterCooling) {
                                         ShouldBeACTIVE = true;
+                                    } else if (SELECT_CASE_var == TypeOf_CoilLiqDesiccantDehum) {
+                                        ShouldBeACTIVE = true;
                                     } else if (SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling) {
                                         ShouldBeACTIVE = true;
                                     } else if (SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating) {
@@ -3896,6 +3904,10 @@ namespace EnergyPlus {
                                     this_component.FlowCtrl = ControlType_Active;
                                     this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
                                     this_component.HowLoadServed = HowMet_PassiveCap;
+                                } else if (SELECT_CASE_var == TypeOf_TS_PcmSimple) { //                    = 29
+                                    this_component.FlowCtrl = ControlType_Active;
+                                    this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
+                                    this_component.HowLoadServed = HowMet_PassiveCap;
                                 } else if (SELECT_CASE_var == TypeOf_ValveTempering) { //                  = 30
                                     this_component.FlowCtrl = ControlType_Active;
                                     this_component.FlowPriority = LoopFlowStatus_NeedyIfLoopOn;
@@ -3946,6 +3958,10 @@ namespace EnergyPlus {
                                     this_component.HowLoadServed = HowMet_NoneDemand;
                                 } else if (SELECT_CASE_var ==
                                            TypeOf_CoilWaterCooling) { //               = 39  ! demand side component
+                                    this_component.FlowCtrl = ControlType_Active;
+                                    this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
+                                    this_component.HowLoadServed = HowMet_NoneDemand;
+                                } else if (SELECT_CASE_var == TypeOf_CoilLiqDesiccantDehum) { //               = 97  ! demand side component
                                     this_component.FlowCtrl = ControlType_Active;
                                     this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                     this_component.HowLoadServed = HowMet_NoneDemand;

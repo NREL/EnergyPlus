@@ -83,6 +83,10 @@
 #include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/PlantChillers.hh>
 
 namespace EnergyPlus {
 
@@ -110,6 +114,7 @@ namespace VariableSpeedCoils {
     using DXCoils::AdjustCBF;
     using DXCoils::CalcCBF;
     using General::RoundSigDigits;
+    using ScheduleManager::GetCurrentScheduleValue;
 
     // Use statements for access to subroutines in other modules
 
@@ -289,9 +294,21 @@ namespace VariableSpeedCoils {
           bIsDesuperheater(false),          // whether the coil is used for a desuperheater, i.e. zero all the cooling capacity and power
           // end variables for HPWH
           reportCoilFinalSizes(true), // coil report
-          capModFacTotal(0.0)         // coil report
-
+          capModFacTotal(0.0),         // coil report
+          GridScheduleIndex(0),         // grid schedule index
+          GridLowBound(1.0e10),         // low bound to apply grid responsive control
+          GridHighBound(-1.0e10),       // high bound to apply grid responsive control
+          GridMaxSpeed(10.0),           // max speed level to apply grid responsive control
+          GridLoadCtrlMode(GRID_SENLAT), // control sensible or latent
+          PeakStoreHours(0.0),         // hours to store the peak capacity
+          StoreMoisture(false),          // whether to store latent capacity = true; false = store sensible capacity
+          StoreDiff(1.0e6),              // differential during storag, i.e. temperature difference, humidity differenc, etc
+          RecoveryCapacityRatio(1.0)       // nominal capacity ratio of the recovery unit to the main VS coil
     {
+        StorageType = "N";
+        StorageName = "N";
+        RecoveryUnitType = "N";
+        RecoveryUnitName = "N"; 
     }
 
     void SimVariableSpeedCoils(EnergyPlusData &state,
@@ -420,8 +437,21 @@ namespace VariableSpeedCoils {
         }
 
         // two additional output variables
-        VarSpeedCoil(DXCoilNum).SpeedNumReport = SpeedCal;
-        VarSpeedCoil(DXCoilNum).SpeedRatioReport = SpeedRatio;
+        int MaxSpeed = SpeedCal; // correct real running speed considering grid contro request
+        MaxSpeed = CompareGridSpeed(DXCoilNum, MaxSpeed);
+
+        if (MaxSpeed < SpeedCal) { // corrected by grid signal
+            if (MaxSpeed <= 0) {
+                VarSpeedCoil(DXCoilNum).SpeedNumReport = 1;
+                VarSpeedCoil(DXCoilNum).SpeedRatioReport = 0.0;
+            } else {
+                VarSpeedCoil(DXCoilNum).SpeedNumReport = MaxSpeed;
+                VarSpeedCoil(DXCoilNum).SpeedRatioReport = 1.0;
+            }
+        } else {
+            VarSpeedCoil(DXCoilNum).SpeedNumReport = SpeedCal;
+            VarSpeedCoil(DXCoilNum).SpeedRatioReport = SpeedRatio;
+        }
     }
 
     void GetVarSpeedCoilInput(EnergyPlusData &state)
@@ -431,6 +461,7 @@ namespace VariableSpeedCoils {
         //       AUTHOR         Bo Shen
         //       DATE WRITTEN   March, 2012
         //       MODIFIED       Bo Shen, 12/2014, add variable-speed HPWH
+        //       MODIFIED       Bo Shen, add grid responsive speed control, 07/2020
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -483,6 +514,8 @@ namespace VariableSpeedCoils {
         Array1D<Real64> NumArray;        // Numeric input items for object
         Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        int NumStorageCoolPairs(0);             //cooling energy storage pair
+        int NumStorageHeatPairs(0);             //heating energy storage pair
 
         NumCool = inputProcessor->getNumObjectsFound("COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
         NumHeat = inputProcessor->getNumObjectsFound("COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
@@ -491,6 +524,9 @@ namespace VariableSpeedCoils {
         NumHPWHAirToWater = inputProcessor->getNumObjectsFound("COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED");
         NumVarSpeedCoils = NumCool + NumHeat + NumCoolAS + NumHeatAS + NumHPWHAirToWater;
         DXCoilNum = 0;
+
+        NumStorageCoolPairs = inputProcessor->getNumObjectsFound("THERMALSTORAGE:COOLING:PAIR");
+        NumStorageHeatPairs = inputProcessor->getNumObjectsFound("THERMALSTORAGE:HEATING:PAIR");
 
         if (NumVarSpeedCoils <= 0) {
             ShowSevereError("No Equipment found in GetVarSpeedCoilInput");
@@ -1103,27 +1139,50 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr = GetScheduleIndex(AlphArray(9));
                 if (VarSpeedCoil(DXCoilNum).BasinHeaterSchedulePtr == 0) {
                     ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError("...not found " + cAlphaFields(14) + "=\"" + AlphArray(9) + "\".");
+                    ShowContinueError("...not found " + cAlphaFields(9) + "=\"" + AlphArray(9) + "\".");
                     ShowContinueError("Basin heater will be available to operate throughout the simulation.");
                 }
             }
 
-            for (I = 1; I <= VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(13 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(14 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(15 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(16 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).EvapCondAirFlow(I) = NumArray(17 + (I - 1) * 6);
+            if (lAlphaBlanks(10)) {
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
+            } else {
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(AlphArray(10));
+                if (VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowContinueError("..." + cAlphaFields(10) + "=\"" + AlphArray(10) + "\"Missing");
+                    ErrorsFound = true;
+                }
+            }
 
-                VarSpeedCoil(DXCoilNum).EvapCondEffect(I) = NumArray(18 + (I - 1) * 6);
+            VarSpeedCoil(DXCoilNum).GridLowBound = NumArray(13);
+            VarSpeedCoil(DXCoilNum).GridHighBound = NumArray(14);
+            VarSpeedCoil(DXCoilNum).GridMaxSpeed = NumArray(15);
+
+            if (UtilityRoutines::SameString(AlphArray(11), "Sensible")) {
+                VarSpeedCoil(DXCoilNum).GridLoadCtrlMode = GRID_SENSIBLE;
+            } else if (UtilityRoutines::SameString(AlphArray(11), "Latent")) {
+                VarSpeedCoil(DXCoilNum).GridLoadCtrlMode = GRID_LATENT;
+            } else {
+                VarSpeedCoil(DXCoilNum).GridLoadCtrlMode = GRID_SENLAT;
+            }
+
+            for (I = 1; I <= VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
+                VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(16 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(17 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(18 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(19 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).EvapCondAirFlow(I) = NumArray(20 + (I - 1) * 6);
+
+                VarSpeedCoil(DXCoilNum).EvapCondEffect(I) = NumArray(21 + (I - 1) * 6);
                 if (VarSpeedCoil(DXCoilNum).EvapCondEffect(I) < 0.0 || VarSpeedCoil(DXCoilNum).EvapCondEffect(I) > 1.0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
-                    ShowContinueError("..." + cNumericFields(18 + (I - 1) * 6) + " cannot be < 0.0 or > 1.0.");
-                    ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(18 + (I - 1) * 6), 2) + "].");
+                    ShowContinueError("..." + cNumericFields(21 + (I - 1) * 6) + " cannot be < 0.0 or > 1.0.");
+                    ShowContinueError("...entered value=[" + TrimSigDigits(NumArray(21 + (I - 1) * 6), 2) + "].");
                     ErrorsFound = true;
                 }
 
-                AlfaFieldIncre = 10 + (I - 1) * 4;
+                AlfaFieldIncre = 12 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -1153,7 +1212,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 11 + (I - 1) * 4;
+                AlfaFieldIncre = 13 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -1183,7 +1242,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 12 + (I - 1) * 4;
+                AlfaFieldIncre = 14 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -1213,7 +1272,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 13 + (I - 1) * 4;
+                AlfaFieldIncre = 15 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -1815,10 +1874,25 @@ namespace VariableSpeedCoils {
                 ShowContinueError("..." + cNumericFields(6) + " = 0.0 for defrost strategy = RESISTIVE.");
             }
 
+            if (lAlphaBlanks(8)) {
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
+            } else {
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(AlphArray(8));
+                if (VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowContinueError("..." + cAlphaFields(8) + "=\"" + AlphArray(8) + "\"Missing");
+                    ErrorsFound = true;
+                }
+            }
+
+            VarSpeedCoil(DXCoilNum).GridLowBound = NumArray(12);
+            VarSpeedCoil(DXCoilNum).GridHighBound = NumArray(13);
+            VarSpeedCoil(DXCoilNum).GridMaxSpeed = NumArray(14);
+
             for (I = 1; I <= VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(12 + (I - 1) * 3);
-                VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(13 + (I - 1) * 3);
-                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(14 + (I - 1) * 3);
+                VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(15 + (I - 1) * 3);
+                VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(16 + (I - 1) * 3);
+                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(17 + (I - 1) * 3);
 
                 if (VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) < 1.e-10) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid value");
@@ -1827,7 +1901,7 @@ namespace VariableSpeedCoils {
                     ErrorsFound = true;
                 }
 
-                AlfaFieldIncre = 8 + (I - 1) * 4;
+                AlfaFieldIncre = 9 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -1857,7 +1931,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 9 + (I - 1) * 4;
+                AlfaFieldIncre = 10 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -1887,7 +1961,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 10 + (I - 1) * 4;
+                AlfaFieldIncre = 11 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -1917,7 +1991,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 11 + (I - 1) * 4;
+                AlfaFieldIncre = 12 + (I - 1) * 4;
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -2208,15 +2282,30 @@ namespace VariableSpeedCoils {
                 }
             }
 
-            for (I = 1; I <= VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
-                VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(12 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(13 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(14 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(15 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) = NumArray(16 + (I - 1) * 6);
-                VarSpeedCoil(DXCoilNum).MSWHPumpPower(I) = NumArray(17 + (I - 1) * 6);
+            if (lAlphaBlanks(11)) {
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = 0;
+            } else {
+                VarSpeedCoil(DXCoilNum).GridScheduleIndex = GetScheduleIndex(AlphArray(11));
+                if (VarSpeedCoil(DXCoilNum).GridScheduleIndex == 0) {
+                    ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + VarSpeedCoil(DXCoilNum).Name + "\", invalid");
+                    ShowContinueError("..." + cAlphaFields(11) + "=\"" + AlphArray(11) + "\"Missing");
+                    ErrorsFound = true;
+                }
+            }
 
-                AlfaFieldIncre = 11 + (I - 1) * 6;
+            VarSpeedCoil(DXCoilNum).GridLowBound = NumArray(12);
+            VarSpeedCoil(DXCoilNum).GridHighBound = NumArray(13);
+            VarSpeedCoil(DXCoilNum).GridMaxSpeed = NumArray(14);
+
+            for (I = 1; I <= VarSpeedCoil(DXCoilNum).NumOfSpeeds; ++I) {
+                VarSpeedCoil(DXCoilNum).MSRatedTotCap(I) = NumArray(15 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSRatedCOP(I) = NumArray(16 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSRatedSHR(I) = NumArray(17 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = NumArray(18 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSRatedWaterVolFlowRate(I) = NumArray(19 + (I - 1) * 6);
+                VarSpeedCoil(DXCoilNum).MSWHPumpPower(I) = NumArray(20 + (I - 1) * 6);
+
+                AlfaFieldIncre = 12 + (I - 1) * 6;
                 VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -2248,7 +2337,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 12 + (I - 1) * 6;
+                AlfaFieldIncre = 13 + (I - 1) * 6;
                 VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -2280,7 +2369,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 13 + (I - 1) * 6;
+                AlfaFieldIncre = 14 + (I - 1) * 6;
                 VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSCCapWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -2312,7 +2401,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 14 + (I - 1) * 6;
+                AlfaFieldIncre = 15 + (I - 1) * 6;
                 VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -2344,7 +2433,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 15 + (I - 1) * 6;
+                AlfaFieldIncre = 16 + (I - 1) * 6;
                 VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRAirFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -2376,7 +2465,7 @@ namespace VariableSpeedCoils {
                     }
                 }
 
-                AlfaFieldIncre = 16 + (I - 1) * 6;
+                AlfaFieldIncre = 17 + (I - 1) * 6;
                 VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) = GetCurveIndex(state, AlphArray(AlfaFieldIncre)); // convert curve name to number
                 if (VarSpeedCoil(DXCoilNum).MSEIRWaterFFlow(I) == 0) {
                     if (lAlphaBlanks(AlfaFieldIncre)) {
@@ -2481,6 +2570,99 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).RatedCapCoolSens = AutoSize; // always auto-sized, to be determined in the sizing calculation
         }
         //---------------------------VARIABLE-SPEED AIR SOURCE HPWH END --------------
+
+
+        //------------------------VARIABLE-SPEED ENERGY STROAGE COOLING PAIR---BEGIN
+        CurrentModuleObject = "THERMALSTORAGE:COOLING:PAIR"; // for reporting
+
+        for (CoilCounter = 1; CoilCounter <= NumStorageCoolPairs; ++CoilCounter) {
+
+            AlfaFieldIncre = 1;
+
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CoilCounter,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
+            //AlphArray(2) -- coil type
+            // AlphArray(3) -- coil name
+
+            const int iCoilID = UtilityRoutines::FindItemInList(AlphArray(3), VarSpeedCoil);
+            if (iCoilID == 0) {
+                ShowSevereError("GetVarSpeedCoilInput: Could not find CoilType=\"" + AlphArray(2) + "\" with Name=\"" + AlphArray(3) + "\"");
+                ErrorsFound = true;
+            }
+
+            VarSpeedCoil(iCoilID).StorageType = AlphArray(4);
+            VarSpeedCoil(iCoilID).StorageName = AlphArray(5);
+            VarSpeedCoil(iCoilID).PeakStoreHours = NumArray(1);
+            VarSpeedCoil(iCoilID).StoreDiff = NumArray(2);
+
+            if (UtilityRoutines::SameString(AlphArray(6), "LATENT")) {
+                VarSpeedCoil(iCoilID).StoreMoisture = true;
+            } else {
+                VarSpeedCoil(iCoilID).StoreMoisture = false;
+            }
+
+            if (!lAlphaBlanks(7)) {
+                VarSpeedCoil(iCoilID).RecoveryUnitType = AlphArray(7);
+                VarSpeedCoil(iCoilID).RecoveryUnitName = AlphArray(8);
+                VarSpeedCoil(iCoilID).RecoveryCapacityRatio = NumArray(3);
+            }
+        }
+        //------------------------VARIABLE-SPEED ENERGY STROAGE COOLING PAIR---END --------------
+
+        //------------------------VARIABLE-SPEED ENERGY STROAGE HEATING PAIR---BEGIN
+        CurrentModuleObject = "THERMALSTORAGE:HEATING:PAIR"; // for reporting
+
+        for (CoilCounter = 1; CoilCounter <= NumStorageHeatPairs; ++CoilCounter) {
+
+            AlfaFieldIncre = 1;
+
+            inputProcessor->getObjectItem(CurrentModuleObject,
+                                          CoilCounter,
+                                          AlphArray,
+                                          NumAlphas,
+                                          NumArray,
+                                          NumNums,
+                                          IOStat,
+                                          lNumericBlanks,
+                                          lAlphaBlanks,
+                                          cAlphaFields,
+                                          cNumericFields);
+            // ErrorsFound will be set to True if problem was found, left untouched otherwise
+            VerifyUniqueCoilName(CurrentModuleObject, AlphArray(1), ErrorsFound, CurrentModuleObject + " Name");
+
+            // AlphArray(2) -- coil type
+            // AlphArray(3) -- coil name
+
+            const int iCoilID = UtilityRoutines::FindItemInList(AlphArray(3), VarSpeedCoil);
+            if (iCoilID == 0) {
+                ShowSevereError("GetVarSpeedCoilInput: Could not find CoilType=\"" + AlphArray(2) + "\" with Name=\"" + AlphArray(3) + "\"");
+                ErrorsFound = true;
+            }
+
+            VarSpeedCoil(iCoilID).StorageType = AlphArray(4);
+            VarSpeedCoil(iCoilID).StorageName = AlphArray(5);
+            VarSpeedCoil(iCoilID).PeakStoreHours = NumArray(1);
+            VarSpeedCoil(iCoilID).StoreDiff = NumArray(2);
+                        
+            if (!lAlphaBlanks(6)) {
+                VarSpeedCoil(iCoilID).RecoveryUnitType = AlphArray(6);
+                VarSpeedCoil(iCoilID).RecoveryUnitName = AlphArray(7);
+                VarSpeedCoil(iCoilID).RecoveryCapacityRatio = NumArray(3);
+            }
+        }
+        //------------------------VARIABLE-SPEED ENERGY STROAGE HEATING PAIR---END --------------
 
         AlphArray.deallocate();
         cAlphaFields.deallocate();
@@ -3220,6 +3402,7 @@ namespace VariableSpeedCoils {
         using PlantUtilities::ScanPlantLoopsForObject;
         using PlantUtilities::SetComponentFlowRate;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
+        using ReportSizingManager::ReportSizingOutput;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3317,6 +3500,45 @@ namespace VariableSpeedCoils {
         if (!SysSizingCalc && MySizeFlag(DXCoilNum) && !MyPlantScanFlag(DXCoilNum)) {
             // for each furnace, do the sizing once.
             SizeVarSpeedCoil(state, DXCoilNum);
+
+             // size recovery unit if any
+            if (!UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "N")) {
+
+                double dScaleCapacity = 0.0;
+
+                if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "COIL:WATERHEATING:AIRTOWATERHEATPUMP:VARIABLESPEED")) {
+                    dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapHeat * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
+
+                    const int IndexNum = UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, VarSpeedCoil);
+
+                    if (IndexNum > 0) {
+                        VarSpeedCoil(IndexNum).RatedCapWH = dScaleCapacity;
+                        // size again if already sized HPWH
+                        if (MySizeFlag(DXCoilNum) == false) SizeVarSpeedCoil(state, IndexNum);
+                    }
+
+                } else if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "Chiller:Electric:EIR")) {
+                    dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
+
+                    const int IndexNum =
+                        UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataChillerElectricEIR.ElectricEIRChiller);
+
+                    if (IndexNum > 0) state.dataChillerElectricEIR.ElectricEIRChiller(IndexNum).RefCap = dScaleCapacity;
+                } else if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).RecoveryUnitType, "Chiller:Electric")) {
+
+                    dScaleCapacity = VarSpeedCoil(DXCoilNum).RatedCapCoolTotal * VarSpeedCoil(DXCoilNum).RecoveryCapacityRatio;
+
+                    const int IndexNum =
+                        UtilityRoutines::FindItemInList(VarSpeedCoil(DXCoilNum).RecoveryUnitName, state.dataPlantChillers.ElectricChiller);
+
+                    if (IndexNum > 0) state.dataPlantChillers.ElectricChiller(IndexNum).NomCap = dScaleCapacity;
+                }
+
+                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + ":DX:VARIABLESPEED",
+                                   VarSpeedCoil(DXCoilNum).Name,
+                                   "Recovery unit capacity [W]",
+                                   dScaleCapacity);
+            }
 
             MySizeFlag(DXCoilNum) = false;
 
@@ -3826,6 +4048,8 @@ namespace VariableSpeedCoils {
         using CurveManager::CurveValue;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
+        using IceThermalStorage::SetIceStoreNormCapacity; 
+        using WaterThermalTanks::SetTankVolume; 
 
         // Locals
         Real64 QLoadTotal; // placeholder for calculating SHR
@@ -5022,6 +5246,45 @@ namespace VariableSpeedCoils {
                 ShowContinueError("... to ensure they meet the expected manufacturers performance specifications.");
             }
         }
+
+        //size storage tank if any
+        if (!UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).StorageType, "N") )
+        {
+            if (UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).StorageType, "ThermalStorage:Ice:Simple") ||
+                UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).StorageType, "ThermalStorage:Ice:Detailed") ||
+                UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).StorageType, "ThermalStorage:Pcm:Simple")) 
+            {
+                const double dNormCapacity = CoolCapAtPeak * VarSpeedCoil(DXCoilNum).PeakStoreHours * 3600.0 /1.0e9; //GJ
+                IceThermalStorage::
+                    SetIceStoreNormCapacity(VarSpeedCoil(DXCoilNum).StorageType, VarSpeedCoil(DXCoilNum).StorageName, dNormCapacity);
+
+                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                   VarSpeedCoil(DXCoilNum).Name,
+                                   "Storage tank capacity [GJ]",
+                                   dNormCapacity);
+            } 
+            else if(UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).StorageType, "WaterHeater:Mixed") ||
+                       UtilityRoutines::SameString(VarSpeedCoil(DXCoilNum).StorageType, "WaterHeater:Stratified"))
+            {
+                double dRatedHeatCapa = 0.0; 
+                if (VarSpeedCoil(DXCoilNum).CoolHeatType == "HEATING") {
+                    dRatedHeatCapa = VarSpeedCoil(DXCoilNum).RatedCapHeat;
+                } else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
+                    dRatedHeatCapa = VarSpeedCoil(DXCoilNum).RatedCapWH;
+                }
+
+                const double dVolume = dRatedHeatCapa * VarSpeedCoil(DXCoilNum).PeakStoreHours * 3600.0 /
+                                       VarSpeedCoil(DXCoilNum).StoreDiff / 4186.0 / 1000.0;
+                WaterThermalTanks::
+                    SetTankVolume(VarSpeedCoil(DXCoilNum).StorageType, VarSpeedCoil(DXCoilNum).StorageName, dVolume);
+
+                ReportSizingOutput("COIL:" + VarSpeedCoil(DXCoilNum).CoolHeatType + CurrentObjSubfix,
+                                   VarSpeedCoil(DXCoilNum).Name,
+                                   "Storage tank volume [m3]",
+                                   dVolume);
+            }
+        }
+
     }
 
     void CalcVarSpeedCoilCooling(EnergyPlusData &state,
@@ -5040,7 +5303,7 @@ namespace VariableSpeedCoils {
 
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:CalcHPCoolingSimple
         //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
+        //       MODIFIED       Bo Shen, add grid responsive speed control, 07/2020
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -5130,6 +5393,7 @@ namespace VariableSpeedCoils {
         Real64 PLF;                             // part-load function
         Real64 MaxHumRat;                       // max possible humidity
         Real64 MaxOutletEnth;                   // max possible outlet enthalpy
+        Real64 dGridSignal(0.0);                // real time grid signal
 
         // ADDED VARIABLES FOR air source coil
         static Real64 OutdoorDryBulb(0.0);        // Outdoor dry-bulb temperature at condenser (C)
@@ -5162,6 +5426,12 @@ namespace VariableSpeedCoils {
         LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, OutBaroPress, RoutineName);
 
         MaxSpeed = VarSpeedCoil(DXCoilNum).NumOfSpeeds;
+
+        MaxSpeed = CompareGridSpeed(DXCoilNum, MaxSpeed);
+        if (MaxSpeed <= 0) {
+            VarSpeedCoil(DXCoilNum).SimFlag = false;
+            return;
+        }
 
         // must be placed inside the loop, otherwise cause bug in release mode, need to be present at two places
         if (SpeedNum > MaxSpeed) {
@@ -5859,7 +6129,13 @@ namespace VariableSpeedCoils {
             VarSpeedCoil(DXCoilNum).SimFlag = true;
         }
 
+        
         MaxSpeed = VarSpeedCoil(DXCoilNum).NumOfSpeeds;
+        MaxSpeed = CompareGridSpeed(DXCoilNum, MaxSpeed);
+        if (MaxSpeed <= 0) {
+            VarSpeedCoil(DXCoilNum).SimFlag = false;
+            return;
+        }
 
         // must be placed inside the loop, otherwise cause bug in release mode, need to be present at two places
         if (SpeedNum > MaxSpeed) {
@@ -6259,7 +6535,7 @@ namespace VariableSpeedCoils {
 
         //       AUTHOR         Bo Shen, based on WaterToAirHeatPumpSimple:CalcHPHeatingSimple
         //       DATE WRITTEN   March 2012
-        //       MODIFIED       na
+        //       MODIFIED       Bo Shen, add grid responsive speed control, 07/2020
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -6321,7 +6597,8 @@ namespace VariableSpeedCoils {
         Real64 QWasteHeat2;         // recoverable waste heat at high speed
         Real64 PLF;                 // part-load function
         Real64 ReportingConstant;
-        Real64 rhoair(0.0); // entering air density
+        Real64 rhoair(0.0);      // entering air density
+        Real64 dGridSignal(0.0); // real time grid signal
 
         // ADDED VARIABLES FOR air source coil
         static Real64 OutdoorCoilT(0.0);              // Outdoor coil temperature (C)
@@ -6339,6 +6616,12 @@ namespace VariableSpeedCoils {
         static Real64 TotRatedCapacity(0.0);          // total rated capacity at the given speed and speed ratio for defrosting
 
         MaxSpeed = VarSpeedCoil(DXCoilNum).NumOfSpeeds;
+
+        MaxSpeed = CompareGridSpeed(DXCoilNum, MaxSpeed);
+        if (MaxSpeed <= 0) {
+            VarSpeedCoil(DXCoilNum).SimFlag = false;
+            return;
+        }
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
         if (!(CyclingScheme == ContFanCycCoil) && PartLoadRatio > 0.0) {
@@ -7145,6 +7428,58 @@ namespace VariableSpeedCoils {
         }
 
         return MinOAT;
+    }
+
+    int CompareGridSpeed(const int CompIndex, // coil index No
+                         const int SpeedInput // loop commanded speed level
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Bo Shen
+        //       DATE WRITTEN   07/2020
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+        //      PURPOSE OF THIS FUNCTION:
+        //      check the maximum allow speed to drive air flow rate in the air loop
+
+        int MinSpeed = SpeedInput;
+
+        if (CompIndex > 0) {
+            if (VarSpeedCoil(CompIndex).GridScheduleIndex > 0) {
+                const double dGridSignal = GetCurrentScheduleValue(VarSpeedCoil(CompIndex).GridScheduleIndex);
+
+                if ((dGridSignal >= VarSpeedCoil(CompIndex).GridLowBound) && (dGridSignal <= VarSpeedCoil(CompIndex).GridHighBound)) {
+                    MinSpeed = min(int(VarSpeedCoil(CompIndex).GridMaxSpeed), MinSpeed);
+                }
+            }
+        }
+
+        return (MinSpeed);
+    }
+
+    int GetGridLoadCtrlMode(const int CompIndex // coil index No
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Bo Shen
+        //       DATE WRITTEN   07/2020
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+        //      PURPOSE OF THIS FUNCTION:
+        //      check the maximum allow speed to drive air flow rate in the air loop
+
+        int iMode = GRID_SENLAT;
+        if (CompIndex > 0) {
+            if (VarSpeedCoil(CompIndex).GridScheduleIndex > 0) {
+                const double dGridSignal = GetCurrentScheduleValue(VarSpeedCoil(CompIndex).GridScheduleIndex);
+
+                if ((dGridSignal >= VarSpeedCoil(CompIndex).GridLowBound) && (dGridSignal <= VarSpeedCoil(CompIndex).GridHighBound)) {
+                    iMode = VarSpeedCoil(CompIndex).GridLoadCtrlMode;
+                }
+            }
+        }
+
+        return (iMode);
     }
 
     int GetVSCoilNumOfSpeeds(EnergyPlusData &state,
