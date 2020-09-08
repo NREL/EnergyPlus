@@ -473,6 +473,7 @@ namespace SolarShading {
             MultIsoSky = 0.0;
             MultCircumSolar = 0.0;
             MultHorizonZenith = 0.0;
+            SurfConstrNum = 0.0;
 
             InsideGlassCondensationFlag = 0;
             InsideFrameCondensationFlag = 0;
@@ -1010,6 +1011,7 @@ namespace SolarShading {
         CosIncAngHR.dimension(24, TotSurfaces, 0.0);
         CosIncAng.dimension(NumOfTimeStepInHour, 24, TotSurfaces, 0.0);
         AnisoSkyMult.dimension(TotSurfaces, 1.0); // For isotropic sky: recalculated in AnisoSkyViewFactors if anisotropic radiance
+        SurfConstrNum.dimension(TotSurfaces, 0.0);
         //  ALLOCATE(WithShdgIsoSky(TotSurfaces))
         //  WithShdgIsoSky=0.0
         //  ALLOCATE(WoShdgIsoSky(TotSurfaces))

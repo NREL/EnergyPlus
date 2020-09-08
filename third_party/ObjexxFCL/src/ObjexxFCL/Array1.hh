@@ -1169,6 +1169,7 @@ public: // Subscript
 	T &
 	operator ()( int const i )
 	{
+
 		assert( contains( i ) );
 		return sdata_[ i ];
 	}

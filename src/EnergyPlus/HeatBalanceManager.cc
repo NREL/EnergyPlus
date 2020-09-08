@@ -5233,6 +5233,10 @@ namespace HeatBalanceManager {
             for (SurfNum = 1; SurfNum <= TotSurfaces; SurfNum++) {
                 DataSurfaces::SurfaceWindow(SurfNum).ThetaFace = 296.15;
                 DataSurfaces::SurfWinEffInsSurfTemp(SurfNum) = 23.0;
+                DataSurfaces::SurfConstrNum(SurfNum) = 0;
+                if (DataSurfaces::Surface(SurfNum).HeatTransSurf) {
+                    DataSurfaces::SurfConstrNum(SurfNum) = DataSurfaces::Surface(SurfNum).Construction;
+                }
             }
         }
 
@@ -5252,6 +5256,11 @@ namespace HeatBalanceManager {
                     DataSurfaces::SurfWinStormWinFlagPrevDay(SurfNum) = DataSurfaces::SurfWinStormWinFlag(SurfNum);
                 }
                 ChangeSet = true;
+            }
+            for (StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum) {
+                if (DataSurfaces::SurfWinStormWinFlag(StormWinNum) == 1) {
+                    DataSurfaces::SurfConstrNum(StormWinNum) = DataSurfaces::Surface(StormWinNum).StormWinConstruction;
+                }
             }
         }
 

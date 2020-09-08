@@ -11840,6 +11840,7 @@ namespace SurfaceGeometry {
                 } // End of check if new window constructions have to be created
             }     // End of loop over unshaded and shaded window constructions
         }         // End of loop over storm window objects
+
     }
 
     void ModifyWindow(int const SurfNum,    // SurfNum has construction of glazing system from Window5 Data File;
