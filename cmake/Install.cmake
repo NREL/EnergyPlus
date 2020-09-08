@@ -34,7 +34,7 @@ if (UNIX)
     set(CPACK_BINARY_DRAGNDROP     OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_OSXX11        OFF CACHE BOOL "Recommended OFF")
     set(CPACK_BINARY_PACKAGEMAKER  OFF CACHE BOOL "This was the legacy method on Apple, superseded by IFW")
-    set(CPACK_BINRARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
+    set(CPACK_BINARY_PRODUCTBUILD OFF CACHE BOOL "Recommended OFF")
 
   else()
     # TODO: Make IFW recommended? Deprecate STGZ?
