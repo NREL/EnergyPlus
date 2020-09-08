@@ -2820,7 +2820,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_MultispeedPerformance)
     EXPECT_EQ(RatedSourceTempCool, 35.0);
     Real64 CoolCoolCapAtPeak = 32454.876753104443;
     Real64 TotCapTempModFac = CurveManager::CurveValue(
-        VariableSpeedCoils::VarSpeedCoil(1).MSCCapFTemp(VariableSpeedCoils::VarSpeedCoil(1).NormSpedLevel), 17.410329442560833, RatedSourceTempCool);
+        state, VariableSpeedCoils::VarSpeedCoil(1).MSCCapFTemp(VariableSpeedCoils::VarSpeedCoil(1).NormSpedLevel), 17.410329442560833, RatedSourceTempCool);
 
     EXPECT_NEAR(TotCapTempModFac, 0.930018048445091, 0.001);
     Real64 RatedCapCoolTotalDes = CoolCoolCapAtPeak / TotCapTempModFac;
@@ -9917,10 +9917,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read zone equipment configuration and list objects
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     SingleDuct::GetSysInput(state);
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     DataAirSystems::PrimaryAirSystem.allocate(1);
@@ -11367,7 +11367,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerInlet)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -11516,7 +11516,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputATMixerSupply)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
 
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
@@ -11642,7 +11642,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipment)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
 
     // call the UnitarySystem factory
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -11773,7 +11773,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputZoneEquipmentBlankCtrlZone)
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
     DataZoneEquipment::GetZoneEquipmentData1(state);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     UnitarySys thisSys;
 
     std::string compName = "UNITARY SYSTEM MODEL";
@@ -14045,7 +14045,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);

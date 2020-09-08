@@ -4696,15 +4696,15 @@ namespace SystemReports {
 
                     } else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
                         OutAirNode =
-                            GetHybridUnitaryACOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetHybridUnitaryACZoneInletNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACZoneInletNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
 
                         ReturnAirNode =
-                            GetHybridUnitaryACReturnAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetHybridUnitaryACReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((OutAirNode > 0) && (ReturnAirNode > 0)) {
                             //						ZFAUEnthMixedAir = PsyHFnTdbW( Node( MixedAirNode ).Temp, Node( MixedAirNode
                             //).HumRat

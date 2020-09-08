@@ -62,7 +62,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedInput )
 {
     std::string idf_objects = this->getSpeedObjectString("speed1");
     EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitSpeed thisSpeed("speed1");
+    CoilCoolingDXCurveFitSpeed thisSpeed(state, "speed1");
     EXPECT_EQ("SPEED1", thisSpeed.name);
 }
 
@@ -70,7 +70,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
 {
     std::string idf_objects = this->getSpeedObjectString("speed1");
     EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitSpeed thisSpeed("speed1");
+    CoilCoolingDXCurveFitSpeed thisSpeed(state, "speed1");
     EXPECT_EQ("SPEED1", thisSpeed.name);
 
     CoilCoolingDXCurveFitOperatingMode thisMode;
@@ -96,7 +96,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitSpeedTest )
     thisSpeed.AirMassFlow = 1.0;
     int fanOpMode = 0;
     Real64 condInletTemp = 24;
-    thisSpeed.CalcSpeedOutput(inletNode, outletNode, thisSpeed.PLR, fanOpMode, condInletTemp);
+    thisSpeed.CalcSpeedOutput(state, inletNode, outletNode, thisSpeed.PLR, fanOpMode, condInletTemp);
 
     EXPECT_NEAR( outletNode.Temp, 17.791, 0.001 );
     EXPECT_NEAR( outletNode.HumRat, 0.00754, 0.0001 );

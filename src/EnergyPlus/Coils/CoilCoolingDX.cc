@@ -87,9 +87,9 @@ namespace EnergyPlus {
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
 }
 
-int CoilCoolingDX::factory(std::string const & coilName) {
+int CoilCoolingDX::factory(EnergyPlusData &state, std::string const & coilName) {
     if (coilCoolingDXGetInputFlag) {
-        CoilCoolingDX::getInput();
+        CoilCoolingDX::getInput(state);
         coilCoolingDXGetInputFlag = false;
     }
     int handle = -1;
@@ -108,7 +108,7 @@ void CoilCoolingDX::clear_state() {
     coilCoolingDXGetInputFlag = true;
 }
 
-void CoilCoolingDX::getInput() {
+void CoilCoolingDX::getInput(EnergyPlusData &state) {
     int numCoolingCoilDXs = inputProcessor->getNumObjectsFound(coilCoolingDXObjectName);
     if (numCoolingCoilDXs <= 0) {
         ShowFatalError(R"(No "Coil:Cooling:DX" objects in input file)");
@@ -130,21 +130,21 @@ void CoilCoolingDX::getInput() {
         input_specs.condensate_collection_water_storage_tank_name = cAlphaArgs(9);
         input_specs.evaporative_condenser_supply_water_storage_tank_name = cAlphaArgs(10);
         CoilCoolingDX thisCoil;
-        thisCoil.instantiateFromInputSpec(input_specs);
+        thisCoil.instantiateFromInputSpec(state, input_specs);
         coilCoolingDXs.push_back(thisCoil);
     }
 }
 
-void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data)
+void CoilCoolingDX::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXInputSpecification& input_data)
 {
     static const std::string routineName("CoilCoolingDX::instantiateFromInputSpec: ");
     this->original_input_specs = input_data;
     bool errorsFound = false;
     this->name = input_data.name;
-    this->performance = CoilCoolingDXCurveFitPerformance(input_data.performance_object_name);
+    this->performance = CoilCoolingDXCurveFitPerformance(state, input_data.performance_object_name);
 
     if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
-        !this->performance.original_input_specs.alternate_operating_mode_name.empty() && 
+        !this->performance.original_input_specs.alternate_operating_mode_name.empty() &&
         !this->performance.original_input_specs.alternate_operating_mode2_name.empty()) {
         this->CoolingCoilType = DataHVACGlobals::CoilDX_SubcoolReheat;
     }
@@ -392,11 +392,11 @@ void CoilCoolingDX::oneTimeInit() {
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio", 
-                            OutputProcessor::Unit::None, 
-                            this->performance.ModeRatio, 
-                            "System", 
-                            "Average", 
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio",
+                            OutputProcessor::Unit::None,
+                            this->performance.ModeRatio,
+                            "System",
+                            "Average",
                             this->name);
         SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
                             OutputProcessor::Unit::W,
@@ -460,7 +460,7 @@ void CoilCoolingDX::size(EnergyPlusData &state) {
     this->performance.size(state);
 }
 
-void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
+void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode, Real64 LoadSHR)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -478,7 +478,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.OperatingMode = 0;
     this->performance.ModeRatio = 0.0;
-    this->performance.simulate(
+    this->performance.simulate(state,
         evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, LoadSHR);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
