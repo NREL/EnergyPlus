@@ -1526,7 +1526,7 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     EXPECT_NEAR(56.0, Tank.SourceOutletTemp, 0.0000001);    // source outlet = average tank temp
 
     // ValidateFuelType tests for WaterHeater:Mixed
-    WaterThermalTanks::getWaterHeaterMixedInputs();
+    WaterThermalTanks::getWaterHeaterMixedInputs(state);
     EXPECT_EQ(Tank.FuelType, "Electricity");
     EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
     EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
@@ -4240,7 +4240,7 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         EXPECT_EQ(HPWH.FanName, "HPWHPUMPED FANSYSTEMMODEL");
         
         // ValidateFuelType tests for WaterHeater:Mixed
-        WaterThermalTanks::getWaterHeaterMixedInputs();
+        WaterThermalTanks::getWaterHeaterMixedInputs(state);
         EXPECT_EQ(HPWHTank.FuelType, "Steam");
         EXPECT_EQ(HPWHTank.OffCycParaFuelType, "Steam");
         EXPECT_EQ(HPWHTank.OnCycParaFuelType, "Steam");
