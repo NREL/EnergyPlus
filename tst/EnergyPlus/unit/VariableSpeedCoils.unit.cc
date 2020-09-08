@@ -2485,7 +2485,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_mixedCoilTypesInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(state);
 
     EXPECT_EQ(VariableSpeedCoils::VarSpeedCoil(1).Name, "LOBBY_ZN_1_FLR_2 WSHP COOLING MODE");
 
@@ -2654,7 +2654,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXVariableSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(state);
 
     ASSERT_EQ("HEATING COIL VARIABLESPEED", VariableSpeedCoils::VarSpeedCoil(1).Name); // Heating Coil Variable Speed
     ASSERT_EQ(-60.0, VariableSpeedCoils::VarSpeedCoil(1).MinOATCompressor);            // removed the minimum limit of -50.0C
@@ -2751,7 +2751,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    VariableSpeedCoils::GetVarSpeedCoilInput();
+    VariableSpeedCoils::GetVarSpeedCoilInput(state);
 
     Real64 LSInletDBTemp = 24.0; // conditions at 24 DB / 20 Wb found at http://www.sugartech.co.za/psychro/index.php
     Real64 LSInletHumRat = 0.013019367;
@@ -2772,7 +2772,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_Test_CalcTotCap_VSWSHP)
     Real64 SSInletTemp = 24.0;
     Real64 InletAirPressure = 101320.0;
 
-    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
+    VariableSpeedCoils::CalcTotCapSHR_VSWSHP(state, LSInletDBTemp, LSInletHumRat, LSInletEnth, LSInletWBTemp, AirMassFlowRatio, WaterMassFlowRatio,
                                              LSMassFlowRate, CBFSpeed, MSRatedTotCap, MSCapFTemp, MSCapAirFFlow, MSCapWaterFFlow, 0.0, 0, 0, 0,
                                              QLoadTotal1, QLoadTotal2, QLoadTotal, SHR, SSInletTemp, InletAirPressure, 0.0, 1,
                                              VariableSpeedCoils::VarSpeedCoil(1).capModFacTotal);

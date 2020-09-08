@@ -255,12 +255,42 @@ int getActuatorHandle(EnergyPlusState, const char* componentType, const char* co
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
     std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
     for (int ActuatorLoop = 1; ActuatorLoop <= EnergyPlus::DataRuntimeLanguage::numEMSActuatorsAvailable; ++ActuatorLoop) {
-        auto const & availActuator = EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(ActuatorLoop);
+        auto & availActuator = EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(ActuatorLoop);
         handle++;
         std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
         std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
         std::string const actuatorControlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ControlTypeName);
         if (typeUC == actuatorTypeUC && keyUC == actuatorIDUC && controlUC == actuatorControlUC) {
+
+            if (availActuator.handleCount > 0) {
+                // If the handle is already used by an IDF EnergyManagementSystem:Actuator, we should warn the user
+                bool foundActuator = false;
+
+                for (int ActuatorLoopUsed = 1; ActuatorLoopUsed <= EnergyPlus::DataRuntimeLanguage::numActuatorsUsed; ++ActuatorLoopUsed) {
+                    auto const & usedActuator = EnergyPlus::DataRuntimeLanguage::EMSActuatorUsed(ActuatorLoopUsed);
+                    if (usedActuator.ActuatorVariableNum == handle) {
+                        EnergyPlus::ShowWarningError(
+                                "Data Exchange API: An EnergyManagementSystem:Actuator seems to be already defined in the EnergyPlus File and named '"
+                                + usedActuator.Name + "'.");
+                        EnergyPlus::ShowContinueError("Occurred for componentType='" + typeUC + "', controlType='" + controlUC
+                                + "', uniqueKey='" + keyUC + "'.");
+                        EnergyPlus::ShowContinueError("The getActuatorHandle function will still return the handle (= " + std::to_string(handle)
+                                + ") but caller should take note that there is a risk of overwritting.");
+                        foundActuator = true;
+                        break;
+                    }
+                }
+                if (!foundActuator) {
+                    EnergyPlus::ShowWarningError("Data Exchange API: You seem to already have tried to get an Actuator Handle on this one.");
+                    EnergyPlus::ShowContinueError("Occurred for componentType='" + typeUC + "', controlType='" + controlUC
+                                + "', uniqueKey='" + keyUC + "'.");
+                    EnergyPlus::ShowContinueError("The getActuatorHandle function will still return the handle (= " + std::to_string(handle)
+                                + ") but caller should take note that there is a risk of overwritting.");
+
+                }
+            }
+            ++availActuator.handleCount;
+
             return handle;
         }
     }

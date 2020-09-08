@@ -216,7 +216,7 @@ namespace ChillerIndirectAbsorption {
         {
         }
 
-        static PlantComponent *factory(ChillerIndirectAbsoprtionData &chillers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -230,14 +230,14 @@ namespace ChillerIndirectAbsorption {
 
         void setupOutputVars();
 
-        void sizeChiller();
+        void sizeChiller(EnergyPlusData &state);
 
         void updateRecords(Real64 MyLoad, bool RunFlag);
 
-        void calculate(Real64 MyLoad, bool RunFlag);
+        void calculate(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
-    void GetIndirectAbsorberInput(ChillerIndirectAbsoprtionData &chillers);
+    void GetIndirectAbsorberInput(EnergyPlusData &state, ChillerIndirectAbsoprtionData &chillers);
 
 } // namespace ChillerIndirectAbsorption
 

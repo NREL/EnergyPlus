@@ -180,7 +180,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
         "  LeavingSetpointModulated,!- Chiller Flow Mode",
         "  60.0,                    !- Maximum Temperature for Heat Recovery at Heat Recovery Outlet Node {C}",
         " ;                       !- Sizing Factor",
-      
+
         " Curve:Quadratic,",
         "  Fuel Use Curve,          !- Name",
         "  1.3,                     !- Coefficient1 Constant",
@@ -223,7 +223,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EngineDrivenChillerSpecs::getInput(state.dataPlantChillers);
+    EngineDrivenChillerSpecs::getInput(state, state.dataPlantChillers);
 
     EXPECT_EQ(1, state.dataPlantChillers.NumEngineDrivenChillers);
     EXPECT_EQ(state.dataPlantChillers.EngineDrivenChiller(1).FuelType, "Diesel");
