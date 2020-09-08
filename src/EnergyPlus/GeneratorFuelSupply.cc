@@ -126,7 +126,7 @@ namespace GeneratorFuelSupply {
         MyOneTimeFlag = true;
     }
 
-    void GetGeneratorFuelSupplyInput(IOFiles &ioFiles)
+    void GetGeneratorFuelSupplyInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -198,7 +198,7 @@ namespace GeneratorFuelSupply {
                     ErrorsFound = true;
                 }
 
-                FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(AlphArray(5));
+                FuelSupply(FuelSupNum).CompPowerCurveID = GetCurveIndex(state, AlphArray(5));
                 if (FuelSupply(FuelSupNum).CompPowerCurveID == 0) {
                     ShowSevereError("Invalid, " + cAlphaFieldNames(5) + " = " + AlphArray(5));
                     ShowContinueError("Entered in " + cCurrentModuleObject + '=' + AlphArray(1));

@@ -111,7 +111,7 @@ namespace AirflowNetworkBalanceManager {
 
     void AllocateAndInitData();
 
-    void CalcAirflowNetworkAirBalance();
+    void CalcAirflowNetworkAirBalance(EnergyPlusData &state);
 
     Real64 CalcDuctInsideConvResist(Real64 Tair, // Average air temperature
                                     Real64 mdot, // Mass flow rate
@@ -128,7 +128,8 @@ namespace AirflowNetworkBalanceManager {
                                      Real64 hOut     // User defined convection coefficient
     );
 
-    Real64 CalcWindPressure(int curve,           // Curve index, change this to pointer after curve refactor
+    Real64 CalcWindPressure(EnergyPlusData &state,
+                            int curve,           // Curve index, change this to pointer after curve refactor
                             bool symmetricCurve, // True if the curve is symmetric (0 to 180)
                             bool relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                             Real64 azimuth,      // Azimuthal angle of surface
@@ -202,7 +203,8 @@ namespace AirflowNetworkBalanceManager {
         {
         }
 
-        void calc(int ZoneNum,
+        void calc(EnergyPlusData &state,
+                  int ZoneNum,
                   Real64 TimeOpenDuration,
                   Real64 TimeCloseDuration,
                   int &OpeningStatus,
@@ -219,8 +221,8 @@ namespace AirflowNetworkBalanceManager {
 
     struct AirflowNetworkBalanceManagerData : BaseGlobalStruct {
 
-        void initialize();
-        void calculateWindPressureCoeffs();
+        void initialize(EnergyPlusData &state);
+        void calculateWindPressureCoeffs(EnergyPlusData &state);
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;

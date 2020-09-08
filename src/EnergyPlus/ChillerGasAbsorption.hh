@@ -206,7 +206,7 @@ namespace ChillerGasAbsorption {
         {
         }
 
-        static PlantComponent *factory(ChillerGasAbsorptionData &chillers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -224,9 +224,9 @@ namespace ChillerGasAbsorption {
 
         void size();
 
-        void calculateChiller(Real64 &MyLoad);
+        void calculateChiller(EnergyPlusData &state, Real64 &MyLoad);
 
-        void calculateHeater(Real64 &MyLoad, bool RunFlag);
+        void calculateHeater(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void updateCoolRecords(Real64 MyLoad, // current load
                                bool RunFlag   // TRUE if Absorber operating
@@ -237,7 +237,7 @@ namespace ChillerGasAbsorption {
         );
     };
 
-    void GetGasAbsorberInput(ChillerGasAbsorptionData &chillers);
+    void GetGasAbsorberInput(EnergyPlusData &state, ChillerGasAbsorptionData &chillers);
 
 } // namespace ChillerGasAbsorption
 

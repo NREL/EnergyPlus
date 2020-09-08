@@ -56,9 +56,7 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-#include <EnergyPlus/AirLoopHVACDOAS.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
@@ -94,17 +92,25 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <unordered_map>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
 namespace EnergyPlus {
 
+    // forward declare all structs
+    struct AirLoopHVACDOASData;
+    struct BaseboardRadiatorData;
+    struct BaseboardElectricData;
+    struct CurveManagerData;
+
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
 
-        AirLoopHVACDOASData dataAirLoopHVACDOAS;
-        BaseboardRadiatorData dataBaseboardRadiator;
-        BaseboardElectricData dataBaseboardElectric;
+        std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
+        std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
+        std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
+        std::unique_ptr<CurveManagerData> dataCurveManager;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         BranchInputManagerData dataBranchInputManager;
@@ -144,57 +150,15 @@ namespace EnergyPlus {
         ZonePlenumData dataZonePlenum;
         ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
-        EnergyPlusData() {
-            // todo, try to eliminate the need for the singleton
-            IOFiles::setSingleton(&files);
-        }
-
+        EnergyPlusData();
 
         // Cannot safely copy or delete this until we eradicate all remaining
         // calls to IOFiles::getSingleton and IOFiles::setSingleton
         EnergyPlusData(const EnergyPlusData &) = delete;
         EnergyPlusData(EnergyPlusData &&) = delete;
 
-        // all clear states
-        void clear_state() override {
-            dataAirLoopHVACDOAS.clear_state();
-            dataBaseboardElectric.clear_state();
-            dataBaseboardRadiator.clear_state();
-            dataBoilers.clear_state();
-            dataBranchInputManager.clear_state();
-            dataSteamBoilers.clear_state();
-            dataChilledCeilingPanelSimple.clear_state();
-            dataChillerAbsorbers.clear_state();
-            dataChillerElectricEIR.clear_state();
-            dataChillerExhaustAbsorption.clear_state();
-            dataChillerGasAbsorption.clear_state();
-            dataChillerIndirectAbsorption.clear_state();
-            dataChillerReformulatedEIR.clear_state();
-            dataConvectionCoefficients.clear_state();
-            dataCondenserLoopTowers.clear_state();
-            dataCostEstimateManager.clear_state();
-            dataCoolTower.clear_state();
-            dataCTElectricGenerator.clear_state();
-            dataCrossVentMgr.clear_state();
-            dataGlobals.clear_state();
-            exteriorEnergyUse.clear_state();
-            fans.clear_state();
-            //outputReportTabular.clear_state();
-            pipes.clear_state();
-            dataPlantChillers.clear_state();
-            dataWaterUse.clear_state();
-            dataWindowAC.clear_state();
-            dataWindowComplexManager.clear_state();
-            dataWindowEquivalentLayer.clear_state();
-            dataWindowManager.clear_state();
-            dataWindTurbine.clear_state();
-            dataZoneAirLoopEquipmentManager.clear_state();
-            dataZoneContaminantPredictorCorrector.clear_state();
-            dataZoneDehumidifier.clear_state();
-            dataZoneEquipmentManager.clear_state();
-            dataZonePlenum.clear_state();
-            dataZoneTempPredictorCorrector.clear_state();
-        };
+        void clear_state() override;
+
     };
 
 }

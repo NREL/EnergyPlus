@@ -48,6 +48,7 @@
 #include <EnergyPlus/api/state.h>
 
 #include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
