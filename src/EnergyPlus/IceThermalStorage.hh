@@ -328,7 +328,7 @@ namespace IceThermalStorage {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state),
                       const PlantLocation &calledFromLocation,

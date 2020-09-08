@@ -186,11 +186,11 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    PlantComponent *SimplePcmStorageData::factory(std::string const &objectName)
+    PlantComponent *SimplePcmStorageData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (getITSInput) {
-            GetIceStorageInput();
+            GetIceStorageInput(state);
             getITSInput = false;
         }
 
