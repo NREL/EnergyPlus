@@ -5336,7 +5336,7 @@ namespace OutputReportTabular {
         // Zone Equipment Cooling Contribution
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             ZonePreDefRep(iZone).SHGSAnZoneEqHt += (ZoneEqHeat(iZone)-ATUDeltaHeat(iZone));
-            ZonePreDefRep(iZone).SHGSAnZoneEqHt += (ZoneEqHeat(iZone)-ATUDeltaCool(iZone));
+            ZonePreDefRep(iZone).SHGSAnZoneEqCl += (ZoneEqCool(iZone)-ATUDeltaCool(iZone));
         }
 
         curZone = 0;
