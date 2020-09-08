@@ -761,7 +761,7 @@ namespace UtilityRoutines {
                     " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
-        if (state.files.outputControl.end) {
+        {
             auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
@@ -948,7 +948,7 @@ namespace UtilityRoutines {
         ShowMessage("EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed);
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
-        if (ioFiles.outputControl.end) {
+        {
             auto tempfl = ioFiles.endFile.try_open(ioFiles.outputControl.end);
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");

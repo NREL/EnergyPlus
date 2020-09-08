@@ -62,7 +62,7 @@ namespace EnergyPlus {
 InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open(output_to_file);
+        open(false, output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
@@ -107,7 +107,7 @@ std::ostream::pos_type InputFile::position() const noexcept
     return is->tellg();
 }
 
-void InputFile::open(bool)
+void InputFile::open(bool, bool)
 {
     is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
     is->imbue(std::locale("C"));
