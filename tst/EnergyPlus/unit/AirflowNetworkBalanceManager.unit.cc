@@ -154,9 +154,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSch)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceWindow.allocate(2);
-    SurfaceWindow(1).OriginalClass = 11;
-    SurfaceWindow(2).OriginalClass = 11;
+    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfWinOriginalClass(1) = 11;
+    SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -277,10 +277,10 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     Surface(3).Vertex(2).z = 1.0;
     Surface(3).Vertex(3).z = 1.0;
 
-    SurfaceWindow.allocate(3);
-    SurfaceWindow(1).OriginalClass = 11;
-    SurfaceWindow(2).OriginalClass = 11;
-    SurfaceWindow(3).OriginalClass = 11;
+    SurfaceGeometry::AllocateSurfaceWindows(3);
+    SurfWinOriginalClass(1) = 11;
+    SurfWinOriginalClass(2) = 11;
+    SurfWinOriginalClass(3) = 11;
     NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -2346,9 +2346,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestPressureStat)
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(2).OpenFactor);
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(5).OpenFactor);
     EXPECT_EQ(0.0, AirflowNetwork::MultizoneSurfaceData(14).OpenFactor);
-    EXPECT_EQ(0.0, SurfaceWindow(2).VentingOpenFactorMultRep);
-    EXPECT_EQ(0.0, SurfaceWindow(5).VentingOpenFactorMultRep);
-    EXPECT_EQ(0.0, SurfaceWindow(14).VentingOpenFactorMultRep);
+    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(2));
+    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(5));
+    EXPECT_EQ(0.0, SurfWinVentingOpenFactorMultRep(14));
 
     // Test for #7162
     DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
@@ -2426,9 +2426,9 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingSchWithAdaptiveCtrl)
     Surface(2).Tilt = 90.0;
     Surface(2).Sides = 4;
 
-    SurfaceWindow.allocate(2);
-    SurfaceWindow(1).OriginalClass = 11;
-    SurfaceWindow(2).OriginalClass = 11;
+    SurfaceGeometry::AllocateSurfaceWindows(2);
+    SurfWinOriginalClass(1) = 11;
+    SurfWinOriginalClass(2) = 11;
     NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
@@ -2843,16 +2843,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestPolygonalWindows)
     Surface(11).Vertex(2).z = 2.4384;
     Surface(11).Vertex(3).z = 2.4384;
 
-    SurfaceWindow.allocate(14);
-    SurfaceWindow(4).OriginalClass = 11;
-    SurfaceWindow(5).OriginalClass = 11;
-    SurfaceWindow(6).OriginalClass = 11;
-    SurfaceWindow(9).OriginalClass = 11;
-    SurfaceWindow(10).OriginalClass = 11;
-    SurfaceWindow(11).OriginalClass = 11;
-    SurfaceWindow(12).OriginalClass = 11;
-    SurfaceWindow(13).OriginalClass = 11;
-    SurfaceWindow(14).OriginalClass = 11;
+    SurfaceGeometry::AllocateSurfaceWindows(14);
+    SurfWinOriginalClass(4) = 11;
+    SurfWinOriginalClass(5) = 11;
+    SurfWinOriginalClass(6) = 11;
+    SurfWinOriginalClass(9) = 11;
+    SurfWinOriginalClass(10) = 11;
+    SurfWinOriginalClass(11) = 11;
+    SurfWinOriginalClass(12) = 11;
+    SurfWinOriginalClass(13) = 11;
+    SurfWinOriginalClass(14) = 11;
     NumOfZones = 1;
 
     std::string const idf_objects = delimited_string({
@@ -15675,8 +15675,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoZoneNode)
     DataSurfaces::Surface(1).Tilt = 180.0;
     DataSurfaces::Surface(1).Sides = 4;
 
-    DataSurfaces::SurfaceWindow.allocate(1);
-    DataSurfaces::SurfaceWindow(1).OriginalClass = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass_Window;
 
     DataAirSystems::PrimaryAirSystem.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
@@ -15743,8 +15743,8 @@ TEST_F(EnergyPlusFixture, AirflowNetwork_CheckMultiZoneNodes_NoInletNode)
     DataSurfaces::Surface(1).Tilt = 180.0;
     DataSurfaces::Surface(1).Sides = 4;
 
-    DataSurfaces::SurfaceWindow.allocate(1);
-    DataSurfaces::SurfaceWindow(1).OriginalClass = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::SurfWinOriginalClass.allocate(1);
+    DataSurfaces::SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass_Window;
 
     DataAirSystems::PrimaryAirSystem.allocate(1);
     DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;

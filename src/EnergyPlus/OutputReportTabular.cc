@@ -11254,18 +11254,18 @@ namespace OutputReportTabular {
 
     void WriteResilienceBinsTable(int const columnNum,
                                   std::vector<int> const &columnHead,
-                                  Array1D<std::vector<double>> const &ZoneBins)
+                                  Array1D<std::vector<Real64>> const &ZoneBins)
     {
-        std::vector<double> columnMax(columnNum, 0);
-        std::vector<double> columnMin(columnNum, 0);
-        std::vector<double> columnSum(columnNum, 0);
+        std::vector<Real64> columnMax(columnNum, 0);
+        std::vector<Real64> columnMin(columnNum, 0);
+        std::vector<Real64> columnSum(columnNum, 0);
         for (int j = 0; j < columnNum; j++) {
             columnMin[j] = ZoneBins(1)[j];
         }
         for (int i = 1; i <= NumOfZones; ++i) {
             std::string ZoneName = Zone(i).Name;
             for (int j = 0; j < columnNum; j++) {
-                double curValue = ZoneBins(i)[j];
+                Real64 curValue = ZoneBins(i)[j];
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
@@ -11283,17 +11283,17 @@ namespace OutputReportTabular {
 
     void WriteSETHoursTable(int const columnNum,
                             std::vector<int> const &columnHead,
-                            Array1D<std::vector<double>> const &ZoneBins)
+                            Array1D<std::vector<Real64>> const &ZoneBins)
     {
-        std::vector<double> columnMax(columnNum - 1, 0);
-        std::vector<double> columnMin(columnNum - 1, 0);
-        std::vector<double> columnSum(columnNum - 1, 0);
+        std::vector<Real64> columnMax(columnNum - 1, 0);
+        std::vector<Real64> columnMin(columnNum - 1, 0);
+        std::vector<Real64> columnSum(columnNum - 1, 0);
         for (int j = 0; j < columnNum - 1; j++) {
             columnMin[j] = ZoneBins(1)[j];
         }
         for (int i = 1; i <= NumOfZones; ++i) {
             for (int j = 0; j < columnNum - 1; j++) {
-                double curValue = ZoneBins(i)[j];
+                Real64 curValue = ZoneBins(i)[j];
                 if (curValue > columnMax[j]) columnMax[j] = curValue;
                 if (curValue < columnMin[j]) columnMin[j] = curValue;
                 columnSum[j] += curValue;
@@ -12623,10 +12623,10 @@ namespace OutputReportTabular {
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
         using DataSurfaces::TotSurfaces;
-        using DataSurfaces::WinGainConvGlazShadGapToZoneRep;
-        using DataSurfaces::WinGainConvGlazToZoneRep;
-        using DataSurfaces::WinGainConvShadeToZoneRep;
-        using DataSurfaces::WinGainFrameDividerToZoneRep;
+        using DataSurfaces::SurfWinGainConvGlazShadGapToZoneRep;
+        using DataSurfaces::SurfWinGainConvGlazToZoneRep;
+        using DataSurfaces::SurfWinGainConvShadeToZoneRep;
+        using DataSurfaces::SurfWinGainFrameDividerToZoneRep;
         using DataZoneEquipment::ZoneEquipConfig;
 
         // Locals
@@ -12657,8 +12657,8 @@ namespace OutputReportTabular {
                 if (Surface(iSurf).Class != SurfaceClass_Window) continue;
                 // IF (.not. ZoneEquipConfig(ZoneNum)%IsControlled) CYCLE
                 feneCondInstantSeq(CurOverallSimDay, TimeStepInDay, ZoneNum) +=
-                    WinGainConvGlazToZoneRep(iSurf) + WinGainConvGlazShadGapToZoneRep(iSurf) + WinGainConvShadeToZoneRep(iSurf) +
-                    WinGainFrameDividerToZoneRep(iSurf);
+                    SurfWinGainConvGlazToZoneRep(iSurf) + SurfWinGainConvGlazShadGapToZoneRep(iSurf) + SurfWinGainConvShadeToZoneRep(iSurf) +
+                            SurfWinGainFrameDividerToZoneRep(iSurf);
                 // for now assume zero instant solar - may change related
                 // to how blinds and shades absorb solar radiation and
                 // convect that heat that timestep.

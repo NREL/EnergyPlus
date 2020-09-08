@@ -869,7 +869,6 @@ namespace RoomAirModelAirflowNetwork {
         using DataLoopNode::Node;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
         //using InternalHeatGains::SumInternalConvectionGainsByTypes;
@@ -1072,49 +1071,49 @@ namespace RoomAirModelAirflowNetwork {
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
 
                 // Add to the convective internal gains
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfaceWindow(SurfNum).DividerArea;
-                    SumIntGain += SurfaceWindow(SurfNum).DividerHeatGain;
+                    Area += SurfWinDividerArea(SurfNum);
+                    SumIntGain += SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn)
-                    SumIntGain += SurfaceWindow(SurfNum).ConvHeatFlowNatural;
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
+                    SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0) {
-                    SumIntGain += SurfaceWindow(SurfNum).ConvHeatGainToZoneAir;
+                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGain += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        WinHeatGain(SurfNum) += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        WinHeatTransfer(SurfNum) += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        if (WinHeatGain(SurfNum) >= 0.0) {
-                            WinHeatGainRep(SurfNum) = WinHeatGain(SurfNum);
-                            WinHeatGainRepEnergy(SurfNum) = WinHeatGainRep(SurfNum) * TimeStepZone * SecInHour;
+                        SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
+                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
+                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * TimeStepZone * SecInHour;
                         } else {
-                            WinHeatLossRep(SurfNum) = -WinHeatGain(SurfNum);
-                            WinHeatLossRepEnergy(SurfNum) = WinHeatLossRep(SurfNum) * TimeStepZone * SecInHour;
+                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
+                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * TimeStepZone * SecInHour;
                         }
-                        WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
-                        WinHeatTransferRepEnergy(SurfNum) = WinHeatGain(SurfNum) * TimeStepZone * SecInHour;
+                        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
+                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatGain(SurfNum) * TimeStepZone * SecInHour;
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(SurfNum).FrameTempSurfIn;
-                    HA += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn);
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                                  SurfWinFrameTempSurfIn(SurfNum);
+                    HA += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum));
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution(only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(SurfNum).DividerTempSurfIn;
-                    HA += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn);
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                                  SurfWinDividerTempSurfIn(SurfNum);
+                    HA += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum));
                 }
 
             } // End of check if window

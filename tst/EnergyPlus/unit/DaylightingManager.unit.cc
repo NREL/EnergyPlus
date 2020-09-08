@@ -1379,26 +1379,26 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     ZoneDaylight(ZoneNum).DaylIllFacSky(DataGlobals::HourOfDay, Shaded, ISky, RefPt, DayltgExtWin) = 0.05;
 
     // Window5 model - expect 100 for unshaded and 50 for shaded (10 and 5 for RefPt2)
-    SurfaceWindow(IWin).WindowModelType = Window5DetailedModel;
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::NoShade;
+    SurfWinWindowModelType(IWin) = Window5DetailedModel;
+    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
 
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::ExtBlindOn;
+    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 50.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 5.0, 0.001);
 
     // BSDF model - expect 100 for unshaded and 100 for shaded (10 for RefPt2
     // BSDF does shading differently, it's integrated in the base state
-    SurfaceWindow(IWin).WindowModelType = WindowBSDFModel;
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::NoShade;
+    SurfWinWindowModelType(IWin) = WindowBSDFModel;
+    SurfWinShadingFlag(IWin) = DataSurfaces::NoShade;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
 
-    SurfaceWindow(IWin).ShadingFlag = DataSurfaces::ExtBlindOn;
+    SurfWinShadingFlag(IWin) = DataSurfaces::ExtBlindOn;
     DaylightingManager::DayltgInteriorIllum(ZoneNum);
     EXPECT_NEAR(DaylightingManager::DaylIllum(1), 100.0, 0.001);
     EXPECT_NEAR(DaylightingManager::DaylIllum(2), 10.0, 0.001);
