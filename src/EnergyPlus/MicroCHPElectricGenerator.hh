@@ -205,7 +205,7 @@ namespace MicroCHPElectricGenerator {
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void setupOutputVars();
 
@@ -213,7 +213,8 @@ namespace MicroCHPElectricGenerator {
 
         void CalcUpdateHeatRecovery();
 
-        void CalcMicroCHPNoNormalizeGeneratorModel(bool RunFlagElectCenter, // TRUE when Generator operating
+        void CalcMicroCHPNoNormalizeGeneratorModel(EnergyPlusData &state,
+                                                   bool RunFlagElectCenter, // TRUE when Generator operating
                                                    bool RunFlagPlant,
                                                    Real64 MyElectricLoad, // Generator demand
                                                    Real64 MyThermalLoad,
@@ -221,10 +222,10 @@ namespace MicroCHPElectricGenerator {
 
         void UpdateMicroCHPGeneratorRecords();
 
-        static PlantComponent *factory(IOFiles &ioFiles, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, IOFiles &ioFiles, std::string const &objectName);
     };
 
-    void GetMicroCHPGeneratorInput(IOFiles &ioFiles);
+    void GetMicroCHPGeneratorInput(EnergyPlusData &state, IOFiles &ioFiles);
 
     Real64 FuncDetermineEngineTemp(Real64 TcwOut,   // hot water leaving temp
                                    Real64 MCeng,    // Fictitious mass and heat capacity of engine

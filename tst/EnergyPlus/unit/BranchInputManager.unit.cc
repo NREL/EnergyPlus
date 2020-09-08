@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
             }
             ++BCount;
 
-            GetSingleBranchInput(state.dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
+            GetSingleBranchInput(state, state.dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
         }
 
         EXPECT_EQ(NumOfBranches, 1);
@@ -287,7 +287,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
             }
             ++BCount;
 
-            GetSingleBranchInput(state.dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
+            GetSingleBranchInput(state, state.dataBranchInputManager, RoutineName, BCount, Alphas, cAlphaFields, NumAlphas, NodeNums, lAlphaBlanks);
         }
 
         EXPECT_EQ(NumOfBranches, 1);
@@ -460,7 +460,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     CompType = "AIRLOOPHVAC:OUTDOORAIRSYSTEM";
     CompName = "DOAS OA SYSTEM";
 
-    BranchIndex = GetAirBranchIndex(state.dataBranchInputManager, CompType, CompName);
+    BranchIndex = GetAirBranchIndex(state, state.dataBranchInputManager, CompType, CompName);
 
     EXPECT_EQ(1, BranchIndex);
 
@@ -468,7 +468,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE";
 
-    BranchIndex = GetAirBranchIndex(state.dataBranchInputManager, CompType, CompName);
+    BranchIndex = GetAirBranchIndex(state, state.dataBranchInputManager, CompType, CompName);
 
     EXPECT_EQ(2, BranchIndex);
 
@@ -476,7 +476,7 @@ TEST_F(EnergyPlusFixture, BranchInputManager_GetAirBranchIndex)
     CompType = "PIPE:ADIABATIC";
     CompName = "TOWERWATERSYS DEMAND BYPASS PIPE NOT THERE";
 
-    BranchIndex = GetAirBranchIndex(state.dataBranchInputManager, CompType, CompName);
+    BranchIndex = GetAirBranchIndex(state, state.dataBranchInputManager, CompType, CompName);
 
     EXPECT_EQ(0, BranchIndex);
 }

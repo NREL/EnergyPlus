@@ -60,7 +60,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
+void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlusData &state, CoilCoolingDXCurveFitOperatingModeInputSpecification input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -93,7 +93,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
         errorsFound = true;
     }
     for (auto &speed_name : input_data.speed_data_names) {
-        this->speeds.emplace_back(speed_name);
+        this->speeds.emplace_back(state, speed_name);
     }
 
     if (errorsFound) {
@@ -101,7 +101,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     }
 }
 
-CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find)
+CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(EnergyPlusData &state, const std::string& name_to_find)
 {
     int numModes = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitOperatingMode::object_name);
     if (numModes <= 0) {
@@ -140,7 +140,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std
             input_specs.speed_data_names.push_back(cAlphaArgs(fieldNum));
         }
 
-        this->instantiateFromInputSpec(input_specs);
+        this->instantiateFromInputSpec(state, input_specs);
         break;
     }
 
@@ -191,7 +191,8 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::NodeData &inletNode,
+void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(EnergyPlusData &state,
+                                                           const DataLoopNode::NodeData &inletNode,
                                                            DataLoopNode::NodeData &outletNode,
                                                            Real64 &PLR,
                                                            int &speedNum,
@@ -235,7 +236,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
         plr1 = speedRatio;
     }
 
-    thisspeed.CalcSpeedOutput(inletNode, outletNode, plr1, fanOpMode, this->condInletTemp);
+    thisspeed.CalcSpeedOutput(state, inletNode, outletNode, plr1, fanOpMode, this->condInletTemp);
 
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
@@ -256,7 +257,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);
         lowerspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateLow;
 
-        lowerspeed.CalcSpeedOutput(inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
+        lowerspeed.CalcSpeedOutput(state, inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 
         outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
         outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;

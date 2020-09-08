@@ -205,7 +205,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+    GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
     auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
@@ -312,7 +312,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+    GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
     auto &thisEIRChiller = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
@@ -363,7 +363,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_NEAR(thisEIRChiller.CondVolFlowRate, 2.3925760323498, 0.0000001);
     EXPECT_NEAR(thisEIRChiller.CondMassFlowRateMax, 2.7918772761695, 0.0000001);
     // run chiller
-    thisEIRChiller.calculate(MyLoad, RunFlag);
+    thisEIRChiller.calculate(state, MyLoad, RunFlag);
     // calc evap-cooler water consumption rate
     Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - DataEnvironment::OutHumRat) /
                                       Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);
