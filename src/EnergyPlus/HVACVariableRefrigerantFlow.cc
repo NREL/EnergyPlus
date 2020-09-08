@@ -2451,6 +2451,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
+            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::iRT_Electricity;
 
             if (lAlphaFieldBlanks(2)) {
                 VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
@@ -2813,6 +2814,7 @@ namespace HVACVariableRefrigerantFlow {
             VRF(VRFNum).VRFSystemTypeNum = VRF_HeatPump;
             VRF(VRFNum).VRFAlgorithmTypeNum = AlgorithmTypeFluidTCtrl;
             VRF(VRFNum).FuelType = "Electricity";
+            VRF(VRFNum).FuelTypeNum = DataGlobalConstants::iRT_Electricity;
 
             if (lAlphaFieldBlanks(2)) {
                 VRF(VRFNum).SchedPtr = ScheduleAlwaysOn;
