@@ -1009,7 +1009,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
     ASSERT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData1(state);
-    GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     GetSysInput(state);
 
     DataGlobals::SysSizingCalc = true;
