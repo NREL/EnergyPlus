@@ -1328,13 +1328,6 @@ namespace Psychrometrics {
         return (1.00484e3 + max(1.0e-5, WZone) * 1.85895e3) * (TDBEquip - TDBZone);
     }
 
-    //inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
-    //                                  Real64 const TDB1  // dry-bulb temperature at  at state 1 {C}
-    //)
-    //{
-    //    // calculate average latent heat of vaporization of water vapor in moist air
-    //    return (2.50094e6 + 0.5 * (TDB2 + TDB1) * 1.85895e3);
-    //}
 } // namespace Psychrometrics
 
 } // namespace EnergyPlus
