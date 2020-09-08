@@ -70,6 +70,7 @@
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
@@ -1586,7 +1587,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 {
     // #7586
     DataSurfaces::Surface.allocate(2);
-    DataSurfaces::SurfaceWindow.allocate(2);
+    EnergyPlus::SurfaceGeometry::AllocateSurfaceWindows(2);
     dataConstruction.Construct.allocate(1);
     DataSurfaces::WindowShadingControl.allocate(2);
     DataDaylighting::ZoneDaylight.allocate(1);
@@ -1603,10 +1604,10 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
     DataSurfaces::Surface(1).HasShadeControl = true;
     DataSurfaces::Surface(2).HasShadeControl = true;
 
-    DataSurfaces::SurfaceWindow(1).HasShadeOrBlindLayer = false;
-    DataSurfaces::SurfaceWindow(2).HasShadeOrBlindLayer = false;
-    DataSurfaces::SurfaceWindow(1).ShadedConstruction = 1;
-    DataSurfaces::SurfaceWindow(2).ShadedConstruction = 1;
+    DataSurfaces::SurfWinHasShadeOrBlindLayer(1) = false;
+    DataSurfaces::SurfWinHasShadeOrBlindLayer(2) = false;
+    DataSurfaces::SurfWinShadedConstruction(1) = 1;
+    DataSurfaces::SurfWinShadedConstruction(2) = 1;
 
     dataConstruction.Construct(1).Name = "Construction1";
 
@@ -1617,13 +1618,17 @@ TEST_F(EnergyPlusFixture, EMSManager_TestWindowShadingControlExteriorScreenOptio
 
     SetupWindowShadingControlActuators();
 
-    EXPECT_FALSE(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn);
-    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue, 0);
+    EXPECT_FALSE(DataSurfaces::SurfWinShadingFlagEMSOn(2));
+    EXPECT_EQ(DataSurfaces::SurfWinShadingFlagEMSValue(2), 0);
 
-    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSOn = true;
-    DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue = 1.0;
+    DataHeatBalance::Zone.allocate(1);
+    DataHeatBalance::Zone(1).WindowSurfaceFirst = 1;
+    DataHeatBalance::Zone(1).WindowSurfaceLast = 2;
+    DataGlobals::NumOfZones = 1;
+    DataSurfaces::SurfWinShadingFlagEMSOn(2) = true;
+    DataSurfaces::SurfWinShadingFlagEMSValue(2) = 1.0;
     SolarShading::WindowShadingManager(*state.dataWindowEquivalentLayer);
-    EXPECT_EQ(DataSurfaces::SurfaceWindow(2).ShadingFlag, DataSurfaces::SurfaceWindow(2).ShadingFlagEMSValue);
+    EXPECT_EQ(DataSurfaces::SurfWinShadingFlag(2), DataSurfaces::SurfWinShadingFlagEMSValue(2));
 
 }
 TEST_F(EnergyPlusFixture, EMS_WeatherDataActuators)

@@ -5661,6 +5661,14 @@ namespace HVACVariableRefrigerantFlow {
                                 EMSManager::CheckIfNodeSetPointManagedByEMS(
                                     VRFTU(TUIndex).heatCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
                                 SPNotFound = SPNotFound || SetPointErrorFlag;
+
+                                // We disable the check at end (if API), because one of the nodes is enough, so there's an almost certainty
+                                // that it will throw as you're unlikely going to actuate all three nodes
+                                // It's not ideal, but it's better to let slide a bad condition rather than throw false positives...
+                                DataLoopNode::NodeSetpointCheck(VRFTU(TUIndex).VRFTUOutletNodeNum).needsSetpointChecking = false;
+                                DataLoopNode::NodeSetpointCheck(VRFTU(TUIndex).coolCoilAirOutNode).needsSetpointChecking = false;
+                                DataLoopNode::NodeSetpointCheck(VRFTU(TUIndex).heatCoilAirOutNode).needsSetpointChecking = false;
+
                                 if (SPNotFound && state.dataAirLoop->AirLoopInputsFilled) {
                                     ShowSevereError(
                                         "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for unitary system = " +

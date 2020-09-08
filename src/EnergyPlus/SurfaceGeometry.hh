@@ -92,7 +92,7 @@ namespace SurfaceGeometry {
         RadiantEnclosures,
         SolarEnclosures
     };
-    
+
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -128,6 +128,8 @@ namespace SurfaceGeometry {
     void SetupZoneGeometry(EnergyPlusData &state, bool &ErrorsFound);
 
     void AllocateModuleArrays();
+
+    void AllocateSurfaceWindows(int NumSurfaces);
 
     void GetSurfaceData(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
 
@@ -410,7 +412,7 @@ namespace SurfaceGeometry {
                                 int const ConstrNumRev, // construction index for reversed construction
                                 int const TotalLayers   // total layers for construction definition
     );
-    
+
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

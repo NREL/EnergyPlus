@@ -734,7 +734,9 @@ namespace PoweredInductionUnits {
         }
 
         for (PIUNum = 1; PIUNum <= NumPIUs; ++PIUNum) {
-            // Setup Report variables for the Fan Coils
+            // Setup Report variables for the PIUs
+            SetupOutputVariable(
+                "Zone Air Terminal Primary Damper Position", OutputProcessor::Unit::None, PIU(PIUNum).PriDamperPosition, "System", "Average", PIU(PIUNum).Name);
             SetupOutputVariable(
                 "Zone Air Terminal Heating Rate", OutputProcessor::Unit::W, PIU(PIUNum).HeatingRate, "System", "Average", PIU(PIUNum).Name);
             SetupOutputVariable(
@@ -1667,6 +1669,11 @@ namespace PoweredInductionUnits {
         // Set inlet node flowrates
         Node(PriNode).MassFlowRate = PriAirMassFlow;
         Node(SecNode).MassFlowRate = SecAirMassFlow;
+        if (PriAirMassFlowMax == 0) {
+            PIU(PIUNum).PriDamperPosition = 0;
+        } else {
+            PIU(PIUNum).PriDamperPosition = PriAirMassFlow / PriAirMassFlowMax;
+        }
         // now that inlet airflows have been set, the terminal bos components can be simulated.
 
         // fire the mixer
@@ -1951,6 +1958,11 @@ namespace PoweredInductionUnits {
         Node(PriNode).MassFlowRate = PriAirMassFlow;
         Node(SecNode).MassFlowRate = SecAirMassFlow;
         Node(SecNode).MassFlowRateMaxAvail = SecAirMassFlow;
+        if (PriAirMassFlowMax == 0) {
+            PIU(PIUNum).PriDamperPosition = 0;
+        } else {
+            PIU(PIUNum).PriDamperPosition = PriAirMassFlow / PriAirMassFlowMax;
+        }
         // now that inlet airflows have been set, the terminal box components can be simulated.
         // fire the fan
 

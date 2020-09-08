@@ -177,7 +177,7 @@ void InputFile::backspace() noexcept
 InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open(output_to_file);
+        open(false, output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
@@ -187,7 +187,7 @@ InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool ou
 
 bool InputOutputFile::good() const
 {
-    if (print_to_dev_null && os->bad()) { // badbit is set
+    if (os && print_to_dev_null && os->bad()) { // badbit is set
         return true;
     } else if (os) {
         return os->good();

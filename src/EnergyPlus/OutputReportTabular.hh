@@ -835,11 +835,11 @@ namespace OutputReportTabular {
 
     void WriteResilienceBinsTable(int const columnNum,
                                   std::vector<int> const &columnHead,
-                                  Array1D<std::vector<double>> const &ZoneBins);
+                                  Array1D<std::vector<Real64>> const &ZoneBins);
 
     void WriteSETHoursTable(int const columnNum,
                             std::vector<std::string> const &columnHead,
-                            Array1D<std::vector<double>> const &ZoneBins);
+                            Array1D<std::vector<Real64>> const &ZoneBins);
 
     void WriteHeatEmissionTable(CostEstimateManagerData &dataCostEstimateManager);
 

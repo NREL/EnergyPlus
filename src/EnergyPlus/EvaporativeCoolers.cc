@@ -1,7 +1,7 @@
 // EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
-// National Laboratory, managed by UT-aBattelle, Alliance for Sustainable Energy, LLC, and other
+// National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
 // contributors. All rights reserved.
 //
 // NOTICE: This Software was developed under funding from the U.S. Department of Energy and the
@@ -989,6 +989,8 @@ namespace EvaporativeCoolers {
                         } else {
                             localSetPointCheck = false;
                             CheckIfNodeSetPointManagedByEMS(ControlNode, iTemperatureSetPoint, localSetPointCheck);
+                            DataLoopNode::NodeSetpointCheck(ControlNode).needsSetpointChecking = false;
+                            // Let it slide apparently
                             if (localSetPointCheck) {
                                 ShowSevereError("Missing temperature setpoint for Evap Cooler unit " + EvapCond(EvapCoolNum).EvapCoolerName);
                                 ShowContinueError(" use a Setpoint Manager to establish a setpoint at the unit control node.");

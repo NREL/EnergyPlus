@@ -706,6 +706,7 @@ namespace HVACControllers {
                             auto const SELECT_CASE_var(ControllerProps(Num).ControlVar);
                             if (SELECT_CASE_var == iTemperature) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                                DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
                                     if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
                                         ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
@@ -716,6 +717,7 @@ namespace HVACControllers {
                                 }
                             } else if (SELECT_CASE_var == iHumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                                DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
                                     if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
                                         ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
@@ -726,6 +728,7 @@ namespace HVACControllers {
                                 }
                             } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
+                                DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
                                     if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
                                         ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
@@ -736,6 +739,7 @@ namespace HVACControllers {
                                 }
                                 EMSSetPointErrorFlag = false;
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
+                                DataLoopNode::NodeSetpointCheck(ControllerProps(Num).SensedNode).needsSetpointChecking = false;
                                 if (EMSSetPointErrorFlag) {
                                     if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
                                         ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
