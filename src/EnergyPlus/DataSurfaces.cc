@@ -441,8 +441,6 @@ namespace DataSurfaces {
     Array1D<Real64> SurfSkySolarInc;                       // Incident diffuse solar from sky; if CalcSolRefl is true, includes reflection of sky diffuse and beam solar from exterior obstructions [W/m2]
     Array1D<Real64> SurfGndSolarInc;                       // Incident diffuse solar from ground; if CalcSolRefl is true, accounts for shadowing of ground by building and obstructions [W/m2]
 
-    Array1D<Real64> SurfConstrNum;
-
     std::vector<int> AllHTSurfaceList;          // List of all heat transfer surfaces
     std::vector<int> AllIZSurfaceList;          // List of all interzone heat transfer surfaces
     std::vector<int> AllHTNonWindowSurfaceList; // List of all non-window heat transfer surfaces
@@ -1254,7 +1252,6 @@ namespace DataSurfaces {
         SurfSunlitFrac.deallocate();
         SurfSkySolarInc.clear();
         SurfGndSolarInc.clear();
-        SurfConstrNum.clear();
         AllHTSurfaceList.clear();
         AllIZSurfaceList.clear();
         AllHTNonWindowSurfaceList.clear();
