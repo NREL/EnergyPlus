@@ -354,7 +354,7 @@ namespace SimulationManager {
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 
-        ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+        ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
@@ -405,7 +405,7 @@ namespace SimulationManager {
 
         CheckAndReadFaults(state);
 
-        InitCurveReporting();
+        InitCurveReporting(state);
 
         AskForConnectionsReport = true; // set to true now that input processing and sizing is done.
         KickOffSimulation = false;
@@ -3170,7 +3170,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
     if (ResimHB) {
         // Surface simulation
         InitSurfaceHeatBalance(state);
-        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files);
+        HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files);
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
         // Air simulation

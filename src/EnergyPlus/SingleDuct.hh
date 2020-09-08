@@ -222,7 +222,7 @@ namespace SingleDuct {
         bool EMSOverrideAirFlow;     // if true, EMS is calling to override flow rate
         Real64 EMSMassFlowRateValue; // value EMS is directing to use for flow rate [kg/s]
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
-        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
+        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
         bool MyEnvrnFlag;
         bool MySizeFlag;
@@ -371,13 +371,14 @@ namespace SingleDuct {
 
     void SimATMixer(std::string const &SysName, bool const FirstHVACIteration, int &SysIndex);
 
-    void GetATMixers(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
+    void GetATMixers(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
 
     void CalcATMixer(int const SysNum);
 
     void UpdateATMixer(int const SysNum);
 
-    void GetATMixer(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(EnergyPlusData &state,
+                    ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type

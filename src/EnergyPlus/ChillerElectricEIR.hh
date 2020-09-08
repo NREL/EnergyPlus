@@ -227,7 +227,7 @@ namespace ChillerElectricEIR {
         {
         }
 
-        static PlantComponent *factory(ChillerElectricEIRData &state, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void setupOutputVars();
 
@@ -245,7 +245,7 @@ namespace ChillerElectricEIR {
 
         void size(EnergyPlusData &state);
 
-        void calculate(Real64 &MyLoad, bool RunFlag);
+        void calculate(EnergyPlusData &state, Real64 &MyLoad, bool RunFlag);
 
         void calcHeatRecovery(Real64 &QCond,        // Current condenser load [W]
                               Real64 CondMassFlow,  // Current condenser mass flow [kg/s]
@@ -256,7 +256,7 @@ namespace ChillerElectricEIR {
         void update(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers);
+    void GetElectricEIRChillerInput(EnergyPlusData &state, ChillerElectricEIRData &chillers);
 
 } // namespace ChillerElectricEIR
 
