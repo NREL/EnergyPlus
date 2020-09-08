@@ -64,7 +64,6 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
@@ -132,7 +131,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates ASIHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -157,7 +156,7 @@ namespace IntegratedHeatPump {
 
         if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
 
-        InitializeIHP(DXCoilNum);
+        InitializeIHP(state, DXCoilNum);
 
         airMassFlowRate = Node(IntegratedHeatPumps(DXCoilNum).AirCoolInletNodeNum).MassFlowRate;
         waterMassFlowRate = Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate;
@@ -1079,10 +1078,10 @@ namespace IntegratedHeatPump {
             break;
         }
 
-        UpdateIHP(DXCoilNum);
+        UpdateIHP(state, DXCoilNum);
     }
 
-    void GetIHPInput()
+    void GetIHPInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1103,7 +1102,6 @@ namespace IntegratedHeatPump {
         using BranchNodeConnections::SetUpCompSets;
         using BranchNodeConnections::TestCompSet;
         using GlobalNames::VerifyUniqueCoilName;
-        using namespace OutputReportPredefined;
         using General::TrimSigDigits;
         using VariableSpeedCoils::GetCoilIndexVariableSpeed;
         using VariableSpeedCoils::VarSpeedCoil;
@@ -1206,7 +1204,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).SCCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).SCCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1224,7 +1222,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).SHCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).SHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1242,7 +1240,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).DWHCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).DWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1260,7 +1258,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1278,7 +1276,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1296,7 +1294,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1316,7 +1314,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1334,7 +1332,7 @@ namespace IntegratedHeatPump {
                 ErrorsFound = true;
             } else {
                 errFlag = false;
-                IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex = GetCoilIndexVariableSpeed(Coiltype, CoilName, errFlag);
+                IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex = GetCoilIndexVariableSpeed(state, Coiltype, CoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + AlphArray(1) + "\".");
                     ErrorsFound = true;
@@ -1937,7 +1935,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates AS-IHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         };
 
@@ -1951,7 +1949,7 @@ namespace IntegratedHeatPump {
         }
 
         // associate SC coil with SH coil
-        SetVarSpeedCoilData(IntegratedHeatPumps(DXCoilNum).SCCoilIndex, ErrorsFound, _, IntegratedHeatPumps(DXCoilNum).SHCoilIndex);
+        SetVarSpeedCoilData(state, IntegratedHeatPumps(DXCoilNum).SCCoilIndex, ErrorsFound, _, IntegratedHeatPumps(DXCoilNum).SHCoilIndex);
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: Could not match cooling coil\"" + IntegratedHeatPumps(DXCoilNum).SCCoilName + "\" with heating coil=\"" +
                             IntegratedHeatPumps(DXCoilNum).SHCoilName + "\"");
@@ -1978,7 +1976,7 @@ namespace IntegratedHeatPump {
         };
 
         // associate SCDWH air coil to SHDWH air coil
-        SetVarSpeedCoilData(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex, ErrorsFound, _, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex);
+        SetVarSpeedCoilData(state, IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex, ErrorsFound, _, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex);
 
         // size SCDWH air coil
         SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex);
@@ -2044,13 +2042,13 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps(DXCoilNum).IHPCoilsSized = true;
     }
 
-    void InitializeIHP(int const DXCoilNum)
+    void InitializeIHP(EnergyPlusData &state, int const DXCoilNum)
     {
         using General::TrimSigDigits;
 
         // Obtains and Allocates AS-IHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2076,7 +2074,7 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps(DXCoilNum).TotalCOP = 0.0;
     }
 
-    void UpdateIHP(int const DXCoilNum)
+    void UpdateIHP(EnergyPlusData &state, int const DXCoilNum)
     {
         using DataHVACGlobals::TimeStepSys;
         using General::TrimSigDigits;
@@ -2088,7 +2086,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates AS-IHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2185,7 +2183,8 @@ namespace IntegratedHeatPump {
         }
     }
 
-    void DecideWorkMode(EnergyPlusData &state, int const DXCoilNum,
+    void DecideWorkMode(EnergyPlusData &state,
+                        int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
                         )                       // shall be called from a air loop parent
@@ -2211,7 +2210,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates AS-IHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2343,7 +2342,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2354,21 +2353,21 @@ namespace IntegratedHeatPump {
         }
 
         // clear up
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SCCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).SHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(state, 
+        SimVariableSpeedCoils(state,
             BlankString, IntegratedHeatPumps(DXCoilNum).DWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
         return;
@@ -2380,7 +2379,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2395,16 +2394,17 @@ namespace IntegratedHeatPump {
         return (IntegratedHeatPumps(DXCoilNum).CurMode);
     }
 
-    bool IHPInModel()
+    bool IHPInModel(EnergyPlusData &state)
     {
         if (GetCoilsInputFlag) {
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         }
         return !IntegratedHeatPumps.empty();
     }
 
-    int GetCoilIndexIHP(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexIHP(EnergyPlusData &state,
+                        std::string const &CoilType, // must match coil types in this module
                         std::string const &CoilName, // must match coil names for the coil type
                         bool &ErrorsFound            // set to true if problem
     )
@@ -2426,7 +2426,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2441,7 +2441,8 @@ namespace IntegratedHeatPump {
         return IndexNum;
     }
 
-    int GetCoilInletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeIHP(EnergyPlusData &state,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     )
@@ -2465,7 +2466,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2484,7 +2485,8 @@ namespace IntegratedHeatPump {
         return NodeNumber;
     }
 
-    int GetDWHCoilInletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilInletNodeIHP(EnergyPlusData &state,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     )
@@ -2508,7 +2510,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2527,7 +2529,8 @@ namespace IntegratedHeatPump {
         return NodeNumber;
     }
 
-    int GetDWHCoilOutletNodeIHP(std::string const &CoilType, // must match coil types in this module
+    int GetDWHCoilOutletNodeIHP(EnergyPlusData &state,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -2551,7 +2554,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2570,7 +2573,8 @@ namespace IntegratedHeatPump {
         return NodeNumber;
     }
 
-    int GetIHPDWHCoilPLFFPLR(std::string const &CoilType,            // must match coil types in this module
+    int GetIHPDWHCoilPLFFPLR(EnergyPlusData &state,
+                             std::string const &CoilType,            // must match coil types in this module
                              std::string const &CoilName,            // must match coil names for the coil type
                              IHPOperationMode const EP_UNUSED(Mode), // mode coil type
                              bool &ErrorsFound                       // set to true if problem
@@ -2595,7 +2599,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2604,9 +2608,9 @@ namespace IntegratedHeatPump {
         if (WhichCoil != 0) {
             // this will be called by HPWH parent
             if (IntegratedHeatPumps(WhichCoil).DWHCoilIndex > 0)
-                PLRNumber = GetVSCoilPLFFPLR(IntegratedHeatPumps(WhichCoil).DWHCoilType, IntegratedHeatPumps(WhichCoil).DWHCoilName, ErrorsFound);
+                PLRNumber = GetVSCoilPLFFPLR(state, IntegratedHeatPumps(WhichCoil).DWHCoilType, IntegratedHeatPumps(WhichCoil).DWHCoilName, ErrorsFound);
             else
-                PLRNumber = GetVSCoilPLFFPLR(IntegratedHeatPumps(WhichCoil).SCWHCoilType, IntegratedHeatPumps(WhichCoil).SCWHCoilName, ErrorsFound);
+                PLRNumber = GetVSCoilPLFFPLR(state, IntegratedHeatPumps(WhichCoil).SCWHCoilType, IntegratedHeatPumps(WhichCoil).SCWHCoilName, ErrorsFound);
         } else {
             WhichCoil = 0;
         }
@@ -2620,7 +2624,8 @@ namespace IntegratedHeatPump {
         return PLRNumber;
     }
 
-    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state, std::string const &CoilType,            // must match coil types in this module
+    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state,
+                                 std::string const &CoilType,            // must match coil types in this module
                                  std::string const &CoilName,            // must match coil names for the coil type
                                  IHPOperationMode const EP_UNUSED(Mode), // mode coil type
                                  bool &ErrorsFound                       // set to true if problem
@@ -2646,7 +2651,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2658,9 +2663,9 @@ namespace IntegratedHeatPump {
 
             if (IntegratedHeatPumps(WhichCoil).DWHCoilIndex > 0) {
                 CoilCapacity =
-                    GetCoilCapacityVariableSpeed(IntegratedHeatPumps(WhichCoil).DWHCoilType, IntegratedHeatPumps(WhichCoil).DWHCoilName, ErrorsFound);
+                    GetCoilCapacityVariableSpeed(state, IntegratedHeatPumps(WhichCoil).DWHCoilType, IntegratedHeatPumps(WhichCoil).DWHCoilName, ErrorsFound);
             } else {
-                CoilCapacity = GetCoilCapacityVariableSpeed(
+                CoilCapacity = GetCoilCapacityVariableSpeed(state,
                     IntegratedHeatPumps(WhichCoil).SCWHCoilType, IntegratedHeatPumps(WhichCoil).SCWHCoilName, ErrorsFound);
             }
         } else {
@@ -2676,7 +2681,7 @@ namespace IntegratedHeatPump {
         return CoilCapacity;
     }
 
-    int GetLowSpeedNumIHP(int const DXCoilNum)
+    int GetLowSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum)
     {
         using General::TrimSigDigits;
 
@@ -2684,7 +2689,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2726,14 +2731,14 @@ namespace IntegratedHeatPump {
         return (SpeedNum);
     }
 
-    int GetMaxSpeedNumIHP(int const DXCoilNum)
+    int GetMaxSpeedNumIHP(EnergyPlusData &state, int const DXCoilNum)
     {
         using General::TrimSigDigits;
         using VariableSpeedCoils::VarSpeedCoil;
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             //    WaterIndex=FindGlycol('WATER') !Initialize the WaterIndex once
             GetCoilsInputFlag = false;
         }
@@ -2793,7 +2798,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2887,7 +2892,7 @@ namespace IntegratedHeatPump {
         return (AirVolFlowRate);
     }
 
-    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, 
+    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state,
         int const DXCoilNum,
         int const SpeedNum,
         Real64 const SpeedRatio,
@@ -2902,7 +2907,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2982,7 +2987,7 @@ namespace IntegratedHeatPump {
 
         // Obtains and Allocates WatertoAirHP related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetIHPInput();
+            GetIHPInput(state);
             GetCoilsInputFlag = false;
         }
 

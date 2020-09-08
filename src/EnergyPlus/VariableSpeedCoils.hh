@@ -66,11 +66,6 @@ namespace VariableSpeedCoils {
     // Data
     // MODULE PARAMETER DEFINITIONS
 
-    // Condenser Type (using same numbering scheme as for chillers)
-    int const GRID_SENSIBLE(1);   // CONTROL SENSIBLE LOAD DURING GRID RESPONSIVE OPERTION
-    int const GRID_LATENT(-1);    // CONTROL LATENT LOAD DURING GRID RESPONSIVE OPERTION
-    int const GRID_SENLAT(0);  // CONTROL BOTH SENISIBLE AND LATENT LOAD DURING GRID RESPONSIVE OPERTION
-
     extern Real64 const RatedInletAirTemp;       // 26.6667C or 80F
     extern Real64 const RatedInletWetBulbTemp;   // 19.44 or 67F, cooling mode
     extern Real64 const RatedInletAirHumRat;     // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
@@ -369,20 +364,6 @@ namespace VariableSpeedCoils {
         bool reportCoilFinalSizes; // one time report of sizes to coil selection report
         Real64 capModFacTotal;     // coil  TotCapTempModFac * TotCapAirFFModFac * TotCapWaterFFModFac, for result for simulation peak reporting
 
-        int GridScheduleIndex;    //index referring to grid signal schedule
-        Real64 GridLowBound;      //value above which, apply grid responsive control
-        Real64 GridHighBound;      // value below which, apply grid responsive control
-        Real64 GridMaxSpeed;      // maximum speed level when apply grid responsive control
-        int GridLoadCtrlMode;     //control sensible or latent load during grid responsive control
-        std::string StorageType; //storage type related to the coil
-        std::string StorageName; //name of the storage object
-        Real64 PeakStoreHours; //hours to store the peak capacity
-        bool StoreMoisture; //whether to store latent capacity = true; false = store sensible capacity
-        Real64 StoreDiff; //differential during storag, i.e. temperature difference, humidity differenc, etc
-        std::string RecoveryUnitType; // type of the reconvery unit
-        std::string RecoveryUnitName; // name of the recovery unit
-        Real64 RecoveryCapacityRatio;// nominal capacity ratio of the recovery unit to the main VS coil
-
         // Default Constructor
         VariableSpeedCoilData();
     };
@@ -408,7 +389,7 @@ namespace VariableSpeedCoils {
                                Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
     );
 
-    void GetVarSpeedCoilInput();
+    void GetVarSpeedCoilInput(EnergyPlusData &state);
 
     // Beginning Initialization Section of the Module
     //******************************************************************************
@@ -427,7 +408,8 @@ namespace VariableSpeedCoils {
 
     void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum);
 
-    void CalcVarSpeedCoilCooling(int const DXCoilNum,            // Heat Pump Number
+    void CalcVarSpeedCoilCooling(EnergyPlusData &state,
+                                 int const DXCoilNum,            // Heat Pump Number
                                  int const CyclingScheme,        // Fan/Compressor cycling scheme indicator
                                  Real64 &RuntimeFrac,            // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                                  Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
@@ -439,7 +421,8 @@ namespace VariableSpeedCoils {
                                  int const SpeedNum              // Speed number, high bound
     );
 
-    void CalcVarSpeedCoilHeating(int const DXCoilNum,            // Heat Pump Number
+    void CalcVarSpeedCoilHeating(EnergyPlusData &state,
+                                 int const DXCoilNum,            // Heat Pump Number
                                  int const CyclingScheme,        // Fan/Compressor cycling scheme indicator
                                  Real64 &RuntimeFrac,            // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                                  Real64 const SensDemand,        // Cooling Sensible Demand [W] !unused1208
@@ -450,65 +433,69 @@ namespace VariableSpeedCoils {
                                  int const SpeedNum              // Speed number, high bound, i.e. SpeedNum - 1 is the other side
     );
 
-    Real64 GetCoilCapacityVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacityVariableSpeed(EnergyPlusData &state,
+                                        std::string const &CoilType, // must match coil types in this module
                                         std::string const &CoilName, // must match coil names for the coil type
                                         bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilIndexVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilIndexVariableSpeed(EnergyPlusData &state,
+                                  std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilAirFlowRateVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilAirFlowRateVariableSpeed(EnergyPlusData &state,
+                                           std::string const &CoilType, // must match coil types in this module
                                            std::string const &CoilName, // must match coil names for the coil type
                                            bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilInletNodeVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNodeVariableSpeed(EnergyPlusData &state,
+                                      std::string const &CoilType, // must match coil types in this module
                                       std::string const &CoilName, // must match coil names for the coil type
                                       bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNodeVariableSpeed(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNodeVariableSpeed(EnergyPlusData &state,
+                                       std::string const &CoilType, // must match coil types in this module
                                        std::string const &CoilName, // must match coil names for the coil type
                                        bool &ErrorsFound            // set to true if problem
     );
 
-    int GetVSCoilCondenserInletNode(std::string const &CoilName, // must match coil names for the coil type
+    int GetVSCoilCondenserInletNode(EnergyPlusData &state,
+                                    std::string const &CoilName, // must match coil names for the coil type
                                     bool &ErrorsFound            // set to true if problem
     );
 
-    int GetVSCoilPLFFPLR(std::string const &CoilType, // must match coil types in this module
+    int GetVSCoilPLFFPLR(EnergyPlusData &state,
+                         std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetVSCoilCapFTCurveIndex(int const &CoilIndex, // must match coil names for the coil type
+    int GetVSCoilCapFTCurveIndex(EnergyPlusData &state,
+                                 int const &CoilIndex, // must match coil names for the coil type
                                  bool &ErrorsFound     // set to true if problem
     );
 
-    Real64 GetVSCoilMinOATCompressor(std::string const &CoilName, // must match coil names for the coil type
+    Real64 GetVSCoilMinOATCompressor(EnergyPlusData &state,
+                                     std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+    Real64 GetVSCoilMinOATCompressorUsingIndex(EnergyPlusData &state,
+                                               int const CoilIndex, // index to cooling coil
                                                bool &ErrorsFound    // set to true if problem
     );
 
-
-    int CompareGridSpeed(const int CompIndex, //coil index No
-                            const int SpeedInput // input speed level
-    );
-
-    int GetGridLoadCtrlMode(const int CompIndex // coil index No
-    );
-
-    int GetVSCoilNumOfSpeeds(std::string const &CoilName, // must match coil names for the coil type
+    int GetVSCoilNumOfSpeeds(EnergyPlusData &state,
+                             std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     );
 
-    void SetVarSpeedCoilData(int const WSHPNum,                        // Number of OA Controller
+    void SetVarSpeedCoilData(EnergyPlusData &state,
+                             int const WSHPNum,                        // Number of OA Controller
                              bool &ErrorsFound,                        // Set to true if certain errors found
                              Optional_int CompanionCoolingCoilNum = _, // Index to cooling coil for heating coil = SimpleWSHPNum
                              Optional_int CompanionHeatingCoilNum = _, // Index to heating coil for cooling coil = SimpleWSHPNum
@@ -527,7 +514,8 @@ namespace VariableSpeedCoils {
                             Real64 const EnteringWB  // Entering air wet-bulb temperature
     );
 
-    void CalcTotCapSHR_VSWSHP(Real64 const InletDryBulb,       // inlet air dry bulb temperature [C]
+    void CalcTotCapSHR_VSWSHP(EnergyPlusData &state,
+                              Real64 const InletDryBulb,       // inlet air dry bulb temperature [C]
                               Real64 const InletHumRat,        // inlet air humidity ratio [kg water / kg dry air]
                               Real64 const InletEnthalpy,      // inlet air specific enthalpy [J/kg]
                               Real64 &InletWetBulb,            // inlet air wet bulb temperature [C]
@@ -554,7 +542,8 @@ namespace VariableSpeedCoils {
                               Real64 &TotCapModFac             // capacity modification factor, func of temp and func of flow
     );
 
-    void CalcVarSpeedHPWH(int const DXCoilNum,        // the number of the DX coil to be simulated
+    void CalcVarSpeedHPWH(EnergyPlusData &state,
+                          int const DXCoilNum,        // the number of the DX coil to be simulated
                           Real64 &RuntimeFrac,        // Runtime Fraction of compressor or percent on time (on-time/cycle time)
                           Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
                           Real64 const SpeedRatio,    // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)

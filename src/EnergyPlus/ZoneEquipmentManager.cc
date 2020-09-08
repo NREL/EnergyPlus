@@ -2896,7 +2896,7 @@ namespace ZoneEquipmentManager {
                                        LatOutputProvided);
 
                     } else if (SELECT_CASE_var == ZoneDXDehumidifier_Num) { // 'ZoneHVAC:Dehumidifier:DX'
-                        SimZoneDehumidifier(state.dataZoneDehumidifier, state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimZoneDehumidifier(state, state.dataZoneDehumidifier, state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
                                             ActualZoneNum,
                                             FirstHVACIteration,
                                             SysOutputProvided,
@@ -3117,7 +3117,7 @@ namespace ZoneEquipmentManager {
                                                      ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num) {
-                        SimZoneHybridUnitaryAirConditioners(state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimZoneHybridUnitaryAirConditioners(state, state.dataZoneEquipmentManager.PrioritySimOrder(EquipTypeNum).EquipName,
                                                             ActualZoneNum,
                                                             SysOutputProvided,
                                                             LatOutputProvided,
