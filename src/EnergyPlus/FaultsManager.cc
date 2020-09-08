@@ -269,27 +269,9 @@ namespace FaultsManager {
         // METHODOLOGY EMPLOYED:
         // Get number of faults-related input objects and assign faults input to data structure
 
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
         using ScheduleManager::GetScheduleIndex;
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetobjectItem call
@@ -926,12 +908,12 @@ namespace FaultsManager {
                            UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Cooling:Water") ||
                            UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Cooling:Water:Detailedgeometry")) {
                     // Read in coil input if not done yet
-                    if (WaterCoils::GetWaterCoilsInputFlag) {
-                        WaterCoils::GetWaterCoilInput();
-                        WaterCoils::GetWaterCoilsInputFlag = false;
+                    if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
+                        WaterCoils::GetWaterCoilInput(state);
+                        state.dataWaterCoils->GetWaterCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
-                    int CoilNum = UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, WaterCoils::WaterCoil);
+                    int CoilNum = UtilityRoutines::FindItemInList(FaultsCoilSATSensor(jFault_CoilSAT).CoilName, state.dataWaterCoils->WaterCoil);
                     if (CoilNum <= 0) {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(5) + " = \"" +
                                         cAlphaArgs(5) + "\" not found.");
@@ -964,7 +946,7 @@ namespace FaultsManager {
                         HVACControllers::ControllerProps(ControlNum).FaultyCoilSATIndex = jFault_CoilSAT;
 
                         // Check whether the controller match the coil
-                        if (HVACControllers::ControllerProps(ControlNum).SensedNode != WaterCoils::WaterCoil(CoilNum).AirOutletNodeNum) {
+                        if (HVACControllers::ControllerProps(ControlNum).SensedNode != state.dataWaterCoils->WaterCoil(CoilNum).AirOutletNodeNum) {
                             ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid " + cAlphaFieldNames(6) + " = \"" +
                                             cAlphaArgs(6) + "\" does not match " + cAlphaFieldNames(5) + " = \"" + cAlphaArgs(5));
                             ErrorsFound = true;
@@ -1725,88 +1707,88 @@ namespace FaultsManager {
             // Coil check and link
             {
                 // Obtains and Allocates WaterCoil related parameters from input file
-                if (WaterCoils::GetWaterCoilsInputFlag) {
-                    WaterCoils::GetWaterCoilInput();
-                    WaterCoils::GetWaterCoilsInputFlag = false;
+                if (state.dataWaterCoils->GetWaterCoilsInputFlag) {
+                    WaterCoils::GetWaterCoilInput(state);
+                    state.dataWaterCoils->GetWaterCoilsInputFlag = false;
                 }
 
                 // Check the coil name and type
-                int CoilNum = UtilityRoutines::FindItemInList(FouledCoils(jFault_FoulingCoil).FouledCoilName, WaterCoils::WaterCoil);
+                int CoilNum = UtilityRoutines::FindItemInList(FouledCoils(jFault_FoulingCoil).FouledCoilName, state.dataWaterCoils->WaterCoil);
                 if (CoilNum <= 0) {
                     ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\". Referenced Coil named \"" +
                                     FouledCoils(jFault_FoulingCoil).FouledCoilName + "\" was not found.");
                     ErrorsFound = true;
                 } else {
                     // Coil is found: check if the right type
-                    if ( (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_SimpleHeating) ||
-                         (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) )
+                    if ( (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_SimpleHeating) ||
+                         (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) )
                     {
                         // Link the Coil with the fault model
-                        WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
-                        WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
+                        state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
+                        state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
 
-                        FouledCoils(jFault_FoulingCoil).FouledCoiledType = WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num;
+                        FouledCoils(jFault_FoulingCoil).FouledCoiledType = state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num;
                         FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
 
                         SetupOutputVariable("Coil Fouling Factor",
                                     OutputProcessor::Unit::K_W,
-                                    WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFactor,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).FaultyCoilFoulingFactor,
                                     "System",
                                     "Average",
-                                    WaterCoils::WaterCoil(CoilNum).Name);
+                                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
                         // but here, it's useful since we do change it via fouling, so report it
-                        if (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) {
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).WaterCoilType_Num == state.dataWaterCoils->WaterCoil_Cooling) {
                             SetupOutputVariable("Cooling Coil Total U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
-                                    WaterCoils::WaterCoil(CoilNum).UACoilTotal,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).UACoilTotal,
                                     "System",
                                     "Average",
-                                    WaterCoils::WaterCoil(CoilNum).Name);
+                                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable("Cooling Coil External U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
-                                    WaterCoils::WaterCoil(CoilNum).UACoilExternal,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).UACoilExternal,
                                     "System",
                                     "Average",
-                                    WaterCoils::WaterCoil(CoilNum).Name);
+                                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
-                                    WaterCoils::WaterCoil(CoilNum).UACoilInternal,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).UACoilInternal,
                                     "System",
                                     "Average",
-                                    WaterCoils::WaterCoil(CoilNum).Name);
+                                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable("Cooling Coil Total U Factor Times Area Value Before Fouling",
                                     OutputProcessor::Unit::W_K,
-                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilVariable,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
                                     "System",
                                     "Average",
-                                    WaterCoils::WaterCoil(CoilNum).Name);
+                                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable("Cooling Coil External U Factor Times Area Value Before Fouling",
                                     OutputProcessor::Unit::W_K,
-                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilExternal,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilExternal,
                                     "System",
                                     "Average",
-                                    WaterCoils::WaterCoil(CoilNum).Name);
+                                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                             SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value Before Fouling",
                                     OutputProcessor::Unit::W_K,
-                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilInternal,
+                                    state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilInternal,
                                     "System",
                                     "Average",
-                                    WaterCoils::WaterCoil(CoilNum).Name);
+                                    state.dataWaterCoils->WaterCoil(CoilNum).Name);
 
                         } else {
                             SetupOutputVariable("Heating Coil U Factor Times Area Value Before Fouling",
                                 OutputProcessor::Unit::W_K,
-                                WaterCoils::WaterCoil(CoilNum).OriginalUACoilVariable,
+                                state.dataWaterCoils->WaterCoil(CoilNum).OriginalUACoilVariable,
                                 "System",
                                 "Average",
-                                WaterCoils::WaterCoil(CoilNum).Name);
+                                state.dataWaterCoils->WaterCoil(CoilNum).Name);
                         }
                     } else {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "

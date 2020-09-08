@@ -4931,7 +4931,6 @@ namespace OutputReportTabular {
         using RefrigeratedCase::RefrigRack;
         using VariableSpeedCoils::NumVarSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
-        using WaterThermalTanks::WaterThermalTank;
 
         static int iOACtrl(0);
         static int iCoil(0);
@@ -5060,9 +5059,9 @@ namespace OutputReportTabular {
         }
 
         // Water heater and thermal storage
-        for (iTank = 1; iTank <= WaterThermalTanks::numWaterThermalTank; ++iTank) {
-            if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
-                SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
+        for (iTank = 1; iTank <= state.dataWaterThermalTanks->numWaterThermalTank; ++iTank) {
+            if (state.dataWaterThermalTanks->WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
+                SysTotalHVACRejectHeatLoss += state.dataWaterThermalTanks->WaterThermalTank(iTank).FuelEnergy - state.dataWaterThermalTanks->WaterThermalTank(iTank).TotalDemandEnergy;
             }
         }
 
@@ -5745,7 +5744,7 @@ namespace OutputReportTabular {
 
         if (WriteTabularFiles) {
             // call each type of report in turn
-            WriteBEPSTable(state.dataCostEstimateManager, state.dataZoneTempPredictorCorrector, state.files);
+            WriteBEPSTable(state.dataCostEstimateManager, *state.dataZoneTempPredictorCorrector, state.files);
             WriteTableOfContents(state);
             WriteVeriSumTable(state.dataCostEstimateManager, state.files);
             WriteDemandEndUseSummary(state.dataCostEstimateManager);
@@ -6654,8 +6653,8 @@ namespace OutputReportTabular {
         PreDefTableEntry(pdchHVACcntVal, "Conditioned Zones", numCondZones);
         PreDefTableEntry(pdchHVACcntVal, "Unconditioned Zones", numUncondZones);
         // add the number of plenums to the count report
-        PreDefTableEntry(pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum.NumZoneSupplyPlenums);
-        PreDefTableEntry(pdchHVACcntVal, "Return Plenums", state.dataZonePlenum.NumZoneReturnPlenums);
+        PreDefTableEntry(pdchHVACcntVal, "Supply Plenums", state.dataZonePlenum->NumZoneSupplyPlenums);
+        PreDefTableEntry(pdchHVACcntVal, "Return Plenums", state.dataZonePlenum->NumZoneReturnPlenums);
 
         // Started to create a total row but did not fully implement
         // CALL PreDefTableEntry(pdchOaoZoneVol1,'Total OA Avg', totalVolume)
@@ -6856,7 +6855,7 @@ namespace OutputReportTabular {
             }
         }
         // fill the LEED setpoint table
-        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state.dataZoneTempPredictorCorrector);
+        ZoneTempPredictorCorrector::FillPredefinedTableOnThermostatSetpoints(state);
     }
 
     void WriteMonthlyTables(CostEstimateManagerData &dataCostEstimateManager)
@@ -13019,7 +13018,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqCool,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqCool);
-                    CollectPeakZoneConditions(ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                    CollectPeakZoneConditions(state, ZoneCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     // send latent load info to coil summary report
                     coilSelectionReportObj->setZoneLatentLoadCoolingIdealPeak(iZone, ZoneCoolCompLoadTables(iZone).cells(cLatent, rGrdTot));
 
@@ -13052,7 +13051,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqHeat,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqHeat);
-                    CollectPeakZoneConditions(ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                    CollectPeakZoneConditions(state, ZoneHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
 
                     // send latent load info to coil summary report
                     coilSelectionReportObj->setZoneLatentLoadHeatingIdealPeak(iZone, ZoneHeatCompLoadTables(iZone).cells(cLatent, rGrdTot));
@@ -13171,7 +13170,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqCool,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqCool);
-                        CollectPeakZoneConditions(AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        CollectPeakZoneConditions(state, AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
                     }
                     if (displayZoneComponentLoadSummary &&
@@ -13206,7 +13205,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqHeat,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqHeat);
-                        CollectPeakZoneConditions(AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                        CollectPeakZoneConditions(state, AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
                     }
                 }
@@ -13286,7 +13285,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqCool,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqCool);
-                    CollectPeakZoneConditions(FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                    CollectPeakZoneConditions(state, FacilityZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesCoolCompLoadTables(iZone));
                 }
                 FacilityZonesCoolCompLoadTables(iZone).timeStepMax = timeCoolMax;
@@ -13321,7 +13320,7 @@ namespace OutputReportTabular {
                                                    feneSolarDelaySeqHeat,
                                                    feneCondInstantSeq,
                                                    surfDelaySeqHeat);
-                    CollectPeakZoneConditions(FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                    CollectPeakZoneConditions(state, FacilityZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
                     AddAreaColumnForZone(iZone, ZoneComponentAreas, FacilityZonesHeatCompLoadTables(iZone));
                 }
                 FacilityZonesHeatCompLoadTables(iZone).timeStepMax = timeHeatMax;
@@ -13723,7 +13722,7 @@ namespace OutputReportTabular {
     }
 
     // for the load summary report add values the peak conditions subtable
-    void CollectPeakZoneConditions(
+    void CollectPeakZoneConditions(EnergyPlusData &state,
         CompLoadTablesType &compLoad, int const &desDaySelected, int const &timeOfMax, int const &zoneIndex, bool const &isCooling)
     {
         using DataHeatBalance::People;
@@ -13743,9 +13742,9 @@ namespace OutputReportTabular {
 
             if (isCooling) {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = CoolPeakDateHrMin(zoneIndex);
@@ -13796,9 +13795,9 @@ namespace OutputReportTabular {
 
             } else {
                 // Time of Peak Load
-                if ((size_t)desDaySelected <= WeatherManager::DesDayInput.size()) {
-                    compLoad.peakDateHrMin = General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).Month) + "/" +
-                                             General::TrimSigDigits(WeatherManager::DesDayInput(desDaySelected).DayOfMonth) + " " +
+                if ((size_t)desDaySelected <= state.dataWeatherManager->DesDayInput.size()) {
+                    compLoad.peakDateHrMin = General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).Month) + "/" +
+                                             General::TrimSigDigits(state.dataWeatherManager->DesDayInput(desDaySelected).DayOfMonth) + " " +
                                              coilSelectionReportObj->getTimeText(timeOfMax);
                 } else {
                     compLoad.peakDateHrMin = HeatPeakDateHrMin(zoneIndex);

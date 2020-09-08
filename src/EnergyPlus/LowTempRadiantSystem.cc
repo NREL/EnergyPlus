@@ -2170,7 +2170,7 @@ namespace LowTempRadiantSystem {
 
             if (anyRadiantSystemUsingRunningMeanAverage) {
                 if (DataGlobals::BeginDayFlag && CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
-                    CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature();
+                    CFloRadSys(RadSysNum).calculateRunningMeanAverageTemperature(state);
                     CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = false; // only set these once per system
                 } else if (!DataGlobals::BeginDayFlag && !CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay) {
                     CFloRadSys(RadSysNum).setRunningMeanValuesAtBeginningOfDay = true;  // reset so that the next time BeginDayFlag is true this can get set
@@ -4895,7 +4895,7 @@ namespace LowTempRadiantSystem {
 
     }
 
-    void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature()
+    void ConstantFlowRadiantSystemData::calculateRunningMeanAverageTemperature(EnergyPlusData& state)
     {
         // This routine grabs the current weather data since it is currently available at this point in the simulation.  Note, however,
         // that the formula that calculates the running mean average (dry-bulb) temperature uses the values from "yesterday".  So, today's
@@ -4903,7 +4903,7 @@ namespace LowTempRadiantSystem {
         // that are then used in the formula.  So, that is why some of the assignments are done in the order that they are in below.
         if (DataGlobals::DayOfSim == 1 && DataGlobals::WarmupFlag) {
             // there is no "history" here--assume everything that came before was the same (this applies to design days also--weather is always the same
-            this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB();
+            this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB(state);
             this->yesterdayAverageOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
             this->todayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
             this->yesterdayRunningMeanOutdoorDryBulbTemperature = this->todayAverageOutdoorDryBulbTemperature;
@@ -4915,16 +4915,16 @@ namespace LowTempRadiantSystem {
             // Now update the running mean and average outdoor air temperatures
             this->todayRunningMeanOutdoorDryBulbTemperature = (1.0 - this->runningMeanOutdoorAirTemperatureWeightingFactor) * this->yesterdayAverageOutdoorDryBulbTemperature
                                                               + this->runningMeanOutdoorAirTemperatureWeightingFactor * this->yesterdayRunningMeanOutdoorDryBulbTemperature;
-            this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB();
+            this->todayAverageOutdoorDryBulbTemperature = this->calculateCurrentDailyAverageODB(state);
         }
     }
 
-    Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB()
+    Real64 ConstantFlowRadiantSystemData::calculateCurrentDailyAverageODB(EnergyPlusData& state)
     {
         Real64 sum = 0.0;
         for (int hourNumber = 1; hourNumber <= DataGlobals::HoursInDay; ++hourNumber) {
             for (int timeStepNumber = 1; timeStepNumber <= DataGlobals::NumOfTimeStepInHour; ++timeStepNumber) {
-                sum += WeatherManager::TodayOutDryBulbTemp(timeStepNumber,hourNumber);
+                sum += state.dataWeatherManager->TodayOutDryBulbTemp(timeStepNumber,hourNumber);
             }
         }
         return sum/double(DataGlobals::HoursInDay*DataGlobals::NumOfTimeStepInHour);

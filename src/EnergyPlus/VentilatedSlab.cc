@@ -1029,8 +1029,8 @@ namespace VentilatedSlab {
                     VentSlab(Item).HotControlOffset = 0.001;
 
                     if (VentSlab(Item).HCoilType == Heating_WaterCoilType) {
-                        VentSlab(Item).MaxVolHotWaterFlow = GetWaterCoilMaxFlowRate("Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
-                        VentSlab(Item).MaxVolHotSteamFlow = GetWaterCoilMaxFlowRate("Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
+                        VentSlab(Item).MaxVolHotWaterFlow = GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
+                        VentSlab(Item).MaxVolHotSteamFlow = GetWaterCoilMaxFlowRate(state, "Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
                     } else if (VentSlab(Item).HCoilType == Heating_SteamCoilType) {
                         VentSlab(Item).MaxVolHotWaterFlow = GetSteamCoilMaxFlowRate("Coil:Heating:Steam", VentSlab(Item).HCoilName, ErrorsFound);
                         VentSlab(Item).MaxVolHotSteamFlow = GetSteamCoilMaxFlowRate("Coil:Heating:Steam", VentSlab(Item).HCoilName, ErrorsFound);
@@ -1123,10 +1123,10 @@ namespace VentilatedSlab {
                     VentSlab(Item).ColdControlOffset = 0.001;
 
                     if (VentSlab(Item).CCoilType == Cooling_CoilWaterCooling) {
-                        VentSlab(Item).MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate("Coil:Cooling:Water", VentSlab(Item).CCoilName, ErrorsFound);
+                        VentSlab(Item).MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate(state, "Coil:Cooling:Water", VentSlab(Item).CCoilName, ErrorsFound);
                     } else if (VentSlab(Item).CCoilType == Cooling_CoilDetailedCooling) {
                         VentSlab(Item).MaxVolColdWaterFlow =
-                            GetWaterCoilMaxFlowRate("Coil:Cooling:Water:DetailedGeometry", VentSlab(Item).CCoilName, ErrorsFound);
+                            GetWaterCoilMaxFlowRate(state, "Coil:Cooling:Water:DetailedGeometry", VentSlab(Item).CCoilName, ErrorsFound);
                     } else if (VentSlab(Item).CCoilType == Cooling_CoilHXAssisted) {
                         VentSlab(Item).MaxVolColdWaterFlow =
                             GetHXAssistedCoilFlowRate(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab(Item).CCoilName, ErrorsFound);
@@ -1750,11 +1750,6 @@ namespace VentilatedSlab {
         using ReportSizingManager::RequestSizing;
         using SteamCoils::GetCoilSteamInletNode;
         using SteamCoils::GetCoilSteamOutletNode;
-        using WaterCoils::GetCoilWaterInletNode;
-        using WaterCoils::GetCoilWaterOutletNode;
-        using WaterCoils::GetWaterCoilIndex;
-        using WaterCoils::SetCoilDesFlow;
-        using WaterCoils::WaterCoil;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("SizeVentilatedSlab");
@@ -2058,14 +2053,14 @@ namespace VentilatedSlab {
                 } else { // Autosize or hard-size with sizing run
                     CheckZoneSizing(cMO_VentilatedSlab, VentSlab(Item).Name);
 
-                    CoilWaterInletNode = GetCoilWaterInletNode("Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
-                    CoilWaterOutletNode = GetCoilWaterOutletNode("Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
+                    CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
+                    CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, "Coil:Heating:Water", VentSlab(Item).HCoilName, ErrorsFound);
                     if (IsAutoSize) {
                         PltSizHeatNum =
                             MyPlantSizingIndex("Coil:Heating:Water", VentSlab(Item).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
-                        CoilNum = GetWaterCoilIndex("COIL:HEATING:WATER", VentSlab(Item).HCoilName, ErrorsFound);
-                        if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
-                            WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
+                        CoilNum = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", VentSlab(Item).HCoilName, ErrorsFound);
+                        if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
+                            WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                             DoWaterCoilSizing = true;
                         } else {
                             if (PltSizHeatNum > 0) {
@@ -2299,13 +2294,13 @@ namespace VentilatedSlab {
                     CoolingCoilName = VentSlab(Item).CCoilName;
                     CoolingCoilType = VentSlab(Item).CCoilTypeCh;
                 }
-                CoilWaterInletNode = GetCoilWaterInletNode(CoolingCoilType, CoolingCoilName, ErrorsFound);
-                CoilWaterOutletNode = GetCoilWaterOutletNode(CoolingCoilType, CoolingCoilName, ErrorsFound);
+                CoilWaterInletNode = WaterCoils::GetCoilWaterInletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                CoilWaterOutletNode = WaterCoils::GetCoilWaterOutletNode(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                 if (IsAutoSize) {
                     PltSizCoolNum = MyPlantSizingIndex(CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound);
-                    CoilNum = GetWaterCoilIndex(CoolingCoilType, CoolingCoilName, ErrorsFound);
-                    if (WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
-                        WaterCoilSizDeltaT = WaterCoil(CoilNum).DesignWaterDeltaTemp;
+                    CoilNum = WaterCoils::GetWaterCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
+                    if (state.dataWaterCoils->WaterCoil(CoilNum).UseDesignWaterDeltaTemp) {
+                        WaterCoilSizDeltaT = state.dataWaterCoils->WaterCoil(CoilNum).DesignWaterDeltaTemp;
                         DoWaterCoilSizing = true;
                     } else {
                         if (PltSizCoolNum > 0) {
@@ -2407,8 +2402,8 @@ namespace VentilatedSlab {
             CoolingCoilName = VentSlab(Item).CCoilName;
             CoolingCoilType = VentSlab(Item).CCoilTypeCh;
         }
-        SetCoilDesFlow(CoolingCoilType, CoolingCoilName, VentSlab(Item).MaxAirVolFlow, ErrorsFound);
-        SetCoilDesFlow(VentSlab(Item).HCoilTypeCh, VentSlab(Item).HCoilName, VentSlab(Item).MaxAirVolFlow, ErrorsFound);
+        WaterCoils::SetCoilDesFlow(state, CoolingCoilType, CoolingCoilName, VentSlab(Item).MaxAirVolFlow, ErrorsFound);
+        WaterCoils::SetCoilDesFlow(state, VentSlab(Item).HCoilTypeCh, VentSlab(Item).HCoilName, VentSlab(Item).MaxAirVolFlow, ErrorsFound);
 
         if (CurZoneEqNum > 0) {
             ZoneEqSizing(CurZoneEqNum).MaxHWVolFlow = VentSlab(Item).MaxVolHotWaterFlow;
@@ -2560,7 +2555,7 @@ namespace VentilatedSlab {
                     auto const SELECT_CASE_var1(VentSlab(Item).HCoilType);
 
                     if (SELECT_CASE_var1 == Heating_WaterCoilType) {
-                        CheckWaterCoilSchedule(
+                        CheckWaterCoilSchedule(state, 
                             "Coil:Heating:Water", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_SteamCoilType) {
                         CheckSteamCoilSchedule(
@@ -2579,10 +2574,10 @@ namespace VentilatedSlab {
                     auto const SELECT_CASE_var1(VentSlab(Item).CCoilType);
 
                     if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
-                        CheckWaterCoilSchedule(
+                        CheckWaterCoilSchedule(state, 
                             "Coil:Cooling:Water", VentSlab(Item).CCoilName, VentSlab(Item).CCoilSchedValue, VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
-                        CheckWaterCoilSchedule("Coil:Cooling:Water:DetailedGeometry",
+                        CheckWaterCoilSchedule(state, "Coil:Cooling:Water:DetailedGeometry",
                                                VentSlab(Item).CCoilName,
                                                VentSlab(Item).CCoilSchedValue,
                                                VentSlab(Item).CCoil_Index);
@@ -2601,7 +2596,7 @@ namespace VentilatedSlab {
                     auto const SELECT_CASE_var1(VentSlab(Item).HCoilType);
 
                     if (SELECT_CASE_var1 == Heating_WaterCoilType) {
-                        CheckWaterCoilSchedule(
+                        CheckWaterCoilSchedule(state, 
                             "Coil:Heating:Water", VentSlab(Item).HCoilName, VentSlab(Item).HCoilSchedValue, VentSlab(Item).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_SteamCoilType) {
                         CheckSteamCoilSchedule(
@@ -2622,10 +2617,10 @@ namespace VentilatedSlab {
                     auto const SELECT_CASE_var1(VentSlab(Item).CCoilType);
 
                     if (SELECT_CASE_var1 == Cooling_CoilWaterCooling) {
-                        CheckWaterCoilSchedule(
+                        CheckWaterCoilSchedule(state, 
                             "Coil:Cooling:Water", VentSlab(Item).CCoilName, VentSlab(Item).CCoilSchedValue, VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilDetailedCooling) {
-                        CheckWaterCoilSchedule("Coil:Cooling:Water:DetailedGeometry",
+                        CheckWaterCoilSchedule(state, "Coil:Cooling:Water:DetailedGeometry",
                                                VentSlab(Item).CCoilName,
                                                VentSlab(Item).CCoilSchedValue,
                                                VentSlab(Item).CCoil_Index);

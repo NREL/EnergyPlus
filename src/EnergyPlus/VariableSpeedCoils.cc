@@ -1059,7 +1059,7 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromMains;
             } else {
                 VarSpeedCoil(DXCoilNum).EvapWaterSupplyMode = WaterSupplyFromTank;
-                SetupTankDemandComponent(VarSpeedCoil(DXCoilNum).Name,
+                SetupTankDemandComponent(state, VarSpeedCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          VarSpeedCoil(DXCoilNum).EvapWaterSupplyName,
                                          ErrorsFound,
@@ -1073,7 +1073,7 @@ namespace VariableSpeedCoils {
                 VarSpeedCoil(DXCoilNum).CondensateCollectMode = CondensateDiscarded;
             } else {
                 VarSpeedCoil(DXCoilNum).CondensateCollectMode = CondensateToTank;
-                SetupTankSupplyComponent(VarSpeedCoil(DXCoilNum).Name,
+                SetupTankSupplyComponent(state, VarSpeedCoil(DXCoilNum).Name,
                                          CurrentModuleObject,
                                          VarSpeedCoil(DXCoilNum).CondensateCollectName,
                                          ErrorsFound,

@@ -723,7 +723,7 @@ namespace UnitarySystems {
                 if (initUnitarySystemsErrFlag) {
                     ShowFatalError("InitUnitarySystem: Program terminated for previous conditions.");
                 }
-                this->MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(CoolingCoilType, CoolingCoilName, initUnitarySystemsErrorsFound);
+                this->MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, CoolingCoilType, CoolingCoilName, initUnitarySystemsErrorsFound);
 
                 if (this->MaxCoolCoilFluidFlow > 0.0) {
                     Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidName,
@@ -746,7 +746,7 @@ namespace UnitarySystems {
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                     TypeOfCoilWaterHeating = DataPlant::TypeOf_CoilWaterSimpleHeating;
                     HeatingCoilType = "Coil:Heating:Water";
-                    WaterCoils::SetCoilDesFlow(DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num),
+                    WaterCoils::SetCoilDesFlow(state, DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num),
                                                this->m_HeatingCoilName,
                                                this->m_MaxHeatAirVolFlow,
                                                initUnitarySystemsErrorsFound);
@@ -773,7 +773,7 @@ namespace UnitarySystems {
                 }
                 if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                     this->MaxHeatCoilFluidFlow =
-                        WaterCoils::GetCoilMaxWaterFlowRate(HeatingCoilType, this->m_HeatingCoilName, initUnitarySystemsErrorsFound);
+                        WaterCoils::GetCoilMaxWaterFlowRate(state, HeatingCoilType, this->m_HeatingCoilName, initUnitarySystemsErrorsFound);
 
                     if (this->MaxHeatCoilFluidFlow > 0.0) {
                         Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
@@ -781,7 +781,7 @@ namespace UnitarySystems {
                                                                        DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidIndex,
                                                                        routineName);
                         this->MaxHeatCoilFluidFlow =
-                            WaterCoils::GetCoilMaxWaterFlowRate(HeatingCoilType, this->m_HeatingCoilName, initUnitarySystemsErrorsFound) * rho;
+                            WaterCoils::GetCoilMaxWaterFlowRate(state, HeatingCoilType, this->m_HeatingCoilName, initUnitarySystemsErrorsFound) * rho;
                     }
                 } else {
                     this->MaxHeatCoilFluidFlow = SteamCoils::GetCoilMaxSteamFlowRate(this->m_HeatingCoilIndex, initUnitarySystemsErrorsFound);
@@ -823,7 +823,7 @@ namespace UnitarySystems {
                                                         _,
                                                         _,
                                                         _);
-                WaterCoils::SetCoilDesFlow(DataHVACGlobals::cAllCoilTypes(this->m_SuppHeatCoilType_Num),
+                WaterCoils::SetCoilDesFlow(state, DataHVACGlobals::cAllCoilTypes(this->m_SuppHeatCoilType_Num),
                                            this->m_SuppHeatCoilName,
                                            this->m_MaxHeatAirVolFlow,
                                            initUnitarySystemsErrorsFound);
@@ -832,7 +832,7 @@ namespace UnitarySystems {
                     ShowFatalError("InitUnitarySystems: Program terminated for previous conditions.");
                 }
                 this->m_MaxSuppCoilFluidFlow =
-                    WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", this->m_SuppHeatCoilName, initUnitarySystemsErrorsFound);
+                    WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, initUnitarySystemsErrorsFound);
 
                 if (this->m_MaxSuppCoilFluidFlow > 0.0) {
                     Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
@@ -840,7 +840,7 @@ namespace UnitarySystems {
                                                                    DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidIndex,
                                                                    routineName);
                     this->m_MaxSuppCoilFluidFlow =
-                        WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", this->m_SuppHeatCoilName, initUnitarySystemsErrorsFound) * rho;
+                        WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, initUnitarySystemsErrorsFound) * rho;
                 }
                 // fill outlet node for coil
                 this->m_SuppCoilFluidOutletNodeNum = DataPlant::PlantLoop(this->m_SuppCoilLoopNum)
@@ -936,7 +936,7 @@ namespace UnitarySystems {
                     }
                     WaterCoils::SimulateWaterCoilComponents(state, this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex);
                     Real64 CoilMaxVolFlowRate =
-                        WaterCoils::GetCoilMaxWaterFlowRate(CoolingCoilType, this->m_CoolingCoilName, initUnitarySystemsErrorsFound);
+                        WaterCoils::GetCoilMaxWaterFlowRate(state, CoolingCoilType, this->m_CoolingCoilName, initUnitarySystemsErrorsFound);
                     if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                         Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CoolCoilLoopNum).FluidName,
                                                                        DataGlobals::CWInitConvTemp,
@@ -962,7 +962,7 @@ namespace UnitarySystems {
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex);
                         Real64 CoilMaxVolFlowRate =
-                            WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", this->m_HeatingCoilName, initUnitarySystemsErrorsFound);
+                            WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_HeatingCoilName, initUnitarySystemsErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                            DataGlobals::CWInitConvTemp,
@@ -1003,7 +1003,7 @@ namespace UnitarySystems {
                         // If water coil max water flow rate is DataSizing::AutoSized, simulate once in order to mine max flow rate
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex);
                         Real64 CoilMaxVolFlowRate =
-                            WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", this->m_SuppHeatCoilName, initUnitarySystemsErrorsFound);
+                            WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, initUnitarySystemsErrorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                            DataGlobals::CWInitConvTemp,
@@ -1970,7 +1970,7 @@ namespace UnitarySystems {
                         this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
                         WaterCoils::SimulateWaterCoilComponents(state,
                             this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                        EqSizing.DesCoolingLoad = WaterCoils::GetWaterCoilCapacity(
+                        EqSizing.DesCoolingLoad = WaterCoils::GetWaterCoilCapacity(state,
                             UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num)),
                             this->m_CoolingCoilName,
                             ErrFound);
@@ -1987,7 +1987,7 @@ namespace UnitarySystems {
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                         WaterCoils::SimulateWaterCoilComponents(state,
                             this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                        EqSizing.DesHeatingLoad = WaterCoils::GetWaterCoilCapacity(
+                        EqSizing.DesHeatingLoad = WaterCoils::GetWaterCoilCapacity(state, 
                             UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num)),
                             this->m_HeatingCoilName,
                             ErrFound);
@@ -2464,7 +2464,7 @@ namespace UnitarySystems {
                 this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) {
                 WaterCoils::SimulateWaterCoilComponents(state,
                     this->m_CoolingCoilName, FirstHVACIteration, this->m_CoolingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(
+                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
                     UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num)), this->m_CoolingCoilName, ErrFound);
                 EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
                 DataSizing::DataFractionUsedForSizing = 1.0;
@@ -2476,7 +2476,7 @@ namespace UnitarySystems {
                 ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state,
                     DataHVACGlobals::cAllCoilTypes(this->m_CoolingCoilType_Num), this->m_CoolingCoilName, ErrFound, true);
                 HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil(state, blankString, true, On, 1.0, this->m_CoolingCoilIndex, 1, false, 1.0, false);
-                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(
+                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
                     UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType)), HXCoilName, ErrFound);
                 EqSizing.DesCoolingLoad = DataSizing::DataConstantUsedForSizing;
                 DataSizing::DataFractionUsedForSizing = 1.0;
@@ -2555,7 +2555,7 @@ namespace UnitarySystems {
             if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                 WaterCoils::SimulateWaterCoilComponents(state,
                     this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex, QActual, this->m_FanOpMode, 1.0);
-                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(
+                DataSizing::DataConstantUsedForSizing = WaterCoils::GetWaterCoilCapacity(state,
                     UtilityRoutines::MakeUPPERCase(DataHVACGlobals::cAllCoilTypes(this->m_HeatingCoilType_Num)), this->m_HeatingCoilName, ErrFound);
                 EqSizing.DesHeatingLoad = DataSizing::DataConstantUsedForSizing;
                 DataSizing::DataFractionUsedForSizing = 1.0;
@@ -3183,7 +3183,7 @@ namespace UnitarySystems {
 
                 // Get AirTerminal mixer data
                 SingleDuct::GetATMixer(state,
-                                       state.dataZoneAirLoopEquipmentManager, thisObjectName,
+                                       thisObjectName,
                                        thisSys.m_ATMixerName,
                                        thisSys.m_ATMixerIndex,
                                        thisSys.ATMixerType,
@@ -4004,14 +4004,14 @@ namespace UnitarySystems {
 
                         errFlag = false;
                         thisSys.m_HeatingCoilAvailSchPtr =
-                            WaterCoils::GetWaterCoilAvailScheduleIndex(loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                            WaterCoils::GetWaterCoilAvailScheduleIndex(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
                             errFlag = false;
                         }
 
-                        thisSys.m_HeatingCoilIndex = WaterCoils::GetWaterCoilIndex("COIL:HEATING:WATER", loc_m_HeatingCoilName, errFlag);
+                        thisSys.m_HeatingCoilIndex = WaterCoils::GetWaterCoilIndex(state, "COIL:HEATING:WATER", loc_m_HeatingCoilName, errFlag);
                         if (thisSys.m_HeatingCoilIndex == 0) {
                             ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                             // ShowContinueError("Illegal " + cAlphaFields(iHeatingCoilNameAlphaNum) + " = " + HeatingCoilName);
@@ -4026,7 +4026,7 @@ namespace UnitarySystems {
                         }
 
                         // Get the Heating Coil water Inlet or control Node number
-                        thisSys.HeatCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode("Coil:Heating:Water", loc_m_HeatingCoilName, errFlag);
+                        thisSys.HeatCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", loc_m_HeatingCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                             errorsFound = true;
@@ -4034,7 +4034,7 @@ namespace UnitarySystems {
                         }
 
                         // Get the Heating Coil hot water max volume flow rate
-                        thisSys.MaxHeatCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", loc_m_HeatingCoilName, errFlag);
+                        thisSys.MaxHeatCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", loc_m_HeatingCoilName, errFlag);
                         if (thisSys.MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
                             thisSys.m_RequestAutoSize = true;
                             thisSys.m_DesignHeatingCapacity = DataSizing::AutoSize;
@@ -4150,7 +4150,7 @@ namespace UnitarySystems {
                             errFlag = false;
                         }
 
-                        thisSys.m_HeatingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                        thisSys.m_HeatingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                         if (thisSys.m_HeatingCoilIndex == 0) {
                             ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                             ShowContinueError("Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
@@ -4169,7 +4169,7 @@ namespace UnitarySystems {
                         // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
                         errFlag = false;
                         thisSys.m_MaxHeatAirVolFlow =
-                            WaterToAirHeatPumpSimple::GetCoilAirFlowRate(loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                            WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                         if (thisSys.m_MaxHeatAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -4210,7 +4210,7 @@ namespace UnitarySystems {
                             errFlag = false;
                         }
 
-                        thisSys.m_HeatingCoilIndex = WaterToAirHeatPump::GetCoilIndex(loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
+                        thisSys.m_HeatingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, loc_heatingCoilType, loc_m_HeatingCoilName, errFlag);
                         if (thisSys.m_HeatingCoilIndex == 0) {
                             ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                             ShowContinueError("Illegal Heating Coil Name = " + loc_m_HeatingCoilName);
@@ -4258,7 +4258,7 @@ namespace UnitarySystems {
                             errFlag = false;
                         }
 
-                        UserDefinedComponents::GetUserDefinedCoilIndex(
+                        UserDefinedComponents::GetUserDefinedCoilIndex(state, 
                             loc_m_HeatingCoilName, thisSys.m_HeatingCoilIndex, errFlag, cCurrentModuleObject);
                         if (thisSys.m_HeatingCoilIndex == 0) {
                             ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
@@ -4279,7 +4279,7 @@ namespace UnitarySystems {
 
                         // Get the Cooling Coil Inlet Node
                         errFlag = false;
-                        UserDefinedComponents::GetUserDefinedCoilAirInletNode(
+                        UserDefinedComponents::GetUserDefinedCoilAirInletNode(state, 
                             loc_m_HeatingCoilName, HeatingCoilInletNode, errFlag, cCurrentModuleObject);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -4288,7 +4288,7 @@ namespace UnitarySystems {
                         }
 
                         // Get the Cooling Coil Outlet Node
-                        UserDefinedComponents::GetUserDefinedCoilAirOutletNode(
+                        UserDefinedComponents::GetUserDefinedCoilAirOutletNode(state, 
                             loc_m_HeatingCoilName, HeatingCoilOutletNode, errFlag, cCurrentModuleObject);
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -4823,12 +4823,12 @@ namespace UnitarySystems {
 
                             errFlag = false;
                             thisSys.m_CoolingCoilAvailSchPtr =
-                                WaterCoils::GetWaterCoilAvailScheduleIndex(DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
+                                WaterCoils::GetWaterCoilAvailScheduleIndex(state, DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
                             thisSys.MaxCoolCoilFluidFlow =
-                                WaterCoils::GetCoilMaxWaterFlowRate(DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
+                                WaterCoils::GetCoilMaxWaterFlowRate(state, DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
                             // Get the Cooling Coil water Inlet Node number
                             thisSys.CoolCoilFluidInletNode =
-                                WaterCoils::GetCoilWaterInletNode(DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
+                                WaterCoils::GetCoilWaterInletNode(state, DataHVACGlobals::cAllCoilTypes(ActualCoolCoilType), HXCoilName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5032,14 +5032,14 @@ namespace UnitarySystems {
 
                             errFlag = false;
                             thisSys.m_CoolingCoilAvailSchPtr =
-                                WaterCoils::GetWaterCoilAvailScheduleIndex(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                                WaterCoils::GetWaterCoilAvailScheduleIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
                                 errFlag = false;
                             }
 
-                            thisSys.m_CoolingCoilIndex = WaterCoils::GetWaterCoilIndex(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                            thisSys.m_CoolingCoilIndex = WaterCoils::GetWaterCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (thisSys.m_CoolingCoilIndex == 0) {
                                 ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                                 ShowContinueError("Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
@@ -5049,7 +5049,7 @@ namespace UnitarySystems {
 
                             // call for air flow rate not valid for other water coil types
                             if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater) {
-                                thisSys.m_MaxCoolAirVolFlow = WaterCoils::GetWaterCoilDesAirFlow(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                                thisSys.m_MaxCoolAirVolFlow = WaterCoils::GetWaterCoilDesAirFlow(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                                 if (errFlag) {
                                     ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                     errorsFound = true;
@@ -5058,7 +5058,7 @@ namespace UnitarySystems {
                             }
 
                             // Get the Cooling Coil water Inlet Node number
-                            thisSys.CoolCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                            thisSys.CoolCoilFluidInletNode = WaterCoils::GetCoilWaterInletNode(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5077,7 +5077,7 @@ namespace UnitarySystems {
 
                             // Get the Cooling Coil chilled water max volume flow rate
                             errFlag = false;
-                            thisSys.MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                            thisSys.MaxCoolCoilFluidFlow = WaterCoils::GetCoilMaxWaterFlowRate(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (thisSys.MaxCoolCoilFluidFlow == DataSizing::AutoSize) {
                                 thisSys.m_RequestAutoSize = true;
                                 thisSys.m_DesignCoolingCapacity = DataSizing::AutoSize; // water coils don't have a capacity field, need other logic?
@@ -5119,7 +5119,7 @@ namespace UnitarySystems {
                                 errFlag = false;
                             }
 
-                            thisSys.m_CoolingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                            thisSys.m_CoolingCoilIndex = WaterToAirHeatPumpSimple::GetCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (thisSys.m_CoolingCoilIndex == 0) {
                                 ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                                 ShowContinueError("Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
@@ -5138,7 +5138,7 @@ namespace UnitarySystems {
                             // Get DX coil air flow rate. Later fields will overwrite this IF input field is present
                             errFlag = false;
                             thisSys.m_MaxCoolAirVolFlow =
-                                WaterToAirHeatPumpSimple::GetCoilAirFlowRate(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                                WaterToAirHeatPumpSimple::GetCoilAirFlowRate(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -5189,7 +5189,7 @@ namespace UnitarySystems {
                                 errFlag = false;
                             }
 
-                            thisSys.m_CoolingCoilIndex = WaterToAirHeatPump::GetCoilIndex(loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
+                            thisSys.m_CoolingCoilIndex = WaterToAirHeatPump::GetCoilIndex(state, loc_coolingCoilType, loc_m_CoolingCoilName, errFlag);
                             if (thisSys.m_CoolingCoilIndex == 0) {
                                 ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
                                 ShowContinueError("Illegal Cooling Coil Name = " + loc_m_CoolingCoilName);
@@ -5249,7 +5249,7 @@ namespace UnitarySystems {
                                 errFlag = false;
                             }
 
-                            UserDefinedComponents::GetUserDefinedCoilIndex(
+                            UserDefinedComponents::GetUserDefinedCoilIndex(state, 
                                 loc_m_CoolingCoilName, thisSys.m_CoolingCoilIndex, errFlag, cCurrentModuleObject);
                             if (thisSys.m_CoolingCoilIndex == 0) {
                                 ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
@@ -5270,7 +5270,7 @@ namespace UnitarySystems {
 
                             // Get the Cooling Coil Inlet Node
                             errFlag = false;
-                            UserDefinedComponents::GetUserDefinedCoilAirInletNode(
+                            UserDefinedComponents::GetUserDefinedCoilAirInletNode(state, 
                                 loc_m_CoolingCoilName, CoolingCoilInletNode, errFlag, cCurrentModuleObject);
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -5279,7 +5279,7 @@ namespace UnitarySystems {
                             }
 
                             // Get the Cooling Coil Outlet Node
-                            UserDefinedComponents::GetUserDefinedCoilAirOutletNode(
+                            UserDefinedComponents::GetUserDefinedCoilAirOutletNode(state, 
                                 loc_m_CoolingCoilName, CoolingCoilOutletNode, errFlag, cCurrentModuleObject);
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
@@ -5377,7 +5377,7 @@ namespace UnitarySystems {
                 if (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWaterToAirHPSimple &&
                     thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPSimple) {
                     thisSys.m_WaterCyclingMode = DataHVACGlobals::WaterCycling;
-                    WaterToAirHeatPumpSimple::SetSimpleWSHPData(
+                    WaterToAirHeatPumpSimple::SetSimpleWSHPData(state, 
                         thisSys.m_CoolingCoilIndex, errorsFound, thisSys.m_WaterCyclingMode, _, thisSys.m_HeatingCoilIndex);
                 }
 
@@ -5583,7 +5583,7 @@ namespace UnitarySystems {
                             // Get the Heating Coil water Inlet or control Node number
                             errFlag = false;
                             thisSys.m_SuppCoilFluidInletNode =
-                                WaterCoils::GetCoilWaterInletNode("Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
+                                WaterCoils::GetCoilWaterInletNode(state, "Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
                                 errorsFound = true;
@@ -5592,7 +5592,7 @@ namespace UnitarySystems {
                             // Get the ReHeat Coil hot water max volume flow rate
                             errFlag = false;
                             thisSys.m_MaxSuppCoilFluidFlow =
-                                WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
+                                WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", loc_m_SuppHeatCoilName, errFlag);
                             if (thisSys.m_MaxSuppCoilFluidFlow == DataSizing::AutoSize) {
                                 thisSys.m_RequestAutoSize = true;
                                 thisSys.m_DesignSuppHeatingCapacity = DataSizing::AutoSize;
@@ -5698,7 +5698,7 @@ namespace UnitarySystems {
                             //						}
 
                             errFlag = false;
-                            UserDefinedComponents::GetUserDefinedCoilIndex(
+                            UserDefinedComponents::GetUserDefinedCoilIndex(state, 
                                 loc_m_SuppHeatCoilName, thisSys.m_SuppHeatCoilIndex, errFlag, cCurrentModuleObject);
                             if (thisSys.m_SuppHeatCoilIndex == 0) {
                                 ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
@@ -5709,7 +5709,7 @@ namespace UnitarySystems {
 
                             // Get the supplemental heating Coil Inlet Node
                             errFlag = false;
-                            UserDefinedComponents::GetUserDefinedCoilAirInletNode(
+                            UserDefinedComponents::GetUserDefinedCoilAirInletNode(state, 
                                 loc_m_SuppHeatCoilName, SupHeatCoilInletNode, errFlag, cCurrentModuleObject);
                             thisSys.m_SuppCoilAirInletNode = SupHeatCoilInletNode;
                             if (errFlag) {
@@ -5719,7 +5719,7 @@ namespace UnitarySystems {
                             }
 
                             // Get the supplemenatal heating Coil Outlet Node
-                            UserDefinedComponents::GetUserDefinedCoilAirOutletNode(
+                            UserDefinedComponents::GetUserDefinedCoilAirOutletNode(state, 
                                 loc_m_SuppHeatCoilName, SupHeatCoilOutletNode, errFlag, cCurrentModuleObject);
                             thisSys.m_SuppCoilAirOutletNode = SupHeatCoilOutletNode;
                             if (errFlag) {
@@ -9301,7 +9301,7 @@ namespace UnitarySystems {
                     // IF water coil max water flow rate is DataSizing::AutoSized, simulate once in order to mine max flow rate
                     if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_HeatingCoilName, FirstHVACIteration, this->m_HeatingCoilIndex);
-                        Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", this->m_HeatingCoilName, errorsFound);
+                        Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_HeatingCoilName, errorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HeatCoilLoopNum).FluidName,
                                                                            DataGlobals::CWInitConvTemp,
@@ -9341,7 +9341,7 @@ namespace UnitarySystems {
                     if (this->m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                         // IF water coil max water flow rate is DataSizing::AutoSized, simulate once in order to mine max flow rate
                         WaterCoils::SimulateWaterCoilComponents(state, this->m_SuppHeatCoilName, FirstHVACIteration, this->m_SuppHeatCoilIndex);
-                        Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", this->m_SuppHeatCoilName, errorsFound);
+                        Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate(state, "Coil:Heating:Water", this->m_SuppHeatCoilName, errorsFound);
                         if (CoilMaxVolFlowRate != DataSizing::AutoSize) {
                             Real64 rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->m_SuppCoilLoopNum).FluidName,
                                                                            DataGlobals::CWInitConvTemp,

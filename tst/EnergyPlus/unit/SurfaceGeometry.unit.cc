@@ -470,7 +470,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(state.files, ErrorsFound); // read construction data
@@ -487,7 +487,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // compare_err_stream( "" ); // just for debugging
@@ -691,7 +691,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool FoundError = false;
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, FoundError);
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, FoundError);
     GetConstructData(state.files, FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
     DataHeatBalance::AnyCTF = true;
@@ -924,7 +924,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
 
     // Prepare data for the test
     ASSERT_TRUE(process_idf(idf_objects));
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
     GetConstructData(state.files, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
@@ -938,7 +938,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // For each surface Run the test then Check the result
@@ -3006,7 +3006,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(state, state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     EXPECT_EQ(2, SurfNum);
     std::string const error_string =
@@ -3556,7 +3556,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(state.files, ErrorsFound); // read construction data
@@ -3575,7 +3575,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
@@ -3669,7 +3669,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Material and Construction, and expect no errors
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -3694,7 +3694,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(state, state.files, ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     // We expect one surface, but an error since Surface B cannot be located
     EXPECT_EQ(1, SurfNum);
@@ -4024,7 +4024,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
     GetConstructData(state.files, ErrorsFound);
@@ -4362,7 +4362,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
     GetConstructData(state.files, ErrorsFound);
@@ -4794,7 +4794,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(state.files, ErrorsFound); // read construction data
@@ -4932,7 +4932,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(state.files, ErrorsFound); // read construction data
@@ -5073,7 +5073,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(state.files, ErrorsFound); // read construction data
@@ -5321,7 +5321,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(state.files, ErrorsFound); // read construction data
@@ -6198,7 +6198,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);                             // expect no errors
 
-    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);                       // expect no errors
 
     GetConstructData(state.files, ErrorsFound); // read construction data
@@ -6210,7 +6210,7 @@ TEST_F(EnergyPlusFixture, GetSurfaceData_SurfaceOrder)
     SetupZoneGeometry(state, ErrorsFound);
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    GetSurfaceData(state.dataZoneTempPredictorCorrector, state.files, ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(state, state.files, ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);                                                            // expect no errors
 
     // compare_err_stream( "" ); // just for debugging

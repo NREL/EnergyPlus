@@ -397,9 +397,9 @@ namespace LowTempRadiantSystem {
                                                             Real64 &LoadMet           // Load met by the low temperature radiant system, in Watts
         );
 
-        void calculateRunningMeanAverageTemperature();
+        void calculateRunningMeanAverageTemperature(EnergyPlusData& state);
 
-        Real64 calculateCurrentDailyAverageODB();
+        Real64 calculateCurrentDailyAverageODB(EnergyPlusData& state);
 
         void updateLowTemperatureRadiantSystem();
 

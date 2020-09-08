@@ -201,7 +201,7 @@ namespace RoomAirModelAirflowNetwork {
             thisRAFN.CalcRoomAirModelAirflowNetwork(ThisRoomAirNode);
         }
 
-        thisRAFN.UpdateRoomAirModelAirflowNetwork(state, state.dataZoneDehumidifier);
+        thisRAFN.UpdateRoomAirModelAirflowNetwork(state);
 
     } // SimRoomAirModelAirflowNetwork
 
@@ -574,7 +574,7 @@ namespace RoomAirModelAirflowNetwork {
         }
 
         // reuse code in ZoneTempPredictorCorrector for sensible components.
-        CalcNodeSums(state.dataZonePlenum, RoomAirNode);
+        CalcNodeSums(*state.dataZonePlenum, RoomAirNode);
 
         SumNonAirSystemResponseForNode(state, RoomAirNode);
 
@@ -756,7 +756,7 @@ namespace RoomAirModelAirflowNetwork {
 
     } // CalcRoomAirModelAirflowNetwork
 
-    void RAFNData::UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier)
+    void RAFNData::UpdateRoomAirModelAirflowNetwork(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -797,7 +797,7 @@ namespace RoomAirModelAirflowNetwork {
 
         if (!ThisRAFNZone.IsUsed) return;
 
-        if (!ZoneSizingCalc) SumSystemDepResponseForNode(state,dataZoneDehumidifier);
+        if (!ZoneSizingCalc) SumSystemDepResponseForNode(state);
 
         AirNodeNum = RoomAirflowNetworkZoneInfo(ZoneNum).ControlAirNodeID;
 
@@ -1380,7 +1380,7 @@ namespace RoomAirModelAirflowNetwork {
 
     //*****************************************************************************************
 
-    void RAFNData::SumSystemDepResponseForNode(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier)
+    void RAFNData::SumSystemDepResponseForNode(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B.Griffith
@@ -1421,7 +1421,7 @@ namespace RoomAirModelAirflowNetwork {
             for (I = 1; I <= ThisRAFNZone.Node(RoomAirNode).NumHVACs; ++I) {
                 if (ThisRAFNZone.Node(RoomAirNode).HVAC(I).TypeOfNum == ZoneEquipTypeOf_DehumidifierDX) {
                     if (SysOutputProvided == 0.0)
-                        SimZoneDehumidifier(state, dataZoneDehumidifier, ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
+                        SimZoneDehumidifier(state, *state.dataZoneDehumidifier, ThisRAFNZone.Node(RoomAirNode).HVAC(I).Name,
                                             ZoneNum,
                                             false,
                                             SysOutputProvided,

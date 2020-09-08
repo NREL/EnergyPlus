@@ -196,7 +196,7 @@ namespace UserDefinedComponents {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
@@ -327,17 +327,17 @@ namespace UserDefinedComponents {
     void SimAirTerminalUserDefined(EnergyPlusData &state,
                                    std::string const &CompName, bool FirstHVACIteration, int ZoneNum, int ZoneNodeNum, int &CompIndex);
 
-    void GetUserDefinedPlantComponents();
+    void GetUserDefinedPlantComponents(EnergyPlusData &state);
 
-    void GetUserDefinedComponents();
+    void GetUserDefinedComponents(EnergyPlusData &state);
 
-    void GetUserDefinedCoilIndex(std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
-
-    void
-    GetUserDefinedCoilAirInletNode(std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    void GetUserDefinedCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
     void
-    GetUserDefinedCoilAirOutletNode(std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+    GetUserDefinedCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
+
+    void
+    GetUserDefinedCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject);
 
 } // namespace UserDefinedComponents
 
