@@ -205,6 +205,7 @@ namespace DataLoopNode {
                                        // contaminant setpoint {ppm} | Set to true when node has SPM which follows wetbulb
     Array1D<MoreNodeData> MoreNodeInfo;
     Array1D<MarkedNodeData> MarkedNode;
+    Array1D<NodeSetpointCheckData> NodeSetpointCheck;
 
     // Clears the global data in DataLoopNode.
     // Needed for unit tests, should not be normally called.
@@ -265,6 +266,7 @@ namespace DataLoopNode {
                                      false);
         MoreNodeInfo.deallocate();
         MarkedNode.deallocate();
+        NodeSetpointCheck.deallocate();
     }
 
 } // namespace DataLoopNode

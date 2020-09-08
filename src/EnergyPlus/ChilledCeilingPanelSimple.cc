@@ -1405,7 +1405,7 @@ namespace CoolingPanelSimple {
                 // Now, distribute the radiant energy of all systems to the appropriate surfaces, to people, and the air
                 DistributeCoolingPanelRadGains(state.dataChilledCeilingPanelSimple);
                 // Now "simulate" the system by recalculating the heat balances
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, state.files, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
 
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
@@ -1707,7 +1707,13 @@ namespace CoolingPanelSimple {
         using DataSurfaces::IntShadeOn;
         using DataSurfaces::Surface;
         using DataSurfaces::SurfaceClass_Window;
-        using DataSurfaces::SurfaceWindow;
+        using DataSurfaces::SurfWinShadingFlag;
+        using DataSurfaces::SurfWinFrameArea;
+        using DataSurfaces::SurfWinProjCorrFrIn;
+        using DataSurfaces::SurfWinFrameTempSurfIn;
+        using DataSurfaces::SurfWinDividerArea;
+        using DataSurfaces::SurfWinProjCorrDivIn;
+        using DataSurfaces::SurfWinDividerTempSurfIn;
 
         // Return value
         Real64 SumHATsurf;
@@ -1729,22 +1735,20 @@ namespace CoolingPanelSimple {
 
             if (ThisSurf.Class == SurfaceClass_Window) {
 
-                auto &ThisSurfWin(SurfaceWindow(SurfNum));
-
-                if (ThisSurfWin.ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind area = the sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += ThisSurfWin.DividerArea;
+                    Area += DataSurfaces::SurfWinDividerArea(SurfNum);
                 }
 
-                if (ThisSurfWin.FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * ThisSurfWin.FrameArea * (1.0 + ThisSurfWin.ProjCorrFrIn) * ThisSurfWin.FrameTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) * SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (ThisSurfWin.DividerArea > 0.0 && ThisSurfWin.ShadingFlag != IntShadeOn && ThisSurfWin.ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn && SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
                     SumHATsurf +=
-                        HConvIn(SurfNum) * ThisSurfWin.DividerArea * (1.0 + 2.0 * ThisSurfWin.ProjCorrDivIn) * ThisSurfWin.DividerTempSurfIn;
+                        HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) * SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

@@ -53,7 +53,6 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -66,7 +65,7 @@
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
 
-void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
+void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &state, const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data)
 {
     static const std::string routineName("CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec: ");
     bool errorsFound(false);
@@ -75,7 +74,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     this->minOutdoorDrybulb = input_data.minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
     this->maxOutdoorDrybulbForBasin = input_data.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
     this->crankcaseHeaterCap = input_data.crankcase_heater_capacity;
-    this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
+    this->normalMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.base_operating_mode_name);
     if (UtilityRoutines::SameString(input_data.capacity_control, "CONTINUOUS")) {
         this->capControlMethod = CapControlMethod::CONTINUOUS;
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "DISCRETE")) {
@@ -108,13 +107,12 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
 
     if (!input_data.alternate_operating_mode_name.empty() && input_data.alternate_operating_mode2_name.empty()) {
         this->hasAlternateMode = DataHVACGlobals::coilEnhancedMode;
-        this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
+        this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
     }
-
     if (!input_data.alternate_operating_mode2_name.empty() && !input_data.alternate_operating_mode_name.empty()) {
         this->hasAlternateMode = DataHVACGlobals::coilSubcoolReheatMode;
-        this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
-        this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode2_name);
+        this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
+        this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode2_name);
         setOperMode(this->normalMode, 1);
         setOperMode(this->alternateMode, 2);
         setOperMode(this->alternateMode2, 3);
@@ -125,7 +123,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     }
 }
 
-CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::string &name_to_find)
+CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(EnergyPlusData &state, const std::string &name_to_find)
 {
     int numPerformances = inputProcessor->getNumObjectsFound(CoilCoolingDXCurveFitPerformance::object_name);
     if (numPerformances <= 0) {
@@ -164,7 +162,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
             input_specs.alternate_operating_mode2_name = cAlphaArgs(7);
         }
 
-        this->instantiateFromInputSpec(input_specs);
+        this->instantiateFromInputSpec(state, input_specs);
         break;
     }
 
@@ -173,7 +171,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &inletNode,
+void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const DataLoopNode::NodeData &inletNode,
                                                 DataLoopNode::NodeData &outletNode,
                                                 int useAlternateMode,
                                                 Real64 &PLR,
@@ -202,7 +200,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 
         this->recoveredEnergyRate = 0.0;
         this->NormalSHR = 0.0;
-        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
 
         //this->OperatingMode = 1;
         totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
@@ -229,7 +227,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 
         if (LoadSHR < SysNorSHR) {
             outletNode.MassFlowRate = inletNode.MassFlowRate;
-            this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+            this->calculate(state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
             totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
             minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
             sensSubRate = outletNode.MassFlowRate *
@@ -237,7 +235,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
             SysSubSHR = sensSubRate / totalCoolingRate;
             if (LoadSHR < SysSubSHR) {
                 outletNode.MassFlowRate = inletNode.MassFlowRate;
-                this->calculate(this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+                this->calculate(state, this->alternateMode2, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
                 totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
                 minAirHumRat = min(inletNode.HumRat, outletNode.HumRat);
                 sensRehRate = outletNode.MassFlowRate *
@@ -287,9 +285,9 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
         }
 
     } else if (useAlternateMode == DataHVACGlobals::coilEnhancedMode) {
-        this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        this->calculate(state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     } else {
-        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     }
 }
 
@@ -308,7 +306,8 @@ void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingMode &currentMode,
+void CoilCoolingDXCurveFitPerformance::calculate(EnergyPlusData &state,
+                                                 CoilCoolingDXCurveFitOperatingMode &currentMode,
                                                  const DataLoopNode::NodeData &inletNode,
                                                  DataLoopNode::NodeData &outletNode,
                                                  Real64 &PLR,
@@ -320,7 +319,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 {
 
     // calculate the performance at this mode/speed
-    currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    currentMode.CalcOperatingMode(state, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
 
     // scaling term to get rate into consumptions
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -359,7 +358,6 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex,
                                                            IOFiles &ioFiles) {
 
-    using General::SolveRoot;
     using TempSolveRoot::SolveRoot;
     // If fan index hasn't been set, we can't do anything
     if (supplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
@@ -404,8 +402,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
     bool errorsFound = false;
 
     if (this->unitStatic > 0.0) {
-        totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatioRated);
-        totCapTempModFac = CurveManager::CurveValue(
+        totCapFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatioRated);
+        totCapTempModFac = CurveManager::CurveValue(state,
             this->normalMode.speeds.back().indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         for (int Iter = 1; Iter <= 4; ++Iter) { // iterative solution in the event that net capacity is near a threshold for external static
             // Obtain external static pressure from Table 5 in ANSI/AHRI Std. 340/360-2007
@@ -461,8 +459,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
     } else {
         fanPowerCorrection = DefaultFanPowerPerEvapAirFlowRate * this->normalMode.ratedEvapAirFlowRate;
         fanHeatCorrection = DefaultFanPowerPerEvapAirFlowRate * this->normalMode.ratedEvapAirFlowRate;
-        totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatioRated);
-        totCapTempModFac = CurveManager::CurveValue(
+        totCapFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatioRated);
+        totCapTempModFac = CurveManager::CurveValue(state,
             this->normalMode.speeds.back().indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         NetCoolingCapRated = this->normalMode.ratedGrossTotalCap * totCapTempModFac * totCapFlowModFac - fanHeatCorrection;
     }
@@ -477,8 +475,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
 
     // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
     Real64 EIRTempModFac =
-        CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-    Real64 EIRFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFFF, AirMassFlowRatioRated);
+        CurveManager::CurveValue(state, this->normalMode.speeds.back().indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+    Real64 EIRFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexEIRFFF, AirMassFlowRatioRated);
     Real64 EIR = 0.0;
     if (this->normalMode.speeds.back().ratedCOP > 0.0) {
         // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
@@ -511,7 +509,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
     condInlet.Temp = OutdoorUnitInletAirDryBulbTempRated;
     int speedNum = 1;
     int fanOpMode = DataHVACGlobals::CycFanCycCoil;
-    this->calculate(this->normalMode, evapInlet, evapOutlet, CycRatio, speedNum, speedRatio, fanOpMode, condInlet, condOutlet);
+    this->calculate(state, this->normalMode, evapInlet, evapOutlet, CycRatio, speedNum, speedRatio, fanOpMode, condInlet, condOutlet);
     Real64 TempDryBulb_Leaving_Apoint = evapOutlet.Temp;
 
     std::vector<Real64> const OutdoorUnitInletAirDryBulbTempPLTestPoint({27.5, 20.0, 18.3});
@@ -614,34 +612,34 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
                 fanHeatCorrection = DefaultFanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
             }
 
-            totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatio);
-            totCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFT,
+            totCapFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatio);
+            totCapTempModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexCapFT,
                                                         CoolingCoilInletAirWetBulbTempRated,
                                                         OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
             Real64 HighSpeedTotCoolingCap = this->normalMode.ratedGrossTotalCap * totCapTempModFac * totCapFlowModFac;
             Real64 HighSpeedNetCoolingCap = HighSpeedTotCoolingCap - fanHeatCorrection;
 
-            EIRTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFT,
+            EIRTempModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexEIRFT,
                                                      CoolingCoilInletAirWetBulbTempRated,
                                                      OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
-            EIRFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexEIRFFF, AirMassFlowRatio);
+            EIRFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexEIRFFF, AirMassFlowRatio);
             Real64 EIR_HighSpeed = 0.0;
             if (this->normalMode.speeds.back().ratedCOP > 0.0) {
                 // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
                 EIR_HighSpeed = EIRTempModFac * EIRFlowModFac / this->normalMode.speeds.back().ratedCOP;
             }
 
-            totCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFFF, AirMassFlowRatio);
-            totCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFT,
+            totCapFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds[0].indexCapFFF, AirMassFlowRatio);
+            totCapTempModFac = CurveManager::CurveValue(state, this->normalMode.speeds[0].indexCapFT,
                                                         CoolingCoilInletAirWetBulbTempRated,
                                                         OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
             Real64 const LowSpeedTotCoolingCap = this->normalMode.speeds[0].rated_total_capacity * totCapTempModFac * totCapFlowModFac;
             Real64 const LowSpeedNetCoolingCap = LowSpeedTotCoolingCap - fanHeatCorrection;
 
-            EIRTempModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexEIRFT,
+            EIRTempModFac = CurveManager::CurveValue(state, this->normalMode.speeds[0].indexEIRFT,
                                                      CoolingCoilInletAirWetBulbTempRated,
                                                      OutdoorUnitInletAirDryBulbTempPLTestPoint[PartLoadTestPoint - 1]);
-            EIRFlowModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexEIRFFF, AirMassFlowRatio);
+            EIRFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds[0].indexEIRFFF, AirMassFlowRatio);
             Real64 EIR_LowSpeed = 0.0;
             if (this->normalMode.speeds[0].ratedCOP > 0.0) {
                 // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
@@ -660,7 +658,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state
                 NetPower_TestPoint[PartLoadTestPoint] = TotalElecPowerRated;
             } else { // minimum unloading limit exceeded without cycling, so cycle
                 CycRatio = TargetNetCapacity / LowSpeedNetCoolingCap;
-                Real64 PLF = CurveManager::CurveValue(this->normalMode.speeds.back().indexPLRFPLF, CycRatio);
+                Real64 PLF = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexPLRFPLF, CycRatio);
                 if (PLF < 0.7) {
                     PLF = 0.7;
                 }
@@ -874,12 +872,12 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlusData &state,Real64 
         FanHeatCorrection = FanPowerPerEvapAirFlowRate * SupplyAirVolFlowRate;
     }
 
-    TotCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatio);
-    TotCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds.back().indexCapFT, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
+    TotCapFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexCapFFF, AirMassFlowRatio);
+    TotCapTempModFac = CurveManager::CurveValue(state, this->normalMode.speeds.back().indexCapFT, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
     HighSpeedNetCoolingCap = this->normalMode.speeds.back().parentModeRatedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
-    TotCapFlowModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFFF, AirMassFlowRatio);
-    TotCapTempModFac = CurveManager::CurveValue(this->normalMode.speeds[0].indexCapFT, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
+    TotCapFlowModFac = CurveManager::CurveValue(state, this->normalMode.speeds[0].indexCapFFF, AirMassFlowRatio);
+    TotCapTempModFac = CurveManager::CurveValue(state, this->normalMode.speeds[0].indexCapFT, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
     LowSpeedNetCoolingCap = this->normalMode.speeds[0].parentModeRatedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
     if (LowSpeedNetCoolingCap <= TargetNetCapacity) {
@@ -902,7 +900,7 @@ CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlusData &state,Real64 
     evapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(26.7, evapInlet.HumRat);
     int speedNum = (int)this->normalMode.speeds.size();
     int fanOpMode = DataHVACGlobals::CycFanCycCoil;
-    this->calculate(this->normalMode, evapInlet, evapOutlet, CycRatio, speedNum, SpeedRatio, fanOpMode, condInlet, condOutlet);
+    this->calculate(state, this->normalMode, evapInlet, evapOutlet, CycRatio, speedNum, SpeedRatio, fanOpMode, condInlet, condOutlet);
 
     OutletAirTemp = evapOutlet.Temp;
     return TargetCoilLeavingDryBulb - OutletAirTemp;

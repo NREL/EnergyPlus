@@ -122,7 +122,7 @@ namespace DataPlant {
 
         // Do pressure system initialize if this is the demand side (therefore once per whole loop)
         if (this->myLoopSideNum == DataPlant::DemandSide) {
-            PlantPressureSystem::SimPressureDropSystem(this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Init);
+            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Init);
         }
 
         // Turn on any previously disabled branches due to constant speed branch pump issue
@@ -152,7 +152,7 @@ namespace DataPlant {
         } else { // LoopSide == SupplySide
 
             // Update pressure drop reporting, calculate total loop pressure drop for use elsewhere
-            PlantPressureSystem::SimPressureDropSystem(this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Update);
+            PlantPressureSystem::SimPressureDropSystem(state, this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Update);
 
             // Pass the loop information via the HVAC interface manager (only the flow)
             HVACInterfaceManager::UpdatePlantLoopInterface(this->myLoopNum,
@@ -1224,7 +1224,7 @@ namespace DataPlant {
 
         // Now we know what the loop would "like" to run at, let's see the pump
         // operation range (min/max avail) to see whether it is possible this time around
-        Real64 ThisLoopSideFlow = this->DetermineLoopSideFlowRate(state.dataBranchInputManager, ThisSideInletNode, ThisLoopSideFlowRequest);
+        Real64 ThisLoopSideFlow = this->DetermineLoopSideFlowRate(state, state.dataBranchInputManager, ThisSideInletNode, ThisLoopSideFlowRequest);
 
         for (auto &branch : this->Branch) {
             branch.lastComponentSimulated = 0;
@@ -1744,9 +1744,9 @@ namespace DataPlant {
                     break;
                 case DataPlant::PumpOpSchemeType: //~ pump
                     if (this->BranchPumpsExist) {
-                        SimulateSinglePump(state.dataBranchInputManager, this_comp.location, branch.RequestedMassFlow);
+                        SimulateSinglePump(state, state.dataBranchInputManager, this_comp.location, branch.RequestedMassFlow);
                     } else {
-                        SimulateSinglePump(state.dataBranchInputManager, this_comp.location, FlowRequest);
+                        SimulateSinglePump(state, state.dataBranchInputManager, this_comp.location, FlowRequest);
                     }
                     break;
                 case DataPlant::CompSetPtBasedSchemeType:
@@ -1799,7 +1799,7 @@ namespace DataPlant {
         components_end:;
 
             if (this->FlowLock == DataPlant::FlowLocked) {
-                PlantPressureSystem::SimPressureDropSystem(
+                PlantPressureSystem::SimPressureDropSystem(state,
                     this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
             }
 
@@ -1844,9 +1844,9 @@ namespace DataPlant {
                     PumpLocation.branchNum = BranchCounter;
                     PumpLocation.compNum = CompCounter;
                     if (this->BranchPumpsExist) {
-                        SimulateSinglePump(state.dataBranchInputManager, PumpLocation, branch.RequestedMassFlow);
+                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, branch.RequestedMassFlow);
                     } else {
-                        SimulateSinglePump(state.dataBranchInputManager, PumpLocation, FlowRequest);
+                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, FlowRequest);
                     }
                     break;
                 default:
@@ -1875,7 +1875,7 @@ namespace DataPlant {
 
             //~ If we are locked, go ahead and simulate the pressure components on this branch
             if (this->FlowLock == DataPlant::FlowLocked) {
-                PlantPressureSystem::SimPressureDropSystem(
+                PlantPressureSystem::SimPressureDropSystem(state,
                     this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
             }
 
@@ -1907,9 +1907,9 @@ namespace DataPlant {
                     PumpLocation.branchNum = BranchCounter;
                     PumpLocation.compNum = CompCounter;
                     if (this->BranchPumpsExist) {
-                        SimulateSinglePump(state.dataBranchInputManager, PumpLocation, branch.RequestedMassFlow);
+                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, branch.RequestedMassFlow);
                     } else {
-                        SimulateSinglePump(state.dataBranchInputManager, PumpLocation, FlowRequest);
+                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, FlowRequest);
                     }
                     break;
                 default:
@@ -1926,7 +1926,7 @@ namespace DataPlant {
             } //~ CompCounter
 
             if (this->FlowLock == DataPlant::FlowLocked) {
-                PlantPressureSystem::SimPressureDropSystem(
+                PlantPressureSystem::SimPressureDropSystem(state,
                     this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Calc, this->myLoopSideNum, BranchCounter);
             }
 
@@ -2031,7 +2031,7 @@ namespace DataPlant {
         this->UpdatedDemandToLoopSetPoint = this->InitialDemandToLoopSetPoint - this->CurrentAlterationsToDemand;
     }
 
-    void HalfLoopData::SimulateSinglePump(BranchInputManagerData &dataBranchInputManager, PlantLocation const SpecificPumpLocation, Real64 &SpecificPumpFlowRate)
+    void HalfLoopData::SimulateSinglePump(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, PlantLocation const SpecificPumpLocation, Real64 &SpecificPumpFlowRate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2053,7 +2053,8 @@ namespace DataPlant {
 
         // Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
         bool DummyThisPumpRunning;
-        Pumps::SimPumps(dataBranchInputManager,
+        Pumps::SimPumps(state,
+                        dataBranchInputManager,
                         pump.PumpName,
                         SpecificPumpLocation.loopNum,
                         SpecificPumpFlowRate,
@@ -2071,7 +2072,8 @@ namespace DataPlant {
         }
     }
 
-    void HalfLoopData::SimulateAllLoopSidePumps(BranchInputManagerData &dataBranchInputManager,
+    void HalfLoopData::SimulateAllLoopSidePumps(EnergyPlusData &state,
+                                                BranchInputManagerData &dataBranchInputManager,
                                                 Optional<PlantLocation const> SpecificPumpLocation,
                                                 Optional<Real64 const> SpecificPumpFlowRate) {
 
@@ -2125,7 +2127,7 @@ namespace DataPlant {
 
             // Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
             bool DummyThisPumpRunning;
-            Pumps::SimPumps(dataBranchInputManager, pump.PumpName, PumpLoopNum, FlowToRequest, DummyThisPumpRunning,
+            Pumps::SimPumps(state, dataBranchInputManager, pump.PumpName, PumpLoopNum, FlowToRequest, DummyThisPumpRunning,
                             loop_side_branch(PumpBranchNum).PumpIndex, pump.PumpHeatToFluid);
 
             //~ Pull some state information from the pump outlet node
@@ -2143,7 +2145,7 @@ namespace DataPlant {
         }
     }
 
-    Real64 HalfLoopData::DetermineLoopSideFlowRate(BranchInputManagerData &dataBranchInputManager, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest)
+    Real64 HalfLoopData::DetermineLoopSideFlowRate(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest)
     {
         Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
         Real64 TotalPumpMinAvailFlow = 0.0;
@@ -2158,7 +2160,7 @@ namespace DataPlant {
             this->FlowLock = DataPlant::FlowPumpQuery;
 
             //~ Simulate pumps
-            this->SimulateAllLoopSidePumps(dataBranchInputManager);
+            this->SimulateAllLoopSidePumps(state, dataBranchInputManager);
 
             //~ Calculate totals
             for (auto const &e : this->Pumps) {
