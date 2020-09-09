@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -107,12 +106,11 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(EnergyPlusData &
     }
 
     if (!input_data.alternate_operating_mode_name.empty() && input_data.alternate_operating_mode2_name.empty()) {
-        this->hasAlternateMode = coilEnhancedMode;
+        this->hasAlternateMode = DataHVACGlobals::coilEnhancedMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
     }
-
     if (!input_data.alternate_operating_mode2_name.empty() && !input_data.alternate_operating_mode_name.empty()) {
-        this->hasAlternateMode = coilSubcoolReheatMode;
+        this->hasAlternateMode = DataHVACGlobals::coilSubcoolReheatMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode_name);
         this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(state, input_data.alternate_operating_mode2_name);
         setOperMode(this->normalMode, 1);
@@ -186,7 +184,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
 {
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-    if (useAlternateMode == coilSubcoolReheatMode) {
+    if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
         Real64 totalCoolingRate;
         Real64 sensNorRate;
         Real64 sensSubRate;
@@ -286,7 +284,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(EnergyPlusData &state, const Dat
             return;
         }
 
-    } else if (useAlternateMode == coilEnhancedMode) {
+    } else if (useAlternateMode == DataHVACGlobals::coilEnhancedMode) {
         this->calculate(state, this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     } else {
         this->calculate(state, this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
@@ -297,10 +295,10 @@ void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         this->normalMode.size(state);
-        if (this->hasAlternateMode == coilEnhancedMode) {
+        if (this->hasAlternateMode == DataHVACGlobals::coilEnhancedMode) {
             this->alternateMode.size(state);
         }
-        if (this->hasAlternateMode == coilSubcoolReheatMode) {
+        if (this->hasAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
             this->alternateMode.size(state);
             this->alternateMode2.size(state);
         }
