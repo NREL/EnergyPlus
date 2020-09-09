@@ -110,7 +110,7 @@ namespace SolarCollectors {
     {
         NumOfCollectors = 0;
         NumOfParameters = 0;
-        GetInputFlag = false;
+        GetInputFlag = true;
         Parameters.deallocate();
         Collector.deallocate();
         UniqueCollectorNames.clear();
@@ -148,7 +148,7 @@ namespace SolarCollectors {
         // PURPOSE OF THIS SUBROUTINE:
         // Gets the solar collector input from the input file and sets up the parameters and collector objects.
 
-        static bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);       // Set to true if errors in input, fatal at end of routine
         int IOStatus;                         // Used in GetObjectItem
         int NumAlphas;                        // Number of Alphas for each GetObjectItem call
         int NumNumbers;                       // Number of Numbers for each GetObjectItem call
@@ -760,7 +760,7 @@ namespace SolarCollectors {
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
 
         {
             auto const SELECT_CASE_var(this->TypeNum);
@@ -779,7 +779,7 @@ namespace SolarCollectors {
         this->report();
     }
 
-    void CollectorData::initialize(BranchInputManagerData &dataBranchInputManager)
+    void CollectorData::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -806,7 +806,7 @@ namespace SolarCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitSolarCollector: Program terminated due to previous condition(s).");

@@ -132,6 +132,13 @@ namespace RoomAirModelUserTempPattern {
     // MODULE SUBROUTINES:
 
     // Functions
+    bool MyOneTimeFlag(true); // one time setup flag
+    bool MyOneTimeFlag2(true);
+
+    void clear_state() {
+        MyOneTimeFlag = true;
+        MyOneTimeFlag2 = true;
+    }
 
     void ManageUserDefinedPatterns(int const ZoneNum) // index number for the specified zone
     {
@@ -221,7 +228,6 @@ namespace RoomAirModelUserTempPattern {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
-        static bool MyOneTimeFlag(true); // one time setup flag
         int SurfNum;                     // do loop counter
 
         if (MyOneTimeFlag) {
@@ -579,11 +585,10 @@ namespace RoomAirModelUserTempPattern {
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
         static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
-        static bool MyOneTimeFlag(true);
 
-        if (MyOneTimeFlag) {
+        if (MyOneTimeFlag2) {
             SetupOutputFlag.dimension(NumOfZones, true); // init
-            MyOneTimeFlag = false;
+            MyOneTimeFlag2 = false;
         }
 
         if (SetupOutputFlag(ZoneNum)) {
@@ -992,7 +997,6 @@ namespace RoomAirModelUserTempPattern {
         using DataSurfaces::AdjacentAirTemp;
         using DataSurfaces::AirFlowWindow_Destination_ReturnAir;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceWindow;
         using DataSurfaces::ZoneMeanAirTemp;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
@@ -1062,12 +1066,12 @@ namespace RoomAirModelUserTempPattern {
 
             if (DataZoneEquipment::ZoneEquipConfig(zoneEquipNum).ZoneHasAirFlowWindowReturn) {
                 for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                    if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0 &&
-                        SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_ReturnAir) {
-                        FlowThisTS = PsyRhoAirFnPbTdbW(OutBaroPress, SurfaceWindow(SurfNum).TAirflowGapOutlet, Node(ZoneNode).HumRat) *
-                                     SurfaceWindow(SurfNum).AirflowThisTS * Surface(SurfNum).Width;
+                    if (DataSurfaces::SurfWinAirflowThisTS(SurfNum) > 0.0 &&
+                        DataSurfaces::SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                        FlowThisTS = PsyRhoAirFnPbTdbW(OutBaroPress, DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum), Node(ZoneNode).HumRat) *
+                                     DataSurfaces::SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
                         WinGapFlowToRA += FlowThisTS;
-                        WinGapFlowTtoRA += FlowThisTS * SurfaceWindow(SurfNum).TAirflowGapOutlet;
+                        WinGapFlowTtoRA += FlowThisTS * DataSurfaces::SurfWinTAirflowGapOutlet(SurfNum);
                     }
                 }
             }

@@ -306,7 +306,7 @@ namespace PurchasedAirManager {
         int CtrlZone;                                              // zone index
         int NodeNum;                                               // node index
         static std::string const RoutineName("GetPurchasedAir: "); // include trailing blank space
-        static bool ErrorsFound(false);                            // If errors detected in input
+        bool ErrorsFound(false);                            // If errors detected in input
         bool IsOANodeListed;                                       // Flag for OA node name listed in OutdoorAir:Node or Nodelist
         bool UniqueNodeError;                                      // Flag for non-unique node error(s)
 

@@ -52,17 +52,18 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
 #include <ostream>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -150,7 +151,7 @@ protected:
 
     // This function creates a string based on a vector of string inputs that is delimited by DataStringGlobals::NL by default, but any
     // delimiter can be passed in to this function. This allows for cross platform output string comparisons.
-    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = DataStringGlobals::NL);
+    std::string delimited_string(std::vector<std::string> const &strings, std::string const &delimiter = "\n");
 
     // This function reads all the lines in the supplied filePath. It puts each line into the vector.
     std::vector<std::string> read_lines_in_file(std::string const &filePath);
@@ -269,7 +270,7 @@ protected:
                      std::vector<bool> const &numbers_blank);
 
     // Opens output files as stringstreams
-    void openOutputFiles(OutputFiles &outputFiles);
+    void openOutputFiles(IOFiles &ioFiles);
 
 public:
     EnergyPlusData state;
@@ -287,8 +288,10 @@ private:
 
     static bool process_idd(std::string const &idd, bool &errors_found);
 
-    std::unique_ptr<std::ostringstream> json_stream;
-    std::unique_ptr<std::ostringstream> err_stream;
+    // Note that these are non-owning raw pointers. The `state` object owns the underlying streams.
+    std::ostringstream *json_stream;
+    std::ostringstream *err_stream;
+
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;
     std::unique_ptr<std::ostringstream> m_delightin_stream;

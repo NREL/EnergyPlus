@@ -3711,7 +3711,7 @@
 
   Output:Variable,*,Heat Exchanger Total Cooling Rate,hourly;
 
-  Output:Variable,*,Heat Exchanger Electric Power,hourly;
+  Output:Variable,*,Heat Exchanger Electricity Rate,hourly;
 
   Output:Variable,*,Heat Exchanger Sensible Effectiveness,hourly;
 

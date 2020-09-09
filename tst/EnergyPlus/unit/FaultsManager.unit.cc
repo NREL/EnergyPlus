@@ -62,11 +62,13 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -94,8 +96,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     bool TestRestult;
 
     // Allocate
-    NumCurves = 1;
-    PerfCurve.allocate(NumCurves);
+    state.dataCurveManager->NumCurves = 1;
+    state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
     state.fans.NumFans = 2;
     Fan.allocate(state.fans.NumFans);
@@ -103,17 +105,17 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
 
     // Inputs: fan curve
     CurveNum = 1;
-    PerfCurve(CurveNum).CurveType = Cubic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 1151.1;
-    PerfCurve(CurveNum).Coeff2 = 13.509;
-    PerfCurve(CurveNum).Coeff3 = -0.9105;
-    PerfCurve(CurveNum).Coeff4 = -0.0129;
-    PerfCurve(CurveNum).Coeff5 = 0.0;
-    PerfCurve(CurveNum).Coeff6 = 0.0;
-    PerfCurve(CurveNum).Var1Min = 7.0;
-    PerfCurve(CurveNum).Var1Max = 21.0;
+    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
+    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = -0.0129;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
 
     // Inputs:
     FanNum = 1;
@@ -143,8 +145,198 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     EXPECT_FALSE(TestRestult);
 
     // Clean up
-    PerfCurve.deallocate();
+    state.dataCurveManager->PerfCurve.deallocate();
     Fan.deallocate();
+}
+
+TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_AutosizedFan)
+{
+    // #7896 - Cannot check check whether the fan curve specified in the FaultModel:Fouling:AirFilter object
+    // covers the rated operational point of the corresponding fan before the Fan is sized
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Continuous;              !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "  OnOff,                   !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Discrete;                !- Numeric Type",
+
+        "Schedule:Constant,Always On Discrete,OnOff,1;",
+
+        "Schedule:Compact,",
+        "  AvailSched,              !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.00;       !- Field 3",
+
+        "Schedule:Compact,",
+        "  Pressure Fraction Schedule,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.25;       !- Field 3",
+
+        "Fan:ConstantVolume,",
+        "  Fan CV,                  !- Name",
+        "  Always On Discrete,      !- Availability Schedule Name",
+        "  0.7,                     !- Fan Total Efficiency",
+        "  150,                     !- Pressure Rise {Pa}",
+        "  AutoSize,                !- Maximum Flow Rate {m3/s}",
+        "  0.93,                    !- Motor Efficiency",
+        "  1,                       !- Motor In Airstream Fraction",
+        "  Node 21,                 !- Air Inlet Node Name",
+        "  Node 38;                 !- Air Outlet Node Name",
+
+        "FaultModel:Fouling:AirFilter,",
+        "  Fan CV Fouling Air Filter,  !- Name",
+        "  Fan:ConstantVolume,      !- Fan Object Type",
+        "  Fan CV,                  !- Fan Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  Pressure Fraction Schedule,  !- Pressure Fraction Schedule Name",
+        "  Fouled Fan Curve;        !- Fan Curve Name",
+
+        "Curve:Cubic,",
+        "  Fouled Fan Curve,        !- Name",
+        "  1015,                    !- Coefficient1 Constant",
+        "  -1750,                   !- Coefficient2 x",
+        "  59050,                   !- Coefficient3 x**2",
+        "  -1624000,                !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  0.09,                    !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+    });
+
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::StdRhoAir = 1.2;
+
+    // Run CheckAndReadFaults which will call GetFanInput if not done yet
+    EXPECT_NO_THROW(CheckAndReadFaults(state));
+    compare_err_stream("", true);
+
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurSysNum = 0;
+    DataSizing::CurOASysNum = 0;
+
+    // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
+    DataSizing::DataNonZoneNonAirloopValue = 0.114;
+    // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
+    int FanNum = 1;
+    EXPECT_NO_THROW(Fans::SizeFan(state, FanNum));
+    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+}
+
+TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFilterFanCurve_NonAutosizedFan)
+{
+    // #7896 - Ensure that the check is still done when the fan is NOT autosized (was moved inside Fans::SizeFan)
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Continuous;              !- Numeric Type",
+
+        "ScheduleTypeLimits,",
+        "  OnOff,                   !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Discrete;                !- Numeric Type",
+
+        "Schedule:Constant,Always On Discrete,OnOff,1;",
+
+        "Schedule:Compact,",
+        "  AvailSched,              !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.00;       !- Field 3",
+
+        "Schedule:Compact,",
+        "  Pressure Fraction Schedule,  !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.25;       !- Field 3",
+
+        "Fan:ConstantVolume,",
+        "  Fan CV,                  !- Name",
+        "  Always On Discrete,      !- Availability Schedule Name",
+        "  0.7,                     !- Fan Total Efficiency",
+        "  400,                     !- Pressure Rise {Pa}",
+        "  0.114,                   !- Maximum Flow Rate {m3/s}",
+        "  0.93,                    !- Motor Efficiency",
+        "  1,                       !- Motor In Airstream Fraction",
+        "  Node 21,                 !- Air Inlet Node Name",
+        "  Node 38;                 !- Air Outlet Node Name",
+
+        "FaultModel:Fouling:AirFilter,",
+        "  Fan CV Fouling Air Filter,  !- Name",
+        "  Fan:ConstantVolume,      !- Fan Object Type",
+        "  Fan CV,                  !- Fan Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  Pressure Fraction Schedule,  !- Pressure Fraction Schedule Name",
+        "  Fouled Fan Curve;        !- Fan Curve Name",
+
+        "Curve:Cubic,",
+        "  Fouled Fan Curve,        !- Name",
+        "  1015,                    !- Coefficient1 Constant",
+        "  -1750,                   !- Coefficient2 x",
+        "  59050,                   !- Coefficient3 x**2",
+        "  -1624000,                !- Coefficient4 x**3",
+        "  0,                       !- Minimum Value of x",
+        "  0.09,                    !- Maximum Value of x",
+        "  ,                        !- Minimum Curve Output",
+        "  ,                        !- Maximum Curve Output",
+        "  Dimensionless,           !- Input Unit Type for X",
+        "  Dimensionless;           !- Output Unit Type",
+    });
+
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataEnvironment::StdRhoAir = 1.2;
+
+    // Run CheckAndReadFaults which will call GetFanInput if not done yet
+    EXPECT_NO_THROW(CheckAndReadFaults(state));
+    compare_err_stream("", true);
+
+    DataSizing::CurZoneEqNum = 0;
+    DataSizing::CurSysNum = 0;
+    DataSizing::CurOASysNum = 0;
+
+    // DataNonZoneNonAirloopValue must be set when CurZoneEqNum and CurSysNum = 0
+    DataSizing::DataNonZoneNonAirloopValue = 0.15;
+    // We expect this one to throw, I changed the fan design pressure to 400, and made it non autosized.
+    int FanNum = 1;
+    EXPECT_ANY_THROW(Fans::SizeFan(state, FanNum));
+    EXPECT_DOUBLE_EQ(0.114, Fans::Fan(FanNum).MaxAirFlowRate);
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
+        "   **   ~~~   ** Invalid Fan Curve Name = \"FOULED FAN CURVE\" does not cover ",
+        "   **   ~~~   ** the operational point of Fan FAN CV",
+        "   **  Fatal  ** SizeFan: Invalid FaultModel:Fouling:AirFilter=FAN CV FOULING AIR FILTER",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FaultModel:Fouling:AirFilter = \"FAN CV FOULING AIR FILTER\"",
+    });
+    compare_err_stream(error_string, true);
+
 }
 
 TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFlowReduction)
@@ -159,25 +351,25 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     double FanFaultyDeltaPressInc = 0.10; // Increase by 10%
 
     // Allocate
-    NumCurves = 1;
-    PerfCurve.allocate(NumCurves);
+    state.dataCurveManager->NumCurves = 1;
+    state.dataCurveManager->PerfCurve.allocate(state.dataCurveManager->NumCurves);
 
     state.fans.NumFans = 1;
     Fan.allocate(state.fans.NumFans);
 
     // Inputs: fan curve
     CurveNum = 1;
-    PerfCurve(CurveNum).CurveType = Cubic;
-    PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
-    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
-    PerfCurve(CurveNum).Coeff1 = 1151.1;
-    PerfCurve(CurveNum).Coeff2 = 13.509;
-    PerfCurve(CurveNum).Coeff3 = -0.9105;
-    PerfCurve(CurveNum).Coeff4 = -0.0129;
-    PerfCurve(CurveNum).Coeff5 = 0.0;
-    PerfCurve(CurveNum).Coeff6 = 0.0;
-    PerfCurve(CurveNum).Var1Min = 7.0;
-    PerfCurve(CurveNum).Var1Max = 21.0;
+    state.dataCurveManager->PerfCurve(CurveNum).CurveType = CurveTypeEnum::Cubic;
+    state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Curve:Cubic";
+    state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = InterpTypeEnum::EvaluateCurveToLimits;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff1 = 1151.1;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff2 = 13.509;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff3 = -0.9105;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff4 = -0.0129;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff5 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Coeff6 = 0.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 7.0;
+    state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 21.0;
 
     // Inputs: fans
     FanNum = 1;
@@ -187,13 +379,13 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CalFaultyFanAirFl
     Fan(FanNum).DeltaPress = 1017.59;
 
     // Run and Check
-    FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(
+    FanDesignFlowRateDec = CalFaultyFanAirFlowReduction(state,
         Fan(FanNum).FanName, Fan(FanNum).MaxAirFlowRate, Fan(FanNum).DeltaPress, FanFaultyDeltaPressInc * Fan(FanNum).DeltaPress, CurveNum);
 
     EXPECT_NEAR(3.845, FanDesignFlowRateDec, 0.005);
 
     // Clean up
-    PerfCurve.deallocate();
+    state.dataCurveManager->PerfCurve.deallocate();
     Fan.deallocate();
 }
 
@@ -459,7 +651,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     MixedAir::GetOAControllerInputs(state);
 
@@ -689,7 +881,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);  // read schedule data
+    ScheduleManager::ProcessScheduleInput(state.files);  // read schedule data
     int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
     EXPECT_EQ(1, avaiSchedIndex);
     int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");

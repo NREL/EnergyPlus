@@ -45,21 +45,139 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 #include "DataStringGlobals.hh"
+#include "FileSystem.hh"
 #include "UtilityRoutines.hh"
+#include "InputProcessing/InputProcessor.hh"
+#include "InputProcessing/EmbeddedEpJSONSchema.hh"
 
-#include <ObjexxFCL/gio.hh>
+#include "nlohmann/json.hpp"
 #include <fmt/format.h>
 #include <stdexcept>
 
 namespace EnergyPlus {
 
-OutputFile &OutputFile::ensure_open(const std::string &caller)
+InputFile &InputFile::ensure_open(const std::string &caller, bool output_to_file)
 {
     if (!good()) {
-        open();
+        open(output_to_file);
+    }
+    if (!good()) {
+        ShowFatalError(fmt::format("{}: Could not open file {} for input (read).", caller, fileName));
+    }
+    return *this;
+}
+
+bool InputFile::good() const noexcept
+{
+    if (is) {
+        return is->good();
+    } else {
+        return false;
+    }
+}
+
+void InputFile::close()
+{
+    is.reset();
+}
+
+InputFile::ReadResult<std::string> InputFile::readLine() noexcept
+{
+    if (is) {
+        std::string line;
+        std::getline(*is, line);
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+        return {std::move(line), is->eof(), is->good()};
+    } else {
+        return {"", true, false};
+    }
+}
+
+InputFile::InputFile(std::string FileName) : fileName(std::move(FileName))
+{
+}
+
+std::ostream::pos_type InputFile::position() const noexcept
+{
+    return is->tellg();
+}
+
+void InputFile::open(bool)
+{
+    is = std::unique_ptr<std::istream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::binary));
+    is->imbue(std::locale("C"));
+}
+
+std::string InputFile::error_state_to_string() const
+{
+    const auto state = rdstate();
+
+    if (!is_open()) {
+        return "file not opened'";
+    }
+
+    if (state == std::ios_base::failbit) {
+        return "io operation failed";
+    } else if (state == std::ios_base::badbit) {
+        return "irrecoverable stream error";
+    } else if (state == std::ios_base::eofbit) {
+        return "end of file reached";
+    } else {
+        return "no error";
+    }
+}
+
+std::istream::iostate InputFile::rdstate() const noexcept
+{
+    if (is) {
+        return is->rdstate();
+    } else {
+        return std::ios_base::badbit;
+    }
+}
+
+bool InputFile::is_open() const noexcept
+{
+    if (is) {
+        auto *ss = dynamic_cast<std::ifstream *>(is.get());
+        if (ss) {
+            return ss->is_open();
+        } else {
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
+void InputFile::backspace() noexcept
+{
+    if (is) {
+        is->clear();
+        std::streamoff g1(is->tellg()); // Current position
+        is->seekg(0, std::ios::beg);    // Beginning of file
+        std::streampos const g0(is->tellg());
+        is->seekg(g1, std::ios::beg); // Restore position
+        if (g1 > g0) --g1;
+        while (g1 > g0) {
+            is->seekg(--g1, std::ios::beg); // Backup by 1
+            if (is->peek() == '\n') {       // Found end of previous record
+                is->seekg(++g1, std::ios::beg);
+                break;
+            }
+        }
+    }
+}
+
+InputOutputFile &InputOutputFile::ensure_open(const std::string &caller, bool output_to_file)
+{
+    if (!good()) {
+        open(false, output_to_file);
     }
     if (!good()) {
         ShowFatalError(fmt::format("{}: Could not open file {} for output (write).", caller, fileName));
@@ -67,41 +185,43 @@ OutputFile &OutputFile::ensure_open(const std::string &caller)
     return *this;
 }
 
-bool OutputFile::good() const
+bool InputOutputFile::good() const
 {
-    if (os) {
+    if (os && print_to_dev_null && os->bad()) { // badbit is set
+        return true;
+    } else if (os) {
         return os->good();
     } else {
         return false;
     }
 }
 
-void OutputFile::close()
+void InputOutputFile::close()
 {
     os.reset();
 }
 
-void OutputFile::del()
+void InputOutputFile::del()
 {
     if (os) {
         os.reset();
-        std::remove(fileName.c_str());
+        FileSystem::removeFile(fileName);
     }
 }
 
-void OutputFile::open_as_stringstream()
+void InputOutputFile::open_as_stringstream()
 {
     os = std::unique_ptr<std::iostream>(new std::stringstream());
 }
 
-void OutputFile::flush()
+void InputOutputFile::flush()
 {
     if (os) {
         os->flush();
     }
 }
 
-std::string OutputFile::get_output()
+std::string InputOutputFile::get_output()
 {
     auto *ss = dynamic_cast<std::stringstream *>(os.get());
     if (ss) {
@@ -111,16 +231,18 @@ std::string OutputFile::get_output()
     }
 }
 
-OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
+InputOutputFile::InputOutputFile(std::string FileName, const bool DefaultToStdout)
+  : fileName{std::move(FileName)},
+    defaultToStdOut{DefaultToStdout}
 {
 }
 
-std::ostream::pos_type OutputFile::position() const noexcept
+std::ostream::pos_type InputOutputFile::position() const noexcept
 {
     return os->tellg();
 }
 
-void OutputFile::open(const bool forAppend)
+void InputOutputFile::open(const bool forAppend, bool output_to_file)
 {
     auto appendMode = [=]() {
         if (forAppend) {
@@ -129,11 +251,18 @@ void OutputFile::open(const bool forAppend)
             return std::ios_base::trunc;
         }
     }();
-
-    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+    if (!output_to_file) {
+        os = std::unique_ptr<std::iostream>(new std::iostream(nullptr));
+        os->imbue(std::locale("C"));
+        print_to_dev_null = true;
+    } else {
+        os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | appendMode));
+        os->imbue(std::locale("C"));
+        print_to_dev_null = false;
+    }
 }
 
-std::vector<std::string> OutputFile::getLines()
+std::vector<std::string> InputOutputFile::getLines()
 {
     if (os) {
         // avoid saving and reloading the file by simply reading the current input stream
@@ -155,24 +284,151 @@ std::vector<std::string> OutputFile::getLines()
     return std::vector<std::string>();
 }
 
-OutputFiles &OutputFiles::getSingleton()
+void IOFiles::OutputControl::getInput()
+{
+    auto const instances = inputProcessor->epJSON.find("Output:Control");
+    if (instances != inputProcessor->epJSON.end()) {
+
+        auto find_input = [](nlohmann::json const & fields, std::string const & field_name) -> std::string {
+            std::string input;
+            auto found = fields.find(field_name);
+            if (found != fields.end()) {
+                input = found.value().get<std::string>();
+                input = UtilityRoutines::MakeUPPERCase(input);
+            } else {
+                inputProcessor->getDefaultValue("Output:Control", field_name, input);
+            }
+            return input;
+        };
+
+        auto boolean_choice = [](std::string const & input) -> bool {
+            if (input == "YES") {
+                return true;
+            } else if (input == "NO") {
+                return false;
+            }
+            ShowFatalError("Invalid boolean Yes/No choice input");
+            return true;
+        };
+
+        auto &instancesValue = instances.value();
+        for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+            auto const &fields = instance.value();
+
+            { // "output_csv"
+                csv = boolean_choice(find_input(fields, "output_csv"));
+            }
+            { // "output_mtr"
+                mtr = boolean_choice(find_input(fields, "output_mtr"));
+            }
+            { // "output_eso"
+                eso = boolean_choice(find_input(fields, "output_eso"));
+            }
+            { // "output_eio"
+                eio = boolean_choice(find_input(fields, "output_eio"));
+            }
+            { // "output_audit"
+                audit = boolean_choice(find_input(fields, "output_audit"));
+            }
+            { // "output_zone_sizing"
+                zsz = boolean_choice(find_input(fields, "output_zone_sizing"));
+            }
+            { // "output_system_sizing"
+                ssz = boolean_choice(find_input(fields, "output_system_sizing"));
+            }
+            { // "output_dxf"
+                dxf = boolean_choice(find_input(fields, "output_dxf"));
+            }
+            { // "output_bnd"
+                bnd = boolean_choice(find_input(fields, "output_bnd"));
+            }
+            { // "output_rdd"
+                rdd = boolean_choice(find_input(fields, "output_rdd"));
+            }
+            { // "output_mdd"
+                mdd = boolean_choice(find_input(fields, "output_mdd"));
+            }
+            { // "output_mtd"
+                mtd = boolean_choice(find_input(fields, "output_mtd"));
+            }
+            { // "output_end"
+                end = boolean_choice(find_input(fields, "output_end"));
+            }
+            { // "output_shd"
+                shd = boolean_choice(find_input(fields, "output_shd"));
+            }
+            { // "output_dfs"
+                dfs = boolean_choice(find_input(fields, "output_dfs"));
+            }
+            { // "output_glhe"
+                glhe = boolean_choice(find_input(fields, "output_glhe"));
+            }
+            { // "output_delightin"
+                delightin = boolean_choice(find_input(fields, "output_delightin"));
+            }
+            { // "output_delighteldmp"
+                delighteldmp = boolean_choice(find_input(fields, "output_delighteldmp"));
+            }
+            { // "output_delightdfdmp"
+                delightdfdmp = boolean_choice(find_input(fields, "output_delightdfdmp"));
+            }
+            { // "output_edd"
+                edd = boolean_choice(find_input(fields, "output_edd"));
+            }
+            { // "output_dbg"
+                dbg = boolean_choice(find_input(fields, "output_dbg"));
+            }
+            { // "output_perflog"
+                perflog = boolean_choice(find_input(fields, "output_perflog"));
+            }
+            { // "output_sln"
+                sln = boolean_choice(find_input(fields, "output_sln"));
+            }
+            { // "output_sci"
+                sci = boolean_choice(find_input(fields, "output_sci"));
+            }
+            { // "output_wrl"
+                wrl = boolean_choice(find_input(fields, "output_wrl"));
+            }
+            { // "output_screen"
+                screen = boolean_choice(find_input(fields, "output_screen"));
+            }
+            { // "output_tarcog"
+                tarcog = boolean_choice(find_input(fields, "output_tarcog"));
+            }
+            { // "output_extshd"
+                extshd = boolean_choice(find_input(fields, "output_extshd"));
+            }
+            { // "json"
+                json = boolean_choice(find_input(fields, "json"));
+            }
+            { // "tabular"
+                tabular = boolean_choice(find_input(fields, "tabular"));
+            }
+            { // "sqlite"
+                sqlite = boolean_choice(find_input(fields, "sqlite"));
+            }
+        }
+    }
+}
+
+IOFiles &IOFiles::getSingleton()
 {
     assert(getSingletonInternal() != nullptr);
-
     if (getSingletonInternal() == nullptr) {
         throw std::runtime_error("Invalid impossible state of no outputfiles!?!?!");
     }
     return *getSingletonInternal();
 }
 
-void OutputFiles::setSingleton(OutputFiles *newSingleton) noexcept
+void IOFiles::setSingleton(IOFiles *newSingleton) noexcept
 {
     getSingletonInternal() = newSingleton;
 }
 
-OutputFiles *&OutputFiles::getSingletonInternal()
+IOFiles *&IOFiles::getSingletonInternal()
 {
-    static OutputFiles *singleton{nullptr};
+    static IOFiles *singleton{nullptr};
     return singleton;
 }
 
@@ -415,7 +671,7 @@ public:
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
-    assert(os.good());
+//    assert(os.good());
     fmt::memory_buffer buffer;
     try {
         // Pass custom argument formatter as a template arg to vformat_to.

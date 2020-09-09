@@ -56,9 +56,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace PlantCondLoopOperation {
 
     // Data
@@ -85,7 +82,7 @@ namespace PlantCondLoopOperation {
     // Functions
     void clear_state();
 
-    void ManagePlantLoadDistribution(BranchInputManagerData &dataBranchInputManager,
+    void ManagePlantLoadDistribution(EnergyPlusData &state,
                                      int const LoopNum,     // PlantLoop data structure loop counter
                                      int const LoopSideNum, // PlantLoop data structure LoopSide counter
                                      int const BranchNum,   // PlantLoop data structure branch counter
@@ -143,7 +140,7 @@ namespace PlantCondLoopOperation {
     // Beginning Initialization Section of the Plant Loop Module
     //******************************************************************************
 
-    void InitLoadDistribution(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration);
+    void InitLoadDistribution(EnergyPlusData &state, bool const FirstHVACIteration);
 
     // End Initialization Section of the Plant Loop Module
     //******************************************************************************
@@ -178,7 +175,8 @@ namespace PlantCondLoopOperation {
                         int const OpNum // index for Plant()%LoopSide()%Branch()%Comp()%OpScheme()
     );
 
-    void DistributeUserDefinedPlantLoad(int const LoopNum,
+    void DistributeUserDefinedPlantLoad(EnergyPlusData &state,
+                                        int const LoopNum,
                                         int const LoopSideNum,
                                         int const BranchNum,
                                         int const CompNum,

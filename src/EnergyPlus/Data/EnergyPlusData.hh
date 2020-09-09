@@ -56,11 +56,9 @@
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
-#include <EnergyPlus/AirLoopHVACDOAS.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerAbsorption.hh>
@@ -73,15 +71,19 @@
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CostEstimateManager.hh>
 #include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Pipes.hh>
 #include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WindowAC.hh>
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindTurbine.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
@@ -90,16 +92,27 @@
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 #include <unordered_map>
+#include <memory>
 #include <string>
+#include <unordered_map>
 
 namespace EnergyPlus {
+
+    // forward declare all structs
+    struct AirLoopHVACDOASData;
+    struct BaseboardRadiatorData;
+    struct BaseboardElectricData;
+    struct CurveManagerData;
+    struct DataAirLoopData;
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
 
-        AirLoopHVACDOASData dataAirLoopHVACDOAS;
-        BaseboardRadiatorData dataBaseboardRadiator;
-        BaseboardElectricData dataBaseboardElectric;
+        std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
+        std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
+        std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
+        std::unique_ptr<CurveManagerData> dataCurveManager;
+        std::unique_ptr<DataAirLoopData> dataAirLoop;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         BranchInputManagerData dataBranchInputManager;
@@ -114,6 +127,8 @@ namespace EnergyPlus {
         CondenserLoopTowersData dataCondenserLoopTowers;
         CostEstimateManagerData dataCostEstimateManager;
         CoolTowerData dataCoolTower;
+        CTElectricGeneratorData dataCTElectricGenerator;
+        CrossVentMgrData dataCrossVentMgr;
         DataGlobal dataGlobals;
         ExteriorEnergyUseData exteriorEnergyUse;
         FansData fans;
@@ -122,15 +137,14 @@ namespace EnergyPlus {
         PlantChillersData dataPlantChillers;
         //OutputReportTabular outputReportTabular;
 
-        // todo: move this from a reference to an object value
-        // after we have eliminated all calls to getSingleton
-        // after we've plumbed enough of the functions to allow
-        OutputFiles outputFiles;
+        IOFiles files;
 
+        WaterUseData dataWaterUse;
         WindowACData dataWindowAC;
         WindowComplexManagerData dataWindowComplexManager;
         WindowEquivalentLayerData dataWindowEquivalentLayer;
         WindowManagerData dataWindowManager;
+        WindTurbineData dataWindTurbine;
         ZoneAirLoopEquipmentManagerData dataZoneAirLoopEquipmentManager;
         ZoneContaminantPredictorCorrectorData dataZoneContaminantPredictorCorrector;
         ZoneDehumidifierData dataZoneDehumidifier;
@@ -138,51 +152,15 @@ namespace EnergyPlus {
         ZonePlenumData dataZonePlenum;
         ZoneTempPredictorCorrectorData dataZoneTempPredictorCorrector;
 
-        EnergyPlusData() {
-            OutputFiles::setSingleton(&outputFiles);
-        }
+        EnergyPlusData();
 
         // Cannot safely copy or delete this until we eradicate all remaining
-        // calls to OutputFiles::getSingleton and OutputFiles::setSingleton
+        // calls to IOFiles::getSingleton and IOFiles::setSingleton
         EnergyPlusData(const EnergyPlusData &) = delete;
         EnergyPlusData(EnergyPlusData &&) = delete;
 
-        // all clear states
-        void clear_state() override {
-            dataAirLoopHVACDOAS.clear_state();
-            dataBaseboardElectric.clear_state();
-            dataBaseboardRadiator.clear_state();
-            dataBoilers.clear_state();
-            dataBranchInputManager.clear_state();
-            dataSteamBoilers.clear_state();
-            dataChilledCeilingPanelSimple.clear_state();
-            dataChillerAbsorbers.clear_state();
-            dataChillerElectricEIR.clear_state();
-            dataChillerExhaustAbsorption.clear_state();
-            dataChillerGasAbsorption.clear_state();
-            dataChillerIndirectAbsorption.clear_state();
-            dataChillerReformulatedEIR.clear_state();
-            dataConvectionCoefficients.clear_state();
-            dataCondenserLoopTowers.clear_state();
-            dataCostEstimateManager.clear_state();
-            dataCoolTower.clear_state();
-            dataGlobals.clear_state();
-            exteriorEnergyUse.clear_state();
-            fans.clear_state();
-            //outputReportTabular.clear_state();
-            pipes.clear_state();
-            dataPlantChillers.clear_state();
-            dataWindowAC.clear_state();
-            dataWindowComplexManager.clear_state();
-            dataWindowEquivalentLayer.clear_state();
-            dataWindowManager.clear_state();
-            dataZoneAirLoopEquipmentManager.clear_state();
-            dataZoneContaminantPredictorCorrector.clear_state();
-            dataZoneDehumidifier.clear_state();
-            dataZoneEquipmentManager.clear_state();
-            dataZonePlenum.clear_state();
-            dataZoneTempPredictorCorrector.clear_state();
-        };
+        void clear_state() override;
+
     };
 
 }

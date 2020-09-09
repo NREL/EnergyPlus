@@ -56,6 +56,8 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
+
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/Construction.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
@@ -75,13 +77,14 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -208,7 +211,7 @@ namespace ZoneTempPredictorCorrector {
         // temperature setpoint for each zone from the schedule manager.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.outputFiles);
+            GetZoneAirSetPoints(state.dataZoneTempPredictorCorrector, state.files);
             GetZoneAirStatsInputFlag = false;
         }
 
@@ -218,7 +221,7 @@ namespace ZoneTempPredictorCorrector {
             auto const SELECT_CASE_var(UpdateType);
 
             if (SELECT_CASE_var == iGetZoneSetPoints) {
-                CalcZoneAirTempSetPoints(state.dataZoneTempPredictorCorrector);
+                CalcZoneAirTempSetPoints(state.dataZoneTempPredictorCorrector, state.files);
 
             } else if (SELECT_CASE_var == iPredictStep) {
                 PredictSystemLoads(state, state.dataZoneTempPredictorCorrector, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -238,7 +241,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, OutputFiles &outputFiles)
+    void GetZoneAirSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -279,7 +282,7 @@ namespace ZoneTempPredictorCorrector {
         int DualTempHeatCoolControlNum;
         int ControlTypeNum;
         int IOStat;
-        static bool ErrorsFound(false);
+        bool ErrorsFound(false);
         bool errFlag;
         int CTIndex;
         int HumidControlledZoneNum; // The Humidity Controller that information is being loaded into
@@ -1738,8 +1741,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        print(outputFiles.eio, Header);
-        print(outputFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
+        print(ioFiles.eio, Header);
+        print(ioFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(static_cast<int>(ZControlTypes::OTTStat));
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -1833,7 +1836,7 @@ namespace ZoneTempPredictorCorrector {
                                     if (!dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
                                         Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
-                                        CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
+                                        CalculateMonthlyRunningAverageDryBulb(ioFiles, runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
                                     }
                                 }
@@ -1925,7 +1928,7 @@ namespace ZoneTempPredictorCorrector {
                                     if (!dataZoneTempPredictorCorrector.AdapComfortDailySetPointSchedule.initialized) {
                                         Array1D<Real64> runningAverageASH(NumDaysInYear, 0.0);
                                         Array1D<Real64> runningAverageCEN(NumDaysInYear, 0.0);
-                                        CalculateMonthlyRunningAverageDryBulb(runningAverageASH, runningAverageCEN);
+                                        CalculateMonthlyRunningAverageDryBulb(ioFiles, runningAverageASH, runningAverageCEN);
                                         CalculateAdaptiveComfortSetPointSchl(dataZoneTempPredictorCorrector, runningAverageASH, runningAverageCEN);
                                     }
                                 }
@@ -2349,7 +2352,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalculateMonthlyRunningAverageDryBulb(Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
+    void CalculateMonthlyRunningAverageDryBulb(IOFiles &ioFiles, Array1D<Real64> &runningAverageASH, Array1D<Real64> &runningAverageCEN)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Xuan Luo
@@ -2361,7 +2364,6 @@ namespace ZoneTempPredictorCorrector {
 
         // Using/Aliasing
 
-        using DataStringGlobals::inStatFileName;
         using OutputReportTabular::GetColumnUsingTabs;
         using OutputReportTabular::StrToReal;
         using WeatherManager::NumDaysInYear;
@@ -2378,9 +2380,6 @@ namespace ZoneTempPredictorCorrector {
         Real64 dryBulb;
         Real64 avgDryBulb;
 
-        int epwFile;
-        bool epwFileExists;
-
         int readStat;
         int calcEndDay;
         int calcStartDayASH;
@@ -2393,39 +2392,16 @@ namespace ZoneTempPredictorCorrector {
         Array1D<Real64> dailyDryTemp(NumDaysInYear, 0.0);
 
         readStat = 0;
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(DataStringGlobals::inputWeatherFileName, flags);
-            epwFileExists = flags.exists();
-        }
-
-        if (epwFileExists) {
+        if (FileSystem::fileExists(ioFiles.inputWeatherFileName.fileName)) {
             // Read hourly dry bulb temperature first
-            epwFile = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.ACTION("READ");
-                ObjexxFCL::gio::open(epwFile, DataStringGlobals::inputWeatherFileName, flags);
-                readStat = flags.ios();
-            }
-            if (readStat != 0) {
-                ShowFatalError("CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read).");
-            }
+            auto epwFile = ioFiles.inputWeatherFileName.open("CalcThermalComfortAdaptive");
             for (i = 1; i <= 9; ++i) { // Headers
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::read(epwFile, fmtA, flags);
-                    readStat = flags.ios();
-                }
+                epwFile.readLine();
             }
             for (i = 1; i <= NumDaysInYear; ++i) {
                 avgDryBulb = 0.0;
                 for (j = 1; j <= 24; ++j) {
-                    {
-                        IOFlags flags;
-                        ObjexxFCL::gio::read(epwFile, fmtA, flags) >> epwLine;
-                        readStat = flags.ios();
-                    }
+                    epwLine = epwFile.readLine().data;
                     for (ind = 1; ind <= 6; ++ind) {
                         pos = index(epwLine, ',');
                         epwLine.erase(0, pos + 1);
@@ -2436,7 +2412,7 @@ namespace ZoneTempPredictorCorrector {
                 }
                 dailyDryTemp(i) = avgDryBulb;
             }
-            ObjexxFCL::gio::close(epwFile);
+            epwFile.close();
 
             // Calculate monthly running average dry bulb temperature.
             int dayOfYear = 0;
@@ -2485,7 +2461,7 @@ namespace ZoneTempPredictorCorrector {
                 }
             }
         } else {
-            ShowFatalError("CalcThermalComfortAdaptive: Could not open file " + DataStringGlobals::inputWeatherFileName + " for input (read).");
+            ShowFatalError("CalcThermalComfortAdaptive: Could not open file " + ioFiles.inputWeatherFileName.fileName + " for input (read). (File does not exist)");
         }
     }
 
@@ -2588,13 +2564,6 @@ namespace ZoneTempPredictorCorrector {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int ZoneNum;
-        //////////// hoisted into namespace changed to InitZoneAirSetPointsOneTimeFlag////////////
-        // static bool MyOneTimeFlag( true );
-        //////////////////////////////////////
-        static bool MyEnvrnFlag(true);
-        static bool MyDayFlag(true);
-        static bool ErrorsFound(false);
-        static bool ControlledZonesChecked(false);
         bool FirstSurfFlag;
         int TRefFlag; // Flag for Reference Temperature process in Zones
         int SurfNum;
@@ -2931,7 +2900,7 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Do the Begin Environment initializations
-        if (MyEnvrnFlag && BeginEnvrnFlag) {
+        if (dataZoneTempPredictorCorrector.MyEnvrnFlag && BeginEnvrnFlag) {
             AIRRAT = 0.0;
             ZTM1 = 0.0;
             ZTM2 = 0.0;
@@ -3008,29 +2977,29 @@ namespace ZoneTempPredictorCorrector {
             PreviousMeasuredHumRat2 = 0.0; // Hybrid modeling
             PreviousMeasuredHumRat3 = 0.0; // Hybrid modeling
 
-            MyEnvrnFlag = false;
+            dataZoneTempPredictorCorrector.MyEnvrnFlag = false;
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag = true;
+            dataZoneTempPredictorCorrector.MyEnvrnFlag = true;
         }
 
         // Do the Begin Day initializations
-        if (MyDayFlag && BeginDayFlag) {
-            MyDayFlag = false;
+        if (dataZoneTempPredictorCorrector.MyDayFlag && BeginDayFlag) {
+            dataZoneTempPredictorCorrector.MyDayFlag = false;
         }
 
         if (!BeginDayFlag) {
-            MyDayFlag = true;
+            dataZoneTempPredictorCorrector.MyDayFlag = true;
         }
 
         for (Loop = 1; Loop <= NumTempControlledZones; ++Loop) {
-            if (ZoneEquipInputsFilled && !ControlledZonesChecked) {
+            if (ZoneEquipInputsFilled && !dataZoneTempPredictorCorrector.ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(TempControlledZone(Loop).ZoneName)) {
                     ShowSevereError(RoutineName + "Zone=\"" + TempControlledZone(Loop).ZoneName +
                                     "\" has specified a Thermostatic control but is not a controlled zone.");
                     ShowContinueError("...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
-                    ErrorsFound = true;
+                    dataZoneTempPredictorCorrector.ErrorsFound = true;
                 }
             }
 
@@ -3082,12 +3051,12 @@ namespace ZoneTempPredictorCorrector {
         }
 
         for (Loop = 1; Loop <= NumComfortControlledZones; ++Loop) {
-            if (ZoneEquipInputsFilled && !ControlledZonesChecked) {
+            if (ZoneEquipInputsFilled && !dataZoneTempPredictorCorrector.ControlledZonesChecked) {
                 if (!VerifyControlledZoneForThermostat(ComfortControlledZone(Loop).ZoneName)) {
                     ShowSevereError(RoutineName + "Zone=\"" + ComfortControlledZone(Loop).ZoneName +
                                     "\" has specified a Comfort control but is not a controlled zone.");
                     ShowContinueError("...must have a ZoneHVAC:EquipmentConnections specification for this zone.");
-                    ErrorsFound = true;
+                    dataZoneTempPredictorCorrector.ErrorsFound = true;
                 }
             }
             if (ComfortControlledZone(Loop).ManageDemand) {
@@ -3140,12 +3109,12 @@ namespace ZoneTempPredictorCorrector {
             } // Demand manager
         }
 
-        if (ErrorsFound) {
+        if (dataZoneTempPredictorCorrector.ErrorsFound) {
             ShowFatalError("InitZoneAirSetpoints - program terminates due to previous condition.");
         }
 
         if (ZoneEquipInputsFilled) {
-            ControlledZonesChecked = true;
+            dataZoneTempPredictorCorrector.ControlledZonesChecked = true;
         }
     }
 
@@ -3594,7 +3563,7 @@ namespace ZoneTempPredictorCorrector {
             // Calculate the various heat balance sums
 
             // NOTE: SumSysMCp and SumSysMCpT are not used in the predict step
-            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);
+            CalcZoneSums(state.dataZonePlenum, ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT, false);
 
             // Sum all convective internal gains except for people: SumIntGainExceptPeople
             if (HybridModel::FlagHybridModel_PC) {
@@ -3713,7 +3682,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void CalcZoneAirTempSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3938,7 +3907,7 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(dataZoneTempPredictorCorrector);
+        if (NumComfortControlledZones > 0) CalcZoneAirComfortSetPoints(dataZoneTempPredictorCorrector, ioFiles);
         OverrideAirSetPointsforEMSCntrl();
     }
 
@@ -6107,7 +6076,8 @@ namespace ZoneTempPredictorCorrector {
                       Real64 &SumMCp,     // Zone sum of MassFlowRate*Cp
                       Real64 &SumMCpT,    // Zone sum of MassFlowRate*Cp*T
                       Real64 &SumSysMCp,  // Zone sum of air system MassFlowRate*Cp
-                      Real64 &SumSysMCpT  // Zone sum of air system MassFlowRate*Cp*T
+                      Real64 &SumSysMCpT, // Zone sum of air system MassFlowRate*Cp*T
+                      bool const CorrectorFlag
     )
     {
 
@@ -6203,84 +6173,85 @@ namespace ZoneTempPredictorCorrector {
         // Sum all system air flow: SumSysMCp, SumSysMCpT
         // Check to see if this is a controlled zone
         ControlledZoneAirFlag = Zone(ZoneNum).IsControlled;
+        if (CorrectorFlag) {
+            // Check to see if this is a plenum zone
+            ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
+            ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
 
-        // Check to see if this is a plenum zone
-        ZoneRetPlenumAirFlag = Zone(ZoneNum).IsReturnPlenum;
-        ZoneSupPlenumAirFlag = Zone(ZoneNum).IsSupplyPlenum;
+            // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
+            if (ControlledZoneAirFlag) {
+                ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
+                auto const &zec(ZoneEquipConfig(ZoneEquipConfigNum));
+                for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
+                    // Get node conditions
+                    //  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
+                    //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
+                    auto const &node(Node(zec.InletNode(NodeNum)));
+                    NodeTemp = node.Temp;
+                    MassFlowRate = node.MassFlowRate;
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
-        // Plenum and controlled zones have a different set of inlet nodes which must be calculated.
-        if (ControlledZoneAirFlag) {
-            ZoneEquipConfigNum = Zone(ZoneNum).ZoneEqNum;
-            auto const &zec(ZoneEquipConfig(ZoneEquipConfigNum));
-            for (int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
+                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                    SumSysMCp += MassFlowRate_CpAir;
+                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                } // NodeNum
+
+            } else if (ZoneRetPlenumAirFlag) {
+                ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
+                auto const &zrpc(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum));
+                Real64 const air_hum_rat(ZoneAirHumRat(ZoneNum));
+                for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
+                    // Get node conditions
+                    auto const &node(Node(zrpc.InletNode(NodeNum)));
+                    NodeTemp = node.Temp;
+                    MassFlowRate = node.MassFlowRate;
+                    CpAir = PsyCpAirFnW(air_hum_rat);
+
+                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                    SumSysMCp += MassFlowRate_CpAir;
+                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                } // NodeNum
+                // add in the leaks
+                for (int ADUListIndex = 1, ADUListIndex_end = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs;
+                     ADUListIndex <= ADUListIndex_end;
+                     ++ADUListIndex) {
+                    ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
+                    if (AirDistUnit(ADUNum).UpStreamLeak) {
+                        ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
+                        NodeTemp = Node(ADUInNode).Temp;
+                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
+                        CpAir = PsyCpAirFnW(air_hum_rat);
+                        Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                        SumSysMCp += MassFlowRate_CpAir;
+                        SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                    }
+                    if (AirDistUnit(ADUNum).DownStreamLeak) {
+                        ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
+                        NodeTemp = Node(ADUOutNode).Temp;
+                        MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
+                        CpAir = PsyCpAirFnW(air_hum_rat);
+                        Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
+                        SumSysMCp += MassFlowRate_CpAir;
+                        SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
+                    }
+                }
+
+            } else if (ZoneSupPlenumAirFlag) {
+                ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
                 // Get node conditions
-                //  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
-                //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
-                auto const &node(Node(zec.InletNode(NodeNum)));
-                NodeTemp = node.Temp;
-                MassFlowRate = node.MassFlowRate;
+                NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+                MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
                 CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
-                Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                SumSysMCp += MassFlowRate_CpAir;
-                SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-            } // NodeNum
-
-        } else if (ZoneRetPlenumAirFlag) {
-            ZoneRetPlenumNum = Zone(ZoneNum).PlenumCondNum;
-            auto const &zrpc(dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum));
-            Real64 const air_hum_rat(ZoneAirHumRat(ZoneNum));
-            for (int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum) {
-                // Get node conditions
-                auto const &node(Node(zrpc.InletNode(NodeNum)));
-                NodeTemp = node.Temp;
-                MassFlowRate = node.MassFlowRate;
-                CpAir = PsyCpAirFnW(air_hum_rat);
-
-                Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                SumSysMCp += MassFlowRate_CpAir;
-                SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-            } // NodeNum
-            // add in the leaks
-            for (int ADUListIndex = 1, ADUListIndex_end = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).NumADUs; ADUListIndex <= ADUListIndex_end;
-                 ++ADUListIndex) {
-                ADUNum = dataZonePlenum.ZoneRetPlenCond(ZoneRetPlenumNum).ADUIndex(ADUListIndex);
-                if (AirDistUnit(ADUNum).UpStreamLeak) {
-                    ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
-                    NodeTemp = Node(ADUInNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnW(air_hum_rat);
-                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                    SumSysMCp += MassFlowRate_CpAir;
-                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-                }
-                if (AirDistUnit(ADUNum).DownStreamLeak) {
-                    ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
-                    NodeTemp = Node(ADUOutNode).Temp;
-                    MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnW(air_hum_rat);
-                    Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
-                    SumSysMCp += MassFlowRate_CpAir;
-                    SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
-                }
+                SumSysMCp += MassFlowRate * CpAir;
+                SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             }
 
-        } else if (ZoneSupPlenumAirFlag) {
-            ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
-            // Get node conditions
-            NodeTemp = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
-            MassFlowRate = Node(dataZonePlenum.ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+            ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
 
-            SumSysMCp += MassFlowRate * CpAir;
-            SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+            SumSysMCp /= ZoneMult;
+            SumSysMCpT /= ZoneMult;
         }
-
-        ZoneMult = Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-
-        SumSysMCp /= ZoneMult;
-        SumSysMCpT /= ZoneMult;
-
         // Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
 
@@ -6290,55 +6261,55 @@ namespace ZoneTempPredictorCorrector {
             Area = Surface(SurfNum).Area; // For windows, this is the glazing area
 
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
-                auto const shading_flag(SurfaceWindow(SurfNum).ShadingFlag);
+                auto const shading_flag(SurfWinShadingFlag(SurfNum));
 
                 // Add to the convective internal gains
                 if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfaceWindow(SurfNum).DividerArea;
+                    Area += SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
                     // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
                     // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
                     // at the same time that the interaction between glass and shade is calculated.
-                    SumIntGain += SurfaceWindow(SurfNum).DividerHeatGain;
+                    SumIntGain += SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfaceWindow(SurfNum).OtherConvHeatGain;
+                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGain += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) SumIntGain += SurfaceWindow(SurfNum).ConvHeatFlowNatural;
+                if (shading_flag == IntShadeOn || shading_flag == IntBlindOn) SumIntGain += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0) {
-                    SumIntGain += SurfaceWindow(SurfNum).ConvHeatGainToZoneAir;
+                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGain += SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGain += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        WinHeatGain(SurfNum) += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        WinHeatTransfer(SurfNum) += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
-                        if (WinHeatGain(SurfNum) >= 0.0) {
-                            WinHeatGainRep(SurfNum) = WinHeatGain(SurfNum);
-                            WinHeatGainRepEnergy(SurfNum) = WinHeatGainRep(SurfNum) * TimeStepZoneSec;
+                        SumIntGain += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatGain(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        SurfWinHeatTransfer(SurfNum) += SurfWinRetHeatGainToZoneAir(SurfNum);
+                        if (SurfWinHeatGain(SurfNum) >= 0.0) {
+                            SurfWinHeatGainRep(SurfNum) = SurfWinHeatGain(SurfNum);
+                            SurfWinHeatGainRepEnergy(SurfNum) = SurfWinHeatGainRep(SurfNum) * TimeStepZoneSec;
                         } else {
-                            WinHeatLossRep(SurfNum) = -WinHeatGain(SurfNum);
-                            WinHeatLossRepEnergy(SurfNum) = WinHeatLossRep(SurfNum) * TimeStepZoneSec;
+                            SurfWinHeatLossRep(SurfNum) = - SurfWinHeatGain(SurfNum);
+                            SurfWinHeatLossRepEnergy(SurfNum) = SurfWinHeatLossRep(SurfNum) * TimeStepZoneSec;
                         }
-                        WinHeatTransferRepEnergy(SurfNum) = WinHeatTransfer(SurfNum) * TimeStepZoneSec;
+                        SurfWinHeatTransferRepEnergy(SurfNum) = SurfWinHeatTransfer(SurfNum) * TimeStepZoneSec;
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    Real64 const HA_surf(HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn));
-                    SumHATsurf += HA_surf * SurfaceWindow(SurfNum).FrameTempSurfIn;
+                    Real64 const HA_surf(HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)));
+                    SumHATsurf += HA_surf * SurfWinFrameTempSurfIn(SurfNum);
                     HA += HA_surf;
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && shading_flag != IntShadeOn && shading_flag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && shading_flag != IntShadeOn && shading_flag != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    Real64 const HA_surf(HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn));
-                    SumHATsurf += HA_surf * SurfaceWindow(SurfNum).DividerTempSurfIn;
+                    Real64 const HA_surf(HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)));
+                    SumHATsurf += HA_surf * SurfWinDividerTempSurfIn(SurfNum);
                     HA += HA_surf;
                 }
 
@@ -6629,44 +6600,44 @@ namespace ZoneTempPredictorCorrector {
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
 
                 // Add to the convective internal gains
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The shade area covers the area of the glazing plus the area of the dividers.
-                    Area += SurfaceWindow(SurfNum).DividerArea;
+                    Area += SurfWinDividerArea(SurfNum);
                     // If interior shade or blind is present it is assumed that both the convective and IR radiative gain
                     // from the inside surface of the divider goes directly into the zone air -- i.e., the IR radiative
                     // interaction between divider and shade or blind is ignored due to the difficulty of calculating this interaction
                     // at the same time that the interaction between glass and shade is calculated.
-                    SumIntGains += SurfaceWindow(SurfNum).DividerHeatGain;
+                    SumIntGains += SurfWinDividerHeatGain(SurfNum);
                 }
 
                 // Other convection term is applicable to equivalent layer window (ASHWAT) model
-                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfaceWindow(SurfNum).OtherConvHeatGain;
+                if (dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) SumIntGains += SurfWinOtherConvHeatGain(SurfNum);
 
                 // Convective heat gain from natural convection in gap between glass and interior shade or blind
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn)
-                    SumIntGains += SurfaceWindow(SurfNum).ConvHeatFlowNatural;
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn)
+                    SumIntGains += SurfWinConvHeatFlowNatural(SurfNum);
 
                 // Convective heat gain from airflow window
-                if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0) {
-                    SumIntGains += SurfaceWindow(SurfNum).ConvHeatGainToZoneAir;
+                if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
+                    SumIntGains += SurfWinConvHeatGainToZoneAir(SurfNum);
                     if (Zone(ZoneNum).NoHeatToReturnAir) {
-                        SumIntGains += SurfaceWindow(SurfNum).RetHeatGainToZoneAir;
+                        SumIntGains += SurfWinRetHeatGainToZoneAir(SurfNum);
                     }
                 }
 
                 // Add to the surface convection sums
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
 
-                    SumHADTsurfs += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
-                                    (SurfaceWindow(SurfNum).FrameTempSurfIn - RefAirTemp);
+                    SumHADTsurfs += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                                    (SurfWinFrameTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHADTsurfs += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                    (SurfaceWindow(SurfNum).DividerTempSurfIn - RefAirTemp);
+                    SumHADTsurfs += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                                    (SurfWinDividerTempSurfIn(SurfNum) - RefAirTemp);
                 }
 
             } // End of check if window
@@ -6726,7 +6697,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, std::string const &ZoneName) // Zone to verify
+    bool VerifyThermostatInZone(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, std::string const &ZoneName) // Zone to verify
     {
 
         // FUNCTION INFORMATION:
@@ -6743,7 +6714,7 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, OutputFiles::getSingleton());
+            GetZoneAirSetPoints(dataZoneTempPredictorCorrector, ioFiles);
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {
@@ -7031,7 +7002,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void CalcZoneAirComfortSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector)
+    void CalcZoneAirComfortSetPoints(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7066,13 +7037,11 @@ namespace ZoneTempPredictorCorrector {
         Real64 NumberOccupants;
         Real64 Tset;
 
-        static bool FirstTimeFlag(true); // Flag set to make sure you get input once
-
         // FLOW:
         // Call thermal comfort module to read zone control comfort object
-        if (FirstTimeFlag) {
-            ManageThermalComfort(dataZoneTempPredictorCorrector, true);
-            FirstTimeFlag = false;
+        if (dataZoneTempPredictorCorrector.CalcZoneAirComfortSetPointsFirstTimeFlag) {
+            ManageThermalComfort(dataZoneTempPredictorCorrector, ioFiles, true);
+            dataZoneTempPredictorCorrector.CalcZoneAirComfortSetPointsFirstTimeFlag = false;
         }
 
         ComfortControlType = 0; // Default
@@ -7211,7 +7180,7 @@ namespace ZoneTempPredictorCorrector {
                         SetPointLo /= PeopleCount;
                         if (ComfortControlType(ActualZoneNum) == static_cast<int>(ComfortControl::DualSetPointFanger)) SetPointHi /= PeopleCount;
                     } else {
-                        // reccurring warnings
+                        // recurring warnings
                         //          ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount = &
                         //                                           ComfortControlledZone(RelativeZoneNum)%PeopleAverageErrCount + 1
                         if (ComfortControlledZone(RelativeZoneNum).PeopleAverageErrIndex == 0) {

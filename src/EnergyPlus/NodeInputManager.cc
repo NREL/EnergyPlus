@@ -62,9 +62,9 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -283,7 +283,7 @@ namespace NodeInputManager {
         }
     }
 
-    void SetupNodeVarsForReporting(OutputFiles &outputFiles)
+    void SetupNodeVarsForReporting(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -503,39 +503,39 @@ namespace NodeInputManager {
             }
             NodeVarsSetup = true;
 
-            print(outputFiles.bnd, "{}\n", "! This file shows details about the branches, nodes, and other");
-            print(outputFiles.bnd, "{}\n", "! elements of the flow connections.");
-            print(outputFiles.bnd, "{}\n", "! This file is intended for use in \"debugging\" potential problems");
-            print(outputFiles.bnd, "{}\n", "! that may also be detected by the program, but may be more easily");
-            print(outputFiles.bnd, "{}\n", "! identified by \"eye\".");
-            print(outputFiles.bnd, "{}\n", "! This file is also intended to support software which draws a");
-            print(outputFiles.bnd, "{}\n", "! schematic diagram of the HVAC system.");
-            print(outputFiles.bnd, "{}\n", "! ===============================================================");
+            print(ioFiles.bnd, "{}\n", "! This file shows details about the branches, nodes, and other");
+            print(ioFiles.bnd, "{}\n", "! elements of the flow connections.");
+            print(ioFiles.bnd, "{}\n", "! This file is intended for use in \"debugging\" potential problems");
+            print(ioFiles.bnd, "{}\n", "! that may also be detected by the program, but may be more easily");
+            print(ioFiles.bnd, "{}\n", "! identified by \"eye\".");
+            print(ioFiles.bnd, "{}\n", "! This file is also intended to support software which draws a");
+            print(ioFiles.bnd, "{}\n", "! schematic diagram of the HVAC system.");
+            print(ioFiles.bnd, "{}\n", "! ===============================================================");
             // Show the node names on the Branch-Node Details file
             static constexpr auto Format_700("! #Nodes,<Number of Unique Nodes>");
-            print(outputFiles.bnd, "{}\n", Format_700);
-            print(outputFiles.bnd, " #Nodes,{}\n", NumOfUniqueNodeNames);
+            print(ioFiles.bnd, "{}\n", Format_700);
+            print(ioFiles.bnd, " #Nodes,{}\n", NumOfUniqueNodeNames);
             if (NumOfUniqueNodeNames > 0) {
                 static constexpr auto Format_702(
                     "! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
-                print(outputFiles.bnd, "{}\n", Format_702);
+                print(ioFiles.bnd, "{}\n", Format_702);
             }
             int Count0 = 0;
             for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
-               print(outputFiles.bnd, " Node,{},{},{},{}\n", NumNode, NodeID(NumNode), ValidNodeFluidTypes(Node(NumNode).FluidType) ,NodeRef(NumNode));
+               print(ioFiles.bnd, " Node,{},{},{},{}\n", NumNode, NodeID(NumNode), ValidNodeFluidTypes(Node(NumNode).FluidType) ,NodeRef(NumNode));
                 if (NodeRef(NumNode) == 0) ++Count0;
             }
             // Show suspicious node names on the Branch-Node Details file
             if (Count0 > 0) {
-                print(outputFiles.bnd, "{}\n", "! ===============================================================");
-                print(outputFiles.bnd, "{}\n", "! Suspicious nodes have 0 references.  It is normal for some nodes, however.");
-                print(outputFiles.bnd, "{}\n", "! Listing nodes with 0 references (culled from previous list):");
+                print(ioFiles.bnd, "{}\n", "! ===============================================================");
+                print(ioFiles.bnd, "{}\n", "! Suspicious nodes have 0 references.  It is normal for some nodes, however.");
+                print(ioFiles.bnd, "{}\n", "! Listing nodes with 0 references (culled from previous list):");
                 static constexpr auto Format_703(
                     "! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>");
-                print(outputFiles.bnd, "{}\n", Format_703);
+                print(ioFiles.bnd, "{}\n", Format_703);
                 for (int NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
                     if (NodeRef(NumNode) > 0) continue;
-                    print(outputFiles.bnd, " Suspicious Node,{},{},{},{}\n", NumNode, NodeID(NumNode),ValidNodeFluidTypes(Node(NumNode).FluidType) ,  NodeRef(NumNode));
+                    print(ioFiles.bnd, " Suspicious Node,{},{},{},{}\n", NumNode, NodeID(NumNode),ValidNodeFluidTypes(Node(NumNode).FluidType) ,  NodeRef(NumNode));
                 }
             }
         }
@@ -753,6 +753,7 @@ namespace NodeInputManager {
                 NodeID.redimension({0, NumOfNodes});
                 NodeRef.redimension(NumOfNodes);
                 MarkedNode.redimension(NumOfNodes);
+                NodeSetpointCheck.redimension(NumOfNodes);
                 // Set new item in Node
                 Node(NumOfNodes).FluidType = NodeFluidType;
                 NodeRef(NumOfNodes) = 0;
@@ -768,6 +769,7 @@ namespace NodeInputManager {
             NodeID.allocate({0, 1});
             NodeRef.allocate(1);
             MarkedNode.allocate(1);
+            NodeSetpointCheck.allocate(1);
 
             NumOfUniqueNodeNames = 1;
             NodeID(0) = "Undefined";

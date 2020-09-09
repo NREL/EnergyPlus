@@ -178,7 +178,7 @@ namespace WindowEquivalentLayer {
             if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) continue;
             if (!dataConstruction.Construct(Surface(SurfNum).Construction).WindowTypeEQL) continue;
 
-            SurfaceWindow(SurfNum).WindowModelType = WindowEQLModel;
+            SurfWinWindowModelType(SurfNum) = WindowEQLModel;
 
         } //  end do for SurfNum
     }
@@ -830,7 +830,7 @@ namespace WindowEquivalentLayer {
 
                 // The IR radiance of this window's "exterior" surround is the IR radiance
                 // from surfaces and high-temp radiant sources in the adjacent zone
-                outir = SurfaceWindow(SurfNumAdj).IRfromParentZone + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
+                outir = SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
                         QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj) + QRadThermInAbs(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
@@ -878,7 +878,7 @@ namespace WindowEquivalentLayer {
         SurfOutsideEmiss = LWAbsOut;
         // Indoor mean radiant temperature.
         // IR incident on window from zone surfaces and high-temp radiant sources
-        rmir = SurfaceWindow(SurfNum).IRfromParentZone + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
+        rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum) + QRadThermInAbs(SurfNum);
         TRMIN = root_4(rmir / StefanBoltzmann); // TODO check model equation.
 
@@ -897,7 +897,7 @@ namespace WindowEquivalentLayer {
         QXConv = QCONV - HcIn * (SurfInsideTemp - TaIn);
         // Save the extra convection term. This term is added to the zone air heat
         // balance equation
-        SurfaceWindow(SurfNum).OtherConvHeatGain = Surface(SurfNum).Area * QXConv;
+        SurfWinOtherConvHeatGain(SurfNum) = Surface(SurfNum).Area * QXConv;
         SurfOutsideTemp = T(1) - KelvinConv;
         // Various reporting calculations
         InSideLayerType = CFS(EQLNum).L(NL).LTYPE;
@@ -906,27 +906,27 @@ namespace WindowEquivalentLayer {
         } else {
             ConvHeatFlowNatural = Surface(SurfNum).Area * QOCFRoom;
         }
-        SurfaceWindow(SurfNum).EffInsSurfTemp = SurfInsideTemp;
+        SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
         NetIRHeatGainWindow = Surface(SurfNum).Area * LWAbsIn * (StefanBoltzmann * pow_4(SurfInsideTemp + KelvinConv) - rmir);
         ConvHeatGainWindow = Surface(SurfNum).Area * HcIn * (SurfInsideTemp - TaIn);
         // Window heat gain (or loss) is calculated here
-        WinHeatGain(SurfNum) = WinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
-        WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
-        SurfaceWindow(SurfNum).ConvHeatFlowNatural = ConvHeatFlowNatural;
+        SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
+        SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
+        SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
         // store for component reporting
-        WinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
-        WinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
-        WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
-        WinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural;
+        SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainWindow;
+        SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainWindow;
+        SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainWindow;
         if (InSideLayerType == ltyGLAZE) {
             // no interior sade
-            WinGainIRShadeToZoneRep(SurfNum) = 0.0;
+            SurfWinGainIRShadeToZoneRep(SurfNum) = 0.0;
         } else {
             // Interior shade exists
-            WinGainIRGlazToZoneRep(SurfNum) = 0.0;
+            SurfWinGainIRGlazToZoneRep(SurfNum) = 0.0;
         }
         // Advanced report variable (DisplayAdvancedReportVariables)
-        OtherConvGainInsideFaceToZoneRep(SurfNum) = SurfaceWindow(SurfNum).OtherConvHeatGain;
+        SurfWinOtherConvGainInsideFaceToZoneRep(SurfNum) = SurfWinOtherConvHeatGain(SurfNum);
     }
 
     void OPENNESS_LW(Real64 const OPENNESS, // shade openness (=tausbb at normal incidence)
@@ -6897,10 +6897,8 @@ namespace WindowEquivalentLayer {
 
         Real64 RAT_1MR; // adjustment factors, see Specular_OffNormal()
         Real64 RAT_TAU; // adjustment factors, see Specular_OffNormal()
-        static bool Specular_OffNormalReturn(true);
 
-        Specular_OffNormalReturn = Specular_OffNormal(OMEGA, RAT_1MR, RAT_TAU);
-
+        bool Specular_OffNormalReturn = Specular_OffNormal(OMEGA, RAT_1MR, RAT_TAU);
         if (Specular_OffNormalReturn) {
             Specular_Adjust(SWP, RAT_1MR, RAT_TAU);
         }
@@ -6979,10 +6977,9 @@ namespace WindowEquivalentLayer {
 
         Real64 RAT_TAU;
         Real64 RAT_1MR;
-        static bool Specular_OffNormalReturn(true);
 
         // Modified by BAN April 19, 2013
-        Specular_OffNormalReturn = Specular_OffNormal(THETA, RAT_1MR, RAT_TAU);
+        Specular_OffNormal(THETA, RAT_1MR, RAT_TAU);
 
         if (OPT == dataWindowEquivalentLayer.hipRHO) {
             Specular_F = RAT_1MR;
@@ -8192,7 +8189,7 @@ namespace WindowEquivalentLayer {
             }
         }
         if (CFS(EQLNum).VBLayerPtr > 0) {
-            SurfaceWindow(SurfNum).SlatAngThisTSDeg = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
+            SurfWinSlatAngThisTSDeg(SurfNum) = CFS(EQLNum).L(CFS(EQLNum).VBLayerPtr).PHI_DEG;
         }
     }
 

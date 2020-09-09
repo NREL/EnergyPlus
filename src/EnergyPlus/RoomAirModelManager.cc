@@ -125,6 +125,7 @@ namespace RoomAirModelManager {
 
     bool GetUCSDDVDataFlag(true); // UCSD
     bool GetAirModelData(true);   // Used to "get" all air model data
+    bool MyOneTimeFlag(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -136,6 +137,7 @@ namespace RoomAirModelManager {
     {
         GetUCSDDVDataFlag = true;
         GetAirModelData = true;
+        MyOneTimeFlag = true;
     }
 
     void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
@@ -206,19 +208,19 @@ namespace RoomAirModelManager {
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDDV) { // UCDV Displacement Ventilation model
                 // simulate room airflow using UCSDDV model
-                ManageUCSDDVModel(state.dataConvectionCoefficients, ZoneNum);
+                ManageUCSDDVModel(state, state.dataConvectionCoefficients, ZoneNum);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDCV) { // UCSD Cross Ventilation model
                 // simulate room airflow using UCSDDV model
-                ManageUCSDCVModel(state.dataConvectionCoefficients, ZoneNum);
+                ManageUCSDCVModel(state, state.dataConvectionCoefficients, state.dataCrossVentMgr, ZoneNum);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDUFI) { // UCSD UFAD interior zone model
                 // simulate room airflow using the UCSDUFI model
-                ManageUCSDUFModels(state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFI);
+                ManageUCSDUFModels(state, state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFI);
 
             } else if (SELECT_CASE_var == RoomAirModel_UCSDUFE) { // UCSD UFAD exterior zone model
                 // simulate room airflow using the UCSDUFE model
-                ManageUCSDUFModels(state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFE);
+                ManageUCSDUFModels(state, state.dataConvectionCoefficients, ZoneNum, RoomAirModel_UCSDUFE);
 
             } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) { // RoomAirflowNetwork zone model
                 // simulate room airflow using the AirflowNetwork - based model
@@ -1935,7 +1937,6 @@ namespace RoomAirModelManager {
         Real64 AinCV;
         int AirflowNetworkSurfPtr;
         int NSides;
-        static bool MyOneTimeFlag(true);
         static Array1D_bool MyEnvrnFlag;
 
         static int CompNum(0);  // AirflowNetwork Component number
@@ -2863,7 +2864,7 @@ namespace RoomAirModelManager {
             SupplyNodeName = Alphas(4);
             ReturnNodeName = "";   // Zone return node
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) { // ZoneHVAC : EnergyRecoveryVentilator
-            I = GetFanOutletNode(state.fans, "Fan:OnOff", Alphas(4), errorfound);
+            I = GetFanOutletNode(state, "Fan:OnOff", Alphas(4), errorfound);
             if (errorfound) {
             }
             SupplyNodeName = NodeID(I); // ?????

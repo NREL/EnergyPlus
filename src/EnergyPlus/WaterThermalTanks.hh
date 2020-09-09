@@ -59,9 +59,8 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace WaterThermalTanks {
 
@@ -653,17 +652,17 @@ namespace WaterThermalTanks {
 
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void setupOutputVars();
+        void setupOutputVars(IOFiles &ioFiles);
 
         void setupZoneInternalGains();
 
-        void setupChilledWaterTankOutputVars(OutputFiles &outputFiles);
+        void setupChilledWaterTankOutputVars(IOFiles &ioFiles);
 
-        void setupWaterHeaterOutputVars(OutputFiles &outputFiles);
+        void setupWaterHeaterOutputVars(IOFiles &ioFiles);
 
         void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
+        Real64 PartLoadFactor(EnergyPlusData &state, Real64 PartLoadRatio_loc);
 
         void CalcNodeMassFlows(InletModeEnum inletMode);
 
@@ -683,7 +682,7 @@ namespace WaterThermalTanks {
 
         void SizeSupplySidePlantConnections(Optional_int_const LoopNum = _);
 
-        void CalcWaterThermalTank();
+        void CalcWaterThermalTank(EnergyPlusData &state);
 
         void SizeStandAloneWaterHeater();
 
@@ -693,11 +692,11 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankStratified(); // Water Heater being simulated
 
-        void CalcWaterThermalTankMixed(); // Water Heater being simulated
+        void CalcWaterThermalTankMixed(EnergyPlusData &state); // Water Heater being simulated
 
         void CalcStandardRatings(EnergyPlusData &state);
 
-        void ReportCWTankInits(OutputFiles &outputFiles);
+        void ReportCWTankInits(IOFiles &ioFiles);
 
         Real64 GetHPWHSensedTankTemp();
 
@@ -765,15 +764,16 @@ namespace WaterThermalTanks {
                                                             Real64 &Qsource // steady state heat transfer rate from a constant source side flow
         );
 
-        void CalcDesuperheaterWaterHeater(bool FirstHVACIteration);
+        void CalcDesuperheaterWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
-        Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        Real64 PLRResidualWaterThermalTank(EnergyPlusData &state,
+                                           Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                            Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
         void CalcHeatPumpWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void ConvergeSingleSpeedHPWHCoilAndTank(Real64 partLoadRatio);
+        void ConvergeSingleSpeedHPWHCoilAndTank(EnergyPlusData &state, Real64 partLoadRatio);
 
         void SetVSHPWHFlowRates(EnergyPlusData &state, HeatPumpWaterHeaterData &HPWH,
                                 int SpeedNum,
@@ -783,13 +783,13 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
+        Real64 PLRResidualHPWH(EnergyPlusData &state, Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
 
         Real64 PLRResidualIterSpeed(EnergyPlusData &state, Real64 SpeedRatio,        // speed ratio between two speed levels
                                     Array1D<Real64> const &Par
         );
 
-        static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
+        static void ValidatePLFCurve(EnergyPlusData &state, int CurveIndex, bool &IsValid);
 
         void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
@@ -891,11 +891,11 @@ namespace WaterThermalTanks {
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
                                 int &CompIndex);
 
-    bool getDesuperHtrInput();
+    bool getDesuperHtrInput(EnergyPlusData &state);
 
     bool getHPWaterHeaterInput(EnergyPlusData &state);
 
-    bool getWaterHeaterMixedInputs();
+    bool getWaterHeaterMixedInputs(EnergyPlusData &state);
 
     bool getWaterHeaterStratifiedInput();
 

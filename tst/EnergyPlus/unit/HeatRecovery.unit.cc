@@ -51,8 +51,9 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "Fixtures/EnergyPlusFixture.hh"
 #include "EnergyPlus/DataAirLoop.hh"
+#include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -60,10 +61,9 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -4046,7 +4046,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     // get OA Controller
     MixedAir::GetOAControllerInputs(state);
     int OAContrllerNum = 1;
@@ -4056,9 +4056,9 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     // get OA System
     MixedAir::GetOutsideAirSysInputs(state);
     int OASysNum = 1;
-    auto &thisOASys = DataAirLoop::OutsideAirSys(OASysNum);
+    auto &thisOASys = state.dataAirLoop->OutsideAirSys(OASysNum);
     thisOASys.OAControllerIndex = MixedAir::GetOAController(thisOAController.Name);
-    EXPECT_EQ(1, DataAirLoop::NumOASystems);
+    EXPECT_EQ(1, state.dataAirLoop->NumOASystems);
     EXPECT_EQ("VAV WITH REHEAT_OA", thisOASys.Name);
     // get HR HX generic
     GetHeatRecoveryInput();
@@ -4113,7 +4113,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_HeatExchangerGenericCalcTest)
     EXPECT_NEAR(0.60, thisHX.LatEffectiveness, 0.0001);
     EXPECT_GT(thisHX.SupOutTemp, thisHX.SupInTemp);
     EXPECT_EQ(0, thisHX.UnBalancedErrCount); // balanced flow
-    EXPECT_EQ(0, thisHX.LowFlowErrCount ); // flow ratio within range, < 1.3 
+    EXPECT_EQ(0, thisHX.LowFlowErrCount ); // flow ratio within range, < 1.3
 
     // test 2: secondary flow is 10 times primary
     Node(thisHX.SupInletNode).MassFlowRate = thisHX.NomSupAirVolFlow * DataEnvironment::StdRhoAir;
@@ -4186,8 +4186,8 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     thisOAController.ControllerType_Num = MixedAir::ControllerOutsideAir;
 
     int OASysNum = 1;
-    DataAirLoop::OutsideAirSys.allocate(OASysNum);
-    auto &thisOASys = DataAirLoop::OutsideAirSys(OASysNum);
+    state.dataAirLoop->OutsideAirSys.allocate(OASysNum);
+    auto &thisOASys = state.dataAirLoop->OutsideAirSys(OASysNum);
     thisOASys.OAControllerIndex = 1;
 
     DataSizing::CurSysNum = 1;
@@ -4240,7 +4240,7 @@ TEST_F(EnergyPlusFixture, HeatRecovery_NominalAirFlowAutosizeTest)
     SizeHeatRecovery(state, ExchNum);
     // check autosized nominal supply flow
     EXPECT_EQ(thisHX.NomSupAirVolFlow, 0.20);
-    
+
     // test 6: the HX is on OA system but with economizer and bypass
     thisOAController.Econo = MixedAir::DifferentialDryBulb;
     thisOAController.EconBypass = true; // with bypass

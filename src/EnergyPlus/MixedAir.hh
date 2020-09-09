@@ -58,9 +58,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace MixedAir {
 
@@ -287,6 +286,8 @@ namespace MixedAir {
         bool HighHumCtrlActive;            // if true high humidity control is active
         Array1D_int EconmizerFaultNum;     // index to economizer fault
         int NumFaultyEconomizer;           // total number of economizer faults
+        int CountMechVentFrac;             // Count when OA min fraction > mech vent fraction
+        int IndexMechVentFrac;             // Index when OA min fraction > mech vent fraction
 
         // Default Constructor
         OAControllerProps()
@@ -301,20 +302,21 @@ namespace MixedAir {
               OAFractionRpt(0.0), MinOAFracLimit(0.0), MechVentOAMassFlowRequest(0.0), EMSOverrideOARate(false), EMSOARateValue(0.0),
               HeatRecoveryBypassControlType(BypassWhenWithinEconomizerLimits), ManageDemand(false), DemandLimitFlowRate(0.0), MaxOAFracBySetPoint(0),
               MixedAirSPMNum(0), CoolCoilFreezeCheck(false), EconoActive(false), HighHumCtrlActive(false), EconmizerFaultNum(0),
-              NumFaultyEconomizer(0)
+              NumFaultyEconomizer(0), CountMechVentFrac(0), IndexMechVentFrac(0)
         {
         }
 
         void CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration);
 
-        void CalcOAEconomizer(EnergyPlusData &state, 
+        void CalcOAEconomizer(EnergyPlusData &state,
             int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration);
 
         void SizeOAController(EnergyPlusData &state);
 
         void UpdateOAController();
 
-        void Checksetpoints(Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
+        void Checksetpoints(EnergyPlusData &state,
+                            Real64 const OutAirMinFrac,   // Local variable used to calculate min OA fraction
                             Real64 &OutAirSignal,         // Used to set OA mass flow rate
                             bool &EconomizerOperationFlag // logical used to show economizer status
         );
@@ -487,7 +489,7 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(EnergyPlusData &EP_UNUSED(state), int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 
@@ -553,7 +555,7 @@ namespace MixedAir {
 
     int GetOASystemNumber(EnergyPlusData &state, std::string const &OASysName); // OA Sys Name
 
-    int FindOAMixerMatchForOASystem(int const OASysNumber); // Which OA System
+    int FindOAMixerMatchForOASystem(EnergyPlusData &state, int const OASysNumber); // Which OA System
 
     int GetOAMixerIndex(std::string const &OAMixerName); // Which Mixer
 

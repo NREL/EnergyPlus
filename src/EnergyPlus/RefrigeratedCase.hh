@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EneryPlusData;
-struct BranchInputManagerData;
 
 namespace RefrigeratedCase {
 
@@ -242,7 +241,7 @@ namespace RefrigeratedCase {
             StoredEnergy = 0.0;
         }
 
-        void CalculateCase(); // Absolute pointer to refrigerated case
+        void CalculateCase(EnergyPlusData &state); // Absolute pointer to refrigerated case
     };
 
     struct RefrigRackData : PlantComponent
@@ -366,7 +365,7 @@ namespace RefrigeratedCase {
 
         void UpdateCondenser();
 
-        void CalcRackSystem();
+        void CalcRackSystem(EnergyPlusData &state);
 
         void ReportRackSystem(int RackNum);
 
@@ -529,11 +528,11 @@ namespace RefrigeratedCase {
             TotHiStageCompCoolingEnergy = 0.0;
         }
 
-        void CalcDetailedSystem(int SysNum);
+        void CalcDetailedSystem(EnergyPlusData &state, int SysNum);
 
-        void CalculateCondensers(int SysNum);
+        void CalculateCondensers(EnergyPlusData &state, int SysNum);
 
-        void CalculateCompressors();
+        void CalculateCompressors(EnergyPlusData &state);
 
         void CalculateSubcoolers();
     };
@@ -680,11 +679,11 @@ namespace RefrigeratedCase {
             TotCompCoolingEnergy = 0.0;
         }
 
-        void CalcDetailedTransSystem(int SysNum);
+        void CalcDetailedTransSystem(EnergyPlusData &state, int SysNum);
 
         void CalcGasCooler(int SysNum);
 
-        void CalculateTransCompressors();
+        void CalculateTransCompressors(EnergyPlusData &state);
     };
 
     struct CaseAndWalkInListDef // Derived Type for CaseAndWalkIn Lists
@@ -1114,7 +1113,7 @@ namespace RefrigeratedCase {
             DistPipeZoneHeatGain = 0.0;
         }
 
-        void CalculateSecondary(int SecondaryNum);
+        void CalculateSecondary(EnergyPlusData &state, int SecondaryNum);
     };
 
     struct TransferLoadListDef // Derived Type for Transfer Load (Secondary and Cascade) Lists
@@ -1423,7 +1422,7 @@ namespace RefrigeratedCase {
             ReportHeatingCreditEnergy = 0.0;
         }
 
-        void CalculateCoil(Real64 QZnReq);
+        void CalculateCoil(EnergyPlusData &state, Real64 QZnReq);
     };
 
     struct AirChillerSetData
@@ -1449,7 +1448,7 @@ namespace RefrigeratedCase {
         {
         }
 
-        void CalculateAirChillerSets();
+        void CalculateAirChillerSets(EnergyPlusData &state);
     };
 
     struct CoilCreditData // used to sum impact of all coils within a zone
@@ -1529,11 +1528,11 @@ namespace RefrigeratedCase {
 
     void InitRefrigeration();
 
-    void InitRefrigerationPlantConnections(BranchInputManagerData &dataBranchInputManager);
+    void InitRefrigerationPlantConnections(EnergyPlusData &state);
 
-    void SimulateDetailedRefrigerationSystems();
+    void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
 
-    void SimulateDetailedTransRefrigSystems();
+    void SimulateDetailedTransRefrigSystems(EnergyPlusData &statex);
 
     void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
@@ -1542,7 +1541,7 @@ namespace RefrigeratedCase {
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);
 
-    void ReportRefrigerationComponents(OutputFiles &outputFiles);
+    void ReportRefrigerationComponents(IOFiles &ioFiles);
 
     void SumZoneImpacts();
 

@@ -134,7 +134,6 @@ namespace WindowComplexManager {
 
         using namespace Vectors;
 
-        static bool Once(true); // Flag for insuring things happen once
         static int IBasis(0);   // Index for identifying basis in dataWindowComplexManager.BasisList
         static int ISurf(0);    // Index for sorting thru Surface array
         static int IConst(0);   // Index for accessing Construct array
@@ -156,6 +155,24 @@ namespace WindowComplexManager {
         Array1D<Real64> V(3);   // vector array
         Real64 VLen;            // Length of vector array
         int NHold;              // No. values in the Temporary array
+
+        if (dataWindowComplexManager.resetAbunchOfStuff) {
+            IBasis = 0;
+            ISurf = 0;
+            IConst = 0;
+            IState = 0;
+            IWind = 0;
+            I = 0;
+            J = 0;
+            JSurf = 0;
+            K = 0;
+            KBkSurf = 0;
+            KBasis = 0;
+            NumBasis = 0;
+            NBkSurf = 0;
+            MatrixNo = 0;
+            dataWindowComplexManager.resetAbunchOfStuff = false;
+        }
 
         struct TempBasisIdx
         {
@@ -213,7 +230,7 @@ namespace WindowComplexManager {
             if (!(dataConstruction.Construct(IConst).TypeIsWindow && (dataConstruction.Construct(IConst).WindowTypeBSDF))) continue; // Only BSDF windows
             // Simon Check: Thermal construction removed
             // ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
-            SurfaceWindow(ISurf).WindowModelType = WindowBSDFModel;
+            SurfWinWindowModelType(ISurf) = WindowBSDFModel;
             DataHeatBalance::AnyBSDF = true;
             ++dataWindowComplexManager.NumComplexWind;
             NumStates = 1;
@@ -268,7 +285,7 @@ namespace WindowComplexManager {
                     if (K > NHold) break;
                     KBasis = IHold(K).Basis;
                     J = IHold(K).State;
-                    Once = true;
+                    dataWindowComplexManager.InitBSDFWindowsOnce = true;
                     for (I = J + 1; I <= dataWindowComplexManager.WindowList(IWind).NumStates; ++I) { // See if subsequent states have the same basis
                         if ((dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).InitInc == dataWindowComplexManager.Calculate_Geometry) &&
                             (dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).IncBasisIndx == KBasis)) {
@@ -279,8 +296,8 @@ namespace WindowComplexManager {
                             dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).InitTrn = dataWindowComplexManager.Copy_Geometry;
                             dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).CopyIncState = J;
                             dataWindowComplexManager.WindowStateList(I, dataWindowComplexManager.NumComplexWind).CopyTrnState = J;
-                        } else if (Once) {
-                            Once = false; // First occurrence of a different basis
+                        } else if (dataWindowComplexManager.InitBSDFWindowsOnce) {
+                            dataWindowComplexManager.InitBSDFWindowsOnce = false; // First occurrence of a different basis
                             ++NHold;
                             IHold(NHold).State = I;
                             IHold(NHold).Basis = dataWindowComplexManager.WindowStateList(I, IWind).IncBasisIndx;
@@ -513,11 +530,9 @@ namespace WindowComplexManager {
         // PURPOSE OF THIS SUBROUTINE:
         // Extract simple init for Complex Windows
 
-        static bool Once(true); // Flag for insuring things happen once
-
         // One-time initialization
-        if (Once) {
-            Once = false;
+        if (dataWindowComplexManager.InitComplexWindowsOnce) {
+            dataWindowComplexManager.InitComplexWindowsOnce = false;
             InitBSDFWindows(dataWindowComplexManager);
             CalcStaticProperties(dataWindowComplexManager);
         }
@@ -844,7 +859,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) {
             BaseSurf = Surface(ISurf).BaseSurf; // ShadowComb is organized by base surface
             JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (SurfaceWindow(JSurf).WindowModelType == WindowBSDFModel) continue;
+            if (SurfWinWindowModelType(JSurf) == WindowBSDFModel) continue;
             if (!(Surface(JSurf).Class == SurfaceClass_Window || Surface(JSurf).Class == SurfaceClass_GlassDoor)) continue;
             if (!(Surface(JSurf).HeatTransSurf && Surface(JSurf).ExtBoundCond == ExternalEnvironment && Surface(JSurf).ExtSolar)) continue;
             // Back surface is an exterior window or door
@@ -960,15 +975,13 @@ namespace WindowComplexManager {
         // Calculates the basis length for a Window6 Non-Symmetric or Axisymmetric basis
         // from the input basis matrix
 
-        int ZoneNum;                 // Zone Number
-        int SurfNum;                 // Surface Number
-        static int NumSurfInZone(0); // Number of zone surfaces
-        static bool ComplexFenInZone(false);
+        int NumSurfInZone(0); // Number of zone surfaces
+        bool ComplexFenInZone(false);
 
-        for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+        for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             ComplexFenInZone = false;
-            for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-                if (SurfaceWindow(SurfNum).WindowModelType == WindowBSDFModel) ComplexFenInZone = true;
+            for (int SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
+                if (SurfWinWindowModelType(SurfNum) == WindowBSDFModel) ComplexFenInZone = true;
             }
             if (ComplexFenInZone) {
                 NumSurfInZone = Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1;
@@ -1883,7 +1896,7 @@ namespace WindowComplexManager {
         for (KBkSurf = 1; KBkSurf <= Window.NBkSurf; ++KBkSurf) { // back surface loop
             BaseSurf = Surface(ISurf).BaseSurf;                   // ShadowComb is organized by base surface
             JSurf = ShadowComb(BaseSurf).BackSurf(KBkSurf);
-            if (SurfaceWindow(JSurf).WindowModelType != WindowBSDFModel) continue;
+            if (SurfWinWindowModelType(JSurf) != WindowBSDFModel) continue;
 
             //  Directional-hemispherical back reflectance
             Sum1 = 0.0;
@@ -2548,7 +2561,6 @@ namespace WindowComplexManager {
         //     (A, B, C for max of 10 gasses) {maxgas x 3}
         static Array1D<Real64> wght(maxgas, 0.0); // Vector of Molecular weights for gasses {maxgas}
         static Array1D<Real64> gama(maxgas, 0.0); // Vector of spefic heat ration for low pressure calc {maxgas}
-        static bool feedData(false);              // flag to notify if data needs to be feed into gas arrays
         static Array1D_int nmix(maxlay + 1, 0);   // Vector of number of gasses in gas mixture of each gap {maxlay+1}
         static Real64 hin(0.0);                   // Indoor combined film coefficient (if non-zero) [W/m^2.K]
         static Real64 hout(0.0);                  // Outdoor combined film coefficient (if non-zero) [W/m^2.K]
@@ -2762,7 +2774,7 @@ namespace WindowComplexManager {
         if (CalcCondition == noCondition) {
             ConstrNum = Surface(SurfNum).Construction;
             SurfNumAdj = Surface(SurfNum).ExtBoundCond;
-            ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
+            ShadeFlag = SurfWinShadingFlag(SurfNum);
         }
 
         TotGlassLay = dataConstruction.Construct(ConstrNum).TotGlassLayers;
@@ -2888,7 +2900,7 @@ namespace WindowComplexManager {
                 //  AbsRadGlassFace(1) = AbsRadGlassFace(1) + QRadThermInAbs(SurfNumAdj)
                 //  ! The IR radiance of this window's "exterior" surround is the IR radiance
                 //  ! from surfaces and high-temp radiant sources in the adjacent zone
-                outir = SurfaceWindow(SurfNumAdj).IRfromParentZone + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
+                outir = SurfWinIRfromParentZone(SurfNumAdj) + QHTRadSysSurf(SurfNumAdj) + QCoolingPanelSurf(SurfNumAdj) +
                         QHWBaseboardSurf(SurfNumAdj) + QSteamBaseboardSurf(SurfNumAdj) + QElecBaseboardSurf(SurfNumAdj);
 
             } else { // Exterior window (ExtBoundCond = 0)
@@ -2940,7 +2952,7 @@ namespace WindowComplexManager {
 
             // indoor mean radiant temperature.
             // IR incident on window from zone surfaces and high-temp radiant sources
-            rmir = SurfaceWindow(SurfNum).IRfromParentZone + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
+            rmir = SurfWinIRfromParentZone(SurfNum) + QHTRadSysSurf(SurfNum) + QCoolingPanelSurf(SurfNum) + QHWBaseboardSurf(SurfNum) +
                    QSteamBaseboardSurf(SurfNum) + QElecBaseboardSurf(SurfNum);
             trmin = root_4(rmir / StefanBoltzmann); // TODO check model equation.
 
@@ -3065,6 +3077,7 @@ namespace WindowComplexManager {
                     // to be correctly referenced by gap arrays
 
                     // First check if gas coefficients are already part of array.  Duplicates are not necessary
+                    bool feedData(false);
                     CheckGasCoefs(dataMaterial.Material(GasPointer).GasWght(IMix), iprop(IMix, IGap + 1), wght, feedData);
                     if (feedData) {
                         wght(iprop(IMix, IGap + 1)) = dataMaterial.Material(GasPointer).GasWght(IMix);
@@ -3118,7 +3131,7 @@ namespace WindowComplexManager {
         asol = 0.0;
         // direct solar radiation
         if (CalcCondition == noCondition) {
-            ShadeFlag = SurfaceWindow(SurfNum).ShadingFlag;
+            ShadeFlag = SurfWinShadingFlag(SurfNum);
             dir = QRadSWOutIncident(SurfNum) + QS(Surface(SurfNum).SolarEnclIndex); // TODO, check , !
             //                  currently using Exterior beam plus diffuse solar incident on surface
             //                  plus zone short wave.  CHECK
@@ -3182,7 +3195,7 @@ namespace WindowComplexManager {
         }
 
         if (SurfNum != 0)
-            edgeGlCorrFac = SurfaceWindow(SurfNum).EdgeGlCorrFac;
+            edgeGlCorrFac = SurfWinEdgeGlCorrFac(SurfNum);
         else
             edgeGlCorrFac = 1;
 
@@ -3338,7 +3351,7 @@ namespace WindowComplexManager {
         } else if (CalcCondition == noCondition) { // expect converged results...
             // Window heat balance solution has converged.
 
-            SurfaceWindow(SurfNum).WindowCalcIterationsRep = NumOfIterations;
+            SurfWinWindowCalcIterationsRep(SurfNum) = NumOfIterations;
             HConvIn(SurfNum) = hcin;
 
             // For interior shade, add convective gain from glass/shade gap air flow to zone convective gain;
@@ -3346,7 +3359,7 @@ namespace WindowComplexManager {
             // contribution of frame and divider.
 
             SurfInsideTemp = theta(2 * nlayer) - KelvinConv;
-            SurfaceWindow(SurfNum).EffInsSurfTemp = SurfInsideTemp;
+            SurfWinEffInsSurfTemp(SurfNum) = SurfInsideTemp;
             SurfOutsideTemp = theta(1) - KelvinConv;
             SurfOutsideEmiss = emis(1);
 
@@ -3355,15 +3368,15 @@ namespace WindowComplexManager {
                 // Interior shade or blind
                 ConvHeatFlowNatural = -qv(nlayer) * height * width;
 
-                SurfaceWindow(SurfNum).ConvHeatFlowNatural = ConvHeatFlowNatural;
-                WinGapConvHtFlowRep(SurfNum) = ConvHeatFlowNatural;
-                WinGapConvHtFlowRepEnergy(SurfNum) = WinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
+                SurfWinConvHeatFlowNatural(SurfNum) = ConvHeatFlowNatural;
+                SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowNatural;
+                SurfWinGapConvHtFlowRepEnergy(SurfNum) = SurfWinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
                 // Window heat gain from glazing and shade/blind to zone. Consists of transmitted solar, convection
                 //   from air exiting gap, convection from zone-side of shade/blind, net IR to zone from shade and net IR to
                 //   zone from the glass adjacent to the shade/blind (zero if shade/blind IR transmittance is zero).
                 // Following assumes glazed area = window area (i.e., dividers ignored) in calculating
                 //   IR to zone from glass when interior shade/blind is present.
-                ShadeArea = Surface(SurfNum).Area + SurfaceWindow(SurfNum).DividerArea;
+                ShadeArea = Surface(SurfNum).Area + SurfWinDividerArea(SurfNum);
                 sconsh = scon(ngllayer + 1) / thick(ngllayer + 1);
                 nglfacep = nglface + 2;
                 CondHeatGainShade = ShadeArea * sconsh * (theta(nglfacep - 1) - theta(nglfacep));
@@ -3378,30 +3391,30 @@ namespace WindowComplexManager {
                                      EpsShIR1 * (dataWindowComplexManager.sigma * pow_4(theta(nglfacep - 1)) - rmir) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
                 NetIRHeatGainGlass = ShadeArea * (emis(2 * ngllayer) * TauShIR / ShGlReflFacIR) * (dataWindowComplexManager.sigma * pow_4(theta(2 * ngllayer)) - rmir);
                 ConvHeatGainFrZoneSideOfShade = ShadeArea * hcin * (theta(nglfacep) - tind);
-                WinHeatGain(SurfNum) =
-                    WinTransSolar(SurfNum) + ConvHeatFlowNatural + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
-                WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+                SurfWinHeatGain(SurfNum) =
+                        SurfWinTransSolar(SurfNum) + ConvHeatFlowNatural + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
+                SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
                 // store components for reporting
-                WinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural; // result is in [W]
-                WinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfShade;
-                WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
-                WinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainShade;
+                SurfWinGainConvGlazShadGapToZoneRep(SurfNum) = ConvHeatFlowNatural; // result is in [W]
+                SurfWinGainConvShadeToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfShade;
+                SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
+                SurfWinGainIRShadeToZoneRep(SurfNum) = NetIRHeatGainShade;
             } else {
                 // Interior shade or blind not present; innermost layer is glass
                 CondHeatGainGlass = Surface(SurfNum).Area * scon(nlayer) / thick(nlayer) * (theta(2 * nlayer - 1) - theta(2 * nlayer));
                 NetIRHeatGainGlass = Surface(SurfNum).Area * emis(2 * nlayer) * (dataWindowComplexManager.sigma * pow_4(theta(2 * nlayer)) - rmir);
                 ConvHeatGainFrZoneSideOfGlass = Surface(SurfNum).Area * hcin * (theta(2 * nlayer) - tind);
-                WinHeatGain(SurfNum) = WinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
-                WinHeatTransfer(SurfNum) = WinHeatGain(SurfNum);
+                SurfWinHeatGain(SurfNum) = SurfWinTransSolar(SurfNum) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
+                SurfWinHeatTransfer(SurfNum) = SurfWinHeatGain(SurfNum);
                 // store components for reporting
-                WinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
-                WinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
+                SurfWinGainConvGlazToZoneRep(SurfNum) = ConvHeatGainFrZoneSideOfGlass;
+                SurfWinGainIRGlazToZoneRep(SurfNum) = NetIRHeatGainGlass;
                 // need to report convective heat flow from the gap in case of exterior shade
                 if (ShadeFlag == ExtShadeOn) {
                     ConvHeatFlowNatural = -qv(2) * height * width; // qv(1) is exterior environment
 
-                    WinGapConvHtFlowRep(SurfNum) = ConvHeatFlowNatural;
-                    WinGapConvHtFlowRepEnergy(SurfNum) = WinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
+                    SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowNatural;
+                    SurfWinGapConvHtFlowRepEnergy(SurfNum) = SurfWinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
                 }
             }
 
@@ -3411,20 +3424,20 @@ namespace WindowComplexManager {
 
             // WinGapConvHtFlowRep(SurfNum) = 0.0d0
             // WinGapConvHtFlowRepEnergy(SurfNum) = 0.0d0
-            TotAirflowGap = SurfaceWindow(SurfNum).AirflowThisTS * Surface(SurfNum).Width;
+            TotAirflowGap = SurfWinAirflowThisTS(SurfNum) * Surface(SurfNum).Width;
             TAirflowGapOutlet = KelvinConv; // TODO Need to calculate this
             TAirflowGapOutletC = TAirflowGapOutlet - KelvinConv;
-            SurfaceWindow(SurfNum).TAirflowGapOutlet = TAirflowGapOutletC;
-            if (SurfaceWindow(SurfNum).AirflowThisTS > 0.0) {
+            SurfWinTAirflowGapOutlet(SurfNum) = TAirflowGapOutletC;
+            if (SurfWinAirflowThisTS(SurfNum) > 0.0) {
                 ConvHeatFlowForced = sum(qv); // TODO.  figure forced ventilation heat flow in Watts
 
-                WinGapConvHtFlowRep(SurfNum) = ConvHeatFlowForced;
-                WinGapConvHtFlowRepEnergy(SurfNum) = WinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
+                SurfWinGapConvHtFlowRep(SurfNum) = ConvHeatFlowForced;
+                SurfWinGapConvHtFlowRepEnergy(SurfNum) = SurfWinGapConvHtFlowRep(SurfNum) * TimeStepZoneSec;
                 // Add heat from gap airflow to zone air if destination is inside air; save the heat gain to return
                 // air in case it needs to be sent to the zone (due to no return air determined in HVAC simulation)
-                if (SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_IndoorAir ||
-                    SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_ReturnAir) {
-                    if (SurfaceWindow(SurfNum).AirflowSource == AirFlowWindow_Source_IndoorAir) {
+                if (SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir ||
+                    SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_ReturnAir) {
+                    if (SurfWinAirflowSource(SurfNum) == AirFlowWindow_Source_IndoorAir) {
                         InletAirHumRat = ZoneAirHumRat(ZoneNum);
                     } else { // AirflowSource = outside air
                         InletAirHumRat = OutHumRat;
@@ -3433,12 +3446,12 @@ namespace WindowComplexManager {
                     CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
                     CpAirZone = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
-                    if (SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_IndoorAir) {
-                        SurfaceWindow(SurfNum).ConvHeatGainToZoneAir = ConvHeatGainToZoneAir;
-                        WinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
-                        WinHeatTransfer(SurfNum) += ConvHeatGainToZoneAir;
+                    if (SurfWinAirflowDestination(SurfNum) == AirFlowWindow_Destination_IndoorAir) {
+                        SurfWinConvHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
+                        SurfWinHeatGain(SurfNum) += ConvHeatGainToZoneAir;
+                        SurfWinHeatTransfer(SurfNum) += ConvHeatGainToZoneAir;
                     } else {
-                        SurfaceWindow(SurfNum).RetHeatGainToZoneAir = ConvHeatGainToZoneAir;
+                        SurfWinRetHeatGainToZoneAir(SurfNum) = ConvHeatGainToZoneAir;
                     }
                 }
                 // For AirflowDestination = ReturnAir in a controlled (i.e., conditioned) zone with return air, see CalcZoneLeavingConditions
@@ -3466,29 +3479,29 @@ namespace WindowComplexManager {
             //  TransDiff = InterpSW(SurfaceWindow(SurfNum)%SwitchingFactor,Construct(ConstrNum)%TransDiff, &
             //                             Construct(ConstrNumSh)%TransDiff)
             // END IF
-            WinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            WinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
-            WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatGain(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinHeatTransfer(SurfNum) -= QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
+            SurfWinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * Surface(SurfNum).Area * TransDiff;
 
             if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn) {
-                WinShadingAbsorbedSolar(SurfNum) = (SurfaceWindow(SurfNum).ExtBeamAbsByShade + SurfaceWindow(SurfNum).ExtDiffAbsByShade) *
-                                                   (Surface(SurfNum).Area + SurfaceWindow(SurfNum).DividerArea);
-                WinShadingAbsorbedSolarEnergy(SurfNum) = WinShadingAbsorbedSolar(SurfNum) * TimeStepZoneSec;
+                SurfWinShadingAbsorbedSolar(SurfNum) = (SurfWinExtBeamAbsByShade(SurfNum) + SurfWinExtDiffAbsByShade(SurfNum)) *
+                                                   (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum));
+                SurfWinShadingAbsorbedSolarEnergy(SurfNum) = SurfWinShadingAbsorbedSolar(SurfNum) * TimeStepZoneSec;
             }
             if (SunIsUp) {
-                WinSysSolTransmittance(SurfNum) =
-                    WinTransSolar(SurfNum) / (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfaceWindow(SurfNum).DividerArea) + 0.0001);
-                WinSysSolAbsorptance(SurfNum) = (QRadSWwinAbsTot(SurfNum) + WinShadingAbsorbedSolar(SurfNum)) /
-                                                (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfaceWindow(SurfNum).DividerArea) + 0.0001);
-                WinSysSolReflectance(SurfNum) = 1.0 - WinSysSolTransmittance(SurfNum) - WinSysSolAbsorptance(SurfNum);
+                SurfWinSysSolTransmittance(SurfNum) =
+                        SurfWinTransSolar(SurfNum) / (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                SurfWinSysSolAbsorptance(SurfNum) = (QRadSWwinAbsTot(SurfNum) + SurfWinShadingAbsorbedSolar(SurfNum)) /
+                                                (QRadSWOutIncident(SurfNum) * (Surface(SurfNum).Area + SurfWinDividerArea(SurfNum)) + 0.0001);
+                SurfWinSysSolReflectance(SurfNum) = 1.0 - SurfWinSysSolTransmittance(SurfNum) - SurfWinSysSolAbsorptance(SurfNum);
             } else {
-                WinSysSolTransmittance(SurfNum) = 0.0;
-                WinSysSolAbsorptance(SurfNum) = 0.0;
-                WinSysSolReflectance(SurfNum) = 0.0;
+                SurfWinSysSolTransmittance(SurfNum) = 0.0;
+                SurfWinSysSolAbsorptance(SurfNum) = 0.0;
+                SurfWinSysSolReflectance(SurfNum) = 0.0;
             }
 
             // Save hcv for use in divider calc with interior or exterior shade (see CalcWinFrameAndDividerTemps)
-            if (ShadeFlag == IntShadeOn) SurfaceWindow(SurfNum).ConvCoeffWithShade = 0.0;
+            if (ShadeFlag == IntShadeOn) SurfWinConvCoeffWithShade(SurfNum) = 0.0;
 
             if (ShadeFlag == IntShadeOn) {
                 SurfInsideTemp = theta(2 * ngllayer + 2) - KelvinConv;
@@ -3497,7 +3510,7 @@ namespace WindowComplexManager {
 
                 Real64 EffShBlEmiss = SurfaceWindow(SurfNum).EffShBlindEmiss[0];
                 Real64 EffGlEmiss = SurfaceWindow(SurfNum).EffGlassEmiss[0];
-                SurfaceWindow(SurfNum).EffInsSurfTemp =
+                SurfWinEffInsSurfTemp(SurfNum) =
                     (EffShBlEmiss * SurfInsideTemp + EffGlEmiss * (theta(2 * ngllayer) - KelvinConv)) / (EffShBlEmiss + EffGlEmiss);
 
             } else {
@@ -3528,12 +3541,9 @@ namespace WindowComplexManager {
         // Argument array dimensioning
         EP_SIZE_CHECK(wght, maxgas);
 
-        static int counter(1);
-        static bool coeffFound(false);
-
         feedData = false;
-        coeffFound = false;
-        counter = 1;
+        bool coeffFound = false;
+        int counter = 1;
         while ((counter <= maxgas) && (wght(counter) != 0) && (!coeffFound)) {
             if (std::abs(currentWeight - wght(counter)) < 1.0e-5) {
                 coeffFound = true;

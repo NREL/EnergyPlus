@@ -57,12 +57,12 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
-struct BranchInputManagerData;
+struct EnergyPlusData;
 
 namespace BranchInputManager {
 
@@ -177,13 +177,13 @@ namespace BranchInputManager {
     };
 
     // Functions
-    void ManageBranchInput(BranchInputManagerData &dataBranchInputManager);
+    void ManageBranchInput(EnergyPlusData &state);
 
     //==================================================================================
     //   Routines that "get" data from internal branch management structure
     //==================================================================================
 
-    void GetBranchList(BranchInputManagerData &dataBranchInputManager,
+    void GetBranchList(EnergyPlusData &state,
                        std::string const &LoopName,       // Name of Loop Branch List is on
                        std::string const &BranchListName, // Branch List Name from Input
                        int &NumBranchNames,               // Number of Branches for this Branch List
@@ -191,9 +191,9 @@ namespace BranchInputManager {
                        std::string const &LoopType        // Type of Loop Branch list is on
     );
 
-    int NumBranchesInBranchList(BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName);
+    int NumBranchesInBranchList(EnergyPlusData &state, std::string const &BranchListName);
 
-    void GetBranchData(BranchInputManagerData &dataBranchInputManager,
+    void GetBranchData(EnergyPlusData &state,
                        std::string const &LoopName,         // Loop Name of this Branch
                        std::string const &BranchName,       // Requested Branch Name
                        int &PressCurveType,                 // Index of a pressure curve object
@@ -207,17 +207,17 @@ namespace BranchInputManager {
                        Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound);
 
-    int NumCompsInBranch(BranchInputManagerData &dataBranchInputManager, std::string const &BranchName);
+    int NumCompsInBranch(EnergyPlusData &state, std::string const &BranchName);
 
-    int GetAirBranchIndex(BranchInputManagerData &dataBranchInputManager, std::string const &CompType, std::string const &CompName);
+    int GetAirBranchIndex(EnergyPlusData &state, std::string const &CompType, std::string const &CompName);
 
-    void GetBranchFanTypeName(BranchInputManagerData &dataBranchInputManager,
+    void GetBranchFanTypeName(EnergyPlusData &state,
                               int BranchNum, std::string &FanType,
                               std::string &FanName,
                               bool &ErrFound               // Set to true if error found, false otherwise
     );
 
-    void GetInternalBranchData(BranchInputManagerData &dataBranchInputManager,
+    void GetInternalBranchData(EnergyPlusData &state,
                                std::string const &LoopName,         // Loop Name for Branch
                                std::string const &BranchName,       // Requested Branch Name
                                int &PressCurveType,                 // Index of pressure curve object
@@ -227,7 +227,7 @@ namespace BranchInputManager {
                                bool &ErrorsFound                    // True when Loop Name is already assigned and this not same loop
     );
 
-    void GetNumSplitterMixerInConntrList(BranchInputManagerData &dataBranchInputManager,
+    void GetNumSplitterMixerInConntrList(EnergyPlusData &state,
                                          std::string const &LoopName,          // Loop Name for this Splitter (used in error message)
                                          std::string const &ConnectorListName, // Requested Connector List Name
                                          int &numSplitters,                    // Number of splitters in the loop
@@ -235,13 +235,13 @@ namespace BranchInputManager {
                                          bool &ErrorsFound                     // if no connector list
     );
 
-    void GetConnectorList(BranchInputManagerData &dataBranchInputManager,
+    void GetConnectorList(EnergyPlusData &state,
                           std::string const &ConnectorListName, // Requested Connector List
                           ConnectorData &Connectoid,            // Returned Connector Data
                           Optional_int_const NumInList = _      // Number of the current connector in the list of connectors
     );
 
-    void GetLoopMixer(BranchInputManagerData &dataBranchInputManager,
+    void GetLoopMixer(EnergyPlusData &state,
                       std::string const &LoopName,          // Loop Name for Mixer
                       std::string const &ConnectorListName, // Requested Connector List Name
                       std::string &MixerName,               // Name of Mixer
@@ -256,7 +256,7 @@ namespace BranchInputManager {
                       Optional_int MixerNumber = _            // Mixer number for this specific splitter
     );
 
-    void GetLoopSplitter(BranchInputManagerData &dataBranchInputManager,
+    void GetLoopSplitter(EnergyPlusData &state,
                          std::string const &LoopName,          // Loop Name for this Splitter
                          std::string const &ConnectorListName, // Requested Connector List Name
                          std::string &SplitterName,            // Name of Splitter
@@ -271,17 +271,17 @@ namespace BranchInputManager {
                          Optional_int SplitterNumber = _         // splitter number for this specific splitter
     );
 
-    std::string GetFirstBranchInletNodeName(BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName); // Branch List name to search
+    std::string GetFirstBranchInletNodeName(EnergyPlusData &state, std::string const &BranchListName); // Branch List name to search
 
-    std::string GetLastBranchOutletNodeName(BranchInputManagerData &dataBranchInputManager, std::string const &BranchListName); // Branch List name to search
+    std::string GetLastBranchOutletNodeName(EnergyPlusData &state, std::string const &BranchListName); // Branch List name to search
 
     //==================================================================================
     //   Routines that get the input for the internal branch management structure
     //==================================================================================
 
-    void GetBranchInput(BranchInputManagerData &dataBranchInputManager);
+    void GetBranchInput(EnergyPlusData &state);
 
-    void GetSingleBranchInput(BranchInputManagerData &dataBranchInputManager,
+    void GetSingleBranchInput(EnergyPlusData &state,
                               std::string const &RoutineName,
                               int BCount,
                               Array1D_string &Alphas,
@@ -290,13 +290,13 @@ namespace BranchInputManager {
                               Array1D_int &NodeNums,
                               Array1D_bool &lAlphaBlanks);
 
-    void GetBranchListInput(BranchInputManagerData &dataBranchInputManager);
+    void GetBranchListInput(EnergyPlusData &state);
 
-    void GetConnectorListInput(BranchInputManagerData &dataBranchInputManager);
+    void GetConnectorListInput(EnergyPlusData &state);
 
-    void GetSplitterInput(BranchInputManagerData &dataBranchInputManager);
+    void GetSplitterInput(EnergyPlusData &state);
 
-    void GetMixerInput(BranchInputManagerData &dataBranchInputManager);
+    void GetMixerInput(EnergyPlusData &state);
 
     void FindPlantLoopBranchConnection(std::string const &BranchListName,
                                        std::string &FoundPlantLoopName,
@@ -329,13 +329,13 @@ namespace BranchInputManager {
     //   Routines that test branch integrity
     //==================================================================================
 
-    void AuditBranches(BranchInputManagerData &dataBranchInputManager,
+    void AuditBranches(EnergyPlusData &state,
                        bool mustprint,               // true if the warning should be printed.
                        Optional_string_const CompType = _, // when mustprint (ScanPlantLoop)  use CompType in error message and scan
                        Optional_string_const CompName = _  // when mustprint (ScanPlantLoop)  use CompName in error message and scan
     );
 
-    void TestBranchIntegrity(BranchInputManagerData &dataBranchInputManager, EnergyPlus::OutputFiles &outputFiles, bool &ErrFound);              // ErrFound is a return value, true or false
+    void TestBranchIntegrity(EnergyPlusData &state, EnergyPlus::IOFiles &ioFiles, bool &ErrFound);              // ErrFound is a return value, true or false
 
 } // namespace BranchInputManager
 

@@ -169,11 +169,39 @@ namespace SurfaceGroundHeatExchanger {
     Array1D<Real64> QRadSysSrcAvg;      // Average source over the time step
     Array1D<Real64> LastSysTimeElapsed; // record of system time
     Array1D<Real64> LastTimeStepSys;    // previous time step size
+    bool InitializeTempTop(false);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE PlantSurfaceGroundHeatExchangers
 
     // Object Data
     Array1D<SurfaceGroundHeatExchangerData> SurfaceGHE;
+
+    void clear_state() {
+        NoSurfaceGroundTempObjWarning = true;
+        FlowRate = 0.0;
+        TopSurfTemp = 0.0;
+        BtmSurfTemp = 0.0;
+        TopSurfFlux = 0.0;
+        BtmSurfFlux = 0.0;
+        SourceFlux = 0.0;
+        CheckEquipName.clear();
+        PastBeamSolarRad = 0.0;
+        PastSolarDirCosVert = 0.0;
+        PastDifSolarRad = 0.0;
+        PastGroundTemp = 0.0;
+        PastIsRain = false;
+        PastIsSnow = false;
+        PastOutDryBulbTemp = 0.0;
+        PastOutWetBulbTemp = 0.0;
+        PastSkyTemp = 0.0;
+        PastWindSpeed = 0.0;
+        GetInputFlag = true;
+        QRadSysSrcAvg.clear();
+        LastSysTimeElapsed.clear();
+        LastTimeStepSys.clear();
+        InitializeTempTop = false;
+        SurfaceGHE.clear();
+    }
 
     PlantComponent *SurfaceGroundHeatExchangerData::factory(int const EP_UNUSED(objectType), std::string const objectName)
     {
@@ -198,7 +226,7 @@ namespace SurfaceGroundHeatExchanger {
                                                   Real64 &EP_UNUSED(CurLoad),
                                                   bool const EP_UNUSED(RunFlag))
     {
-        this->InitSurfaceGroundHeatExchanger(state.dataBranchInputManager);
+        this->InitSurfaceGroundHeatExchanger(state);
         this->CalcSurfaceGroundHeatExchanger(FirstHVACIteration);
         this->UpdateSurfaceGroundHeatExchngr();
         this->ReportSurfaceGroundHeatExchngr();
@@ -234,7 +262,7 @@ namespace SurfaceGroundHeatExchanger {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        static bool ErrorsFound(false); // Set to true if errors in input,
+        bool ErrorsFound(false); // Set to true if errors in input,
         // fatal at end of routine
         int IOStatus;   // Used in GetObjectItem
         int Item;       // Item to be "gotten"
@@ -438,7 +466,7 @@ namespace SurfaceGroundHeatExchanger {
         }
     }
 
-    void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager)
+    void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -487,7 +515,7 @@ namespace SurfaceGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                 this->Name, TypeOf_GrndHtExchgSurface, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
 
             if (errFlag) {
@@ -660,7 +688,6 @@ namespace SurfaceGroundHeatExchanger {
         Real64 OldSourceFlux;  // previous value of source flux - used during iteration
         int iter;
         int iter1;
-        static bool InitializeTempTop(false);
 
         // check if we are in very first call for this zone time step
         if (FirstHVACIteration && !DataHVACGlobals::ShortenTimeStepSys && this->firstTimeThrough) {

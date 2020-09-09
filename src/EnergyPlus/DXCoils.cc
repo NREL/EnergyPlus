@@ -46,7 +46,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -69,8 +68,6 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
@@ -79,10 +76,10 @@
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -165,13 +162,6 @@ namespace DXCoils {
 
     Real64 const DryCoilOutletHumRatioMin(0.00001); // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
-    // Curve Types
-    int const Linear(1);
-    int const BiLinear(2);
-    int const Quadratic(3);
-    int const BiQuadratic(4);
-    int const Cubic(5);
-
     // Multimode DX Coil
     int const MaxCapacityStages(2);                               // Maximum number of capacity stages supported
     int const MaxDehumidModes(1);                                 // Maximum number of enhanced dehumidification modes supported
@@ -187,7 +177,7 @@ namespace DXCoils {
     int const NumValidOutputFuelTypes(9);
     Array1D_string const
         cValidOutputFuelTypes(NumValidOutputFuelTypes,
-                              {"Electricity", "Gas", "Propane", "Diesel", "Gasoline", "FuelOil#1", "FuelOil#2", "OtherFuel1", "OtherFuel2"});
+                              {"Electricity", "NaturalGas", "Propane", "Diesel", "Gasoline", "FuelOilNo1", "FuelOilNo2", "OtherFuel1", "OtherFuel2"});
 
     static std::string const BlankString;
 
@@ -238,6 +228,7 @@ namespace DXCoils {
     int NumDXMulSpeedCoolCoils(0); // number of multispeed DX cooling coils
     int NumDXMulSpeedHeatCoils(0); // number of multispeed DX heating coils
     Array1D_bool CheckEquipName;
+    bool CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite(true);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -300,7 +291,7 @@ namespace DXCoils {
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -350,37 +341,37 @@ namespace DXCoils {
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) {
 
                 if (present(CoilCoolingHeatingPLRRatio)) {
-                    CalcDoe2DXCoil(DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio, CoilCoolingHeatingPLRRatio);
+                    CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio, CoilCoolingHeatingPLRRatio);
                 } else {
-                    CalcDoe2DXCoil(DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio);
+                    CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration, PartLoadRatio, FanOpMode, _, AirFlowRatio);
                 }
 
             } else if (SELECT_CASE_var == CoilDX_HeatingEmpirical) {
 
-                CalcDXHeatingCoil(DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio);
+                CalcDXHeatingCoil(state, DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio);
 
             } else if (SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterPumped || SELECT_CASE_var == CoilDX_HeatPumpWaterHeaterWrapped) {
 
                 //   call the HPWHDXCoil routine to calculate water side performance set up the DX coil info for air-side calcs
-                CalcHPWHDXCoil(DXCoilNum, PartLoadRatio);
-                //    CALL CalcDOE2DXCoil(DXCoilNum, CompOp, FirstHVACIteration,PartLoadRatio), perform air-side calculations
-                CalcDoe2DXCoil(DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode);
+                CalcHPWHDXCoil(state, DXCoilNum, PartLoadRatio);
+                //    CALL CalcDoe2DXCoil(state, DXCoilNum, CompOp, FirstHVACIteration,PartLoadRatio), perform air-side calculations
+                CalcDoe2DXCoil(state, DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode);
 
             } else if (SELECT_CASE_var == CoilVRF_Cooling) {
 
-                CalcVRFCoolingCoil(DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, AirFlowRatio, MaxCap);
+                CalcVRFCoolingCoil(state, DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, AirFlowRatio, MaxCap);
 
             } else if (SELECT_CASE_var == CoilVRF_Heating) {
 
-                CalcDXHeatingCoil(DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio, MaxCap);
+                CalcDXHeatingCoil(state, DXCoilNum, PartLoadRatio, FanOpMode, AirFlowRatio, MaxCap);
 
             } else if (SELECT_CASE_var == CoilVRF_FluidTCtrl_Cooling) {
 
-                CalcVRFCoolingCoil_FluidTCtrl(DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _);
+                CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, 1, FirstHVACIteration, PartLoadRatio, FanOpMode, CompCycRatio, _, _);
 
             } else if (SELECT_CASE_var == CoilVRF_FluidTCtrl_Heating) {
 
-                CalcVRFHeatingCoil_FluidTCtrl(CompOp, DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap);
+                CalcVRFHeatingCoil_FluidTCtrl(state, CompOp, DXCoilNum, PartLoadRatio, FanOpMode, _, MaxCap);
 
             } else {
                 ShowSevereError("Error detected in DX Coil=" + CompName);
@@ -393,7 +384,7 @@ namespace DXCoils {
         UpdateDXCoil(DXCoilNum);
 
         // Report the result of the simulation
-        ReportDXCoil(DXCoilNum);
+        ReportDXCoil(state, DXCoilNum);
     }
 
     void SimDXCoilMultiSpeed(EnergyPlusData &state,
@@ -433,7 +424,7 @@ namespace DXCoils {
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -477,11 +468,11 @@ namespace DXCoils {
 
             if (SELECT_CASE_var == CoilDX_CoolingTwoSpeed) {
 
-                CalcMultiSpeedDXCoil(DXCoilNum, SpeedRatio, CycRatio);
+                CalcMultiSpeedDXCoil(state, DXCoilNum, SpeedRatio, CycRatio);
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (present(SpeedNum))
-                    CalcMultiSpeedDXCoilCooling(DXCoilNum,
+                    CalcMultiSpeedDXCoilCooling(state, DXCoilNum,
                                                 SpeedRatio,
                                                 CycRatio,
                                                 SpeedNum,
@@ -491,7 +482,8 @@ namespace DXCoils {
 
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedHeating) {
                 if (present(SpeedNum))
-                    CalcMultiSpeedDXCoilHeating(DXCoilNum,
+                    CalcMultiSpeedDXCoilHeating(state,
+                                                DXCoilNum,
                                                 SpeedRatio,
                                                 CycRatio,
                                                 SpeedNum,
@@ -509,7 +501,7 @@ namespace DXCoils {
         UpdateDXCoil(DXCoilNum);
 
         // Report the result of the simulation
-        ReportDXCoil(DXCoilNum);
+        ReportDXCoil(state, DXCoilNum);
     }
 
     void SimDXCoilMultiMode(EnergyPlusData &state,
@@ -583,7 +575,7 @@ namespace DXCoils {
 
         // First time SimDXCoil is called, get the input for all the DX coils (condensing units)
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false; // Set GetInputFlag false so you don't get coil inputs again
         }
 
@@ -656,14 +648,14 @@ namespace DXCoils {
                 if ((DXCoil(DXCoilNum).NumCapacityStages == 1) || (PartLoadRatio <= 0.0)) {
                     // Run stage 1 at its part load
                     PerfMode = DehumidMode * 2 + 1;
-                    CalcDoe2DXCoil(DXCoilNum, On, FirstHVACIteration, PartLoadRatio, FanOpMode, PerfMode);
+                    CalcDoe2DXCoil(state, DXCoilNum, On, FirstHVACIteration, PartLoadRatio, FanOpMode, PerfMode);
                     S1PLR = PartLoadRatio;
                     S2PLR = 0.0;
                 } else {
                     // If a two-stage coil
                     // Run stage 1 at full load
                     PerfMode = DehumidMode * 2 + 1;
-                    CalcDoe2DXCoil(DXCoilNum, On, FirstHVACIteration, 1.0, FanOpMode, PerfMode);
+                    CalcDoe2DXCoil(state, DXCoilNum, On, FirstHVACIteration, 1.0, FanOpMode, PerfMode);
                     S1SensCoolingEnergyRate = DXCoil(DXCoilNum).SensCoolingEnergyRate;
                     if (S1SensCoolingEnergyRate > 0.0) {
                         S1PLR = PartLoadRatio;
@@ -673,7 +665,7 @@ namespace DXCoils {
                     // Run stage 1+2 at full load
                     if (DXCoil(DXCoilNum).NumCapacityStages >= 2) {
                         PerfMode = DehumidMode * 2 + 2;
-                        CalcDoe2DXCoil(DXCoilNum, On, FirstHVACIteration, 1.0, FanOpMode, PerfMode);
+                        CalcDoe2DXCoil(state, DXCoilNum, On, FirstHVACIteration, 1.0, FanOpMode, PerfMode);
                         S12SensCoolingEnergyRate = DXCoil(DXCoilNum).SensCoolingEnergyRate;
                         S12ElecCoolFullLoadPower = DXCoil(DXCoilNum).ElecCoolingPower;
                     }
@@ -706,7 +698,7 @@ namespace DXCoils {
 
                     // Run stage 1 at its part load
                     PerfMode = DehumidMode * 2 + 1;
-                    CalcDoe2DXCoil(DXCoilNum, On, FirstHVACIteration, S1PLR, FanOpMode, PerfMode);
+                    CalcDoe2DXCoil(state, DXCoilNum, On, FirstHVACIteration, S1PLR, FanOpMode, PerfMode);
                 }
                 // For stage-1 only operation, all outputs are set by CalcDoe2DXCoil.
                 // No further adjustments are necessary.
@@ -732,7 +724,7 @@ namespace DXCoils {
 
                     // Run stage 1+2 at its part load
                     PerfMode = DehumidMode * 2 + 2;
-                    CalcDoe2DXCoil(DXCoilNum, On, FirstHVACIteration, S2PLR, FanOpMode, PerfMode);
+                    CalcDoe2DXCoil(state, DXCoilNum, On, FirstHVACIteration, S2PLR, FanOpMode, PerfMode);
                     S12RuntimeFraction = DXCoil(DXCoilNum).CoolingCoilRuntimeFraction;
                     S12OutletAirEnthalpy = DXCoil(DXCoilNum).OutletAirEnthalpy;
                     S12OutletAirHumRat = DXCoil(DXCoilNum).OutletAirHumRat;
@@ -843,10 +835,10 @@ namespace DXCoils {
         UpdateDXCoil(DXCoilNum);
 
         // Report the result of the simulation
-        ReportDXCoil(DXCoilNum);
+        ReportDXCoil(state, DXCoilNum);
     }
 
-    void GetDXCoils()
+    void GetDXCoils(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1104,7 +1096,7 @@ namespace DXCoils {
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
-            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(Alphas(5)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
                 if (lAlphaBlanks(5)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -1116,7 +1108,8 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                            DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
                                                             {2},                            // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -1124,7 +1117,8 @@ namespace DXCoils {
                                                             cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    checkCurveIsNormalizedToOne(state,
+                                                RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp(1),
                                                 cAlphaFields(5),
@@ -1134,7 +1128,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(Alphas(6)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(state, Alphas(6)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFFlow(1) == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -1146,7 +1140,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
                                                             {1},                            // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -1154,12 +1148,12 @@ namespace DXCoils {
                                                             cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
-            DXCoil(DXCoilNum).EIRFTemp(1) = GetCurveIndex(Alphas(7)); // convert curve name to number
+            DXCoil(DXCoilNum).EIRFTemp(1) = GetCurveIndex(state, Alphas(7)); // convert curve name to number
             if (DXCoil(DXCoilNum).EIRFTemp(1) == 0) {
                 if (lAlphaBlanks(7)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -1171,7 +1165,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
                                                             {2},                           // Valid dimensions
                                                             RoutineName,                   // Routine name
                                                             CurrentModuleObject,           // Object Type
@@ -1179,7 +1173,7 @@ namespace DXCoils {
                                                             cAlphaFields(7));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).EIRFTemp(1),
                                                 cAlphaFields(7),
@@ -1189,7 +1183,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).EIRFFlow(1) = GetCurveIndex(Alphas(8)); // convert curve name to number
+            DXCoil(DXCoilNum).EIRFFlow(1) = GetCurveIndex(state, Alphas(8)); // convert curve name to number
             if (DXCoil(DXCoilNum).EIRFFlow(1) == 0) {
                 if (lAlphaBlanks(8)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -1201,7 +1195,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
                                                             {1},                           // Valid dimensions
                                                             RoutineName,                   // Routine name
                                                             CurrentModuleObject,           // Object Type
@@ -1209,12 +1203,12 @@ namespace DXCoils {
                                                             cAlphaFields(8));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
-            DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(Alphas(9)); // convert curve name to number
+            DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(state, Alphas(9)); // convert curve name to number
             if (DXCoil(DXCoilNum).PLFFPLR(1) == 0) {
                 if (lAlphaBlanks(9)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -1226,7 +1220,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
                                                             {1},                          // Valid dimensions
                                                             RoutineName,                  // Routine name
                                                             CurrentModuleObject,          // Object Type
@@ -1239,7 +1233,7 @@ namespace DXCoils {
                     MaxCurveVal = -999.0;
                     CurveInput = 0.0;
                     while (CurveInput <= 1.0) {
-                        CurveVal = CurveValue(DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
+                        CurveVal = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
                         if (CurveVal < MinCurveVal) {
                             MinCurveVal = CurveVal;
                             MinCurvePLR = CurveInput;
@@ -1256,7 +1250,7 @@ namespace DXCoils {
                         ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                           TrimSigDigits(MinCurveVal, 3));
                         ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -1265,7 +1259,7 @@ namespace DXCoils {
                         ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                           TrimSigDigits(MaxCurveVal, 3));
                         ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
                     }
                 }
             }
@@ -1422,13 +1416,13 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(15) && NumAlphas > 14) {
-                DXCoil(DXCoilNum).SHRFTemp(1) = GetCurveIndex(Alphas(15)); // convert curve name to number
+                DXCoil(DXCoilNum).SHRFTemp(1) = GetCurveIndex(state, Alphas(15)); // convert curve name to number
                 if (DXCoil(DXCoilNum).SHRFTemp(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
                                                                 {2},                           // Valid dimensions
                                                                 RoutineName,                   // Routine name
                                                                 CurrentModuleObject,           // Object Type
@@ -1438,13 +1432,13 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(16) && NumAlphas > 15) {
-                DXCoil(DXCoilNum).SHRFFlow(1) = GetCurveIndex(Alphas(16)); // convert curve name to number
+                DXCoil(DXCoilNum).SHRFFlow(1) = GetCurveIndex(state, Alphas(16)); // convert curve name to number
                 if (DXCoil(DXCoilNum).SHRFTemp(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(16) + "=\"" + Alphas(16) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is Quadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
                                                                 {1},                           // Valid dimensions
                                                                 RoutineName,                   // Routine name
                                                                 CurrentModuleObject,           // Object Type
@@ -1625,7 +1619,7 @@ namespace DXCoils {
                                 DXCoil(DXCoilNum).RatedAirVolFlowRate(PerfModeNum) *= (1.0 - DXCoil(DXCoilNum).BypassedFlowFrac(PerfModeNum));
                             }
 
-                            DXCoil(DXCoilNum).CCapFTemp(PerfModeNum) = GetCurveIndex(Alphas2(2)); // convert curve name to number
+                            DXCoil(DXCoilNum).CCapFTemp(PerfModeNum) = GetCurveIndex(state, Alphas2(2)); // convert curve name to number
                             if (DXCoil(DXCoilNum).CCapFTemp(PerfModeNum) == 0) {
                                 if (lAlphaBlanks2(2)) {
                                     ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
@@ -1637,7 +1631,7 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(PerfModeNum), // Curve index
+                                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFTemp(PerfModeNum), // Curve index
                                                                             {2},                                      // Valid dimensions
                                                                             RoutineName,                              // Routine name
                                                                             CurrentModuleObject,                      // Object Type
@@ -1645,7 +1639,7 @@ namespace DXCoils {
                                                                             cAlphaFields2(2));                        // Field Name
 
                                 if (!ErrorsFound) {
-                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                                 DXCoil(DXCoilNum).Name,
                                                                 DXCoil(DXCoilNum).CCapFTemp(PerfModeNum),
                                                                 cAlphaFields2(2),
@@ -1655,7 +1649,7 @@ namespace DXCoils {
                                 }
                             }
 
-                            DXCoil(DXCoilNum).CCapFFlow(PerfModeNum) = GetCurveIndex(Alphas2(3)); // convert curve name to number
+                            DXCoil(DXCoilNum).CCapFFlow(PerfModeNum) = GetCurveIndex(state, Alphas2(3)); // convert curve name to number
                             if (DXCoil(DXCoilNum).CCapFFlow(PerfModeNum) == 0) {
                                 if (lAlphaBlanks2(3)) {
                                     ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
@@ -1667,7 +1661,7 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is Quadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(PerfModeNum), // Curve index
+                                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFFlow(PerfModeNum), // Curve index
                                                                             {1},                                      // Valid dimensions
                                                                             RoutineName,                              // Routine name
                                                                             CurrentModuleObject,                      // Object Type
@@ -1675,7 +1669,7 @@ namespace DXCoils {
                                                                             cAlphaFields2(3));                        // Field Name
 
                                 if (!ErrorsFound) {
-                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                                 DXCoil(DXCoilNum).Name,
                                                                 DXCoil(DXCoilNum).CCapFFlow(PerfModeNum),
                                                                 cAlphaFields2(3),
@@ -1684,7 +1678,7 @@ namespace DXCoils {
                                 }
                             }
 
-                            DXCoil(DXCoilNum).EIRFTemp(PerfModeNum) = GetCurveIndex(Alphas2(4)); // convert curve name to number
+                            DXCoil(DXCoilNum).EIRFTemp(PerfModeNum) = GetCurveIndex(state, Alphas2(4)); // convert curve name to number
                             if (DXCoil(DXCoilNum).EIRFTemp(PerfModeNum) == 0) {
                                 if (lAlphaBlanks2(4)) {
                                     ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
@@ -1696,7 +1690,7 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is BiQuadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(PerfModeNum), // Curve index
+                                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFTemp(PerfModeNum), // Curve index
                                                                             {2},                                     // Valid dimensions
                                                                             RoutineName,                             // Routine name
                                                                             CurrentModuleObject,                     // Object Type
@@ -1704,7 +1698,7 @@ namespace DXCoils {
                                                                             cAlphaFields2(4));                       // Field Name
 
                                 if (!ErrorsFound) {
-                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                                 DXCoil(DXCoilNum).Name,
                                                                 DXCoil(DXCoilNum).EIRFTemp(PerfModeNum),
                                                                 cAlphaFields2(4),
@@ -1714,7 +1708,7 @@ namespace DXCoils {
                                 }
                             }
 
-                            DXCoil(DXCoilNum).EIRFFlow(PerfModeNum) = GetCurveIndex(Alphas2(5)); // convert curve name to number
+                            DXCoil(DXCoilNum).EIRFFlow(PerfModeNum) = GetCurveIndex(state, Alphas2(5)); // convert curve name to number
                             if (DXCoil(DXCoilNum).EIRFFlow(PerfModeNum) == 0) {
                                 if (lAlphaBlanks2(5)) {
                                     ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
@@ -1726,7 +1720,7 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal type is Quadratic
-                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(PerfModeNum), // Curve index
+                                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFFlow(PerfModeNum), // Curve index
                                                                             {1},                                     // Valid dimensions
                                                                             RoutineName,                             // Routine name
                                                                             CurrentModuleObject,                     // Object Type
@@ -1734,7 +1728,7 @@ namespace DXCoils {
                                                                             cAlphaFields2(5));                       // Field Name
 
                                 if (!ErrorsFound) {
-                                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                                 DXCoil(DXCoilNum).Name,
                                                                 DXCoil(DXCoilNum).EIRFFlow(PerfModeNum),
                                                                 cAlphaFields2(5),
@@ -1743,7 +1737,7 @@ namespace DXCoils {
                                 }
                             }
 
-                            DXCoil(DXCoilNum).PLFFPLR(PerfModeNum) = GetCurveIndex(Alphas2(6)); // convert curve name to number
+                            DXCoil(DXCoilNum).PLFFPLR(PerfModeNum) = GetCurveIndex(state, Alphas2(6)); // convert curve name to number
                             if (DXCoil(DXCoilNum).PLFFPLR(PerfModeNum) == 0) {
                                 if (lAlphaBlanks2(6)) {
                                     ShowSevereError(RoutineName + PerfObjectType + "=\"" + PerfObjectName + "\", invalid");
@@ -1755,7 +1749,7 @@ namespace DXCoils {
                                 ErrorsFound = true;
                             } else {
                                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), // Curve index
+                                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), // Curve index
                                                                             {1},                                    // Valid dimensions
                                                                             RoutineName,                            // Routine name
                                                                             CurrentModuleObject,                    // Object Type
@@ -1768,7 +1762,7 @@ namespace DXCoils {
                                     MaxCurveVal = -999.0;
                                     CurveInput = 0.0;
                                     while (CurveInput <= 1.0) {
-                                        CurveVal = CurveValue(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), CurveInput);
+                                        CurveVal = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), CurveInput);
                                         if (CurveVal < MinCurveVal) {
                                             MinCurveVal = CurveVal;
                                             MinCurvePLR = CurveInput;
@@ -1785,7 +1779,7 @@ namespace DXCoils {
                                         ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) +
                                                           " is " + TrimSigDigits(MinCurveVal, 3));
                                         ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
+                                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
                                     }
 
                                     if (MaxCurveVal > 1.0) {
@@ -1794,7 +1788,7 @@ namespace DXCoils {
                                         ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) +
                                                           " is " + TrimSigDigits(MaxCurveVal, 3));
                                         ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, _, 1.0);
+                                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, _, 1.0);
                                     }
                                 }
                             }
@@ -1872,13 +1866,13 @@ namespace DXCoils {
 
                             // read in user specified SHR modifer curves
                             if (!lAlphaBlanks2(9) && NumAlphas2 > 8) {
-                                DXCoil(DXCoilNum).SHRFTemp(PerfModeNum) = GetCurveIndex(Alphas2(9)); // convert curve name to number
+                                DXCoil(DXCoilNum).SHRFTemp(PerfModeNum) = GetCurveIndex(state, Alphas2(9)); // convert curve name to number
                                 if (DXCoil(DXCoilNum).SHRFTemp(PerfModeNum) == 0) {
                                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                                     ShowContinueError("...not found " + cAlphaFields2(9) + "=\"" + Alphas2(9) + "\".");
                                 } else {
                                     // Verify Curve Object, only legal type is BiQuadratic
-                                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(PerfModeNum), // Curve index
+                                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFTemp(PerfModeNum), // Curve index
                                                                                 {2},                                     // Valid dimensions
                                                                                 RoutineName,                             // Routine name
                                                                                 CurrentModuleObject,                     // Object Type
@@ -1888,13 +1882,13 @@ namespace DXCoils {
                             }
 
                             if (!lAlphaBlanks2(10) && NumAlphas2 > 9) {
-                                DXCoil(DXCoilNum).SHRFFlow(PerfModeNum) = GetCurveIndex(Alphas2(10)); // convert curve name to number
+                                DXCoil(DXCoilNum).SHRFFlow(PerfModeNum) = GetCurveIndex(state, Alphas2(10)); // convert curve name to number
                                 if (DXCoil(DXCoilNum).SHRFTemp(PerfModeNum) == 0) {
                                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                                     ShowContinueError("...not found " + cAlphaFields2(10) + "=\"" + Alphas2(10) + "\".");
                                 } else {
                                     // Verify Curve Object, only legal type is BiQuadratic
-                                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(PerfModeNum), // Curve index
+                                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFFlow(PerfModeNum), // Curve index
                                                                                 {1},                                     // Valid dimensions
                                                                                 RoutineName,                             // Routine name
                                                                                 CurrentModuleObject,                     // Object Type
@@ -2053,7 +2047,7 @@ namespace DXCoils {
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
-            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(Alphas(5)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
                 if (lAlphaBlanks(5)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2065,7 +2059,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
                                                             {1, 2},                         // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -2073,15 +2067,15 @@ namespace DXCoils {
                                                             cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
                                                     cAlphaFields(5),
                                                     Alphas(5),
                                                     RatedOutdoorAirTempHeat);
                     } else {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
                                                     cAlphaFields(5),
@@ -2092,7 +2086,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(Alphas(6)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(state, Alphas(6)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFFlow(1) == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2104,7 +2098,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
                                                             {1},                            // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -2112,12 +2106,12 @@ namespace DXCoils {
                                                             cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
-            DXCoil(DXCoilNum).EIRFTemp(1) = GetCurveIndex(Alphas(7)); // convert curve name to number
+            DXCoil(DXCoilNum).EIRFTemp(1) = GetCurveIndex(state, Alphas(7)); // convert curve name to number
             if (DXCoil(DXCoilNum).EIRFTemp(1) == 0) {
                 if (lAlphaBlanks(7)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2129,7 +2123,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // only legal types are Quadratic, BiQuadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
                                                             {1, 2},                        // Valid dimensions
                                                             RoutineName,                   // Routine name
                                                             CurrentModuleObject,           // Object Type
@@ -2137,15 +2131,15 @@ namespace DXCoils {
                                                             cAlphaFields(7));              // Field Name
 
                 if (!ErrorsFound) {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(1)).NumDims == 1) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).EIRFTemp(1)).NumDims == 1) {
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).EIRFTemp(1),
                                                     cAlphaFields(7),
                                                     Alphas(7),
                                                     RatedOutdoorAirTempHeat);
                     } else {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).EIRFTemp(1),
                                                     cAlphaFields(7),
@@ -2156,7 +2150,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).EIRFFlow(1) = GetCurveIndex(Alphas(8)); // convert curve name to number
+            DXCoil(DXCoilNum).EIRFFlow(1) = GetCurveIndex(state, Alphas(8)); // convert curve name to number
             if (DXCoil(DXCoilNum).EIRFFlow(1) == 0) {
                 if (lAlphaBlanks(8)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2168,7 +2162,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
                                                             {1},                           // Valid dimensions
                                                             RoutineName,                   // Routine name
                                                             CurrentModuleObject,           // Object Type
@@ -2176,12 +2170,12 @@ namespace DXCoils {
                                                             cAlphaFields(8));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
-            DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(Alphas(9)); // convert curve name to number
+            DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(state, Alphas(9)); // convert curve name to number
             if (DXCoil(DXCoilNum).PLFFPLR(1) == 0) {
                 if (lAlphaBlanks(9)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2193,7 +2187,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
                                                             {1},                          // Valid dimensions
                                                             RoutineName,                  // Routine name
                                                             CurrentModuleObject,          // Object Type
@@ -2206,7 +2200,7 @@ namespace DXCoils {
                     MaxCurveVal = -999.0;
                     CurveInput = 0.0;
                     while (CurveInput <= 1.0) {
-                        CurveVal = CurveValue(DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
+                        CurveVal = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
                         if (CurveVal < MinCurveVal) {
                             MinCurveVal = CurveVal;
                             MinCurvePLR = CurveInput;
@@ -2223,7 +2217,7 @@ namespace DXCoils {
                         ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                           TrimSigDigits(MinCurveVal, 3));
                         ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -2232,13 +2226,13 @@ namespace DXCoils {
                         ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                           TrimSigDigits(MaxCurveVal, 3));
                         ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
                     }
                 }
             }
 
             // Only required for reverse cycle heat pumps
-            DXCoil(DXCoilNum).DefrostEIRFT = GetCurveIndex(Alphas(10)); // convert curve name to number
+            DXCoil(DXCoilNum).DefrostEIRFT = GetCurveIndex(state, Alphas(10)); // convert curve name to number
             if (UtilityRoutines::SameString(Alphas(11), "ReverseCycle")) {
                 if (DXCoil(DXCoilNum).DefrostEIRFT == 0) {
                     if (lAlphaBlanks(10)) {
@@ -2252,7 +2246,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
                                                                 {2},                            // Valid dimensions
                                                                 RoutineName,                    // Routine name
                                                                 CurrentModuleObject,            // Object Type
@@ -2260,7 +2254,7 @@ namespace DXCoils {
                                                                 cAlphaFields(10));              // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).DefrostEIRFT,
                                                     cAlphaFields(10),
@@ -2404,7 +2398,7 @@ namespace DXCoils {
                 }
                 // A15, \field Sensible Heat Ratio Modifier Function of Temperature Curve Name
                 if (!lAlphaBlanks(15)) {
-                    DXCoil(DXCoilNum).SecCoilSHRFT = GetCurveIndex(Alphas(15));
+                    DXCoil(DXCoilNum).SecCoilSHRFT = GetCurveIndex(state, Alphas(15));
                     if (DXCoil(DXCoilNum).SecCoilSHRFT == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
@@ -2412,7 +2406,7 @@ namespace DXCoils {
                 }
                 // A16; \field Sensible Heat Ratio Function of Flow Fraction Curve Name
                 if (!lAlphaBlanks(16)) {
-                    DXCoil(DXCoilNum).SecCoilSHRFF = GetCurveIndex(Alphas(16));
+                    DXCoil(DXCoilNum).SecCoilSHRFF = GetCurveIndex(state, Alphas(16));
                     if (DXCoil(DXCoilNum).SecCoilSHRFF == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...not found " + cAlphaFields(16) + "=\"" + Alphas(16) + "\".");
@@ -2488,7 +2482,7 @@ namespace DXCoils {
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
-            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(Alphas(5)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
                 if (lAlphaBlanks(5)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2500,7 +2494,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
                                                             {2},                            // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -2508,7 +2502,7 @@ namespace DXCoils {
                                                             cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp(1),
                                                 cAlphaFields(5),
@@ -2518,7 +2512,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(Alphas(6)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(state, Alphas(6)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFFlow(1) == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2530,7 +2524,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
                                                             {1},                            // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -2538,12 +2532,12 @@ namespace DXCoils {
                                                             cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
 
-            DXCoil(DXCoilNum).EIRFTemp(1) = GetCurveIndex(Alphas(7)); // convert curve name to number
+            DXCoil(DXCoilNum).EIRFTemp(1) = GetCurveIndex(state, Alphas(7)); // convert curve name to number
             if (DXCoil(DXCoilNum).EIRFTemp(1) == 0) {
                 if (lAlphaBlanks(7)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2555,7 +2549,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFTemp(1), // Curve index
                                                             {2},                           // Valid dimensions
                                                             RoutineName,                   // Routine name
                                                             CurrentModuleObject,           // Object Type
@@ -2563,7 +2557,7 @@ namespace DXCoils {
                                                             cAlphaFields(7));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).EIRFTemp(1),
                                                 cAlphaFields(7),
@@ -2573,7 +2567,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).EIRFFlow(1) = GetCurveIndex(Alphas(8)); // convert curve name to number
+            DXCoil(DXCoilNum).EIRFFlow(1) = GetCurveIndex(state, Alphas(8)); // convert curve name to number
             if (DXCoil(DXCoilNum).EIRFFlow(1) == 0) {
                 if (lAlphaBlanks(8)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2585,7 +2579,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFFlow(1), // Curve index
                                                             {1},                           // Valid dimensions
                                                             RoutineName,                   // Routine name
                                                             CurrentModuleObject,           // Object Type
@@ -2593,12 +2587,12 @@ namespace DXCoils {
                                                             cAlphaFields(8));              // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).EIRFFlow(1), cAlphaFields(8), Alphas(8), 1.0);
                 }
             }
 
-            DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(Alphas(9)); // convert curve name to number
+            DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(state, Alphas(9)); // convert curve name to number
             if (DXCoil(DXCoilNum).PLFFPLR(1) == 0) {
                 if (lAlphaBlanks(9)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2610,7 +2604,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal types are Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
                                                             {1},                          // Valid dimensions
                                                             RoutineName,                  // Routine name
                                                             CurrentModuleObject,          // Object Type
@@ -2623,7 +2617,7 @@ namespace DXCoils {
                     MaxCurveVal = -999.0;
                     CurveInput = 0.0;
                     while (CurveInput <= 1.0) {
-                        CurveVal = CurveValue(DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
+                        CurveVal = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
                         if (CurveVal < MinCurveVal) {
                             MinCurveVal = CurveVal;
                             MinCurvePLR = CurveInput;
@@ -2640,7 +2634,7 @@ namespace DXCoils {
                         ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                           TrimSigDigits(MinCurveVal, 3));
                         ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
                     }
 
                     if (MaxCurveVal > 1.0) {
@@ -2649,7 +2643,7 @@ namespace DXCoils {
                         ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                           TrimSigDigits(MaxCurveVal, 3));
                         ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                        SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                        SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
                     }
                 }
             }
@@ -2666,7 +2660,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).MinOATCompressor = Numbers(10);
             }
 
-            DXCoil(DXCoilNum).CCapFTemp2 = GetCurveIndex(Alphas(10)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFTemp2 = GetCurveIndex(state, Alphas(10)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFTemp2 == 0) {
                 if (lAlphaBlanks(10)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2678,7 +2672,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp2, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFTemp2, // Curve index
                                                             {2},                          // Valid dimensions
                                                             RoutineName,                  // Routine name
                                                             CurrentModuleObject,          // Object Type
@@ -2686,7 +2680,7 @@ namespace DXCoils {
                                                             cAlphaFields(10));            // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp2,
                                                 cAlphaFields(10),
@@ -2696,7 +2690,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).EIRFTemp2 = GetCurveIndex(Alphas(11)); // convert curve name to number
+            DXCoil(DXCoilNum).EIRFTemp2 = GetCurveIndex(state, Alphas(11)); // convert curve name to number
             if (DXCoil(DXCoilNum).EIRFTemp2 == 0) {
                 if (lAlphaBlanks(11)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -2708,7 +2702,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).EIRFTemp2, // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).EIRFTemp2, // Curve index
                                                             {2},                         // Valid dimensions
                                                             RoutineName,                 // Routine name
                                                             CurrentModuleObject,         // Object Type
@@ -2716,7 +2710,7 @@ namespace DXCoils {
                                                             cAlphaFields(11));           // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).EIRFTemp2,
                                                 cAlphaFields(11),
@@ -2869,14 +2863,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(17) && NumAlphas > 16) {
-                DXCoil(DXCoilNum).SHRFTemp(1) = GetCurveIndex(Alphas(17)); // convert curve name to number
+                DXCoil(DXCoilNum).SHRFTemp(1) = GetCurveIndex(state, Alphas(17)); // convert curve name to number
                 // DXCoil(DXCoilNum)%SHRFTemp2 = DXCoil(DXCoilNum)%SHRFTemp(1)
                 if (DXCoil(DXCoilNum).SHRFTemp(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(17) + "=\"" + Alphas(17) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFTemp(1), // Curve index
                                                                 {2},                           // Valid dimensions
                                                                 RoutineName,                   // Routine name
                                                                 CurrentModuleObject,           // Object Type
@@ -2886,14 +2880,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(18) && NumAlphas > 17) {
-                DXCoil(DXCoilNum).SHRFFlow(1) = GetCurveIndex(Alphas(18)); // convert curve name to number
+                DXCoil(DXCoilNum).SHRFFlow(1) = GetCurveIndex(state, Alphas(18)); // convert curve name to number
                 // DXCoil(DXCoilNum)%SHRFFlow2 = DXCoil(DXCoilNum)%SHRFFlow(1)
                 if (DXCoil(DXCoilNum).SHRFFlow(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(18) + "=\"" + Alphas(18) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFFlow(1), // Curve index
                                                                 {1},                           // Valid dimensions
                                                                 RoutineName,                   // Routine name
                                                                 CurrentModuleObject,           // Object Type
@@ -2903,13 +2897,13 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(19) && NumAlphas > 18) {
-                DXCoil(DXCoilNum).SHRFTemp2 = GetCurveIndex(Alphas(19)); // convert curve name to number
+                DXCoil(DXCoilNum).SHRFTemp2 = GetCurveIndex(state, Alphas(19)); // convert curve name to number
                 if (DXCoil(DXCoilNum).SHRFTemp2 == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(19) + "=\"" + Alphas(19) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFTemp2, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFTemp2, // Curve index
                                                                 {2},                         // Valid dimensions
                                                                 RoutineName,                 // Routine name
                                                                 CurrentModuleObject,         // Object Type
@@ -2919,13 +2913,13 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(20) && NumAlphas > 19) {
-                DXCoil(DXCoilNum).SHRFFlow2 = GetCurveIndex(Alphas(20)); // convert curve name to number
+                DXCoil(DXCoilNum).SHRFFlow2 = GetCurveIndex(state, Alphas(20)); // convert curve name to number
                 if (DXCoil(DXCoilNum).SHRFTemp2 == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(20) + "=\"" + Alphas(20) + "\".");
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).SHRFFlow2, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).SHRFFlow2, // Curve index
                                                                 {1},                         // Valid dimensions
                                                                 RoutineName,                 // Routine name
                                                                 CurrentModuleObject,         // Object Type
@@ -3166,14 +3160,14 @@ namespace DXCoils {
             InletWaterTemp = DXCoil(DXCoilNum).RatedInletWaterTemp;
 
             if (!lAlphaBlanks(10)) {
-                DXCoil(DXCoilNum).HCapFTemp = GetCurveIndex(Alphas(10));
+                DXCoil(DXCoilNum).HCapFTemp = GetCurveIndex(state, Alphas(10));
                 if (DXCoil(DXCoilNum).HCapFTemp == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(10) + "=\"" + Alphas(10) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCapFTemp, // Curve index
                                                                 {1, 2},                      // Valid dimensions
                                                                 RoutineName,                 // Routine name
                                                                 CurrentModuleObject,         // Object Type
@@ -3181,15 +3175,15 @@ namespace DXCoils {
                                                                 cAlphaFields(10));           // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
                                                         cAlphaFields(10),
                                                         Alphas(10),
                                                         InletAirTemp);
                         } else {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
                                                         cAlphaFields(10),
@@ -3202,14 +3196,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(11)) {
-                DXCoil(DXCoilNum).HCapFAirFlow = GetCurveIndex(Alphas(11));
+                DXCoil(DXCoilNum).HCapFAirFlow = GetCurveIndex(state, Alphas(11));
                 if (DXCoil(DXCoilNum).HCapFAirFlow == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(11) + "=\"" + Alphas(11) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
                                                                 {1},                            // Valid dimensions
                                                                 RoutineName,                    // Routine name
                                                                 CurrentModuleObject,            // Object Type
@@ -3217,7 +3211,7 @@ namespace DXCoils {
                                                                 cAlphaFields(11));              // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).HCapFAirFlow,
                                                     cAlphaFields(11),
@@ -3228,14 +3222,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(12)) {
-                DXCoil(DXCoilNum).HCapFWaterFlow = GetCurveIndex(Alphas(12));
+                DXCoil(DXCoilNum).HCapFWaterFlow = GetCurveIndex(state, Alphas(12));
                 if (DXCoil(DXCoilNum).HCapFWaterFlow == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(12) + "=\"" + Alphas(12) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFWaterFlow, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCapFWaterFlow, // Curve index
                                                                 {1},                              // Valid dimensions
                                                                 RoutineName,                      // Routine name
                                                                 CurrentModuleObject,              // Object Type
@@ -3243,7 +3237,7 @@ namespace DXCoils {
                                                                 cAlphaFields(12));                // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).HCapFWaterFlow,
                                                     cAlphaFields(12),
@@ -3254,14 +3248,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(13)) {
-                DXCoil(DXCoilNum).HCOPFTemp = GetCurveIndex(Alphas(13));
+                DXCoil(DXCoilNum).HCOPFTemp = GetCurveIndex(state, Alphas(13));
                 if (DXCoil(DXCoilNum).HCOPFTemp == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(13) + "=\"" + Alphas(13) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCOPFTemp, // Curve index
                                                                 {1, 2},                      // Valid dimensions
                                                                 RoutineName,                 // Routine name
                                                                 CurrentModuleObject,         // Object Type
@@ -3269,15 +3263,15 @@ namespace DXCoils {
                                                                 cAlphaFields(13));           // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
                                                         cAlphaFields(13),
                                                         Alphas(13),
                                                         InletAirTemp);
                         } else {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
                                                         cAlphaFields(13),
@@ -3290,14 +3284,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(14)) {
-                DXCoil(DXCoilNum).HCOPFAirFlow = GetCurveIndex(Alphas(14));
+                DXCoil(DXCoilNum).HCOPFAirFlow = GetCurveIndex(state, Alphas(14));
                 if (DXCoil(DXCoilNum).HCOPFAirFlow == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(14) + "=\"" + Alphas(14) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
                                                                 {1},                            // Valid dimensions
                                                                 RoutineName,                    // Routine name
                                                                 CurrentModuleObject,            // Object Type
@@ -3305,7 +3299,7 @@ namespace DXCoils {
                                                                 cAlphaFields(14));              // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).HCOPFAirFlow,
                                                     cAlphaFields(14),
@@ -3316,14 +3310,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(15)) {
-                DXCoil(DXCoilNum).HCOPFWaterFlow = GetCurveIndex(Alphas(15));
+                DXCoil(DXCoilNum).HCOPFWaterFlow = GetCurveIndex(state, Alphas(15));
                 if (DXCoil(DXCoilNum).HCOPFWaterFlow == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(15) + "=\"" + Alphas(15) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFWaterFlow, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCOPFWaterFlow, // Curve index
                                                                 {1},                              // Valid dimensions
                                                                 RoutineName,                      // Routine name
                                                                 CurrentModuleObject,              // Object Type
@@ -3331,7 +3325,7 @@ namespace DXCoils {
                                                                 cAlphaFields(15));                // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).HCOPFWaterFlow,
                                                     cAlphaFields(15),
@@ -3342,14 +3336,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(16)) {
-                DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(Alphas(16));
+                DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(state, Alphas(16));
                 if (DXCoil(DXCoilNum).PLFFPLR(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(16) + "=\"" + Alphas(16) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
                                                                 {1},                          // Valid dimensions
                                                                 RoutineName,                  // Routine name
                                                                 CurrentModuleObject,          // Object Type
@@ -3362,7 +3356,7 @@ namespace DXCoils {
                         MaxCurveVal = -999.0;
                         CurveInput = 0.0;
                         while (CurveInput <= 1.0) {
-                            CurveVal = CurveValue(DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
+                            CurveVal = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
                             if (CurveVal < MinCurveVal) {
                                 MinCurveVal = CurveVal;
                                 MinCurvePLR = CurveInput;
@@ -3379,7 +3373,7 @@ namespace DXCoils {
                             ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                               TrimSigDigits(MinCurveVal, 3));
                             ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
                         }
 
                         if (MaxCurveVal > 1.0) {
@@ -3388,7 +3382,7 @@ namespace DXCoils {
                             ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                               TrimSigDigits(MaxCurveVal, 3));
                             ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
                         }
                     }
                 }
@@ -3564,14 +3558,14 @@ namespace DXCoils {
             InletWaterTemp = DXCoil(DXCoilNum).RatedInletWaterTemp;
 
             if (!lAlphaBlanks(6)) {
-                DXCoil(DXCoilNum).HCapFTemp = GetCurveIndex(Alphas(6));
+                DXCoil(DXCoilNum).HCapFTemp = GetCurveIndex(state, Alphas(6));
                 if (DXCoil(DXCoilNum).HCapFTemp == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(6) + "=\"" + Alphas(6) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFTemp, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCapFTemp, // Curve index
                                                                 {1, 2},                      // Valid dimensions
                                                                 RoutineName,                 // Routine name
                                                                 CurrentModuleObject,         // Object Type
@@ -3579,15 +3573,15 @@ namespace DXCoils {
                                                                 cAlphaFields(6));            // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).HCapFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
                                                         cAlphaFields(6),
                                                         Alphas(6),
                                                         InletAirTemp);
                         } else {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCapFTemp,
                                                         cAlphaFields(6),
@@ -3600,14 +3594,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(7)) {
-                DXCoil(DXCoilNum).HCapFAirFlow = GetCurveIndex(Alphas(7));
+                DXCoil(DXCoilNum).HCapFAirFlow = GetCurveIndex(state, Alphas(7));
                 if (DXCoil(DXCoilNum).HCapFAirFlow == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(7) + "=\"" + Alphas(7) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCapFAirFlow, // Curve index
                                                                 {1},                            // Valid dimensions
                                                                 RoutineName,                    // Routine name
                                                                 CurrentModuleObject,            // Object Type
@@ -3615,7 +3609,7 @@ namespace DXCoils {
                                                                 cAlphaFields(7));               // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).HCapFAirFlow,
                                                     cAlphaFields(7),
@@ -3626,14 +3620,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(8)) {
-                DXCoil(DXCoilNum).HCOPFTemp = GetCurveIndex(Alphas(8));
+                DXCoil(DXCoilNum).HCOPFTemp = GetCurveIndex(state, Alphas(8));
                 if (DXCoil(DXCoilNum).HCOPFTemp == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(8) + "=\"" + Alphas(8) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are BiQuadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFTemp, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCOPFTemp, // Curve index
                                                                 {1, 2},                      // Valid dimensions
                                                                 RoutineName,                 // Routine name
                                                                 CurrentModuleObject,         // Object Type
@@ -3641,15 +3635,15 @@ namespace DXCoils {
                                                                 cAlphaFields(8));            // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).HCOPFTemp).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
                                                         cAlphaFields(8),
                                                         Alphas(8),
                                                         InletAirTemp);
                         } else {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).HCOPFTemp,
                                                         cAlphaFields(8),
@@ -3662,14 +3656,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(9)) {
-                DXCoil(DXCoilNum).HCOPFAirFlow = GetCurveIndex(Alphas(9));
+                DXCoil(DXCoilNum).HCOPFAirFlow = GetCurveIndex(state, Alphas(9));
                 if (DXCoil(DXCoilNum).HCOPFAirFlow == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(9) + "=\"" + Alphas(9) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).HCOPFAirFlow, // Curve index
                                                                 {1},                            // Valid dimensions
                                                                 RoutineName,                    // Routine name
                                                                 CurrentModuleObject,            // Object Type
@@ -3677,7 +3671,7 @@ namespace DXCoils {
                                                                 cAlphaFields(9));               // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).HCOPFAirFlow,
                                                     cAlphaFields(9),
@@ -3688,14 +3682,14 @@ namespace DXCoils {
             }
 
             if (!lAlphaBlanks(10)) {
-                DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(Alphas(10));
+                DXCoil(DXCoilNum).PLFFPLR(1) = GetCurveIndex(state, Alphas(10));
                 if (DXCoil(DXCoilNum).PLFFPLR(1) == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                     ShowContinueError("...not found " + cAlphaFields(10) + "=\"" + Alphas(10) + "\".");
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Cubic or Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).PLFFPLR(1), // Curve index
                                                                 {1},                          // Valid dimensions
                                                                 RoutineName,                  // Routine name
                                                                 CurrentModuleObject,          // Object Type
@@ -3708,7 +3702,7 @@ namespace DXCoils {
                         MaxCurveVal = -999.0;
                         CurveInput = 0.0;
                         while (CurveInput <= 1.0) {
-                            CurveVal = CurveValue(DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
+                            CurveVal = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(1), CurveInput);
                             if (CurveVal < MinCurveVal) {
                                 MinCurveVal = CurveVal;
                                 MinCurvePLR = CurveInput;
@@ -3725,7 +3719,7 @@ namespace DXCoils {
                             ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                               TrimSigDigits(MinCurveVal, 3));
                             ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
                         }
 
                         if (MaxCurveVal > 1.0) {
@@ -3734,7 +3728,7 @@ namespace DXCoils {
                             ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                               TrimSigDigits(MaxCurveVal, 3));
                             ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, _, 1.0);
                         }
                     }
                 }
@@ -3983,7 +3977,7 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).MSRatedAirVolFlowRate(I) = Numbers(10 + (I - 1) * 13);
                 DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate(I) = Numbers(11 + (I - 1) * 13);
 
-                DXCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(Alphas(13 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(state, Alphas(13 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     if (lAlphaBlanks(13 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -3995,7 +3989,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
                                                                 {2},                              // Valid dimensions
                                                                 RoutineName,                      // Routine name
                                                                 CurrentModuleObject,              // Object Type
@@ -4003,7 +3997,7 @@ namespace DXCoils {
                                                                 cAlphaFields(13 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).MSCCapFTemp(I),
                                                     cAlphaFields(13 + (I - 1) * 6),
@@ -4013,7 +4007,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSCCapFFlow(I) = GetCurveIndex(Alphas(14 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSCCapFFlow(I) = GetCurveIndex(state, Alphas(14 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSCCapFFlow(I) == 0) {
                     if (lAlphaBlanks(14 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4025,7 +4019,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
                                                                 {1},                              // Valid dimensions
                                                                 RoutineName,                      // Routine name
                                                                 CurrentModuleObject,              // Object Type
@@ -4033,7 +4027,7 @@ namespace DXCoils {
                                                                 cAlphaFields(14 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).MSCCapFFlow(I),
                                                     cAlphaFields(14 + (I - 1) * 6),
@@ -4042,7 +4036,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(Alphas(15 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(state, Alphas(15 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(15 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4054,7 +4048,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
                                                                 {2},                             // Valid dimensions
                                                                 RoutineName,                     // Routine name
                                                                 CurrentModuleObject,             // Object Type
@@ -4062,7 +4056,7 @@ namespace DXCoils {
                                                                 cAlphaFields(15 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).MSEIRFTemp(I),
                                                     cAlphaFields(15 + (I - 1) * 6),
@@ -4072,7 +4066,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSEIRFFlow(I) = GetCurveIndex(Alphas(16 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSEIRFFlow(I) = GetCurveIndex(state, Alphas(16 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSEIRFFlow(I) == 0) {
                     if (lAlphaBlanks(16 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4084,7 +4078,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
                                                                 {1},                             // Valid dimensions
                                                                 RoutineName,                     // Routine name
                                                                 CurrentModuleObject,             // Object Type
@@ -4092,7 +4086,7 @@ namespace DXCoils {
                                                                 cAlphaFields(16 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).MSEIRFFlow(I),
                                                     cAlphaFields(16 + (I - 1) * 6),
@@ -4101,7 +4095,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSPLFFPLR(I) = GetCurveIndex(Alphas(17 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSPLFFPLR(I) = GetCurveIndex(state, Alphas(17 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSPLFFPLR(I) == 0) {
                     if (lAlphaBlanks(17 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4113,7 +4107,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
                                                                 {1},                             // Valid dimensions
                                                                 RoutineName,                     // Routine name
                                                                 CurrentModuleObject,             // Object Type
@@ -4126,7 +4120,7 @@ namespace DXCoils {
                         MaxCurveVal = -999.0;
                         CurveInput = 0.0;
                         while (CurveInput <= 1.0) {
-                            CurveVal = CurveValue(DXCoil(DXCoilNum).MSPLFFPLR(I), CurveInput);
+                            CurveVal = CurveValue(state, DXCoil(DXCoilNum).MSPLFFPLR(I), CurveInput);
                             if (CurveVal < MinCurveVal) {
                                 MinCurveVal = CurveVal;
                                 MinCurvePLR = CurveInput;
@@ -4144,7 +4138,7 @@ namespace DXCoils {
                             ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                               TrimSigDigits(MinCurveVal, 3));
                             ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(PerfModeNum), ErrorsFound, 0.7, _);
                         }
 
                         if (MaxCurveVal > 1.0) {
@@ -4154,7 +4148,7 @@ namespace DXCoils {
                             ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                               TrimSigDigits(MaxCurveVal, 3));
                             ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
                         }
                     }
                 }
@@ -4192,11 +4186,11 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).MSWasteHeatFrac(I) = Numbers(16 + (I - 1) * 13);
 
                 // Read waste heat modifier curve name
-                DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(Alphas(18 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(state, Alphas(18 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
-                        ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
                                                                     {2},                              // Valid dimensions
                                                                     RoutineName,                      // Routine name
                                                                     CurrentModuleObject,              // Object Type
@@ -4204,7 +4198,7 @@ namespace DXCoils {
                                                                     cAlphaFields(18 + (I - 1) * 6));  // Field Name
 
                         if (!ErrorsFound) {
-                            CurveVal = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
+                            CurveVal = CurveValue(state, DXCoil(DXCoilNum).MSWasteHeat(I), RatedOutdoorAirTemp, RatedInletAirTemp);
                             if (CurveVal > 1.10 || CurveVal < 0.90) {
                                 ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", curve values");
                                 ShowContinueError(cAlphaFields(18 + (I - 1) * 6) + " = " + Alphas(18 + (I - 1) * 6));
@@ -4331,7 +4325,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).MaxOATCrankcaseHeater = Numbers(4);
 
             // Only required for reverse cycle heat pumps
-            DXCoil(DXCoilNum).DefrostEIRFT = GetCurveIndex(Alphas(5)); // convert curve name to number
+            DXCoil(DXCoilNum).DefrostEIRFT = GetCurveIndex(state, Alphas(5)); // convert curve name to number
             if (UtilityRoutines::SameString(Alphas(6), "ReverseCycle")) {
                 if (DXCoil(DXCoilNum).DefrostEIRFT == 0) {
                     if (lAlphaBlanks(5)) {
@@ -4344,7 +4338,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is BiQuadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).DefrostEIRFT, // Curve index
                                                                 {2},                            // Valid dimensions
                                                                 RoutineName,                    // Routine name
                                                                 CurrentModuleObject,            // Object Type
@@ -4352,7 +4346,7 @@ namespace DXCoils {
                                                                 cAlphaFields(5));               // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).DefrostEIRFT,
                                                     cAlphaFields(5),
@@ -4461,14 +4455,14 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).MSFanPowerPerEvapAirFlowRate(I) = Numbers(13 + (I - 1) * 5);
                 DXCoil(DXCoilNum).MSWasteHeatFrac(I) = Numbers(14 + (I - 1) * 5);
 
-                DXCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(Alphas(10 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSCCapFTemp(I) = GetCurveIndex(state, Alphas(10 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSCCapFTemp(I) == 0) {
                     ShowSevereError(CurrentModuleObject + ", \"" + DXCoil(DXCoilNum).Name + "\" " + cAlphaFields(10 + (I - 1) * 6) +
                                     " not found:" + Alphas(10 + (I - 1) * 6));
                     ErrorsFound = true;
                 } else {
                     // only legal types are Quadratic, BiQuadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSCCapFTemp(I), // Curve index
                                                                 {1, 2},                           // Valid dimensions
                                                                 RoutineName,                      // Routine name
                                                                 CurrentModuleObject,              // Object Type
@@ -4476,15 +4470,15 @@ namespace DXCoils {
                                                                 cAlphaFields(10 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(I)).NumDims == 1) {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(I)).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSCCapFTemp(I),
                                                         cAlphaFields(10 + (I - 1) * 6),
                                                         Alphas(10 + (I - 1) * 6),
                                                         RatedOutdoorAirTempHeat);
                         } else {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSCCapFTemp(I),
                                                         cAlphaFields(10 + (I - 1) * 6),
@@ -4495,7 +4489,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSCCapFFlow(I) = GetCurveIndex(Alphas(11 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSCCapFFlow(I) = GetCurveIndex(state, Alphas(11 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSCCapFFlow(I) == 0) {
                     if (lAlphaBlanks(11 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4507,7 +4501,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSCCapFFlow(I), // Curve index
                                                                 {1},                              // Valid dimensions
                                                                 RoutineName,                      // Routine name
                                                                 CurrentModuleObject,              // Object Type
@@ -4515,7 +4509,7 @@ namespace DXCoils {
                                                                 cAlphaFields(11 + (I - 1) * 6));  // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).MSCCapFFlow(I),
                                                     cAlphaFields(11 + (I - 1) * 6),
@@ -4524,7 +4518,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(Alphas(12 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSEIRFTemp(I) = GetCurveIndex(state, Alphas(12 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSEIRFTemp(I) == 0) {
                     if (lAlphaBlanks(12 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4536,7 +4530,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // only legal types are Quadratic, BiQuadratic and Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSEIRFTemp(I), // Curve index
                                                                 {1, 2},                          // Valid dimensions
                                                                 RoutineName,                     // Routine name
                                                                 CurrentModuleObject,             // Object Type
@@ -4544,15 +4538,15 @@ namespace DXCoils {
                                                                 cAlphaFields(12 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(I)).NumDims == 1) {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(I)).NumDims == 1) {
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSEIRFTemp(I),
                                                         cAlphaFields(12 + (I - 1) * 6),
                                                         Alphas(12 + (I - 1) * 6),
                                                         RatedOutdoorAirTempHeat);
                         } else {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSEIRFTemp(I),
                                                         cAlphaFields(12 + (I - 1) * 6),
@@ -4563,7 +4557,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSEIRFFlow(I) = GetCurveIndex(Alphas(13 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSEIRFFlow(I) = GetCurveIndex(state, Alphas(13 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSEIRFFlow(I) == 0) {
                     if (lAlphaBlanks(13 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4575,7 +4569,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal type is Quadratic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSEIRFFlow(I), // Curve index
                                                                 {1},                             // Valid dimensions
                                                                 RoutineName,                     // Routine name
                                                                 CurrentModuleObject,             // Object Type
@@ -4583,7 +4577,7 @@ namespace DXCoils {
                                                                 cAlphaFields(13 + (I - 1) * 6)); // Field Name
 
                     if (!ErrorsFound) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).MSEIRFFlow(I),
                                                     cAlphaFields(13 + (I - 1) * 6),
@@ -4592,7 +4586,7 @@ namespace DXCoils {
                     }
                 }
 
-                DXCoil(DXCoilNum).MSPLFFPLR(I) = GetCurveIndex(Alphas(14 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSPLFFPLR(I) = GetCurveIndex(state, Alphas(14 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).MSPLFFPLR(I) == 0) {
                     if (lAlphaBlanks(14 + (I - 1) * 6)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4604,7 +4598,7 @@ namespace DXCoils {
                     ErrorsFound = true;
                 } else {
                     // Verify Curve Object, only legal types are Quadratic or Cubic
-                    ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
+                    ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSPLFFPLR(I),  // Curve index
                                                                 {1},                             // Valid dimensions
                                                                 RoutineName,                     // Routine name
                                                                 CurrentModuleObject,             // Object Type
@@ -4617,7 +4611,7 @@ namespace DXCoils {
                         MaxCurveVal = -999.0;
                         CurveInput = 0.0;
                         while (CurveInput <= 1.0) {
-                            CurveVal = CurveValue(DXCoil(DXCoilNum).MSPLFFPLR(I), CurveInput);
+                            CurveVal = CurveValue(state, DXCoil(DXCoilNum).MSPLFFPLR(I), CurveInput);
                             if (CurveVal < MinCurveVal) {
                                 MinCurveVal = CurveVal;
                                 MinCurvePLR = CurveInput;
@@ -4634,8 +4628,8 @@ namespace DXCoils {
                             ShowContinueError("...Curve minimum must be >= 0.7, curve min at PLR = " + TrimSigDigits(MinCurvePLR, 2) + " is " +
                                               TrimSigDigits(MinCurveVal, 3));
                             ShowContinueError("...Setting curve minimum to 0.7 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 0.7, _);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).PLFFPLR(1), ErrorsFound, 0.7, _);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, 0.7, _);
                         }
 
                         if (MaxCurveVal > 1.0) {
@@ -4644,17 +4638,17 @@ namespace DXCoils {
                             ShowContinueError("...Curve maximum must be <= 1.0, curve max at PLR = " + TrimSigDigits(MaxCurvePLR, 2) + " is " +
                                               TrimSigDigits(MaxCurveVal, 3));
                             ShowContinueError("...Setting curve maximum to 1.0 and simulation continues.");
-                            SetCurveOutputMinMaxValues(DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
+                            SetCurveOutputMinMaxValues(state, DXCoil(DXCoilNum).MSPLFFPLR(I), ErrorsFound, _, 1.0);
                         }
                     }
                 }
 
                 // Read waste heat modifier curve name
-                DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(Alphas(15 + (I - 1) * 6)); // convert curve name to number
+                DXCoil(DXCoilNum).MSWasteHeat(I) = GetCurveIndex(state, Alphas(15 + (I - 1) * 6)); // convert curve name to number
                 if (DXCoil(DXCoilNum).FuelType != FuelTypeElectricity) {
                     if (DXCoil(DXCoilNum).MSWasteHeat(I) > 0) {
                         // Verify Curve Object, only legal types are BiQuadratic
-                        ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).MSWasteHeat(I), // Curve index
                                                                     {2},                              // Valid dimensions
                                                                     RoutineName,                      // Routine name
                                                                     CurrentModuleObject,              // Object Type
@@ -4662,7 +4656,7 @@ namespace DXCoils {
                                                                     cAlphaFields(15 + (I - 1) * 6));  // Field Name
 
                         if (!ErrorsFound) {
-                            checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                            checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                         DXCoil(DXCoilNum).Name,
                                                         DXCoil(DXCoilNum).MSWasteHeat(I),
                                                         cAlphaFields(15 + (I - 1) * 6),
@@ -4698,7 +4692,7 @@ namespace DXCoils {
                     DXCoil(DXCoilNum).MSSecCoilRatedSHR(I) = Numbers(32 + (I - 1) * 3);
                     // Read SHR modifier curve function of temperature
                     if (!lAlphaBlanks(35 + (I - 1) * 2)) {
-                        DXCoil(DXCoilNum).MSSecCoilSHRFT(I) = GetCurveIndex(Alphas(35 + (I - 1) * 2)); // convert curve name to number
+                        DXCoil(DXCoilNum).MSSecCoilSHRFT(I) = GetCurveIndex(state, Alphas(35 + (I - 1) * 2)); // convert curve name to number
                         if (DXCoil(DXCoilNum).MSSecCoilSHRFT(I) == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                             ShowContinueError("...not found " + cAlphaFields(35 + (I - 1) * 2) + "=\"" + Alphas(35 + (I - 1) * 2) + "\".");
@@ -4706,7 +4700,7 @@ namespace DXCoils {
                     }
                     // Read SHR modifier curve function of flow fraction
                     if (!lAlphaBlanks(36 + (I - 1) * 2)) {
-                        DXCoil(DXCoilNum).MSSecCoilSHRFF(I) = GetCurveIndex(Alphas(36 + (I - 1) * 2)); // convert curve name to number
+                        DXCoil(DXCoilNum).MSSecCoilSHRFF(I) = GetCurveIndex(state, Alphas(36 + (I - 1) * 2)); // convert curve name to number
                         if (DXCoil(DXCoilNum).MSSecCoilSHRFF(I) == 0) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                             ShowContinueError("...not found " + cAlphaFields(36 + (I - 1) * 2) + "=\"" + Alphas(36 + (I - 1) * 2) + "\".");
@@ -4760,9 +4754,9 @@ namespace DXCoils {
             DXCoil(DXCoilNum).RatedSHR(1) = Numbers(2);
             DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = Numbers(3);
 
-            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(Alphas(3));
+            DXCoil(DXCoilNum).CCapFTemp(1) = GetCurveIndex(state, Alphas(3));
             // Verify Curve Object, only legal type is Linear, Quadratic, Cubic, or BiQuadratic
-            ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+            ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
                                                         {1, 2},                         // Valid dimensions
                                                         RoutineName,                    // Routine name
                                                         CurrentModuleObject,            // Object Type
@@ -4770,15 +4764,15 @@ namespace DXCoils {
                                                         cAlphaFields(3));               // Field Name
 
             if (!ErrorsFound) {
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
+                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp(1),
                                                 cAlphaFields(3),
                                                 Alphas(3),
                                                 RatedInletWetBulbTemp);
                 } else {
-                    checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                 DXCoil(DXCoilNum).Name,
                                                 DXCoil(DXCoilNum).CCapFTemp(1),
                                                 cAlphaFields(3),
@@ -4788,7 +4782,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(Alphas(4)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(state, Alphas(4)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFFlow(1) == 0) {
                 if (lAlphaBlanks(4)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4800,7 +4794,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Linear, Quadratic or Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
                                                             {1},                            // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -4808,7 +4802,7 @@ namespace DXCoils {
                                                             cAlphaFields(4));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(4), Alphas(4), 1.0);
                 }
             }
@@ -4890,7 +4884,7 @@ namespace DXCoils {
 
             TestCompSet(CurrentModuleObject, Alphas(1), Alphas(3), Alphas(4), "Air Nodes");
 
-            DXCoil(DXCoilNum).CCapFTemp = GetCurveIndex(Alphas(5));
+            DXCoil(DXCoilNum).CCapFTemp = GetCurveIndex(state, Alphas(5));
             if (DXCoil(DXCoilNum).CCapFTemp(1) == 0) {
                 if (lAlphaBlanks(5)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4901,7 +4895,7 @@ namespace DXCoils {
                 }
                 ErrorsFound = true;
             } else {
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFTemp(1), // Curve index
                                                             {1, 2},                         // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -4909,8 +4903,8 @@ namespace DXCoils {
                                                             cAlphaFields(5));               // Field Name
 
                 if (!ErrorsFound) {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
-                        checkCurveIsNormalizedToOne(RoutineName + CurrentModuleObject,
+                    if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).CCapFTemp(1)).NumDims == 1) {
+                        checkCurveIsNormalizedToOne(state, RoutineName + CurrentModuleObject,
                                                     DXCoil(DXCoilNum).Name,
                                                     DXCoil(DXCoilNum).CCapFTemp(1),
                                                     cAlphaFields(5),
@@ -4923,7 +4917,7 @@ namespace DXCoils {
                 }
             }
 
-            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(Alphas(6)); // convert curve name to number
+            DXCoil(DXCoilNum).CCapFFlow(1) = GetCurveIndex(state, Alphas(6)); // convert curve name to number
             if (DXCoil(DXCoilNum).CCapFFlow(1) == 0) {
                 if (lAlphaBlanks(6)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", missing");
@@ -4935,7 +4929,7 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is Quadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
+                ErrorsFound |= CurveManager::CheckCurveDims(state, DXCoil(DXCoilNum).CCapFFlow(1), // Curve index
                                                             {1},                            // Valid dimensions
                                                             RoutineName,                    // Routine name
                                                             CurrentModuleObject,            // Object Type
@@ -4943,7 +4937,7 @@ namespace DXCoils {
                                                             cAlphaFields(6));               // Field Name
 
                 if (!ErrorsFound) {
-                    checkCurveIsNormalizedToOne(
+                    checkCurveIsNormalizedToOne(state,
                         RoutineName + CurrentModuleObject, DXCoil(DXCoilNum).Name, DXCoil(DXCoilNum).CCapFFlow(1), cAlphaFields(6), Alphas(6), 1.0);
                 }
             }
@@ -5006,7 +5000,7 @@ namespace DXCoils {
             // @@ DXCoil( DXCoilNum ).RateBFVRFIUEvap = 0.0592; there will be a new field for this, which will be handled in a separate issue to
             // update VRF-HP idd. It is not hanlded here to avoide tranistion issues for VRF-HP.
 
-            int indexSHCurve = GetCurveIndex(Alphas(5)); // convert curve name to index number
+            int indexSHCurve = GetCurveIndex(state,  Alphas(5)); // convert curve name to index number
             // Verify curve name and type
             if (indexSHCurve == 0) {
                 if (lAlphaBlanks(5)) {
@@ -5019,15 +5013,15 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 {
-                    if (CurveManager::PerfCurve(indexSHCurve).ObjectType == "Curve:Quadratic") {
-                        DXCoil(DXCoilNum).C1Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff1;
-                        DXCoil(DXCoilNum).C2Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff2;
-                        DXCoil(DXCoilNum).C3Te = EnergyPlus::CurveManager::PerfCurve(indexSHCurve).Coeff3;
+                    if (state.dataCurveManager->PerfCurve(indexSHCurve).ObjectType == "Curve:Quadratic") {
+                        DXCoil(DXCoilNum).C1Te = state.dataCurveManager->PerfCurve(indexSHCurve).Coeff1;
+                        DXCoil(DXCoilNum).C2Te = state.dataCurveManager->PerfCurve(indexSHCurve).Coeff2;
+                        DXCoil(DXCoilNum).C3Te = state.dataCurveManager->PerfCurve(indexSHCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + CurveManager::PerfCurve(indexSHCurve).ObjectType);
+                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexSHCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -5103,7 +5097,7 @@ namespace DXCoils {
             DXCoil(DXCoilNum).SC = Numbers(2);
             //@@ DXCoil( DXCoilNum ).RateBFVRFIUCond = 0.136;
 
-            int indexSCCurve = GetCurveIndex(Alphas(5)); // convert curve name to index number
+            int indexSCCurve = GetCurveIndex(state, Alphas(5)); // convert curve name to index number
             // Verify curve name and type
             if (indexSCCurve == 0) {
                 if (lAlphaBlanks(5)) {
@@ -5116,15 +5110,15 @@ namespace DXCoils {
                 ErrorsFound = true;
             } else {
                 {
-                    if (CurveManager::PerfCurve(indexSCCurve).ObjectType == "Curve:Quadratic") {
-                        DXCoil(DXCoilNum).C1Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff1;
-                        DXCoil(DXCoilNum).C2Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff2;
-                        DXCoil(DXCoilNum).C3Tc = EnergyPlus::CurveManager::PerfCurve(indexSCCurve).Coeff3;
+                    if (state.dataCurveManager->PerfCurve(indexSCCurve).ObjectType == "Curve:Quadratic") {
+                        DXCoil(DXCoilNum).C1Tc = state.dataCurveManager->PerfCurve(indexSCCurve).Coeff1;
+                        DXCoil(DXCoilNum).C2Tc = state.dataCurveManager->PerfCurve(indexSCCurve).Coeff2;
+                        DXCoil(DXCoilNum).C3Tc = state.dataCurveManager->PerfCurve(indexSCCurve).Coeff3;
 
                     } else {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
                         ShowContinueError("...illegal " + cAlphaFields(5) +
-                                          " type for this object = " + CurveManager::PerfCurve(indexSCCurve).ObjectType);
+                                          " type for this object = " + state.dataCurveManager->PerfCurve(indexSCCurve).ObjectType);
                         ShowContinueError("... Curve type must be Quadratic.");
                         ErrorsFound = true;
                     }
@@ -5164,15 +5158,15 @@ namespace DXCoils {
                     "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
                 SetupOutputVariable(
                     "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
-                SetupOutputVariable("Cooling Coil Electric Power", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
-                SetupOutputVariable("Cooling Coil Electric Energy",
+                SetupOutputVariable("Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
+                SetupOutputVariable("Cooling Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.ElecCoolingConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     _,
                                     "System");
@@ -5238,38 +5232,38 @@ namespace DXCoils {
                                         "Cooling",
                                         _,
                                         "System");
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.EvapCondPumpElecPower,
                                         "System",
                                         "Average",
                                         Coil.Name);
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.EvapCondPumpElecConsumption,
                                         "System",
                                         "Sum",
                                         Coil.Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "COOLING",
                                         _,
                                         "System");
                     if (Coil.BasinHeaterPowerFTempDiff > 0.0) {
-                        SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
+                        SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             Coil.BasinHeaterPower,
                                             "System",
                                             "Average",
                                             Coil.Name);
-                        SetupOutputVariable("Cooling Coil Basin Heater Electric Energy",
+                        SetupOutputVariable("Cooling Coil Basin Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Coil.BasinHeaterConsumption,
                                             "System",
                                             "Sum",
                                             Coil.Name,
                                             _,
-                                            "Electric",
+                                            "Electricity",
                                             "COOLING",
                                             _,
                                             "System");
@@ -5307,45 +5301,45 @@ namespace DXCoils {
                                     "HEATINGCOILS",
                                     _,
                                     "System");
-                SetupOutputVariable("Heating Coil Electric Power", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
-                SetupOutputVariable("Heating Coil Electric Energy",
+                SetupOutputVariable("Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
+                SetupOutputVariable("Heating Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.ElecHeatingConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HEATING",
                                     _,
                                     "System");
                 SetupOutputVariable(
-                    "Heating Coil Defrost Electric Power", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name);
-                SetupOutputVariable("Heating Coil Defrost Electric Energy",
+                    "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name);
+                SetupOutputVariable("Heating Coil Defrost Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.DefrostConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HEATING",
                                     _,
                                     "System");
-                SetupOutputVariable("Heating Coil Crankcase Heater Electric Power",
+                SetupOutputVariable("Heating Coil Crankcase Heater Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.CrankcaseHeaterPower,
                                     "System",
                                     "Average",
                                     Coil.Name);
-                SetupOutputVariable("Heating Coil Crankcase Heater Electric Energy",
+                SetupOutputVariable("Heating Coil Crankcase Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.CrankcaseHeaterConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HEATING",
                                     _,
                                     "System");
@@ -5405,15 +5399,15 @@ namespace DXCoils {
                     "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
                 SetupOutputVariable(
                     "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
-                SetupOutputVariable("Cooling Coil Electric Power", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
-                SetupOutputVariable("Cooling Coil Electric Energy",
+                SetupOutputVariable("Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
+                SetupOutputVariable("Cooling Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.ElecCoolingConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     _,
                                     "System");
@@ -5453,38 +5447,38 @@ namespace DXCoils {
                                         "Cooling",
                                         _,
                                         "System");
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.EvapCondPumpElecPower,
                                         "System",
                                         "Average",
                                         Coil.Name);
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.EvapCondPumpElecConsumption,
                                         "System",
                                         "Sum",
                                         Coil.Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "COOLING",
                                         _,
                                         "System");
                     if (Coil.BasinHeaterPowerFTempDiff > 0.0) {
-                        SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
+                        SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             Coil.BasinHeaterPower,
                                             "System",
                                             "Average",
                                             Coil.Name);
-                        SetupOutputVariable("Cooling Coil Basin Heater Electric Energy",
+                        SetupOutputVariable("Cooling Coil Basin Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Coil.BasinHeaterConsumption,
                                             "System",
                                             "Sum",
                                             Coil.Name,
                                             _,
-                                            "Electric",
+                                            "Electricity",
                                             "COOLING",
                                             _,
                                             "System");
@@ -5529,20 +5523,20 @@ namespace DXCoils {
                     "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, Coil.CoolingCoilRuntimeFraction, "System", "Average", Coil.Name);
 
                 if (Coil.ReportCoolingCoilCrankcasePower) {
-                    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power",
+                    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.CrankcaseHeaterPower,
                                         "System",
                                         "Average",
                                         Coil.Name);
-                    SetupOutputVariable("Cooling Coil Crankcase Heater Electric Energy",
+                    SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.CrankcaseHeaterConsumption,
                                         "System",
                                         "Sum",
                                         Coil.Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "DHW",
                                         _,
                                         "Plant");
@@ -5558,20 +5552,20 @@ namespace DXCoils {
                                     "Sum",
                                     Coil.Name); //, &
                 //                           ResourceTypeKey='ENERGYTRANSFER',EndUseKey='HEATING',GroupKey='Plant')
-                SetupOutputVariable("Cooling Coil Water Heating Electric Power",
+                SetupOutputVariable("Cooling Coil Water Heating Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.ElecWaterHeatingPower,
                                     "System",
                                     "Average",
                                     Coil.Name);
-                SetupOutputVariable("Cooling Coil Water Heating Electric Energy",
+                SetupOutputVariable("Cooling Coil Water Heating Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.ElecWaterHeatingConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "DHW",
                                     _,
                                     "Plant");
@@ -5601,15 +5595,15 @@ namespace DXCoils {
                     "Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, Coil.LatCoolingEnergyRate, "System", "Average", Coil.Name);
                 SetupOutputVariable(
                     "Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, Coil.LatCoolingEnergy, "System", "Sum", Coil.Name);
-                SetupOutputVariable("Cooling Coil Electric Power", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
-                SetupOutputVariable("Cooling Coil Electric Energy",
+                SetupOutputVariable("Cooling Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecCoolingPower, "System", "Average", Coil.Name);
+                SetupOutputVariable("Cooling Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.ElecCoolingConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "COOLING",
                                     _,
                                     "System");
@@ -5662,38 +5656,38 @@ namespace DXCoils {
                                         "Cooling",
                                         _,
                                         "System");
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Power",
+                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         Coil.EvapCondPumpElecPower,
                                         "System",
                                         "Average",
                                         Coil.Name);
-                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electric Energy",
+                    SetupOutputVariable("Cooling Coil Evaporative Condenser Pump Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.EvapCondPumpElecConsumption,
                                         "System",
                                         "Sum",
                                         Coil.Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "COOLING",
                                         _,
                                         "System");
                     if (Coil.BasinHeaterPowerFTempDiff > 0.0) {
-                        SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
+                        SetupOutputVariable("Cooling Coil Basin Heater Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             Coil.BasinHeaterPower,
                                             "System",
                                             "Average",
                                             Coil.Name);
-                        SetupOutputVariable("Cooling Coil Basin Heater Electric Energy",
+                        SetupOutputVariable("Cooling Coil Basin Heater Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             Coil.BasinHeaterConsumption,
                                             "System",
                                             "Sum",
                                             Coil.Name,
                                             _,
-                                            "Electric",
+                                            "Electricity",
                                             "COOLING",
                                             _,
                                             "System");
@@ -5726,15 +5720,15 @@ namespace DXCoils {
                                     "HEATINGCOILS",
                                     _,
                                     "System");
-                SetupOutputVariable("Heating Coil Electric Power", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
-                SetupOutputVariable("Heating Coil Electric Energy",
+                SetupOutputVariable("Heating Coil Electricity Rate", OutputProcessor::Unit::W, Coil.ElecHeatingPower, "System", "Average", Coil.Name);
+                SetupOutputVariable("Heating Coil Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.ElecHeatingConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HEATING",
                                     _,
                                     "System");
@@ -5779,34 +5773,34 @@ namespace DXCoils {
                                         "System");
                 } else {
                     SetupOutputVariable(
-                        "Heating Coil Defrost Electric Power", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name);
-                    SetupOutputVariable("Heating Coil Defrost Electric Energy",
+                        "Heating Coil Defrost Electricity Rate", OutputProcessor::Unit::W, Coil.DefrostPower, "System", "Average", Coil.Name);
+                    SetupOutputVariable("Heating Coil Defrost Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Coil.DefrostConsumption,
                                         "System",
                                         "Sum",
                                         Coil.Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "HEATING",
                                         _,
                                         "System");
                 }
 
-                SetupOutputVariable("Heating Coil Crankcase Heater Electric Power",
+                SetupOutputVariable("Heating Coil Crankcase Heater Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     Coil.CrankcaseHeaterPower,
                                     "System",
                                     "Average",
                                     Coil.Name);
-                SetupOutputVariable("Heating Coil Crankcase Heater Electric Energy",
+                SetupOutputVariable("Heating Coil Crankcase Heater Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     Coil.CrankcaseHeaterConsumption,
                                     "System",
                                     "Sum",
                                     Coil.Name,
                                     _,
-                                    "Electric",
+                                    "Electricity",
                                     "HEATING",
                                     _,
                                     "System");
@@ -6017,7 +6011,7 @@ namespace DXCoils {
         lAlphaBlanks2.deallocate();
         lNumericBlanks2.deallocate();
         bool anyEMSRan;
-        ManageEMS(emsCallFromComponentGetInput, anyEMSRan);
+        ManageEMS(state, emsCallFromComponentGetInput, anyEMSRan, ObjexxFCL::Optional_int_const());
     }
 
     void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the current DX coil unit being simulated
@@ -6038,7 +6032,6 @@ namespace DXCoils {
         // Uses the status flags to trigger initializations.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopInputsFilled;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
         using General::TrimSigDigits;
@@ -6103,7 +6096,7 @@ namespace DXCoils {
             //   get rated coil bypass factor excluding fan heat
 
             //   call CalcHPWHDXCoil to determine DXCoil%RatedTotCap(1) for rated CBF calculation below
-            CalcHPWHDXCoil(DXCoilNum, 1.0);
+            CalcHPWHDXCoil(state, DXCoilNum, 1.0);
             if (MySizeFlag(DXCoilNum)) {
                 SizeDXCoil(state, DXCoilNum);
                 MySizeFlag(DXCoilNum) = false;
@@ -6155,27 +6148,27 @@ namespace DXCoils {
 
         // CR7308 - Wait for zone and air loop equipment to be simulated, then print out report variables
         if (CrankcaseHeaterReportVarFlag) {
-            if (AirLoopInputsFilled) {
+            if (state.dataAirLoop->AirLoopInputsFilled) {
                 //     Set report variables for DX cooling coils that will have a crankcase heater (all DX coils not used in a HP AC unit)
                 for (DXCoilNumTemp = 1; DXCoilNumTemp <= NumDXCoils; ++DXCoilNumTemp) {
                     if ((DXCoil(DXCoilNumTemp).DXCoilType_Num == CoilDX_CoolingTwoStageWHumControl) ||
                         (DXCoil(DXCoilNumTemp).DXCoilType_Num == CoilDX_CoolingSingleSpeed) ||
                         (DXCoil(DXCoilNumTemp).DXCoilType_Num == CoilDX_MultiSpeedCooling)) {
                         if (DXCoil(DXCoilNumTemp).ReportCoolingCoilCrankcasePower) {
-                            SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power",
+                            SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Rate",
                                                 OutputProcessor::Unit::W,
                                                 DXCoil(DXCoilNumTemp).CrankcaseHeaterPower,
                                                 "System",
                                                 "Average",
                                                 DXCoil(DXCoilNumTemp).Name);
-                            SetupOutputVariable("Cooling Coil Crankcase Heater Electric Energy",
+                            SetupOutputVariable("Cooling Coil Crankcase Heater Electricity Energy",
                                                 OutputProcessor::Unit::J,
                                                 DXCoil(DXCoilNumTemp).CrankcaseHeaterConsumption,
                                                 "System",
                                                 "Sum",
                                                 DXCoil(DXCoilNumTemp).Name,
                                                 _,
-                                                "Electric",
+                                                "Electricity",
                                                 "COOLING",
                                                 _,
                                                 "Plant");
@@ -6184,7 +6177,7 @@ namespace DXCoils {
                     }
                 }
                 CrankcaseHeaterReportVarFlag = false;
-            } //(AirLoopInputsFilled)THEN
+            } //(state.dataAirLoop->AirLoopInputsFilled)THEN
         }     //(CrankcaseHeaterReportVarFlag)THEN
 
         if (!SysSizingCalc && MySizeFlag(DXCoilNum)) {
@@ -6266,13 +6259,13 @@ namespace DXCoils {
 
                 // calculate coil model at rating point
                 if (DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
-                    CalcDoe2DXCoil(DXCoilNum, 1.0, false, 1.0, 1.0, _, 1.0);
+                    CalcDoe2DXCoil(state, DXCoilNum, 1.0, false, 1.0, 1.0, _, 1.0);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
-                    CalcMultiSpeedDXCoil(DXCoilNum, 1.0, 1.0);
+                    CalcMultiSpeedDXCoil(state, DXCoilNum, 1.0, 1.0);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilVRF_Cooling) {
-                    CalcVRFCoolingCoil(DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _, _);
+                    CalcVRFCoolingCoil(state, DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _, _);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling) {
-                    CalcVRFCoolingCoil_FluidTCtrl(DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _);
+                    CalcVRFCoolingCoil_FluidTCtrl(state, DXCoilNum, 1, false, 1.0, 1.0, 1.0, _, _);
                 }
 
                 // coil outlets
@@ -6418,11 +6411,11 @@ namespace DXCoils {
 
                 // calculate coil model at rating point
                 if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
-                    CalcDXHeatingCoil(DXCoilNum, 1.0, 1.0, 1.0);
+                    CalcDXHeatingCoil(state, DXCoilNum, 1.0, 1.0, 1.0);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_Heating) {
-                    CalcDXHeatingCoil(DXCoilNum, 1.0, 1.0, _, _);
+                    CalcDXHeatingCoil(state, DXCoilNum, 1.0, 1.0, _, _);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilVRF_FluidTCtrl_Heating) {
-                    CalcVRFHeatingCoil_FluidTCtrl(1.0, DXCoilNum, 1.0, 1.0, _, _);
+                    CalcVRFHeatingCoil_FluidTCtrl(state, 1.0, DXCoilNum, 1.0, 1.0, _, _);
                 }
                 // coil outlets
                 Real64 RatedOutletWetBulb(0.0);
@@ -6966,7 +6959,7 @@ namespace DXCoils {
                             CoilInTemp = SysSizingRunDone ? FinalSysSizing(CurSysNum).MixTempAtCoolPeak : 26;
                         }
                     }
-                    CalcVRFCoilCapModFac(0, _, CompName, CoilInTemp, _, _, _, DataTotCapCurveValue);
+                    CalcVRFCoilCapModFac(state, 0, _, CompName, CoilInTemp, _, _, _, DataTotCapCurveValue);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling) {
                     SizingMethod = CoolingCapacitySizing;
                     CompName = DXCoil(DXCoilNum).Name;
@@ -7858,7 +7851,8 @@ namespace DXCoils {
         // Call routine that computes AHRI certified rating for single-speed DX Coils
         if ((DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed && DXCoil(DXCoilNum).CondenserType(1) == AirCooled) ||
             DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
-            CalcDXCoilStandardRating(state.outputFiles,
+            CalcDXCoilStandardRating(state,
+                                     state.files,
                                      DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
@@ -7881,7 +7875,8 @@ namespace DXCoils {
         }
         // Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
         if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-            CalcDXCoilStandardRating(state.outputFiles,
+            CalcDXCoilStandardRating(state,
+                                     state.files,
                                      DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
@@ -7969,7 +7964,8 @@ namespace DXCoils {
         }
     }
 
-    void CalcHPWHDXCoil(int const DXCoilNum,       // the number of the DX coil to be simulated
+    void CalcHPWHDXCoil(EnergyPlusData &state,
+                        int const DXCoilNum,       // the number of the DX coil to be simulated
                         Real64 const PartLoadRatio // sensible water heating load / full load sensible water heating capacity
     )
     {
@@ -8063,10 +8059,10 @@ namespace DXCoils {
 
         // get output of Heating Capacity and Heating COP curves (curves default to 1 if user has not specified curve name)
         if (Coil.HCapFTemp > 0) {
-            if (CurveManager::PerfCurve(Coil.HCapFTemp).NumDims == 1) {
-                HeatCapFTemp = CurveValue(Coil.HCapFTemp, InletAirTemp);
+            if (state.dataCurveManager->PerfCurve(Coil.HCapFTemp).NumDims == 1) {
+                HeatCapFTemp = CurveValue(state, Coil.HCapFTemp, InletAirTemp);
             } else {
-                HeatCapFTemp = CurveValue(Coil.HCapFTemp, InletAirTemp, InletWaterTemp);
+                HeatCapFTemp = CurveValue(state, Coil.HCapFTemp, InletAirTemp, InletWaterTemp);
             }
             //   Warn user if curve output goes negative
             if (HeatCapFTemp < 0.0) {
@@ -8074,7 +8070,7 @@ namespace DXCoils {
                     ShowWarningMessage(Coil.DXCoilType + " \"" + Coil.Name + "\":");
                     ShowContinueError(" HPWH Heating Capacity Modifier curve (function of temperature) output is negative (" +
                                       TrimSigDigits(HeatCapFTemp, 3) + ").");
-                    if (CurveManager::PerfCurve(Coil.HCapFTemp).NumDims == 2) {
+                    if (state.dataCurveManager->PerfCurve(Coil.HCapFTemp).NumDims == 2) {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) +
                                           " and an inlet water temperature of " + TrimSigDigits(InletWaterTemp, 1) + '.');
                     } else {
@@ -8098,10 +8094,10 @@ namespace DXCoils {
         }
 
         if (Coil.HCOPFTemp > 0) {
-            if (CurveManager::PerfCurve(Coil.HCOPFTemp).NumDims == 1) {
-                HeatCOPFTemp = CurveValue(Coil.HCOPFTemp, InletAirTemp);
+            if (state.dataCurveManager->PerfCurve(Coil.HCOPFTemp).NumDims == 1) {
+                HeatCOPFTemp = CurveValue(state, Coil.HCOPFTemp, InletAirTemp);
             } else {
-                HeatCOPFTemp = CurveValue(Coil.HCOPFTemp, InletAirTemp, InletWaterTemp);
+                HeatCOPFTemp = CurveValue(state, Coil.HCOPFTemp, InletAirTemp, InletWaterTemp);
             }
             //   Warn user if curve output goes negative
             if (HeatCOPFTemp < 0.0) {
@@ -8109,7 +8105,7 @@ namespace DXCoils {
                     ShowWarningMessage(Coil.DXCoilType + " \"" + Coil.Name + "\":");
                     ShowContinueError(" HPWH Heating COP Modifier curve (function of temperature) output is negative (" +
                                       TrimSigDigits(HeatCOPFTemp, 3) + ").");
-                    if (CurveManager::PerfCurve(Coil.HCOPFTemp).NumDims == 2) {
+                    if (state.dataCurveManager->PerfCurve(Coil.HCOPFTemp).NumDims == 2) {
                         ShowContinueError(" Negative value occurs using an inlet air temperature of " + TrimSigDigits(InletAirTemp, 1) +
                                           " and an inlet water temperature of " + TrimSigDigits(InletWaterTemp, 1) + '.');
                     } else {
@@ -8134,7 +8130,7 @@ namespace DXCoils {
 
         if (Coil.HCapFAirFlow > 0) {
             AirFlowRateRatio = EvapInletMassFlowRate / (Coil.RatedAirMassFlowRate(1));
-            HeatCapFAirFlow = CurveValue(Coil.HCapFAirFlow, AirFlowRateRatio);
+            HeatCapFAirFlow = CurveValue(state, Coil.HCapFAirFlow, AirFlowRateRatio);
             //   Warn user if curve output goes negative
             if (HeatCapFAirFlow < 0.0) {
                 if (Coil.HCapFAirFlowErrorIndex == 0) {
@@ -8158,7 +8154,7 @@ namespace DXCoils {
 
         if (Coil.HCOPFAirFlow > 0) {
             AirFlowRateRatio = EvapInletMassFlowRate / (Coil.RatedAirMassFlowRate(1));
-            HeatCOPFAirFlow = CurveValue(Coil.HCOPFAirFlow, AirFlowRateRatio);
+            HeatCOPFAirFlow = CurveValue(state, Coil.HCOPFAirFlow, AirFlowRateRatio);
             //   Warn user if curve output goes negative
             if (HeatCOPFAirFlow < 0.0) {
                 if (Coil.HCOPFAirFlowErrorIndex == 0) {
@@ -8182,7 +8178,7 @@ namespace DXCoils {
 
         if (Coil.HCapFWaterFlow > 0) {
             WaterFlowRateRatio = CondInletMassFlowRate / (Coil.RatedHPWHCondWaterFlow * RhoH2O(InletWaterTemp));
-            HeatCapFWaterFlow = CurveValue(Coil.HCapFWaterFlow, WaterFlowRateRatio);
+            HeatCapFWaterFlow = CurveValue(state, Coil.HCapFWaterFlow, WaterFlowRateRatio);
             //   Warn user if curve output goes negative
             if (HeatCapFWaterFlow < 0.0) {
                 if (Coil.HCapFWaterFlowErrorIndex == 0) {
@@ -8206,7 +8202,7 @@ namespace DXCoils {
 
         if (Coil.HCOPFWaterFlow > 0) {
             WaterFlowRateRatio = CondInletMassFlowRate / (Coil.RatedHPWHCondWaterFlow * RhoH2O(InletWaterTemp));
-            HeatCOPFWaterFlow = CurveValue(Coil.HCOPFWaterFlow, WaterFlowRateRatio);
+            HeatCOPFWaterFlow = CurveValue(state, Coil.HCOPFWaterFlow, WaterFlowRateRatio);
             //   Warn user if curve output goes negative
             if (HeatCOPFWaterFlow < 0.0) {
                 if (Coil.HCOPFWaterFlowErrorIndex == 0) {
@@ -8246,7 +8242,7 @@ namespace DXCoils {
 
         // find part load fraction to calculate RTF
         if (Coil.PLFFPLR(1) > 0) {
-            PartLoadFraction = max(0.7, CurveValue(Coil.PLFFPLR(1), PartLoadRatio));
+            PartLoadFraction = max(0.7, CurveValue(state, Coil.PLFFPLR(1), PartLoadRatio));
         } else {
             PartLoadFraction = 1.0;
         }
@@ -8321,7 +8317,8 @@ namespace DXCoils {
         Coil.ElecWaterHeatingPower = (CompressorPower + Coil.HPWHCondPumpElecNomPower) * HPRTF;
     }
 
-    void CalcDoe2DXCoil(int const DXCoilNum,                      // the number of the DX coil to be simulated
+    void CalcDoe2DXCoil(EnergyPlusData &state,
+                        int const DXCoilNum,                      // the number of the DX coil to be simulated
                         int const CompOp,                         // compressor operation; 1=on, 0=off
                         bool const FirstHVACIteration,            // true if this is the first iteration of HVAC
                         Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
@@ -8761,10 +8758,10 @@ namespace DXCoils {
                     TotCapTempModFac = 1.0;
                     TotCapFlowModFac = 1.0;
                 } else {
-                    if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
-                        TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+                    if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
+                        TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
                     } else {
-                        TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), CondInletTemp);
+                        TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), CondInletTemp);
                     }
 
                     //    Warn user if curve output goes negative
@@ -8773,7 +8770,7 @@ namespace DXCoils {
                             ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + " \"" + DXCoil(DXCoilNum).Name + "\":");
                             ShowContinueError(" Total Cooling Capacity Modifier curve (function of temperature) output is negative (" +
                                               TrimSigDigits(TotCapTempModFac, 3) + ").");
-                            if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
+                            if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                                 ShowContinueError(" Negative value occurs using a condenser inlet air temperature of " +
                                                   TrimSigDigits(CondInletTemp, 1) + " and an inlet air wet-bulb temperature of " +
                                                   TrimSigDigits(InletAirWetBulbC, 1) + '.');
@@ -8796,7 +8793,7 @@ namespace DXCoils {
                     }
 
                     //    Get total capacity modifying factor (function of mass flow) for off-rated conditions
-                    TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(Mode), AirMassFlowRatio);
+                    TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(Mode), AirMassFlowRatio);
                     //    Warn user if curve output goes negative
                     if (TotCapFlowModFac < 0.0) {
                         if (DXCoil(DXCoilNum).CCapFFlowErrorIndex == 0) {
@@ -8821,7 +8818,8 @@ namespace DXCoils {
                 TotCap = DXCoil(DXCoilNum).RatedTotCap(Mode) * TotCapFlowModFac * TotCapTempModFac;
                 // if user specified SHR modifier curves are available calculate the SHR as follows:
                 if (DXCoil(DXCoilNum).UserSHRCurveExists) {
-                    SHR = CalcSHRUserDefinedCurves(InletAirDryBulbTemp,
+                    SHR = CalcSHRUserDefinedCurves(state,
+                                                   InletAirDryBulbTemp,
                                                    InletAirWetBulbC,
                                                    AirMassFlowRatio,
                                                    DXCoil(DXCoilNum).SHRFTemp(Mode),
@@ -8864,7 +8862,7 @@ namespace DXCoils {
             } // end of DO iteration loop
 
             if (DXCoil(DXCoilNum).PLFFPLR(Mode) > 0) {
-                PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), PartLoadRatio); // Calculate part-load factor
+                PLF = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(Mode), PartLoadRatio); // Calculate part-load factor
             } else {
                 PLF = 1.0;
             }
@@ -9047,7 +9045,7 @@ namespace DXCoils {
                     QLatActual = TotCap * (1.0 - SHR);
                     HeatRTF = PartLoadRatio / DXcoolToHeatPLRRatio;
                     if (DXCoil(DXCoilNum).HeatingCoilPLFCurvePTR > 0) {
-                        HeatingCoilPLF = CurveValue(DXCoil(DXCoilNum).HeatingCoilPLFCurvePTR, HeatRTF);
+                        HeatingCoilPLF = CurveValue(state, DXCoil(DXCoilNum).HeatingCoilPLFCurvePTR, HeatRTF);
                         if (HeatingCoilPLF > 0) HeatRTF /= HeatingCoilPLF;
                     }
                     SHRUnadjusted = SHR;
@@ -9137,7 +9135,7 @@ namespace DXCoils {
                 EIRTempModFac = 1.0;
                 EIRFlowModFac = 1.0;
             } else {
-                EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+                EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirWetBulbC, CondInletTemp);
 
                 //   Warn user if curve output goes negative
                 if (EIRTempModFac < 0.0) {
@@ -9145,7 +9143,7 @@ namespace DXCoils {
                         ShowWarningMessage(RoutineName + DXCoil(DXCoilNum).DXCoilType + "=\"" + DXCoil(DXCoilNum).Name + "\":");
                         ShowContinueError(" Energy Input Ratio Modifier curve (function of temperature) output is negative (" +
                                           TrimSigDigits(EIRTempModFac, 3) + ").");
-                        if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 2) {
+                        if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 2) {
                             ShowContinueError(" Negative value occurs using a condenser inlet air temperature of " + TrimSigDigits(CondInletTemp, 1) +
                                               " and an inlet air wet-bulb temperature of " + TrimSigDigits(InletAirWetBulbC, 1) + '.');
                         } else {
@@ -9166,7 +9164,7 @@ namespace DXCoils {
                     EIRTempModFac = 0.0;
                 }
 
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
 
                 //   Warn user if curve output goes negative
                 if (EIRFlowModFac < 0.0) {
@@ -9319,11 +9317,12 @@ namespace DXCoils {
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            CalcSecondaryDXCoils(DXCoilNum);
+            CalcSecondaryDXCoils(state, DXCoilNum);
         }
     }
 
-    void CalcVRFCoolingCoil(int const DXCoilNum,                      // the number of the DX coil to be simulated
+    void CalcVRFCoolingCoil(EnergyPlusData &state,
+                            int const DXCoilNum,                      // the number of the DX coil to be simulated
                             int const CompOp,                         // compressor operation; 1=on, 0=off
                             bool const FirstHVACIteration,            // true if this is the first iteration of HVAC
                             Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
@@ -9704,7 +9703,7 @@ namespace DXCoils {
             // No need to differentiate between curve types, single-independent curve will just use first variable
             // (as long as the first independent variable is the same for both curve types)
         Label50:;
-            TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+            TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirWetBulbC, CondInletTemp);
 
             //  Warn user if curve output goes negative
             if (TotCapTempModFac < 0.0) {
@@ -9730,7 +9729,7 @@ namespace DXCoils {
 
             //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
             AirMassFlowRatio = AirMassFlow / DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
-            TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(Mode), AirMassFlowRatio);
+            TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(Mode), AirMassFlowRatio);
 
             //  Warn user if curve output goes negative
             if (TotCapFlowModFac < 0.0) {
@@ -9792,7 +9791,7 @@ namespace DXCoils {
             }
 
             if (DXCoil(DXCoilNum).PLFFPLR(Mode) > 0 && CompCycRatio < 1.0) {
-                PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), CompCycRatio); // Calculate part-load factor
+                PLF = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(Mode), CompCycRatio); // Calculate part-load factor
             } else {
                 PLF = 1.0;
             }
@@ -9982,7 +9981,8 @@ namespace DXCoils {
         Node(airOutletNode).HumRat = DXCoil(DXCoilNum).OutletAirHumRat;
     }
 
-    void CalcDXHeatingCoil(int const DXCoilNum,                      // the number of the DX heating coil to be simulated
+    void CalcDXHeatingCoil(EnergyPlusData &state,
+                           int const DXCoilNum,                      // the number of the DX heating coil to be simulated
                            Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
                            int const FanOpMode,                      // Allows parent object to control fan mode
                            Optional<Real64 const> OnOffAirFlowRatio, // ratio of compressor on airflow to compressor off airflow
@@ -10184,13 +10184,13 @@ namespace DXCoils {
             // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-            if (CurveManager::PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
+            if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).CCapFTemp(Mode)).NumDims == 2) {
                 {
                     auto const SELECT_CASE_var(DXCoil(DXCoilNum).HeatingPerformanceOATType);
                     if (SELECT_CASE_var == DryBulbIndicator) {
-                        TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
+                        TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
                     } else if (SELECT_CASE_var == WetBulbIndicator) {
-                        TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp, OutdoorWetBulb);
+                        TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp, OutdoorWetBulb);
                     } else {
                         TotCapTempModFac = 1.0;
                     }
@@ -10200,15 +10200,15 @@ namespace DXCoils {
                     auto const SELECT_CASE_var(DXCoil(DXCoilNum).HeatingPerformanceOATType);
                     if (SELECT_CASE_var == DryBulbIndicator) {
                         if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                            TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), OutdoorDryBulb);
+                            TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), OutdoorDryBulb);
                         } else {
-                            TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp);
+                            TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp);
                         }
                     } else if (SELECT_CASE_var == WetBulbIndicator) {
                         if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                            TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), OutdoorWetBulb);
+                            TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), OutdoorWetBulb);
                         } else {
-                            TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp);
+                            TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(Mode), InletAirDryBulbTemp);
                         }
                     } else {
                         TotCapTempModFac = 1.0;
@@ -10234,7 +10234,7 @@ namespace DXCoils {
 
             //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
             AirMassFlowRatio = AirMassFlow / DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode);
-            TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(Mode), AirMassFlowRatio);
+            TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(Mode), AirMassFlowRatio);
 
             // Calculate total heating capacity for off-rated conditions
             TotCap = DXCoil(DXCoilNum).RatedTotCap(Mode) * TotCapFlowModFac * TotCapTempModFac;
@@ -10270,7 +10270,7 @@ namespace DXCoils {
                     if (DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle) {
                         LoadDueToDefrost =
                             (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (DXCoil(DXCoilNum).RatedTotCap(Mode) / 1.01667);
-                        DefrostEIRTempModFac = CurveValue(DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
+                        DefrostEIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                         DXCoil(DXCoilNum).DefrostPower =
                             DefrostEIRTempModFac * (DXCoil(DXCoilNum).RatedTotCap(Mode) / 1.01667) * FractionalDefrostTime;
                     } else { // Defrost strategy is resistive
@@ -10322,12 +10322,12 @@ namespace DXCoils {
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
                 } else {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
             } else {
                 EIRTempModFac = 1.0;
                 EIRFlowModFac = 1.0;
@@ -10357,7 +10357,7 @@ namespace DXCoils {
                 PLRHeating = 0.0;
             }
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating) {
-                PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), PLRHeating); // Calculate part-load factor
+                PLF = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(Mode), PLRHeating); // Calculate part-load factor
             } else {
                 PLF = 1.0;
             }
@@ -10455,11 +10455,12 @@ namespace DXCoils {
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            CalcSecondaryDXCoils(DXCoilNum);
+            CalcSecondaryDXCoils(state, DXCoilNum);
         }
     }
 
-    void CalcMultiSpeedDXCoil(int const DXCoilNum,     // the number of the DX heating coil to be simulated
+    void CalcMultiSpeedDXCoil(EnergyPlusData &state,
+                              int const DXCoilNum,     // the number of the DX heating coil to be simulated
                               Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                               Real64 const CycRatio,   // cycling part load ratio
                               Optional_bool_const ForceOn)
@@ -10627,7 +10628,7 @@ namespace DXCoils {
                 RatedCBFHS = DXCoil(DXCoilNum).RatedCBF(Mode);
                 CBFHS = AdjustCBF(RatedCBFHS, DXCoil(DXCoilNum).RatedAirMassFlowRate(Mode), DXCoil(DXCoilNum).InletAirMassFlowRateMax);
                 // get high speed total capacity and SHR at current conditions
-                CalcTotCapSHR(InletAirDryBulbTemp,
+                CalcTotCapSHR(state, InletAirDryBulbTemp,
                               InletAirHumRat,
                               InletAirEnthalpy,
                               InletAirWetBulbC,
@@ -10646,7 +10647,8 @@ namespace DXCoils {
                 //                       CondInletTemp, Node(DXCoil(DXCoilNum)%AirInNode)%Press)
                 // get the high speed SHR from user specified SHR modifier curves
                 if (DXCoil(DXCoilNum).UserSHRCurveExists) {
-                    SHRHS = CalcSHRUserDefinedCurves(InletAirDryBulbTemp,
+                    SHRHS = CalcSHRUserDefinedCurves(state,
+                                                     InletAirDryBulbTemp,
                                                      InletAirWetBulbC,
                                                      AirMassFlowRatio,
                                                      DXCoil(DXCoilNum).SHRFTemp(Mode),
@@ -10654,7 +10656,7 @@ namespace DXCoils {
                                                      DXCoil(DXCoilNum).RatedSHR(Mode));
                 }
                 // get low speed total capacity and SHR at current conditions
-                CalcTotCapSHR(InletAirDryBulbTemp,
+                CalcTotCapSHR(state, InletAirDryBulbTemp,
                               InletAirHumRat,
                               InletAirEnthalpy,
                               InletAirWetBulbC,
@@ -10673,7 +10675,8 @@ namespace DXCoils {
                 //                       Node(DXCoil(DXCoilNum)%AirInNode)%Press)
                 // get the low speed SHR from user specified SHR modifier curves
                 if (DXCoil(DXCoilNum).UserSHRCurveExists) {
-                    SHRLS = CalcSHRUserDefinedCurves(InletAirDryBulbTemp,
+                    SHRLS = CalcSHRUserDefinedCurves(state,
+                                                     InletAirDryBulbTemp,
                                                      InletAirWetBulbC,
                                                      AirMassFlowRatio2,
                                                      DXCoil(DXCoilNum).SHRFTemp2,
@@ -10681,13 +10684,13 @@ namespace DXCoils {
                                                      DXCoil(DXCoilNum).RatedSHR2);
                 }
                 // get high speed EIR at current conditions
-                EIRTempModFacHS = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirWetBulbC, CondInletTemp);
-                EIRFlowModFacHS = CurveValue(DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
+                EIRTempModFacHS = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirWetBulbC, CondInletTemp);
+                EIRFlowModFacHS = CurveValue(state, DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
                 EIRHS = DXCoil(DXCoilNum).RatedEIR(Mode) * EIRFlowModFacHS * EIRTempModFacHS;
                 // get low speed EIR at current conditions
-                //    EIRTempModFacLS = CurveValue(DXCoil(DXCoilNum)%EIRFTemp(Mode),InletAirWetBulbC,CondInletTemp)
+                //    EIRTempModFacLS = CurveValue(state, DXCoil(DXCoilNum)%EIRFTemp(Mode),InletAirWetBulbC,CondInletTemp)
                 //    CR7307 changed EIRTempModFacLS calculation to that shown below.
-                EIRTempModFacLS = CurveValue(DXCoil(DXCoilNum).EIRFTemp2, InletAirWetBulbC, CondInletTemp);
+                EIRTempModFacLS = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp2, InletAirWetBulbC, CondInletTemp);
                 EIRLS = DXCoil(DXCoilNum).RatedEIR2 * EIRTempModFacLS;
 
                 // get current total capacity, SHR, EIR
@@ -10796,7 +10799,7 @@ namespace DXCoils {
                 // Adjust low speed coil bypass factor for actual flow rate.
                 // CBF = AdjustCBF(DXCoil(DXCoilNum)%RatedCBF2,DXCoil(DXCoilNum)%RatedAirMassFlowRate2,AirMassFlow)
                 // get low speed total capacity and SHR at current conditions
-                CalcTotCapSHR(InletAirDryBulbTemp,
+                CalcTotCapSHR(state, InletAirDryBulbTemp,
                               InletAirHumRat,
                               InletAirEnthalpy,
                               InletAirWetBulbC,
@@ -10813,7 +10816,8 @@ namespace DXCoils {
                               DXCoil(DXCoilNum).capModFacTotal);
                 // get the low speed SHR from user specified SHR modifier curves
                 if (DXCoil(DXCoilNum).UserSHRCurveExists) {
-                    SHRLS = CalcSHRUserDefinedCurves(InletAirDryBulbTemp,
+                    SHRLS = CalcSHRUserDefinedCurves(state,
+                                                     InletAirDryBulbTemp,
                                                      InletAirWetBulbC,
                                                      1.0,
                                                      DXCoil(DXCoilNum).SHRFTemp2,
@@ -10876,12 +10880,12 @@ namespace DXCoils {
                 OutletAirHumRat = CycRatio * LSOutletAirHumRat + (1.0 - CycRatio) * InletAirHumRat;
                 OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 // get low speed EIR at current conditions
-                //    EIRTempModFacLS = CurveValue(DXCoil(DXCoilNum)%EIRFTemp(Mode),InletAirWetBulbC,CondInletTemp)
+                //    EIRTempModFacLS = CurveValue(state, DXCoil(DXCoilNum)%EIRFTemp(Mode),InletAirWetBulbC,CondInletTemp)
                 //    CR7307 changed EIRTempModFacLS calculation to that shown below.
-                EIRTempModFacLS = CurveValue(DXCoil(DXCoilNum).EIRFTemp2, InletAirWetBulbC, CondInletTemp);
+                EIRTempModFacLS = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp2, InletAirWetBulbC, CondInletTemp);
                 EIRLS = DXCoil(DXCoilNum).RatedEIR2 * EIRTempModFacLS;
                 // get the part load factor that will account for cycling losses
-                PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), CycRatio);
+                PLF = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(Mode), CycRatio);
                 if (PLF < 0.7) {
                     PLF = 0.7;
                 }
@@ -10970,7 +10974,7 @@ namespace DXCoils {
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            CalcSecondaryDXCoils(DXCoilNum);
+            CalcSecondaryDXCoils(state, DXCoilNum);
         }
     }
 
@@ -11117,7 +11121,7 @@ namespace DXCoils {
         Real64 HTinHumRatOut;                   // Air enthalpy at inlet air temp and outlet air humidity ratio [J/kg]
         Real64 AirMassFlowRate;                 // the standard air mass flow rate at the given capacity [kg/s]
         Real64 adjustedSHR;                     // SHR calculated using adjusted outlet air properties []
-        static bool CBFErrors(false);           // Set to true if errors in CBF calculation, fatal at end of routine
+        bool CBFErrors(false);           // Set to true if errors in CBF calculation, fatal at end of routine
 
         AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(StdPressureSeaLevel, InletAirTemp, InletAirHumRat, RoutineName);
         DeltaH = TotCap / AirMassFlowRate;
@@ -11530,7 +11534,8 @@ namespace DXCoils {
         return SHReff;
     }
 
-    void CalcTotCapSHR(Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
+    void CalcTotCapSHR(EnergyPlusData &state,
+                       Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
                        Real64 const InletHumRat,      // inlet air humidity ratio [kg water / kg dry air]
                        Real64 const InletEnthalpy,    // inlet air specific enthalpy [J/kg]
                        Real64 const InletWetBulb,     // inlet air wet bulb temperature [C]
@@ -11621,9 +11626,9 @@ namespace DXCoils {
         //  DO WHILE (ABS(werror) .gt. Tolerance .OR. Counter == 0)
         //   Get capacity modifying factor (function of inlet wetbulb & outside drybulb) for off-rated conditions
         while (true) {
-            TotCapTempModFac = CurveValue(CCapFTemp, InletWetBulbCalc, CondInletTemp);
+            TotCapTempModFac = CurveValue(state, CCapFTemp, InletWetBulbCalc, CondInletTemp);
             //   Get capacity modifying factor (function of mass flow) for off-rated conditions
-            TotCapFlowModFac = CurveValue(CCapFFlow, AirMassFlowRatio);
+            TotCapFlowModFac = CurveValue(state, CCapFFlow, AirMassFlowRatio);
             //   Get total capacity
             TotCapCalc = TotCapNom * TotCapFlowModFac * TotCapTempModFac;
 
@@ -11667,7 +11672,8 @@ namespace DXCoils {
         TotCapModFac = TotCapTempModFac * TotCapFlowModFac;
     }
 
-    void CalcMultiSpeedDXCoilCooling(int const DXCoilNum,     // the number of the DX heating coil to be simulated
+    void CalcMultiSpeedDXCoilCooling(EnergyPlusData &state,
+                                     int const DXCoilNum,     // the number of the DX heating coil to be simulated
                                      Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                                      Real64 const CycRatio,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
@@ -11952,7 +11958,7 @@ namespace DXCoils {
                 RatedCBFLS = DXCoil(DXCoilNum).MSRatedCBF(SpeedNumLS);
                 CBFLS = AdjustCBF(RatedCBFLS, DXCoil(DXCoilNum).MSRatedAirMassFlowRate(SpeedNumLS), MSHPMassFlowRateLow);
                 // get low speed total capacity and SHR at current conditions
-                CalcTotCapSHR(InletAirDryBulbTemp,
+                CalcTotCapSHR(state, InletAirDryBulbTemp,
                               InletAirHumRat,
                               InletAirEnthalpy,
                               InletAirWetBulbC,
@@ -11996,7 +12002,7 @@ namespace DXCoils {
 
                 // get high speed total capacity and SHR at current conditions
 
-                CalcTotCapSHR(InletAirDryBulbTemp,
+                CalcTotCapSHR(state, InletAirDryBulbTemp,
                               InletAirHumRat,
                               InletAirEnthalpy,
                               InletAirWetBulbC,
@@ -12027,7 +12033,7 @@ namespace DXCoils {
                 }
                 // cr8918    SHRHS = MIN((hTinwADP-hADP)/(InletAirEnthalpy-hADP),1.0d0)
                 // get the part load factor that will account for cycling losses
-                PLF = CurveValue(DXCoil(DXCoilNum).MSPLFFPLR(SpeedNumHS), SpeedRatio);
+                PLF = CurveValue(state, DXCoil(DXCoilNum).MSPLFFPLR(SpeedNumHS), SpeedRatio);
                 if (PLF < 0.7) {
                     PLF = 0.7;
                 }
@@ -12076,12 +12082,12 @@ namespace DXCoils {
                 }
 
                 // get high speed EIR at current conditions
-                EIRTempModFacHS = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirWetBulbC, CondInletTemp);
-                EIRFlowModFacHS = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumHS), AirMassFlowRatioHS);
+                EIRTempModFacHS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirWetBulbC, CondInletTemp);
+                EIRFlowModFacHS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumHS), AirMassFlowRatioHS);
                 EIRHS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNumHS) * EIRFlowModFacHS * EIRTempModFacHS;
                 // get low speed EIR at current conditions
-                EIRTempModFacLS = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirWetBulbC, CondInletTemp);
-                EIRFlowModFacLS = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
+                EIRTempModFacLS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirWetBulbC, CondInletTemp);
+                EIRFlowModFacLS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
                 EIRLS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNumLS) * EIRTempModFacLS * EIRFlowModFacLS;
 
                 // get current total capacity, SHR, EIR
@@ -12166,13 +12172,13 @@ namespace DXCoils {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
-                        WasteHeatLS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS), OutdoorDryBulb, InletAirDryBulbTemp) *
+                        WasteHeatLS = CurveValue(state, DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     }
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS) == 0) {
                         WasteHeatHS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     } else {
-                        WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
+                        WasteHeatHS = CurveValue(state, DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
                     DXCoil(DXCoilNum).MSFuelWasteHeat =
@@ -12237,7 +12243,7 @@ namespace DXCoils {
                 // Adjust low speed coil bypass factor for actual flow rate.
                 // CBF = AdjustCBF(DXCoil(DXCoilNum)%RatedCBF2,DXCoil(DXCoilNum)%RatedAirMassFlowRate2,AirMassFlow)
                 // get low speed total capacity and SHR at current conditions
-                CalcTotCapSHR(InletAirDryBulbTemp,
+                CalcTotCapSHR(state, InletAirDryBulbTemp,
                               InletAirHumRat,
                               InletAirEnthalpy,
                               InletAirWetBulbC,
@@ -12273,7 +12279,7 @@ namespace DXCoils {
                 // cr8918    SHR = MIN((hTinwADP-hADP)/(InletAirEnthalpy-hADP),1.0d0)
 
                 // get the part load factor that will account for cycling losses
-                PLF = CurveValue(DXCoil(DXCoilNum).MSPLFFPLR(SpeedNum), CycRatio);
+                PLF = CurveValue(state, DXCoil(DXCoilNum).MSPLFFPLR(SpeedNum), CycRatio);
                 if (FanOpMode == CycFanCycCoil && CycRatio == 1.0 && PLF != 1.0) {
                     if (DXCoil(DXCoilNum).PLFErrIndex == 0) {
                         ShowWarningMessage("The PLF curve value for DX cooling coil " + DXCoil(DXCoilNum).Name + " =" + RoundSigDigits(PLF, 2) +
@@ -12341,8 +12347,8 @@ namespace DXCoils {
                 OutletAirHumRat = LSOutletAirHumRat;
                 OutletAirDryBulbTemp = LSOutletAirDryBulbTemp;
                 // get low speed EIR at current conditions
-                EIRTempModFacLS = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNum), InletAirWetBulbC, CondInletTemp);
-                EIRFlowModFacLS = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNum), AirMassFlowRatioLS);
+                EIRTempModFacLS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNum), InletAirWetBulbC, CondInletTemp);
+                EIRFlowModFacLS = CurveValue(state, DXCoil(DXCoilNum).MSEIRFFlow(SpeedNum), AirMassFlowRatioLS);
                 EIRLS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNum) * EIRTempModFacLS * EIRFlowModFacLS;
 
                 // get the eletrical power consumption
@@ -12398,7 +12404,7 @@ namespace DXCoils {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
                         DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
                     } else {
-                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(state, DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
                                                             DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecCoolingPower;
                     }
                     if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
@@ -12487,11 +12493,12 @@ namespace DXCoils {
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            CalcSecondaryDXCoils(DXCoilNum);
+            CalcSecondaryDXCoils(state, DXCoilNum);
         }
     }
 
-    void CalcMultiSpeedDXCoilHeating(int const DXCoilNum,     // the number of the DX heating coil to be simulated
+    void CalcMultiSpeedDXCoilHeating(EnergyPlusData &state,
+                                     int const DXCoilNum,     // the number of the DX heating coil to be simulated
                                      Real64 const SpeedRatio, // = (CompressorSpeed - CompressorSpeedMin) / (CompressorSpeedMax - CompressorSpeedMin)
                                      Real64 const CycRatio,   // cycling part load ratio
                                      int const SpeedNum,      // Speed number
@@ -12752,23 +12759,23 @@ namespace DXCoils {
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
                 // Low speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS)).NumDims == 1) {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS)).NumDims == 1) {
+                    TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), OutdoorDryBulb);
                 } else {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
+                    TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
-                TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFFlow(SpeedNumLS), AirMassFlowRatioLS);
+                TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFFlow(SpeedNumLS), AirMassFlowRatioLS);
                 // Calculate total heating capacity for off-rated conditions
                 TotCapLS = DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS) * TotCapFlowModFac * TotCapTempModFac;
                 // High speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS)).NumDims == 1) {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS)).NumDims == 1) {
+                    TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), OutdoorDryBulb);
                 } else {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
+                    TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
                 //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
-                TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFFlow(SpeedNumHS), AirMassFlowRatioHS);
+                TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFFlow(SpeedNumHS), AirMassFlowRatioHS);
                 // Calculate total heating capacity for off-rated conditions
                 TotCapHS = DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumHS) * TotCapFlowModFac * TotCapTempModFac;
                 // Calculate electricity consumed. First, get EIR modifying factors for off-rated conditions
@@ -12776,20 +12783,20 @@ namespace DXCoils {
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
                 // Low Speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).NumDims == 1) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS)).NumDims == 1) {
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), OutdoorDryBulb);
                 } else {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumLS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumLS), AirMassFlowRatioLS);
                 EIRLS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNumLS) * EIRTempModFac * EIRFlowModFac;
                 // High Speed
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).NumDims == 1) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS)).NumDims == 1) {
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), OutdoorDryBulb);
                 } else {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(SpeedNumHS), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumHS), AirMassFlowRatioHS);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFFlow(SpeedNumHS), AirMassFlowRatioHS);
                 EIRHS = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(SpeedNumHS) * EIRTempModFac * EIRFlowModFac;
 
                 // Calculating adjustment factors for defrost
@@ -12825,7 +12832,7 @@ namespace DXCoils {
                         // Calculate defrost adjustment factors depending on defrost control strategy
                         if (DXCoil(DXCoilNum).DefrostStrategy == ReverseCycle && DXCoil(DXCoilNum).DefrostControl == OnDemand) {
                             DefrostEIRTempModFac =
-                                CurveValue(DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
+                                CurveValue(state, DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                             LoadDueToDefrostLS =
                                 (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS) / 1.01667);
                             DefrostPowerLS = DefrostEIRTempModFac * (DXCoil(DXCoilNum).MSRatedTotCap(SpeedNumLS) / 1.01667) * FractionalDefrostTime;
@@ -12845,7 +12852,7 @@ namespace DXCoils {
 
                 // Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
                 PLRHeating = min(1.0, (SpeedRatio + LoadDueToDefrostHS / TotCapHSAdj));
-                PLF = CurveValue(DXCoil(DXCoilNum).MSPLFFPLR(SpeedNumHS), PLRHeating); // Calculate part-load factor
+                PLF = CurveValue(state, DXCoil(DXCoilNum).MSPLFFPLR(SpeedNumHS), PLRHeating); // Calculate part-load factor
 
                 if (PLF < 0.7) {
                     if (DXCoil(DXCoilNum).PLRErrIndex == 0) {
@@ -12913,13 +12920,13 @@ namespace DXCoils {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS) == 0) {
                         WasteHeatLS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     } else {
-                        WasteHeatLS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS), OutdoorDryBulb, InletAirDryBulbTemp) *
+                        WasteHeatLS = CurveValue(state, DXCoil(DXCoilNum).MSWasteHeat(SpeedNumLS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumLS);
                     }
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS) == 0) {
                         WasteHeatHS = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     } else {
-                        WasteHeatHS = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
+                        WasteHeatHS = CurveValue(state, DXCoil(DXCoilNum).MSWasteHeat(SpeedNumHS), OutdoorDryBulb, InletAirDryBulbTemp) *
                                       DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNumHS);
                     }
                     DXCoil(DXCoilNum).MSFuelWasteHeat =
@@ -12985,16 +12992,16 @@ namespace DXCoils {
                 // Model was extended to accept bi-quadratic curves. This allows sensitivity of the heating capacity
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum)).NumDims == 1) {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum)).NumDims == 1) {
+                    TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), OutdoorDryBulb);
                 } else {
-                    TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), InletAirDryBulbTemp, OutdoorDryBulb);
+                    TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFTemp(SpeedNum), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
 
                 //  Get total capacity modifying factor (function of mass flow) for off-rated conditions
                 //    AirMassFlowRatio = AirMassFlow/DXCoil(DXCoilNum)%MSRatedAirMassFlowRate(SpeedNumLS)
-                //    TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum)%MSCCapFFlow(SpeedNumLS),AirMassFlowRatio)
-                TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).MSCCapFFlow(SpeedNum), AirMassFlowRatioLS);
+                //    TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum)%MSCCapFFlow(SpeedNumLS),AirMassFlowRatio)
+                TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).MSCCapFFlow(SpeedNum), AirMassFlowRatioLS);
                 // Calculate total heating capacity for off-rated conditions
                 TotCap = DXCoil(DXCoilNum).MSRatedTotCap(SpeedNum) * TotCapFlowModFac * TotCapTempModFac;
 
@@ -13030,7 +13037,7 @@ namespace DXCoils {
                             LoadDueToDefrost =
                                 (0.01 * FractionalDefrostTime) * (7.222 - OutdoorDryBulb) * (DXCoil(DXCoilNum).MSRatedTotCap(1) / 1.01667);
                             DefrostEIRTempModFac =
-                                CurveValue(DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
+                                CurveValue(state, DXCoil(DXCoilNum).DefrostEIRFT, max(15.555, InletAirWetBulbC), max(15.555, OutdoorDryBulb));
                             DXCoil(DXCoilNum).DefrostPower =
                                 DefrostEIRTempModFac * (DXCoil(DXCoilNum).MSRatedTotCap(1) / 1.01667) * FractionalDefrostTime;
                         } else { // Defrost strategy is resistive
@@ -13066,16 +13073,16 @@ namespace DXCoils {
                 // Model was extended to accept bi-quadratic curves. This allows sensitivity of the EIR
                 // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
                 // advised to use the bi-quadratic curve if sufficient manufacturer data is available.
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(1)).NumDims == 1) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(1), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).MSEIRFTemp(1)).NumDims == 1) {
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(1), OutdoorDryBulb);
                 } else {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFTemp(1), InletAirDryBulbTemp, OutdoorDryBulb);
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFTemp(1), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).MSEIRFFlow(1), AirMassFlowRatioLS);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).MSEIRFFlow(1), AirMassFlowRatioLS);
                 EIR = 1.0 / DXCoil(DXCoilNum).MSRatedCOP(1) * EIRTempModFac * EIRFlowModFac;
                 // Calculate modified PartLoadRatio due to defrost (reverse-cycle defrost only)
                 PLRHeating = min(1.0, (CycRatio + LoadDueToDefrost / TotCapAdj));
-                PLF = CurveValue(DXCoil(DXCoilNum).MSPLFFPLR(1), PLRHeating); // Calculate part-load factor
+                PLF = CurveValue(state, DXCoil(DXCoilNum).MSPLFFPLR(1), PLRHeating); // Calculate part-load factor
                 if (FanOpMode == CycFanCycCoil && CycRatio == 1.0 && PLF != 1.0) {
                     if (DXCoil(DXCoilNum).PLFErrIndex == 0) {
                         ShowWarningMessage("The PLF curve value for DX heating coil " + DXCoil(DXCoilNum).Name + " =" + RoundSigDigits(PLF, 2) +
@@ -13143,7 +13150,7 @@ namespace DXCoils {
                     if (DXCoil(DXCoilNum).MSWasteHeat(SpeedNum) == 0) {
                         DXCoil(DXCoilNum).MSFuelWasteHeat = DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
                     } else {
-                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
+                        DXCoil(DXCoilNum).MSFuelWasteHeat = CurveValue(state, DXCoil(DXCoilNum).MSWasteHeat(SpeedNum), OutdoorDryBulb, InletAirDryBulbTemp) *
                                                             DXCoil(DXCoilNum).MSWasteHeatFrac(SpeedNum) * DXCoil(DXCoilNum).ElecHeatingPower;
                     }
                     if (DXCoil(DXCoilNum).MSHPHeatRecActive) {
@@ -13204,7 +13211,7 @@ namespace DXCoils {
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            CalcSecondaryDXCoils(DXCoilNum);
+            CalcSecondaryDXCoils(state, DXCoilNum);
         }
     }
 
@@ -13248,7 +13255,7 @@ namespace DXCoils {
         }
     }
 
-    void ReportDXCoil(int const DXCoilNum) // number of the current fan coil unit being simulated
+    void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the current fan coil unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -13263,8 +13270,6 @@ namespace DXCoils {
         // Fills some of the report variables for the DX coils
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
-        using DataAirLoop::LoopDXCoilRTF;
         using DataHVACGlobals::DXElecCoolingPower;
         using DataHVACGlobals::DXElecHeatingPower;
         using DataHVACGlobals::TimeStepSys;
@@ -13377,9 +13382,9 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).OutletAirTemp;
         }
 
-        LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
+        state.dataAirLoop->LoopDXCoilRTF = max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
         if (DXCoil(DXCoilNum).AirLoopNum > 0) {
-            AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
+            state.dataAirLoop->AirLoopAFNInfo(DXCoil(DXCoilNum).AirLoopNum).AFNLoopDXCoilRTF =
                 max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
         }
     }
@@ -13479,7 +13484,6 @@ namespace DXCoils {
         Real64 PLF;
         Real64 RunTimeFraction;
         Real64 LowerBoundMassFlowRate;
-        static bool OneTimeEIOHeaderWrite(true);
         int PartLoadTestPoint;
         int countStaticInputs;
         int index;
@@ -13513,8 +13517,8 @@ namespace DXCoils {
         // using either user supplied or AHRI default value for fan power per air volume flow rate
         if (DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject) {
 
-            TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatioRated);
-            TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(1), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+            TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatioRated);
+            TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(1), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
             for (Iter = 1; Iter <= 4; ++Iter) { // iterative solution in the event that net capacity is near a threshold for external static
                 // Obtain external static pressure from Table 5 in ANSI/AHRI Std. 340/360-2007
                 if (NetCoolingCapRated <= 21000.0) {
@@ -13541,8 +13545,8 @@ namespace DXCoils {
                     FanInletNode = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->inletNodeNum;
                     FanOutletNode = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->outletNodeNum;
                 } else {
-                    FanInletNode = Fans::GetFanInletNode(state.fans, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
-                    FanOutletNode = Fans::GetFanOutletNode(state.fans, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
+                    FanInletNode = Fans::GetFanInletNode(state, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
+                    FanOutletNode = Fans::GetFanOutletNode(state, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
                 }
 
                 // set node state variables in preparation for fan model.
@@ -13570,16 +13574,16 @@ namespace DXCoils {
             FanPowerPerEvapAirFlowRate = DefaultFanPowerPerEvapAirFlowRate;
             FanPowerCorrection = DefaultFanPowerPerEvapAirFlowRate * DXCoil(DXCoilNum).RatedAirVolFlowRate(1);
             FanHeatCorrection = DefaultFanPowerPerEvapAirFlowRate * DXCoil(DXCoilNum).RatedAirVolFlowRate(1);
-            TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatioRated);
-            TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(1), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+            TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatioRated);
+            TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(1), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
             NetCoolingCapRated = DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
         }
 
         SupAirMdot_TestPoint(1) = DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
         // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
-        EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(1), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-        EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(1), AirMassFlowRatioRated);
+        EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp(1), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
+        EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFFlow(1), AirMassFlowRatioRated);
         if (DXCoil(DXCoilNum).RatedCOP(1) > 0.0) {
             // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
             EIR = EIRTempModFac * EIRFlowModFac / DXCoil(DXCoilNum).RatedCOP(1);
@@ -13614,7 +13618,7 @@ namespace DXCoils {
         }
         SpeedRatio = 1.0;
         CycRatio = 1.0;
-        CalcMultiSpeedDXCoil(DXCoilNum, SpeedRatio, CycRatio, true);
+        CalcMultiSpeedDXCoil(state, DXCoilNum, SpeedRatio, CycRatio, true);
         TempDryBulb_Leaving_Apoint = DXCoilOutletTemp(DXCoilNum); // store result
 
         // IEER - part load test points ***************************************************
@@ -13709,16 +13713,16 @@ namespace DXCoils {
                     FanHeatCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
                 }
 
-                TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
-                TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(1),
+                TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
+                TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(1),
                                               CoolingCoilInletAirWetBulbTempRated,
                                               OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint));
                 HighSpeedTotCoolingCap = DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac;
                 HighSpeedNetCoolingCap = HighSpeedTotCoolingCap - FanHeatCorrection;
 
-                EIRTempModFac = CurveValue(
+                EIRTempModFac = CurveValue(state,
                     DXCoil(DXCoilNum).EIRFTemp(1), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint));
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(1), AirMassFlowRatio);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFFlow(1), AirMassFlowRatio);
                 if (DXCoil(DXCoilNum).RatedCOP(1) > 0.0) {
                     // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
                     EIR_HighSpeed = EIRTempModFac * EIRFlowModFac / DXCoil(DXCoilNum).RatedCOP(1);
@@ -13726,15 +13730,15 @@ namespace DXCoils {
                     EIR = 0.0;
                 }
 
-                TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp2, AirMassFlowRatio);
-                TotCapTempModFac = CurveValue(
+                TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp2, AirMassFlowRatio);
+                TotCapTempModFac = CurveValue(state,
                     DXCoil(DXCoilNum).CCapFTemp2, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint));
                 LowSpeedTotCoolingCap = DXCoil(DXCoilNum).RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac;
                 LowSpeedNetCoolingCap = LowSpeedTotCoolingCap - FanHeatCorrection;
 
-                EIRTempModFac = CurveValue(
+                EIRTempModFac = CurveValue(state,
                     DXCoil(DXCoilNum).EIRFTemp2, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempPLTestPoint(PartLoadTestPoint));
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(1), AirMassFlowRatio);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFFlow(1), AirMassFlowRatio);
                 if (DXCoil(DXCoilNum).RatedCOP2 > 0.0) {
                     // RatedCOP <= 0.0 is trapped in GetInput, but keep this as "safety"
                     EIR_LowSpeed = EIRTempModFac * EIRFlowModFac / DXCoil(DXCoilNum).RatedCOP2;
@@ -13756,7 +13760,7 @@ namespace DXCoils {
                 } else { // minimum unloading limit exceeded without cycling, so cycle
                     SpeedRatio = 0.0;
                     CycRatio = TargetNetCapacity / LowSpeedNetCoolingCap;
-                    PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(1), CycRatio);
+                    PLF = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(1), CycRatio);
                     if (PLF < 0.7) {
                         PLF = 0.7;
                     }
@@ -13776,9 +13780,9 @@ namespace DXCoils {
         IEER = (0.02 * EER_TestPoint_IP(1)) + (0.617 * EER_TestPoint_IP(2)) + (0.238 * EER_TestPoint_IP(3)) + (0.125 * EER_TestPoint_IP(4));
 
         // begin output
-        if (OneTimeEIOHeaderWrite) {
-            print(state.outputFiles.eio, Header);
-            OneTimeEIOHeaderWrite = false;
+        if (CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite) {
+            print(state.files.eio, Header);
+            CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = false;
             pdstVAVDXCoolCoil = newPreDefSubTable(pdrEquip, "VAV DX Cooling Standard Rating Details");
             pdchVAVDXCoolCoilType = newPreDefColumn(pdstVAVDXCoolCoil, "DX Cooling Coil Type");
             pdchVAVDXFanName = newPreDefColumn(pdstVAVDXCoolCoil, "Assocated Fan");
@@ -13827,7 +13831,7 @@ namespace DXCoils {
             }
         }();
 
-        print(state.outputFiles.eio,
+        print(state.files.eio,
               Format_891,
               "Coil:Cooling:DX:TwoSpeed",
               DXCoil(DXCoilNum).Name,
@@ -13941,7 +13945,7 @@ namespace DXCoils {
                     for (CompNum = 1; CompNum <= PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).TotalComponents; ++CompNum) {
                         if (PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num == SimAirServingZones::Fan_Simple_VAV) {
                             SupplyFanName = PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                            Fans::GetFanIndex(state.fans, SupplyFanName, SupplyFanIndex, ErrorsFound);
+                            Fans::GetFanIndex(state, SupplyFanName, SupplyFanIndex, ErrorsFound, ObjexxFCL::Optional_string_const());
                             SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
                             break;
                             // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
@@ -14068,12 +14072,12 @@ namespace DXCoils {
             FanHeatCorrection = FanPowerPerEvapAirFlowRate * SupplyAirVolFlowRate;
         }
 
-        TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
-        TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp(1), IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
+        TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
+        TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp(1), IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
         HighSpeedNetCoolingCap = DXCoil(DXCoilNum).RatedTotCap(1) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
-        TotCapFlowModFac = CurveValue(DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
-        TotCapTempModFac = CurveValue(DXCoil(DXCoilNum).CCapFTemp2, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
+        TotCapFlowModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFFlow(1), AirMassFlowRatio);
+        TotCapTempModFac = CurveValue(state, DXCoil(DXCoilNum).CCapFTemp2, IndoorUnitInletWetBulb, OutdoorUnitInletDryBulb);
         LowSpeedNetCoolingCap = DXCoil(DXCoilNum).RatedTotCap2 * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 
         if (LowSpeedNetCoolingCap <= TargetNetCapacity) {
@@ -14086,7 +14090,7 @@ namespace DXCoils {
 
         DXCoil(DXCoilNum).InletAirMassFlowRate = SupplyAirMassFlowRate;
 
-        CalcMultiSpeedDXCoil(DXCoilNum, SpeedRatio, CycRatio, true);
+        CalcMultiSpeedDXCoil(state, DXCoilNum, SpeedRatio, CycRatio, true);
         OutletAirTemp = DXCoilOutletTemp(DXCoilNum);
         Residuum = TargetCoilLeavingDryBulb - OutletAirTemp;
 
@@ -14095,8 +14099,12 @@ namespace DXCoils {
 
     // ======================  Utility routines ======================================
 
-    void GetDXCoilIndex(
-        std::string const &DXCoilName, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
+    void GetDXCoilIndex(EnergyPlusData &state,
+                        std::string const &DXCoilName,
+                        int &DXCoilIndex,
+                        bool &ErrorsFound,
+                        Optional_string_const ThisObjectType,
+                        Optional_bool_const SuppressWarning)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14108,7 +14116,7 @@ namespace DXCoils {
         // DX Coil is not a legal DX Coil.
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14127,7 +14135,7 @@ namespace DXCoils {
         }
     }
 
-    std::string GetDXCoilName(int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
+    std::string GetDXCoilName(EnergyPlusData &state, int &DXCoilIndex, bool &ErrorsFound, Optional_string_const ThisObjectType, Optional_bool_const SuppressWarning)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14139,7 +14147,7 @@ namespace DXCoils {
         // DX Coil is not a legal DX Coil.
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14162,7 +14170,7 @@ namespace DXCoils {
         }
     }
 
-    Real64 GetCoilCapacity(EnergyPlusData &EP_UNUSED(state),
+    Real64 GetCoilCapacity(EnergyPlusData &state,
                            std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
@@ -14186,7 +14194,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14226,7 +14234,8 @@ namespace DXCoils {
         return CoilCapacity;
     }
 
-    Real64 GetCoilCapacityByIndexType(int const CoilIndex,    // must match coil index for the coil type
+    Real64 GetCoilCapacityByIndexType(EnergyPlusData &state,
+                                      int const CoilIndex,    // must match coil index for the coil type
                                       int const CoilType_Num, // must match coil types in this module
                                       bool &ErrorsFound       // set to true if problem
     )
@@ -14246,7 +14255,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14277,7 +14286,8 @@ namespace DXCoils {
         return CoilCapacity;
     }
 
-    int GetCoilTypeNum(std::string const &CoilType,     // must match coil types in this module
+    int GetCoilTypeNum(EnergyPlusData &state,
+                       std::string const &CoilType,     // must match coil types in this module
                        std::string const &CoilName,     // must match coil names for the coil type
                        bool &ErrorsFound,               // set to true if problem
                        Optional_bool_const PrintWarning // prints warning when true
@@ -14302,7 +14312,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14326,7 +14336,8 @@ namespace DXCoils {
         return TypeNum;
     }
 
-    Real64 GetMinOATCompressor(std::string const &CoilType, // must match coil types in this module
+    Real64 GetMinOATCompressor(EnergyPlusData &state,
+                               std::string const &CoilType, // must match coil types in this module
                                std::string const &CoilName, // must match coil names for the coil type
                                bool &ErrorsFound            // set to true if problem
     )
@@ -14349,7 +14360,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14385,7 +14396,8 @@ namespace DXCoils {
         return MinOAT;
     }
 
-    Real64 GetMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+    Real64 GetMinOATCompressorUsingIndex(EnergyPlusData &state,
+                                         int const CoilIndex, // index to cooling coil
                                          bool &ErrorsFound    // set to true if problem
     )
     {
@@ -14404,7 +14416,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14422,7 +14434,7 @@ namespace DXCoils {
 
         return MinOAT;
     }
-    int GetCoilInletNode(EnergyPlusData &EP_UNUSED(state),
+    int GetCoilInletNode(EnergyPlusData &state,
                          std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
@@ -14446,7 +14458,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14462,7 +14474,8 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int getCoilInNodeIndex(int const &CoilIndex, // coil index
+    int getCoilInNodeIndex(EnergyPlusData &state,
+                           int const &CoilIndex, // coil index
                            bool &ErrorsFound     // set to true if problem
     )
     {
@@ -14471,7 +14484,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14486,7 +14499,7 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(EnergyPlusData &EP_UNUSED(state),
+    int GetCoilOutletNode(EnergyPlusData &state,
                           std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
@@ -14510,7 +14523,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14527,7 +14540,8 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int getCoilOutNodeIndex(int const &CoilIndex, // must match coil types in this module
+    int getCoilOutNodeIndex(EnergyPlusData &state,
+                            int const &CoilIndex, // must match coil types in this module
                             bool &ErrorsFound     // set to true if problem
     )
     {
@@ -14536,7 +14550,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14551,7 +14565,8 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int GetCoilCondenserInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilCondenserInletNode(EnergyPlusData &state,
+                                  std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     )
@@ -14573,7 +14588,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14589,7 +14604,8 @@ namespace DXCoils {
         return CondNode;
     }
 
-    Real64 GetDXCoilBypassedFlowFrac(std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilBypassedFlowFrac(EnergyPlusData &state,
+                                     std::string const &CoilType, // must match coil types in this module
                                      std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     )
@@ -14612,7 +14628,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14729,7 +14745,8 @@ namespace DXCoils {
         return DXCoolingCoilIndex;
     }
 
-    int GetDXCoilNumberOfSpeeds(std::string const &CoilType, // must match coil types in this module
+    int GetDXCoilNumberOfSpeeds(EnergyPlusData &state,
+                                std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -14751,7 +14768,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14767,7 +14784,8 @@ namespace DXCoils {
         return NumberOfSpeeds;
     }
 
-    int GetDXCoilAvailSchPtr(std::string const &CoilType, // must match coil types in this module
+    int GetDXCoilAvailSchPtr(EnergyPlusData &state,
+                             std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound,           // set to true if problem
                              Optional_int_const CoilIndex // Coil index number
@@ -14791,7 +14809,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14822,7 +14840,8 @@ namespace DXCoils {
         return SchPtr;
     }
 
-    Real64 GetDXCoilAirFlow(std::string const &CoilType, // must match coil types in this module
+    Real64 GetDXCoilAirFlow(EnergyPlusData &state,
+                            std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     )
@@ -14845,7 +14864,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14875,7 +14894,8 @@ namespace DXCoils {
         return AirFlow;
     }
 
-    int GetDXCoilCapFTCurveIndex(int const CoilIndex, // coil index pointer
+    int GetDXCoilCapFTCurveIndex(EnergyPlusData &state,
+                                 int const CoilIndex, // coil index pointer
                                  bool &ErrorsFound    // set to true if problem
     )
     {
@@ -14894,7 +14914,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -14967,7 +14987,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -15084,7 +15104,8 @@ namespace DXCoils {
         }
     }
 
-    void SetCoilSystemHeatingDXFlag(std::string const &CoilType, // must match coil types in this module
+    void SetCoilSystemHeatingDXFlag(EnergyPlusData &state,
+                                    std::string const &CoilType, // must match coil types in this module
                                     std::string const &CoilName  // must match coil names for the coil type
     )
     {
@@ -15105,7 +15126,7 @@ namespace DXCoils {
 
         // Obtains and Allocates DXCoils
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -15117,7 +15138,8 @@ namespace DXCoils {
         }
     }
 
-    void SetCoilSystemCoolingData(std::string const &CoilName, // must match coil names for the coil type
+    void SetCoilSystemCoolingData(EnergyPlusData &state,
+                                  std::string const &CoilName, // must match coil names for the coil type
                                   std::string const &CoilSystemName)
     {
 
@@ -15132,7 +15154,7 @@ namespace DXCoils {
         int WhichCoil;
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -15144,7 +15166,8 @@ namespace DXCoils {
         }
     }
 
-    Real64 CalcSHRUserDefinedCurves(Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
+    Real64 CalcSHRUserDefinedCurves(EnergyPlusData &state,
+                                    Real64 const InletDryBulb,     // inlet air dry bulb temperature [C]
                                     Real64 const InletWetBulb,     // inlet air wet bulb temperature [C]
                                     Real64 const AirMassFlowRatio, // ratio of actual air mass flow to rated air mass flow
                                     int const SHRFTempCurveIndex,  // SHR modifier curve index
@@ -15186,7 +15209,7 @@ namespace DXCoils {
         if (SHRFTempCurveIndex == 0) {
             SHRTempModFac = 1.0;
         } else {
-            SHRTempModFac = CurveValue(SHRFTempCurveIndex, InletWetBulb, InletDryBulb);
+            SHRTempModFac = CurveValue(state, SHRFTempCurveIndex, InletWetBulb, InletDryBulb);
             if (SHRTempModFac < 0.0) {
                 SHRTempModFac = 0.0;
             }
@@ -15195,7 +15218,7 @@ namespace DXCoils {
         if (SHRFFlowCurveIndex == 0) {
             SHRFlowModFac = 1.0;
         } else {
-            SHRFlowModFac = CurveValue(SHRFFlowCurveIndex, AirMassFlowRatio);
+            SHRFlowModFac = CurveValue(state, SHRFFlowCurveIndex, AirMassFlowRatio);
             if (SHRFlowModFac < 0.0) {
                 SHRFlowModFac = 0.0;
             }
@@ -15209,7 +15232,7 @@ namespace DXCoils {
         return SHRopr;
     }
 
-    void SetDXCoilTypeData(std::string const &CoilName) // must match coil names for the coil type
+    void SetDXCoilTypeData(EnergyPlusData &state, std::string const &CoilName) // must match coil names for the coil type
     {
 
         // SUBROUTINE INFORMATION:
@@ -15223,7 +15246,7 @@ namespace DXCoils {
         int WhichCoil;
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -15237,7 +15260,7 @@ namespace DXCoils {
         }
     }
 
-    void CalcSecondaryDXCoils(int const DXCoilNum)
+    void CalcSecondaryDXCoils(EnergyPlusData &state, int const DXCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -15335,7 +15358,8 @@ namespace DXCoils {
                         SecCoilSHRFT = DXCoil(DXCoilNum).SecCoilSHRFT;
                         SecCoilSHRFF = DXCoil(DXCoilNum).SecCoilSHRFF;
                         // determine the current SHR
-                        SHR = CalcSecondaryDXCoilsSHR(DXCoilNum,
+                        SHR = CalcSecondaryDXCoilsSHR(state,
+                                                      DXCoilNum,
                                                       EvapAirMassFlow,
                                                       TotalHeatRemovalRate,
                                                       PartLoadRatio,
@@ -15410,7 +15434,8 @@ namespace DXCoils {
                             SecCoilSHRFT = DXCoil(DXCoilNum).MSSecCoilSHRFT(MSSpeedNumHS);
                             SecCoilSHRFF = DXCoil(DXCoilNum).MSSecCoilSHRFF(MSSpeedNumHS);
                             SecCoilRatedSHR = DXCoil(DXCoilNum).MSSecCoilRatedSHR(MSSpeedNumHS);
-                            SHRHighSpeed = CalcSecondaryDXCoilsSHR(DXCoilNum,
+                            SHRHighSpeed = CalcSecondaryDXCoilsSHR(state,
+                                                                   DXCoilNum,
                                                                    EvapAirMassFlow,
                                                                    TotalHeatRemovalRate,
                                                                    PartLoadRatio,
@@ -15427,7 +15452,8 @@ namespace DXCoils {
                             SecCoilSHRFT = DXCoil(DXCoilNum).MSSecCoilSHRFT(MSSpeedNumLS);
                             SecCoilSHRFF = DXCoil(DXCoilNum).MSSecCoilSHRFF(MSSpeedNumLS);
                             SecCoilRatedSHR = DXCoil(DXCoilNum).MSSecCoilRatedSHR(MSSpeedNumLS);
-                            SHRLowSpeed = CalcSecondaryDXCoilsSHR(DXCoilNum,
+                            SHRLowSpeed = CalcSecondaryDXCoilsSHR(state,
+                                                                  DXCoilNum,
                                                                   EvapAirMassFlow,
                                                                   TotalHeatRemovalRate,
                                                                   PartLoadRatio,
@@ -15449,7 +15475,8 @@ namespace DXCoils {
                             SecCoilSHRFF = DXCoil(DXCoilNum).MSSecCoilSHRFF(MSSpeedNumLS);
                             SecCoilRatedSHR = DXCoil(DXCoilNum).MSSecCoilRatedSHR(MSSpeedNumLS);
                             SecCoilFlowFraction = 1.0;
-                            SHRLowSpeed = CalcSecondaryDXCoilsSHR(DXCoilNum,
+                            SHRLowSpeed = CalcSecondaryDXCoilsSHR(state,
+                                                                  DXCoilNum,
                                                                   EvapAirMassFlow,
                                                                   TotalHeatRemovalRate,
                                                                   MSCycRatio,
@@ -15501,7 +15528,8 @@ namespace DXCoils {
         }
     }
 
-    Real64 CalcSecondaryDXCoilsSHR(int const EP_UNUSED(DXCoilNum),
+    Real64 CalcSecondaryDXCoilsSHR(EnergyPlusData &state,
+                                   int const EP_UNUSED(DXCoilNum),
                                    Real64 const EvapAirMassFlow,
                                    Real64 const TotalHeatRemovalRate,
                                    Real64 const PartLoadRatio,
@@ -15597,7 +15625,7 @@ namespace DXCoils {
             }
         }
         // determine SHR from user specified nominal value and SHR modifier curves
-        SHR = CalcSHRUserDefinedCurves(CondInletDryBulb, EvapInletWetBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF, SecCoilRatedSHR);
+        SHR = CalcSHRUserDefinedCurves(state, CondInletDryBulb, EvapInletWetBulb, SecCoilFlowFraction, SecCoilSHRFT, SecCoilSHRFF, SecCoilRatedSHR);
         if (CoilMightBeDry) {
             if ((EvapInletHumRat < DryCoilTestEvapInletHumRat) && (SHRadp > SHR)) { // coil is dry for sure
                 SHR = 1.0;
@@ -15608,7 +15636,8 @@ namespace DXCoils {
         return SHR;
     }
 
-    void CalcVRFCoolingCoil_FluidTCtrl(int const DXCoilNum,           // the number of the DX coil to be simulated
+    void CalcVRFCoolingCoil_FluidTCtrl(EnergyPlusData &state,
+                                       int const DXCoilNum,           // the number of the DX coil to be simulated
                                        int const CompOp,              // compressor operation; 1=on, 0=off
                                        bool const FirstHVACIteration, // true if this is the first iteration of HVAC
                                        Real64 const PartLoadRatio,    // sensible cooling load / full load sensible cooling capacity
@@ -15642,7 +15671,6 @@ namespace DXCoils {
         using General::TrimSigDigits;
         using HVACVariableRefrigerantFlow::OACompOffMassFlow;
         using HVACVariableRefrigerantFlow::OACompOnMassFlow;
-        using namespace DataZoneEnergyDemands;
         using namespace HVACVariableRefrigerantFlow;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -15937,7 +15965,7 @@ namespace DXCoils {
             // commented, not used issue #6950 ends here
 
             if (DXCoil(DXCoilNum).PLFFPLR(Mode) > 0 && CompCycRatio < 1.0) {
-                PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), CompCycRatio); // Calculate part-load factor
+                PLF = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(Mode), CompCycRatio); // Calculate part-load factor
             } else {
                 PLF = 1.0;
             }
@@ -16067,7 +16095,8 @@ namespace DXCoils {
         DXCoilCoolInletAirWBTemp(DXCoilNum) = PsyTwbFnTdbWPb(InletAirDryBulbTemp, InletAirHumRat, OutdoorPressure);
     }
 
-    void CalcVRFHeatingCoil_FluidTCtrl(int const CompOp,                         // compressor operation; 1=on, 0=off
+    void CalcVRFHeatingCoil_FluidTCtrl(EnergyPlusData &state,
+                                       int const CompOp,                         // compressor operation; 1=on, 0=off
                                        int const DXCoilNum,                      // the number of the DX heating coil to be simulated
                                        Real64 const PartLoadRatio,               // sensible cooling load / full load sensible cooling capacity
                                        int const FanOpMode,                      // Allows parent object to control fan mode
@@ -16092,7 +16121,6 @@ namespace DXCoils {
         using General::RoundSigDigits;
         using HVACVariableRefrigerantFlow::OACompOffMassFlow;
         using HVACVariableRefrigerantFlow::OACompOnMassFlow;
-        using namespace DataZoneEnergyDemands;
         using namespace HVACVariableRefrigerantFlow;
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -16248,12 +16276,12 @@ namespace DXCoils {
             // to the entering dry-bulb temperature as well as the outside dry-bulb temperature. User is
             // advised to use the bi-quaratic curve if sufficient manufacturer data is available.
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                if (CurveManager::PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
+                if (state.dataCurveManager->PerfCurve(DXCoil(DXCoilNum).EIRFTemp(Mode)).NumDims == 1) {
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp(Mode), OutdoorDryBulb);
                 } else {
-                    EIRTempModFac = CurveValue(DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
+                    EIRTempModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFTemp(Mode), InletAirDryBulbTemp, OutdoorDryBulb);
                 }
-                EIRFlowModFac = CurveValue(DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
+                EIRFlowModFac = CurveValue(state, DXCoil(DXCoilNum).EIRFFlow(Mode), AirMassFlowRatio);
             } else {
                 EIRTempModFac = 1.0;
                 EIRFlowModFac = 1.0;
@@ -16268,7 +16296,7 @@ namespace DXCoils {
             }
 
             if (DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_Heating && DXCoil(DXCoilNum).DXCoilType_Num != CoilVRF_FluidTCtrl_Heating) {
-                PLF = CurveValue(DXCoil(DXCoilNum).PLFFPLR(Mode), PLRHeating); // Calculate part-load factor
+                PLF = CurveValue(state, DXCoil(DXCoilNum).PLFFPLR(Mode), PLRHeating); // Calculate part-load factor
             } else {
                 PLF = 1.0;
             }
@@ -16361,7 +16389,7 @@ namespace DXCoils {
 
         // calc secondary coil if specified
         if (DXCoil(DXCoilNum).IsSecondaryDXCoilInZone) {
-            CalcSecondaryDXCoils(DXCoilNum);
+            CalcSecondaryDXCoils(state, DXCoilNum);
         }
     }
 
@@ -16392,7 +16420,6 @@ namespace DXCoils {
         //       A new physics based VRF model applicable for Fluid Temperature Control.
         //
         // USE STATEMENTS:
-        using namespace DataZoneEnergyDemands;
         using General::SolveRoot;
         using Psychrometrics::PsyHFnTdbW;
 
@@ -16709,7 +16736,8 @@ namespace DXCoils {
         }
     }
 
-    void CalcVRFCoilCapModFac(int const OperationMode,        // mode 0 for cooling, 1 for heating
+    void CalcVRFCoilCapModFac(EnergyPlusData &state,
+                              int const OperationMode,        // mode 0 for cooling, 1 for heating
                               Optional<int const> CoilIndex,  // index to VRFTU cooling or heating coil
                               Optional<std::string> CoilName, // name of VRFTU cooling or heating coil
                               Real64 const Tinlet,            // dry bulb temperature of air entering the coil
@@ -16752,7 +16780,7 @@ namespace DXCoils {
         if (present(CoilIndex)) {
             CoilNum = CoilIndex;
         } else {
-            GetDXCoilIndex(CoilName, CoilNum, ErrorsFound);
+            GetDXCoilIndex(state, CoilName, CoilNum, ErrorsFound, ObjexxFCL::Optional_string_const(), ObjexxFCL::Optional_bool_const());
         }
 
         BFC_rate = DXCoil(CoilNum).RateBFVRFIUEvap;
@@ -16916,7 +16944,7 @@ namespace DXCoils {
         }
     }
 
-    void SetDXCoilAirLoopNumber(std::string const &CoilName, int const AirLoopNum)
+    void SetDXCoilAirLoopNumber(EnergyPlusData &state, std::string const &CoilName, int const AirLoopNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L. Gu
@@ -16929,7 +16957,7 @@ namespace DXCoils {
         int WhichCoil;
 
         if (GetCoilsInputFlag) {
-            GetDXCoils();
+            GetDXCoils(state);
             GetCoilsInputFlag = false;
         }
 
@@ -16991,6 +17019,7 @@ namespace DXCoils {
         DXCoilHeatInletAirDBTemp.deallocate();
         DXCoilHeatInletAirWBTemp.deallocate();
         CheckEquipName.deallocate();
+        CalcTwoSpeedDXCoilStandardRatingOneTimeEIOHeaderWrite = true;
     }
 
 } // namespace DXCoils

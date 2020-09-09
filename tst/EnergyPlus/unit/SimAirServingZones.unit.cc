@@ -81,14 +81,12 @@ using namespace SimAirServingZones;
 
 namespace EnergyPlus {
 
-TEST(SimAirServingZones, ReheatCoilSizing)
+TEST_F(EnergyPlusFixture, SimAirServingZones_ReheatCoilSizing)
 {
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine test the GetHeatingSATempForSizing & GetHeatingSATempHumRatForSizing methods,
     // which are designed to get the proper reheat coil inlet temperature/humidity ratio for sizing
     // depending on the system configurations
-
-    ShowMessage("Begin Test: SimAirServingZones, ReheatCoilSizing");
 
     int NumPrimaryAirSys = 4; // total number of air loops
     int AirLoopNum;           // index of air loops
@@ -785,7 +783,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_1AirLoop2ADU)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);
@@ -1017,7 +1015,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop2ADU)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);
@@ -1282,7 +1280,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUa)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);
@@ -1548,7 +1546,7 @@ TEST_F(EnergyPlusFixture, InitAirLoops_2AirLoop3ADUb)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     EXPECT_TRUE(compare_err_stream(""));
     ASSERT_FALSE(ErrorsFound);
     SingleDuct::GetSysInput(state);

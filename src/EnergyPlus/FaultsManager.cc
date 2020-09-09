@@ -450,7 +450,7 @@ namespace FaultsManager {
                 if (UtilityRoutines::SameString(SELECT_CASE_VAR, "EvaporativeCooler:Indirect:WetCoil")) {
                     // Read in evaporative cooler is not done yet
                     if (EvaporativeCoolers::GetInputEvapComponentsFlag) {
-                        EvaporativeCoolers::GetEvapInput();
+                        EvaporativeCoolers::GetEvapInput(state);
                         EvaporativeCoolers::GetInputEvapComponentsFlag = false;
                     }
 
@@ -574,7 +574,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerElectricEIR.getInputFlag) {
-                        ChillerElectricEIR::GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+                        ChillerElectricEIR::GetElectricEIRChillerInput(state);
                         state.dataChillerElectricEIR.getInputFlag = false;
                     }
 
@@ -604,7 +604,7 @@ namespace FaultsManager {
 
                     // Read in chiller if not done yet
                     if (state.dataChillerReformulatedEIR.GetInputREIR) {
-                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state.dataChillerReformulatedEIR);
+                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
                         state.dataChillerReformulatedEIR.GetInputREIR = false;
                     }
 
@@ -788,7 +788,7 @@ namespace FaultsManager {
             // Boiler check and link
             {
                 if (state.dataBoilers.getBoilerInputFlag) {
-                    Boilers::GetBoilerInput(state.dataBoilers);
+                    Boilers::GetBoilerInput(state);
                     state.dataBoilers.getBoilerInputFlag = false;
                 }
                 // Check the boiler name and boiler type
@@ -1082,7 +1082,7 @@ namespace FaultsManager {
             {
                 // Read in tower input if not done yet
                 if (state.dataCondenserLoopTowers.GetInput) {
-                    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+                    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
                     state.dataCondenserLoopTowers.GetInput = false;
                 }
                 // Check the tower name and tower type
@@ -1186,7 +1186,7 @@ namespace FaultsManager {
             {
                 // Read in tower input if not done yet
                 if (state.dataCondenserLoopTowers.GetInput) {
-                    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+                    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
                     state.dataCondenserLoopTowers.GetInput = false;
                 }
                 // Check the tower name and tower type
@@ -1306,7 +1306,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerElectricEIR.getInputFlag) {
-                        ChillerElectricEIR::GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+                        ChillerElectricEIR::GetElectricEIRChillerInput(state);
                         state.dataChillerElectricEIR.getInputFlag = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1325,7 +1325,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerReformulatedEIR.GetInputREIR) {
-                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state.dataChillerReformulatedEIR);
+                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
                         state.dataChillerReformulatedEIR.GetInputREIR = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1402,7 +1402,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerAbsorbers.getInput) {
-                        ChillerAbsorption::GetBLASTAbsorberInput(state.dataChillerAbsorbers);
+                        ChillerAbsorption::GetBLASTAbsorberInput(state);
                         state.dataChillerAbsorbers.getInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1421,7 +1421,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption:Indirect")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerIndirectAbsorption.GetInput) {
-                        ChillerIndirectAbsorption::GetIndirectAbsorberInput(state.dataChillerIndirectAbsorption);
+                        ChillerIndirectAbsorption::GetIndirectAbsorberInput(state);
                         state.dataChillerIndirectAbsorption.GetInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1441,6 +1441,11 @@ namespace FaultsManager {
 
         // read faults input of Fault_type 109: Fouled Air Filters
         for (int jFault_AirFilter = 1; jFault_AirFilter <= NumFaultyAirFilter; ++jFault_AirFilter) {
+
+            // Read in fan if not done yet
+            if (state.fans.GetFanInputFlag) {
+                Fans::GetFanInput(state);
+            }
 
             cFaultCurrentObject = cFaults(9); // fault object string
             inputProcessor->getObjectItem(cFaultCurrentObject,
@@ -1507,20 +1512,15 @@ namespace FaultsManager {
 
             // Fan curve describing the relationship between fan pressure rise and air flow rate
             FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurve = cAlphaArgs(6);
-            FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurvePtr = GetCurveIndex(cAlphaArgs(6));
+            FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurvePtr = GetCurveIndex(state, cAlphaArgs(6));
             if (FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanCurvePtr == 0) {
                 ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" not found.");
                 ErrorsFound = true;
             }
 
-            // Check whether the specified fan curve covers the design operational point of the fan
-            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
-                ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
-                ShowContinueError("Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" does not cover ");
-                ShowContinueError("the operational point of Fan " + FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanName);
-                ErrorsFound = true;
-            }
+            // Checking  whether the specified fan curve covers the **design** operational point of the fan cannot be done here
+            // as the fan might be autosized and is not sized yet, so we call it in Fan::SizeFan instead
 
             // In the fan object, calculate by each time-step: 1) pressure increase value; 2) air flow rate decrease value.
         }
@@ -2140,7 +2140,7 @@ namespace FaultsManager {
             return false;
         }
 
-        FanDeltaPressCal = CurveValue(FanCurvePtr, FanMaxAirFlowRate);
+        FanDeltaPressCal = CurveValue(state, FanCurvePtr, FanMaxAirFlowRate);
 
         return ((FanDeltaPressCal > 0.95 * FanDeltaPress) && (FanDeltaPressCal < 1.05 * FanDeltaPress));
     }

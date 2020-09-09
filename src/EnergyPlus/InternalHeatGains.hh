@@ -56,9 +56,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
+    class IOFiles;
     struct EnergyPlusData;
-    class OutputFiles;
 
 namespace InternalHeatGains {
 
@@ -76,7 +75,7 @@ namespace InternalHeatGains {
 
     void CheckReturnAirHeatGain();
 
-    void CalcZoneITEq();
+    void CalcZoneITEq(EnergyPlusData &state);
 
     void ReportInternalHeatGains();
 

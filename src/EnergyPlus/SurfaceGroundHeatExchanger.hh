@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace SurfaceGroundHeatExchanger {
 
@@ -68,6 +67,8 @@ namespace SurfaceGroundHeatExchanger {
         extern int const MaxCTFTerms; // Maximum number of CTF terms allowed to still allow stability //Note Duplicate of DataHeatBalance::MaxCTFTerms
                                       // to avoid static initialization order bug: Keep them in sync
     }                                 // namespace loc
+
+    void clear_state();
 
     struct SurfaceGroundHeatExchangerData : PlantComponent
     {
@@ -182,7 +183,7 @@ namespace SurfaceGroundHeatExchanger {
 
         static PlantComponent *factory(int objectType, std::string objectName);
 
-        void InitSurfaceGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager);
+        void InitSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
         //==============================================================================
 

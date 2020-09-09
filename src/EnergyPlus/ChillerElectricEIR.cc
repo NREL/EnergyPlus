@@ -58,12 +58,12 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -71,13 +71,13 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -115,15 +115,15 @@ namespace ChillerElectricEIR {
     // REFERENCES:
     // 1. DOE-2 Engineers Manual, Version 2.1A, November 1982, LBL-11353
 
-    PlantComponent *ElectricEIRChillerSpecs::factory(ChillerElectricEIRData &chillers, std::string const &objectName)
+    PlantComponent *ElectricEIRChillerSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data if it hasn't been done already
-        if (chillers.getInputFlag) {
-            GetElectricEIRChillerInput(chillers);
-            chillers.getInputFlag = false;
+        if (state.dataChillerElectricEIR.getInputFlag) {
+            GetElectricEIRChillerInput(state);
+            state.dataChillerElectricEIR.getInputFlag = false;
         }
         // Now look for this particular object in the list
-        for (auto &obj : chillers.ElectricEIRChiller) {
+        for (auto &obj : state.dataChillerElectricEIR.ElectricEIRChiller) {
             if (obj.Name == objectName) {
                 return &obj;
             }
@@ -148,8 +148,8 @@ namespace ChillerElectricEIR {
         //  up reporting variables.
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
-            this->calculate(CurLoad, RunFlag);
+            this->initialize(state, RunFlag, CurLoad);
+            this->calculate(state, CurLoad, RunFlag);
             this->update(CurLoad, RunFlag);
 
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
@@ -207,14 +207,14 @@ namespace ChillerElectricEIR {
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
-        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
+        this->initialize(state, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->size(state);
         }
     }
 
-    void GetElectricEIRChillerInput(ChillerElectricEIRData &chillers)
+    void GetElectricEIRChillerInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Raustad, FSEC
@@ -228,18 +228,18 @@ namespace ChillerElectricEIR {
         bool ErrorsFound(false); // True when input errors are found
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:EIR";
-        chillers.NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerElectricEIR.NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumElectricEIRChillers <= 0) {
+        if (state.dataChillerElectricEIR.NumElectricEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        chillers.ElectricEIRChiller.allocate(chillers.NumElectricEIRChillers);
+        state.dataChillerElectricEIR.ElectricEIRChiller.allocate(state.dataChillerElectricEIR.NumElectricEIRChillers);
 
         // Load arrays with electric EIR chiller data
-        for (int EIRChillerNum = 1; EIRChillerNum <= chillers.NumElectricEIRChillers; ++EIRChillerNum) {
+        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerElectricEIR.NumElectricEIRChillers; ++EIRChillerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -260,25 +260,25 @@ namespace ChillerElectricEIR {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ElectricEIRChiller(EIRChillerNum);
+            auto &thisChiller = state.dataChillerElectricEIR.ElectricEIRChiller(EIRChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
 
             //   Performance curves
-            thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(2));
+            thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(2));
             if (thisChiller.ChillerCapFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + " \"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(2) + '=' + DataIPShortCuts::cAlphaArgs(2));
                 ErrorsFound = true;
             }
 
-            thisChiller.ChillerEIRFTIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(3));
+            thisChiller.ChillerEIRFTIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(3));
             if (thisChiller.ChillerEIRFTIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(3) + '=' + DataIPShortCuts::cAlphaArgs(3));
                 ErrorsFound = true;
             }
 
-            thisChiller.ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(4));
+            thisChiller.ChillerEIRFPLRIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(4));
             if (thisChiller.ChillerEIRFPLRIndex == 0) {
                 ShowSevereError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(4) + '=' + DataIPShortCuts::cAlphaArgs(4));
@@ -635,7 +635,7 @@ namespace ChillerElectricEIR {
 
             //   Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
             if (thisChiller.ChillerCapFTIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerCapFTIndex,
+                Real64 CurveVal = CurveManager::CurveValue(state, thisChiller.ChillerCapFTIndex,
                                                            thisChiller.TempRefEvapOut,
                                                            thisChiller.TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -647,7 +647,7 @@ namespace ChillerElectricEIR {
             }
 
             if (thisChiller.ChillerEIRFTIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerEIRFTIndex,
+                Real64 CurveVal = CurveManager::CurveValue(state, thisChiller.ChillerEIRFTIndex,
                                                            thisChiller.TempRefEvapOut,
                                                            thisChiller.TempRefCondIn);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -659,7 +659,7 @@ namespace ChillerElectricEIR {
             }
 
             if (thisChiller.ChillerEIRFPLRIndex > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(thisChiller.ChillerEIRFPLRIndex, 1.0);
+                Real64 CurveVal = CurveManager::CurveValue(state, thisChiller.ChillerEIRFPLRIndex, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\"");
@@ -673,7 +673,7 @@ namespace ChillerElectricEIR {
                 bool FoundNegValue = false;
                 Array1D<Real64> CurveValArray(11); // Used to evaluate PLFFPLR curve objects
                 for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
-                    Real64 CurveValTmp = CurveManager::CurveValue(thisChiller.ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
+                    Real64 CurveValTmp = CurveManager::CurveValue(state, thisChiller.ChillerEIRFPLRIndex, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
@@ -736,9 +736,9 @@ namespace ChillerElectricEIR {
 
         SetupOutputVariable("Chiller Cycling Ratio", OutputProcessor::Unit::None, this->ChillerCyclingRatio, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Power", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Electricity Rate", OutputProcessor::Unit::W, this->Power, "System", "Average", this->Name);
 
-        SetupOutputVariable("Chiller Electric Energy",
+        SetupOutputVariable("Chiller Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->Energy,
                             "System",
@@ -852,9 +852,9 @@ namespace ChillerElectricEIR {
 
             if (this->CondenserFanPowerRatio > 0) {
                 SetupOutputVariable(
-                    "Chiller Condenser Fan Electric Power", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
+                    "Chiller Condenser Fan Electricity Rate", OutputProcessor::Unit::W, this->CondenserFanPower, "System", "Average", this->Name);
 
-                SetupOutputVariable("Chiller Condenser Fan Electric Energy",
+                SetupOutputVariable("Chiller Condenser Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     this->CondenserFanEnergyConsumption,
                                     "System",
@@ -893,16 +893,16 @@ namespace ChillerElectricEIR {
 
                 if (this->BasinHeaterPowerFTempDiff > 0.0) {
                     SetupOutputVariable(
-                        "Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
+                        "Chiller Basin Heater Electricity Rate", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
 
-                    SetupOutputVariable("Chiller Basin Heater Electric Energy",
+                    SetupOutputVariable("Chiller Basin Heater Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         this->BasinHeaterConsumption,
                                         "System",
                                         "Sum",
                                         this->Name,
                                         _,
-                                        "Electric",
+                                        "Electricity",
                                         "CHILLERS",
                                         _,
                                         "Plant");
@@ -914,7 +914,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
+    void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -938,7 +938,7 @@ namespace ChillerElectricEIR {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_ElectricEIR,
                                                     this->CWLoopNum,
@@ -952,7 +952,7 @@ namespace ChillerElectricEIR {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricEIR,
                                                         this->CDLoopNum,
@@ -969,7 +969,7 @@ namespace ChillerElectricEIR {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ElectricEIR, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricEIR,
                                                         this->HRLoopNum,
@@ -1020,6 +1020,7 @@ namespace ChillerElectricEIR {
                         // need call to EMS to check node
                         bool fatalError = false; // but not really fatal yet, but should be.
                         EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
+                        DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                         if (fatalError) {
                             if (!this->ModulatedFlowErrDone) {
                                 ShowWarningError("Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + this->Name);
@@ -1139,6 +1140,7 @@ namespace ChillerElectricEIR {
                             // need call to EMS to check node
                             bool fatalError = false; // but not really fatal yet, but should be.
                             EMSManager::CheckIfNodeSetPointManagedByEMS(this->EvapOutletNodeNum, EMSManager::iTemperatureSetPoint, fatalError);
+                            DataLoopNode::NodeSetpointCheck(this->EvapOutletNodeNum).needsSetpointChecking = false;
                             if (fatalError) {
                                 if (!this->HRSPErrDone) {
                                     ShowWarningError("Missing heat recovery temperature setpoint for chiller named " + this->Name);
@@ -1506,7 +1508,8 @@ namespace ChillerElectricEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->IPLVFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(state.outputFiles,
+                StandardRatings::CalcChillerIPLV(state,
+                                                 state.files,
                                                  this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricEIR,
                                                  this->RefCap,
@@ -1533,7 +1536,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::calculate(Real64 &MyLoad, bool const RunFlag)
+    void ElectricEIRChillerSpecs::calculate(EnergyPlusData &state, Real64 &MyLoad, bool const RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad, FSEC
@@ -1786,7 +1789,7 @@ namespace ChillerElectricEIR {
         }
 
         // Get capacity curve info with respect to CW setpoint and entering condenser water temps
-        this->ChillerCapFT = CurveManager::CurveValue(this->ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
+        this->ChillerCapFT = CurveManager::CurveValue(state, this->ChillerCapFTIndex, EvapOutletTempSetPoint, AvgCondSinkTemp);
 
         if (this->ChillerCapFT < 0) {
             if (this->ChillerCapFTError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 &&
@@ -2075,7 +2078,7 @@ namespace ChillerElectricEIR {
                 this->BasinHeaterPowerFTempDiff, this->BasinHeaterSchedulePtr, this->BasinHeaterSetPointTemp, this->BasinHeaterPower);
         }
 
-        this->ChillerEIRFT = CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
+        this->ChillerEIRFT = CurveManager::CurveValue(state, this->ChillerEIRFTIndex, this->EvapOutletTemp, AvgCondSinkTemp);
         if (this->ChillerEIRFT < 0.0) {
             if (this->ChillerEIRFTError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 &&
                 !DataGlobals::WarmupFlag) {
@@ -2097,7 +2100,7 @@ namespace ChillerElectricEIR {
             this->ChillerEIRFT = 0.0;
         }
 
-        this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, PartLoadRat);
+        this->ChillerEIRFPLR = CurveManager::CurveValue(state, this->ChillerEIRFPLRIndex, PartLoadRat);
         if (this->ChillerEIRFPLR < 0.0) {
             if (this->ChillerEIRFPLRError < 1 && DataPlant::PlantLoop(this->CWLoopNum).LoopSide(this->CWLoopSideNum).FlowLock != 0 &&
                 !DataGlobals::WarmupFlag) {

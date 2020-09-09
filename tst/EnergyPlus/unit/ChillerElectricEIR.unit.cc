@@ -205,7 +205,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+    GetElectricEIRChillerInput(state);
     auto &thisEIR = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
@@ -226,12 +226,12 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    thisEIR.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIR.initialize(state, RunFlag, MyLoad);
     thisEIR.size(state);
 
     // run through init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    thisEIR.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIR.initialize(state, RunFlag, MyLoad);
 
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIR.EvapMassFlowRateMax, 0.999898, 0.0000001);
@@ -312,7 +312,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetElectricEIRChillerInput(state.dataChillerElectricEIR);
+    GetElectricEIRChillerInput(state);
     auto &thisEIRChiller = state.dataChillerElectricEIR.ElectricEIRChiller(1);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
@@ -344,17 +344,17 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     // set load and run flag
     bool RunFlag(true);
     Real64 MyLoad(-18000.0);
-    openOutputFiles(state.outputFiles);
+    openOutputFiles(state.files);
 
     DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
     DataLoopNode::Node(thisEIRChiller.EvapOutletNodeNum).TempSetPoint = 6.67;
     DataLoopNode::Node(thisEIRChiller.EvapInletNodeNum).Temp = 16.0;
     // init and size
-    thisEIRChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIRChiller.initialize(state, RunFlag, MyLoad);
     thisEIRChiller.size(state);
     // init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;
-    thisEIRChiller.initialize(state.dataBranchInputManager, RunFlag, MyLoad);
+    thisEIRChiller.initialize(state, RunFlag, MyLoad);
     // check chiller water side evap flow rate is non-zero
     EXPECT_NEAR(thisEIRChiller.EvapMassFlowRateMax, 0.999898, 0.0000001);
     // check autocalculate for evaporatively-cooled chiller condenser side fluid flow rate
@@ -363,7 +363,7 @@ TEST_F(EnergyPlusFixture, ChillerElectricEIR_EvaporativelyCooled_Calculate)
     EXPECT_NEAR(thisEIRChiller.CondVolFlowRate, 2.3925760323498, 0.0000001);
     EXPECT_NEAR(thisEIRChiller.CondMassFlowRateMax, 2.7918772761695, 0.0000001);
     // run chiller
-    thisEIRChiller.calculate(MyLoad, RunFlag);
+    thisEIRChiller.calculate(state, MyLoad, RunFlag);
     // calc evap-cooler water consumption rate
     Real64 EvapCondWaterVolFlowRate = thisEIRChiller.CondMassFlowRate * (thisEIRChiller.CondOutletHumRat - DataEnvironment::OutHumRat) /
                                       Psychrometrics::RhoH2O(DataGlobals::InitConvTemp);

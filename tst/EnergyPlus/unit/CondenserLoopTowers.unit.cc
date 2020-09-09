@@ -53,12 +53,12 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
-#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
@@ -492,27 +492,27 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
-    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).initialize(state);
     state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
-    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).initialize(state);
     Real64 MyLoad = 0.0;
     state.dataCondenserLoopTowers.towers(1).calculateMerkelVariableSpeedTower(state, MyLoad);
     state.dataCondenserLoopTowers.towers(1).update();
@@ -884,27 +884,27 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
-    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).initialize(state);
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
-    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).initialize(state);
     state.dataCondenserLoopTowers.towers(1).calculateSingleSpeedTower();
     state.dataCondenserLoopTowers.towers(1).update();
     state.dataCondenserLoopTowers.towers(1).report(true);
@@ -1315,23 +1315,23 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -1730,23 +1730,23 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeTower(state);
@@ -2214,23 +2214,23 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     SimulationManager::SetupSimulation(state, ErrorsFound);
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
     // sized using user inputs in cooling tower instead of plant sizing object
     state.dataCondenserLoopTowers.towers(1).SizeVSMerkelTower();
@@ -2641,16 +2641,16 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
 
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
@@ -2659,7 +2659,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     SimulationManager::SetupSimulation(state, ErrorsFound);
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
     // check the low speed nominal capacity field is autosized
     EXPECT_TRUE(state.dataCondenserLoopTowers.towers(1).TowerLowSpeedNomCapWasAutoSized);
     // check user input value for high speed nominal capacity
@@ -3028,17 +3028,17 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
@@ -3420,17 +3420,17 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
 
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
@@ -3448,9 +3448,9 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     DataGlobals::KickOffSimulation = true;
 
     // get inputs of cooling tower object
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
 
-    state.dataCondenserLoopTowers.towers(1).initialize(state.dataBranchInputManager);
+    state.dataCondenserLoopTowers.towers(1).initialize(state);
 
     // Fake a flow
     state.dataCondenserLoopTowers.towers(1).DesignWaterFlowRate = 1000.0;
@@ -3895,15 +3895,15 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
     OutputReportPredefined::SetPredefinedTables();
 
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone);
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput(state.outputFiles);
+    OutputProcessor::GetReportVariableInput(state.files);
     PlantManager::CheckIfAnyPlant();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state);
 
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
@@ -3916,7 +3916,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
-    CondenserLoopTowers::GetTowerInput(state.dataCondenserLoopTowers);
+    CondenserLoopTowers::GetTowerInput(state, state.dataCondenserLoopTowers);
     auto &VSTower = state.dataCondenserLoopTowers.towers(1);
 
     DataPlant::PlantFirstSizesOkayToFinalize = true;
@@ -3930,10 +3930,10 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
         Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
     DataLoopNode::Node(VSTower.WaterInletNodeNum).Temp = 35.0;
 
-    VSTower.initialize(state.dataBranchInputManager);
+    VSTower.initialize(state);
     DataGlobals::BeginEnvrnFlag = false;
     VSTower.SizeTower(state);
-    VSTower.initialize(state.dataBranchInputManager);
+    VSTower.initialize(state);
 
     VSTower.InletWaterTemp = 35.0;
     Real64 WaterFlowRateRatio = 0.75;

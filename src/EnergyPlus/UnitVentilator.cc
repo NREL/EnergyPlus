@@ -180,7 +180,8 @@ namespace UnitVentilator {
     Array1D<UnitVentilatorData> UnitVent;
     Array1D<UnitVentNumericFieldData> UnitVentNumericFields;
 
-    // Functions
+    bool MyOneTimeFlag = true;
+    bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
     void clear_state()
     {
@@ -193,6 +194,9 @@ namespace UnitVentilator {
         CheckEquipName.deallocate();
         UnitVent.deallocate();
         UnitVentNumericFields.deallocate();
+        MyOneTimeFlag = true;
+        ZoneEquipmentListChecked = false;
+
     }
 
     void SimUnitVentilator(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
@@ -476,7 +480,8 @@ namespace UnitVentilator {
                 GetOnlySingleNode(Alphas(7), ErrorsFound, CurrentModuleObject, Alphas(1), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent);
 
             // Get AirTerminal mixer data
-            GetATMixer(state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
+            GetATMixer(state,
+                       state.dataZoneAirLoopEquipmentManager, UnitVent(UnitVentNum).Name,
                        UnitVent(UnitVentNum).ATMixerName,
                        UnitVent(UnitVentNum).ATMixerIndex,
                        UnitVent(UnitVentNum).ATMixerType,
@@ -508,7 +513,7 @@ namespace UnitVentilator {
                 ErrorsFound = true;
             } else {
                 if (!UtilityRoutines::SameString(UnitVent(UnitVentNum).FanType, "Fan:SystemModel")) {
-                    GetFanType(state.fans,
+                    GetFanType(state,
                         UnitVent(UnitVentNum).FanName, UnitVent(UnitVentNum).FanType_Num, errFlag, CurrentModuleObject, UnitVent(UnitVentNum).Name);
 
                     {
@@ -518,12 +523,12 @@ namespace UnitVentilator {
 
                             // Get fan outlet node
                             UnitVent(UnitVentNum).FanOutletNode =
-                                GetFanOutletNode(state.fans, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
+                                GetFanOutletNode(state, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
                             if (errFlag) {
                                 ShowContinueError("specified in " + CurrentModuleObject + " = \"" + UnitVent(UnitVentNum).Name + "\".");
                                 ErrorsFound = true;
                             } else {
-                                GetFanIndex(state.fans, UnitVent(UnitVentNum).FanName, FanIndex, errFlag, CurrentModuleObject);
+                                GetFanIndex(state, UnitVent(UnitVentNum).FanName, FanIndex, errFlag, CurrentModuleObject);
                                 // Other error checks should trap before it gets to this point in the code, but including just in case.
 
                                 GetFanVolFlow(FanIndex, FanVolFlow);
@@ -549,7 +554,7 @@ namespace UnitVentilator {
                                 // Get the fan's availability schedule
                                 errFlag = false;
                                 UnitVent(UnitVentNum).FanAvailSchedPtr =
-                                    GetFanAvailSchPtr(state.fans, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
+                                    GetFanAvailSchPtr(state, UnitVent(UnitVentNum).FanType, UnitVent(UnitVentNum).FanName, errFlag);
                                 if (errFlag) {
                                     ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + UnitVent(UnitVentNum).Name + "\"");
                                     ErrorsFound = true;
@@ -563,7 +568,7 @@ namespace UnitVentilator {
                     }
                 } else if (UtilityRoutines::SameString(UnitVent(UnitVentNum).FanType, "Fan:SystemModel")) {
                     UnitVent(UnitVentNum).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(UnitVent(UnitVentNum).FanName));              // call constructor
+                    HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, UnitVent(UnitVentNum).FanName));              // call constructor
                     UnitVent(UnitVentNum).Fan_Index = HVACFan::getFanObjectVectorIndex(UnitVent(UnitVentNum).FanName); // zero-based
                     UnitVent(UnitVentNum).FanOutletNode = HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->outletNodeNum;
                     FanVolFlow = HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->designAirVolFlowRate;
@@ -1138,14 +1143,14 @@ namespace UnitVentilator {
                                 "System",
                                 "Sum",
                                 UnitVent(UnitVentNum).Name);
-            SetupOutputVariable("Zone Unit Ventilator Fan Electric Power",
+            SetupOutputVariable("Zone Unit Ventilator Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 UnitVent(UnitVentNum).ElecPower,
                                 "System",
                                 "Average",
                                 UnitVent(UnitVentNum).Name);
             // Note that the unit vent fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Unit Ventilator Fan Electric Energy",
+            SetupOutputVariable("Zone Unit Ventilator Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 UnitVent(UnitVentNum).ElecEnergy,
                                 "System",
@@ -1292,8 +1297,6 @@ namespace UnitVentilator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirRelNode;  // relief air node number in unit ventilator loop
         int ColdConNode; // cold water control node number in unit ventilator loop
-        static bool MyOneTimeFlag(true);
-        static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
@@ -1339,7 +1342,7 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (UnitVent(UnitVentNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         UnitVent(UnitVentNum).HCoilName,
                                         UnitVent(UnitVentNum).HCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).HWLoopNum,
@@ -1366,7 +1369,7 @@ namespace UnitVentilator {
             if ((UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                 (UnitVent(UnitVentNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         UnitVent(UnitVentNum).CCoilPlantName,
                                         UnitVent(UnitVentNum).CCoil_PlantTypeNum,
                                         UnitVent(UnitVentNum).CWLoopNum,
@@ -3349,7 +3352,7 @@ namespace UnitVentilator {
                     Node(ATMixerPriNode).MassFlowRate =
                         min(min(Node(ATMixerPriNode).MassFlowRateMaxAvail, OAMassFlowRate), Node(InletNode).MassFlowRate);
                     // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
-                    SimATMixer(UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
+                    SimATMixer(state, UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
                 }
             } else {
                 SimUnitVentOAMixer(UnitVentNum, FanOpMode);
@@ -3430,7 +3433,7 @@ namespace UnitVentilator {
                     Node(ATMixerPriNode).MassFlowRate =
                         min(min(Node(ATMixerPriNode).MassFlowRateMaxAvail, OAMassFlowRate), Node(InletNode).MassFlowRate);
                     // now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
-                    SimATMixer(UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
+                    SimATMixer(state, UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
                 }
             } else {
                 SimUnitVentOAMixer(UnitVentNum, FanOpMode);
@@ -3553,7 +3556,7 @@ namespace UnitVentilator {
                 // set the primary air inlet mass flow rate
                 Node(ATMixerPriNode).MassFlowRate = min(Node(ATMixerPriNode).MassFlowRateMaxAvail, OAMassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
-                SimATMixer(UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
+                SimATMixer(state, UnitVent(UnitVentNum).ATMixerName, FirstHVACIteration, UnitVent(UnitVentNum).ATMixerIndex);
                 SpecHumMin = min(Node(ATMixOutNode).HumRat, Node(InletNode).HumRat);
                 LoadMet = Node(ATMixOutNode).MassFlowRate *
                           (PsyHFnTdbW(Node(ATMixOutNode).Temp, SpecHumMin) - PsyHFnTdbW(Node(InletNode).Temp, SpecHumMin));

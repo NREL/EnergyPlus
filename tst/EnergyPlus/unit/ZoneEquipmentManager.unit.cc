@@ -51,6 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -61,11 +62,10 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 
@@ -145,21 +145,21 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
 
     // Test here - if zone equipment exhausts slightly more than it supplies, there should be no unbalanced exhaust flow warning
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
-    CalcZoneMassBalance(false);
+    CalcZoneMassBalance(state, false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess balanced zone exhaust from exhaust fan, still no warning
     ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.5;
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
-    CalcZoneMassBalance(false);
+    CalcZoneMassBalance(state, false);
     EXPECT_FALSE(has_err_output());
 
     // Add excess unbalanced zone exhaust from exhaust fan, now there should be warning
     ZoneEquipConfig(ZoneNum).ZoneExh = 0.5;
     ZoneEquipConfig(ZoneNum).ZoneExhBalanced = 0.0;
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(2)).MassFlowRate = 0.5;
-    CalcZoneMassBalance(false);
+    CalcZoneMassBalance(state, false);
     EXPECT_TRUE(has_err_output());
 
     // Deallocate everything - should all be taken care of in clear_states
@@ -378,7 +378,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(has_err_output());
     bool ErrorsFound = false;
-    ScheduleManager::ProcessScheduleInput(state.outputFiles);
+    ScheduleManager::ProcessScheduleInput(state.files);
     GetZoneData(ErrorsFound);
     DataHeatBalFanSys::ZoneReOrder.allocate(NumOfZones);
 
@@ -544,14 +544,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     DataAirSystems::PrimaryAirSystem.allocate(3);
-    DataAirLoop::AirLoopFlow.allocate(3);
+    state.dataAirLoop->AirLoopFlow.allocate(3);
 
     DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
-    DataAirLoop::AirLoopFlow(1).DesReturnFrac = 1.0;
+    state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
     DataAirSystems::PrimaryAirSystem(2).OASysExists = false;
-    DataAirLoop::AirLoopFlow(2).DesReturnFrac = 1.0;
+    state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 1.0;
     DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
-    DataAirLoop::AirLoopFlow(3).DesReturnFrac = 1.0;
+    state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
     DataGlobals::DoingSizing = false;
     DataGlobals::isPulseZoneSizing = false;
 
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.0);
@@ -583,7 +583,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     StdTotalReturnMassFlow = 0.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 1.0);
@@ -657,10 +657,10 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
 
     DataHVACGlobals::NumPrimaryAirSys = 1;
     DataAirSystems::PrimaryAirSystem.allocate(1);
-    DataAirLoop::AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow.allocate(1);
 
     DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
-    DataAirLoop::AirLoopFlow(1).DesReturnFrac = 1.0;
+    state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
     DataGlobals::DoingSizing = false;
     DataGlobals::isPulseZoneSizing = false;
 
@@ -678,14 +678,14 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumReturnFlowBasisNodes; ++NodeNum) {
         Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(NodeNum)).MassFlowRate = 0.0;
     }
-    CalcZoneMassBalance(false);
+    CalcZoneMassBalance(state, false);
     EXPECT_EQ(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate,0.0);
 
     // Set return node basis node flows to non-zero values, return flow should be the sum
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(1)).MassFlowRate = 0.05;
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(2)).MassFlowRate = 0.10;
     Node(ZoneEquipConfig(ZoneNum).ReturnFlowBasisNode(3)).MassFlowRate = 0.20;
-    CalcZoneMassBalance(false);
+    CalcZoneMassBalance(state, false);
     EXPECT_NEAR(Node(ZoneEquipConfig(ZoneNum).ReturnNode(1)).MassFlowRate, 0.35, 0.00001);
 }
 
@@ -778,17 +778,17 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
 
     DataHVACGlobals::NumPrimaryAirSys = 3;
     DataAirSystems::PrimaryAirSystem.allocate(3);
-    DataAirLoop::AirLoopFlow.allocate(3);
+    state.dataAirLoop->AirLoopFlow.allocate(3);
 
     // Add an outdoor air system to airloop 2
     DataAirSystems::PrimaryAirSystem(1).OASysExists = false;
-    DataAirLoop::AirLoopFlow(1).DesReturnFrac = 1.0;
+    state.dataAirLoop->AirLoopFlow(1).DesReturnFrac = 1.0;
     DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
-    DataAirLoop::AirLoopFlow(2).DesReturnFrac = 0.9;
-    DataAirLoop::AirLoopFlow(2).MaxOutAir = 0.1;
-    DataAirLoop::AirLoopFlow(2).OAFlow = 0.1;
+    state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
+    state.dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.1;
+    state.dataAirLoop->AirLoopFlow(2).OAFlow = 0.1;
     DataAirSystems::PrimaryAirSystem(3).OASysExists = false;
-    DataAirLoop::AirLoopFlow(3).DesReturnFrac = 1.0;
+    state.dataAirLoop->AirLoopFlow(3).DesReturnFrac = 1.0;
     DataGlobals::DoingSizing = false;
     DataGlobals::isPulseZoneSizing = false;
 
@@ -803,7 +803,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     Real64 StdTotalReturnMassFlow = 0.0;
     Real64 FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 0.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 0.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.0);
@@ -820,7 +820,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 5.9);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 0.9);
@@ -829,9 +829,9 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     // Case 3 - add exhaust flow, but set system 2 MaxOutAir to zero, expect sum of inlet flow back
     Node(ZoneEquipConfig(ZoneNum).ExhaustNode(1)).MassFlowRate = 1.000000001;
     DataAirSystems::PrimaryAirSystem(2).OASysExists = true;
-    DataAirLoop::AirLoopFlow(2).DesReturnFrac = 0.9;
-    DataAirLoop::AirLoopFlow(2).MaxOutAir = 0.0;
-    DataAirLoop::AirLoopFlow(2).OAFlow = 0.0;
+    state.dataAirLoop->AirLoopFlow(2).DesReturnFrac = 0.9;
+    state.dataAirLoop->AirLoopFlow(2).MaxOutAir = 0.0;
+    state.dataAirLoop->AirLoopFlow(2).OAFlow = 0.0;
 
     Node(inletNode2).MassFlowRate = 2.0;
     Node(inletNode1).MassFlowRate = 1.0;
@@ -843,7 +843,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     StdTotalReturnMassFlow = 6.0;
     FinalTotalReturnMassFlow = 0.0;
 
-    CalcZoneReturnFlows(ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
+    CalcZoneReturnFlows(state, ZoneNum, StdTotalReturnMassFlow, FinalTotalReturnMassFlow);
     EXPECT_EQ(FinalTotalReturnMassFlow, 6.0);
     EXPECT_EQ(Node(returnNode1).MassFlowRate, 2.0);
     EXPECT_EQ(Node(returnNode2).MassFlowRate, 1.0);
@@ -1353,7 +1353,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
@@ -1571,7 +1571,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialUniformPLR)
     EXPECT_EQ(energy.SequencedOutputRequiredToCoolingSP(3), DataSizing::FinalZoneSizing(ZoneNum).DesHeatLoad);
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 2;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 3;
@@ -1888,7 +1888,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;
@@ -2119,7 +2119,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_DistributeSequentialLoad_MixedEqu
 
     // Check sequenced load processing for unitary systems
     // EquipIndex doesn't get set until the units are simulated, so hard-wire them here
-    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state.dataZoneAirLoopEquipmentManager);
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, state.dataZoneAirLoopEquipmentManager);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(2) = 1;
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(3) = 2;

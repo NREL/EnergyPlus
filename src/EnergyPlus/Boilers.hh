@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BoilersData;
-struct BranchInputManagerData;
 
 namespace Boilers {
 
@@ -161,11 +159,12 @@ namespace Boilers {
 
         void SetupOutputVars();
 
-        void InitBoiler(BranchInputManagerData &dataBranchInputManager); // number of the current boiler being simulated
+        void InitBoiler(EnergyPlusData &state); // number of the current boiler being simulated
 
         void SizeBoiler();
 
-        void CalcBoilerModel(Real64 MyLoad,    // W - hot water demand to be met by boiler
+        void CalcBoilerModel(EnergyPlusData &state,
+                             Real64 MyLoad,    // W - hot water demand to be met by boiler
                              bool RunFlag,     // TRUE if boiler operating
                              int EquipFlowCtrl // Flow control mode for the equipment
         );
@@ -174,10 +173,10 @@ namespace Boilers {
                                  bool RunFlag   // boiler on when TRUE
         );
 
-        static PlantComponent *factory(BoilersData &boilers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetBoilerInput(BoilersData &boilers);
+    void GetBoilerInput(EnergyPlusData &state);
 
 } // namespace Boilers
 

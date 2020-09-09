@@ -317,11 +317,9 @@ TEST_F(EnergyPlusFixture, General_SolveRootTest)
 
 }
 
-TEST(General, nthDayOfWeekOfMonth_test)
+TEST_F(EnergyPlusFixture, nthDayOfWeekOfMonth_test)
 {
     // J.Glazer - August 2017
-    ShowMessage("Begin Test: General, nthDayOfWeekOfMonth_test");
-
     //		nthDayOfWeekOfMonth(
     //			int const & dayOfWeek, // day of week (Sunday=1, Monday=2, ...)
     //			int const & nthTime,   // nth time the day of the week occurs (first monday, third tuesday, ..)

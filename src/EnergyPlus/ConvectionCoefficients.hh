@@ -63,7 +63,8 @@ namespace EnergyPlus {
 
     // Forward declarations
     struct ConvectionCoefficientsData;
-    class OutputFiles;
+    struct EnergyPlusData;
+    class IOFiles;
 
 namespace ConvectionCoefficients {
 
@@ -418,12 +419,16 @@ namespace ConvectionCoefficients {
 
     // Functions
 
-    void InitInteriorConvectionCoeffs(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void InitInteriorConvectionCoeffs(EnergyPlusData &state,
+                                      ConvectionCoefficientsData &dataConvectionCoefficients,
+                                      IOFiles &ioFiles,
                                       const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate = _    // if passed in, then only calculate surfaces that have this zone
     );
 
-    void InitExteriorConvectionCoeff(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void InitExteriorConvectionCoeff(EnergyPlusData &state,
+                                     ConvectionCoefficientsData &dataConvectionCoefficients,
+                                     IOFiles &ioFiles,
                                      int SurfNum,      // Surface number (in Surface derived type)
                                      Real64 HMovInsul, // Equivalent convection coefficient of movable insulation
                                      int Roughness,    // Roughness index (1-6), see DataHeatBalance parameters
@@ -449,7 +454,7 @@ namespace ConvectionCoefficients {
                   Real64 WindDirection // Wind direction measured clockwise from geographhic North
     );
 
-    void GetUserConvectionCoefficients(ConvectionCoefficientsData &dataConvectionCoefficients, OutputFiles &outputFiles);
+    void GetUserConvectionCoefficients(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles);
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int Value);
 
@@ -471,7 +476,8 @@ namespace ConvectionCoefficients {
                                         Real64 ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
 
-    void CalcDetailedHcInForDVModel(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcDetailedHcInForDVModel(EnergyPlusData &state,
+                                    ConvectionCoefficientsData &dataConvectionCoefficients,
                                     int SurfNum,                          // surface number for which coefficients are being calculated
                                     const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                     Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
@@ -516,9 +522,9 @@ namespace ConvectionCoefficients {
                      Real64 &gnu        // Gap gas Nusselt number
     );
 
-    Real64 SetExtConvectionCoeff(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // Surface Number
+    Real64 SetExtConvectionCoeff(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // Surface Number
 
-    Real64 SetIntConvectionCoeff(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // Surface Number
+    Real64 SetIntConvectionCoeff(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // Surface Number
 
     Real64 CalcISO15099WindowIntConvCoeff(Real64 SurfaceTemperature, // Temperature of surface for evaluation of HcIn
                                           Real64 AirTemperature,     // Mean Air Temperature of Zone (or adjacent air temperature)
@@ -533,24 +539,26 @@ namespace ConvectionCoefficients {
                                         Real64 AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
 
-    void SetupAdaptiveConvectionStaticMetaData(ConvectionCoefficientsData &dataConvectionCoefficients, EnergyPlus::OutputFiles &outputFiles);
+    void SetupAdaptiveConvectionStaticMetaData(ConvectionCoefficientsData &dataConvectionCoefficients, EnergyPlus::IOFiles &ioFiles);
 
     void SetupAdaptiveConvectionRadiantSurfaceData(ConvectionCoefficientsData &dataConvectionCoefficients);
 
-    void ManageInsideAdaptiveConvectionAlgo(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // surface number for which coefficients are being calculated
+    void ManageInsideAdaptiveConvectionAlgo(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // surface number for which coefficients are being calculated
 
-    void ManageOutsideAdaptiveConvectionAlgo(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void ManageOutsideAdaptiveConvectionAlgo(EnergyPlusData &state,
+                                             ConvectionCoefficientsData &dataConvectionCoefficients,
                                              int SurfNum, // surface number for which coefficients are being calculated
                                              Real64 &Hc         // result for Hc Outside face, becomes HExt.
     );
 
-    void EvaluateIntHcModels(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void EvaluateIntHcModels(EnergyPlusData &state,
+                             ConvectionCoefficientsData &dataConvectionCoefficients,
                              int SurfNum,
                              int ConvModelEquationNum,
                              Real64 &Hc // calculated Hc value
     );
 
-    void EvaluateExtHcModels(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int NaturalConvModelEqNum, int ForcedConvModelEqNum, Real64 &Hc);
+    void EvaluateExtHcModels(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int NaturalConvModelEqNum, int ForcedConvModelEqNum, Real64 &Hc);
 
     void DynamicExtConvSurfaceClassification(int SurfNum); // surface number
 
@@ -560,9 +568,9 @@ namespace ConvectionCoefficients {
 
     void MapIntConvClassificationToHcModels(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum); // surface pointer index
 
-    void CalcUserDefinedInsideHcModel(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int UserCurveNum, Real64 &Hc);
+    void CalcUserDefinedInsideHcModel(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int UserCurveNum, Real64 &Hc);
 
-    void CalcUserDefinedOutsideHcModel(ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int UserCurveNum, Real64 &H);
+    void CalcUserDefinedOutsideHcModel(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, int SurfNum, int UserCurveNum, Real64 &H);
 
     //** Begin catalog of Hc equation functions. **** !*************************************************
 

@@ -54,19 +54,19 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
 
 // Forward declarations
-struct BranchInputManagerData;
+struct CTElectricGeneratorData;
+struct EnergyPlusData;
 
 namespace CTElectricGenerator {
 
     using DataGlobalConstants::iGeneratorCombTurbine;
-
-    extern int NumCTGenerators; // number of CT Generators specified in input
 
     struct CTGeneratorData : PlantComponent
     {
@@ -145,26 +145,35 @@ namespace CTElectricGenerator {
         {
         }
 
-        void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void setupOutputVars();
 
-        void InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
+        void InitCTGenerators(EnergyPlusData &state,
                               bool RunFlag, bool FirstHVACIteration);
 
-        void CalcCTGeneratorModel(bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
+        void CalcCTGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    // Object Data
-    extern Array1D<CTGeneratorData> CTGenerator; // dimension to number of machines
-
-    void GetCTGeneratorInput();
-
-    void clear_state();
+    void GetCTGeneratorInput(EnergyPlusData &state);
 
 } // namespace CTElectricGenerator
+
+    struct CTElectricGeneratorData : BaseGlobalStruct {
+
+        int NumCTGenerators = 0;
+        bool getCTInputFlag = true;
+        Array1D<CTElectricGenerator::CTGeneratorData> CTGenerator;
+
+        void clear_state() override
+        {
+            NumCTGenerators = 0;
+            getCTInputFlag = true;
+            CTGenerator.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

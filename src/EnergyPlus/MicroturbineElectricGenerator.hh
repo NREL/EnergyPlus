@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace MicroturbineElectricGenerator {
 
@@ -69,6 +68,8 @@ namespace MicroturbineElectricGenerator {
 
     extern int NumMTGenerators; // number of MT Generators specified in input
     extern bool GetMTInput;     // then TRUE, calls subroutine to read input file.
+
+    void clear_state();
 
     struct MTGeneratorSpecs : PlantComponent
     {
@@ -206,12 +207,13 @@ namespace MicroturbineElectricGenerator {
                                  Real64 &EP_UNUSED(MinLoad),
                                  Real64 &EP_UNUSED(OptLoad)) override;
 
-        void InitMTGenerators(BranchInputManagerData &dataBranchInputManager,
+        void InitMTGenerators(EnergyPlusData &state,
                               bool RunFlag,
                               Real64 MyLoad, // electrical load in W
                               bool FirstHVACIteration);
 
-        void CalcMTGeneratorModel(bool RunFlag, // TRUE when generator is being asked to operate
+        void CalcMTGeneratorModel(EnergyPlusData &state,
+                                  bool RunFlag, // TRUE when generator is being asked to operate
                                   Real64 MyLoad // Generator demand (W)
         );
 
@@ -219,12 +221,12 @@ namespace MicroturbineElectricGenerator {
 
         void setupOutputVars();
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
     extern Array1D<MTGeneratorSpecs> MTGenerator; // dimension to number of generators
 
-    void GetMTGeneratorInput();
+    void GetMTGeneratorInput(EnergyPlusData &state);
 
 } // namespace MicroturbineElectricGenerator
 

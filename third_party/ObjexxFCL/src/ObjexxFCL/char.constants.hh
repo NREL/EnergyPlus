@@ -16,7 +16,6 @@
 namespace ObjexxFCL {
 
 extern char const CMA;
-extern char const NL;
 extern char const NUL;
 extern char const SPC;
 extern char const TAB;

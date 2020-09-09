@@ -107,7 +107,7 @@ namespace PhotovoltaicThermalCollectors {
 
     Real64 const SimplePVTWaterSizeFactor(1.905e-5); // [ m3/s/m2 ] average of collectors in SolarCollectors.idf
 
-    static bool GetInputFlag(true); // First time, input is "gotten"
+    bool GetInputFlag(true); // First time, input is "gotten"
 
     int NumPVT(0); // count of all types of PVT in input file
 
@@ -141,7 +141,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(state.dataBranchInputManager, true);
+        this->initialize(state, true);
         this->size();
     }
 
@@ -151,9 +151,9 @@ namespace PhotovoltaicThermalCollectors {
                                       bool const EP_UNUSED(RunFlag))
     {
 
-        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
+        this->initialize(state, FirstHVACIteration);
         this->control();
-        this->calculate(state.dataConvectionCoefficients);
+        this->calculate(state, state.dataConvectionCoefficients, state.files);
         this->update();
     }
 
@@ -445,7 +445,7 @@ namespace PhotovoltaicThermalCollectors {
             "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
     }
 
-    void PVTCollectorStruct::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration)
+    void PVTCollectorStruct::initialize(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -468,7 +468,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPVTcollectors: Program terminated for previous conditions.");
@@ -844,7 +844,7 @@ namespace PhotovoltaicThermalCollectors {
         }
     }
 
-    void PVTCollectorStruct::calculate(ConvectionCoefficientsData &dataConvectionCoefficients)
+    void PVTCollectorStruct::calculate(EnergyPlusData &state, ConvectionCoefficientsData &dataConvectionCoefficients, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -947,7 +947,9 @@ namespace PhotovoltaicThermalCollectors {
                 Real64 HcExt(0.0);
                 Real64 HrSky(0.0);
 
-                ConvectionCoefficients::InitExteriorConvectionCoeff(dataConvectionCoefficients,
+                ConvectionCoefficients::InitExteriorConvectionCoeff(state,
+                                                                    dataConvectionCoefficients,
+                                                                    ioFiles,
                                                                     this->SurfNum,
                                                                     0.0,
                                                                     DataHeatBalance::VerySmooth,

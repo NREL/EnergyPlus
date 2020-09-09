@@ -58,10 +58,9 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -802,14 +801,14 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(state, state.outputFiles, ErrorsFound); // read project control data
+    GetProjectControlData(state, ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound); // read material data
+    GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
@@ -819,7 +818,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     SetPreConstructionInputParameters();
 
     ErrorsFound = false;
-    GetConstructData(ErrorsFound); // read construction data
+    GetConstructData(state.files, ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);     // expect no errors
 
     ErrorsFound = false;
@@ -827,7 +826,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(state.outputFiles, ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -851,12 +850,12 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     int windowSurfNum = UtilityRoutines::FindItemInList("ZN001:WALL001:WIN001", DataSurfaces::Surface);
 
-    EXPECT_FALSE(SurfaceWindow(windowSurfNum).HasShadeOrBlindLayer); // the window construction has no blind
+    EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer();
-    EXPECT_FALSE(SurfaceWindow(windowSurfNum).HasShadeOrBlindLayer); // the window construction has no blind
+    EXPECT_FALSE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has no blind
 
-    GetEMSInput();
+    GetEMSInput(state, state.files);
     // check if EMS actuator is not setup because there is no blind/shade layer
     SetupWindowShadingControlActuators();
     EXPECT_EQ(numEMSActuatorsAvailable, 0); // no EMS actuator because there is shade/blind layer
@@ -883,9 +882,9 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // check if the construction has a blind material layer
     SetFlagForWindowConstructionWithShadeOrBlindLayer();
-    EXPECT_TRUE(SurfaceWindow(windowSurfNum).HasShadeOrBlindLayer); // the window construction has blind
+    EXPECT_TRUE(SurfWinHasShadeOrBlindLayer(windowSurfNum)); // the window construction has blind
     // set the blind to movable
-    SurfaceWindow(windowSurfNum).MovableSlats = true;
+    SurfWinMovableSlats(windowSurfNum) = true;
     // check if EMS actuator is available when blind layer is added
     SetupWindowShadingControlActuators();
     EXPECT_EQ(numEMSActuatorsAvailable, 2);

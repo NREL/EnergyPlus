@@ -68,8 +68,8 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
@@ -186,7 +186,6 @@ namespace DaylightingDevices {
     using DataSurfaces::SurfaceClass_TDD_Diffuser;
     using DataSurfaces::SurfaceClass_TDD_Dome;
     using DataSurfaces::SurfaceClass_Window;
-    using DataSurfaces::SurfaceWindow;
     using DataSurfaces::TotSurfaces;
     using namespace DataDaylightingDevices;
 
@@ -197,14 +196,21 @@ namespace DaylightingDevices {
 
     // MODULE VARIABLE DECLARATIONS:
     Array1D<Real64> COSAngle(NumOfAngles); // List of cosines of incident angle
+    bool ShelfReported = false;
 
     // SUBROUTINE SPECIFICATIONS:
 
     // MODULE SUBROUTINES:
 
+    void clear_state() {
+        COSAngle.clear();
+        COSAngle.allocate(NumOfAngles);
+        ShelfReported = false;
+    }
+
     // Functions
 
-    void InitDaylightingDevices(OutputFiles &outputFiles)
+    void InitDaylightingDevices(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -247,8 +253,7 @@ namespace DaylightingDevices {
         int ShelfSurf; // Daylighting shelf surface number
         int WinSurf;   // Window surface number
 
-        static int NumStored(0); // Counter for number of pipes stored as they are calculated
-        static bool ShelfReported(false);
+        int NumStored(0); // Counter for number of pipes stored as they are calculated
 
         struct TDDPipeStoredData
         {
@@ -442,11 +447,11 @@ namespace DaylightingDevices {
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
-                    print(outputFiles.eio,
+                    print(ioFiles.eio,
                         "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
                     ShelfReported = true;
                 }
-                print(outputFiles.eio,
+                print(ioFiles.eio,
                       "{},{:.2R},{},{:.2R},{:.2R}\n",
                       Shelf(ShelfNum).Name,
                       Shelf(ShelfNum).ViewFactor,
@@ -576,7 +581,7 @@ namespace DaylightingDevices {
                     }
 
                     TDDPipe(PipeNum).Dome = SurfNum;
-                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
+                    DataSurfaces::SurfWinTDDPipeNum(SurfNum) = PipeNum;
                 }
 
                 // Get TDD:DIFFUSER object
@@ -592,7 +597,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (SurfaceWindow(SurfNum).OriginalClass != SurfaceClass_TDD_Diffuser) {
+                    if (DataSurfaces::SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " is not of surface type TubularDaylightDiffuser.");
                         ErrorsFound = true;
@@ -648,7 +653,7 @@ namespace DaylightingDevices {
                     // Window multiplier is already handled in SurfaceGeometry.cc
 
                     TDDPipe(PipeNum).Diffuser = SurfNum;
-                    SurfaceWindow(SurfNum).TDDPipeNum = PipeNum;
+                    DataSurfaces::SurfWinTDDPipeNum(SurfNum) = PipeNum;
                 }
 
                 // Construction
@@ -1456,7 +1461,7 @@ namespace DaylightingDevices {
         using DataHeatBalance::QRadSWwinAbs;
         using DataHeatBalance::QRadSWwinAbsTot;
         using DataHeatBalance::QS;
-        using DataSurfaces::WinTransSolar;
+        using DataSurfaces::SurfWinTransSolar;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS: na
@@ -1477,12 +1482,12 @@ namespace DaylightingDevices {
 
             // Calculate diffuse solar reflected back up the pipe by the inside surface of the TDD:DIFFUSER
             // All solar arriving at the diffuser is assumed to be isotropically diffuse by this point
-            QRefl = (QRadSWOutIncident(DiffSurf) - QRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - WinTransSolar(DiffSurf);
+            QRefl = (QRadSWOutIncident(DiffSurf) - QRadSWwinAbsTot(DiffSurf)) * Surface(DiffSurf).Area - SurfWinTransSolar(DiffSurf);
 
             // Add diffuse interior shortwave reflected from zone surfaces and from zone sources, lights, etc.
             QRefl += QS(Surface(DiffSurf).SolarEnclIndex) * Surface(DiffSurf).Area * transDiff;
 
-            TotTDDPipeGain = WinTransSolar(TDDPipe(PipeNum).Dome) - QRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
+            TotTDDPipeGain = SurfWinTransSolar(TDDPipe(PipeNum).Dome) - QRadSWOutIncident(DiffSurf) * Surface(DiffSurf).Area +
                              QRefl * (1.0 - TDDPipe(PipeNum).TransSolIso / transDiff) +
                              QRadSWwinAbs(1, TDDPipe(PipeNum).Dome) * Surface(DiffSurf).Area / 2.0 +
                              QRadSWwinAbs(1, DiffSurf) * Surface(DiffSurf).Area / 2.0; // Solar entering pipe | Solar exiting pipe | Absorbed due to

@@ -53,9 +53,10 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/IOFiles.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    struct EnergyPlusData;
 
 // note there are routines that lie outside of the Module at the end of this file
 
@@ -87,41 +88,49 @@ namespace EMSManager {
     // Functions
     void clear_state();
 
-    void CheckIfAnyEMS(OutputFiles &outputFiles);
+    void CheckIfAnyEMS(IOFiles &ioFiles);
 
     // MODULE SUBROUTINES:
 
-    void ManageEMS(int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
+    void ManageEMS(EnergyPlusData &state,
+                   int const iCalledFrom,                     // indicates where subroutine was called from, parameters in DataGlobals.
                    bool &anyProgramRan,                       // true if any Erl programs ran for this call
                    Optional_int_const ProgramManagerToRun = _ // specific program manager to run
     );
 
-    void InitEMS(int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom); // indicates where subroutine was called from, parameters in DataGlobals.
 
     void ReportEMS();
 
-    void GetEMSInput();
+    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ProcessEMSInput(bool const reportErrors); // .  If true, then report out errors ,otherwise setup what we can
 
     void GetVariableTypeAndIndex(std::string const &VarName, std::string const &VarKeyName, int &VarType, int &VarIndex);
 
-    void EchoOutActuatorKeyChoices(OutputFiles &outputFiles);
+    void EchoOutActuatorKeyChoices(IOFiles &ioFiles);
 
-    void EchoOutInternalVariableChoices(OutputFiles &outputFiles);
+    void EchoOutInternalVariableChoices(IOFiles &ioFiles);
 
     void SetupNodeSetPointsAsActuators();
 
     void UpdateEMSTrendVariables();
 
-    void CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
+    std::string controlTypeName(int const SetPointType); // Maps int to the std::string equivalent
+                                                         // (eg iTemperatureSetPoint => "Temperature Setpoint")
+
+    bool CheckIfNodeSetPointManaged(int const NodeNum, // index of node being checked.
+                                    int const SetPointType,
+                                    bool byHandle = false);
+
+    bool CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
                                          int const SetPointType,
                                          bool &ErrorFlag);
 
     bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
                                         std::string const &varName);
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators();
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state);
 
     void SetupWindowShadingControlActuators();
 
@@ -138,6 +147,8 @@ namespace EMSManager {
     void SetupZoneInfoAsInternalDataAvail();
 
     void checkForUnusedActuatorsAtEnd();
+
+    void checkSetpointNodesAtEnd();
 
 } // namespace EMSManager
 

@@ -63,8 +63,8 @@
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -240,8 +240,7 @@ TEST_F(EnergyPlusFixture, Beam_FactoryAllAutosize)
         "PERIMETER_TOP_ZN_4 4PIPE BEAM"; // needs to be uppercased, or item will not be found at line 2488 in IP
     DataDefineEquip::AirDistUnit(1).OutletNodeNum = 3;
 
-    DataDefineEquip::AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(
-        DataDefineEquip::SingleDuctConstVolFourPipeBeam, DataDefineEquip::AirDistUnit(1).EquipName(1));
+    DataDefineEquip::AirDistUnit(1).airTerminalPtr = FourPipeBeam::HVACFourPipeBeam::fourPipeBeamFactory(state, DataDefineEquip::AirDistUnit(1).EquipName(1));
 
     // EXPECT_EQ( DataDefineEquip::AirDistUnit( 1 ).airTerminalPtr->name, "PERIMETER_TOP_ZN_4 4PIPE BEAM");
 
@@ -1720,7 +1719,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1729,14 +1728,14 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    TestAirPathIntegrity(state, state.outputFiles, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
+    TestAirPathIntegrity(state, state.files, ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
     SimulationManager::SetupSimulation(state, ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
@@ -3294,7 +3293,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData(state, state.outputFiles);
+    SimulationManager::GetProjectData(state);
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -3303,7 +3302,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;

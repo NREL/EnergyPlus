@@ -64,7 +64,7 @@
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+    class IOFiles;
 
     // Forward Declarations
     struct EnergyPlusData;
@@ -82,9 +82,9 @@ namespace WindowManager {
     //   Optical Calculation Routines
     //   Heat Balance Routines
 
-    void InitWindowOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitWindowOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
-    void InitGlassOpticalCalculations(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void InitGlassOpticalCalculations(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
     //*****************************************************************************************
 
@@ -339,7 +339,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass(WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, OutputFiles &outputFiles);
+    void ReportGlass(EnergyPlusData &state, WindowComplexManagerData &dataWindowComplexManager, WindowManagerData &dataWindowManager, IOFiles &ioFiles);
 
     //*************************************************************************************
 
@@ -347,7 +347,7 @@ namespace WindowManager {
 
     //*************************************************************************************
 
-    void CalcWindowScreenProperties(OutputFiles &outputFiles);
+    void CalcWindowScreenProperties(IOFiles &ioFiles);
 
     void BlindOpticsDiffuse(int const BlindNum,      // Blind number
                             int const ISolVis,       // 1 = solar and IR calculation; 2 = visible calculation
@@ -537,6 +537,15 @@ namespace WindowManager {
         std::unique_ptr<WindowManager::CWindowModel> inExtWindowModel;       // Information about windows model (interior or exterior)
         std::unique_ptr<WindowManager::CWindowOpticalModel> winOpticalModel; // Information about windows optical model (Simplified or BSDF)
 
+        bool RunMeOnceFlag = false;
+        bool lSimpleGlazingSystem = false; // true if using simple glazing system block model
+        bool BGFlag = false;               // True if between-glass shade or blind
+        bool locTCFlag = false; // True if this surface is a TC window
+        bool DoReport = false;
+        bool HasWindows = false;
+        bool HasComplexWindows = false;
+        bool HasEQLWindows = false; // equivalent layer window defined
+
         void clear_state() override {
             wle = Array1D<Real64>(nume, {0.3000, 0.3050, 0.3100, 0.3150, 0.3200, 0.3250, 0.3300, 0.3350, 0.3400, 0.3450, 0.3500, 0.3600, 0.3700, 0.3800,
                 0.3900, 0.4000, 0.4100, 0.4200, 0.4300, 0.4400, 0.4500, 0.4600, 0.4700, 0.4800, 0.4900, 0.5000, 0.5100, 0.5200,
@@ -652,15 +661,23 @@ namespace WindowManager {
             rbvisPhi = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
             CosPhiIndepVar = Array1D<Real64>(MaxNumOfIncidentAngles, 0.0);
             WindowManager::CWindowConstructionsSimplified::clearState();
+            RunMeOnceFlag = false;
+            lSimpleGlazingSystem = false; // true if using simple glazing system block model
+            BGFlag = false;               // True if between-glass shade or blind
+            locTCFlag = false; // True if this surface is a TC window
+            DoReport = false;
+            HasWindows = false;
+            HasComplexWindows = false;
+            HasEQLWindows = false; // equivalent layer window defined
         }
 
         // Default Constructor
         WindowManagerData() : sigma(5.6697e-8), TKelvin(DataGlobals::KelvinConv), nume(107), numt3(81),
-            gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0), gwght(5, 5, 0.0), gfract(5, 5, 0.0), 
-            gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0), 
-            AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0), 
-            dtheta(5, 0.0), zir(10, 10, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0), 
-            qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), dhf(5, 10, 0.0), sour(10, 0.0), delta(5, 0.0), 
+            gcon(3, 5, 5, 0.0), gvis(3, 5, 5, 0.0), gcp(3, 5, 5, 0.0), gwght(5, 5, 0.0), gfract(5, 5, 0.0),
+            gnmix(5, 0), gap(5, 0.0), thick(5, 0.0), scon(5, 0.0), tir(10, 0.0), emis(10, 0.0), rir(10, 0.0),
+            AbsRadGlassFace(10, 0.0), thetas(10, 0.0), thetasPrev(10, 0.0), fvec(10, 0.0), fjac(10, 10, 0.0),
+            dtheta(5, 0.0), zir(10, 10, 0.0), ziri(10, 10, 0.0), ddeldt(10, 10, 0.0), dtddel(10, 10, 0.0),
+            qf(10, 0.0), hf(10, 0.0), der(5, 10, 0.0), dhf(5, 10, 0.0), sour(10, 0.0), delta(5, 0.0),
             hcgap(5, 0.0), hrgap(5, 0.0), rgap(6, 0.0), rs(6, 0.0), arhs(6, 0.0), MaxNumOfIncidentAngles(20), MaxSpectralDataElements(800)
         {
             AirProps.allocate(8);

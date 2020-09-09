@@ -278,9 +278,9 @@ namespace InternalHeatGains {
 
         auto print_and_divide_if_greater_than_zero = [&](const Real64 numerator, const Real64 denominator) {
             if (denominator > 0.0) {
-                print(state.outputFiles.eio, "{:.3R},", numerator / denominator);
+                print(state.files.eio, "{:.3R},", numerator / denominator);
             } else {
-                print(state.outputFiles.eio, "N/A,");
+                print(state.files.eio, "N/A,");
             }
         };
 
@@ -1400,7 +1400,7 @@ namespace InternalHeatGains {
                     if (Lights(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Lights Electric Power", OutputProcessor::Unit::W, Lights(Loop).Power, "Zone", "Average", Lights(Loop).Name);
+                    SetupOutputVariable("Lights Electricity Rate", OutputProcessor::Unit::W, Lights(Loop).Power, "Zone", "Average", Lights(Loop).Name);
 
                     SetupOutputVariable(
                         "Lights Radiant Heating Energy", OutputProcessor::Unit::J, Lights(Loop).RadGainEnergy, "Zone", "Sum", Lights(Loop).Name);
@@ -1439,7 +1439,7 @@ namespace InternalHeatGains {
                         "Lights Total Heating Energy", OutputProcessor::Unit::J, Lights(Loop).TotGainEnergy, "Zone", "Sum", Lights(Loop).Name);
                     SetupOutputVariable(
                         "Lights Total Heating Rate", OutputProcessor::Unit::W, Lights(Loop).TotGainRate, "Zone", "Average", Lights(Loop).Name);
-                    SetupOutputVariable("Lights Electric Energy",
+                    SetupOutputVariable("Lights Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         Lights(Loop).Consumption,
                                         "Zone",
@@ -1457,13 +1457,13 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(Lights(Loop).ZonePtr)) {
                         RepVarSet(Lights(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Lights Electric Power",
+                        SetupOutputVariable("Zone Lights Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsPower,
                                             "Zone",
                                             "Average",
                                             Zone(Lights(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Lights Electric Energy",
+                        SetupOutputVariable("Zone Lights Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(Lights(Loop).ZonePtr).LtsElecConsump,
                                             "Zone",
@@ -1794,13 +1794,13 @@ namespace InternalHeatGains {
                     if (ZoneElectric(Loop).ZonePtr <= 0) continue; // Error, will be caught and terminated later
 
                     // Object report variables
-                    SetupOutputVariable("Electric Equipment Electric Power",
+                    SetupOutputVariable("Electric Equipment Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZoneElectric(Loop).Power,
                                         "Zone",
                                         "Average",
                                         ZoneElectric(Loop).Name);
-                    SetupOutputVariable("Electric Equipment Electric Energy",
+                    SetupOutputVariable("Electric Equipment Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneElectric(Loop).Consumption,
                                         "Zone",
@@ -1879,13 +1879,13 @@ namespace InternalHeatGains {
                     // Zone total report variables
                     if (RepVarSet(ZoneElectric(Loop).ZonePtr)) {
                         RepVarSet(ZoneElectric(Loop).ZonePtr) = false;
-                        SetupOutputVariable("Zone Electric Equipment Electric Power",
+                        SetupOutputVariable("Zone Electric Equipment Electricity Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneElectric(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Electric Equipment Electric Energy",
+                        SetupOutputVariable("Zone Electric Equipment Electricity Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneElectric(Loop).ZonePtr).ElecConsump,
                                             "Zone",
@@ -2210,15 +2210,15 @@ namespace InternalHeatGains {
 
                     // Object report variables
                     SetupOutputVariable(
-                        "Gas Equipment Gas Rate", OutputProcessor::Unit::W, ZoneGas(Loop).Power, "Zone", "Average", ZoneGas(Loop).Name);
-                    SetupOutputVariable("Gas Equipment Gas Energy",
+                        "Gas Equipment NaturalGas Rate", OutputProcessor::Unit::W, ZoneGas(Loop).Power, "Zone", "Average", ZoneGas(Loop).Name);
+                    SetupOutputVariable("Gas Equipment NaturalGas Energy",
                                         OutputProcessor::Unit::J,
                                         ZoneGas(Loop).Consumption,
                                         "Zone",
                                         "Sum",
                                         ZoneGas(Loop).Name,
                                         _,
-                                        "Gas",
+                                        "NaturalGas",
                                         "InteriorEquipment",
                                         ZoneGas(Loop).EndUseSubcategory,
                                         "Building",
@@ -2275,13 +2275,13 @@ namespace InternalHeatGains {
                     if (RepVarSet(ZoneGas(Loop).ZonePtr)) {
                         RepVarSet(ZoneGas(Loop).ZonePtr) = false;
 
-                        SetupOutputVariable("Zone Gas Equipment Gas Rate",
+                        SetupOutputVariable("Zone Gas Equipment NaturalGas Rate",
                                             OutputProcessor::Unit::W,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasPower,
                                             "Zone",
                                             "Average",
                                             Zone(ZoneGas(Loop).ZonePtr).Name);
-                        SetupOutputVariable("Zone Gas Equipment Gas Energy",
+                        SetupOutputVariable("Zone Gas Equipment NaturalGas Energy",
                                             OutputProcessor::Unit::J,
                                             ZnRpt(ZoneGas(Loop).ZonePtr).GasConsump,
                                             "Zone",
@@ -3748,21 +3748,21 @@ namespace InternalHeatGains {
                 bool hasReturnApproachTemp = !lNumericFieldBlanks(11);
 
                 // Performance curves
-                ZoneITEq(Loop).CPUPowerFLTCurve = GetCurveIndex(AlphaName(7));
+                ZoneITEq(Loop).CPUPowerFLTCurve = GetCurveIndex(state, AlphaName(7));
                 if (ZoneITEq(Loop).CPUPowerFLTCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(7) + '=' + AlphaName(7));
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).AirFlowFLTCurve = GetCurveIndex(AlphaName(8));
+                ZoneITEq(Loop).AirFlowFLTCurve = GetCurveIndex(state, AlphaName(8));
                 if (ZoneITEq(Loop).AirFlowFLTCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(8) + '=' + AlphaName(8));
                     ErrorsFound = true;
                 }
 
-                ZoneITEq(Loop).FanPowerFFCurve = GetCurveIndex(AlphaName(9));
+                ZoneITEq(Loop).FanPowerFFCurve = GetCurveIndex(state, AlphaName(9));
                 if (ZoneITEq(Loop).FanPowerFFCurve == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                     ShowContinueError("Invalid " + cAlphaFieldNames(9) + '=' + AlphaName(9));
@@ -3771,7 +3771,7 @@ namespace InternalHeatGains {
 
                 if (!lAlphaFieldBlanks(15)) {
                     // If this field isn't blank, it must point to a valid curve
-                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(AlphaName(15));
+                    ZoneITEq(Loop).RecircFLTCurve = GetCurveIndex(state, AlphaName(15));
                     if (ZoneITEq(Loop).RecircFLTCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                         ShowContinueError("Invalid " + cAlphaFieldNames(15) + '=' + AlphaName(15));
@@ -3784,7 +3784,7 @@ namespace InternalHeatGains {
 
                 if (!lAlphaFieldBlanks(16)) {
                     // If this field isn't blank, it must point to a valid curve
-                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(AlphaName(16));
+                    ZoneITEq(Loop).UPSEfficFPLRCurve = GetCurveIndex(state, AlphaName(16));
                     if (ZoneITEq(Loop).UPSEfficFPLRCurve == 0) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " \"" + AlphaName(1) + "\"");
                         ShowContinueError("Invalid " + cAlphaFieldNames(16) + '=' + AlphaName(16));
@@ -3943,18 +3943,18 @@ namespace InternalHeatGains {
 
                 // Object report variables
                 SetupOutputVariable(
-                    "ITE CPU Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).CPUPower, "Zone", "Average", ZoneITEq(Loop).Name);
+                    "ITE CPU Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).CPUPower, "Zone", "Average", ZoneITEq(Loop).Name);
                 SetupOutputVariable(
-                    "ITE Fan Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).FanPower, "Zone", "Average", ZoneITEq(Loop).Name);
+                    "ITE Fan Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).FanPower, "Zone", "Average", ZoneITEq(Loop).Name);
                 SetupOutputVariable(
-                    "ITE UPS Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).UPSPower, "Zone", "Average", ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE CPU Electric Power at Design Inlet Conditions",
+                    "ITE UPS Electricity Rate", OutputProcessor::Unit::W, ZoneITEq(Loop).UPSPower, "Zone", "Average", ZoneITEq(Loop).Name);
+                SetupOutputVariable("ITE CPU Electricity Rate at Design Inlet Conditions",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).CPUPowerAtDesign,
                                     "Zone",
                                     "Average",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Fan Electric Power at Design Inlet Conditions",
+                SetupOutputVariable("ITE Fan Electricity Rate at Design Inlet Conditions",
                                     OutputProcessor::Unit::W,
                                     ZoneITEq(Loop).FanPowerAtDesign,
                                     "Zone",
@@ -3973,7 +3973,7 @@ namespace InternalHeatGains {
                                     "Average",
                                     ZoneITEq(Loop).Name);
 
-                SetupOutputVariable("ITE CPU Electric Energy",
+                SetupOutputVariable("ITE CPU Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).CPUConsumption,
                                     "Zone",
@@ -3987,7 +3987,7 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE Fan Electric Energy",
+                SetupOutputVariable("ITE Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).FanConsumption,
                                     "Zone",
@@ -4001,7 +4001,7 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE UPS Electric Energy",
+                SetupOutputVariable("ITE UPS Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).UPSConsumption,
                                     "Zone",
@@ -4015,13 +4015,13 @@ namespace InternalHeatGains {
                                     Zone(ZoneITEq(Loop).ZonePtr).Name,
                                     Zone(ZoneITEq(Loop).ZonePtr).Multiplier,
                                     Zone(ZoneITEq(Loop).ZonePtr).ListMultiplier);
-                SetupOutputVariable("ITE CPU Electric Energy at Design Inlet Conditions",
+                SetupOutputVariable("ITE CPU Electricity Energy at Design Inlet Conditions",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).CPUEnergyAtDesign,
                                     "Zone",
                                     "Sum",
                                     ZoneITEq(Loop).Name);
-                SetupOutputVariable("ITE Fan Electric Energy at Design Inlet Conditions",
+                SetupOutputVariable("ITE Fan Electricity Energy at Design Inlet Conditions",
                                     OutputProcessor::Unit::J,
                                     ZoneITEq(Loop).FanEnergyAtDesign,
                                     "Zone",
@@ -4164,31 +4164,31 @@ namespace InternalHeatGains {
                 // Zone total report variables
                 if (RepVarSet(ZoneITEq(Loop).ZonePtr)) {
                     RepVarSet(ZoneITEq(Loop).ZonePtr) = false;
-                    SetupOutputVariable("Zone ITE CPU Electric Power",
+                    SetupOutputVariable("Zone ITE CPU Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Power",
+                    SetupOutputVariable("Zone ITE Fan Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Electric Power",
+                    SetupOutputVariable("Zone ITE UPS Electricity Rate",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSPower,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE CPU Electric Power at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE CPU Electricity Rate at Design Inlet Conditions",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUPowerAtDesign,
                                         "Zone",
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Power at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE Fan Electricity Rate at Design Inlet Conditions",
                                         OutputProcessor::Unit::W,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanPowerAtDesign,
                                         "Zone",
@@ -4213,31 +4213,31 @@ namespace InternalHeatGains {
                                         "Average",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
 
-                    SetupOutputVariable("Zone ITE CPU Electric Energy",
+                    SetupOutputVariable("Zone ITE CPU Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Energy",
+                    SetupOutputVariable("Zone ITE Fan Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE UPS Electric Energy",
+                    SetupOutputVariable("Zone ITE UPS Electricity Energy",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqUPSConsumption,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE CPU Electric Energy at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE CPU Electricity Energy at Design Inlet Conditions",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqCPUEnergyAtDesign,
                                         "Zone",
                                         "Sum",
                                         Zone(ZoneITEq(Loop).ZonePtr).Name);
-                    SetupOutputVariable("Zone ITE Fan Electric Energy at Design Inlet Conditions",
+                    SetupOutputVariable("Zone ITE Fan Electricity Energy at Design Inlet Conditions",
                                         OutputProcessor::Unit::J,
                                         ZnRpt(ZoneITEq(Loop).ZonePtr).ITEqFanEnergyAtDesign,
                                         "Zone",
@@ -4423,8 +4423,8 @@ namespace InternalHeatGains {
 
             // Object report variables
             SetupOutputVariable(
-                "Baseboard Electric Power", OutputProcessor::Unit::W, ZoneBBHeat(Loop).Power, "Zone", "Average", ZoneBBHeat(Loop).Name);
-            SetupOutputVariable("Baseboard Electric Energy",
+                "Baseboard Electricity Rate", OutputProcessor::Unit::W, ZoneBBHeat(Loop).Power, "Zone", "Average", ZoneBBHeat(Loop).Name);
+            SetupOutputVariable("Baseboard Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 ZoneBBHeat(Loop).Consumption,
                                 "Zone",
@@ -4463,13 +4463,13 @@ namespace InternalHeatGains {
             // Zone total report variables
             if (RepVarSet(ZoneBBHeat(Loop).ZonePtr)) {
                 RepVarSet(ZoneBBHeat(Loop).ZonePtr) = false;
-                SetupOutputVariable("Zone Baseboard Electric Power",
+                SetupOutputVariable("Zone Baseboard Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatPower,
                                     "Zone",
                                     "Average",
                                     Zone(ZoneBBHeat(Loop).ZonePtr).Name);
-                SetupOutputVariable("Zone Baseboard Electric Energy",
+                SetupOutputVariable("Zone Baseboard Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     ZnRpt(ZoneBBHeat(Loop).ZonePtr).BaseHeatElecCons,
                                     "Zone",
@@ -4646,7 +4646,7 @@ namespace InternalHeatGains {
             "Load {{W/m2}},Hot Water Eq {{W/m2}},Steam Equipment {{W/m2}},Sum Loads per Area {{W/m2}},Outdoor Controlled Baseboard "
             "Heat\n");
 
-        print(state.outputFiles.eio, Format_721);
+        print(state.files.eio, Format_721);
         for (Loop = 1; Loop <= NumOfZones; ++Loop) {
             LightTot = 0.0;
             ElecTot = 0.0;
@@ -4689,47 +4689,47 @@ namespace InternalHeatGains {
             }
             Zone(Loop).InternalHeatGains = LightTot + ElecTot + GasTot + OthTot + HWETot + StmTot;
             if (Zone(Loop).FloorArea > 0.0) {
-                print(state.outputFiles.eio, Format_720, Zone(Loop).Name, Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
+                print(state.files.eio, Format_720, Zone(Loop).Name, Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
                 print_and_divide_if_greater_than_zero(Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
-                print(state.outputFiles.eio, "{:.3R},", Zone(Loop).TotOccupants / Zone(Loop).FloorArea);
-                print(state.outputFiles.eio, "{:.3R},", LightTot / Zone(Loop).FloorArea);
-                print(state.outputFiles.eio, "{:.3R},", ElecTot / Zone(Loop).FloorArea);
-                print(state.outputFiles.eio, "{:.3R},", GasTot / Zone(Loop).FloorArea);
-                print(state.outputFiles.eio, "{:.3R},", OthTot / Zone(Loop).FloorArea);
-                print(state.outputFiles.eio, "{:.3R},", HWETot / Zone(Loop).FloorArea);
-                print(state.outputFiles.eio, "{:.3R},", StmTot / Zone(Loop).FloorArea);
-                print(state.outputFiles.eio, "{:.3R},{}\n", Zone(Loop).InternalHeatGains / Zone(Loop).FloorArea, BBHeatInd);
+                print(state.files.eio, "{:.3R},", Zone(Loop).TotOccupants / Zone(Loop).FloorArea);
+                print(state.files.eio, "{:.3R},", LightTot / Zone(Loop).FloorArea);
+                print(state.files.eio, "{:.3R},", ElecTot / Zone(Loop).FloorArea);
+                print(state.files.eio, "{:.3R},", GasTot / Zone(Loop).FloorArea);
+                print(state.files.eio, "{:.3R},", OthTot / Zone(Loop).FloorArea);
+                print(state.files.eio, "{:.3R},", HWETot / Zone(Loop).FloorArea);
+                print(state.files.eio, "{:.3R},", StmTot / Zone(Loop).FloorArea);
+                print(state.files.eio, "{:.3R},{}\n", Zone(Loop).InternalHeatGains / Zone(Loop).FloorArea, BBHeatInd);
             } else {
-                print(state.outputFiles.eio, Format_720, Zone(Loop).Name, Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
-                print(state.outputFiles.eio, "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,{}\n", BBHeatInd);
+                print(state.files.eio, Format_720, Zone(Loop).Name, Zone(Loop).FloorArea, Zone(Loop).TotOccupants);
+                print(state.files.eio, "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,{}\n", BBHeatInd);
             }
         }
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "People",
                       "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
                       "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
                       "Number of People,Nominal Maximum Number of People");
                 if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
                           "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
                           "Calculation,KSU Calculation\n");
                 } else {
-                    print(state.outputFiles.eio, "\n");
+                    print(state.files.eio, "\n");
                 }
             }
 
             ZoneNum = People(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "People-Illegal Zone specified", People(Loop).Name);
+                print(state.files.eio, Format_724, "People-Illegal Zone specified", People(Loop).Name);
                 continue;
             }
 
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "People",
                   People(Loop).Name,
@@ -4738,88 +4738,88 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.1R},", People(Loop).NumberOfPeople);
+            print(state.files.eio, "{:.1R},", People(Loop).NumberOfPeople);
 
             print_and_divide_if_greater_than_zero(People(Loop).NumberOfPeople, Zone(ZoneNum).FloorArea);
 
             if (People(Loop).NumberOfPeople > 0.0){
                 print_and_divide_if_greater_than_zero(Zone(ZoneNum).FloorArea, People(Loop).NumberOfPeople);
             } else {
-                print(state.outputFiles.eio, "N/A,");
+                print(state.files.eio, "N/A,");
             }
 
-            print(state.outputFiles.eio, "{:.3R},", People(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", People(Loop).FractionConvected);
+            print(state.files.eio, "{:.3R},", People(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", People(Loop).FractionConvected);
             if (People(Loop).UserSpecSensFrac == AutoCalculate) {
-                print(state.outputFiles.eio, "AutoCalculate,");
+                print(state.files.eio, "AutoCalculate,");
             } else {
-                print(state.outputFiles.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
+                print(state.files.eio, "{:.3R},", People(Loop).UserSpecSensFrac);
             }
-            print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).ActivityLevelPtr));
+            print(state.files.eio, "{},", GetScheduleName(People(Loop).ActivityLevelPtr));
 
             if (People(Loop).Show55Warning) {
-                print(state.outputFiles.eio, "Yes,");
+                print(state.files.eio, "Yes,");
             } else {
-                print(state.outputFiles.eio, "No,");
+                print(state.files.eio, "No,");
             }
-            print(state.outputFiles.eio, "{:.4R},", People(Loop).CO2RateFactor);
-            print(state.outputFiles.eio, "{:.0R},", People(Loop).NomMinNumberPeople);
+            print(state.files.eio, "{:.4R},", People(Loop).CO2RateFactor);
+            print(state.files.eio, "{:.0R},", People(Loop).NomMinNumberPeople);
 
             if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
-                print(state.outputFiles.eio, "{:.0R},", People(Loop).NomMaxNumberPeople);
+                print(state.files.eio, "{:.0R},", People(Loop).NomMaxNumberPeople);
 
                 if (People(Loop).MRTCalcType == ZoneAveraged) {
-                    print(state.outputFiles.eio, "Zone Averaged,");
+                    print(state.files.eio, "Zone Averaged,");
                 } else if (People(Loop).MRTCalcType == SurfaceWeighted) {
-                    print(state.outputFiles.eio, "Surface Weighted,");
+                    print(state.files.eio, "Surface Weighted,");
                 } else if (People(Loop).MRTCalcType == AngleFactor) {
-                    print(state.outputFiles.eio, "Angle Factor,");
+                    print(state.files.eio, "Angle Factor,");
                 } else {
-                    print(state.outputFiles.eio, "N/A,");
+                    print(state.files.eio, "N/A,");
                 }
-                print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).WorkEffPtr));
+                print(state.files.eio, "{},", GetScheduleName(People(Loop).WorkEffPtr));
 
                 if (People(Loop).ClothingType == 1) {
-                    print(state.outputFiles.eio, "Clothing Insulation Schedule,");
+                    print(state.files.eio, "Clothing Insulation Schedule,");
                 } else if (People(Loop).ClothingType == 2) {
-                    print(state.outputFiles.eio, "Dynamic Clothing Model ASHRAE55,");
+                    print(state.files.eio, "Dynamic Clothing Model ASHRAE55,");
                 } else if (People(Loop).ClothingType == 3) {
-                    print(state.outputFiles.eio, "Calculation Method Schedule,");
+                    print(state.files.eio, "Calculation Method Schedule,");
                 } else {
-                    print(state.outputFiles.eio, "N/A,");
+                    print(state.files.eio, "N/A,");
                 }
 
                 if (People(Loop).ClothingType == 3) {
-                    print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).ClothingMethodPtr));
+                    print(state.files.eio, "{},", GetScheduleName(People(Loop).ClothingMethodPtr));
                 } else {
-                    print(state.outputFiles.eio, "N/A,");
+                    print(state.files.eio, "N/A,");
                 }
 
-                print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).ClothingPtr));
-                print(state.outputFiles.eio, "{},", GetScheduleName(People(Loop).AirVelocityPtr));
+                print(state.files.eio, "{},", GetScheduleName(People(Loop).ClothingPtr));
+                print(state.files.eio, "{},", GetScheduleName(People(Loop).AirVelocityPtr));
 
                 if (People(Loop).Fanger) {
-                    print(state.outputFiles.eio, "Yes,");
+                    print(state.files.eio, "Yes,");
                 } else {
-                    print(state.outputFiles.eio, "No,");
+                    print(state.files.eio, "No,");
                 }
                 if (People(Loop).Pierce) {
-                    print(state.outputFiles.eio, "Yes,");
+                    print(state.files.eio, "Yes,");
                 } else {
-                    print(state.outputFiles.eio, "No,");
+                    print(state.files.eio, "No,");
                 }
                 if (People(Loop).KSU) {
-                    print(state.outputFiles.eio, "Yes\n");
+                    print(state.files.eio, "Yes\n");
                 } else {
-                    print(state.outputFiles.eio, "No\n");
+                    print(state.files.eio, "No\n");
                 }
             } else {
-                print(state.outputFiles.eio, "{:.0R}\n", People(Loop).NomMaxNumberPeople);
+                print(state.files.eio, "{:.0R}\n", People(Loop).NomMaxNumberPeople);
             }
         }
         for (Loop = 1; Loop <= TotLights; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "Lights",
                       "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
@@ -4830,10 +4830,10 @@ namespace InternalHeatGains {
             ZoneNum = Lights(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, "Lights-Illegal Zone specified", Lights(Loop).Name);
+                print(state.files.eio, "Lights-Illegal Zone specified", Lights(Loop).Name);
                 continue;
             }
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "Lights",
                   Lights(Loop).Name,
@@ -4842,23 +4842,23 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).DesignLevel);
+            print(state.files.eio, "{:.3R},", Lights(Loop).DesignLevel);
 
             print_and_divide_if_greater_than_zero(Lights(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
             print_and_divide_if_greater_than_zero(Lights(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionReturnAir);
-            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionShortWave);
-            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionConvected);
-            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).FractionReplaceable);
-            print(state.outputFiles.eio, "{},", Lights(Loop).EndUseSubcategory);
-            print(state.outputFiles.eio, "{:.3R},", Lights(Loop).NomMinDesignLevel);
-            print(state.outputFiles.eio, "{:.3R}\n", Lights(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", Lights(Loop).FractionReturnAir);
+            print(state.files.eio, "{:.3R},", Lights(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", Lights(Loop).FractionShortWave);
+            print(state.files.eio, "{:.3R},", Lights(Loop).FractionConvected);
+            print(state.files.eio, "{:.3R},", Lights(Loop).FractionReplaceable);
+            print(state.files.eio, "{},", Lights(Loop).EndUseSubcategory);
+            print(state.files.eio, "{:.3R},", Lights(Loop).NomMinDesignLevel);
+            print(state.files.eio, "{:.3R}\n", Lights(Loop).NomMaxDesignLevel);
         }
         for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "ElectricEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
@@ -4868,10 +4868,10 @@ namespace InternalHeatGains {
             ZoneNum = ZoneElectric(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "Electric Equipment-Illegal Zone specified", ZoneElectric(Loop).Name);
+                print(state.files.eio, Format_724, "Electric Equipment-Illegal Zone specified", ZoneElectric(Loop).Name);
                 continue;
             }
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "ElectricEquipment",
                   ZoneElectric(Loop).Name,
@@ -4880,22 +4880,22 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).DesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneElectric(Loop).DesignLevel);
 
             print_and_divide_if_greater_than_zero(ZoneElectric(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
             print_and_divide_if_greater_than_zero(ZoneElectric(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionLatent);
-            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionLost);
-            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).FractionConvected);
-            print(state.outputFiles.eio, "{},", ZoneElectric(Loop).EndUseSubcategory);
-            print(state.outputFiles.eio, "{:.3R},", ZoneElectric(Loop).NomMinDesignLevel);
-            print(state.outputFiles.eio, "{:.3R}\n", ZoneElectric(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneElectric(Loop).FractionLatent);
+            print(state.files.eio, "{:.3R},", ZoneElectric(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", ZoneElectric(Loop).FractionLost);
+            print(state.files.eio, "{:.3R},", ZoneElectric(Loop).FractionConvected);
+            print(state.files.eio, "{},", ZoneElectric(Loop).EndUseSubcategory);
+            print(state.files.eio, "{:.3R},", ZoneElectric(Loop).NomMinDesignLevel);
+            print(state.files.eio, "{:.3R}\n", ZoneElectric(Loop).NomMaxDesignLevel);
         }
         for (Loop = 1; Loop <= TotGasEquip; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "GasEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
@@ -4905,11 +4905,11 @@ namespace InternalHeatGains {
             ZoneNum = ZoneGas(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "Gas Equipment-Illegal Zone specified", ZoneGas(Loop).Name);
+                print(state.files.eio, Format_724, "Gas Equipment-Illegal Zone specified", ZoneGas(Loop).Name);
                 continue;
             }
 
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "GasEquipment",
                   ZoneGas(Loop).Name,
@@ -4918,23 +4918,23 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).DesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneGas(Loop).DesignLevel);
 
             print_and_divide_if_greater_than_zero(ZoneGas(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
             print_and_divide_if_greater_than_zero(ZoneGas(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionLatent);
-            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionLost);
-            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).FractionConvected);
-            print(state.outputFiles.eio, "{},", ZoneGas(Loop).EndUseSubcategory);
-            print(state.outputFiles.eio, "{:.3R},", ZoneGas(Loop).NomMinDesignLevel);
-            print(state.outputFiles.eio, "{:.3R}\n", ZoneGas(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneGas(Loop).FractionLatent);
+            print(state.files.eio, "{:.3R},", ZoneGas(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", ZoneGas(Loop).FractionLost);
+            print(state.files.eio, "{:.3R},", ZoneGas(Loop).FractionConvected);
+            print(state.files.eio, "{},", ZoneGas(Loop).EndUseSubcategory);
+            print(state.files.eio, "{:.3R},", ZoneGas(Loop).NomMinDesignLevel);
+            print(state.files.eio, "{:.3R}\n", ZoneGas(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= TotHWEquip; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "HotWaterEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
@@ -4944,11 +4944,11 @@ namespace InternalHeatGains {
             ZoneNum = ZoneHWEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "Hot Water Equipment-Illegal Zone specified", ZoneHWEq(Loop).Name);
+                print(state.files.eio, Format_724, "Hot Water Equipment-Illegal Zone specified", ZoneHWEq(Loop).Name);
                 continue;
             }
 
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "HotWaterEquipment",
                   ZoneHWEq(Loop).Name,
@@ -4957,23 +4957,23 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).DesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneHWEq(Loop).DesignLevel);
 
             print_and_divide_if_greater_than_zero(ZoneHWEq(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
             print_and_divide_if_greater_than_zero(ZoneHWEq(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionLatent);
-            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionLost);
-            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).FractionConvected);
-            print(state.outputFiles.eio, "{},", ZoneHWEq(Loop).EndUseSubcategory);
-            print(state.outputFiles.eio, "{:.3R},", ZoneHWEq(Loop).NomMinDesignLevel);
-            print(state.outputFiles.eio, "{:.3R}\n", ZoneHWEq(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneHWEq(Loop).FractionLatent);
+            print(state.files.eio, "{:.3R},", ZoneHWEq(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", ZoneHWEq(Loop).FractionLost);
+            print(state.files.eio, "{:.3R},", ZoneHWEq(Loop).FractionConvected);
+            print(state.files.eio, "{},", ZoneHWEq(Loop).EndUseSubcategory);
+            print(state.files.eio, "{:.3R},", ZoneHWEq(Loop).NomMinDesignLevel);
+            print(state.files.eio, "{:.3R}\n", ZoneHWEq(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= TotStmEquip; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "SteamEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
@@ -4983,11 +4983,11 @@ namespace InternalHeatGains {
             ZoneNum = ZoneSteamEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "Steam Equipment-Illegal Zone specified", ZoneSteamEq(Loop).Name);
+                print(state.files.eio, Format_724, "Steam Equipment-Illegal Zone specified", ZoneSteamEq(Loop).Name);
                 continue;
             }
 
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "SteamEquipment",
                   ZoneSteamEq(Loop).Name,
@@ -4996,23 +4996,23 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).DesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneSteamEq(Loop).DesignLevel);
 
             print_and_divide_if_greater_than_zero(ZoneSteamEq(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
             print_and_divide_if_greater_than_zero(ZoneSteamEq(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionLatent);
-            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionLost);
-            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).FractionConvected);
-            print(state.outputFiles.eio, "{},", ZoneSteamEq(Loop).EndUseSubcategory);
-            print(state.outputFiles.eio, "{:.3R},", ZoneSteamEq(Loop).NomMinDesignLevel);
-            print(state.outputFiles.eio, "{:.3R}\n", ZoneSteamEq(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneSteamEq(Loop).FractionLatent);
+            print(state.files.eio, "{:.3R},", ZoneSteamEq(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", ZoneSteamEq(Loop).FractionLost);
+            print(state.files.eio, "{:.3R},", ZoneSteamEq(Loop).FractionConvected);
+            print(state.files.eio, "{},", ZoneSteamEq(Loop).EndUseSubcategory);
+            print(state.files.eio, "{:.3R},", ZoneSteamEq(Loop).NomMinDesignLevel);
+            print(state.files.eio, "{:.3R}\n", ZoneSteamEq(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= TotOthEquip; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "OtherEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
@@ -5022,11 +5022,11 @@ namespace InternalHeatGains {
             ZoneNum = ZoneOtherEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "Other Equipment-Illegal Zone specified", ZoneOtherEq(Loop).Name);
+                print(state.files.eio, Format_724, "Other Equipment-Illegal Zone specified", ZoneOtherEq(Loop).Name);
                 continue;
             }
 
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "OtherEquipment",
                   ZoneOtherEq(Loop).Name,
@@ -5035,22 +5035,22 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).DesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneOtherEq(Loop).DesignLevel);
 
             print_and_divide_if_greater_than_zero(ZoneOtherEq(Loop).DesignLevel, Zone(ZoneNum).FloorArea);
             print_and_divide_if_greater_than_zero(ZoneOtherEq(Loop).DesignLevel, Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionLatent);
-            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionLost);
-            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionConvected);
-            print(state.outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).NomMinDesignLevel);
-            print(state.outputFiles.eio, "{:.3R}\n", ZoneOtherEq(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneOtherEq(Loop).FractionLatent);
+            print(state.files.eio, "{:.3R},", ZoneOtherEq(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", ZoneOtherEq(Loop).FractionLost);
+            print(state.files.eio, "{:.3R},", ZoneOtherEq(Loop).FractionConvected);
+            print(state.files.eio, "{:.3R},", ZoneOtherEq(Loop).NomMinDesignLevel);
+            print(state.files.eio, "{:.3R}\n", ZoneOtherEq(Loop).NomMaxDesignLevel);
         }
 
         for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "ElectricEquipment:ITE:AirCooled",
                       "Equipment Level {W},"
@@ -5062,10 +5062,10 @@ namespace InternalHeatGains {
             ZoneNum = ZoneITEq(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "ElectricEquipment:ITE:AirCooled-Illegal Zone specified", ZoneITEq(Loop).Name);
+                print(state.files.eio, Format_724, "ElectricEquipment:ITE:AirCooled-Illegal Zone specified", ZoneITEq(Loop).Name);
                 continue;
             }
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "ElectricEquipment:ITE:AirCooled",
                   ZoneITEq(Loop).Name,
@@ -5074,24 +5074,24 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneITEq(Loop).DesignTotalPower);
+            print(state.files.eio, "{:.3R},", ZoneITEq(Loop).DesignTotalPower);
 
             print_and_divide_if_greater_than_zero(ZoneITEq(Loop).DesignTotalPower, Zone(ZoneNum).FloorArea);
 
             // ElectricEquipment:ITE:AirCooled is 100% convective
-            print(state.outputFiles.eio, "1.0,");
+            print(state.files.eio, "1.0,");
 
-            print(state.outputFiles.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryCPU);
-            print(state.outputFiles.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryFan);
-            print(state.outputFiles.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryUPS);
-            print(state.outputFiles.eio, "{:.3R},", ZoneITEq(Loop).NomMinDesignLevel);
-            print(state.outputFiles.eio, "{:.3R},", ZoneITEq(Loop).NomMaxDesignLevel);
-            print(state.outputFiles.eio, "{:.10R}\n", ZoneITEq(Loop).DesignAirVolFlowRate);
+            print(state.files.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryCPU);
+            print(state.files.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryFan);
+            print(state.files.eio, "{},", ZoneITEq(Loop).EndUseSubcategoryUPS);
+            print(state.files.eio, "{:.3R},", ZoneITEq(Loop).NomMinDesignLevel);
+            print(state.files.eio, "{:.3R},", ZoneITEq(Loop).NomMaxDesignLevel);
+            print(state.files.eio, "{:.10R}\n", ZoneITEq(Loop).DesignAirVolFlowRate);
         }
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
             if (Loop == 1) {
-                print(state.outputFiles.eio,
+                print(state.files.eio,
                       Format_723,
                       "Outdoor Controlled Baseboard Heat",
                       "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature "
@@ -5101,10 +5101,10 @@ namespace InternalHeatGains {
             ZoneNum = ZoneBBHeat(Loop).ZonePtr;
 
             if (ZoneNum == 0) {
-                print(state.outputFiles.eio, Format_724, "Outdoor Controlled Baseboard Heat-Illegal Zone specified", ZoneBBHeat(Loop).Name);
+                print(state.files.eio, Format_724, "Outdoor Controlled Baseboard Heat-Illegal Zone specified", ZoneBBHeat(Loop).Name);
                 continue;
             }
-            print(state.outputFiles.eio,
+            print(state.files.eio,
                   Format_722,
                   "Outdoor Controlled Baseboard Heat",
                   ZoneBBHeat(Loop).Name,
@@ -5113,13 +5113,13 @@ namespace InternalHeatGains {
                   Zone(ZoneNum).FloorArea,
                   Zone(ZoneNum).TotOccupants);
 
-            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).CapatLowTemperature);
-            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).LowTemperature);
-            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).CapatHighTemperature);
-            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).HighTemperature);
-            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).FractionRadiant);
-            print(state.outputFiles.eio, "{:.3R},", ZoneBBHeat(Loop).FractionConvected);
-            print(state.outputFiles.eio, "{}\n", ZoneBBHeat(Loop).EndUseSubcategory);
+            print(state.files.eio, "{:.3R},", ZoneBBHeat(Loop).CapatLowTemperature);
+            print(state.files.eio, "{:.3R},", ZoneBBHeat(Loop).LowTemperature);
+            print(state.files.eio, "{:.3R},", ZoneBBHeat(Loop).CapatHighTemperature);
+            print(state.files.eio, "{:.3R},", ZoneBBHeat(Loop).HighTemperature);
+            print(state.files.eio, "{:.3R},", ZoneBBHeat(Loop).FractionRadiant);
+            print(state.files.eio, "{:.3R},", ZoneBBHeat(Loop).FractionConvected);
+            print(state.files.eio, "{}\n", ZoneBBHeat(Loop).EndUseSubcategory);
         }
     }
 
@@ -5181,9 +5181,7 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 ActivityLevel_WperPerson; // Units on Activity Level (Schedule)
         Real64 NumberOccupants;          // Number of occupants
-        int SurfNum;                     // DO loop counter for surfaces
         int Loop;
-        int NZ;
         Real64 Q;                  // , QR
         Real64 TotalPeopleGain;    // Total heat gain from people (intermediate calculational variable)
         Real64 SensiblePeopleGain; // Sensible heat gain from people (intermediate calculational variable)
@@ -5265,7 +5263,7 @@ namespace InternalHeatGains {
         //       at 30F were assumed in order to give reasonable values beyond
         //       The reported temperature range.
         for (Loop = 1; Loop <= TotPeople; ++Loop) {
-            NZ = People(Loop).ZonePtr;
+            int NZ = People(Loop).ZonePtr;
             NumberOccupants = People(Loop).NumberOfPeople * GetCurrentScheduleValue(People(Loop).NumberOfPeoplePtr);
             if (People(Loop).EMSPeopleOn) NumberOccupants = People(Loop).EMSNumberOfPeople;
 
@@ -5320,7 +5318,7 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotLights; ++Loop) {
-            NZ = Lights(Loop).ZonePtr;
+            int NZ = Lights(Loop).ZonePtr;
             Q = Lights(Loop).DesignLevel * GetCurrentScheduleValue(Lights(Loop).SchedPtr);
 
             if (ZoneDaylight(NZ).DaylightMethod == SplitFluxDaylighting || ZoneDaylight(NZ).DaylightMethod == DElightDaylighting) {
@@ -5394,7 +5392,7 @@ namespace InternalHeatGains {
             ZoneElectric(Loop).LostRate = Q * ZoneElectric(Loop).FractionLost;
             ZoneElectric(Loop).TotGainRate = Q - ZoneElectric(Loop).LostRate;
 
-            NZ = ZoneElectric(Loop).ZonePtr;
+            int NZ = ZoneElectric(Loop).ZonePtr;
             ZnRpt(NZ).ElecPower += ZoneElectric(Loop).Power;
             ZoneIntGain(NZ).QEERAD += ZoneElectric(Loop).RadGainRate;
             ZoneIntGain(NZ).QEECON += ZoneElectric(Loop).ConGainRate;
@@ -5416,7 +5414,7 @@ namespace InternalHeatGains {
             ZoneGas(Loop).TotGainRate = Q - ZoneGas(Loop).LostRate;
             ZoneGas(Loop).CO2GainRate = Q * ZoneGas(Loop).CO2RateFactor;
 
-            NZ = ZoneGas(Loop).ZonePtr;
+            int NZ = ZoneGas(Loop).ZonePtr;
             ZnRpt(NZ).GasPower += ZoneGas(Loop).Power;
             ZoneIntGain(NZ).QGERAD += ZoneGas(Loop).RadGainRate;
             ZoneIntGain(NZ).QGECON += ZoneGas(Loop).ConGainRate;
@@ -5437,7 +5435,7 @@ namespace InternalHeatGains {
             ZoneOtherEq(Loop).LostRate = Q * ZoneOtherEq(Loop).FractionLost;
             ZoneOtherEq(Loop).TotGainRate = Q - ZoneOtherEq(Loop).LostRate;
 
-            NZ = ZoneOtherEq(Loop).ZonePtr;
+            int NZ = ZoneOtherEq(Loop).ZonePtr;
             ZoneIntGain(NZ).QOERAD += ZoneOtherEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QOECON += ZoneOtherEq(Loop).ConGainRate;
             ZoneIntGain(NZ).QOELAT += ZoneOtherEq(Loop).LatGainRate;
@@ -5457,7 +5455,7 @@ namespace InternalHeatGains {
             ZoneHWEq(Loop).LostRate = Q * ZoneHWEq(Loop).FractionLost;
             ZoneHWEq(Loop).TotGainRate = Q - ZoneHWEq(Loop).LostRate;
 
-            NZ = ZoneHWEq(Loop).ZonePtr;
+            int NZ = ZoneHWEq(Loop).ZonePtr;
             ZnRpt(NZ).HWPower += ZoneHWEq(Loop).Power;
             ZoneIntGain(NZ).QHWRAD += ZoneHWEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QHWCON += ZoneHWEq(Loop).ConGainRate;
@@ -5478,7 +5476,7 @@ namespace InternalHeatGains {
             ZoneSteamEq(Loop).LostRate = Q * ZoneSteamEq(Loop).FractionLost;
             ZoneSteamEq(Loop).TotGainRate = Q - ZoneSteamEq(Loop).LostRate;
 
-            NZ = ZoneSteamEq(Loop).ZonePtr;
+            int NZ = ZoneSteamEq(Loop).ZonePtr;
             ZnRpt(NZ).SteamPower += ZoneSteamEq(Loop).Power;
             ZoneIntGain(NZ).QSERAD += ZoneSteamEq(Loop).RadGainRate;
             ZoneIntGain(NZ).QSECON += ZoneSteamEq(Loop).ConGainRate;
@@ -5487,7 +5485,7 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotBBHeat; ++Loop) {
-            NZ = ZoneBBHeat(Loop).ZonePtr;
+            int NZ = ZoneBBHeat(Loop).ZonePtr;
             if (Zone(NZ).OutDryBulbTemp >= ZoneBBHeat(Loop).HighTemperature) {
                 Q = 0.0;
             } else if (Zone(NZ).OutDryBulbTemp > ZoneBBHeat(Loop).LowTemperature) {
@@ -5515,16 +5513,16 @@ namespace InternalHeatGains {
         }
 
         for (Loop = 1; Loop <= TotCO2Gen; ++Loop) {
-            NZ = ZoneCO2Gen(Loop).ZonePtr;
+            int NZ = ZoneCO2Gen(Loop).ZonePtr;
             ZoneCO2Gen(Loop).CO2GainRate = ZoneCO2Gen(Loop).CO2DesignRate * GetCurrentScheduleValue(ZoneCO2Gen(Loop).SchedPtr);
             ZnRpt(NZ).CO2Rate += ZoneCO2Gen(Loop).CO2GainRate;
         }
 
-        if (NumZoneITEqStatements > 0) CalcZoneITEq();
+        if (NumZoneITEqStatements > 0) CalcZoneITEq(state);
 
         CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
-        CalcWaterUseZoneGains();
+        CalcWaterUseZoneGains(state.dataWaterUse);
         FigureFuelCellZoneGains();
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();
@@ -5534,7 +5532,7 @@ namespace InternalHeatGains {
         // store pointer values to hold generic internal gain values constant for entire timestep
         UpdateInternalGainValues();
 
-        for (NZ = 1; NZ <= NumOfZones; ++NZ) {
+        for (int NZ = 1; NZ <= NumOfZones; ++NZ) {
 
             SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
             // Added for hybrid model
@@ -5560,24 +5558,30 @@ namespace InternalHeatGains {
         if (CompLoadReportIsReq) {
             AllocateLoadComponentArrays();
         }
-        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-            int const NZ = Surface(SurfNum).Zone;
-            if (!Surface(SurfNum).HeatTransSurf || NZ == 0) continue; // Skip non-heat transfer surfaces
-            int const radEnclosureNum = Zone(Surface(SurfNum).Zone).RadiantEnclosureNum;
-            if (!doLoadComponentPulseNow) {
-                QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
-            } else {
-                curQL = QL(radEnclosureNum);
-                // for the loads component report during the special sizing run increase the radiant portion
-                // a small amount to create a "pulse" of heat that is used for the delayed loads
-                adjQL = curQL + DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
-                // ITABSF is the Inside Thermal Absorptance
-                // TMULT is a multiplier for each zone
-                // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
-                QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
-                // store the magnitude and time of the pulse
-                radiantPulseTimestep(CurOverallSimDay, NZ) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
-                radiantPulseReceived(CurOverallSimDay, SurfNum) = (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+        for (int zoneNum = 1; zoneNum <= NumOfZones; ++zoneNum) {// Loop through all surfaces...
+            int const firstSurf = Zone(zoneNum).SurfaceFirst;
+            int const lastSurf = Zone(zoneNum).SurfaceLast;
+            if (firstSurf <= 0) continue;
+            for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                if (!Surface(SurfNum).HeatTransSurf) continue; // Skip non-heat transfer surfaces
+                int const radEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
+                if (!doLoadComponentPulseNow) {
+                    QRadThermInAbs(SurfNum) = QL(radEnclosureNum) * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                } else {
+                    curQL = QL(radEnclosureNum);
+                    // for the loads component report during the special sizing run increase the radiant portion
+                    // a small amount to create a "pulse" of heat that is used for the delayed loads
+                    adjQL = curQL +
+                            DataViewFactorInformation::ZoneRadiantInfo(radEnclosureNum).FloorArea * pulseMultipler;
+                    // ITABSF is the Inside Thermal Absorptance
+                    // TMULT is a multiplier for each zone
+                    // QRadThermInAbs is the thermal radiation absorbed on inside surfaces
+                    QRadThermInAbs(SurfNum) = adjQL * TMULT(radEnclosureNum) * ITABSF(SurfNum);
+                    // store the magnitude and time of the pulse
+                    radiantPulseTimestep(CurOverallSimDay, zoneNum) = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
+                    radiantPulseReceived(CurOverallSimDay, SurfNum) =
+                            (adjQL - curQL) * TMULT(radEnclosureNum) * ITABSF(SurfNum) * Surface(SurfNum).Area;
+                }
             }
         }
     }
@@ -5608,7 +5612,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void CalcZoneITEq()
+    void CalcZoneITEq(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5775,7 +5779,7 @@ namespace InternalHeatGains {
                     TSupply = Node(SupplyNodeNum).Temp;
                     WSupply = Node(SupplyNodeNum).HumRat;
                     if (ZoneITEq(Loop).RecircFLTCurve != 0) {
-                        RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
+                        RecircFrac = ZoneITEq(Loop).DesignRecircFrac * CurveValue(state, ZoneITEq(Loop).RecircFLTCurve, CPULoadSchedFrac, TSupply);
                     } else {
                         RecircFrac = ZoneITEq(Loop).DesignRecircFrac;
                     }
@@ -5816,20 +5820,20 @@ namespace InternalHeatGains {
             }
 
             CPUPower =
-                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
+                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
             ZoneITEq(Loop).CPUPowerAtDesign =
-                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+                max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
 
-            AirVolFlowFrac = max(CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
+            AirVolFlowFrac = max(CurveValue(state, ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
             AirVolFlowRate = ZoneITEq(Loop).DesignAirVolFlowRate * OperSchedFrac * AirVolFlowFrac;
             if (AirVolFlowRate < SmallAirVolFlow) {
                 AirVolFlowRate = 0.0;
             }
-            AirVolFlowFracDesignT = max(CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
+            AirVolFlowFracDesignT = max(CurveValue(state, ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
 
-            FanPower = max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac), 0.0);
+            FanPower = max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFrac), 0.0);
             ZoneITEq(Loop).FanPowerAtDesign =
-                max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
+                max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveValue(state, ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
 
             // Calculate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
             if (ZoneITEq(Loop).DesignTotalPower > 0.0) {
@@ -5839,7 +5843,7 @@ namespace InternalHeatGains {
             }
             if (ZoneITEq(Loop).UPSEfficFPLRCurve != 0) {
                 UPSPower = (CPUPower + FanPower) *
-                           max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
+                           max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency * CurveValue(state, ZoneITEq(Loop).UPSEfficFPLRCurve, UPSPartLoadRatio)), 0.0);
             } else {
                 UPSPower = (CPUPower + FanPower) * max((1.0 - ZoneITEq(Loop).DesignUPSEfficiency), 0.0);
             }

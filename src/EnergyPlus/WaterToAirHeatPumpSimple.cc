@@ -168,19 +168,8 @@ namespace WaterToAirHeatPumpSimple {
     Real64 Winput(0.0);                 // Power Consumption [W]
     Real64 PLRCorrLoadSideMdot(0.0);    // Load Side Mdot corrected for Part Load Ratio of the unit
     bool MyOneTimeFlag(true);           // one time allocation flag
-
+    bool firstTime(true);
     // Subroutine Specifications for the Module
-    // Driver/Manager Routines
-
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Algorithms for the module
-
-    // Update routine
-
-    // Utility routines
 
     // Object Data
     Array1D<SimpleWatertoAirHPConditions> SimpleWatertoAirHP;
@@ -191,9 +180,13 @@ namespace WaterToAirHeatPumpSimple {
     // Functions
     void clear_state()
     {
+        NumWatertoAirHPs = 0;
         MyOneTimeFlag = true;
         GetCoilsInputFlag = true;
+        MySizeFlag.clear();
+        SimpleHPTimeStepFlag.clear();
         SimpleWatertoAirHP.deallocate();
+        firstTime = true;
     }
 
     void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
@@ -455,14 +448,14 @@ namespace WaterToAirHeatPumpSimple {
 
             // Setup Report variables for the cooling coil
             // CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit"
-            SetupOutputVariable("Cooling Coil Electric Energy",
+            SetupOutputVariable("Cooling Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 SimpleWatertoAirHP(HPNum).Energy,
                                 "System",
                                 "Summed",
                                 SimpleWatertoAirHP(HPNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Cooling",
                                 _,
                                 "System");
@@ -568,14 +561,14 @@ namespace WaterToAirHeatPumpSimple {
             TestCompSet(CurrentModuleObject, AlphArray(1), AlphArray(4), AlphArray(5), "Air Nodes");
 
             // CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit"
-            SetupOutputVariable("Heating Coil Electric Energy",
+            SetupOutputVariable("Heating Coil Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 SimpleWatertoAirHP(HPNum).Energy,
                                 "System",
                                 "Summed",
                                 SimpleWatertoAirHP(HPNum).Name,
                                 _,
-                                "Electric",
+                                "Electricity",
                                 "Heating",
                                 _,
                                 "System");
@@ -625,7 +618,7 @@ namespace WaterToAirHeatPumpSimple {
 
             if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
                 // COOLING COIL  Setup Report variables for the Heat Pump
-                SetupOutputVariable("Cooling Coil Electric Power",
+                SetupOutputVariable("Cooling Coil Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     SimpleWatertoAirHP(HPNum).Power,
                                     "System",
@@ -719,7 +712,7 @@ namespace WaterToAirHeatPumpSimple {
 
             } else if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
                 // HEATING COIL Setup Report variables for the Heat Pump
-                SetupOutputVariable("Heating Coil Electric Power",
+                SetupOutputVariable("Heating Coil Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     SimpleWatertoAirHP(HPNum).Power,
                                     "System",
@@ -886,7 +879,7 @@ namespace WaterToAirHeatPumpSimple {
 
         if (MyPlantScanFlag(HPNum) && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state.dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     SimpleWatertoAirHP(HPNum).Name,
                                     SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum,
                                     SimpleWatertoAirHP(HPNum).LoopNum,
@@ -1430,7 +1423,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             RatedCapCoolTotalDes = CoolCapAtPeak;
                         }
-                        coilSelectionReportObj->setCoilEntAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
+                        coilSelectionReportObj->setCoilEntAirTemp(state, SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
                         coilSelectionReportObj->setCoilEntAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, MixHumRat);
                         coilSelectionReportObj->setCoilLvgAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, SupTemp);
                         coilSelectionReportObj->setCoilLvgAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, SupHumRat);
@@ -1519,7 +1512,7 @@ namespace WaterToAirHeatPumpSimple {
                         } else {
                             RatedCapCoolTotalDes = CoolCapAtPeak;
                         }
-                        coilSelectionReportObj->setCoilEntAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
+                        coilSelectionReportObj->setCoilEntAirTemp(state, SimpleWatertoAirHP(HPNum).Name, CompType, MixTemp, CurSysNum, CurZoneEqNum);
                         coilSelectionReportObj->setCoilEntAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, MixHumRat);
                         coilSelectionReportObj->setCoilLvgAirTemp(SimpleWatertoAirHP(HPNum).Name, CompType, SupTemp);
                         coilSelectionReportObj->setCoilLvgAirHumRat(SimpleWatertoAirHP(HPNum).Name, CompType, SupHumRat);
@@ -1774,7 +1767,8 @@ namespace WaterToAirHeatPumpSimple {
                     }
                 }
             }
-            coilSelectionReportObj->setCoilCoolingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilCoolingCapacity(state,
+                                                           SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapCoolTotal,
                                                            RatedCapCoolTotalAutoSized,
@@ -1975,7 +1969,8 @@ namespace WaterToAirHeatPumpSimple {
                 }
             }
 
-            coilSelectionReportObj->setCoilHeatingCapacity(SimpleWatertoAirHP(HPNum).Name,
+            coilSelectionReportObj->setCoilHeatingCapacity(state,
+                                                           SimpleWatertoAirHP(HPNum).Name,
                                                            CompType,
                                                            SimpleWatertoAirHP(HPNum).RatedCapHeat,
                                                            IsAutoSize,
@@ -2205,7 +2200,6 @@ namespace WaterToAirHeatPumpSimple {
         bool LatDegradModelSimFlag; // Latent degradation model simulation flag
         int NumIteration;           // Iteration Counter
         static int Count(0);        // No idea what this is for.
-        static bool firstTime(true);
         static Real64 LoadSideInletDBTemp_Init; // rated conditions
         static Real64 LoadSideInletWBTemp_Init; // rated conditions
         static Real64 LoadSideInletHumRat_Init; // rated conditions

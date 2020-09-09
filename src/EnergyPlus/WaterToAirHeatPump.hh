@@ -57,9 +57,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace WaterToAirHeatPump {
 
     // Using/Aliasing
@@ -82,19 +79,8 @@ namespace WaterToAirHeatPump {
     extern int WaterIndex;         // Water index
     extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
     // Subroutine Specifications for the Module
-    // Driver/Manager Routines
 
-    // Get Input routines for module
-
-    // Initialization routines for module
-
-    // Computational routines
-
-    // Update routine to check convergence and update nodes
-
-    // Utility routines
-
-    // Types
+    void clear_state();
 
     struct WatertoAirHPEquipConditions
     {
@@ -194,7 +180,7 @@ namespace WaterToAirHeatPump {
 
     // Functions
 
-    void SimWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+    void SimWatertoAirHP(EnergyPlusData &state,
                          std::string const &CompName,   // component name
                          int &CompIndex,                // Index for Component name
                          Real64 const DesignAirflow,    // design air flow rate
@@ -221,7 +207,7 @@ namespace WaterToAirHeatPump {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWatertoAirHP(BranchInputManagerData &dataBranchInputManager,
+    void InitWatertoAirHP(EnergyPlusData &state,
                           int const HPNum, // index to main heat pump data structure
                           bool const InitFlag,
                           Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]

@@ -1189,13 +1189,13 @@ namespace HeatRecovery {
                                 _,
                                 "System");
 
-            SetupOutputVariable("Heat Exchanger Electric Power",
+            SetupOutputVariable("Heat Exchanger Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 ExchCond(ExchNum).ElecUseRate,
                                 "System",
                                 "Average",
                                 ExchCond(ExchNum).Name);
-            SetupOutputVariable("Heat Exchanger Electric Energy",
+            SetupOutputVariable("Heat Exchanger Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 ExchCond(ExchNum).ElecUseEnergy,
                                 "System",
@@ -1551,6 +1551,7 @@ namespace HeatRecovery {
                                 } else {
                                     // need call to EMS to check node
                                     CheckIfNodeSetPointManagedByEMS(ExchCond(ExchNum).SecOutletNode, iHumidityRatioMaxSetPoint, LocalWarningError);
+                                    DataLoopNode::NodeSetpointCheck(ExchCond(ExchNum).SecOutletNode).needsSetpointChecking = false;
                                     if (LocalWarningError) {
                                         ShowWarningError("Missing optional HumRatMax setpoint for " + cHXTypes(ExchCond(ExchNum).ExchTypeNum) +
                                                          " \"" + ExchCond(ExchNum).Name + "\"");

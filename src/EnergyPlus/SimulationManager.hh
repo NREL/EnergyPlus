@@ -53,10 +53,10 @@
 
 namespace EnergyPlus {
     // Forward declarations
+    class IOFiles;
     struct CostEstimateManagerData;
     struct EnergyPlusData;
     struct ZoneTempPredictorCorrectorData;
-    class OutputFiles;
 
 namespace SimulationManager {
 
@@ -81,33 +81,33 @@ namespace SimulationManager {
 
     void ManageSimulation(EnergyPlusData &state);
 
-    void GetProjectData(EnergyPlusData &state, OutputFiles &outputFiles);
+    void GetProjectData(EnergyPlusData &state);
 
-    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue);
+    void writeIntialPerfLogValues(IOFiles &ioFiles, std::string const &currentOverrideModeValue);
 
     std::string bool_to_string(bool logical);
 
-    void CheckForMisMatchedEnvironmentSpecifications();
+    void CheckForMisMatchedEnvironmentSpecifications(IOFiles &ioFiles);
 
     void CheckForRequestedReporting();
 
-    void OpenStreamFile(const std::string &fileName, int &unitNumber, std::ostream *&out_stream);
+    std::unique_ptr<std::ostream> OpenStreamFile(const std::string &fileName);
 
-    void OpenOutputFiles(OutputFiles &outputFiles);
+    void OpenOutputFiles(IOFiles &ioFiles);
 
-    void OpenOutputJsonFiles();
+    void OpenOutputJsonFiles(JsonOutputStreams &jsonOutputStreams);
 
-    void CloseOutputFiles(OutputFiles &outputFiles);
+    void CloseOutputFiles(IOFiles &ioFiles);
 
     void SetupSimulation(EnergyPlusData &state, bool &ErrorsFound);
 
-    void ReportNodeConnections(OutputFiles &outputFiles);
+    void ReportNodeConnections(IOFiles &ioFiles);
 
-    void ReportLoopConnections(OutputFiles &outputFiles);
+    void ReportLoopConnections(EnergyPlusData &state, IOFiles &ioFiles);
 
-    void ReportParentChildren(OutputFiles &outputFiles);
+    void ReportParentChildren(IOFiles &ioFiles);
 
-    void ReportCompSetMeterVariables(OutputFiles &outputFiles);
+    void ReportCompSetMeterVariables(IOFiles &ioFiles);
 
     void PostIPProcessing();
 

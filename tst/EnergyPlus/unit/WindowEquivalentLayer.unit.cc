@@ -76,8 +76,8 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/IOFiles.hh>
 #include <EnergyPlus/Material.hh>
-#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -179,8 +179,8 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
-    HeatBalanceManager::GetConstructData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
 
     int VBMatNum(0);
     for (int i = 1; i <= 4; i++) {
@@ -532,7 +532,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     WeatherManager::DetermineSunUpDown(DataEnvironment::SOLCOS);
     // get window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
+        if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
@@ -549,10 +549,10 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBMaximizeBeamSolar)
     // check that the slat angle control type is set to MaximizeSolar
     EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, state.dataWindowEquivalentLayer.lscVBPROF);
     // check the slat angle
-    EXPECT_NEAR(-71.0772, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    EXPECT_NEAR(-71.0772, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for MaximizeSolar slat angle control, the slat angle = -ve vertical profile angle
     DaylightingManager::ProfileAngle(SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
-    EXPECT_NEAR(-DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    EXPECT_NEAR(-DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
@@ -887,7 +887,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     WeatherManager::DetermineSunUpDown(DataEnvironment::SOLCOS);
     // get equivalent layer window surface index
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
+        if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }
@@ -904,13 +904,13 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBBlockBeamSolar)
     // check VB slat angle for BlockBeamSolar slat angle control
     EXPECT_EQ(dataMaterial.Material(VBMatNum).SlatAngleType, state.dataWindowEquivalentLayer.lscVBNOBM);
     // check the VB slat angle
-    EXPECT_NEAR(18.9228, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    EXPECT_NEAR(18.9228, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // check that for BlockBeamSolar slat angle control, the slat angle = 90 - ProfAngVer
     DaylightingManager::ProfileAngle(SurfNum, DataEnvironment::SOLCOS, DataHeatBalance::Horizontal, ProfAngVer);
-    EXPECT_NEAR(90.0 - DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    EXPECT_NEAR(90.0 - DataGlobals::RadToDeg * ProfAngVer, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
     // get the slat angle from profile angle
     Real64 SlateAngleBlockBeamSolar = VB_CriticalSlatAngle(DataGlobals::RadToDeg * ProfAngVer);
-    EXPECT_NEAR(SlateAngleBlockBeamSolar, DataSurfaces::SurfaceWindow(SurfNum).SlatAngThisTSDeg, 0.0001);
+    EXPECT_NEAR(SlateAngleBlockBeamSolar, DataSurfaces::SurfWinSlatAngThisTSDeg(SurfNum), 0.0001);
 }
 
 TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
@@ -932,12 +932,12 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.outputFiles, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotMaterials);
     EXPECT_EQ(dataMaterial.Material(1).Group, DataHeatBalance::WindowSimpleGlazing);
     // get construction returns error forund true due to invalid layer
-    GetConstructData(ErrorsFound);
+    GetConstructData(state.files, ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_EQ(1, DataWindowEquivalentLayer::TotWinEquivLayerConstructs);
     EXPECT_TRUE(dataConstruction.Construct(1).TypeIsWindow);
@@ -1945,7 +1945,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_VBEffectiveEmissivityTest)
     int ConstrNum(0);
 
     for (int iSurf = 1; iSurf <= DataSurfaces::TotSurfaces; iSurf++) {
-        if (DataSurfaces::SurfaceWindow(iSurf).WindowModelType == DataSurfaces::WindowEQLModel) {
+        if (DataSurfaces::SurfWinWindowModelType(iSurf) == DataSurfaces::WindowEQLModel) {
             SurfNum = iSurf;
             break;
         }

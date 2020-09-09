@@ -184,7 +184,7 @@ namespace EnergyPlus {
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
             // Do any initialization here
-            thisDomain.InitPipingSystems(state.dataBranchInputManager, this);
+            thisDomain.InitPipingSystems(state, this);
 
             // Update the temperature field
             thisDomain.PerformIterationLoop(this);
@@ -392,12 +392,12 @@ namespace EnergyPlus {
                 // Write eio header
                 static constexpr auto DomainCellsToEIOHeader(
                     "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
-                print(state.outputFiles.eio, DomainCellsToEIOHeader);
+                print(state.files.eio, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
                     static constexpr auto DomainCellsToEIO("{},{:5},{:5},{:5}\n");
-                    print(state.outputFiles.eio,
+                    print(state.files.eio,
                           DomainCellsToEIO,
                           thisDomain.Name,
                           thisDomain.NumDomainCells,
@@ -2107,7 +2107,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit) {
+        void Domain::InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2129,7 +2129,7 @@ namespace EnergyPlus {
                 }
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         thisCircuit->Name,
                                                         TypeToLookFor,
                                                         thisCircuit->LoopNum,

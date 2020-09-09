@@ -142,7 +142,7 @@ namespace SimAirServingZones {
 
     void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration); // TRUE if first full HVAC iteration in an HVAC timestep
 
-    void ConnectReturnNodes(ZonePlenumData &dataZonePlenum);
+    void ConnectReturnNodes(EnergyPlusData &state, ZonePlenumData &dataZonePlenum);
 
     // Begin Algorithm Section of the Module
     //******************************************************************************
@@ -177,12 +177,14 @@ namespace SimAirServingZones {
                              int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
                              HVACSystemData *CompPointer);
 
-    void UpdateBranchConnections(int const AirLoopNum, // primary air system number
+    void UpdateBranchConnections(EnergyPlusData &state,
+                                 int const AirLoopNum, // primary air system number
                                  int const BranchNum,  // branch reference number
                                  int const Update      // 1=BeforeBranchSim; 2=AfterBranchSim
     );
 
-    void ResolveSysFlow(int const SysNum, // the primary air system number
+    void ResolveSysFlow(EnergyPlusData &state,
+                        int const SysNum, // the primary air system number
                         bool &SysReSim    // Set to TRUE if mass balance fails and resimulation is needed
     );
 
@@ -192,9 +194,9 @@ namespace SimAirServingZones {
 
     void SetUpSysSizingArrays();
 
-    void SizeSysOutdoorAir();
+    void SizeSysOutdoorAir(EnergyPlusData &state);
 
-    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator);
+    void UpdateSysSizing(EnergyPlusData &state, int const CallIndicator);
 
     void UpdateSysSizingForScalableInputs(int const AirLoopNum);
 

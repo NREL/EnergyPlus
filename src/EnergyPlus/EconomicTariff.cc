@@ -66,7 +66,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -2866,7 +2866,7 @@ namespace EconomicTariff {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ComputeTariff()
+    void ComputeTariff(IOFiles &ioFiles)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   July 2004
@@ -2897,6 +2897,11 @@ namespace EconomicTariff {
         Real64 hugeValue;
         Real64 annualAggregate;
         int annualCnt;
+
+        if (!ioFiles.outputControl.tabular) {
+            WriteTabularFiles = false;
+            return;
+        }
 
         hugeValue = HUGE_(Real64());
         //  Clear the isEvaluated flags for all economics variables.
@@ -4070,7 +4075,7 @@ namespace EconomicTariff {
 
         if (numTariff > 0) {
             elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
-            gasFacilMeter = GetMeterIndex("GAS:FACILITY");
+            gasFacilMeter = GetMeterIndex("NATURALGAS:FACILITY");
             distCoolFacilMeter = GetMeterIndex("DISTRICTCOOLING:FACILITY");
             distHeatFacilMeter = GetMeterIndex("DISTRICTHEATING:FACILITY");
             elecTotalEne = 0.0;
@@ -4245,15 +4250,15 @@ namespace EconomicTariff {
                 //---------------------------------
                 WriteReportHeaders("Economics Results Summary Report", "Entire Facility", OutputProcessor::StoreType::Averaged);
                 elecFacilMeter = GetMeterIndex("ELECTRICITY:FACILITY");
-                gasFacilMeter = GetMeterIndex("GAS:FACILITY");
+                gasFacilMeter = GetMeterIndex("NATURALGAS:FACILITY");
                 //---- Annual Summary
                 rowHead.allocate(3);
                 columnHead.allocate(4);
                 columnWidth.allocate(4);
                 tableBody.allocate(4, 3);
                 tableBody = "";
-                columnHead(1) = "Electric";
-                columnHead(2) = "Gas";
+                columnHead(1) = "Electricity";
+                columnHead(2) = "Natural Gas";
                 columnHead(3) = "Other";
                 columnHead(4) = "Total";
                 rowHead(1) = "Cost [~~$~~]";
@@ -4299,8 +4304,8 @@ namespace EconomicTariff {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost");
                 }
                 columnHead.deallocate();
@@ -4356,8 +4361,8 @@ namespace EconomicTariff {
                     sqlite->createSQLiteTabularDataRecords(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
-                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
+                if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(
                         tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary");
                 }
                 columnHead.deallocate();
@@ -4437,9 +4442,9 @@ namespace EconomicTariff {
                         sqlite->createSQLiteTabularDataRecords(
                             tableBody, rowHead, columnHead, "Tariff Report", tariff(iTariff).tariffName, "General");
                     }
-                    if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                        ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report",
-                                                                                                tariff(iTariff).tariffName, "General");
+                    if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+                        ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report",
+                                                                                                    tariff(iTariff).tariffName, "General");
                     }
                     columnHead.deallocate();
                     rowHead.deallocate();
@@ -4816,9 +4821,9 @@ namespace EconomicTariff {
         if (sqlite) {
             sqlite->createSQLiteTabularDataRecords(tableBody, rowHead, columnHead, "Tariff Report", forString, titleString);
         }
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,
-                                                                                    titleString);
+        if (ResultsFramework::resultsFramework->timeSeriesAndTabularEnabled()) {
+            ResultsFramework::resultsFramework->TabularReportsCollection.addReportTable(tableBody, rowHead, columnHead, "Tariff Report", forString,
+                                                                                        titleString);
         }
         columnHead.deallocate();
         rowHead.deallocate();

@@ -57,11 +57,16 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
+    // Forward declarations
+    struct EnergyPlusData;
+    class IOFiles;
 
     // Forward declarations
     struct EnergyPlusData;
     struct ZonePlenumData;
     class OutputFiles;
+
+    void GeneralRoutines_clear_state();
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
@@ -113,7 +118,9 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
                        std::string const &CallString   // Context of this pair -- for error message
 );
 
-void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
+void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
+                                  ConvectionCoefficientsData &dataConvectionCoefficients,
+                                  IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]
                                   Real64 const Cv,              // Oriface coefficient for volume-based discharge, wind-driven [--]
@@ -151,11 +158,11 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
                           Real64 &Power              // Basin heater power (W)
 );
 
-void TestAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound);
+void TestAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
 
-void TestSupplyAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound);
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound);
 
-void TestReturnAirPathIntegrity(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrFound, Array2S_int ValRetAPaths);
+void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &ErrFound, Array2S_int ValRetAPaths);
 
 } // namespace EnergyPlus
 

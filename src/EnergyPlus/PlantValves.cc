@@ -125,7 +125,7 @@ namespace PlantValves {
 
     void TemperValveData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad),
                                    bool EP_UNUSED(RunFlag)) {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         this->calculate();
         PlantUtilities::SafeCopyPlantNode(this->PltInletNodeNum, this->PltOutletNodeNum);
         Real64 mdot = this->MixedMassFlowRate * this->FlowDivFract;
@@ -175,7 +175,7 @@ namespace PlantValves {
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int IOStatus;                    // Used in GetObjectItem
-        static bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
+        bool ErrorsFound(false);  // Set to true if errors in input, fatal at end of routine
         std::string CurrentModuleObject; // for ease in renaming.
 
         CurrentModuleObject = "TemperingValve";
@@ -226,7 +226,7 @@ namespace PlantValves {
         }
     }
 
-    void TemperValveData::initialize(BranchInputManagerData &dataBranchInputManager)
+    void TemperValveData::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,7 +264,7 @@ namespace PlantValves {
                 // Search thru PlantLoop Data Structure to check some things.
                 // Locate the component on the plant loops for later usage
                 errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_ValveTempering,
                                                         this->LoopNum,

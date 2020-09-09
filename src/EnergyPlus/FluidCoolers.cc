@@ -131,7 +131,7 @@ namespace FluidCoolers {
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool const RunFlag)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         if (this->FluidCoolerType_Num == DataPlant::TypeOf_FluidCooler_SingleSpd) {
             this->calcSingleSpeed();
         } else {
@@ -143,7 +143,7 @@ namespace FluidCoolers {
 
     void FluidCoolerspecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         this->size();
     }
 
@@ -407,15 +407,15 @@ namespace FluidCoolers {
         SetupOutputVariable("Cooling Tower Outlet Temperature", OutputProcessor::Unit::C, this->OutletWaterTemp, "System", "Average", this->Name);
         SetupOutputVariable("Cooling Tower Mass Flow Rate", OutputProcessor::Unit::kg_s, this->WaterMassFlowRate, "System", "Average", this->Name);
         SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
-        SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
-        SetupOutputVariable("Cooling Tower Fan Electric Energy",
+        SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->FanEnergy,
                             "System",
                             "Sum",
                             this->Name,
                             _,
-                            "Electric",
+                            "Electricity",
                             "HeatRejection",
                             _,
                             "Plant");
@@ -673,7 +673,7 @@ namespace FluidCoolers {
         return ErrorsFound;
     }
 
-    void FluidCoolerspecs::initialize(BranchInputManagerData &dataBranchInputManager)
+    void FluidCoolerspecs::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -703,7 +703,7 @@ namespace FluidCoolers {
             this->setupOutputVars();
 
             // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->FluidCoolerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {

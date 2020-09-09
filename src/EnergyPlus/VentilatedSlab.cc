@@ -66,7 +66,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -195,6 +194,8 @@ namespace VentilatedSlab {
     Array1D_bool CheckEquipName;
 
     // Autosizing variables
+    bool GetInputFlag(true);
+    bool MyOneTimeFlag(true);
     Array1D_bool MySizeFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
@@ -208,6 +209,8 @@ namespace VentilatedSlab {
 
     void clear_state()
     {
+        MyOneTimeFlag = true;
+        GetInputFlag = true;
         HCoilOn = false;
         NumOfVentSlabs = 0;
         OAMassFlowRate = 0.0;
@@ -251,7 +254,6 @@ namespace VentilatedSlab {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Item;                       // index of ventilated slab being simulated
-        static bool GetInputFlag(true); // First time, input is "gotten"
 
         // FLOW:
         if (GetInputFlag) {
@@ -903,7 +905,7 @@ namespace VentilatedSlab {
 
             if (HVACFan::checkIfFanNameIsAFanSystem(VentSlab(Item).FanName)) {
                 VentSlab(Item).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(VentSlab(Item).FanName));
+                HVACFan::fanObjs.emplace_back(new HVACFan::FanSystem(state, VentSlab(Item).FanName));
                 VentSlab(Item).Fan_Index = HVACFan::getFanObjectVectorIndex(VentSlab(Item).FanName);
             } else {
                 bool isNotOkay(false);
@@ -1296,14 +1298,14 @@ namespace VentilatedSlab {
                                 "System",
                                 "Average",
                                 VentSlab(Item).Name);
-            SetupOutputVariable("Zone Ventilated Slab Fan Electric Power",
+            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 VentSlab(Item).ElecFanPower,
                                 "System",
                                 "Average",
                                 VentSlab(Item).Name);
             //! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
-            SetupOutputVariable("Zone Ventilated Slab Fan Electric Energy",
+            SetupOutputVariable("Zone Ventilated Slab Fan Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 VentSlab(Item).ElecFanEnergy,
                                 "System",
@@ -1415,7 +1417,6 @@ namespace VentilatedSlab {
 
         int AirRelNode;  // relief air node number in Ventilated Slab loop
         int ColdConNode; // cold water control node number in Ventilated Slab loop
-        static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         static Array1D_bool MyEnvrnFlag;
         static Array1D_bool MyPlantScanFlag;
@@ -1473,7 +1474,7 @@ namespace VentilatedSlab {
             if ((VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         VentSlab(Item).HCoilName,
                                         VentSlab(Item).HCoil_PlantTypeNum,
                                         VentSlab(Item).HWLoopNum,
@@ -1500,7 +1501,7 @@ namespace VentilatedSlab {
             if ((VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                 (VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         VentSlab(Item).CCoilPlantName,
                                         VentSlab(Item).CCoil_PlantTypeNum,
                                         VentSlab(Item).CWLoopNum,
@@ -2473,7 +2474,6 @@ namespace VentilatedSlab {
         // USE STATEMENTS:
 
         // Using/Aliasing
-        using namespace DataZoneEnergyDemands;
         using DataEnvironment::CurMnDy;
         using DataEnvironment::EnvironmentName;
         using DataEnvironment::OutBaroPress;
@@ -3895,7 +3895,7 @@ namespace VentilatedSlab {
                 // the new SumHATsurf value for the zone.  Note that the difference between the new
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients, ZoneNum);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files, ZoneNum);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state, ZoneNum);
 
             } // SYSCONFIG. SLABONLY&SLABANDZONE
@@ -4135,7 +4135,7 @@ namespace VentilatedSlab {
                 // SumHATsurf and the value originally calculated by the heat balance with a zero
                 // source for all radiant systems in the zone is the load met by the system (approximately).
 
-                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state.dataConvectionCoefficients);
+                HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf(state, state.dataConvectionCoefficients, state.files);
                 HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf(state);
 
             } // SeriesSlabs
@@ -4590,22 +4590,22 @@ namespace VentilatedSlab {
             Area = Surface(SurfNum).Area;
 
             if (Surface(SurfNum).Class == SurfaceClass_Window) {
-                if (SurfaceWindow(SurfNum).ShadingFlag == IntShadeOn || SurfaceWindow(SurfNum).ShadingFlag == IntBlindOn) {
+                if (SurfWinShadingFlag(SurfNum) == IntShadeOn || SurfWinShadingFlag(SurfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-                    Area += SurfaceWindow(SurfNum).DividerArea;
+                    Area += SurfWinDividerArea(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).FrameArea > 0.0) {
+                if (SurfWinFrameArea(SurfNum) > 0.0) {
                     // Window frame contribution
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).FrameArea * (1.0 + SurfaceWindow(SurfNum).ProjCorrFrIn) *
-                                  SurfaceWindow(SurfNum).FrameTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinFrameArea(SurfNum) * (1.0 + SurfWinProjCorrFrIn(SurfNum)) *
+                                  SurfWinFrameTempSurfIn(SurfNum);
                 }
 
-                if (SurfaceWindow(SurfNum).DividerArea > 0.0 && SurfaceWindow(SurfNum).ShadingFlag != IntShadeOn &&
-                    SurfaceWindow(SurfNum).ShadingFlag != IntBlindOn) {
+                if (SurfWinDividerArea(SurfNum) > 0.0 && SurfWinShadingFlag(SurfNum) != IntShadeOn &&
+                    SurfWinShadingFlag(SurfNum) != IntBlindOn) {
                     // Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-                    SumHATsurf += HConvIn(SurfNum) * SurfaceWindow(SurfNum).DividerArea * (1.0 + 2.0 * SurfaceWindow(SurfNum).ProjCorrDivIn) *
-                                  SurfaceWindow(SurfNum).DividerTempSurfIn;
+                    SumHATsurf += HConvIn(SurfNum) * SurfWinDividerArea(SurfNum) * (1.0 + 2.0 * SurfWinProjCorrDivIn(SurfNum)) *
+                                  SurfWinDividerTempSurfIn(SurfNum);
                 }
             }
 

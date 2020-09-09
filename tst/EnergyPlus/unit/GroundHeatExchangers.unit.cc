@@ -235,12 +235,12 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_Slinky_CalcGroundHeatExchanger
     thisGLHE.SubAGG = 15;
 
     // Horizontal G-Functions
-    thisGLHE.calcGFunctions();
+    thisGLHE.calcGFunctions(state.files);
     EXPECT_NEAR(19.08237, thisGLHE.myRespFactors->GFNC(28), 0.0001);
 
     // Vertical G-Functions
     thisGLHE.verticalConfig = true;
-    thisGLHE.calcGFunctions();
+    thisGLHE.calcGFunctions(state.files);
     EXPECT_NEAR(18.91819, thisGLHE.myRespFactors->GFNC(28), 0.0001);
 }
 
@@ -1181,7 +1181,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -1198,7 +1198,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     thisGLHE.myRespFactors->maxSimYears = 1;
 
-    thisGLHE.calcGFunctions();
+    thisGLHE.calcGFunctions(state.files);
 
     Real64 const tolerance = 0.1;
 
@@ -1663,7 +1663,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -1967,7 +1967,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -2263,7 +2263,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -2561,7 +2561,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -2859,7 +2859,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -3157,7 +3157,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -3455,7 +3455,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);
@@ -3753,7 +3753,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput(state.outputFiles);
+    ProcessScheduleInput(state.files);
     ScheduleInputProcessed = true;
     GetPlantLoopData(state);
     GetPlantInput(state);

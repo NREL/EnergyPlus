@@ -113,6 +113,9 @@ namespace UserDefinedComponents {
 
     void clear_state()
     {
+        GetInput = true;
+        GetPlantCompInput = true;
+
         NumUserPlantComps = 0;
         NumUserCoils = 0;
         NumUserZoneAir = 0;
@@ -154,7 +157,7 @@ namespace UserDefinedComponents {
         Real64 myLoad = 0.0;
         int thisLoop = 0;
 
-        this->initialize(state.dataBranchInputManager, calledFromLocation.loopNum, myLoad);
+        this->initialize(state, calledFromLocation.loopNum, myLoad);
 
         for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
             if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
@@ -164,9 +167,10 @@ namespace UserDefinedComponents {
 
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
+                EMSManager::ManageEMS(
+                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlInitProgramMngr);
             } else if (this->Loop(thisLoop).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->Loop(thisLoop).initPluginLocation);
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).initPluginLocation);
             }
 
             PlantUtilities::InitComponentNodes(this->Loop(thisLoop).MassFlowRateMin,
@@ -229,26 +233,27 @@ namespace UserDefinedComponents {
             thisLoop = loop;
         }
 
-        this->initialize(state.dataBranchInputManager, thisLoop, CurLoad);
+        this->initialize(state, thisLoop, CurLoad);
 
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlSimProgramMngr > 0) {
-                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
+                EMSManager::ManageEMS(
+                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->Loop(thisLoop).ErlSimProgramMngr);
             } else if (this->Loop(thisLoop).simPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->Loop(thisLoop).simPluginLocation);
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->Loop(thisLoop).simPluginLocation);
             }
         }
 
         if (this->ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
+            EMSManager::ManageEMS(state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, this->ErlSimProgramMngr);
         } else if (this->simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this->simPluginLocation);
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this->simPluginLocation);
         }
 
         this->report(thisLoop);
     }
 
-    void SimCoilUserDefined(BranchInputManagerData &dataBranchInputManager,
+    void SimCoilUserDefined(EnergyPlusData &state,
                             std::string const &EquipName, // user name for component
                             int &CompIndex,
                             int const AirLoopNum,
@@ -293,9 +298,10 @@ namespace UserDefinedComponents {
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
             if (UserCoil(CompNum).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlInitProgramMngr);
+                EMSManager::ManageEMS(
+                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlInitProgramMngr);
             } else if (UserCoil(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserCoil(CompNum).initPluginLocation);
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserCoil(CompNum).initPluginLocation);
             }
 
             if (UserCoil(CompNum).PlantIsConnected) {
@@ -313,12 +319,12 @@ namespace UserDefinedComponents {
             }
         }
 
-        UserCoil(CompNum).initialize(dataBranchInputManager);
+        UserCoil(CompNum).initialize(state);
 
         if (UserCoil(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
+            EMSManager::ManageEMS(state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
         } else if (UserCoil(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserCoil(CompNum).simPluginLocation);
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserCoil(CompNum).simPluginLocation);
         }
 
         UserCoil(CompNum).report();
@@ -336,7 +342,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void SimZoneAirUserDefined(BranchInputManagerData &dataBranchInputManager,
+    void SimZoneAirUserDefined(EnergyPlusData &state,
                                std::string const &CompName,    // name of the packaged terminal heat pump
                                int const ZoneNum,              // number of zone being served
                                Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
@@ -381,12 +387,13 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            UserZoneAirHVAC(CompNum).initialize(dataBranchInputManager, ZoneNum);
+            UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
 
             if (UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
+                EMSManager::ManageEMS(
+                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlInitProgramMngr);
             } else if (UserZoneAirHVAC(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserZoneAirHVAC(CompNum).initPluginLocation);
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserZoneAirHVAC(CompNum).initPluginLocation);
             }
             if (UserZoneAirHVAC(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= UserZoneAirHVAC(CompNum).NumPlantConnections; ++Loop) {
@@ -407,12 +414,13 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        UserZoneAirHVAC(CompNum).initialize(dataBranchInputManager, ZoneNum);
+        UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
 
         if (UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
+            EMSManager::ManageEMS(
+                state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserZoneAirHVAC(CompNum).ErlSimProgramMngr);
         } else if (UserZoneAirHVAC(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserZoneAirHVAC(CompNum).simPluginLocation);
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserZoneAirHVAC(CompNum).simPluginLocation);
         }
 
         UserZoneAirHVAC(CompNum).report();
@@ -432,7 +440,7 @@ namespace UserDefinedComponents {
         LatentOutputProvided = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate, kg/s (dehumid = negative)
     }
 
-    void SimAirTerminalUserDefined(BranchInputManagerData &dataBranchInputManager,
+    void SimAirTerminalUserDefined(EnergyPlusData &state,
         std::string const &CompName, bool const EP_UNUSED(FirstHVACIteration), int const ZoneNum, int const EP_UNUSED(ZoneNodeNum), int &CompIndex)
     {
 
@@ -475,12 +483,13 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            UserAirTerminal(CompNum).initialize(dataBranchInputManager, ZoneNum);
+            UserAirTerminal(CompNum).initialize(state, ZoneNum);
 
             if (UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
-                EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
+                EMSManager::ManageEMS(
+                    state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlInitProgramMngr);
             } else if (UserAirTerminal(CompNum).initPluginLocation > -1) {
-                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserAirTerminal(CompNum).initPluginLocation);
+                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserAirTerminal(CompNum).initPluginLocation);
             }
             if (UserAirTerminal(CompNum).NumPlantConnections > 0) {
                 for (int Loop = 1; Loop <= UserAirTerminal(CompNum).NumPlantConnections; ++Loop) {
@@ -501,12 +510,13 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        UserAirTerminal(CompNum).initialize(dataBranchInputManager, ZoneNum);
+        UserAirTerminal(CompNum).initialize(state, ZoneNum);
 
         if (UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
-            EMSManager::ManageEMS(DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
+            EMSManager::ManageEMS(
+                state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserAirTerminal(CompNum).ErlSimProgramMngr);
         } else if (UserAirTerminal(CompNum).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(UserAirTerminal(CompNum).simPluginLocation);
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, UserAirTerminal(CompNum).simPluginLocation);
         }
 
         UserAirTerminal(CompNum).report();
@@ -2068,7 +2078,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserPlantComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager, int LoopNum, Real64 MyLoad)
+    void UserPlantComponentStruct::initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -2082,7 +2092,7 @@ namespace UserDefinedComponents {
             // locate the connections to the plant loops
             for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_PlantComponentUserDefined,
                                                         this->Loop(ConnectionNum).LoopNum,
@@ -2143,7 +2153,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserCoilComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager)
+    void UserCoilComponentStruct::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2157,7 +2167,7 @@ namespace UserDefinedComponents {
         if (this->myOneTimeFlag) {
             if (this->PlantIsConnected) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_CoilUserDefined,
                                                         this->Loop.LoopNum,
@@ -2212,7 +2222,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserZoneHVACForcedAirComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager, int const ZoneNum)
+    void UserZoneHVACForcedAirComponentStruct::initialize(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2230,7 +2240,7 @@ namespace UserDefinedComponents {
             if (this->NumPlantConnections > 0) {
                 for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                    PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
                                                             DataPlant::TypeOf_ZoneHVACAirUserDefined,
                                                             this->Loop(loop).LoopNum,
@@ -2302,7 +2312,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserAirTerminalComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager, int const ZoneNum)
+    void UserAirTerminalComponentStruct::initialize(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2317,7 +2327,7 @@ namespace UserDefinedComponents {
             if (this->NumPlantConnections > 0) {
                 for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                    PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
                                                             DataPlant::TypeOf_AirTerminalUserDefined,
                                                             this->Loop(loop).LoopNum,

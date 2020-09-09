@@ -54,7 +54,6 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
-#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -66,7 +65,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
+#include "IOFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -83,12 +82,13 @@ extern "C" {
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/ResultsFramework.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -106,6 +106,7 @@ namespace UtilityRoutines {
 
     void clear_state()
     {
+        outputErrorHeader = true;
         appendPerfLog_headerRow = "";
         appendPerfLog_valuesRow = "";
     }
@@ -430,7 +431,7 @@ namespace UtilityRoutines {
         return SameString(a, b);
     }
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn)
+    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn)
     // Add column to the performance log file (comma separated) which is appended to existing log.
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
@@ -448,27 +449,26 @@ namespace UtilityRoutines {
 
         if (finalColumn) {
             std::fstream fsPerfLog;
-            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); // open file normally
-                if (!fsPerfLog.fail()) {
+            if (!FileSystem::fileExists(DataStringGlobals::outputPerfLogFileName)) {
+                if (ioFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (write).");
+                    }
                     fsPerfLog << appendPerfLog_headerRow << std::endl;
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
-                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); // append to already existing file
-                if (!fsPerfLog.fail()) {
+                if (ioFiles.outputControl.perflog) {
+                    fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                    if (!fsPerfLog) {
+                        ShowFatalError("appendPerfLog: Could not open file \"" + DataStringGlobals::outputPerfLogFileName + "\" for output (append).");
+                    }
                     fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             }
             fsPerfLog.close();
         }
-    }
-
-    inline bool exists(const std::string &filename)
-    {
-        // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
-        struct stat buffer;
-        return (stat(filename.c_str(), &buffer) == 0);
     }
 
     bool ValidateFuelType(std::string const &FuelTypeInput,
@@ -485,10 +485,10 @@ namespace UtilityRoutines {
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
 
         } else if (SELECT_CASE_var == "DIESEL") {
             FuelTypeOutput = "Diesel";
@@ -500,10 +500,10 @@ namespace UtilityRoutines {
             FuelTypeOutput = "Coal";
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
+            FuelTypeOutput = "FuelOilNo1";
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
+            FuelTypeOutput = "FuelOilNo2";
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -572,11 +572,11 @@ namespace UtilityRoutines {
         auto const SELECT_CASE_var(FuelTypeInput);
 
         if (SELECT_CASE_var == "ELECTRICITY") {
-            FuelTypeOutput = "Electric";
+            FuelTypeOutput = "Electricity";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
         } else if (SELECT_CASE_var == "NATURALGAS") {
-            FuelTypeOutput = "Gas";
+            FuelTypeOutput = "NaturalGas";
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
         } else if (SELECT_CASE_var == "DIESEL") {
@@ -592,12 +592,12 @@ namespace UtilityRoutines {
             FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
         } else if (SELECT_CASE_var == "FUELOILNO1") {
-            FuelTypeOutput = "FuelOil#1";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
+            FuelTypeOutput = "FuelOilNo1";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO1");
 
         } else if (SELECT_CASE_var == "FUELOILNO2") {
-            FuelTypeOutput = "FuelOil#2";
-            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
+            FuelTypeOutput = "FuelOilNo2";
+            FuelTypeNum = DataGlobalConstants::AssignResourceTypeNum("FUELOILNO2");
 
         } else if (SELECT_CASE_var == "PROPANE") {
             FuelTypeOutput = "Propane";
@@ -691,13 +691,13 @@ namespace UtilityRoutines {
             AskForConnectionsReport = false; // Set false here in case any further fatal errors in below processing...
 
             ShowMessage("Fatal error -- final processing.  More error messages may appear.");
-            SetupNodeVarsForReporting(state.outputFiles);
+            SetupNodeVarsForReporting(state.files);
 
             ErrFound = false;
             TerminalError = false;
-            TestBranchIntegrity(state.dataBranchInputManager, state.outputFiles, ErrFound);
+            TestBranchIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(state, state.outputFiles, ErrFound);
+            TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;
@@ -707,8 +707,8 @@ namespace UtilityRoutines {
             if (ErrFound) TerminalError = true;
 
             if (!TerminalError) {
-                ReportAirLoopConnections(state.outputFiles);
-                ReportLoopConnections(state.outputFiles);
+                ReportAirLoopConnections(state, state.files);
+                ReportLoopConnections(state, state.files);
             }
 
         } else if (!ExitDuringSimulations) {
@@ -717,14 +717,14 @@ namespace UtilityRoutines {
         }
 
         if (AskForSurfacesReport) {
-            ReportSurfaces(state.outputFiles);
+            ReportSurfaces(state.files);
         }
 
         ReportSurfaceErrors();
         CheckPlantOnAbort();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(state.outputFiles);
+        CloseMiscOpenFiles(state.files);
         NumWarnings = fmt::to_string(TotalWarningErrors);
         NumSevere = fmt::to_string(TotalSevereErrors);
         NumWarningsDuringWarmup = fmt::to_string(TotalWarningErrorsDuringWarmup);
@@ -748,10 +748,10 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -762,7 +762,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = state.outputFiles.endFile.try_open();
+            auto tempfl = state.files.endFile.try_open(state.files.outputControl.end);
 
             if (!tempfl.good()) {
                 DisplayString("AbortEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
@@ -775,29 +775,22 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(state.files.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
-        }
+        ResultsFramework::resultsFramework->writeOutputs(state.files);
 
 #ifdef EP_Detailed_Timings
-        epSummaryTimes(state.outputFiles.audit, Time_Finish - Time_Start);
+        epSummaryTimes(state.files.audit, Time_Finish - Time_Start);
 #endif
         std::cerr << "Program terminated: "
                   << "EnergyPlus Terminated--Error(s) Detected." << std::endl;
-        CloseOutOpenFiles();
         // Close the socket used by ExternalInterface. This call also sends the flag "-1" to the ExternalInterface,
         // indicating that E+ terminated with an error.
         if (NumExternalInterfaces > 0) CloseSocket(-1);
         return EXIT_FAILURE;
     }
 
-    void CloseMiscOpenFiles(OutputFiles &outputFiles)
+    void CloseMiscOpenFiles(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -837,82 +830,17 @@ namespace UtilityRoutines {
         //      INTEGER :: UnitNumber
         //      INTEGER :: ios
 
-        CloseReportIllumMaps(outputFiles);
-        CloseDFSFile(outputFiles);
+        CloseReportIllumMaps(ioFiles);
+        CloseDFSFile(ioFiles);
 
-        if (DebugOutput || outputFiles.debug.position() > 0) {
-            outputFiles.debug.close();
+        if (DebugOutput || ioFiles.debug.position() > 0) {
+            ioFiles.debug.close();
         } else {
-            outputFiles.debug.del();
+            ioFiles.debug.del();
         }
     }
 
-    void CloseOutOpenFiles()
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   April 2012
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // This subroutine scans potential unit numbers and closes
-        // any that are still open.
-
-        // METHODOLOGY EMPLOYED:
-        // Use INQUIRE to determine if file is open.
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-        bool exists;
-        bool opened;
-        std::string name;
-        const std::string stdin_name("stdin");
-        const std::string stdout_name("stdout");
-        const std::string stderr_name("stderr");
-        bool not_special(false);
-        int UnitNumber;
-        int ios;
-
-        for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(UnitNumber, flags);
-                exists = flags.exists();
-                opened = flags.open();
-                ios = flags.ios();
-                name = flags.name();
-            }
-            if (exists && opened && ios == 0) {
-                not_special = name.compare(stdin_name) != 0;
-                not_special = not_special && (name.compare(stdout_name) != 0);
-                not_special = not_special && (name.compare(stderr_name) != 0);
-                if (not_special) ObjexxFCL::gio::close(UnitNumber);
-            }
-        }
-    }
-
-    int EndEnergyPlus(OutputFiles &outputFiles)
+    int EndEnergyPlus(IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -972,7 +900,7 @@ namespace UtilityRoutines {
         ReportSurfaceErrors();
         ShowRecurringErrors();
         SummarizeErrors();
-        CloseMiscOpenFiles(outputFiles);
+        CloseMiscOpenFiles(ioFiles);
         NumWarnings = RoundSigDigits(TotalWarningErrors);
         strip(NumWarnings);
         NumSevere = RoundSigDigits(TotalSevereErrors);
@@ -990,7 +918,7 @@ namespace UtilityRoutines {
         if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
         Elapsed_Time = Time_Finish - Time_Start;
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
         }
 #ifdef EP_Detailed_Timings
         epStopTime("EntireRun=");
@@ -1003,15 +931,15 @@ namespace UtilityRoutines {
         if (Seconds < 0.0) Seconds = 0.0;
         const auto Elapsed = format("{:02}hr {:02}min {:5.2F}sec", Hours, Minutes, Seconds);
 
-        ResultsFramework::OutputSchema->SimulationInformation.setRunTime(Elapsed);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
-        ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+        ResultsFramework::resultsFramework->SimulationInformation.setRunTime(Elapsed);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
+        ResultsFramework::resultsFramework->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
         if (DataGlobals::createPerfLog) {
-            UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
-            UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-            UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); // last item so write the perfLog file
+            UtilityRoutines::appendPerfLog(ioFiles, "Run Time [string]", Elapsed);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Warnings", NumWarnings);
+            UtilityRoutines::appendPerfLog(ioFiles, "Number of Severe", NumSevere, true); // last item so write the perfLog file
         }
         ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                     " Severe Errors.");
@@ -1021,7 +949,7 @@ namespace UtilityRoutines {
         DisplayString("EnergyPlus Run Time=" + Elapsed);
 
         {
-            auto tempfl = outputFiles.endFile.try_open();
+            auto tempfl = ioFiles.endFile.try_open(ioFiles.outputControl.end);
             if (!tempfl.good()) {
                 DisplayString("EndEnergyPlus: Could not open file " + tempfl.fileName + " for output (write).");
             }
@@ -1029,201 +957,18 @@ namespace UtilityRoutines {
         }
 
         // Output detailed ZONE time series data
-        SimulationManager::OpenOutputJsonFiles();
+        SimulationManager::OpenOutputJsonFiles(ioFiles.json);
 
-        if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
-            ResultsFramework::OutputSchema->writeTimeSeriesReports();
-        }
-
-        if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-            ResultsFramework::OutputSchema->WriteReport();
-        }
+        ResultsFramework::resultsFramework->writeOutputs(ioFiles);
 
 #ifdef EP_Detailed_Timings
         epSummaryTimes(Time_Finish - Time_Start);
 #endif
         std::cerr << "EnergyPlus Completed Successfully." << std::endl;
-        CloseOutOpenFiles();
         // Close the ExternalInterface socket. This call also sends the flag "1" to the ExternalInterface,
         // indicating that E+ finished its simulation
         if ((NumExternalInterfaces > 0) && haveExternalInterfaceBCVTB) CloseSocket(1);
         return EXIT_SUCCESS;
-    }
-
-    int GetNewUnitNumber()
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie, adapted from reference
-        //       DATE WRITTEN   September 1997
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number of a unit that can exist and is not connected.  Note
-        // this routine does not magically mark that unit number in use.  In order to
-        // have the unit "used", the source code must OPEN the file.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        //	// Return value
-        //	int UnitNumber; // Result from scanning currently open files
-        //
-        //	// Locals
-        //	// FUNCTION ARGUMENT DEFINITIONS:
-        //
-        //	// FUNCTION PARAMETER DEFINITIONS:
-        //	//  IO Status Values:
-        //
-        //	int const END_OF_RECORD( -2 );
-        //	int const END_OF_FILE( -1 );
-        //
-        //	//  Indicate default input and output units:
-        //
-        //	int const DEFAULT_INPUT_UNIT( 5 );
-        //	int const DEFAULT_OUTPUT_UNIT( 6 );
-        //
-        //	//  Indicate number and value of preconnected units
-        //
-        //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-        //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
-        //
-        //	//  Largest allowed unit number (or a large number, if none)
-        //	int const MaxUnitNumber( 1000 );
-        //
-        //	// INTERFACE BLOCK SPECIFICATIONS
-        //	// na
-        //
-        //	// DERIVED TYPE DEFINITIONS
-        //	// na
-        //
-        //	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-        //	bool exists; // File exists
-        //	bool opened; // Unit is open
-        //	int ios; // return value from Inquire intrinsic
-        //
-        //	for ( UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber ) {
-        //		if ( UnitNumber == DEFAULT_INPUT_UNIT || UnitNumber == DEFAULT_OUTPUT_UNIT ) continue;
-        //		if ( any_eq( UnitNumber, PRECONNECTED_UNITS ) ) continue;
-        //		{ IOFlags flags; ObjexxFCL::gio::inquire( UnitNumber, flags ); exists = flags.exists(); opened = flags.open(); ios =
-        //flags.ios(); } 		if ( exists && ! opened && ios == 0 ) return UnitNumber; // result is set in UnitNumber
-        //	}
-        //
-        //	UnitNumber = -1;
-        //
-        //	return UnitNumber;
-
-        return ObjexxFCL::gio::get_unit(); // Autodesk:Note ObjexxFCL::gio system provides this (and protects the F90+ preconnected units
-                                           // {100,101,102})
-    }
-
-    int FindUnitNumber(std::string const &FileName) // File name to be searched.
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   September 1997, adapted from reference
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // Returns a unit number for the file name that is either opened or exists.
-
-        // METHODOLOGY EMPLOYED:
-        // Use Inquire function to find out if proposed unit: exists or is opened.
-        // If not, can be used for a new unit number.
-
-        // REFERENCES:
-        // Copyright (c) 1994 Unicomp, Inc.  All rights reserved.
-        // Developed at Unicomp, Inc.
-        // Permission to use, copy, modify, and distribute this
-        // software is freely granted, provided that this notice
-        // is preserved.
-
-        // USE STATEMENTS:
-        // na
-
-        // Return value
-        int UnitNumber; // Unit number that should be used
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        //  Largest allowed unit number (or a large number, if none)
-        int const MaxUnitNumber(1000);
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string TestFileName; // File name returned from opened file
-        bool exists;              // True if file already exists
-        bool opened;              // True if file is open
-        int ios;                  // Status indicator from INQUIRE intrinsic
-
-        {
-            IOFlags flags;
-            ObjexxFCL::gio::inquire(FileName, flags);
-            exists = flags.exists();
-            opened = flags.open();
-            ios = flags.ios();
-        }
-        if (!opened) {
-            UnitNumber = GetNewUnitNumber();
-            {
-                IOFlags flags;
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(UnitNumber, FileName, flags);
-                ios = flags.ios();
-            }
-            if (ios != 0) {
-                DisplayString("FindUnitNumber: Could not open file \"" + FileName + "\" for append.");
-            }
-        } else {
-            std::string::size_type const FileNameLength = len(FileName);
-            std::string::size_type TestFileLength;
-            std::string::size_type Pos; // Position pointer
-            for (UnitNumber = 1; UnitNumber <= MaxUnitNumber; ++UnitNumber) {
-                // Skip preassigned units - ObjexxFCL::gio::inquire breaks std::cout on Windows - these units are assigned in objexx\GlobalStreams
-                // constructor
-                if ((UnitNumber == 0) || (UnitNumber == 5) || (UnitNumber == 6) || (UnitNumber == 100) || (UnitNumber == 101) ||
-                    (UnitNumber == 102)) {
-                    continue;
-                }
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(UnitNumber, flags);
-                    TestFileName = flags.name();
-                    opened = flags.open();
-                }
-                //  Powerstation returns just file name
-                //  DVF (Digital Fortran) returns whole path
-                TestFileLength = len(TestFileName);
-                Pos = index(TestFileName, FileName);
-                if (Pos != std::string::npos) {
-                    //  Must be the last part of the file
-                    if (Pos + FileNameLength == TestFileLength) break;
-                }
-            }
-        }
-
-        return UnitNumber;
     }
 
     void ConvertCaseToUpper(std::string const &InputString, // Input string
@@ -1430,6 +1175,9 @@ namespace UtilityRoutines {
             sqlite->createSQLiteErrorRecord(1, 2, ErrorMessage, 1);
             if (sqlite->sqliteWithinTransaction()) sqlite->sqliteCommit();
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Fatal, ErrorMessage);
+        }
         throw FatalError(ErrorMessage);
     }
 
@@ -1488,6 +1236,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
     void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1541,6 +1292,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 1, ErrorMessage, 0);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Severe, ErrorMessage);
+        }
     }
 
     void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1580,6 +1334,9 @@ namespace UtilityRoutines {
         ShowErrorMessage(" **   ~~~   ** " + Message, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->updateSQLiteErrorRecord(Message);
+        }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Continue, Message);
         }
     }
 
@@ -1637,23 +1394,31 @@ namespace UtilityRoutines {
         }
 
         if (len(Message) < 50) {
-            ShowErrorMessage(" **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                                 CreateSysTimeIntervalString();
+            ShowErrorMessage(" **   ~~~   ** " + m,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
             }
         } else {
-            ShowErrorMessage(" **   ~~~   ** " + Message);
-            ShowErrorMessage(" **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                 CreateSysTimeIntervalString(),
+            const auto m = " **   ~~~   ** " + Message;
+            const auto postfix = " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
+                CreateSysTimeIntervalString();
+            ShowErrorMessage(m);
+            ShowErrorMessage(postfix,
                              OutUnit1,
                              OutUnit2);
             if (sqlite) {
-                sqlite->updateSQLiteErrorRecord(Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' +
-                                                CreateSysTimeIntervalString());
+                sqlite->updateSQLiteErrorRecord(m);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Continue, m);
+                DataGlobals::errorCallback(Error::Continue, postfix);
             }
         }
     }
@@ -1698,6 +1463,9 @@ namespace UtilityRoutines {
             ShowErrorMessage(" ************* " + Message, OutUnit1, OutUnit2);
             if (sqlite) {
                 sqlite->createSQLiteErrorRecord(1, -1, Message, 0);
+            }
+            if (DataGlobals::errorCallback) {
+                DataGlobals::errorCallback(Error::Info, Message);
             }
         }
     }
@@ -1754,6 +1522,9 @@ namespace UtilityRoutines {
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 1);
         }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
+        }
     }
 
     void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
@@ -1783,6 +1554,9 @@ namespace UtilityRoutines {
         ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
         if (sqlite) {
             sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
+        }
+        if (DataGlobals::errorCallback) {
+            DataGlobals::errorCallback(Error::Warning, ErrorMessage);
         }
     }
 
@@ -2057,7 +1831,6 @@ namespace UtilityRoutines {
 
         // Using/Aliasing
         using DataGlobals::DoingInputProcessing;
-        using DataGlobals::err_stream;
         using DataStringGlobals::IDDVerString;
         using DataStringGlobals::VerString;
 
@@ -2075,13 +1848,24 @@ namespace UtilityRoutines {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
+        auto *err_stream = []() -> std::ostream *{
+            // NOTE: this is called in too many places to justify changing the interface right now,
+            // so we are using the Singleton (not ideal)
+            if (IOFiles::hasSingleton()) {
+                return IOFiles::getSingleton().err_stream.get();
+            } else {
+                return nullptr;
+            }
+        }();
+
+
         if (UtilityRoutines::outputErrorHeader && err_stream) {
-            *err_stream << "Program Version," + VerString + ',' + IDDVerString + DataStringGlobals::NL;
+            *err_stream << "Program Version," << VerString << ',' << IDDVerString << '\n';
             UtilityRoutines::outputErrorHeader = false;
         }
 
         if (!DoingInputProcessing) {
-            if (err_stream) *err_stream << "  " << ErrorMessage << DataStringGlobals::NL;
+           if (err_stream) *err_stream << "  " << ErrorMessage << '\n';
         } else {
             // CacheIPErrorFile is never opened or closed
             // so this output would just go to stdout
@@ -2094,8 +1878,8 @@ namespace UtilityRoutines {
         if (present(OutUnit2)) {
             print(OutUnit2(), "  {}", ErrorMessage);
         }
-        std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
-        if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
+        // std::string tmp = "  " + ErrorMessage + '\n';
+        // if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
     }
 
     void SummarizeErrors()
@@ -2217,18 +2001,32 @@ namespace UtilityRoutines {
                     if (sqlite) {
                         sqlite->updateSQLiteErrorRecord(error.Message);
                     }
+                    if (DataGlobals::errorCallback) {
+                        DataGlobals::errorCallback(Error::Continue, error.Message);
+                    }
                 } else {
+                    const auto warning = has_prefix(error.Message, " ** Warning ** ");
+                    const auto severe = has_prefix(error.Message, " ** Severe  ** ");
+
                     ShowMessage("");
                     ShowMessage(error.Message);
                     ShowMessage(StatMessageStart + "  This error occurred " + RoundSigDigits(error.Count) + " total times;");
                     ShowMessage(StatMessageStart + "  during Warmup " + RoundSigDigits(error.WarmupCount) + " times;");
                     ShowMessage(StatMessageStart + "  during Sizing " + RoundSigDigits(error.SizingCount) + " times.");
                     if (sqlite) {
-                        if (has_prefix(error.Message, " ** Warning ** ")) {
+                        if (warning) {
                             sqlite->createSQLiteErrorRecord(1, 0, error.Message.substr(15), error.Count);
-                        } else if (has_prefix(error.Message, " ** Severe  ** ")) {
+                        } else if (severe) {
                             sqlite->createSQLiteErrorRecord(1, 1, error.Message.substr(15), error.Count);
                         }
+                    }
+                    if (DataGlobals::errorCallback) {
+                        Error level = Error::Warning;
+                        if (severe) {
+                            level = Error::Severe;
+                        }
+                        DataGlobals::errorCallback(level, error.Message);
+                        DataGlobals::errorCallback(Error::Continue, "");
                     }
                 }
                 StatMessage = "";

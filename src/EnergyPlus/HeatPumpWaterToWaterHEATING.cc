@@ -178,7 +178,7 @@ namespace HeatPumpWaterToWaterHEATING {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_HPWaterPEHeating,
                                                     this->SourceLoopNum,
@@ -191,7 +191,7 @@ namespace HeatPumpWaterToWaterHEATING {
                                                     _,
                                                     this->SourceSideInletNodeNum,
                                                     _);
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_HPWaterPEHeating,
                                                     this->LoadLoopNum,
@@ -389,13 +389,13 @@ namespace HeatPumpWaterToWaterHEATING {
 
         // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Heating'
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
-            SetupOutputVariable("Heat Pump Electric Power",
+            SetupOutputVariable("Heat Pump Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).Power,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Heat Pump Electric Energy",
+            SetupOutputVariable("Heat Pump Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).Energy,
                                 "System",

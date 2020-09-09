@@ -327,7 +327,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     std::string const idf_objects = delimited_string({
         "  UtilityCost:Tariff,                                                       ",
         "    ExampleTariff,           !- Name                                        ",
-        "    Gas:Facility,            !- Output Meter Name                           ",
+        "    NaturalGas:Facility,     !- Output Meter Name                           ",
         "    CCF,                     !- Conversion Factor Choice                    ",
         "    ,                        !- Energy Conversion Factor                    ",
         "    ,                        !- Demand Conversion Factor                    ",
@@ -343,8 +343,8 @@ TEST_F(EnergyPlusFixture, EconomicTariff_Gas_CCF_Test)
     // Create a water meter
     NumEnergyMeters = 1;
     EnergyMeters.allocate(NumEnergyMeters);
-    EnergyMeters(1).Name = "GAS:FACILITY";
-    EnergyMeters(1).ResourceType = "GAS";
+    EnergyMeters(1).Name = "NATURALGAS:FACILITY";
+    EnergyMeters(1).ResourceType = "NATURALGAS";
 
     UpdateUtilityBills(state.dataCostEstimateManager);;
 
@@ -409,7 +409,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_LEEDtariffReporting_Test)
     NumEnergyMeters = 4;
     EnergyMeters.allocate(NumEnergyMeters);
     EnergyMeters(1).Name = "ELECTRICITY:FACILITY";
-    EnergyMeters(2).Name = "GAS:FACILITY";
+    EnergyMeters(2).Name = "NATURALGAS:FACILITY";
     EnergyMeters(3).Name = "DISTRICTCOOLING:FACILITY";
     EnergyMeters(4).Name = "DISTRICTHEATING:FACILITY";
 
@@ -588,7 +588,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataGlobals::TimeStepZone = 0.25;
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
 
-    ScheduleManager::ProcessScheduleInput(state.outputFiles); // read schedules
+    ScheduleManager::ProcessScheduleInput(state.files); // read schedules
     ExteriorEnergyUse::ManageExteriorEnergyUse(state.exteriorEnergyUse);
     EXPECT_EQ(1, state.exteriorEnergyUse.NumExteriorLights);
     EXPECT_EQ(1000, state.exteriorEnergyUse.ExteriorLights(1).DesignLevel);
