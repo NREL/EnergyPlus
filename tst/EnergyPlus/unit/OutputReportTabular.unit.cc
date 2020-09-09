@@ -8278,3 +8278,21 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     EXPECT_EQ(lightDelaySeqCool1, lightDelaySeqCool2);
     EXPECT_EQ(feneSolarDelaySeqCool1, feneSolarDelaySeqCool2);
 }
+
+TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
+{
+
+    GetInputFuelAndPollutionFactors();
+
+    EXPECT_EQ(sourceFactorElectric, 3.167);
+    EXPECT_EQ(sourceFactorNaturalGas, 1.084);
+    EXPECT_EQ(sourceFactorSteam, 1.2);
+    EXPECT_EQ(sourceFactorGasoline, 1.05);
+    EXPECT_EQ(sourceFactorDiesel, 1.05);
+    EXPECT_EQ(sourceFactorCoal, 1.05);
+    EXPECT_EQ(sourceFactorFuelOil1, 1.05);
+    EXPECT_EQ(sourceFactorFuelOil2, 1.05);
+    EXPECT_EQ(sourceFactorPropane, 1.05);
+    EXPECT_EQ(sourceFactorOtherFuel1, 1.0);
+    EXPECT_EQ(sourceFactorOtherFuel2, 1.0);
+}
