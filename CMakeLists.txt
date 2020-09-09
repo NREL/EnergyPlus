@@ -184,6 +184,7 @@ INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Si
 INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
 INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
 INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/ssc )
 if( OPENGL_FOUND )
     INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/penumbra/include )
 endif()
@@ -244,6 +245,13 @@ ENDIF()
 
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
 set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-CalcEngine)
+
+set(skip_tools 1)
+set(skip_tests 1)
+ADD_SUBDIRECTORY(third_party/ssc)
+unset(skip_tools)
+unset(skip_tests)
+set_target_properties(ssc PROPERTIES FOLDER ThirdParty/ssc)
 
 # Btwxt
 INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
