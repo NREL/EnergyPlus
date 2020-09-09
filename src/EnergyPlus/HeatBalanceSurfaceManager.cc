@@ -2709,27 +2709,31 @@ namespace HeatBalanceSurfaceManager {
             //        DifIncInsSurfIntensRep(SurfNum)
             //      DifIncInsSurfAmountRepEnergy(SurfNum) = DifIncInsSurfAmountRep(SurfNum) * TimeStepZoneSec
             //    END DO
-            for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                if (Surface(SurfNum).Class != SurfaceClass_Shading) continue;
-                // Cosine of incidence angle and solar incident on outside of surface, for reporting
-                Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
-                SurfCosIncidenceAngle(SurfNum) = CosInc;
-                // Incident direct (unreflected) beam
-                SurfQRadSWOutIncidentBeam(SurfNum) = BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, SurfNum) * CosInc;
-                // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-                SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
-                // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
-                SurfQRadSWOutIncidentGndDiffuse(SurfNum) = SurfGndSolarInc(SurfNum);
-                // Incident diffuse solar from beam-to-diffuse reflection from ground
-                SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) = BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
-                // Incident diffuse solar from sky diffuse reflection from ground
-                SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = DifSolarRad * GndReflectance * SkyDiffReflFacGnd(SurfNum);
-                // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
-                // in SkySolarInc.
-                SurfQRadSWOutIncident(SurfNum) =
-                        SurfQRadSWOutIncidentBeam(SurfNum) + SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
-                        SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
+            if (BuildingShadingCount || FixedShadingCount || AttachedShadingCount) {
+                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+                    if (!Surface(SurfNum).ShadowingSurf) continue;
+                    // Cosine of incidence angle and solar incident on outside of surface, for reporting
+                    Real64 CosInc = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                    SurfCosIncidenceAngle(SurfNum) = CosInc;
+                    // Incident direct (unreflected) beam
+                    SurfQRadSWOutIncidentBeam(SurfNum) =
+                            BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, SurfNum) * CosInc;
+                    // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
+                    SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
+                    // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
+                    SurfQRadSWOutIncidentGndDiffuse(SurfNum) = SurfGndSolarInc(SurfNum);
+                    // Incident diffuse solar from beam-to-diffuse reflection from ground
+                    SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) =
+                            BeamSolarRad * SOLCOS(3) * GndReflectance * BmToDiffReflFacGnd(SurfNum);
+                    // Incident diffuse solar from sky diffuse reflection from ground
+                    SurfQRadSWOutIncSkyDiffReflGnd(SurfNum) = DifSolarRad * GndReflectance * SkyDiffReflFacGnd(SurfNum);
+                    // Total incident solar. Beam and sky reflection from obstructions, if calculated, is included
+                    // in SkySolarInc.
+                    SurfQRadSWOutIncident(SurfNum) =
+                            SurfQRadSWOutIncidentBeam(SurfNum) + SurfQRadSWOutIncidentSkyDiffuse(SurfNum) +
+                            SurfQRadSWOutIncBmToDiffReflGnd(SurfNum) + SurfQRadSWOutIncSkyDiffReflGnd(SurfNum);
 
+                }
             }
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 int const firstSurf = Zone(zoneNum).SurfaceFirst;
