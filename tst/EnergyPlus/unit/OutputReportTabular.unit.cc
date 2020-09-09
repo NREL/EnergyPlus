@@ -8286,7 +8286,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 
     EXPECT_EQ(sourceFactorElectric, 3.167);
     EXPECT_EQ(sourceFactorNaturalGas, 1.084);
-    EXPECT_EQ(sourceFactorSteam, 1.2);
+    EXPECT_EQ(sourceFactorSteam, 1.21);
     EXPECT_EQ(sourceFactorGasoline, 1.05);
     EXPECT_EQ(sourceFactorDiesel, 1.05);
     EXPECT_EQ(sourceFactorCoal, 1.05);
