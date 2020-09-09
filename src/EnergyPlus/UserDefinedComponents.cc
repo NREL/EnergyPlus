@@ -157,7 +157,7 @@ namespace UserDefinedComponents {
         Real64 myLoad = 0.0;
         int thisLoop = 0;
 
-        this->initialize(state.dataBranchInputManager, calledFromLocation.loopNum, myLoad);
+        this->initialize(state, calledFromLocation.loopNum, myLoad);
 
         for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
             if (calledFromLocation.loopNum != this->Loop(loop).LoopNum) continue;
@@ -233,7 +233,7 @@ namespace UserDefinedComponents {
             thisLoop = loop;
         }
 
-        this->initialize(state.dataBranchInputManager, thisLoop, CurLoad);
+        this->initialize(state, thisLoop, CurLoad);
 
         if (thisLoop > 0) {
             if (this->Loop(thisLoop).ErlSimProgramMngr > 0) {
@@ -319,7 +319,7 @@ namespace UserDefinedComponents {
             }
         }
 
-        UserCoil(CompNum).initialize(state.dataBranchInputManager);
+        UserCoil(CompNum).initialize(state);
 
         if (UserCoil(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(state, DataGlobals::emsCallFromUserDefinedComponentModel, anyEMSRan, UserCoil(CompNum).ErlSimProgramMngr);
@@ -387,7 +387,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            UserZoneAirHVAC(CompNum).initialize(state.dataBranchInputManager, ZoneNum);
+            UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
 
             if (UserZoneAirHVAC(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(
@@ -414,7 +414,7 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        UserZoneAirHVAC(CompNum).initialize(state.dataBranchInputManager, ZoneNum);
+        UserZoneAirHVAC(CompNum).initialize(state, ZoneNum);
 
         if (UserZoneAirHVAC(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(
@@ -483,7 +483,7 @@ namespace UserDefinedComponents {
         }
         bool anyEMSRan;
         if (DataGlobals::BeginEnvrnFlag) {
-            UserAirTerminal(CompNum).initialize(state.dataBranchInputManager, ZoneNum);
+            UserAirTerminal(CompNum).initialize(state, ZoneNum);
 
             if (UserAirTerminal(CompNum).ErlInitProgramMngr > 0) {
                 EMSManager::ManageEMS(
@@ -510,7 +510,7 @@ namespace UserDefinedComponents {
 
         } // BeginEnvrnFlag
 
-        UserAirTerminal(CompNum).initialize(state.dataBranchInputManager, ZoneNum);
+        UserAirTerminal(CompNum).initialize(state, ZoneNum);
 
         if (UserAirTerminal(CompNum).ErlSimProgramMngr > 0) {
             EMSManager::ManageEMS(
@@ -2078,7 +2078,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserPlantComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager, int LoopNum, Real64 MyLoad)
+    void UserPlantComponentStruct::initialize(EnergyPlusData &state, int LoopNum, Real64 MyLoad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         <author>
@@ -2092,7 +2092,7 @@ namespace UserDefinedComponents {
             // locate the connections to the plant loops
             for (int ConnectionNum = 1; ConnectionNum <= this->NumPlantConnections; ++ConnectionNum) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_PlantComponentUserDefined,
                                                         this->Loop(ConnectionNum).LoopNum,
@@ -2153,7 +2153,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserCoilComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager)
+    void UserCoilComponentStruct::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2167,7 +2167,7 @@ namespace UserDefinedComponents {
         if (this->myOneTimeFlag) {
             if (this->PlantIsConnected) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_CoilUserDefined,
                                                         this->Loop.LoopNum,
@@ -2222,7 +2222,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserZoneHVACForcedAirComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager, int const ZoneNum)
+    void UserZoneHVACForcedAirComponentStruct::initialize(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2240,7 +2240,7 @@ namespace UserDefinedComponents {
             if (this->NumPlantConnections > 0) {
                 for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                    PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
                                                             DataPlant::TypeOf_ZoneHVACAirUserDefined,
                                                             this->Loop(loop).LoopNum,
@@ -2312,7 +2312,7 @@ namespace UserDefinedComponents {
         }
     }
 
-    void UserAirTerminalComponentStruct::initialize(BranchInputManagerData &dataBranchInputManager, int const ZoneNum)
+    void UserAirTerminalComponentStruct::initialize(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2327,7 +2327,7 @@ namespace UserDefinedComponents {
             if (this->NumPlantConnections > 0) {
                 for (int loop = 1; loop <= this->NumPlantConnections; ++loop) {
                     bool errFlag = false;
-                    PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                    PlantUtilities::ScanPlantLoopsForObject(state,
                                                             this->Name,
                                                             DataPlant::TypeOf_AirTerminalUserDefined,
                                                             this->Loop(loop).LoopNum,

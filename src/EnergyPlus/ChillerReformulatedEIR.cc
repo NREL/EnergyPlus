@@ -121,7 +121,7 @@ namespace ChillerReformulatedEIR {
     {
         // Process the input data if it hasn't been done already
         if (state.dataChillerReformulatedEIR.GetInputREIR) {
-            GetElecReformEIRChillerInput(state, state.dataChillerReformulatedEIR);
+            GetElecReformEIRChillerInput(state);
             state.dataChillerReformulatedEIR.GetInputREIR = false;
         }
         // Now look for this particular object in the list
@@ -164,7 +164,7 @@ namespace ChillerReformulatedEIR {
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;
-        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
+        this->initialize(state, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->size(state, state.files);
@@ -185,7 +185,7 @@ namespace ChillerReformulatedEIR {
         //  up reporting variables.
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             this->control(state, CurLoad, RunFlag, FirstHVACIteration);
             this->update(CurLoad, RunFlag);
         } else if (calledFromLocation.loopNum == this->CDLoopNum) {
@@ -214,7 +214,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void GetElecReformEIRChillerInput(EnergyPlusData &state, ChillerReformulatedEIRData &chillers)
+    void GetElecReformEIRChillerInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
@@ -231,18 +231,18 @@ namespace ChillerReformulatedEIR {
         bool ErrorsFound(false); // True when input errors found
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:ReformulatedEIR";
-        chillers.NumElecReformEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerReformulatedEIR.NumElecReformEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumElecReformEIRChillers <= 0) {
+        if (state.dataChillerReformulatedEIR.NumElecReformEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        chillers.ElecReformEIRChiller.allocate(chillers.NumElecReformEIRChillers);
+        state.dataChillerReformulatedEIR.ElecReformEIRChiller.allocate(state.dataChillerReformulatedEIR.NumElecReformEIRChillers);
 
         // Load arrays with reformulated electric EIR chiller data
-        for (int EIRChillerNum = 1; EIRChillerNum <= chillers.NumElecReformEIRChillers; ++EIRChillerNum) {
+        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerReformulatedEIR.NumElecReformEIRChillers; ++EIRChillerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -263,7 +263,7 @@ namespace ChillerReformulatedEIR {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ElecReformEIRChiller(EIRChillerNum);
+            auto &thisChiller = state.dataChillerReformulatedEIR.ElecReformEIRChiller(EIRChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             // Performance curves
             thisChiller.ChillerCapFTIndex = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(2));
@@ -720,7 +720,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
+    void ReformulatedEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -744,7 +744,7 @@ namespace ChillerReformulatedEIR {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                     this->CWLoopNum,
@@ -758,7 +758,7 @@ namespace ChillerReformulatedEIR {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                         this->CDLoopNum,
@@ -775,7 +775,7 @@ namespace ChillerReformulatedEIR {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ElectricReformEIR, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricReformEIR,
                                                         this->HRLoopNum,

@@ -59,6 +59,8 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 
+#include "../../Data/EnergyPlusData.hh"
+
 namespace EnergyPlus {
 
 // define this variable to get new code, commenting should yield original
@@ -462,11 +464,11 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::airmov()
+    void Solver::airmov(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         George Walton
-        //       DATE WRITTEN   Extracted from AIRNET
+        //       DATE WRITTEN   Extracted from AIRNETf
         //       MODIFIED       Lixing Gu, 2/1/04
         //                      Revised the subroutine to meet E+ needs
         //       MODIFIED       Lixing Gu, 6/8/05
@@ -503,7 +505,7 @@ namespace AirflowNetwork {
         int ITER;
 
         // Formats
-        
+
         // static ObjexxFCL::gio::Fmt Format_900("(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')");
         // static ObjexxFCL::gio::Fmt Format_901("(1X,A6,3I5,3F14.6)");
         // static ObjexxFCL::gio::Fmt Format_902("(,/,11X,'n       P',12x,'sumF')");
@@ -551,7 +553,7 @@ namespace AirflowNetwork {
 
         // Calculate pressure field in a large opening
         PStack();
-        solver.solvzp(ITER);
+        solver.solvzp(state, ITER);
 
         // Report element flows and zone pressures.
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
@@ -617,7 +619,7 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::solvzp(int &ITER)  // number of iterations
+    void Solver::solvzp(EnergyPlusData &state, int &ITER)  // number of iterations
     {
 
         // SUBROUTINE INFORMATION:
@@ -703,7 +705,7 @@ namespace AirflowNetwork {
             // Initialize node/zone pressure values by assuming only linear relationship between
             // airflows and pressure drops.
             LFLAG = true;
-            solver.filjac(NNZE, LFLAG);
+            solver.filjac(state, NNZE, LFLAG);
             for (n = 1; n <= NetworkNumOfNodes; ++n) {
                 if (AirflowNetworkNodeData(n).NodeTypeNum == 0) PZ(n) = SUMF(n);
             }
@@ -732,7 +734,7 @@ namespace AirflowNetwork {
 //                print(outputFile, "Begin iteration {}\n", ITER);
 //            }
             // Set up the Jacobian matrix.
-            solver.filjac(NNZE, LFLAG);
+            solver.filjac(state, NNZE, LFLAG);
             // Data dump.
 //            if (LIST >= 3) {
 //                DUMPVR("SUMF:", SUMF, NetworkNumOfNodes, outputFile);
@@ -821,7 +823,8 @@ namespace AirflowNetwork {
         }
     }
 
-    void Solver::filjac(int const NNZE,  // number of nonzero entries in the "AU" array.
+    void Solver::filjac(EnergyPlusData &state,
+                        int const NNZE,  // number of nonzero entries in the "AU" array.
                         bool const LFLAG // if = 1, use laminar relationship (initialization).
     )
     {
@@ -921,7 +924,7 @@ namespace AirflowNetwork {
             //if (LIST >= 4) ObjexxFCL::gio::write(outputFile, Format_901) << "PS:" << i << n << M << PS(i) << PW(i) << AirflowNetworkLinkSimu(i).DP;
             j = AirflowNetworkLinkageData(i).CompNum;
 
-            NF = AirflowNetworkLinkageData(i).element->calculate(LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
+            NF = AirflowNetworkLinkageData(i).element->calculate(state, LFLAG, DP, i, multiplier, control, properties[n], properties[m], F, DF);
             if (AirflowNetworkLinkageData(i).element->type() == ComponentType::CPD && DP != 0.0) {
                 DP = DisSysCompCPDData(AirflowNetworkCompData(j).TypeNum).DP;
             }

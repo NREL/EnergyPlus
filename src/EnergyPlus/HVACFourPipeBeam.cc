@@ -505,7 +505,7 @@ namespace FourPipeBeam {
     {
 
         // initialize the unit
-        this->init(state, state.dataBranchInputManager, FirstHVACIteration);
+        this->init(state, FirstHVACIteration);
 
         // control and simulate the beam
         if (!this->mySizeFlag) {
@@ -515,12 +515,11 @@ namespace FourPipeBeam {
             this->update();
 
             // Fill the report variables.
-            this->report();
+            this->report(state);
         }
     }
 
     void HVACFourPipeBeam::init(EnergyPlusData &state,
-                                BranchInputManagerData &dataBranchInputManager,
                                 bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
     {
@@ -546,7 +545,7 @@ namespace FourPipeBeam {
         if (this->plantLoopScanFlag && allocated(PlantLoop)) {
             errFlag = false;
             if (this->beamCoolingPresent) {
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->cWLocation.loopNum,
@@ -564,7 +563,7 @@ namespace FourPipeBeam {
                 }
             }
             if (this->beamHeatingPresent) {
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         this->name,
                                         TypeOf_FourPipeBeamAirTerminal,
                                         this->hWLocation.loopNum,
@@ -1474,7 +1473,7 @@ namespace FourPipeBeam {
 
     }
 
-    void HVACFourPipeBeam::report() // fill out local output variables for reporting
+    void HVACFourPipeBeam::report(EnergyPlusData &state) // fill out local output variables for reporting
     {
 
         Real64 ReportingConstant;
@@ -1501,14 +1500,14 @@ namespace FourPipeBeam {
 
         this->primAirFlow = this->mDotSystemAir / DataEnvironment::StdRhoAir;
 
-        this->CalcOutdoorAirVolumeFlowRate();
+        this->CalcOutdoorAirVolumeFlowRate(state);
     }
 
-    void HVACFourPipeBeam::CalcOutdoorAirVolumeFlowRate()
+    void HVACFourPipeBeam::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->airLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->airLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->airOutNodeNum).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->airLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

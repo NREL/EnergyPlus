@@ -54,9 +54,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -80,13 +78,11 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 // EnergyPlus Headers
 using namespace EnergyPlus::BranchInputManager;
@@ -8162,7 +8158,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_FCU_NightCycleTest)
     DataHVACGlobals::ZoneComp(1).ZoneCompAvailMgrs(1).StopTime = 4.0;
     SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus = 0;
     // run CalcNCycSysAvailMgr to the availability of the fan coil unit on
-    SystemAvailabilityManager::CalcNCycSysAvailMgr(SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
+    SystemAvailabilityManager::CalcNCycSysAvailMgr(state, SysAvailNum, PriAirSysNum, AvailStatus, ZoneEquipType, CompNum);
     // check that the NightCycle has turned on the equipment
     EXPECT_EQ(DataHVACGlobals::CycleOn, AvailStatus);
     EXPECT_EQ(DataHVACGlobals::CycleOn, SystemAvailabilityManager::NCycSysAvailMgrData(1).AvailStatus);

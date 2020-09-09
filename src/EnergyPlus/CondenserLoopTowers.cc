@@ -135,7 +135,7 @@ namespace CondenserLoopTowers {
                                 Real64 &CurLoad,
                                 bool const RunFlag)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_SingleSpd) {
             this->calculateSingleSpeedTower();
         } else if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_TwoSpd) {
@@ -164,7 +164,7 @@ namespace CondenserLoopTowers {
 
     void CoolingTower::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {
             this->SizeVSMerkelTower();
         } else {
@@ -1820,7 +1820,7 @@ namespace CondenserLoopTowers {
         }
     }
 
-    void CoolingTower::initialize(BranchInputManagerData &dataBranchInputManager)
+    void CoolingTower::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1848,7 +1848,7 @@ namespace CondenserLoopTowers {
 
             // Locate the tower on the plant loops for later usage
             bool ErrorsFound = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->TowerType_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
             if (ErrorsFound) {
                 ShowFatalError("initialize: Program terminated due to previous condition(s).");

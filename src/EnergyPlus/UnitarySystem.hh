@@ -590,7 +590,7 @@ namespace UnitarySystems {
                                        int const ControlMode       // temperature or humidity control mode
         );
 
-        void reportUnitarySystem(int const AirLoopNum);
+        void reportUnitarySystem(EnergyPlusData &state, int const AirLoopNum);
 
         void unitarySystemHeatRecovery();
 

@@ -151,7 +151,7 @@ namespace AirflowNetworkBalanceManager {
 
     void ReportAirflowNetwork();
 
-    void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
+    void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
     void AirflowNetworkVentingControl(int i,       // AirflowNetwork surface number
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
@@ -173,7 +173,8 @@ namespace AirflowNetworkBalanceManager {
 
     int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
-    Real64 AFNPressureResidual(Real64 ExFanMassFlowRate,
+    Real64 AFNPressureResidual(EnergyPlusData &state,
+                               Real64 ExFanMassFlowRate,
                                Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct

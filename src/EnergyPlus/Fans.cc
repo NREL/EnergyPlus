@@ -260,14 +260,14 @@ namespace Fans {
             SimZoneExhaustFan(state.fans, FanNum);
             // cpw22Aug2010 Add call for Component Model fan
         } else if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
-            SimComponentModelFan(state,state.fans, FanNum);
+            SimComponentModelFan(state, state.fans, FanNum);
         }
 
         // Update the current fan to the outlet nodes
         UpdateFan(FanNum);
 
         // Report the current fan
-        ReportFan(FanNum);
+        ReportFan(state, FanNum);
     }
 
     // Get Input Section of the Module
@@ -1024,7 +1024,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
         using DataSizing::CurSysNum;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::ZoneEquipInputsFilled;
@@ -1073,7 +1072,7 @@ namespace Fans {
             // Set the loop cycling flag
             if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
                 if (CurSysNum > 0) {
-                    AirLoopControlInfo(CurSysNum).CyclingFan = true;
+                    state.dataAirLoop->AirLoopControlInfo(CurSysNum).CyclingFan = true;
                 }
             }
 
@@ -2572,7 +2571,7 @@ namespace Fans {
     // Beginning of Reporting subroutines for the Fan Module
     // *****************************************************************************
 
-    void ReportFan(int const FanNum)
+    void ReportFan(EnergyPlusData &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2591,7 +2590,6 @@ namespace Fans {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
 
@@ -2615,7 +2613,7 @@ namespace Fans {
 
         if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
             if (Fan(FanNum).AirLoopNum > 0) {
-                AirLoopAFNInfo(Fan(FanNum).AirLoopNum).AFNLoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
+                state.dataAirLoop->AirLoopAFNInfo(Fan(FanNum).AirLoopNum).AFNLoopOnOffFanRTF = Fan(FanNum).FanRuntimeFraction;
             }
         }
     }

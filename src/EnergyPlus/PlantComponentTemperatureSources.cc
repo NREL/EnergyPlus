@@ -128,7 +128,7 @@ namespace PlantComponentTemperatureSources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterSourceSpecs::initialize(BranchInputManagerData &dataBranchInputManager, Real64 &MyLoad)
+    void WaterSourceSpecs::initialize(EnergyPlusData &state, Real64 &MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -151,7 +151,7 @@ namespace PlantComponentTemperatureSources {
             this->setupOutputVars();
             // Locate the component on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_WaterSource,
                                                     this->Location.loopNum,
@@ -402,7 +402,7 @@ namespace PlantComponentTemperatureSources {
                                     Real64 &CurLoad,
                                     bool EP_UNUSED(RunFlag))
     {
-        this->initialize(state.dataBranchInputManager, CurLoad);
+        this->initialize(state, CurLoad);
         this->calculate();
         this->update();
     }
@@ -423,7 +423,7 @@ namespace PlantComponentTemperatureSources {
     void WaterSourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &)
     {
         Real64 myLoad = 0.0;
-        this->initialize(state.dataBranchInputManager, myLoad);
+        this->initialize(state, myLoad);
         this->autosize();
     }
 
