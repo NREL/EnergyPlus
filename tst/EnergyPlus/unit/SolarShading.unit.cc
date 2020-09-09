@@ -1861,3 +1861,61 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     DataSystemVariables::SlaterBarsky = false;
 }
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
+{
+    int numofsurface;
+    numofsurface = 2;
+    Surface.allocate(numofsurface);
+    Vector VtxA1(0.0, 0.0, 5.0); 
+    Vector VtxA2(0.0, 0.0, 0.0); 
+    Vector VtxA3(5.0, 0.0, 0.0); 
+    Vector VtxA4(5.0, 0.0, 5.0); 
+
+    Vector VtxB1(0.0, -10.0, 5.0);
+    Vector VtxB2(0.0, -10.0, 2.5);
+    Vector VtxB3(0.0, -5.0, 2.5);
+    Vector VtxB4(0.0, -5.0, 0.0);
+    Vector VtxB5(0.0, 0.0, 0.0);
+    Vector VtxB6(0.0, 0.0, 5.0);
+
+    Surface(1).Sides = 4;
+
+    Surface(1).Vertex.allocate(4); 
+    Surface(1).Vertex(1) = VtxA1;
+    Surface(1).Vertex(2) = VtxA2;
+    Surface(1).Vertex(3) = VtxA3;
+    Surface(1).Vertex(4) = VtxA4;
+
+    Surface(1).Name = "Surf_Back";
+    Surface(1).ZoneName = "Zone1";
+
+    Surface(2).Sides = 6; // receiving
+    Surface(2).Vertex.allocate(6); 
+
+    Surface(2).Vertex(1) = VtxB1;
+    Surface(2).Vertex(2) = VtxB2;
+    Surface(2).Vertex(3) = VtxB3;
+    Surface(2).Vertex(4) = VtxB4;
+    Surface(2).Vertex(5) = VtxB5;
+    Surface(2).Vertex(6) = VtxB6;
+
+    Surface(2).Name = "Surf_Recv";
+    Surface(2).ZoneName = "Zone1";
+
+    CHKBKS(1, 2);
+
+    // std::string stream_str = this->err_stream->str();
+
+    EXPECT_TRUE(this->has_err_output(true));
+
+    //std::string const error_string = delimited_string({
+    //    "Problem in interior solar distribution calculation(CHKBKS)",
+    //    "   Solar Distribution = FullInteriorExterior will not work in Zone =Zone1",
+    //    "   because one or more of vertices, such as Vertex 3 of back surface=Surf_Back",
+    //    ", is in front of receiving surface=Surf_Recv",
+    //    "   (Dot Product indicator=62.50)", 
+    //    "   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output : Diagnostics, DisplayExtraWarnings; for more details."
+    //    });
+    //EXPECT_TRUE(compare_err_stream(error_string, true));
+}
