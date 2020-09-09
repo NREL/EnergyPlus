@@ -64,7 +64,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct CondenserLoopTowersData;
 
 namespace CondenserLoopTowers {
 
@@ -425,14 +424,14 @@ namespace CondenserLoopTowers {
 
         void calculateWaterUsage();
 
-        Real64 calculateVariableSpeedApproach(CondenserLoopTowersData &dataCondenserLoopTowers,
+        Real64 calculateVariableSpeedApproach(EnergyPlusData &state,
                                               Real64 PctWaterFlow,  // Water flow ratio of cooling tower
                                               Real64 airFlowRatioLocal, // Air flow ratio of cooling tower
                                               Real64 Twb,           // Inlet air wet-bulb temperature [C]
                                               Real64 Tr             // Cooling tower range (outlet water temp minus inlet air wet-bulb temp) [C]
         );
 
-        void checkModelBounds(CondenserLoopTowersData &dataCondenserLoopTowers,
+        void checkModelBounds(EnergyPlusData &state,
                               Real64 Twb,                      // current inlet air wet-bulb temperature (C)
                               Real64 Tr,                       // requested range temperature for current time step (C)
                               Real64 Ta,                       // requested approach temperature for current time step (C)
@@ -469,7 +468,7 @@ namespace CondenserLoopTowers {
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetTowerInput(EnergyPlusData &state, CondenserLoopTowersData &dataCondenserLoopTowers);
+    void GetTowerInput(EnergyPlusData &state);
 
 } // namespace CondenserLoopTowers
 

@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -318,7 +319,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager)
+    void UpdateUtilityBills(EnergyPlusData &state)
     {
         //    AUTHOR         Jason Glazer of GARD Analytics, Inc.
         //    DATE WRITTEN   September 2003
@@ -337,7 +338,7 @@ namespace EconomicTariff {
         if (Update_GetInput) {
             GetInputEconomicsTariff(ErrorsFound);
             // do rest of GetInput only if at least one tariff is defined.
-            GetInputEconomicsCurrencyType(dataCostEstimateManager, ErrorsFound);
+            GetInputEconomicsCurrencyType(state, ErrorsFound);
             if (numTariff >= 1) {
                 if (!ErrorsFound && displayEconomicResultSummary) AddTOCEntry("Economics Results Summary Report", "Entire Facility");
                 CreateCategoryNativeVariables();
@@ -1330,7 +1331,7 @@ namespace EconomicTariff {
         }
     }
 
-    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound) // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound) // true if errors found during getting input objects.
     {
         //       AUTHOR         Jason Glazer
         //       DATE WRITTEN   August 2008
@@ -1346,16 +1347,14 @@ namespace EconomicTariff {
         int NumCurrencyType;
         int NumAlphas; // Number of elements in the alpha array
         int NumNums;   // Number of elements in the numeric array
-        // CHARACTER(len=MaxNameLength),DIMENSION(5) :: cAlphaArgs !character string data - should be 1
-        // REAL(r64),                   DIMENSION(5) :: rNumericArgs  !numeric data          - should be 0
         int IOStat; // IO Status when calling get input subroutine
         int i;
 
-        initializeMonetaryUnit(dataCostEstimateManager);
+        initializeMonetaryUnit(*state.dataCostEstimateManager);
         NumCurrencyType = inputProcessor->getNumObjectsFound(CurrentModuleObject);
-        dataCostEstimateManager.selectedMonetaryUnit = 0; // invalid
+        state.dataCostEstimateManager->selectedMonetaryUnit = 0; // invalid
         if (NumCurrencyType == 0) {
-            dataCostEstimateManager.selectedMonetaryUnit = 1; // USD - U.S. Dollar
+            state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
         } else if (NumCurrencyType == 1) {
             inputProcessor->getObjectItem(CurrentModuleObject,
                                           1,
@@ -1369,20 +1368,20 @@ namespace EconomicTariff {
                                           cAlphaFieldNames,
                                           cNumericFieldNames);
             // Monetary Unit
-            for (i = 1; i <= dataCostEstimateManager.numMonetaryUnit; ++i) {
-                if (UtilityRoutines::SameString(cAlphaArgs(1), dataCostEstimateManager.monetaryUnit(i).code)) {
-                    dataCostEstimateManager.selectedMonetaryUnit = i;
+            for (i = 1; i <= state.dataCostEstimateManager->numMonetaryUnit; ++i) {
+                if (UtilityRoutines::SameString(cAlphaArgs(1), state.dataCostEstimateManager->monetaryUnit(i).code)) {
+                    state.dataCostEstimateManager->selectedMonetaryUnit = i;
                     break;
                 }
             }
-            if (dataCostEstimateManager.selectedMonetaryUnit == 0) {
+            if (state.dataCostEstimateManager->selectedMonetaryUnit == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + cAlphaArgs(1) + "\" invalid data.");
                 ShowContinueError("... invalid " + cAlphaFieldNames(1) + '.');
                 ErrorsFound = true;
             }
         } else if (NumCurrencyType > 1) {
             ShowWarningError(RoutineName + CurrentModuleObject + " Only one instance of this object is allowed. USD will be used.");
-            dataCostEstimateManager.selectedMonetaryUnit = 1; // USD - U.S. Dollar
+            state.dataCostEstimateManager->selectedMonetaryUnit = 1; // USD - U.S. Dollar
         }
     }
 

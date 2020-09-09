@@ -270,7 +270,7 @@ void commonInitialize(EnergyPlus::EnergyPlusData &state) {
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
-    DataSystemVariables::processEnvironmentVariables(state.dataGlobals);
+    DataSystemVariables::processEnvironmentVariables(*state.dataGlobal);
 
 }
 

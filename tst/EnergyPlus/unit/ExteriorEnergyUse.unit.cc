@@ -68,19 +68,19 @@ using namespace EnergyPlus::ScheduleManager;
 TEST_F(EnergyPlusFixture, ExteriorEquipmentTest_Test1)
 {
 
-    state.exteriorEnergyUse.NumExteriorLights = 0;
-    state.exteriorEnergyUse.NumExteriorEqs = 2;
+    state.dataExteriorEnergyUse->NumExteriorLights = 0;
+    state.dataExteriorEnergyUse->NumExteriorEqs = 2;
     TimeStepZone = 0.25;
     TimeStepZoneSec = TimeStepZone * SecInHour;
-    state.exteriorEnergyUse.ExteriorEquipment.allocate(state.exteriorEnergyUse.NumExteriorEqs);
-    state.exteriorEnergyUse.ExteriorEquipment(1).DesignLevel = 1000.0;
-    state.exteriorEnergyUse.ExteriorEquipment(2).DesignLevel = 0.0;
-    state.exteriorEnergyUse.ExteriorEquipment(1).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-    state.exteriorEnergyUse.ExteriorEquipment(2).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
-    ReportExteriorEnergyUse(state.exteriorEnergyUse);
+    state.dataExteriorEnergyUse->ExteriorEquipment.allocate(state.dataExteriorEnergyUse->NumExteriorEqs);
+    state.dataExteriorEnergyUse->ExteriorEquipment(1).DesignLevel = 1000.0;
+    state.dataExteriorEnergyUse->ExteriorEquipment(2).DesignLevel = 0.0;
+    state.dataExteriorEnergyUse->ExteriorEquipment(1).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    state.dataExteriorEnergyUse->ExteriorEquipment(2).SchedPtr = ScheduleAlwaysOn; // From dataglobals, always returns a 1 for schedule value
+    ReportExteriorEnergyUse(*state.dataExteriorEnergyUse);
 
-    EXPECT_EQ(1000.0, state.exteriorEnergyUse.ExteriorEquipment(1).Power);
-    EXPECT_EQ(0.0, state.exteriorEnergyUse.ExteriorEquipment(2).Power);
-    EXPECT_EQ(900000.0, state.exteriorEnergyUse.ExteriorEquipment(1).CurrentUse);
-    EXPECT_EQ(0.0, state.exteriorEnergyUse.ExteriorEquipment(2).CurrentUse);
+    EXPECT_EQ(1000.0, state.dataExteriorEnergyUse->ExteriorEquipment(1).Power);
+    EXPECT_EQ(0.0, state.dataExteriorEnergyUse->ExteriorEquipment(2).Power);
+    EXPECT_EQ(900000.0, state.dataExteriorEnergyUse->ExteriorEquipment(1).CurrentUse);
+    EXPECT_EQ(0.0, state.dataExteriorEnergyUse->ExteriorEquipment(2).CurrentUse);
 }

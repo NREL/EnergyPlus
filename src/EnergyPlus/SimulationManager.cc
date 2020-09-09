@@ -530,7 +530,7 @@ namespace SimulationManager {
             EndMonthFlag = false;
             WarmupFlag = true;
             DayOfSim = 0;
-            state.dataGlobals.DayOfSimChr = "0";
+            state.dataGlobal->DayOfSimChr = "0";
             NumOfWarmupDays = 0;
             if (CurrentYearIsLeapYear) {
                 if (NumOfDayInEnvrn <= 366) {
@@ -553,12 +553,12 @@ namespace SimulationManager {
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
                 ++DayOfSim;
-                state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
+                state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
                 if (!WarmupFlag) {
                     ++CurrentOverallSimDay;
                     DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
                 } else {
-                    state.dataGlobals.DayOfSimChr = "0";
+                    state.dataGlobal->DayOfSimChr = "0";
                 }
                 BeginDayFlag = true;
                 EndDayFlag = false;
@@ -586,7 +586,7 @@ namespace SimulationManager {
                 }
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
-                    DisplayString("Starting last  year of environment at:  " + state.dataGlobals.DayOfSimChr);
+                    DisplayString("Starting last  year of environment at:  " + state.dataGlobal->DayOfSimChr);
                     ResetTabularReports();
                 }
 
@@ -634,7 +634,7 @@ namespace SimulationManager {
 
                         ManageWeather(state);
 
-                        ManageExteriorEnergyUse(state.exteriorEnergyUse);
+                        ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
 
                         ManageHeatBalance(state);
 
@@ -696,9 +696,9 @@ namespace SimulationManager {
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports(state.dataCostEstimateManager);
+        WriteTabularTariffReports(*state.dataCostEstimateManager);
 
-        ComputeLifeCycleCostAndReport(state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
+        ComputeLifeCycleCostAndReport(*state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile();
 
@@ -2140,7 +2140,7 @@ namespace SimulationManager {
 
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(state.exteriorEnergyUse);
+            ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
 
             ManageHeatBalance(state);
 
@@ -2155,7 +2155,7 @@ namespace SimulationManager {
 
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(state.exteriorEnergyUse);
+            ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
 
             ManageHeatBalance(state);
 
@@ -2168,7 +2168,7 @@ namespace SimulationManager {
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(state.exteriorEnergyUse);
+            ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
 
             ManageHeatBalance(state);
 
@@ -3161,7 +3161,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
 
     // FLOW:
     if (ResimExt) {
-        ManageExteriorEnergyUse(state.exteriorEnergyUse);
+        ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
 
         ++DemandManagerExtIterations;
     }

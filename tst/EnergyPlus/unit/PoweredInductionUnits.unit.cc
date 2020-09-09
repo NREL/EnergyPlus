@@ -184,7 +184,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
-    state.fans.GetFanInputFlag = false;
+    state.dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -413,7 +413,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
-    state.fans.GetFanInputFlag = false;
+    state.dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -694,7 +694,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataZoneEquipment::GetZoneEquipmentData1(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, *state.dataZoneAirLoopEquipmentManager);
     Fans::GetFanInput(state);
-    state.fans.GetFanInputFlag = false;
+    state.dataFans->GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs(state);
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);

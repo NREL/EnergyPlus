@@ -141,7 +141,7 @@ TEST_F(EnergyPlusFixture, CTElectricGenerator_Fueltype)
 
     GetCTGeneratorInput(state);
 
-    EXPECT_EQ(state.dataCTElectricGenerator.CTGenerator(1).FuelType, "NaturalGas");
+    EXPECT_EQ(state.dataCTElectricGenerator->CTGenerator(1).FuelType, "NaturalGas");
 }
 
 } // namespace EnergyPlus

@@ -337,7 +337,7 @@ namespace SizingManager {
                     EndMonthFlag = false;
                     WarmupFlag = true;
                     DayOfSim = 0;
-                    state.dataGlobals.DayOfSimChr = "0";
+                    state.dataGlobal->DayOfSimChr = "0";
                     CurEnvirNumSimDay = 1;
                     ++CurOverallSimDay;
                     while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
@@ -347,7 +347,7 @@ namespace SizingManager {
                             ++CurEnvirNumSimDay;
                         }
 
-                        state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
+                        state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
                         BeginDayFlag = true;
                         EndDayFlag = false;
 
@@ -364,7 +364,7 @@ namespace SizingManager {
                                 }
                             }
                             UpdateZoneSizing(state, BeginDay);
-                            UpdateFacilitySizing(state.dataGlobals, BeginDay);
+                            UpdateFacilitySizing(*state.dataGlobal, BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -423,7 +423,7 @@ namespace SizingManager {
 
                         if (EndDayFlag) {
                             UpdateZoneSizing(state, EndDay);
-                            UpdateFacilitySizing(state.dataGlobals, EndDay);
+                            UpdateFacilitySizing(*state.dataGlobal, EndDay);
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
@@ -438,8 +438,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(state, state.dataGlobals.EndZoneSizingCalc);
-                    UpdateFacilitySizing(state.dataGlobals, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state, state.dataGlobal->EndZoneSizingCalc);
+                    UpdateFacilitySizing(*state.dataGlobal, state.dataGlobal->EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -524,7 +524,7 @@ namespace SizingManager {
                 EndEnvrnFlag = false;
                 WarmupFlag = false;
                 DayOfSim = 0;
-                state.dataGlobals.DayOfSimChr = "0";
+                state.dataGlobal->DayOfSimChr = "0";
                 CurEnvirNumSimDay = 1;
                 ++CurOverallSimDay;
 
@@ -534,7 +534,7 @@ namespace SizingManager {
                     if (!WarmupFlag && DayOfSim > 1) {
                         ++CurEnvirNumSimDay;
                     }
-                    state.dataGlobals.DayOfSimChr = fmt::to_string(DayOfSim);
+                    state.dataGlobal->DayOfSimChr = fmt::to_string(DayOfSim);
                     BeginDayFlag = true;
                     EndDayFlag = false;
 

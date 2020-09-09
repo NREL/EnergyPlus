@@ -1900,11 +1900,11 @@ namespace PlantChillers {
 
     EngineDrivenChillerSpecs *EngineDrivenChillerSpecs::factory(EnergyPlusData &state, std::string const &chillerName)
     {
-        if (state.dataPlantChillers.GetEngineDrivenInput) {
-            EngineDrivenChillerSpecs::getInput(state, state.dataPlantChillers);
-            state.dataPlantChillers.GetEngineDrivenInput = false;
+        if (state.dataPlantChillers->GetEngineDrivenInput) {
+            EngineDrivenChillerSpecs::getInput(state, *state.dataPlantChillers);
+            state.dataPlantChillers->GetEngineDrivenInput = false;
         }
-        for (auto &thisChiller : state.dataPlantChillers.EngineDrivenChiller) {
+        for (auto &thisChiller : state.dataPlantChillers->EngineDrivenChiller) {
             if (UtilityRoutines::MakeUPPERCase(thisChiller.Name) == chillerName) {
                 return &thisChiller;
             }

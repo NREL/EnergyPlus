@@ -55,17 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/Data/BaseData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-
-#include <EnergyPlus/CondenserLoopTowers.hh>
-#include <EnergyPlus/CostEstimateManager.hh>
-#include <EnergyPlus/CoolTower.hh>
-#include <EnergyPlus/CTElectricGenerator.hh>
-#include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
-#include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/IOFiles.hh>
-#include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/PlantChillers.hh>
 
 #include <unordered_map>
 #include <memory>
@@ -88,10 +78,19 @@ namespace EnergyPlus {
     struct ChillerGasAbsorptionData;
     struct ChillerIndirectAbsoprtionData;
     struct ChillerReformulatedEIRData;
+    struct CondenserLoopTowersData;
     struct ConvectionCoefficientsData;
+    struct CoolTowerData;
+    struct CostEstimateManagerData;
+    struct CrossVentMgrData;
+    struct CTElectricGeneratorData;
     struct CurveManagerData;
     struct DataAirLoopData;
-
+    struct DataGlobal;
+    struct ExteriorEnergyUseData;
+    struct FansData;
+    struct PipesData;
+    struct PlantChillersData;
     struct WaterCoilsData;
     struct WaterManagerData;
     struct WaterThermalTanksData;
@@ -112,14 +111,16 @@ namespace EnergyPlus {
     struct ZoneTempPredictorCorrectorData;
 
     struct EnergyPlusData : BaseGlobalStruct {
-        // module globals
 
+        IOFiles files;
+
+        // module globals
         std::unique_ptr<AirLoopHVACDOASData> dataAirLoopHVACDOAS;
         std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
         std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
-        std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
         std::unique_ptr<BoilersData> dataBoilers;
         std::unique_ptr<BoilerSteamData> dataBoilerSteam;
+        std::unique_ptr<BranchInputManagerData> dataBranchInputManager;
         std::unique_ptr<ChilledCeilingPanelSimpleData> dataChilledCeilingPanelSimple;
         std::unique_ptr<ChillerAbsorberData> dataChillerAbsorber;
         std::unique_ptr<ChillerElectricEIRData> dataChillerElectricEIR;
@@ -127,25 +128,19 @@ namespace EnergyPlus {
         std::unique_ptr<ChillerGasAbsorptionData> dataChillerGasAbsorption;
         std::unique_ptr<ChillerIndirectAbsoprtionData> dataChillerIndirectAbsorption;
         std::unique_ptr<ChillerReformulatedEIRData> dataChillerReformulatedEIR;
+        std::unique_ptr<CondenserLoopTowersData> dataCondenserLoopTowers;
         std::unique_ptr<ConvectionCoefficientsData> dataConvectionCoefficient;
+        std::unique_ptr<CoolTowerData> dataCoolTower;
+        std::unique_ptr<CostEstimateManagerData> dataCostEstimateManager;
+        std::unique_ptr<CrossVentMgrData> dataCrossVentMgr;
+        std::unique_ptr<CTElectricGeneratorData> dataCTElectricGenerator;
         std::unique_ptr<CurveManagerData> dataCurveManager;
         std::unique_ptr<DataAirLoopData> dataAirLoop;
-
-        CondenserLoopTowersData dataCondenserLoopTowers;
-        CostEstimateManagerData dataCostEstimateManager;
-        CoolTowerData dataCoolTower;
-        CTElectricGeneratorData dataCTElectricGenerator;
-        CrossVentMgrData dataCrossVentMgr;
-        DataGlobal dataGlobals;
-        ExteriorEnergyUseData exteriorEnergyUse;
-        FansData fans;
-        PipesData pipes;
-
-        PlantChillersData dataPlantChillers;
-        //OutputReportTabular outputReportTabular;
-
-        IOFiles files;
-
+        std::unique_ptr<DataGlobal> dataGlobal;
+        std::unique_ptr<ExteriorEnergyUseData> dataExteriorEnergyUse;
+        std::unique_ptr<FansData> dataFans;
+        std::unique_ptr<PipesData> dataPipes;
+        std::unique_ptr<PlantChillersData> dataPlantChillers;
         std::unique_ptr<WaterCoilsData> dataWaterCoils;
         std::unique_ptr<WaterManagerData> dataWaterManager;
         std::unique_ptr<WaterThermalTanksData> dataWaterThermalTanks;

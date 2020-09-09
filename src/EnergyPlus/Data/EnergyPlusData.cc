@@ -55,9 +55,10 @@ namespace EnergyPlus {
     EnergyPlusData::EnergyPlusData() {
         // todo, try to eliminate the need for the singleton
         IOFiles::setSingleton(&files);
+
         this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
         this->dataAirLoopHVACDOAS = std::unique_ptr<AirLoopHVACDOASData>(new AirLoopHVACDOASData);
-        this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
+        this->dataBaseboardElectric = std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBoilers = std::unique_ptr<BoilersData>(new BoilersData);
         this->dataBoilerSteam = std::unique_ptr<BoilerSteamData>(new BoilerSteamData);
@@ -69,27 +70,36 @@ namespace EnergyPlus {
         this->dataChillerGasAbsorption = std::unique_ptr<ChillerGasAbsorptionData>(new ChillerGasAbsorptionData);
         this->dataChillerIndirectAbsorption = std::unique_ptr<ChillerIndirectAbsoprtionData>(new ChillerIndirectAbsoprtionData);
         this->dataChillerReformulatedEIR = std::unique_ptr<ChillerReformulatedEIRData>(new ChillerReformulatedEIRData);
+        this->dataCondenserLoopTowers = std::unique_ptr<CondenserLoopTowersData>(new CondenserLoopTowersData);
         this->dataConvectionCoefficient = std::unique_ptr<ConvectionCoefficientsData>(new ConvectionCoefficientsData);
+        this->dataCoolTower = std::unique_ptr<CoolTowerData>(new CoolTowerData);
+        this->dataCostEstimateManager = std::unique_ptr<CostEstimateManagerData>(new CostEstimateManagerData);
+        this->dataCrossVentMgr = std::unique_ptr<CrossVentMgrData>(new CrossVentMgrData);
+        this->dataCTElectricGenerator = std::unique_ptr<CTElectricGeneratorData>(new CTElectricGeneratorData);
         this->dataCurveManager = std::unique_ptr<CurveManagerData>(new CurveManagerData);
-        this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
-        this->dataWaterCoils =  std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
-        this->dataWaterManager =  std::unique_ptr<WaterManagerData>(new WaterManagerData);
-        this->dataWaterThermalTanks =  std::unique_ptr<WaterThermalTanksData>(new WaterThermalTanksData);
-        this->dataWaterToAirHeatPump =  std::unique_ptr<WaterToAirHeatPumpData>(new WaterToAirHeatPumpData);
-        this->dataWaterToAirHeatPumpSimple =  std::unique_ptr<WaterToAirHeatPumpSimpleData>(new WaterToAirHeatPumpSimpleData);
-        this->dataWaterUse =  std::unique_ptr<WaterUseData>(new WaterUseData);
-        this->dataWeatherManager =  std::unique_ptr<WeatherManagerData>(new WeatherManagerData);
-        this->dataWindowAC =  std::unique_ptr<WindowACData>(new WindowACData);
-        this->dataWindowComplexManager =  std::unique_ptr<WindowComplexManagerData>(new WindowComplexManagerData);
-        this->dataWindowEquivalentLayer =  std::unique_ptr<WindowEquivalentLayerData>(new WindowEquivalentLayerData);
-        this->dataWindowManager =  std::unique_ptr<WindowManagerData>(new WindowManagerData);
-        this->dataWindTurbine =  std::unique_ptr<WindTurbineData>(new WindTurbineData);
-        this->dataZoneAirLoopEquipmentManager =  std::unique_ptr<ZoneAirLoopEquipmentManagerData>(new ZoneAirLoopEquipmentManagerData);
-        this->dataZoneContaminantPredictorCorrector =  std::unique_ptr<ZoneContaminantPredictorCorrectorData>(new ZoneContaminantPredictorCorrectorData);
-        this->dataZoneDehumidifier =  std::unique_ptr<ZoneDehumidifierData>(new ZoneDehumidifierData);
-        this->dataZoneEquipmentManager =  std::unique_ptr<ZoneEquipmentManagerData>(new ZoneEquipmentManagerData);
-        this->dataZonePlenum =  std::unique_ptr<ZonePlenumData>(new ZonePlenumData);
-        this->dataZoneTempPredictorCorrector =  std::unique_ptr<ZoneTempPredictorCorrectorData>(new ZoneTempPredictorCorrectorData);
+        this->dataExteriorEnergyUse = std::unique_ptr<ExteriorEnergyUseData>(new ExteriorEnergyUseData);
+        this->dataFans = std::unique_ptr<FansData>(new FansData);
+        this->dataGlobal = std::unique_ptr<DataGlobal>(new DataGlobal);
+        this->dataPipes = std::unique_ptr<PipesData>(new PipesData);
+        this->dataPlantChillers = std::unique_ptr<PlantChillersData>(new PlantChillersData);
+        this->dataWaterCoils = std::unique_ptr<WaterCoilsData>(new WaterCoilsData);
+        this->dataWaterManager = std::unique_ptr<WaterManagerData>(new WaterManagerData);
+        this->dataWaterThermalTanks = std::unique_ptr<WaterThermalTanksData>(new WaterThermalTanksData);
+        this->dataWaterToAirHeatPump = std::unique_ptr<WaterToAirHeatPumpData>(new WaterToAirHeatPumpData);
+        this->dataWaterToAirHeatPumpSimple = std::unique_ptr<WaterToAirHeatPumpSimpleData>(new WaterToAirHeatPumpSimpleData);
+        this->dataWaterUse = std::unique_ptr<WaterUseData>(new WaterUseData);
+        this->dataWeatherManager = std::unique_ptr<WeatherManagerData>(new WeatherManagerData);
+        this->dataWindowAC = std::unique_ptr<WindowACData>(new WindowACData);
+        this->dataWindowComplexManager = std::unique_ptr<WindowComplexManagerData>(new WindowComplexManagerData);
+        this->dataWindowEquivalentLayer = std::unique_ptr<WindowEquivalentLayerData>(new WindowEquivalentLayerData);
+        this->dataWindowManager = std::unique_ptr<WindowManagerData>(new WindowManagerData);
+        this->dataWindTurbine = std::unique_ptr<WindTurbineData>(new WindTurbineData);
+        this->dataZoneAirLoopEquipmentManager = std::unique_ptr<ZoneAirLoopEquipmentManagerData>(new ZoneAirLoopEquipmentManagerData);
+        this->dataZoneContaminantPredictorCorrector = std::unique_ptr<ZoneContaminantPredictorCorrectorData>(new ZoneContaminantPredictorCorrectorData);
+        this->dataZoneDehumidifier = std::unique_ptr<ZoneDehumidifierData>(new ZoneDehumidifierData);
+        this->dataZoneEquipmentManager = std::unique_ptr<ZoneEquipmentManagerData>(new ZoneEquipmentManagerData);
+        this->dataZonePlenum = std::unique_ptr<ZonePlenumData>(new ZonePlenumData);
+        this->dataZoneTempPredictorCorrector = std::unique_ptr<ZoneTempPredictorCorrectorData>(new ZoneTempPredictorCorrectorData);
     }
 
     void EnergyPlusData::clear_state() {
@@ -107,39 +117,35 @@ namespace EnergyPlus {
         this->dataChillerGasAbsorption->clear_state();
         this->dataChillerIndirectAbsorption->clear_state();
         this->dataChillerReformulatedEIR->clear_state();
+        this->dataCondenserLoopTowers->clear_state();
         this->dataConvectionCoefficient->clear_state();
+        this->dataCoolTower->clear_state();
+        this->dataCostEstimateManager->clear_state();
+        this->dataCrossVentMgr->clear_state();
+        this->dataCTElectricGenerator->clear_state();
         this->dataCurveManager->clear_state();
-
-        dataCondenserLoopTowers.clear_state();
-        dataCostEstimateManager.clear_state();
-        dataCoolTower.clear_state();
-        dataCTElectricGenerator.clear_state();
-        dataCrossVentMgr.clear_state();
-        dataGlobals.clear_state();
-        exteriorEnergyUse.clear_state();
-        fans.clear_state();
-        //outputReportTabular.clear_state();
-        pipes.clear_state();
-        dataPlantChillers.clear_state();
-
-        dataWaterCoils->clear_state();
-        dataWaterManager->clear_state();
-        dataWaterThermalTanks->clear_state();
-        dataWaterToAirHeatPump->clear_state();
-        dataWaterToAirHeatPumpSimple->clear_state();
-        dataWaterUse->clear_state();
-        dataWeatherManager->clear_state();
-        dataWindowAC->clear_state();
-        dataWindowComplexManager->clear_state();
-        dataWindowEquivalentLayer->clear_state();
-        dataWindowManager->clear_state();
-        dataWindTurbine->clear_state();
-        dataZoneAirLoopEquipmentManager->clear_state();
-        dataZoneContaminantPredictorCorrector->clear_state();
-        dataZoneDehumidifier->clear_state();
-        dataZoneEquipmentManager->clear_state();
-        dataZonePlenum->clear_state();
-        dataZoneTempPredictorCorrector->clear_state();
+        this->dataExteriorEnergyUse->clear_state();
+        this->dataFans->clear_state();
+        this->dataGlobal->clear_state();
+        this->dataPipes->clear_state();
+        this->dataPlantChillers->clear_state();
+        this->dataWaterCoils->clear_state();
+        this->dataWaterManager->clear_state();
+        this->dataWaterThermalTanks->clear_state();
+        this->dataWaterToAirHeatPump->clear_state();
+        this->dataWaterToAirHeatPumpSimple->clear_state();
+        this->dataWaterUse->clear_state();
+        this->dataWeatherManager->clear_state();
+        this->dataWindowAC->clear_state();
+        this->dataWindowComplexManager->clear_state();
+        this->dataWindowEquivalentLayer->clear_state();
+        this->dataWindowManager->clear_state();
+        this->dataWindTurbine->clear_state();
+        this->dataZoneAirLoopEquipmentManager->clear_state();
+        this->dataZoneContaminantPredictorCorrector->clear_state();
+        this->dataZoneDehumidifier->clear_state();
+        this->dataZoneEquipmentManager->clear_state();
+        this->dataZonePlenum->clear_state();
+        this->dataZoneTempPredictorCorrector->clear_state();
     }
-
 }

@@ -399,7 +399,7 @@ namespace HeatBalanceManager {
             CheckWarmupConvergence();
             if (!WarmupFlag) {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
-                state.dataGlobals.DayOfSimChr = "0";
+                state.dataGlobal->DayOfSimChr = "0";
 
                 ManageEMS(state, emsCallFromBeginNewEvironmentAfterWarmUp, anyRan, ObjexxFCL::Optional_int_const()); // calling point
             }
@@ -5929,7 +5929,7 @@ namespace HeatBalanceManager {
             }
 
             UpdateTabularReports(state, OutputProcessor::TimeStepType::TimeStepZone);
-            UpdateUtilityBills(state.dataCostEstimateManager);
+            UpdateUtilityBills(state);
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
                 PrintEnvrnStampWarmup = true;

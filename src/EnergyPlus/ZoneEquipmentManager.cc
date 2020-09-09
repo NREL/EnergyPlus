@@ -1789,7 +1789,7 @@ namespace ZoneEquipmentManager {
                     }
                 }
 
-            } else if (SELECT_CASE_var == state.dataGlobals.EndZoneSizingCalc) {
+            } else if (SELECT_CASE_var == state.dataGlobal->EndZoneSizingCalc) {
 
                 // candidate EMS calling point to customize CalcFinalZoneSizing
                 bool anyEMSRan;
@@ -4755,14 +4755,14 @@ namespace ZoneEquipmentManager {
         }
 
         ManageEarthTube();
-        ManageCoolTower(state, state.dataCoolTower);
+        ManageCoolTower(state);
         ManageThermalChimney();
 
         // Assign zone air temperature
         for (j = 1; j <= NumOfZones; ++j) {
             ZMAT(j) = MAT(j);
             ZHumRat(j) = ZoneAirHumRat(j);
-            // This is only temperory fix for CR8867.  (L. Gu 8/12)
+            // This is only temporary fix for CR8867.  (L. Gu 8/12)
             if (SysTimestepLoop == 1) {
                 ZMAT(j) = XMPT(j);
                 ZHumRat(j) = WZoneTimeMinusP(j);
@@ -4804,9 +4804,6 @@ namespace ZoneEquipmentManager {
             }
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, TempExt, HumRatExt);
             CpAir = PsyCpAirFnW(HumRatExt);
-            // CR7751 should maybe use code below, indoor conditions instead of outdoor conditions
-            //   AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZMAT(NZ), ZHumRat(NZ))
-            //   CpAir = PsyCpAirFnW(ZHumRat(NZ),ZMAT(NZ))
             // Hybrid ventilation global control
             if (Ventilation(j).HybridControlType == HybridControlTypeGlobal && Ventilation(j).HybridControlMasterNum > 0) {
                 I = Ventilation(j).HybridControlMasterNum;

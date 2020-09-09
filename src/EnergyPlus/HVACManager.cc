@@ -543,7 +543,7 @@ namespace HVACManager {
                 }
                 if (ZoneSizingCalc) {
                     UpdateZoneSizing(state, DuringDay);
-                    UpdateFacilitySizing(state.dataGlobals, DuringDay);
+                    UpdateFacilitySizing(*state.dataGlobal, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
@@ -2476,7 +2476,7 @@ namespace HVACManager {
             ZnAirRpt(ZoneLoop).ExhTotalLoss = 0;
             ZnAirRpt(ZoneLoop).ExhSensiLoss = 0;
 
-            for (FanNum = 1; FanNum <= state.fans.NumFans; ++FanNum) {
+            for (FanNum = 1; FanNum <= state.dataFans->NumFans; ++FanNum) {
                 //  Add reportable vars
                 if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
                     for (int ExhNum = 1; ExhNum <= ZoneEquipConfig(ZoneLoop).NumExhaustNodes; ExhNum++) {

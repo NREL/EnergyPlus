@@ -59,7 +59,7 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct CoolTowerData;
+struct EnergyPlusData;
 
 namespace CoolTower {
 
@@ -136,15 +136,15 @@ namespace CoolTower {
         }
     };
 
-    void ManageCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower);
+    void ManageCoolTower(EnergyPlusData &state);
 
-    void GetCoolTower(EnergyPlusData &state, CoolTowerData &dataCoolTower);
+    void GetCoolTower(EnergyPlusData &state);
 
-    void CalcCoolTower(CoolTowerData &dataCoolTower);
+    void CalcCoolTower(EnergyPlusData &state);
 
-    void UpdateCoolTower(CoolTowerData &dataCoolTower);
+    void UpdateCoolTower(EnergyPlusData &state);
 
-    void ReportCoolTower(CoolTowerData &dataCoolTower);
+    void ReportCoolTower(EnergyPlusData &state);
 
 } // namespace CoolTower
 

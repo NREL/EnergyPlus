@@ -58,8 +58,9 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct CostEstimateManagerData;
+    // Forward declarations
+    struct CostEstimateManagerData;
+    struct EnergyPlusData;
 
 namespace EconomicTariff {
 
@@ -557,7 +558,7 @@ namespace EconomicTariff {
 
     // Functions
 
-    void UpdateUtilityBills(CostEstimateManagerData &dataCostEstimateManager);
+    void UpdateUtilityBills(EnergyPlusData &state);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -581,7 +582,7 @@ namespace EconomicTariff {
 
     void GetInputEconomicsComputation(bool &ErrorsFound); // true if errors found during getting input objects.
 
-    void GetInputEconomicsCurrencyType(CostEstimateManagerData &dataCostEstimateManager, bool &ErrorsFound); // true if errors found during getting input objects.
+    void GetInputEconomicsCurrencyType(EnergyPlusData &state, bool &ErrorsFound); // true if errors found during getting input objects.
 
     void parseComputeLine(std::string const &lineOfCompute, int const fromTariff);
 

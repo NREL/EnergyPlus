@@ -150,7 +150,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        state.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -216,7 +216,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        state.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -280,7 +280,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        state.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -348,7 +348,7 @@ namespace OutputProcessor {
         DailyStampReportNbr = 1;
         DailyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        state.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -420,7 +420,7 @@ namespace OutputProcessor {
         MonthlyStampReportNbr = 1;
         MonthlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        state.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -492,7 +492,7 @@ namespace OutputProcessor {
         RunPeriodStampReportNbr = 1;
         RunPeriodStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        state.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -564,7 +564,7 @@ namespace OutputProcessor {
         YearlyStampReportNbr = 1;
         YearlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        state.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobal->DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataGlobals::CalendarYear = 2017;
         DataGlobals::CalendarYearChr = "2017";
@@ -3591,14 +3591,14 @@ namespace OutputProcessor {
                             "CO2",
                             "FuelOilNo2Emissions",
                             _,                    // EndUseSubKey
-                            "");     
+                            "");
 
         int found;
 
         // Cooling
         // testing an ABUPS end use with no sub end use specified
-        EXPECT_EQ(1, EndUseCategory(2).NumSubcategories); 
-        EXPECT_EQ("General", EndUseCategory(2).SubcategoryName(1)); 
+        EXPECT_EQ(1, EndUseCategory(2).NumSubcategories);
+        EXPECT_EQ("General", EndUseCategory(2).SubcategoryName(1));
 
         found = UtilityRoutines::FindItem("Cooling:Electricity", EnergyMeters);
         EXPECT_NE(0, found);
@@ -3615,7 +3615,7 @@ namespace OutputProcessor {
         // lighting
         // testing an ABUPS end use with a sub end use specified
         EXPECT_EQ(1, EndUseCategory(3).NumSubcategories); // lighting end use
-        EXPECT_EQ("RailroadCrossing", EndUseCategory(3).SubcategoryName(1)); 
+        EXPECT_EQ("RailroadCrossing", EndUseCategory(3).SubcategoryName(1));
 
         found = UtilityRoutines::FindItem("InteriorLights:Electricity", EnergyMeters);
         EXPECT_NE(0, found);
@@ -4111,7 +4111,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        state.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4355,7 +4355,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        state.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4612,7 +4612,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        state.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4817,7 +4817,7 @@ namespace OutputProcessor {
 
         // Setup so that UpdateDataandReport can be called.
         DataGlobals::DayOfSim = 365;
-        state.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4957,7 +4957,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        state.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -5035,7 +5035,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        state.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobal->DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -5386,7 +5386,7 @@ namespace OutputProcessor {
             "FuelOilNo1,                 !- Fuel Type",
             ",                           !- Key Name 1",
             "FuelOilNo1:Facility;        !- Variable or Meter 1 Name",
-            
+
             "Meter:Custom,",
             "FuelOilNo2CustomMeter,      !- Name",
             "FuelOilNo2,                 !- Fuel Type",
