@@ -716,13 +716,13 @@ namespace HeatBalanceSurfaceManager {
         //  take the appropriate parts of these inits to the other heat balance managers
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Solar Heat Gains");
 
-        high_resolution_clock::time_point t1 = high_resolution_clock::now();
+//        high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
         InitSolarHeatGains(state.dataWindowComplexManager, state.dataWindowEquivalentLayer, state.dataWindowManager);
 
-        high_resolution_clock::time_point t2 = high_resolution_clock::now();
-        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-        DataGlobals::timer_1 += time_span.count();
+//        high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//        duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+//        DataGlobals::timer_1 += time_span.count();
 
         if (SunIsUp && (BeamSolarRad + GndSolarRad + DifSolarRad > 0.0)) {
             for (int NZ = 1; NZ <= NumOfZones; ++NZ) {
@@ -2562,23 +2562,24 @@ namespace HeatBalanceSurfaceManager {
             }
 
             if (NumOfTDDPipes > 0) {
-                for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                    SurfWinTransSolar(SurfNum) = 0.0;
-                    SurfWinTransSolarEnergy(SurfNum) = 0.0;
-                    SurfQRadSWOutIncident(SurfNum) = 0.0;
-                    SurfWinQRadSWwinAbsTot(SurfNum) = 0.0;
-                }
-                for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
-                    for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
-                        SurfWinQRadSWwinAbs(Lay, SurfNum) = 0.0;
-                    }
-                }
                 for (auto &e : TDDPipe) {
                     e.TransSolBeam = 0.0;
                     e.TransSolDiff = 0.0;
                     e.TransVisBeam = 0.0;
                     e.TransVisDiff = 0.0;
                     e.TransmittedSolar = 0.0;
+                    int SurfDome = e.Dome;
+                    int SurfDiffuser = e.Diffuser;
+                    SurfWinTransSolar(SurfDome) = 0.0;
+                    SurfQRadSWOutIncident(SurfDome) = 0.0;
+                    SurfWinQRadSWwinAbsTot(SurfDome) = 0.0;
+                    SurfWinTransSolar(SurfDiffuser) = 0.0;
+                    SurfQRadSWOutIncident(SurfDiffuser) = 0.0;
+                    SurfWinQRadSWwinAbsTot(SurfDiffuser) = 0.0;
+                    for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
+                        SurfWinQRadSWwinAbs(Lay, SurfDome) = 0.0;
+                        SurfWinQRadSWwinAbs(Lay, SurfDiffuser) = 0.0;
+                    }
                 }
             }
 
