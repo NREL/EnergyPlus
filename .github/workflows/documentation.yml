@@ -29,25 +29,89 @@ jobs:
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
       run: cmake --build . -j 2
 
-    - name: Upload PDFs
+    - name: Upload Acknowledgments
       uses: actions/upload-artifact@v2
       with:
-        name: Documentation PDFs
-        path: |
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/Acknowledgments.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/AuxiliaryPrograms.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EMSApplicationGuide.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EnergyPlusEssentials.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EngineeringReference.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ExternalInterfacesApplicationGuide.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ExternalInterfacesApplicationGuide.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/GettingStarted.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/InputOutputReference.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ModuleDeveloper.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/OutputDetailsAndExamples.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/PlantApplicationGuide.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/TipsAndTricksUsingEnergyPlus.pdf
-          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/UsingEnergyPlusForCompliance.pdf
+        name: Acknowledgments
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/Acknowledgments.pdf
+
+    - name: Upload AuxiliaryPrograms
+      uses: actions/upload-artifact@v2
+      with:
+        name: AuxiliaryPrograms
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/AuxiliaryPrograms.pdf
+
+    - name: Upload EMSApplicationGuide
+      uses: actions/upload-artifact@v2
+      with:
+        name: EMSApplicationGuide
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EMSApplicationGuide.pdf
+
+    - name: Upload EnergyPlusEssentials
+      uses: actions/upload-artifact@v2
+      with:
+        name: EnergyPlusEssentials
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EnergyPlusEssentials.pdf
+
+    - name: Upload EngineeringReference
+      uses: actions/upload-artifact@v2
+      with:
+        name: EngineeringReference
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EngineeringReference.pdf
+
+    - name: Upload ExternalInterfacesApplicationGuide
+      uses: actions/upload-artifact@v2
+      with:
+        name: ExternalInterfacesApplicationGuide
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ExternalInterfacesApplicationGuide.pdf
+
+    - name: Upload GettingStarted
+      uses: actions/upload-artifact@v2
+      with:
+        name: GettingStarted
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/GettingStarted.pdf
+
+    - name: Upload InputOutputReference
+      uses: actions/upload-artifact@v2
+      with:
+        name: InputOutputReference
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/InputOutputReference.pdf
+
+    - name: Upload InterfaceDeveloper
+      uses: actions/upload-artifact@v2
+      with:
+        name: InterfaceDeveloper
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/InterfaceDeveloper.pdf
+
+    - name: Upload ModuleDeveloper
+      uses: actions/upload-artifact@v2
+      with:
+        name: ModuleDeveloper
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ModuleDeveloper.pdf
+
+    - name: Upload OutputDetailsAndExamples
+      uses: actions/upload-artifact@v2
+      with:
+        name: OutputDetailsAndExamples
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/OutputDetailsAndExamples.pdf
+
+    - name: Upload PlantApplicationGuide
+      uses: actions/upload-artifact@v2
+      with:
+        name: PlantApplicationGuide
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/PlantApplicationGuide.pdf
+
+    - name: Upload TipsAndTricksUsingEnergyPlus
+      uses: actions/upload-artifact@v2
+      with:
+        name: TipsAndTricksUsingEnergyPlus
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/TipsAndTricksUsingEnergyPlus.pdf
+
+    - name: Upload UsingEnergyPlusForCompliance
+      uses: actions/upload-artifact@v2
+      with:
+        name: UsingEnergyPlusForCompliance
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/UsingEnergyPlusForCompliance.pdf
 
 #    - name: Test
 #      working-directory: ${{runner.workspace}}/build
