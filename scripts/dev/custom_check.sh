@@ -17,5 +17,3 @@ python3 "$REPO_ROOT"/scripts/dev/verify_cmake_dirs.py || EXIT_STATUS=$?
 python3 "$REPO_ROOT"/scripts/dev/find_included_cc_files.py || EXIT_STATUS=$?
 
 exit $EXIT_STATUS
-
-#    - ./scripts/dev/check_pr_labels.py -- use https://github.com/jesusvasquez333/verify-pr-label-action
