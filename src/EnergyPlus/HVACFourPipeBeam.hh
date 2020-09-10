@@ -63,7 +63,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace FourPipeBeam {
 
@@ -113,7 +112,7 @@ namespace FourPipeBeam {
 
     private: // Methods
         void
-        init(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
+        init(EnergyPlusData &state, bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step         MAYBE THIS SHOULD HAVE A DEFAULT ARG OF = false
         );
 
         void set_size(EnergyPlusData &state);
@@ -136,9 +135,9 @@ namespace FourPipeBeam {
 
         void update() const;
 
-        void report();
+        void report(EnergyPlusData &state);
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
     private:                      // data
         int coolingAvailSchedNum; // index to schedule for cooling availability

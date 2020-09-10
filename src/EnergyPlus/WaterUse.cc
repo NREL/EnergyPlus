@@ -85,7 +85,7 @@ namespace WaterUse {
     //       RE-ENGINEERED  na
 
 
-    void SimulateWaterUse(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse, bool FirstHVACIteration)
+    void SimulateWaterUse(EnergyPlusData &state, WaterUseData &dataWaterUse, bool FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -148,7 +148,7 @@ namespace WaterUse {
 
             if (!dataWaterUse.WaterConnections(WaterConnNum).StandAlone) continue; // only model non plant connections here
 
-            dataWaterUse.WaterConnections(WaterConnNum).InitConnections(dataBranchInputManager, dataWaterUse);
+            dataWaterUse.WaterConnections(WaterConnNum).InitConnections(state, dataWaterUse);
 
             NumIteration = 0;
 
@@ -243,7 +243,7 @@ namespace WaterUse {
 
         if (!DataGlobals::BeginEnvrnFlag) this->MyEnvrnFlag = true;
 
-        this->InitConnections(state.dataBranchInputManager, state.dataWaterUse);
+        this->InitConnections(state, state.dataWaterUse);
 
         int NumIteration = 0;
 
@@ -959,7 +959,7 @@ namespace WaterUse {
         }
     }
 
-    void WaterConnectionsType::InitConnections(BranchInputManagerData &dataBranchInputManager, WaterUseData &dataWaterUse)
+    void WaterConnectionsType::InitConnections(EnergyPlusData &state, WaterUseData &dataWaterUse)
     {
 
         // SUBROUTINE INFORMATION:
@@ -975,7 +975,7 @@ namespace WaterUse {
 
         if (this->plantScanFlag && allocated(DataPlant::PlantLoop) && !this->StandAlone) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_WaterUseConnection,
                                                     this->PlantLoopNum,

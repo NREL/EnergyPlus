@@ -56,7 +56,6 @@
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/HVACManager.hh>
-//#include <CoolTower.hh>
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -72,7 +71,6 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
-#include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -83,7 +81,6 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
-#include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -185,10 +182,6 @@ namespace HVACManager {
 
     int HVACManageIteration(0); // counts iterations to enforce maximum iteration limit
     int RepIterAir(0);
-
-    // Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-    // Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
-    // Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
 
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
@@ -403,7 +396,7 @@ namespace HVACManager {
             ManageAirflowNetworkBalance(state, false);
         }
 
-        SetHeatToReturnAirFlag();
+        SetHeatToReturnAirFlag(state);
 
         SysDepZoneLoadsLagged = SysDepZoneLoads;
 
@@ -533,7 +526,7 @@ namespace HVACManager {
                 if (DoOutputReporting) {
                     CalcMoreNodeInfo();
                     CalculatePollution();
-                    InitEnergyReports(state.files);
+                    InitEnergyReports(state, state.files);
                     ReportSystemEnergyUse();
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
@@ -792,8 +785,8 @@ namespace HVACManager {
         SimElecCircuitsFlag = true;
         FirstHVACIteration = true;
 
-        if (AirLoopInputsFilled) {
-            for (auto &e : AirLoopControlInfo) {
+        if (state.dataAirLoop->AirLoopInputsFilled) {
+            for (auto &e : state.dataAirLoop->AirLoopControlInfo) {
                 // Reset air loop control info for cooling coil active flag (used in TU's for reheat air flow control)
                 e.CoolingActiveFlag = false;
                 // Reset air loop control info for heating coil active flag (used in OA controller for HX control)
@@ -872,7 +865,7 @@ namespace HVACManager {
         // rates that might have been set by the set point and availability
         // managers.
 
-        ResetHVACControl();
+        ResetHVACControl(state);
 
         // Before the HVAC simulation, call ManageSetPoints to set all the HVAC
         // node setpoints
@@ -886,7 +879,7 @@ namespace HVACManager {
 
         // Before the HVAC simulation, call ManageSystemAvailability to set
         // the system on/off flags
-        ManageSystemAvailability();
+        ManageSystemAvailability(state);
 
         ManageEMS(state, emsCallFromAfterHVACManagers, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point
         ManageEMS(state, emsCallFromHVACIterationLoop, anyEMSRan, ObjexxFCL::Optional_int_const()); // calling point id
@@ -1045,7 +1038,7 @@ namespace HVACManager {
 
                         if (any(AirLoopConvergence(AirSysNum).HVACMassFlowNotConverged)) {
 
-                            ShowContinueError("Air System Named = " + AirToZoneNodeInfo(AirSysNum).AirLoopName +
+                            ShowContinueError("Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
                                               " did not converge for mass flow rate");
                             ShowContinueError("Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
@@ -1062,7 +1055,7 @@ namespace HVACManager {
                             ShowContinueError("Supply-to-demand interface deck 1 mass flow rate check value iteration history trace: " +
                                               HistoryTrace);
 
-                            if (AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
+                            if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace +=
@@ -1075,7 +1068,7 @@ namespace HVACManager {
 
                         if (any(AirLoopConvergence(AirSysNum).HVACHumRatNotConverged)) {
 
-                            ShowContinueError("Air System Named = " + AirToZoneNodeInfo(AirSysNum).AirLoopName +
+                            ShowContinueError("Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName +
                                               " did not converge for humidity ratio");
                             ShowContinueError("Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
@@ -1090,7 +1083,7 @@ namespace HVACManager {
                             ShowContinueError("Supply-to-demand interface deck 1 humidity ratio check value iteration history trace: " +
                                               HistoryTrace);
 
-                            if (AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
+                            if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace +=
@@ -1103,7 +1096,7 @@ namespace HVACManager {
 
                         if (any(AirLoopConvergence(AirSysNum).HVACTempNotConverged)) {
 
-                            ShowContinueError("Air System Named = " + AirToZoneNodeInfo(AirSysNum).AirLoopName + " did not converge for temperature");
+                            ShowContinueError("Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName + " did not converge for temperature");
                             ShowContinueError("Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
@@ -1117,7 +1110,7 @@ namespace HVACManager {
                             }
                             ShowContinueError("Supply-to-demand interface deck 1 temperature check value iteration history trace: " + HistoryTrace);
 
-                            if (AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
+                            if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace +=
@@ -1129,7 +1122,7 @@ namespace HVACManager {
                         } // Temps not converged
                         if (any(AirLoopConvergence(AirSysNum).HVACEnergyNotConverged)) {
 
-                            ShowContinueError("Air System Named = " + AirToZoneNodeInfo(AirSysNum).AirLoopName + " did not converge for energy");
+                            ShowContinueError("Air System Named = " + state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).AirLoopName + " did not converge for energy");
                             ShowContinueError("Check values should be zero. Most Recent values listed first.");
                             HistoryTrace = "";
                             for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
@@ -1143,7 +1136,7 @@ namespace HVACManager {
                             }
                             ShowContinueError("Supply-to-demand interface deck 1 energy check value iteration history trace: " + HistoryTrace);
 
-                            if (AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
+                            if (state.dataAirLoop->AirToZoneNodeInfo(AirSysNum).NumSupplyNodes >= 2) {
                                 HistoryTrace = "";
                                 for (StackDepth = 1; StackDepth <= ConvergLogStackDepth; ++StackDepth) {
                                     HistoryTrace +=
@@ -1738,7 +1731,7 @@ namespace HVACManager {
             }
         }
 
-        CheckAirLoopFlowBalance();
+        CheckAirLoopFlowBalance(state);
 
         // Set node setpoints to a flag value so that controllers can check whether their sensed nodes
         // have a setpoint
@@ -1857,10 +1850,10 @@ namespace HVACManager {
                 ManageAirflowNetworkBalance(state, FirstHVACIteration);
             }
             ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
-            AirLoopInputsFilled = true; // all air loop inputs have been read in
+            state.dataAirLoop->AirLoopInputsFilled = true; // all air loop inputs have been read in
             SimAirLoops = true;         // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
             AirLoopsSimOnce = true;     // air loops simulated once for this environment
-            ResetTerminalUnitFlowLimits();
+            ResetTerminalUnitFlowLimits(state);
             FlowMaxAvailAlreadyReset = true;
             ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
@@ -1894,7 +1887,7 @@ namespace HVACManager {
                         // ResetTerminalUnitFlowLimits(); // don't do reset at all - interferes with convergence and terminal unit flow controls
                         FlowResolutionNeeded = true;
                     } else {
-                        ResolveAirLoopFlowLimits();
+                        ResolveAirLoopFlowLimits(state);
                         FlowResolutionNeeded = false;
                     }
                     ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
@@ -1918,7 +1911,7 @@ namespace HVACManager {
                 AirLoopConvergFail = 0;
             }
             // Check to see if any components have been locked out. If so, SimAirLoops will be reset to TRUE.
-            ResolveLockoutFlags(SimAirLoops);
+            ResolveLockoutFlags(state, SimAirLoops);
 
             if (SimNonZoneEquipment) {
                 ManageNonZoneEquipment(state, FirstHVACIteration, SimNonZoneEquipment);
@@ -1946,7 +1939,7 @@ namespace HVACManager {
         }
     }
 
-    void ResetTerminalUnitFlowLimits()
+    void ResetTerminalUnitFlowLimits(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1987,16 +1980,16 @@ namespace HVACManager {
         int TermInletNode;
 
         for (AirLoopIndex = 1; AirLoopIndex <= NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
-            for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled;
+            for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled;
                  ++ZonesCooledIndex) { // loop over the zones cooled by this air loop
-                TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
+                TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
                 // reset the max avail flow rate at the terminal unit cold air inlet to the max
                 Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
                 Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRateMin;
             }
-            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated;
+            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated;
                  ++ZonesHeatedIndex) { // loop over the zones heated by this air loop
-                TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
+                TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
                 // reset the max avail flow rate at the terminal unit hot air inlet to the max
                 Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
                 Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRateMin;
@@ -2004,7 +1997,7 @@ namespace HVACManager {
         }
     }
 
-    void ResolveAirLoopFlowLimits()
+    void ResolveAirLoopFlowLimits(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2050,40 +2043,40 @@ namespace HVACManager {
         Real64 FlowRatio;
 
         for (AirLoopIndex = 1; AirLoopIndex <= NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
-            for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo(AirLoopIndex).NumSupplyNodes;
+            for (SupplyIndex = 1; SupplyIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumSupplyNodes;
                  ++SupplyIndex) {                                                             // loop over the air loop supply outlets
-                if (AirToZoneNodeInfo(AirLoopIndex).SupplyDuctType(SupplyIndex) == Cooling) { // check for cooling duct
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).SupplyDuctType(SupplyIndex) == Cooling) { // check for cooling duct
                     // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                     // node mass flow max avail to what air loop can supply
-                    SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
+                    SupplyNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
                         // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) >
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
                             HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
-                            for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
-                                TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
+                            for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
+                                TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
                                 Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
                                 Node(TermInletNode).MassFlowRateMinAvail =
                                     min(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
                             }
                         }
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) <
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
                             -HVACFlowRateToler * 0.01) {
                             if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 //               CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                                 //                                   TRIM(NodeID(SupplyNode))//  &
                                 //                                   ', check for Node Connection Errors in the following messages.')
-                                for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
-                                    TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
+                                for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
+                                    TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
                                     Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
                                     Node(TermInletNode).MassFlowRateMinAvail =
-                                        Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
+                                        Node(SupplyNode).MassFlowRate / double(state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
                                 }
                             } else {
                                 FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
-                                for (ZonesCooledIndex = 1; ZonesCooledIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
-                                    TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
+                                for (ZonesCooledIndex = 1; ZonesCooledIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled; ++ZonesCooledIndex) {
+                                    TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitCoolInletNodes(ZonesCooledIndex);
                                     Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
                                     Node(TermInletNode).MassFlowRateMaxAvail =
                                         max(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
@@ -2093,40 +2086,40 @@ namespace HVACManager {
                     }
                 }
             }
-            for (SupplyIndex = 1; SupplyIndex <= AirToZoneNodeInfo(AirLoopIndex).NumSupplyNodes;
+            for (SupplyIndex = 1; SupplyIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumSupplyNodes;
                  ++SupplyIndex) {                                                             // loop over the air loop supply outlets
-                if (AirToZoneNodeInfo(AirLoopIndex).SupplyDuctType(SupplyIndex) == Heating) { // check for heating duct
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).SupplyDuctType(SupplyIndex) == Heating) { // check for heating duct
                     // check if terminal units requesting more air than air loop can supply; if so, set terminal unit inlet
                     // node mass flow max avail to what air loop can supply
-                    SupplyNode = AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
+                    SupplyNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).AirLoopSupplyNodeNum(SupplyIndex);
                     if (Node(SupplyNode).MassFlowRate > 0.0) {
                         // must include bypass flow for ChangeoverBypass system so that terminal units are not restricted (e.g., MaxAvail is lowered)
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) >
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) >
                             HVACFlowRateToler * 0.01) {
                             FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
-                            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
-                                TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
+                            for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
+                                TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
                                 Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
                                 Node(TermInletNode).MassFlowRateMinAvail =
                                     min(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
                             }
                         }
-                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - AirLoopFlow(AirLoopIndex).BypassMassFlow) <
+                        if ((Node(SupplyNode).MassFlowRateSetPoint - Node(SupplyNode).MassFlowRate - state.dataAirLoop->AirLoopFlow(AirLoopIndex).BypassMassFlow) <
                             -HVACFlowRateToler * 0.01) {
                             if (Node(SupplyNode).MassFlowRateSetPoint == 0.0) {
                                 // CALL ShowFatalError('ResolveAirLoopFlowLimits: Node MassFlowRateSetPoint = 0.0, Node='//  &
                                 // TRIM(NodeID(SupplyNode))//  &
                                 // ', check for Node Connection Errors in the following messages.')
-                                for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
-                                    TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
+                                for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
+                                    TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
                                     Node(TermInletNode).MassFlowRateMaxAvail = Node(TermInletNode).MassFlowRateMax;
                                     Node(TermInletNode).MassFlowRateMinAvail =
-                                        Node(SupplyNode).MassFlowRate / double(AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
+                                        Node(SupplyNode).MassFlowRate / double(state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesCooled);
                                 }
                             } else {
                                 FlowRatio = Node(SupplyNode).MassFlowRate / Node(SupplyNode).MassFlowRateSetPoint;
-                                for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
-                                    TermInletNode = AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
+                                for (ZonesHeatedIndex = 1; ZonesHeatedIndex <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).NumZonesHeated; ++ZonesHeatedIndex) {
+                                    TermInletNode = state.dataAirLoop->AirToZoneNodeInfo(AirLoopIndex).TermUnitHeatInletNodes(ZonesHeatedIndex);
                                     Node(TermInletNode).MassFlowRateMinAvail = Node(TermInletNode).MassFlowRate * FlowRatio;
                                     Node(TermInletNode).MassFlowRateMaxAvail =
                                         max(Node(TermInletNode).MassFlowRateMaxAvail, Node(TermInletNode).MassFlowRateMinAvail);
@@ -2139,7 +2132,7 @@ namespace HVACManager {
         }
     }
 
-    void ResolveLockoutFlags(bool &SimAir) // TRUE means air loops must be (re)simulated
+    void ResolveLockoutFlags(EnergyPlusData &state, bool &SimAir) // TRUE means air loops must be (re)simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -2178,15 +2171,15 @@ namespace HVACManager {
 
         for (AirLoopIndex = 1; AirLoopIndex <= NumPrimaryAirSys; ++AirLoopIndex) { // loop over the primary air loops
             // check if economizer ia active and if there is a request that it be locked out
-            if (AirLoopControlInfo(AirLoopIndex).EconoActive &&
-                (AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithCompressor || AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithHeating)) {
-                AirLoopControlInfo(AirLoopIndex).EconoLockout = true;
+            if (state.dataAirLoop->AirLoopControlInfo(AirLoopIndex).EconoActive &&
+                (state.dataAirLoop->AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithCompressor || state.dataAirLoop->AirLoopControlInfo(AirLoopIndex).ReqstEconoLockoutWithHeating)) {
+                state.dataAirLoop->AirLoopControlInfo(AirLoopIndex).EconoLockout = true;
                 SimAir = true;
             }
         }
     }
 
-    void ResetHVACControl()
+    void ResetHVACControl(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2222,11 +2215,11 @@ namespace HVACManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (NumPrimaryAirSys == 0) return;
-        for (auto &e : AirLoopControlInfo) {
+        for (auto &e : state.dataAirLoop->AirLoopControlInfo) {
             e.NightVent = false;
             e.LoopFlowRateSet = false;
         }
-        for (auto &e : AirLoopFlow)
+        for (auto &e : state.dataAirLoop->AirLoopFlow)
             e.ReqSupplyFrac = 1.0;
     }
 
@@ -2904,7 +2897,7 @@ namespace HVACManager {
         }
     }
 
-    void SetHeatToReturnAirFlag()
+    void SetHeatToReturnAirFlag(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2922,7 +2915,7 @@ namespace HVACManager {
         // to tell ManageZoneAirUpdates (predict and correct) what to do with the heat to return air.
 
         // METHODOLOGY EMPLOYED:
-        // Uses program data structures AirLoopControlInfo and ZoneEquipInfo
+        // Uses program data structures state.dataAirLoop->AirLoopControlInfo and ZoneEquipInfo
 
         // REFERENCES:
         // na
@@ -2964,19 +2957,19 @@ namespace HVACManager {
         if (MyOneTimeFlag) {
             // set the air loop Any Continuous Fan flag
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-                if (AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
-                    if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                        CycFanMaxVal = GetScheduleMaxValue(AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
+                if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).UnitarySys) { // for unitary systems check the cycling fan schedule
+                    if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
+                        CycFanMaxVal = GetScheduleMaxValue(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr);
                         if (CycFanMaxVal > 0.0) {
-                            AirLoopControlInfo(AirLoopNum).AnyContFan = true;
+                            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan = true;
                         } else {
-                            AirLoopControlInfo(AirLoopNum).AnyContFan = false;
+                            state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan = false;
                         }
                     } else { // no schedule means always cycling fan
-                        AirLoopControlInfo(AirLoopNum).AnyContFan = false;
+                        state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan = false;
                     }
                 } else { // for nonunitary (central) all systems are continuous fan
-                    AirLoopControlInfo(AirLoopNum).AnyContFan = true;
+                    state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AnyContFan = true;
                 }
             }
             // check to see if a controlled zone is served exclusively by a zonal system
@@ -3001,8 +2994,8 @@ namespace HVACManager {
                 for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                     AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                     if (AirLoopNum > 0) {
-                        if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                            CyclingFan = CheckScheduleValue(AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
+                        if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
+                            CyclingFan = CheckScheduleValue(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr, 0.0);
                         }
                     }
                 }
@@ -3034,11 +3027,11 @@ namespace HVACManager {
 
         // set the air loop fan operation mode
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            if (AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
-                if (GetCurrentScheduleValue(AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
-                    AirLoopControlInfo(AirLoopNum).FanOpMode = CycFanCycCoil;
+            if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr > 0) {
+                if (GetCurrentScheduleValue(state.dataAirLoop->AirLoopControlInfo(AirLoopNum).CycFanSchedPtr) == 0.0) {
+                    state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = CycFanCycCoil;
                 } else {
-                    AirLoopControlInfo(AirLoopNum).FanOpMode = ContFanCycCoil;
+                    state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode = ContFanCycCoil;
                 }
             }
         }
@@ -3052,7 +3045,7 @@ namespace HVACManager {
                 for (int zoneInNode = 1; zoneInNode <= ZoneEquipConfig(ControlledZoneNum).NumInletNodes; ++zoneInNode) {
                     AirLoopNum = ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(zoneInNode);
                     if (AirLoopNum > 0) {
-                        if (AirLoopControlInfo(AirLoopNum).FanOpMode == ContFanCycCoil) {
+                        if (state.dataAirLoop->AirLoopControlInfo(AirLoopNum).FanOpMode == ContFanCycCoil) {
                             Zone(ZoneNum).NoHeatToReturnAir = false;
                             break;
                         }
@@ -3127,12 +3120,12 @@ namespace HVACManager {
         }
     }
 
-    void CheckAirLoopFlowBalance()
+    void CheckAirLoopFlowBalance(EnergyPlusData &state)
     {
         // Check for unbalanced airloop
         if (!DataGlobals::WarmupFlag && AirLoopsSimOnce) {
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-                auto &thisAirLoopFlow(AirLoopFlow(AirLoopNum));
+                auto &thisAirLoopFlow(state.dataAirLoop->AirLoopFlow(AirLoopNum));
                 if (!thisAirLoopFlow.FlowError) {
                     Real64 unbalancedExhaustDelta = thisAirLoopFlow.SupFlow - thisAirLoopFlow.OAFlow - thisAirLoopFlow.SysRetFlow;
                     if (unbalancedExhaustDelta > SmallMassFlow) {

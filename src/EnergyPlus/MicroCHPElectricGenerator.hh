@@ -59,7 +59,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace MicroCHPElectricGenerator {
 
@@ -209,7 +208,7 @@ namespace MicroCHPElectricGenerator {
 
         void setupOutputVars();
 
-        void InitMicroCHPNoNormalizeGenerators(BranchInputManagerData &dataBranchInputManager);
+        void InitMicroCHPNoNormalizeGenerators(EnergyPlusData &state);
 
         void CalcUpdateHeatRecovery();
 

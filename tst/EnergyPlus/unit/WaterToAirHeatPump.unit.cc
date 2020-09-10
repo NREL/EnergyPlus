@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
     int CompOp(1);
     WatertoAirHP(HPNum).LoopNum = 1;
 
-    InitWatertoAirHP(state.dataBranchInputManager, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+    InitWatertoAirHP(state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
     CalcWatertoAirHPCooling(HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 
@@ -279,7 +279,7 @@ TEST_F(EnergyPlusFixture, WaterToAirHeatPumpTest_SimWaterToAir)
 
     WatertoAirHP(HPNum).DesignWaterMassFlowRate = 15.0;
 
-    InitWatertoAirHP(state.dataBranchInputManager, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
+    InitWatertoAirHP(state, HPNum, InitFlag, MaxONOFFCyclesperHour, HPTimeConstant, FanDelayTime, SensLoad, LatentLoad, DesignAirflow, PartLoadRatio);
 
     CalcWatertoAirHPHeating(HPNum, CyclingScheme, FirstHVACIteration, RuntimeFrac, InitFlag, SensLoad, CompOp, PartLoadRatio);
 

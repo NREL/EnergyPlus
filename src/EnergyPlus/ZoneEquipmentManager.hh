@@ -90,7 +90,7 @@ namespace ZoneEquipmentManager {
 
     void GetZoneEquipment(EnergyPlusData &state);
 
-    void InitZoneEquipment(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration); // unused 1208
+    void InitZoneEquipment(EnergyPlusData &state, ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration); // unused 1208
 
     void SizeZoneEquipment(EnergyPlusData &state);
 
@@ -114,9 +114,10 @@ namespace ZoneEquipmentManager {
                                     Optional_int_const EquipPriorityNum = _ // index in PrioritySimOrder for this update
     );
 
-    void CalcZoneMassBalance(bool const FirstHVACIteration);
+    void CalcZoneMassBalance(EnergyPlusData &state, bool const FirstHVACIteration);
 
-    void CalcZoneReturnFlows(int const ZoneNum,
+    void CalcZoneReturnFlows(EnergyPlusData &state,
+                             int const ZoneNum,
                              Real64 &ExpTotalReturnMassFlow,  // Expected total return air mass flow rate
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     );
@@ -133,7 +134,7 @@ namespace ZoneEquipmentManager {
 
     void CalcZoneLeavingConditions(ZoneEquipmentManagerData &dataZoneEquipmentManager, bool const FirstHVACIteration);
 
-    void UpdateZoneEquipment(bool &SimAir);
+    void UpdateZoneEquipment(EnergyPlusData &state, bool &SimAir);
 
     void CalcDOASSupCondsForSizing(Real64 OutDB,        // outside air temperature [C]
                                    Real64 OutHR,        // outside humidity ratio [kg Water / kg Dry Air]
@@ -186,7 +187,7 @@ namespace ZoneEquipmentManager {
         }
 
         // Default Constructor
-        ZoneEquipmentManagerData() : GetZoneEquipmentInputFlag(true), SizeZoneEquipmentOneTimeFlag(true), 
+        ZoneEquipmentManagerData() : GetZoneEquipmentInputFlag(true), SizeZoneEquipmentOneTimeFlag(true),
             reportDOASZoneSizingHeader(true), InitZoneEquipmentOneTimeFlag(true), InitZoneEquipmentEnvrnFlag(true), FirstPassZoneEquipFlag(true)
         {
         }

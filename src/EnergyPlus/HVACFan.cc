@@ -176,7 +176,7 @@ namespace HVACFan {
             calcSimpleSystemFan(state, _, _, _, _, _, _, _);
         }
 
-        update();
+        update(state);
 
         report();
     }
@@ -1031,7 +1031,7 @@ namespace HVACFan {
         DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // reset to 1
     }
 
-    void FanSystem::update() const // does not change state of object, only update elsewhere
+    void FanSystem::update(EnergyPlusData &state) const // does not change state of object, only update elsewhere
     {
         // Set the outlet air node of the fan
         DataLoopNode::Node(outletNodeNum).MassFlowRate = m_outletAirMassFlowRate;
@@ -1058,17 +1058,17 @@ namespace HVACFan {
 
         if (speedControl == SpeedControlMethod::Continuous) {
             if (AirLoopNum > 0) {
-                DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_fanRunTimeFractionAtSpeed[0];
+                state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_fanRunTimeFractionAtSpeed[0];
             }
         } else {
             if (AirLoopNum > 0) {
                 if (m_numSpeeds == 1) {
-                    DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_maxAirMassFlowRate;
+                    state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_maxAirMassFlowRate;
                 } else {
                     if (m_outletAirMassFlowRate <= m_massFlowAtSpeed[0]) {
-                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_massFlowAtSpeed[0];
+                        state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = m_outletAirMassFlowRate / m_massFlowAtSpeed[0];
                     } else {
-                        DataAirLoop::AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = 1.0;
+                        state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF = 1.0;
                     }
                 }
             }

@@ -1728,7 +1728,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
@@ -3302,7 +3302,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     PlantManager::CheckIfAnyPlant();
     createFacilityElectricPowerServiceObject();
-    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
+    BranchInputManager::ManageBranchInput(state); // just gets input and returns.
     DataGlobals::DoingSizing = true;
     SizingManager::ManageSizing(state);
     DataGlobals::DoingSizing = false;
