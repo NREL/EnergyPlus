@@ -196,7 +196,6 @@ namespace UnitarySystems {
         int m_SystemHeatControlNodeNum;
         bool m_CoolCoilExists;
         int m_CoolingCoilType_Num;
-        int m_CoolingCoilSubType_Num;
         int m_NumOfSpeedCooling;
         int m_CoolingCoilAvailSchPtr;
         Real64 m_DesignCoolingCapacity;
