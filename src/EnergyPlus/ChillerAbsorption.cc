@@ -112,15 +112,15 @@ namespace ChillerAbsorption {
     const char * fluidNameWater = "WATER";
     const char * fluidNameSteam = "STEAM";
 
-    PlantComponent *BLASTAbsorberSpecs::factory(ChillerAbsorberData &chillers, std::string const &objectName)
+    PlantComponent *BLASTAbsorberSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
-        if (chillers.getInput) {
-            GetBLASTAbsorberInput(chillers);
-            chillers.getInput = false;
+        if (state.dataChillerAbsorbers.getInput) {
+            GetBLASTAbsorberInput(state);
+            state.dataChillerAbsorbers.getInput = false;
         }
         // Now look for this particular object
-        for (auto &thisAbs : chillers.absorptionChillers) {
+        for (auto &thisAbs : state.dataChillerAbsorbers.absorptionChillers) {
             if (thisAbs.Name == objectName) {
                 return &thisAbs;
             }
@@ -140,7 +140,7 @@ namespace ChillerAbsorption {
             // called from dominant chilled water connection loop side
 
             // Calculate Load
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             this->calculate(CurLoad, RunFlag);
             this->updateRecords(CurLoad, RunFlag);
 
@@ -182,7 +182,7 @@ namespace ChillerAbsorption {
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
-        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
+        this->initialize(state, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->sizeChiller();
@@ -213,7 +213,7 @@ namespace ChillerAbsorption {
         tempDesCondIn = this->TempDesCondIn;
     }
 
-    void GetBLASTAbsorberInput(ChillerAbsorberData &chillers)
+    void GetBLASTAbsorberInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -237,20 +237,20 @@ namespace ChillerAbsorption {
 
         DataIPShortCuts::cCurrentModuleObject = moduleObjectType;
 
-        chillers.numAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerAbsorbers.numAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.numAbsorbers <= 0) {
+        if (state.dataChillerAbsorbers.numAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
 
-        if (allocated(chillers.absorptionChillers)) return;
+        if (allocated(state.dataChillerAbsorbers.absorptionChillers)) return;
 
-        chillers.absorptionChillers.allocate(chillers.numAbsorbers);
+        state.dataChillerAbsorbers.absorptionChillers.allocate(state.dataChillerAbsorbers.numAbsorbers);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-        for (AbsorberNum = 1; AbsorberNum <= chillers.numAbsorbers; ++AbsorberNum) {
+        for (AbsorberNum = 1; AbsorberNum <= state.dataChillerAbsorbers.numAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           AbsorberNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -268,7 +268,7 @@ namespace ChillerAbsorption {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.absorptionChillers(AbsorberNum);
+            auto &thisChiller = state.dataChillerAbsorbers.absorptionChillers(AbsorberNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {
@@ -582,7 +582,7 @@ namespace ChillerAbsorption {
         }
     }
 
-    void BLASTAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager,
+    void BLASTAbsorberSpecs::initialize(EnergyPlusData &state,
                                         bool RunFlag, // TRUE when chiller operating
                                         Real64 MyLoad)
     {
@@ -608,7 +608,7 @@ namespace ChillerAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Absorption,
                                                     this->CWLoopNum,
@@ -622,7 +622,7 @@ namespace ChillerAbsorption {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Absorption,
                                                         this->CDLoopNum,
@@ -639,7 +639,7 @@ namespace ChillerAbsorption {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Absorption, true);
             }
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Absorption,
                                                         this->GenLoopNum,

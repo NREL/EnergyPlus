@@ -536,7 +536,7 @@ namespace BaseboardRadiator {
 
         if (baseboard->Baseboard(BaseboardNum).SetLoopIndexFlag && allocated(PlantLoop)) {
             errFlag = false;
-            ScanPlantLoopsForObject(state.dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     baseboard->Baseboard(BaseboardNum).EquipID,
                                     baseboard->Baseboard(BaseboardNum).EquipType,
                                     baseboard->Baseboard(BaseboardNum).LoopNum,

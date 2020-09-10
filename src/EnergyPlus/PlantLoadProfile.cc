@@ -124,7 +124,7 @@ namespace PlantLoadProfile {
 
     void PlantProfileData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitPlantProfile(state.dataBranchInputManager);
+        this->InitPlantProfile(state);
     }
 
     void PlantProfileData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -158,7 +158,7 @@ namespace PlantLoadProfile {
         static std::string const RoutineName("SimulatePlantProfile");
         Real64 DeltaTemp;
 
-        this->InitPlantProfile(state.dataBranchInputManager);
+        this->InitPlantProfile(state);
 
         if (this->MassFlowRate > 0.0) {
             Real64 Cp =
@@ -176,7 +176,7 @@ namespace PlantLoadProfile {
 
     } // simulate()
 
-    void PlantProfileData::InitPlantProfile(BranchInputManagerData &dataBranchInputManager)
+    void PlantProfileData::InitPlantProfile(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -214,7 +214,7 @@ namespace PlantLoadProfile {
         if (this->SetLoopIndexFlag) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPlantProfile: Program terminated for previous conditions.");

@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EneryPlusData;
-struct BranchInputManagerData;
 
 namespace RefrigeratedCase {
 
@@ -1529,7 +1528,7 @@ namespace RefrigeratedCase {
 
     void InitRefrigeration();
 
-    void InitRefrigerationPlantConnections(BranchInputManagerData &dataBranchInputManager);
+    void InitRefrigerationPlantConnections(EnergyPlusData &state);
 
     void SimulateDetailedRefrigerationSystems(EnergyPlusData &state);
 
