@@ -7,7 +7,8 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout EnergyPlus
+      uses: actions/checkout@v2
 
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
@@ -22,11 +23,17 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
-      run: cmake -DTEX_INTERACTION=nonstopmode ..
+      run: cmake -DTEX_INTERACTION=batchmode ..
 
     - name: Build Docs
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
-      run: cmake --build -j 2 .
+      run: cmake --build . -j 2
+
+    - name: Upload PDFs
+      uses: actions/upload-artifact@v2
+      with:
+        name: Documentation PDFs
+        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/*.pdf
 
 #    - name: Test
 #      working-directory: ${{runner.workspace}}/build
