@@ -18,4 +18,4 @@ jobs:
         python-version: 3.7
 
     - name: Custom Check
-      run: /bin/bash ${{runner.workspace}}/scripts/dev/custom_check.sh ${{runner.workspace}}
+      run: ${{runner.workspace}}/scripts/dev/custom_check.sh ${{runner.workspace}}
