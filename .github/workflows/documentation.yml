@@ -22,7 +22,7 @@ jobs:
 
     - name: Configure CMake
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
-      run: cmake ..
+      run: cmake -DTEX_INTERACTION=nonstopmode ..
 
     - name: Build Docs
       working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
