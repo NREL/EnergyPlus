@@ -2616,9 +2616,8 @@ namespace SolarShading {
         //                                    correspond to how CHKBKS is called
         //                      Jan 2002, FW: change error message
         //       RE-ENGINEERED  Lawrie, Oct 2000
-        //       Re-engineered  Jinchao Yuan, Sep 2020: Revised the vector computation method 
-        //                                              to reliabily produce CVec, 
-        //                                              and simplified the warning messages.
+        //       Sep 2020: Revised the vector computation method to reliabily produce CVec,
+        //                 and simplified the warning messages.
 
         // PURPOSE OF THIS SUBROUTINE:
         // Determines whether a any vertices of the back surface are in front of the receiving surface;

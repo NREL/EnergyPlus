@@ -1865,7 +1865,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
 {
     int numofsurface;
-    numofsurface = 2;
+    numofsurface = 4;
     Surface.allocate(numofsurface);
     Vector VtxA1(0.0, 0.0, 5.0); 
     Vector VtxA2(0.0, 0.0, 0.0); 
@@ -1905,17 +1905,44 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_CHKBKS)
 
     CHKBKS(1, 2);
 
-    // std::string stream_str = this->err_stream->str();
+    EXPECT_TRUE(this->has_err_output(false));
+    
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** Problem in interior solar distribution calculation (CHKBKS)",
+        "   **   ~~~   **    Solar Distribution = FullInteriorExterior will not work in Zone=Zone1",
+        "   **   ~~~   **    because one or more of vertices, such as Vertex 3 of back surface=Surf_Back"
+        ", is in front of receiving surface=Surf_Recv",
+        "   **   ~~~   **    (Dot Product indicator=             62.5000)", 
+        "   **   ~~~   **    Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details."
+        });
 
-    EXPECT_TRUE(this->has_err_output(true));
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
-    //std::string const error_string = delimited_string({
-    //    "Problem in interior solar distribution calculation(CHKBKS)",
-    //    "   Solar Distribution = FullInteriorExterior will not work in Zone =Zone1",
-    //    "   because one or more of vertices, such as Vertex 3 of back surface=Surf_Back",
-    //    ", is in front of receiving surface=Surf_Recv",
-    //    "   (Dot Product indicator=62.50)", 
-    //    "   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output : Diagnostics, DisplayExtraWarnings; for more details."
-    //    });
-    //EXPECT_TRUE(compare_err_stream(error_string, true));
+    Surface(3).Sides = 4;
+
+    Surface(3).Vertex.allocate(4);
+    Surface(3).Vertex(1) = VtxA1;
+    Surface(3).Vertex(2) = VtxA2;
+    Surface(3).Vertex(3) = VtxA3;
+    Surface(3).Vertex(4) = VtxA4;
+
+    Surface(3).Name = "Surf_Back2";
+    Surface(3).ZoneName = "Zone2";
+
+    Surface(4).Sides = 6; // receiving
+    Surface(4).Vertex.allocate(6);
+
+    Surface(4).Vertex(1) = VtxB6;
+    Surface(4).Vertex(2) = VtxB5;
+    Surface(4).Vertex(3) = VtxB4;
+    Surface(4).Vertex(4) = VtxB3;
+    Surface(4).Vertex(5) = VtxB2;
+    Surface(4).Vertex(6) = VtxB1;
+
+    Surface(4).Name = "Surf_Recv2";
+    Surface(4).ZoneName = "Zone2";
+
+    CHKBKS(3, 4);
+
+    EXPECT_FALSE(this->has_err_output(true));
 }
