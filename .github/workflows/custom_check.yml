@@ -1,9 +1,9 @@
-name: CMake
+name: Custom Check
 
 on: [push]
 
 jobs:
-  custom_check:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
