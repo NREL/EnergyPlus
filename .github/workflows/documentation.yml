@@ -15,15 +15,15 @@ jobs:
         python-version: 3.7
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/docs/build
+      run: cmake -E make_directory ${{runner.workspace}}/doc/build
 
     - name: Configure CMake
       shell: bash
-      working-directory: ${{runner.workspace}}/docs/build
+      working-directory: ${{runner.workspace}}/doc/build
       run: cmake ..
 
     - name: Build Docs
-      working-directory: ${{runner.workspace}}/docs/build
+      working-directory: ${{runner.workspace}}/doc/build
       shell: bash
       run: cmake --build .
 
