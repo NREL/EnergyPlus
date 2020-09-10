@@ -264,6 +264,7 @@ class Checker(FileVisitor):
                 if not txt.startswith(self.text):
                     self.error(filepath, 1, 'License text is not at top of file')
                     return False
+        return True
 
 
 class Replacer(FileVisitor):
