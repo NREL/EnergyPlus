@@ -18,4 +18,5 @@ jobs:
         python-version: 3.7
 
     - name: Custom Check
+      shell: bash
       run: ./scripts/dev/custom_check.sh .
