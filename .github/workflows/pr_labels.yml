@@ -11,8 +11,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Verify PR label action
-        uses: actions/verify-pr-label-action@v1.1.0
-        id: verify-pr-label
+        uses: mheap/github-action-required-labels@v1
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          valid-labels: 'Defect, Refactoring, NewFeature, Performance, DoNoPublish'
+          mode: minimum
+          count: 1
+          labels: "Defect, Refactoring, NewFeature, Performance, DoNoPublish"
