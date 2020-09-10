@@ -2006,7 +2006,7 @@ namespace EMSManager {
                                      DataSurfaces::SurfWinSlatAngThisTSDegEMSon(loopSurfNum),
                                      DataSurfaces::SurfWinSlatAngThisTSDegEMSValue(loopSurfNum));
                 }
-            } else if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType == WSC_ST_ExteriorScreen) {
+            } else if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType == WSC_ST_ExteriorScreen) {
                 SetupEMSActuator("Window Shading Control",
                                  Surface(loopSurfNum).Name,
                                  "Control Status",
@@ -2014,9 +2014,9 @@ namespace EMSManager {
                                  DataSurfaces::SurfWinShadingFlagEMSOn(loopSurfNum),
                                  DataSurfaces::SurfWinShadingFlagEMSValue(loopSurfNum));
             } else {
-                if (WindowShadingControl(Surface(loopSurfNum).WindowShadingControlPtr).ShadingType != WSC_ST_SwitchableGlazing) {
+                if (WindowShadingControl(Surface(loopSurfNum).activeWindowShadingControl).ShadingType != WSC_ST_SwitchableGlazing) {
                     ShowSevereError("Missing shade or blind layer in window construction name = '" +
-                                    dataConstruction.Construct(DataSurfaces::SurfWinShadedConstruction(loopSurfNum)).Name + "', surface name = '" +
+                                    dataConstruction.Construct(Surface(loopSurfNum).activeShadedConstruction).Name + "', surface name = '" +
                                     Surface(loopSurfNum).Name + "'.");
                     ShowContinueError("...'Control Status' or 'Slat Angle' EMS Actuator cannot be set for a construction that does not have a shade "
                                       "or a blind layer.");

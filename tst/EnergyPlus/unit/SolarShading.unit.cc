@@ -1861,3 +1861,52 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     DataSystemVariables::SlaterBarsky = false;
 }
+
+TEST_F(EnergyPlusFixture, SolarShadingTest_selectActiveWindowShadingControl)
+{
+    TotSurfaces = 2;
+    Surface.allocate(TotSurfaces);
+    
+    int curSurface = 1;
+    Surface(curSurface).windowShadingControlList.push_back(57);
+
+    int curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    int activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    EXPECT_EQ(activeWindowShadingControl, 57);
+
+    curSurface = 2;
+    Surface(curSurface).windowShadingControlList.push_back(1);
+    Surface(curSurface).windowShadingControlList.push_back(2);
+    Surface(curSurface).windowShadingControlList.push_back(3);
+
+    WindowShadingControl.allocate(3);
+    WindowShadingControl(1).Schedule = 1;
+    WindowShadingControl(2).Schedule = 2;
+    WindowShadingControl(3).Schedule = 3;
+
+    ScheduleManager::Schedule.allocate(3);
+    ScheduleManager::Schedule(1).CurrentValue = 0;
+    ScheduleManager::Schedule(2).CurrentValue = 0;
+    ScheduleManager::Schedule(3).CurrentValue = 1;
+
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    EXPECT_EQ(activeWindowShadingControl, 3);
+
+    ScheduleManager::Schedule(1).CurrentValue = 0;
+    ScheduleManager::Schedule(2).CurrentValue = 1;
+    ScheduleManager::Schedule(3).CurrentValue = 0;
+
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    EXPECT_EQ(activeWindowShadingControl, 2);
+
+    ScheduleManager::Schedule(1).CurrentValue = 1;
+    ScheduleManager::Schedule(2).CurrentValue = 0;
+    ScheduleManager::Schedule(3).CurrentValue = 0;
+
+    curIndexActiveWindowShadingControl = selectActiveWindowShadingControlIndex(curSurface);
+    activeWindowShadingControl = DataSurfaces::Surface(curSurface).windowShadingControlList[curIndexActiveWindowShadingControl];
+    EXPECT_EQ(activeWindowShadingControl, 1);
+}
+

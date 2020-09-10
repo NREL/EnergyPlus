@@ -1583,7 +1583,7 @@ namespace SolarShading {
                     // Added TH 5/26/2009 for switchable windows to report switching factor (tinted level)
                     // CurrentModuleObject='Switchable Windows'
                     if (Surface(SurfLoop).HasShadeControl) {
-                        if (WindowShadingControl(Surface(SurfLoop).WindowShadingControlPtr).ShadingType == WSC_ST_SwitchableGlazing) {
+                        if (WindowShadingControl(Surface(SurfLoop).activeWindowShadingControl).ShadingType == WSC_ST_SwitchableGlazing) {
                             // IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
                             SetupOutputVariable("Surface Window Switchable Glazing Switching Factor",
                                                 OutputProcessor::Unit::None,
@@ -6864,10 +6864,10 @@ namespace SolarShading {
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!Surface(SurfNum).ExtSolar) continue;
                 ConstrNum = Surface(SurfNum).Construction;
-                ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
                     ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                 }
                 BlNum = SurfWinBlindNumber(SurfNum);
                 ScNum = SurfWinScreenNumber(SurfNum);
@@ -7969,10 +7969,10 @@ namespace SolarShading {
                                         // transmitting and back window centers
                                         CosIncBack = std::abs(ComplexWind(SurfNum).sdotN(IBack));
                                     }
-                                    ConstrNumBackSh = Surface(BackSurfNum).ShadedConstruction;
+                                    ConstrNumBackSh = Surface(BackSurfNum).activeShadedConstruction;
                                     if (SurfWinStormWinFlag(BackSurfNum) == 1) {
                                         ConstrNum = Surface(BackSurfNum).StormWinConstruction;
-                                        ConstrNumSh = Surface(BackSurfNum).StormWinShadedConstruction;
+                                        ConstrNumSh = Surface(BackSurfNum).activeStormWinShadedConstruction;
                                     }
                                     AbsBeamWin.dimension(DataHeatBalance::MaxSolidWinLayers, 0.0);
                                     TransBeamWin = 0.0;
@@ -8846,10 +8846,10 @@ namespace SolarShading {
                 // TH added 3/24/2010 while debugging CR 7872
                 if (!Surface(SurfNum).ExtSolar) continue;
                 int ConstrNum = Surface(SurfNum).Construction;
-                int ConstrNumSh = SurfWinShadedConstruction(SurfNum);
+                int ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
                     ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                 }
 
                 int SurfNum2 = 0;
@@ -8958,7 +8958,7 @@ namespace SolarShading {
                 Real64 SunLitFract = SunlitFrac(TimeStep, HourOfDay, SurfNum2);
 
                 int ConstrNum = Surface(SurfNum2).Construction;
-                if (SurfWinShadedConstruction(SurfNum2) > 0) ConstrNum = SurfWinShadedConstruction(SurfNum2);
+                if (Surface(SurfNum2).activeShadedConstruction > 0) ConstrNum = Surface(SurfNum2).activeShadedConstruction;
                 auto aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(dataWindowManager, WavelengthRange::Solar, ConstrNum);
 
                 ///////////////////////////////////////////////
@@ -9863,15 +9863,15 @@ namespace SolarShading {
         //  20: window has switchable glazing that is unswitched but may be switched later
         //       to control daylight glare or daylight illuminance
         //  30: window has exterior shade that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  60: window has interior blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  70: window has exterior blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  80: window has between-glass shade that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         //  90: window has between-glass blind that is off but may be triggered on later
-        //       to control daylaight glare or daylight illuminance
+        //       to control daylight glare or daylight illuminance
         // A "shading device" may be an exterior, interior or between-glass shade or blind,
         // or the lower-transmitting (dark) state of switchable glazing (e.g., electrochromic).
         // In all cases, the unshaded condition is represented
@@ -9960,10 +9960,24 @@ namespace SolarShading {
                     SurfWinVisTransSelected(ISurf) = POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) *
                                                      SurfWinGlazedFrac(ISurf);
 
+ 
                 // Window has shading control
-                int IShadingCtrl = Surface(ISurf).WindowShadingControlPtr; // Pointer to a window's shading control
+                // select the active window shading control and corresponding contructions
+                int indexWindowShadingControl = selectActiveWindowShadingControlIndex(ISurf);
+                if (!Surface(ISurf).windowShadingControlList.empty() && indexWindowShadingControl <= Surface(ISurf).windowShadingControlList.size() - 1) {
+                    Surface(ISurf).activeWindowShadingControl = Surface(ISurf).windowShadingControlList[indexWindowShadingControl];
+                }
+                if (!Surface(ISurf).shadedConstructionList.empty() && indexWindowShadingControl <= Surface(ISurf).shadedConstructionList.size() - 1) {
+                    Surface(ISurf).activeShadedConstruction = Surface(ISurf).shadedConstructionList[indexWindowShadingControl];
+                }
+                if (!Surface(ISurf).shadedStormWinConstructionList.empty() && indexWindowShadingControl <= Surface(ISurf).shadedStormWinConstructionList.size() - 1) {
+                    Surface(ISurf).activeStormWinShadedConstruction = Surface(ISurf).shadedStormWinConstructionList[indexWindowShadingControl];
+                }
+                int IShadingCtrl = Surface(ISurf).activeWindowShadingControl;
+
                 int ShadingType = WindowShadingControl(IShadingCtrl).ShadingType; // Type of shading (interior shade, interior blind, etc.)
                 SurfWinShadingFlag(ISurf) = ShadeOff; // Initialize shading flag to off
+
                 int IZone = Surface(ISurf).Zone;
                 // Setpoint for shading
                 Real64 SetPoint = WindowShadingControl(IShadingCtrl).SetPoint; // Control setpoint
@@ -10210,7 +10224,7 @@ namespace SolarShading {
 
                     // Added TH 1/20/2010
                     // Vis trans at normal incidence of fully switched glass
-                    IConst = Surface(ISurf).ShadedConstruction;
+                    IConst = Surface(ISurf).activeShadedConstruction;
                     SurfWinVisTransSelected(ISurf) =
                             POLYF(1.0, dataConstruction.Construct(IConst).TransVisBeamCoef) * SurfWinGlazedFrac(ISurf);
                 }
@@ -10364,6 +10378,23 @@ namespace SolarShading {
 
             } // End of surface loop
         }
+    }
+
+    int selectActiveWindowShadingControlIndex(int curSurface)
+    {
+        // For a given surface, determine based on the schedules which index to the window shading control list vector should be active
+        int selected = 0; // presume it is the first shading control - even if it is not active it needs to be some shading control which is then turned off in the WindowShadingManager
+        if (Surface(curSurface).windowShadingControlList.size() > 1) {
+            for (int listIndex = 0; listIndex < Surface(curSurface).windowShadingControlList.size(); ++listIndex) {
+                int wsc = Surface(curSurface).windowShadingControlList[listIndex];
+                //pick the first WindowShadingControl that has a non-zero schedule value
+                if (ScheduleManager::GetCurrentScheduleValue(WindowShadingControl(wsc).Schedule) != 0.0) {
+                    selected = listIndex;
+                    break;
+                }
+            }
+        }
+        return (selected);
     }
 
     void WindowGapAirflowControl()
@@ -11183,10 +11214,10 @@ namespace SolarShading {
                 W = Surface(SurfNum).Width;
                 d1 = OutsReveal + 0.5 * GlazingThickness;
                 ConstrNum = Surface(SurfNum).Construction;
-                ConstrNumSh = Surface(SurfNum).ShadedConstruction;
+                ConstrNumSh = Surface(SurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(SurfNum) == 1) {
                     ConstrNum = Surface(SurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(SurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(SurfNum).activeStormWinShadedConstruction;
                 }
                 SolTransGlass = POLYF(CosIncAng(TimeStep, HourOfDay, SurfNum),
                                       dataConstruction.Construct(ConstrNum).TransSolBeamCoef);
@@ -11767,7 +11798,7 @@ namespace SolarShading {
             if (firstSurfWin == -1) continue;
             for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                 if (Surface(SurfNum).Class == SurfaceClass_Window && Surface(SurfNum).HasShadeControl) {
-                    int WinShadeCtrlNum = Surface(SurfNum).WindowShadingControlPtr; // Window shading control number
+                    int WinShadeCtrlNum = Surface(SurfNum).activeWindowShadingControl; // Window shading control number
                     int MatNumSh = 0; // Shade layer material number
                     Real64 AbsorpEff = 0.0;    // Effective absorptance of isolated shade layer (fraction of
                     //  of incident radiation remaining after reflected portion is
@@ -11775,7 +11806,7 @@ namespace SolarShading {
                     if (WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_InteriorShade ||
                         WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_ExteriorShade ||
                         WindowShadingControl(WinShadeCtrlNum).ShadingType == WSC_ST_BetweenGlassShade) {
-                        int ConstrNumSh = Surface(SurfNum).ShadedConstruction; // Window construction number with shade
+                        int ConstrNumSh = Surface(SurfNum).activeShadedConstruction; // Window construction number with shade
                         int TotLay = dataConstruction.Construct(ConstrNumSh).TotLayers; // Total layers in a construction
 
 
@@ -12013,10 +12044,10 @@ namespace SolarShading {
                         ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
                     } else { // Exterior or Interior Window
 
-                        int ConstrNumSh = Surface(HeatTransSurfNum).ShadedConstruction;
+                        int ConstrNumSh = Surface(HeatTransSurfNum).activeShadedConstruction;
                         if (SurfWinStormWinFlag(HeatTransSurfNum) == 1) {
                             ConstrNum = Surface(HeatTransSurfNum).StormWinConstruction;
-                            ConstrNumSh = Surface(HeatTransSurfNum).StormWinShadedConstruction;
+                            ConstrNumSh = Surface(HeatTransSurfNum).activeStormWinShadedConstruction;
                         }
                         int TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                         int ShadeFlag = SurfWinShadingFlag(HeatTransSurfNum);
@@ -12554,10 +12585,10 @@ namespace SolarShading {
 
             } else { // Exterior or Interior Window
 
-                ConstrNumSh = Surface(HeatTransSurfNum).ShadedConstruction;
+                ConstrNumSh = Surface(HeatTransSurfNum).activeShadedConstruction;
                 if (SurfWinStormWinFlag(HeatTransSurfNum) == 1) {
                     ConstrNum = Surface(HeatTransSurfNum).StormWinConstruction;
-                    ConstrNumSh = Surface(HeatTransSurfNum).StormWinShadedConstruction;
+                    ConstrNumSh = Surface(HeatTransSurfNum).activeStormWinShadedConstruction;
                 }
                 TotGlassLayers = dataConstruction.Construct(ConstrNum).TotGlassLayers;
                 ShadeFlag = SurfWinShadingFlag(HeatTransSurfNum);
