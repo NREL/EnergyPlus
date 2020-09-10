@@ -33,7 +33,21 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: Documentation PDFs
-        path: ${{runner.workspace}}/EnergyPlus/doc/build/pdf/*.pdf
+        path: |
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/Acknowledgments.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/AuxiliaryPrograms.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EMSApplicationGuide.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EnergyPlusEssentials.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/EngineeringReference.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ExternalInterfacesApplicationGuide.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ExternalInterfacesApplicationGuide.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/GettingStarted.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/InputOutputReference.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/ModuleDeveloper.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/OutputDetailsAndExamples.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/PlantApplicationGuide.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/TipsAndTricksUsingEnergyPlus.pdf
+          ${{runner.workspace}}/EnergyPlus/doc/build/pdf/UsingEnergyPlusForCompliance.pdf
 
 #    - name: Test
 #      working-directory: ${{runner.workspace}}/build
