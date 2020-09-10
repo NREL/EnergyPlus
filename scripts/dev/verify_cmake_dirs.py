@@ -2,6 +2,7 @@
 
 import json
 import os
+import sys
 from pathlib import Path
 
 current_script_dir = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -12,6 +13,8 @@ common_cmake_file_names = ['CMakeLists.txt', '.cmake']
 common_tokens_to_sanitize_out = ['ORIGINAL_CMAKE_SOURCE_DIR', 'ORIGINAL_CMAKE_BINARY_DIR']
 
 DEBUG = False
+
+num_issues_found = 0
 
 
 def custom_check_output_line(relative_file_path: str, line_num: int, message: str) -> str:
@@ -62,14 +65,20 @@ for path in Path(repo_root_dir).rglob('*'):
             print(custom_check_output_line(
                 s_relative_path, i+1, 'Found CMAKE_SOURCE_DIR and CMAKE_BINARY_DIR in file contents'
             ))
+            num_issues_found += 1
         elif cmake_src:
             print(custom_check_output_line(
                 s_relative_path, i+1, 'Found CMAKE_SOURCE_DIR in file contents'
             ))
+            num_issues_found += 1
         elif cmake_bin:
             print(custom_check_output_line(
                 s_relative_path, i+1, 'Found CMAKE_BINARY_DIR in file contents'
             ))
+            num_issues_found += 1
         else:
             if DEBUG:
                 print(' [DONE]')
+
+if num_issues_found > 0:
+    sys.exit(1)
