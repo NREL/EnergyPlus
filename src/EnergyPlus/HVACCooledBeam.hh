@@ -57,9 +57,6 @@
 
 namespace EnergyPlus {
 
-// Forward declarations
-struct BranchInputManagerData;
-
 namespace HVACCooledBeam {
 
     // Using/Aliasing
@@ -157,7 +154,7 @@ namespace HVACCooledBeam {
         {
         }
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
     };
 
     // Object Data
@@ -167,7 +164,7 @@ namespace HVACCooledBeam {
 
     void clear_state();
 
-    void SimCoolBeam(BranchInputManagerData &dataBranchInputManager,
+    void SimCoolBeam(EnergyPlusData &state,
                      std::string const &CompName,   // name of the cooled beam unit
                      bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                      int const ZoneNum,             // index of zone served by the unit
@@ -178,7 +175,7 @@ namespace HVACCooledBeam {
 
     void GetCoolBeams();
 
-    void InitCoolBeam(BranchInputManagerData &dataBranchInputManager,
+    void InitCoolBeam(EnergyPlusData &state,
                       int const CBNum,              // number of the current cooled beam unit being simulated
                       bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     );
@@ -204,7 +201,7 @@ namespace HVACCooledBeam {
 
     void UpdateCoolBeam(int const CBNum);
 
-    void ReportCoolBeam(int const CBNum);
+    void ReportCoolBeam(EnergyPlusData &state, int const CBNum);
 
 } // namespace HVACCooledBeam
 

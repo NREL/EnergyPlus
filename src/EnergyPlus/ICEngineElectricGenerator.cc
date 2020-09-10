@@ -712,7 +712,7 @@ namespace ICEngineElectricGenerator {
         this->HeatRecMdotActual = HeatRecMdot;
     }
 
-    void ICEngineGeneratorSpecs::InitICEngineGenerators(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, bool const FirstHVACIteration)
+    void ICEngineGeneratorSpecs::InitICEngineGenerators(EnergyPlusData &state, bool const RunFlag, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -738,7 +738,7 @@ namespace ICEngineElectricGenerator {
 
         if (this->MyPlantScanFlag && allocated(DataPlant::PlantLoop) && this->HeatRecActive) {
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Generator_ICEngine,
                                                     this->HRLoopNum,
