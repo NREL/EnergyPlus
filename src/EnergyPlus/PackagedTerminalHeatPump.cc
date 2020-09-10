@@ -3853,7 +3853,7 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).ACHeatCoilName,
                                             TypeOf_CoilWaterSimpleHeating,
                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -3887,7 +3887,7 @@ namespace PackagedTerminalHeatPump {
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
 
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).ACHeatCoilName,
                                             TypeOf_CoilSteamAirHeating,
                                             PTUnit(PTUnitNum).HeatCoilLoopNum,
@@ -3928,7 +3928,7 @@ namespace PackagedTerminalHeatPump {
                        (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam)) {
                 if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).SuppHeatCoilName,
                                             TypeOf_CoilWaterSimpleHeating,
                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -3957,7 +3957,7 @@ namespace PackagedTerminalHeatPump {
                     }
                 } else if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
                     errFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             PTUnit(PTUnitNum).SuppHeatCoilName,
                                             TypeOf_CoilSteamAirHeating,
                                             PTUnit(PTUnitNum).SuppCoilLoopNum,
@@ -5884,7 +5884,7 @@ namespace PackagedTerminalHeatPump {
                     min(Node(PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(InletNode).MassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
-                SimATMixer(PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
+                SimATMixer(state, PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
             }
         } else {
             // No air terminal mixer; simulate the outside air mixer
@@ -6297,7 +6297,7 @@ namespace PackagedTerminalHeatPump {
         // If there is a supply side air terminal mixer, calculate its output
         if (PTUnit(PTUnitNum).ATMixerExists) {
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
-                SimATMixer(PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
+                SimATMixer(state, PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
             }
         }
 
@@ -8063,7 +8063,7 @@ namespace PackagedTerminalHeatPump {
                     min(Node(PTUnit(PTUnitNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(InletNode).MassFlowRate);
                 // now calculate the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
-                SimATMixer(PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
+                SimATMixer(state, PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
             }
         } else {
             // No air terminal mixer; simulate the outside air mixer
@@ -8405,7 +8405,7 @@ namespace PackagedTerminalHeatPump {
         // If there is a supply side air terminal mixer, calculate its output
         if (PTUnit(PTUnitNum).ATMixerExists) {
             if (PTUnit(PTUnitNum).ATMixerType == ATMixer_SupplySide) {
-                SimATMixer(PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
+                SimATMixer(state, PTUnit(PTUnitNum).ATMixerName, FirstHVACIteration, PTUnit(PTUnitNum).ATMixerIndex);
             }
         }
 

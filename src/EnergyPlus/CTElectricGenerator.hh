@@ -61,7 +61,6 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct BranchInputManagerData;
 struct CTElectricGeneratorData;
 struct EnergyPlusData;
 
@@ -150,7 +149,7 @@ namespace CTElectricGenerator {
 
         void setupOutputVars();
 
-        void InitCTGenerators(BranchInputManagerData &dataBranchInputManager,
+        void InitCTGenerators(EnergyPlusData &state,
                               bool RunFlag, bool FirstHVACIteration);
 
         void CalcCTGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad, bool FirstHVACIteration);

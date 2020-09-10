@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct ChillerExhaustAbsorptionData;
 
 namespace ChillerExhaustAbsorption {
 
@@ -228,7 +226,7 @@ namespace ChillerExhaustAbsorption {
 
         void getDesignTemperatures(Real64 &TempDesCondIn, Real64 &TempDesEvapOut) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void setupOutputVariables();
 
@@ -243,7 +241,7 @@ namespace ChillerExhaustAbsorption {
         void updateHeatRecords(Real64 MyLoad, bool RunFlag);
     };
 
-    void GetExhaustAbsorberInput(EnergyPlusData &state, ChillerExhaustAbsorptionData &chillers);
+    void GetExhaustAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerExhaustAbsorption
 

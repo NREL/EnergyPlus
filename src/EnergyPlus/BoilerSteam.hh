@@ -61,8 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BoilerSteamData;
-struct BranchInputManagerData;
 
 namespace BoilerSteam {
 
@@ -125,7 +123,7 @@ namespace BoilerSteam {
         {
         }
 
-        void initialize(BranchInputManagerData &dataBranchInputManager);
+        void initialize(EnergyPlusData &state);
 
         void setupOutputVars();
 
@@ -149,10 +147,10 @@ namespace BoilerSteam {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
-        static PlantComponent *factory(BoilerSteamData &boilers, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetBoilerInput(BoilerSteamData &boilers);
+    void GetBoilerInput(EnergyPlusData &state);
 
 } // namespace BoilerSteam
 

@@ -226,7 +226,7 @@ namespace PackagedThermalStorageCoil {
 
         TESOpMode = 1;
 
-        InitTESCoil(state, state.dataBranchInputManager, TESCoilNum);
+        InitTESCoil(state, TESCoilNum);
 
         TESOpMode = TESCoil(TESCoilNum).CurControlMode;
         {
@@ -1817,7 +1817,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void InitTESCoil(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, int &TESCoilNum)
+    void InitTESCoil(EnergyPlusData &state, int &TESCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1883,7 +1883,7 @@ namespace PackagedThermalStorageCoil {
 
             if (TESCoil(TESCoilNum).TESPlantConnectionAvailable) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
+                ScanPlantLoopsForObject(state, TESCoil(TESCoilNum).Name, TypeOf_PackagedTESCoolingCoil, plloopnum, lsnum, brnum, cpnum, errFlag);
 
                 // double check node names match
                 if (errFlag) {
