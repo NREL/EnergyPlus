@@ -1,0 +1,43 @@
+name: CMake
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally
+    # well on Windows or Mac.
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: License Check
+      run: python3 ${{runner.workspace}}/scripts/dev/license-check.py
+
+    - name: Check for Stray Fields in IDD
+      run: python3 ${{runner.workspace}}/scripts/dev/check_stray_fields_in_idd.py
+
+    - name: Verify IDFs Listed in CMakeLists
+      run: python3 ${{runner.workspace}}/scripts/dev/verify_idfs_in_cmake.py
+
+#    - ./scripts/dev/check_non_utf8.py
+#    - ./scripts/dev/check_pr_labels.py -- use https://github.com/jesusvasquez333/verify-pr-label-action
+#    - ./scripts/dev/verify_file_encodings.py
+#    - ./scripts/dev/validate_idd_units.py
+#    - ./scripts/dev/find_byref_bool_override.py
+#    - ./scripts/dev/check_for_tabs_in_idfs.py
+#    - ./scripts/dev/check_for_bom_in_idfs.py
+#    - ./scripts/dev/verify_cmake_dirs.py
+#    - ./scripts/dev/find_included_cc_files.py
