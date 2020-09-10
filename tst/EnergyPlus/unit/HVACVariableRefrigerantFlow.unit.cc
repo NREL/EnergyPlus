@@ -210,7 +210,7 @@ protected:
         DataAirSystems::PrimaryAirSystem.allocate(NumAirLoops);
         int thisAirLoop = 1;
         DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
-        DataAirLoop::AirLoopControlInfo.allocate(1);
+        state.dataAirLoop->AirLoopControlInfo.allocate(1);
 
         ZoneSysEnergyDemand.allocate(numZones);
 
@@ -555,7 +555,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 0.0;
     ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = 0.0;
 
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     Node(VRF(curSysNum).CondenserNodeNum).Temp = 35.0;
 
@@ -3737,7 +3737,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
@@ -3758,7 +3758,7 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     int OAUnitNum = 0;
     Real64 OAUCoilOutTemp = 0.0;
     bool ZoneEquipment = true;
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     SimulateVRF(state,
                 VRFTU(VRFTUNum).Name,
@@ -5570,14 +5570,14 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve_WaterCooled)
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
 
-    BranchInputManager::ManageBranchInput(state, state.dataBranchInputManager);
+    BranchInputManager::ManageBranchInput(state);
     // Get plant loop data
     PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
 
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(state, VRFTUNum); // trigger GetVRFInput by calling a mining function
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
@@ -6441,7 +6441,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(state, VRFTUNum); // trigger GetVRFInput by calling a mining function
     OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum;       // outside air air inlet node num
@@ -10563,7 +10563,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -7000.0;
     ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -7000.0;
     ZoneEqSizing.allocate(1);
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     InitVRF(state, VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     EXPECT_EQ(QZnReq, -5000.0);
     SimVRF(state, VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
@@ -11146,7 +11146,7 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
@@ -12877,7 +12877,7 @@ TEST_F(EnergyPlusFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
@@ -14937,7 +14937,7 @@ TEST_F(EnergyPlusFixture, VRFTest_TU_NotOnZoneHVACEquipmentList)
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(state); // read equipment list and connections
-    DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(state, VRFTUNum);  // trigger GetVRFInput by calling a mining function
     OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num

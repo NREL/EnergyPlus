@@ -755,7 +755,7 @@ namespace DXCoils {
 
     void UpdateDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void ReportDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
+    void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current fan coil unit being simulated
 
     void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum);
 

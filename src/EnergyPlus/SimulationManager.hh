@@ -103,7 +103,7 @@ namespace SimulationManager {
 
     void ReportNodeConnections(IOFiles &ioFiles);
 
-    void ReportLoopConnections(IOFiles &ioFiles);
+    void ReportLoopConnections(EnergyPlusData &state, IOFiles &ioFiles);
 
     void ReportParentChildren(IOFiles &ioFiles);
 

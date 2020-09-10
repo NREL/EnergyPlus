@@ -817,7 +817,7 @@ namespace SteamBaseboardRadiator {
         if (SetLoopIndexFlag(BaseboardNum)) {
             if (allocated(PlantLoop)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         SteamBaseboard(BaseboardNum).EquipID,
                                         SteamBaseboard(BaseboardNum).EquipType,
                                         SteamBaseboard(BaseboardNum).LoopNum,

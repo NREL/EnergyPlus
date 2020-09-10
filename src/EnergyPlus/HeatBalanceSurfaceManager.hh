@@ -58,7 +58,6 @@ namespace EnergyPlus {
 
     // Forward declarations
     class IOFiles;
-    struct ChilledCeilingPanelSimpleData;
     struct ConvectionCoefficientsData;
     struct EnergyPlusData;
     struct WindowComplexManagerData;

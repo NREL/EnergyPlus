@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     SysSizingRunDone = true;
     FinalSysSizing.allocate(1);
     PrimaryAirSystem.allocate(1);
-    AirLoopControlInfo.allocate(1);
+    state.dataAirLoop->AirLoopControlInfo.allocate(1);
     CurSysNum = 1;
     NumDXCoils = 2;
     DXCoilNum = 2;
@@ -383,7 +383,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     UnitarySysEqSizing.deallocate();
     FinalSysSizing.deallocate();
     PrimaryAirSystem.deallocate();
-    AirLoopControlInfo.deallocate();
+    state.dataAirLoop->AirLoopControlInfo.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
@@ -1690,7 +1690,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     // Case 1 test
     GetDXCoils(state);
 
-    EnergyPlus::DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     DataGlobals::SysSizingCalc = true;
 
@@ -1702,7 +1702,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", OutputProcessor::DDVariableTypes(11).VarNameOnly);
 
     DataGlobals::SysSizingCalc = false;
-    EnergyPlus::DataAirLoop::AirLoopInputsFilled = false;
+    state.dataAirLoop->AirLoopInputsFilled = false;
 }
 
 TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
