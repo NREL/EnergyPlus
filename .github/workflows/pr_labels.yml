@@ -1,3 +1,5 @@
+name: Verify that the PR has a valid label
+
 on:
   pull_request:
     types: [opened, labeled, unlabeled, synchronize]
@@ -5,7 +7,6 @@ on:
 jobs:
   check_pr_labels:
     runs-on: ubuntu-latest
-    name: Verify that the PR has a valid label
     steps:
       - name: Checkout
         uses: actions/checkout@v2
