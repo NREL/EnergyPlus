@@ -3,7 +3,7 @@ name: Mac Testing
 on: [push]
 
 env:
-  FC: gfortran
+  FC: gfortran-9
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
         path: 'clone_branch'
 
     - name: Is Gfortran installed?
-      run: which gfortran
+      run: which gfortran-9
 
     - name: Checkout Baseline
       if: ${{ github.ref != 'develop' }}  # TODO: This is an insufficient check -- forks could use the develop branch
