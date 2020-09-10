@@ -1892,7 +1892,7 @@ namespace PlantCondLoopOperation {
                             auto &this_equip(this_equip_list.Comp(EquipNum));
                             ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
                             errFlag1 = false;
-                            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                            PlantUtilities::ScanPlantLoopsForObject(state,
                                                                     this_equip.Name,
                                                                     ThisTypeOfNum,
                                                                     DummyLoopNum,

@@ -119,7 +119,7 @@ namespace ChillerElectricEIR {
     {
         // Process the input data if it hasn't been done already
         if (state.dataChillerElectricEIR.getInputFlag) {
-            GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
+            GetElectricEIRChillerInput(state);
             state.dataChillerElectricEIR.getInputFlag = false;
         }
         // Now look for this particular object in the list
@@ -148,7 +148,7 @@ namespace ChillerElectricEIR {
         //  up reporting variables.
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             this->calculate(state, CurLoad, RunFlag);
             this->update(CurLoad, RunFlag);
 
@@ -207,14 +207,14 @@ namespace ChillerElectricEIR {
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
-        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
+        this->initialize(state, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->size(state);
         }
     }
 
-    void GetElectricEIRChillerInput(EnergyPlusData &state, ChillerElectricEIRData &chillers)
+    void GetElectricEIRChillerInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Richard Raustad, FSEC
@@ -228,18 +228,18 @@ namespace ChillerElectricEIR {
         bool ErrorsFound(false); // True when input errors are found
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Electric:EIR";
-        chillers.NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerElectricEIR.NumElectricEIRChillers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumElectricEIRChillers <= 0) {
+        if (state.dataChillerElectricEIR.NumElectricEIRChillers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             ErrorsFound = true;
         }
 
         // ALLOCATE ARRAYS
-        chillers.ElectricEIRChiller.allocate(chillers.NumElectricEIRChillers);
+        state.dataChillerElectricEIR.ElectricEIRChiller.allocate(state.dataChillerElectricEIR.NumElectricEIRChillers);
 
         // Load arrays with electric EIR chiller data
-        for (int EIRChillerNum = 1; EIRChillerNum <= chillers.NumElectricEIRChillers; ++EIRChillerNum) {
+        for (int EIRChillerNum = 1; EIRChillerNum <= state.dataChillerElectricEIR.NumElectricEIRChillers; ++EIRChillerNum) {
             int NumAlphas; // Number of elements in the alpha array
             int NumNums;   // Number of elements in the numeric array
             int IOStat;    // IO Status when calling get input subroutine
@@ -260,7 +260,7 @@ namespace ChillerElectricEIR {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ElectricEIRChiller(EIRChillerNum);
+            auto &thisChiller = state.dataChillerElectricEIR.ElectricEIRChiller(EIRChillerNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
 
             //   Performance curves
@@ -914,7 +914,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool const RunFlag, Real64 const MyLoad)
+    void ElectricEIRChillerSpecs::initialize(EnergyPlusData &state, bool const RunFlag, Real64 const MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -938,7 +938,7 @@ namespace ChillerElectricEIR {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_ElectricEIR,
                                                     this->CWLoopNum,
@@ -952,7 +952,7 @@ namespace ChillerElectricEIR {
                                                     this->EvapInletNodeNum,
                                                     _);
             if (this->CondenserType != DataPlant::CondenserType::AIRCOOLED && this->CondenserType != DataPlant::CondenserType::EVAPCOOLED) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricEIR,
                                                         this->CDLoopNum,
@@ -969,7 +969,7 @@ namespace ChillerElectricEIR {
                     this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_ElectricEIR, true);
             }
             if (this->HeatRecActive) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ElectricEIR,
                                                         this->HRLoopNum,

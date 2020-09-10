@@ -122,7 +122,7 @@ namespace NonZoneEquipmentManager {
             CountNonZoneEquip = false;
         }
 
-        SimulateWaterUse(state.dataBranchInputManager, state.dataWaterUse, FirstHVACIteration); // simulate non-plant loop water use.
+        SimulateWaterUse(state, state.dataWaterUse, FirstHVACIteration); // simulate non-plant loop water use.
 
         if (!ZoneSizingCalc) {
             for (WaterHeaterNum = 1; WaterHeaterNum <= NumOfWaterHeater; ++WaterHeaterNum) {

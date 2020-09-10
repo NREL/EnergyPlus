@@ -141,7 +141,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void PVTCollectorStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initialize(state.dataBranchInputManager, true);
+        this->initialize(state, true);
         this->size();
     }
 
@@ -151,7 +151,7 @@ namespace PhotovoltaicThermalCollectors {
                                       bool const EP_UNUSED(RunFlag))
     {
 
-        this->initialize(state.dataBranchInputManager, FirstHVACIteration);
+        this->initialize(state, FirstHVACIteration);
         this->control();
         this->calculate(state, state.dataConvectionCoefficients, state.files);
         this->update();
@@ -445,7 +445,7 @@ namespace PhotovoltaicThermalCollectors {
             "Generator PVT Fluid Mass Flow Rate", OutputProcessor::Unit::kg_s, this->Report.MdotWorkFluid, "System", "Average", this->Name);
     }
 
-    void PVTCollectorStruct::initialize(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration)
+    void PVTCollectorStruct::initialize(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -468,7 +468,7 @@ namespace PhotovoltaicThermalCollectors {
         if (this->SetLoopIndexFlag) {
             if (allocated(DataPlant::PlantLoop) && (this->PlantInletNodeNum > 0)) {
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                     this->Name, this->TypeNum, this->WLoopNum, this->WLoopSideNum, this->WLoopBranchNum, this->WLoopCompNum, errFlag, _, _, _, _, _);
                 if (errFlag) {
                     ShowFatalError("InitPVTcollectors: Program terminated for previous conditions.");

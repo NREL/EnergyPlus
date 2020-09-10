@@ -536,7 +536,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
 
     ZoneEquipInputsFilled = true;
     NumPrimaryAirSys = 1;
-    AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow.allocate(1);
     PrimaryAirSystem.allocate(1);
     PrimaryAirSystem(1).OASysExists = true;
     Node.allocate(8);
@@ -560,13 +560,13 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     Node(7).MassFlowRate = 0.0; // Zone 2 exhaust node
     Node(8).MassFlowRate = 8.0; // Zone 2 return node
     ZoneEquipConfig(2).ZoneExh = 0.0;
-    AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
-    AirLoopFlow(1).MaxOutAir = AirLoopFlow(1).OAFlow;
+    state.dataAirLoop->AirLoopFlow(1).OAFlow = Node(2).MassFlowRate + Node(6).MassFlowRate;
+    state.dataAirLoop->AirLoopFlow(1).MaxOutAir = state.dataAirLoop->AirLoopFlow(1).OAFlow;
     Infiltration(1).MassFlowRate = 0.5;
     Mixing(1).MixingMassFlowRate = 0.1;
 
     // call zone air mass balance
-    CalcZoneMassBalance(false);
+    CalcZoneMassBalance(state, false);
     EXPECT_EQ(Node(4).MassFlowRate, 0.0);         // Zone 1 return node (max(0.0, 1-2)
     EXPECT_EQ(Infiltration(1).MassFlowRate, 1.0); // Zone 1 infiltration flow rate (2 - 1)
     EXPECT_EQ(Mixing(1).MixingMassFlowRate, 0.1); // Zone 1 to Zone 2 mixing flow rate (unchanged)
@@ -577,7 +577,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     ZoneEquipConfig.deallocate();
     Node.deallocate();
     PrimaryAirSystem.deallocate();
-    AirLoopFlow.deallocate();
+    state.dataAirLoop->AirLoopFlow.deallocate();
     NumPrimaryAirSys = 0;
 }
 

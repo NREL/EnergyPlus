@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace SurfaceGroundHeatExchanger {
 
@@ -184,7 +183,7 @@ namespace SurfaceGroundHeatExchanger {
 
         static PlantComponent *factory(int objectType, std::string objectName);
 
-        void InitSurfaceGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager);
+        void InitSurfaceGroundHeatExchanger(EnergyPlusData &state);
 
         //==============================================================================
 

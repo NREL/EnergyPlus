@@ -213,7 +213,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
 
     DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
+    PoweredInductionUnits::InitPIU(state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
@@ -441,7 +441,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
 
     DataGlobals::BeginEnvrnFlag = true; // Must be true for initial pass thru InitPIU for this terminal unit
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
+    PoweredInductionUnits::InitPIU(state, SysNum, FirstHVACIteration); // Run thru init once with FirstHVACIteration set to true
     Fans::InitFan(state, 1, FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
@@ -715,7 +715,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
 
     DataGlobals::BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    PoweredInductionUnits::InitPIU(state.dataBranchInputManager, PIUNum, FirstHVACIteration);
+    PoweredInductionUnits::InitPIU(state, PIUNum, FirstHVACIteration);
     Fans::InitFan(state, 1, FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
@@ -732,8 +732,8 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     // Needs an airloop, assume 20% outdoor air
     Real64 const AirLoopOAFraction = 0.20;
     thisSeriesAT.AirLoopNum = 1;
-    DataAirLoop::AirLoopFlow.allocate(1);
-    DataAirLoop::AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
+    state.dataAirLoop->AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow(thisSeriesAT.AirLoopNum).OAFrac = AirLoopOAFraction;
 
     DataZoneEquipment::ZoneEquipConfig(thisSeriesAT.CtrlZoneNum).InletNodeAirLoopNum(thisSeriesAT.ctrlZoneInNodeIndex) = 1;
     // set heating zone and AT unit inlet conditions
@@ -751,7 +751,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRate = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     Real64 expect_OutdoorAirFlowRate = (0.0 / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMaxMassFlow, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(0.0, DataLoopNode::Node(PriNodeNum).MassFlowRate);
@@ -763,7 +763,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRateMinAvail = PriMinMassFlow;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 2000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     expect_OutdoorAirFlowRate = (PriMinMassFlow / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMassFlowAtPrimMin, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(PriMinMassFlow, DataLoopNode::Node(PriNodeNum).MassFlowRate);
@@ -785,7 +785,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUZoneOAVolumeFlowRateTest)
     DataLoopNode::Node(PriNodeNum).MassFlowRateMaxAvail = PriMaxMassFlow;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -3000.0;
     PoweredInductionUnits::CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
-    PoweredInductionUnits::ReportPIU(PIUNum);
+    PoweredInductionUnits::ReportPIU(state, PIUNum);
     expect_OutdoorAirFlowRate = (PriMaxMassFlow / DataEnvironment::StdRhoAir) * AirLoopOAFraction;
     EXPECT_EQ(SecMassFlowAtPrimMax, DataLoopNode::Node(SecNodeNum).MassFlowRate);
     EXPECT_EQ(PriMaxMassFlow, DataLoopNode::Node(PriNodeNum).MassFlowRate);
