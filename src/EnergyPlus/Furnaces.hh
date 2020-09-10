@@ -438,7 +438,8 @@ namespace Furnaces {
     // Beginning of Reporting subroutines for the Furnace Module
     // *****************************************************************************
 
-    void ReportFurnace(int const FurnaceNum, // Furnace Index Number
+    void ReportFurnace(EnergyPlusData &state,
+                       int const FurnaceNum, // Furnace Index Number
                        int const AirLoopNum  // index to air loop
     );
 

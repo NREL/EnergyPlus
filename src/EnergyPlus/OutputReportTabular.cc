@@ -5788,7 +5788,7 @@ namespace OutputReportTabular {
             WriteCompCostTable(state.dataCostEstimateManager);
             WriteAdaptiveComfortTable(state.dataCostEstimateManager);
             WriteEioTables(state.dataCostEstimateManager, state.files);
-            WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+            WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
             WriteHeatEmissionTable(state.dataCostEstimateManager);
 
             if (displayThermalResilienceSummary) WriteThermalResilienceTables();
@@ -12816,7 +12816,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager)
+    void WriteLoadComponentSummaryTables(EnergyPlusData &state, CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -12865,14 +12865,13 @@ namespace OutputReportTabular {
         //
         // METHODOLOGY EMPLOYED:
         //   For each step of sequence from each design day, compute the
-        //   contributations from previous timesteps multiplied by the decay
+        //   contributions from previous timesteps multiplied by the decay
         //   curve. Rather than store every internal load's radiant contribution
         //   to each surface, the TMULT and ITABSF sequences were also stored
         //   which allocates the total radiant to each surface in the zone. The
         //   formula used is:
         //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
-        using DataAirLoop::AirToZoneNodeInfo;
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::NumOfTimeStepInHour;
         using DataHVACGlobals::NumPrimaryAirSys;
@@ -13163,9 +13162,9 @@ namespace OutputReportTabular {
                     timeHeatMax = 0;
                 }
 
-                int NumZonesCooled = AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
+                int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
                     zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
@@ -13173,9 +13172,9 @@ namespace OutputReportTabular {
                     AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
                     AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
                 }
-                int NumZonesHeated = AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
+                int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
                     zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
