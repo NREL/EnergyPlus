@@ -17,14 +17,16 @@ jobs:
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/doc/build
 
+    - name: Check contents of /doc
+      working-directory: ${{runner.workspace}}/doc
+      run: ls
+
     - name: Configure CMake
-      shell: bash
       working-directory: ${{runner.workspace}}/doc/build
       run: cmake ..
 
     - name: Build Docs
       working-directory: ${{runner.workspace}}/doc/build
-      shell: bash
       run: cmake --build .
 
 #    - name: Test
