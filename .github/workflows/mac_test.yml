@@ -15,6 +15,9 @@ jobs:
       with:
         path: 'clone_branch'
 
+    - name: Is Gfortran installed?
+      run: which gfortran
+
     - name: Checkout Baseline
       if: ${{ github.ref != 'develop' }}  # TODO: This is an insufficient check -- forks could use the develop branch
       uses: actions/checkout@v2
@@ -52,7 +55,8 @@ jobs:
       if: ${{ github.ref != 'develop' }}
       shell: bash
       working-directory: ${{runner.workspace}}/clone_baseline/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_baseline
+      # -DBUILD_FORTRAN=ON
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_baseline
 
     - name: Build Baseline
       if: ${{ github.ref != 'develop' }}
@@ -73,7 +77,8 @@ jobs:
       if: ${{ github.ref != 'develop' }}
       shell: bash
       working-directory: ${{runner.workspace}}/clone_branch/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_branch
+      # -DBUILD_FORTRAN=ON
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_branch
 
     - name: Configure Branch with Regressions
       if: ${{ github.ref != 'develop' }}
