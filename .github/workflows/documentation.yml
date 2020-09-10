@@ -15,7 +15,7 @@ jobs:
         python-version: 3.7
 
     - name: Set up LaTeX
-      run: sudo apt-get install texlive texlive-xetex
+      run: sudo apt-get install texlive texlive-xetex texlive-science
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/doc/build
