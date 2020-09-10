@@ -2,6 +2,9 @@ name: Mac Testing
 
 on: [push]
 
+env:
+  FC: gfortran
+
 jobs:
   build:
     runs-on: macos-10.15
@@ -13,7 +16,7 @@ jobs:
         path: 'clone_branch'
 
     - name: Checkout Baseline
-      if: ${{ github.ref != 'develop' }}
+      if: ${{ github.ref != 'develop' }}  # TODO: This is an insufficient check -- forks could use the develop branch
       uses: actions/checkout@v2
       with:
         repository: 'NREL/EnergyPlus'
