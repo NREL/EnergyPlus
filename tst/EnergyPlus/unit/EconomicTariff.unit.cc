@@ -589,7 +589,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * DataGlobals::SecInHour;
 
     ScheduleManager::ProcessScheduleInput(state.files); // read schedules
-    ExteriorEnergyUse::ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+    ExteriorEnergyUse::ManageExteriorEnergyUse(state);
     EXPECT_EQ(1, state.dataExteriorEnergyUse->NumExteriorLights);
     EXPECT_EQ(1000, state.dataExteriorEnergyUse->ExteriorLights(1).DesignLevel);
 
@@ -639,7 +639,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     EXPECT_EQ(1.0, ScheduleManager::GetCurrentScheduleValue(tariff(1).seasonSchIndex));
     EXPECT_EQ(1.0, ScheduleManager::Schedule(seasonSchPtr).CurrentValue);
 
-    ExteriorEnergyUse::ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+    ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
     EXPECT_EQ(1000.0, state.dataExteriorEnergyUse->ExteriorLights(1).Power);
     EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * DataGlobals::TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);
@@ -668,7 +668,7 @@ TEST_F(EnergyPlusFixture, EconomicTariff_GatherForEconomics)
     ScheduleManager::UpdateScheduleValues();
     EXPECT_EQ(3.0, ScheduleManager::GetCurrentScheduleValue(tariff(1).seasonSchIndex));
 
-    ExteriorEnergyUse::ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+    ExteriorEnergyUse::ManageExteriorEnergyUse(state);
 
     EXPECT_EQ(1000.0, state.dataExteriorEnergyUse->ExteriorLights(1).Power);
     EXPECT_EQ(state.dataExteriorEnergyUse->ExteriorLights(1).Power * DataGlobals::TimeStepZoneSec, state.dataExteriorEnergyUse->ExteriorLights(1).CurrentUse);

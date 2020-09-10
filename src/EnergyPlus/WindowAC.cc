@@ -209,7 +209,7 @@ namespace WindowAC {
         SimCyclingWindowAC(state, WindACNum, ZoneNum, FirstHVACIteration, PowerMet, QZnReq, LatOutputProvided);
 
         // Report the result of the simulation
-        ReportWindowAC(*state.dataWindowAC, WindACNum);
+        ReportWindowAC(state, WindACNum);
 
         ZoneEqDXCoil = false;
         ZoneCoolingOnlyFan = false;
@@ -1210,7 +1210,7 @@ namespace WindowAC {
         LatOutputProvided = LatentOutput;
     }
 
-    void ReportWindowAC(WindowACData &dataWindowAC, int const WindACNum) // number of the current AC unit being simulated
+    void ReportWindowAC(EnergyPlusData &state, int const WindACNum) // number of the current AC unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -1228,14 +1228,14 @@ namespace WindowAC {
 
         ReportingConstant = TimeStepSys * SecInHour;
 
-        dataWindowAC.WindAC(WindACNum).SensCoolEnergy = dataWindowAC.WindAC(WindACNum).SensCoolEnergyRate * ReportingConstant;
-        dataWindowAC.WindAC(WindACNum).TotCoolEnergy = dataWindowAC.WindAC(WindACNum).TotCoolEnergyRate * ReportingConstant;
-        dataWindowAC.WindAC(WindACNum).LatCoolEnergy = dataWindowAC.WindAC(WindACNum).LatCoolEnergyRate * ReportingConstant;
-        dataWindowAC.WindAC(WindACNum).ElecConsumption = dataWindowAC.WindAC(WindACNum).ElecPower * ReportingConstant;
+        state.dataWindowAC->WindAC(WindACNum).SensCoolEnergy = state.dataWindowAC->WindAC(WindACNum).SensCoolEnergyRate * ReportingConstant;
+        state.dataWindowAC->WindAC(WindACNum).TotCoolEnergy = state.dataWindowAC->WindAC(WindACNum).TotCoolEnergyRate * ReportingConstant;
+        state.dataWindowAC->WindAC(WindACNum).LatCoolEnergy = state.dataWindowAC->WindAC(WindACNum).LatCoolEnergyRate * ReportingConstant;
+        state.dataWindowAC->WindAC(WindACNum).ElecConsumption = state.dataWindowAC->WindAC(WindACNum).ElecPower * ReportingConstant;
 
-        if (dataWindowAC.WindAC(WindACNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
+        if (state.dataWindowAC->WindAC(WindACNum).FirstPass) { // reset sizing flags so other zone equipment can size normally
             if (!DataGlobals::SysSizingCalc) {
-                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, dataWindowAC.WindAC(WindACNum).FirstPass);
+                DataSizing::resetHVACSizingGlobals(DataSizing::CurZoneEqNum, 0, state.dataWindowAC->WindAC(WindACNum).FirstPass);
             }
         }
     }

@@ -109,7 +109,7 @@ namespace HeatBalanceKivaManager {
         int zoneControlNum;
         Real64 zoneAssumedTemperature;
         void initGround(EnergyPlusData &state, const KivaWeatherData &kivaWeather);
-        void setInitialBoundaryConditions(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
+        void setInitialBoundaryConditions(EnergyPlusData &state, const KivaWeatherData &kivaWeather, const int date, const int hour, const int timestep);
         void setBoundaryConditions();
         void plotDomain();
         Real64 floorWeight;

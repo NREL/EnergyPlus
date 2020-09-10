@@ -56,13 +56,9 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    class IOFiles;
-    struct EnergyPlusData;
-    struct WindowComplexManagerData;
-    struct WindowEquivalentLayerData;
-    struct WindowManagerData;
-    struct ZoneTempPredictorCorrectorData;
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace DataSurfaces {
     struct SurfaceData;
@@ -94,7 +90,7 @@ namespace HeatBalanceSurfaceManager {
 
     void InitSurfaceHeatBalance(EnergyPlusData &state);
 
-    void GatherForPredefinedReport(WindowManagerData &dataWindowManager);
+    void GatherForPredefinedReport(EnergyPlusData &state);
 
     void AllocateSurfaceHeatBalArrays();
 

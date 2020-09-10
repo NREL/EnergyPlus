@@ -61,11 +61,6 @@ namespace EnergyPlus {
     struct EnergyPlusData;
     class IOFiles;
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
-    class OutputFiles;
-
     void GeneralRoutines_clear_state();
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name

@@ -57,9 +57,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct BaseboardRadiatorData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace BaseboardRadiator {
 

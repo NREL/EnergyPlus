@@ -57,9 +57,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct WindowACData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WindowAC {
 
@@ -176,7 +176,7 @@ namespace WindowAC {
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void ReportWindowAC(WindowACData &dataWindowAC, int const WindACNum); // number of the current AC unit being simulated
+    void ReportWindowAC(EnergyPlusData &state, int const WindACNum); // number of the current AC unit being simulated
 
     void CalcWindowACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
@@ -245,7 +245,7 @@ namespace WindowAC {
 
         // Default Constructor
         WindowACData()
-            : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"), 
+            : WindowAC_UnitType(1), cWindowAC_UnitType("ZoneHVAC:WindowAirConditioner"),
               cWindowAC_UnitTypes(1, cWindowAC_UnitType), On(1), Off(0), MyOneTimeFlag(true),
               ZoneEquipmentListChecked(false), NumWindAC(0), NumWindACCyc(0), GetWindowACInputFlag(true),
               CoolingLoad(false)

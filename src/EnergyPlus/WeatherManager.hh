@@ -63,11 +63,11 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    class BaseGroundTempsModel;
-    class IOFiles;
-    struct EnergyPlusData;
-    struct WeatherManagerData;
+
+// Forward declarations
+class BaseGroundTempsModel;
+class IOFiles;
+struct EnergyPlusData;
 
 namespace WeatherManager {
 
@@ -774,7 +774,7 @@ namespace WeatherManager {
 } // namespace WeatherManager
 
     struct WeatherManagerData : BaseGlobalStruct {
-        
+
         // These were static variables within different functions. They were pulled out into the namespace
         // to facilitate easier unit testing of those functions.
         // These are purposefully not in the header file as an extern variable. No one outside of this should
@@ -787,9 +787,9 @@ namespace WeatherManager {
         bool WaterMainsParameterReport; // should only be done once
         bool PrintEnvrnStamp;          // Set to true when the environment header should be printed
         bool PrintDDHeader;
-        
+
         Real64 const Sigma;    // Stefan-Boltzmann constant
-        
+
         int YearOfSim; // The Present year of Simulation.
         int const NumDaysInYear;
         int EnvironmentReportNbr;         // Report number for the environment stamp
@@ -938,15 +938,15 @@ namespace WeatherManager {
         Array1D<WeatherManager::WeatherProperties> WPSkyTemperature;       // NOLINT(cert-err58-cpp)
         Array1D<WeatherManager::SpecialDayData> SpecialDays;               // NOLINT(cert-err58-cpp)
         Array1D<WeatherManager::DataPeriodData> DataPeriods;               // NOLINT(cert-err58-cpp)
-        
+
         std::shared_ptr<BaseGroundTempsModel> siteShallowGroundTempsPtr;
         std::shared_ptr<BaseGroundTempsModel> siteBuildingSurfaceGroundTempsPtr;
         std::shared_ptr<BaseGroundTempsModel> siteFCFactorMethodGroundTempsPtr;
         std::shared_ptr<BaseGroundTempsModel> siteDeepGroundTempsPtr;
-    
+
         std::vector<WeatherManager::UnderwaterBoundary> underwaterBoundaries;
         WeatherManager::AnnualMonthlyDryBulbWeatherData OADryBulbAverage; // processes outside air drybulb temperature
-        
+
         // SetCurrentWeather static vars
         int NextHour;
 
@@ -1153,25 +1153,25 @@ namespace WeatherManager {
 
         // Default Constructor
         WeatherManagerData()
-            : GetBranchInputOneTimeFlag(true), GetEnvironmentFirstCall(true), PrntEnvHeaders(true), FirstCall(true), 
+            : GetBranchInputOneTimeFlag(true), GetEnvironmentFirstCall(true), PrntEnvHeaders(true), FirstCall(true),
               WaterMainsParameterReport(true), PrintEnvrnStamp(false), Sigma(5.6697e-8),
-              YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""), 
+              YearOfSim(1), NumDaysInYear(365), EnvironmentReportNbr(0), EnvironmentReportChr(""),
               WeatherFileExists(false),
-              LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0), 
-              WeatherFileTimeZone(0.0), WeatherFileElevation(0.0), 
-              GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0), 
-              SnowGndRefModifierForDayltg(1.0), WaterMainsTempsSchedule(0), 
-              WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""), 
-              wthFCGroundTemps(false), TotRunPers(0), TotRunDesPers(0), 
-              NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0), 
-              NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true), 
+              LocationGathered(false), WeatherFileLatitude(0.0), WeatherFileLongitude(0.0),
+              WeatherFileTimeZone(0.0), WeatherFileElevation(0.0),
+              GroundTempsFCFromEPWHeader(12, 0.0), GroundReflectances(12, 0.2), SnowGndRefModifier(1.0),
+              SnowGndRefModifierForDayltg(1.0), WaterMainsTempsSchedule(0),
+              WaterMainsTempsAnnualAvgAirTemp(0.0), WaterMainsTempsMaxDiffAirTemp(0.0), WaterMainsTempsScheduleName(""),
+              wthFCGroundTemps(false), TotRunPers(0), TotRunDesPers(0),
+              NumSpecialDays(0), SpecialDayTypes(366, 0), WeekDayTypes(366, 0), DSTIndex(366, 0),
+              NumDataPeriods(0), NumIntervalsPerHour(1), UseDaylightSaving(true), UseSpecialDays(true),
               UseRainValues(true), UseSnowValues(true), EPWDaylightSaving(false), IDFDaylightSaving(false),
-              DaylightSavingIsActive(false), WFAllowsLeapYears(false), 
+              DaylightSavingIsActive(false), WFAllowsLeapYears(false),
               curSimDayForEndOfRunPeriod(0), Envrn(0), NumOfEnvrn(0), NumEPWTypExtSets(0), NumWPSkyTemperatures(0),
-              RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0), 
-              SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0), 
-              NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}), 
-              LeapYearAdd(0), DatesShouldBeReset(false), 
+              RptIsRain(0), RptIsSnow(0), RptDayType(0), HrAngle(0.0),
+              SolarAltitudeAngle(0.0), SolarAzimuthAngle(0.0), HorizIRSky(0.0), TimeStepFraction(0.0),
+              NumSPSiteScheduleNamePtrs(0), EndDayOfMonth(12, {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}),
+              LeapYearAdd(0), DatesShouldBeReset(false),
               StartDatesCycleShouldBeReset(false), Jan1DatesShouldBeReset(false), RPReadAllWeatherData(false)
         {
         }

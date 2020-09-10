@@ -504,7 +504,7 @@ namespace HVACManager {
                 }
             }
 
-            DetectOscillatingZoneTemp(*state.dataZoneTempPredictorCorrector);
+            DetectOscillatingZoneTemp(state);
             UpdateZoneListAndGroupLoads(); // Must be called before UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem)
             UpdateIceFractions();          // Update fraction of ice stored in TES
             ManageWater(state);
@@ -543,7 +543,7 @@ namespace HVACManager {
                 }
                 if (ZoneSizingCalc) {
                     UpdateZoneSizing(state, DuringDay);
-                    UpdateFacilitySizing(*state.dataGlobal, DuringDay);
+                    UpdateFacilitySizing(state, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {

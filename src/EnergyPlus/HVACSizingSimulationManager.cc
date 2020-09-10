@@ -366,7 +366,7 @@ void ManageHVACSizingSimulation(EnergyPlusData &state, bool &ErrorsFound)
 
                         ManageWeather(state);
 
-                        ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+                        ManageExteriorEnergyUse(state);
 
                         ManageHeatBalance(state);
 

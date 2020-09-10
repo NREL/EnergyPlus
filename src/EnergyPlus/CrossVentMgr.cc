@@ -102,7 +102,6 @@ namespace CrossVentMgr {
     Real64 constexpr CrecFlow2(0.466); // Second correlation constant for the recirculation flow rate
 
     void ManageUCSDCVModel(EnergyPlusData &state,
-                           CrossVentMgrData &dataCrossVentMgr,
                            int const ZoneNum) // index number for the specified zone
     {
 
@@ -117,13 +116,13 @@ namespace CrossVentMgr {
 
         using DataHeatBalSurface::TempSurfIn;
 
-        InitUCSDCV(dataCrossVentMgr, ZoneNum);
+        InitUCSDCV(state, ZoneNum);
 
         // perform Cross Ventilation model calculations
         CalcUCSDCV(state, ZoneNum);
     }
 
-    void InitUCSDCV(CrossVentMgrData &dataCrossVentMgr, int const ZoneNum)
+    void InitUCSDCV(EnergyPlusData &state, int const ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -141,18 +140,18 @@ namespace CrossVentMgr {
         using namespace DataRoomAirModel;
 
         // Do the one time initializations
-        if (dataCrossVentMgr.InitUCSDCV_MyOneTimeFlag) {
-            dataCrossVentMgr.InitUCSDCV_MyEnvrnFlag.dimension(NumOfZones, true);
-            dataCrossVentMgr.InitUCSDCV_MyOneTimeFlag = false;
+        if (state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag) {
+            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag.dimension(NumOfZones, true);
+            state.dataCrossVentMgr->InitUCSDCV_MyOneTimeFlag = false;
         }
 
         // Do the begin environment initializations
-        if (BeginEnvrnFlag && dataCrossVentMgr.InitUCSDCV_MyEnvrnFlag(ZoneNum)) {
-            dataCrossVentMgr.InitUCSDCV_MyEnvrnFlag(ZoneNum) = false;
+        if (BeginEnvrnFlag && state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum)) {
+            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum) = false;
         }
 
         if (!BeginEnvrnFlag) {
-            dataCrossVentMgr.InitUCSDCV_MyEnvrnFlag(ZoneNum) = true;
+            state.dataCrossVentMgr->InitUCSDCV_MyEnvrnFlag(ZoneNum) = true;
         }
     }
 

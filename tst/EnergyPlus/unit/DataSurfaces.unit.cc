@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read material data
+    GetMaterialData(state, state.files, ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;

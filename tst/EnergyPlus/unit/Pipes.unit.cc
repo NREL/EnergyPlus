@@ -72,7 +72,7 @@ TEST_F(EnergyPlusFixture, TestPipesInput)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    Pipes::GetPipeInput(*state.dataPipes);
+    Pipes::GetPipeInput(state);
     EXPECT_EQ(2u, Pipes::LocalPipe.size());
     EXPECT_EQ(DataPlant::TypeOf_Pipe, Pipes::LocalPipe(1).TypeOf);
     EXPECT_EQ(DataPlant::TypeOf_PipeSteam, Pipes::LocalPipe(2).TypeOf);

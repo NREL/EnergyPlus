@@ -223,7 +223,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    EngineDrivenChillerSpecs::getInput(state, *state.dataPlantChillers);
+    EngineDrivenChillerSpecs::getInput(state);
 
     EXPECT_EQ(1, state.dataPlantChillers->NumEngineDrivenChillers);
     EXPECT_EQ(state.dataPlantChillers->EngineDrivenChiller(1).FuelType, "Diesel");
@@ -292,7 +292,7 @@ TEST_F(EnergyPlusFixture, CombustionTurbineChiller_Fueltype)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GTChillerSpecs::getInput(*state.dataPlantChillers);
+    GTChillerSpecs::getInput(state);
 
     EXPECT_EQ(1, state.dataPlantChillers->NumGTChillers);
     EXPECT_EQ(state.dataPlantChillers->GTChiller(1).FuelType, "NaturalGas");

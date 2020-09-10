@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     MCPTV(1) = 270.10;
     OutBaroPress = 99500;
 
-    CorrectZoneHumRat(*state.dataZonePlenum, 1);
+    CorrectZoneHumRat(state, 1);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 4: Hybrid model people count with measured temperature (free-floating)
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredHumidityRatioSchedulePtr).CurrentValue = 0.002506251487737;
 
-    CorrectZoneHumRat(*state.dataZonePlenum, 1);
+    CorrectZoneHumRat(state, 1);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Case 6: Hybrid model infiltration with measured temperature (with HVAC)
@@ -462,7 +462,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.8345;
     OutBaroPress = 99500;
 
-    CorrectZoneHumRat(*state.dataZonePlenum, 1);
+    CorrectZoneHumRat(state, 1);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 8: Hybrid model people count with measured temperature (with HVAC)
@@ -537,7 +537,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
     OutBaroPress = 99500;
 
-    CorrectZoneHumRat(*state.dataZonePlenum, 1);
+    CorrectZoneHumRat(state, 1);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything
@@ -780,7 +780,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 388.238646;
 
-    CorrectZoneContaminants(*state.dataZonePlenum, false, true, 10 / 60);
+    CorrectZoneContaminants(state, false, true, 10 / 60);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 2: Hybrid model people count with measured CO2 concentration (free-floating)
@@ -809,7 +809,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     CO2ZoneTimeMinus3(1) = 387.2385685;
     HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr = 1;
     Schedule(HybridModelZone(1).ZoneMeasuredCO2ConcentrationSchedulePtr).CurrentValue = 389.8511796;
-    CorrectZoneContaminants(*state.dataZonePlenum, false, true, 10 / 60);
+    CorrectZoneContaminants(state, false, true, 10 / 60);
     EXPECT_NEAR(4, Zone(1).NumOccHM, 0.1);
 
     // Case 3: Hybrid model infiltration with measured CO2 concentration (with HVAC)
@@ -840,7 +840,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Schedule(HybridModelZone(1).ZoneSupplyAirCO2ConcentrationSchedulePtr).CurrentValue = 388.54049;
     Schedule(HybridModelZone(1).ZoneSupplyAirMassFlowRateSchedulePtr).CurrentValue = 0.898375186;
 
-    CorrectZoneContaminants(*state.dataZonePlenum, false, true, 10 / 60);
+    CorrectZoneContaminants(state, false, true, 10 / 60);
     EXPECT_NEAR(0.5, Zone(1).InfilOAAirChangeRateHM, 0.01);
 
     // Case 4: Hybrid model people count with measured CO2 concentration (with HVAC)
@@ -880,7 +880,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     Schedule(HybridModelZone(1).ZonePeopleRadiationFractionSchedulePtr).CurrentValue = 0.3;
     Schedule(HybridModelZone(1).ZonePeopleCO2GenRateSchedulePtr).CurrentValue = 0.0000000382;
 
-    CorrectZoneContaminants(*state.dataZonePlenum, false, true, 10 / 60);
+    CorrectZoneContaminants(state, false, true, 10 / 60);
     EXPECT_NEAR(7.27, Zone(1).NumOccHM, 0.1);
 
     // Deallocate everything

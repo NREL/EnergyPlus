@@ -3150,7 +3150,7 @@ namespace SingleDuct {
             TermUnitSizing(CurTermUnitSizingNum).DesHeatingLoad = DesCoilLoad; // Coil Summary report
             if (this->ReheatComp_Num == HCoilType_SimpleHeating) {
                 if (this->DamperHeatingAction == Normal) {
-                    SetCoilDesFlow(state, 
+                    SetCoilDesFlow(state,
                         this->ReheatComp, this->ReheatName, this->ZoneMinAirFracDes * this->MaxAirVolFlowRate, ErrorsFound);
                 } else {
                     SetCoilDesFlow(state, this->ReheatComp, this->ReheatName, TermUnitSizing(CurTermUnitSizingNum).AirVolFlow, ErrorsFound);
@@ -5395,7 +5395,7 @@ namespace SingleDuct {
         UpdateATMixer(SysNum);
     }
 
-    void GetATMixers(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
+    void GetATMixers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5449,7 +5449,7 @@ namespace SingleDuct {
         SysATMixer.allocate(NumATMixers);
 
         // Need air distribution units first
-        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, dataZoneAirLoopEquipmentManager);
+        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state);
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -5944,7 +5944,7 @@ namespace SingleDuct {
 
         if (GetATMixerFlag) {
             // CALL GetZoneAirLoopEquipment
-            GetATMixers(state, *state.dataZoneAirLoopEquipmentManager);
+            GetATMixers(state);
             GetATMixerFlag = false;
         }
 

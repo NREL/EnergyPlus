@@ -61,7 +61,6 @@
 namespace EnergyPlus {
 
 struct EnergyPlusData;
-struct ExteriorEnergyUseData;
 
 namespace ExteriorEnergyUse {
 
@@ -130,9 +129,9 @@ namespace ExteriorEnergyUse {
         }
     };
 
-    void ManageExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
+    void ManageExteriorEnergyUse(EnergyPlusData &state);
 
-    void GetExteriorEnergyUseInput(ExteriorEnergyUseData &exteriorEnergyUse);
+    void GetExteriorEnergyUseInput(EnergyPlusData &state);
 
     void ValidateFuelType(ExteriorEnergyUse::ExteriorFuelUsage &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
@@ -142,7 +141,7 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     );
 
-    void ReportExteriorEnergyUse(ExteriorEnergyUseData &exteriorEnergyUse);
+    void ReportExteriorEnergyUse(EnergyPlusData &state);
 
 } // namespace ExteriorEnergyUse
 

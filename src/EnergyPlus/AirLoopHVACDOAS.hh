@@ -55,8 +55,8 @@
 
 namespace EnergyPlus {
 
-    // forward declarations
-    struct EnergyPlusData;
+// forward declarations
+struct EnergyPlusData;
 
 namespace AirLoopHVACDOAS {
 

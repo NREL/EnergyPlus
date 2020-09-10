@@ -62,7 +62,6 @@
 
 namespace EnergyPlus {
 
-    struct DataGlobal;
     struct EnergyPlusData;
 
 namespace GroundTemperatureManager {

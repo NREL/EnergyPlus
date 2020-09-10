@@ -1118,7 +1118,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     ScheduleInputProcessed = true;
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     GetConstructData(state.files, ErrorsFound);

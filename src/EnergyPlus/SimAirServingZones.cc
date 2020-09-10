@@ -1199,7 +1199,7 @@ namespace SimAirServingZones {
                                     if (UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Heating:Water") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Cooling:Water")) {
-                                        WaterCoilNodeNum = GetCoilWaterInletNode(state, 
+                                        WaterCoilNodeNum = GetCoilWaterInletNode(state,
                                             CompType, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
                                         if (WaterCoilNodeNum == ActuatorNodeNum) {
                                             nonLockoutCoilFound = true;
@@ -2020,7 +2020,7 @@ namespace SimAirServingZones {
             }
 
             // now connect return nodes with airloops and corresponding inlet nodes
-            ConnectReturnNodes(state, *state.dataZonePlenum);
+            ConnectReturnNodes(state);
 
             InitAirLoopsOneTimeFlag = false;
 
@@ -2373,7 +2373,7 @@ namespace SimAirServingZones {
         } // end loop over primary air systems
     }
 
-    void ConnectReturnNodes(EnergyPlusData &state, ZonePlenumData &dataZonePlenum)
+    void ConnectReturnNodes(EnergyPlusData &state)
     {
         // This initializes ZoneEquipConfig.ReturnNodeInletNum and ReturnNodeAirLoopNum
         // Search all return paths to match return nodes with the airloop they are connected to and find the corresponding zone inlet node (same zone,
@@ -2416,7 +2416,7 @@ namespace SimAirServingZones {
                                 }
                             }
                         } else if (compType == ZoneReturnPlenum_Type) {
-                            auto const &thisPlenum(dataZonePlenum.ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
+                            auto const &thisPlenum(state.dataZonePlenum->ZoneRetPlenCond(thisRetPath.ComponentIndex(compNum)));
                             for (int inNode = 1; inNode <= thisPlenum.NumInletNodes; ++inNode) {
                                 if (thisReturnNode == thisPlenum.InletNode(inNode)) {
                                     thisZoneEquip.ReturnNodeAirLoopNum(zoneOutNum) = airLoopNum; // set the return node airloop num

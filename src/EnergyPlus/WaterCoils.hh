@@ -59,9 +59,9 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    struct WaterCoilsData;
+
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WaterCoils {
 
@@ -581,10 +581,10 @@ struct WaterCoilsData : BaseGlobalStruct {
 
     // Default Constructor
     WaterCoilsData()
-        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001), 
-          MinAirMassFlow(0.001), CoilType_Cooling(1), CoilType_Heating(2), CoilModel_Simple(1), CoilModel_Cooling(2), CoilModel_Detailed(3), 
-          CounterFlow(1), CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001), 
-          CondensateToTank(1002), UAandFlow(1), NomCap(2), DesignCalc(1), SimCalc(2), NumWaterCoils(0), 
+        : MaxPolynomOrder(4), MaxOrderedPairs(60), PolyConvgTol(1.E-05), MinWaterMassFlowFrac(0.000001),
+          MinAirMassFlow(0.001), CoilType_Cooling(1), CoilType_Heating(2), CoilModel_Simple(1), CoilModel_Cooling(2), CoilModel_Detailed(3),
+          CounterFlow(1), CrossFlow(2), SimpleAnalysis(1), DetailedAnalysis(2), CondensateDiscarded(1001),
+          CondensateToTank(1002), UAandFlow(1), NomCap(2), DesignCalc(1), SimCalc(2), NumWaterCoils(0),
           GetWaterCoilsInputFlag(true), WaterCoilControllerCheckOneTimeFlag(true),
           InitWaterCoilOneTimeFlag(true), WaterCoil_SimpleHeating(DataPlant::TypeOf_CoilWaterSimpleHeating), WaterCoil_DetFlatFinCooling(DataPlant::TypeOf_CoilWaterDetailedFlatCooling), WaterCoil_Cooling(DataPlant::TypeOf_CoilWaterCooling)
     {

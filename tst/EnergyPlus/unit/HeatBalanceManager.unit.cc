@@ -167,7 +167,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     bool ErrorsFound(false);
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -204,7 +204,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     bool ErrorsFound(false);
 
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -712,7 +712,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
@@ -1214,7 +1214,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1766,7 +1766,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, errorsfound);
+    HeatBalanceManager::GetMaterialData(state, state.files, errorsfound);
 
     EXPECT_FALSE(errorsfound);
     EXPECT_NEAR(dataMaterial.Material(1).Resistance,0.158,0.0001);
@@ -1811,7 +1811,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
@@ -1948,7 +1948,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
 
     bool ErrorsFound(false); // If errors detected in input
 
-    HeatBalanceManager::GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound);
+    HeatBalanceManager::GetMaterialData(state, state.files, ErrorsFound);
 
     ASSERT_FALSE(ErrorsFound);
 

@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct WaterUseData;
 
 namespace WaterUse {
 
@@ -141,11 +140,11 @@ namespace WaterUse {
             DrainTemp = 0.0;
         }
 
-        void CalcEquipmentFlowRates(WaterUseData &dataWaterUse);
+        void CalcEquipmentFlowRates(EnergyPlusData &state);
 
         void CalcEquipmentDrainTemp();
 
-        void setupOutputVars(WaterUseData &dataWaterUse);
+        void setupOutputVars(EnergyPlusData &state);
     };
 
     struct WaterConnectionsType : PlantComponent
@@ -226,32 +225,32 @@ namespace WaterUse {
         {
         }
 
-        static PlantComponent *factory(EnergyPlusData &state, WaterUseData &dataWaterUse, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitConnections(EnergyPlusData &state, WaterUseData &dataWaterUse);
+        void InitConnections(EnergyPlusData &state);
 
-        void CalcConnectionsFlowRates(WaterUseData &dataWaterUse, bool FirstHVACIteration);
+        void CalcConnectionsFlowRates(EnergyPlusData &state, bool FirstHVACIteration);
 
-        void CalcConnectionsDrainTemp(WaterUseData &dataWaterUse);
+        void CalcConnectionsDrainTemp(EnergyPlusData &state);
 
         void CalcConnectionsHeatRecovery();
 
         void UpdateWaterConnections();
 
-        void ReportWaterUse(WaterUseData &dataWaterUse);
+        void ReportWaterUse(EnergyPlusData &state);
 
-        void setupOutputVars(WaterUseData &EP_UNUSED(dataWaterUse));
+        void setupOutputVars(EnergyPlusData &EP_UNUSED(state));
     };
 
     void SimulateWaterUse(EnergyPlusData &state, bool FirstHVACIteration);
 
-    void GetWaterUseInput(EnergyPlusData &state, WaterUseData &dataWaterUse);
+    void GetWaterUseInput(EnergyPlusData &state);
 
-    void ReportStandAloneWaterUse(WaterUseData &dataWaterUse);
+    void ReportStandAloneWaterUse(EnergyPlusData &state);
 
-    void CalcWaterUseZoneGains(WaterUseData &dataWaterUse);
+    void CalcWaterUseZoneGains(EnergyPlusData &state);
 
 } // namespace WaterUse
 

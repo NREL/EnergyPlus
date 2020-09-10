@@ -54,13 +54,9 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    //forward declarations
-    struct ZonePlenumData;
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct ZoneContaminantPredictorCorrectorData;
-    struct ZonePlenumData;
+// Forward Declarations
+struct EnergyPlusData;
 
 namespace ZoneContaminantPredictorCorrector {
 
@@ -70,11 +66,11 @@ namespace ZoneContaminantPredictorCorrector {
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
     );
 
-    void GetZoneContaminanInputs(ZoneContaminantPredictorCorrectorData &dataZoneContaminantPredictorCorrector);
+    void GetZoneContaminanInputs(EnergyPlusData &state);
 
     void GetZoneContaminanSetPoints();
 
-    void InitZoneContSetPoints(ZoneContaminantPredictorCorrectorData &dataZoneContaminantPredictorCorrector);
+    void InitZoneContSetPoints(EnergyPlusData &state);
 
     void PredictZoneContaminants(bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
@@ -95,7 +91,8 @@ namespace ZoneContaminantPredictorCorrector {
                          Real64 &RhoAir               // Air density
     );
 
-    void CorrectZoneContaminants(ZonePlenumData &dataZonePlenum, bool const ShortenTimeStepSys,
+    void CorrectZoneContaminants(EnergyPlusData &state,
+                                 bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     );

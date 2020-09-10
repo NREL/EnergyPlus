@@ -2310,7 +2310,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetMaterialData(state, *state.dataWindowEquivalentLayer, state.files, ErrorsFound); // read construction material data
+    GetMaterialData(state, state.files, ErrorsFound); // read construction material data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

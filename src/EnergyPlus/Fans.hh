@@ -60,8 +60,8 @@
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
-    struct FansData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace Fans {
 
@@ -275,17 +275,17 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(EnergyPlusData &state, FansData &fans, int const FanNum);
+    void SimSimpleFan(EnergyPlusData &state, int const FanNum);
 
-    void SimVariableVolumeFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
-    void SimZoneExhaustFan(FansData &fans, int const FanNum);
+    void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum);
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(EnergyPlusData &state, FansData &fans, int const FanNum);
+    void SimComponentModelFan(EnergyPlusData &state, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************

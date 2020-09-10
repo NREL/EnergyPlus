@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     EXPECT_NEAR(1.041692180, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(76.89754831, DataContaminantBalance::GCPredictedRate(1), 0.00001);
 
-    CorrectZoneContaminants(*state.dataZonePlenum, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(489.931000, Node(5).CO2, 0.00001);
     EXPECT_NEAR(0.09093100, Node(5).GenContam, 0.00001);
 
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_CorrectZoneContamina
     ZT(1) = 24.0;
     MixingMassFlowZone(1) = 0.0;
 
-    CorrectZoneContaminants(*state.dataZonePlenum, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(490.0, Node(5).CO2, 0.00001);
     EXPECT_NEAR(90.000999, Node(5).GenContam, 0.00001);
 

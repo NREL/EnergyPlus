@@ -58,9 +58,8 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct ZoneDehumidifierData;
+// Forward Declarations
+struct EnergyPlusData;
 
 namespace ZoneDehumidifier {
 
@@ -137,7 +136,6 @@ namespace ZoneDehumidifier {
     // Functions
 
     void SimZoneDehumidifier(EnergyPlusData &state,
-                             ZoneDehumidifierData &dataZoneDehumidifier,
                              std::string const &CompName,   // Name of the zone dehumidifier
                              int const ZoneNum,             // Number of zone being served
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -146,24 +144,24 @@ namespace ZoneDehumidifier {
                              int &CompIndex                 // Index to the zone dehumidifier
     );
 
-    void GetZoneDehumidifierInput(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier);
+    void GetZoneDehumidifierInput(EnergyPlusData &state);
 
-    void InitZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
+    void InitZoneDehumidifier(EnergyPlusData &state, int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
 
     void SizeZoneDehumidifier();
 
     void CalcZoneDehumidifier(EnergyPlusData &state,
-                              ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum,     // Index number of the current zone dehumidifier being simulated
+                              int const ZoneDehumNum,     // Index number of the current zone dehumidifier being simulated
                               Real64 const QZnDehumidReq, // Dehumidification load to be met (kg/s), negative value means dehumidification load
                               Real64 &SensibleOutput,     // Sensible (heating) output (W), sent to load predictor for next simulation time step
                               Real64 &LatentOutput        // Latent (dehumidification) output provided (kg/s)
     );
 
-    void UpdateZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
+    void UpdateZoneDehumidifier(EnergyPlusData &state, int const ZoneDehumNum); // Number of the current zone dehumidifier being simulated
 
-    void ReportZoneDehumidifier(ZoneDehumidifierData &dataZoneDehumidifier, int const DehumidNum); // Index of the current zone dehumidifier being simulated
+    void ReportZoneDehumidifier(EnergyPlusData &state, int const DehumidNum); // Index of the current zone dehumidifier being simulated
 
-    bool GetZoneDehumidifierNodeNumber(EnergyPlusData &state, ZoneDehumidifierData &dataZoneDehumidifier, int const NodeNumber); // Node being tested
+    bool GetZoneDehumidifierNodeNumber(EnergyPlusData &state, int const NodeNumber); // Node being tested
 
 } // namespace ZoneDehumidifier
 

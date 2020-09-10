@@ -634,7 +634,7 @@ namespace SimulationManager {
 
                         ManageWeather(state);
 
-                        ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+                        ManageExteriorEnergyUse(state);
 
                         ManageHeatBalance(state);
 
@@ -696,9 +696,9 @@ namespace SimulationManager {
 
         WriteTabularReports(state); //     Create the tabular reports at completion of each
 
-        WriteTabularTariffReports(*state.dataCostEstimateManager);
+        WriteTabularTariffReports(state);
 
-        ComputeLifeCycleCostAndReport(*state.dataCostEstimateManager); // must be after WriteTabularReports and WriteTabularTariffReports
+        ComputeLifeCycleCostAndReport(state); // must be after WriteTabularReports and WriteTabularTariffReports
 
         CloseOutputTabularFile();
 
@@ -1242,8 +1242,6 @@ namespace SimulationManager {
                 bool overrideMaxZoneTempDiff(false);
                 bool overrideSystemTimestep(false);
                 bool overrideMaxAllowedDelTemp(false);
-                // ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
-                // dataZoneTempPredictorCorrector.OscillationVariablesNeeded = true;
                 state.dataZoneTempPredictorCorrector->OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
@@ -2140,7 +2138,7 @@ namespace SimulationManager {
 
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+            ManageExteriorEnergyUse(state);
 
             ManageHeatBalance(state);
 
@@ -2155,7 +2153,7 @@ namespace SimulationManager {
 
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+            ManageExteriorEnergyUse(state);
 
             ManageHeatBalance(state);
 
@@ -2168,7 +2166,7 @@ namespace SimulationManager {
             if (DeveloperFlag) DisplayString("Initializing Simulation - hour 24 timestep 1:" + EnvironmentName);
             ManageWeather(state);
 
-            ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+            ManageExteriorEnergyUse(state);
 
             ManageHeatBalance(state);
 
@@ -3077,7 +3075,8 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state,
+                bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 )
@@ -3161,7 +3160,7 @@ void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the
 
     // FLOW:
     if (ResimExt) {
-        ManageExteriorEnergyUse(*state.dataExteriorEnergyUse);
+        ManageExteriorEnergyUse(state);
 
         ++DemandManagerExtIterations;
     }

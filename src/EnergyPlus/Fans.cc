@@ -247,20 +247,20 @@ namespace Fans {
 
         // Calculate the Correct Fan Model with the current FanNum
         if (Fan(FanNum).FanType_Num == FanType_SimpleConstVolume) {
-            SimSimpleFan(state, *state.dataFans, FanNum);
+            SimSimpleFan(state, FanNum);
         } else if (Fan(FanNum).FanType_Num == FanType_SimpleVAV) {
             if (present(PressureRise)) {
-                SimVariableVolumeFan(state, *state.dataFans, FanNum, PressureRise);
+                SimVariableVolumeFan(state, FanNum, PressureRise);
             } else {
-                SimVariableVolumeFan(state, *state.dataFans, FanNum);
+                SimVariableVolumeFan(state, FanNum);
             }
         } else if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-            SimOnOffFan(state, *state.dataFans, FanNum, SpeedRatio);
+            SimOnOffFan(state, FanNum, SpeedRatio);
         } else if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
-            SimZoneExhaustFan(*state.dataFans, FanNum);
+            SimZoneExhaustFan(state, FanNum);
             // cpw22Aug2010 Add call for Component Model fan
         } else if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
-            SimComponentModelFan(state, *state.dataFans, FanNum);
+            SimComponentModelFan(state, FanNum);
         }
 
         // Update the current fan to the outlet nodes
@@ -1528,7 +1528,7 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(EnergyPlusData &state, FansData &fans, int const FanNum)
+    void SimSimpleFan(EnergyPlusData &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1632,7 +1632,7 @@ namespace Fans {
         MassFlow = max(MassFlow, Fan(FanNum).MinAirMassFlowRate);
 
         // Determine the Fan Schedule for the Time step
-        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || fans.LocalTurnFansOn) && !fans.LocalTurnFansOff && MassFlow > 0.0) {
+        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
             // Fan is operating
             Fan(FanNum).FanPower = max(0.0, MassFlow * DeltaPress / (FanEff * RhoAir)); // total fan power
             FanShaftPower = MotEff * Fan(FanNum).FanPower;                              // power delivered to shaft
@@ -1658,7 +1658,7 @@ namespace Fans {
         }
     }
 
-    void SimVariableVolumeFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> PressureRise)
+    void SimVariableVolumeFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> PressureRise)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1790,7 +1790,7 @@ namespace Fans {
         MassFlow = min(MassFlow, MaxAirMassFlowRate);
 
         // Determine the Fan Schedule for the Time step
-        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || fans.LocalTurnFansOn) && !fans.LocalTurnFansOff && MassFlow > 0.0) {
+        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
             // Fan is operating - calculate power loss and enthalpy rise
             //  Fan(FanNum)%FanPower = PartLoadFrac*FullMassFlow*DeltaPress/(FanEff*RhoAir) ! total fan power
             // Calculate and check limits on fraction of system flow
@@ -1870,7 +1870,7 @@ namespace Fans {
         }
     }
 
-    void SimOnOffFan(EnergyPlusData &state, FansData &fans, int const FanNum, Optional<Real64 const> SpeedRatio)
+    void SimOnOffFan(EnergyPlusData &state, int const FanNum, Optional<Real64 const> SpeedRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1971,7 +1971,7 @@ namespace Fans {
         Fan(FanNum).FanRuntimeFraction = 0.0;
 
         // Determine the Fan Schedule for the Time step
-        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || fans.LocalTurnFansOn) && !fans.LocalTurnFansOff && MassFlow > 0.0 &&
+        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff && MassFlow > 0.0 &&
             Fan(FanNum).MaxAirMassFlowRate > 0.0) {
             // The actual flow fraction is calculated from MassFlow and the MaxVolumeFlow * AirDensity
             FlowFrac = MassFlow / MaxAirMassFlowRate;
@@ -2071,7 +2071,7 @@ namespace Fans {
         }
     }
 
-    void SimZoneExhaustFan(FansData &fans, int const FanNum)
+    void SimZoneExhaustFan(EnergyPlusData &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2134,7 +2134,7 @@ namespace Fans {
         //  and TurnFansOff to LocalTurnFansOff in the IF statement below.
 
         // apply controls to determine if operating
-        if (Fan(FanNum).AvailManagerMode == fans.ExhaustFanCoupledToAvailManagers) {
+        if (Fan(FanNum).AvailManagerMode == state.dataFans->ExhaustFanCoupledToAvailManagers) {
             if (((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0) || TurnFansOn) && !TurnFansOff && MassFlow > 0.0) { // available
                 if (Fan(FanNum).MinTempLimitSchedNum > 0) {
                     if (Tin >= GetCurrentScheduleValue(Fan(FanNum).MinTempLimitSchedNum)) {
@@ -2149,7 +2149,7 @@ namespace Fans {
                 FanIsRunning = false;
             }
 
-        } else if (Fan(FanNum).AvailManagerMode == fans.ExhaustFanDecoupledFromAvailManagers) {
+        } else if (Fan(FanNum).AvailManagerMode == state.dataFans->ExhaustFanDecoupledFromAvailManagers) {
             if (GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 && MassFlow > 0.0) {
                 if (Fan(FanNum).MinTempLimitSchedNum > 0) {
                     if (Tin >= GetCurrentScheduleValue(Fan(FanNum).MinTempLimitSchedNum)) {
@@ -2192,7 +2192,7 @@ namespace Fans {
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(EnergyPlusData &state, FansData &fans, int const FanNum)
+    void SimComponentModelFan(EnergyPlusData &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2315,7 +2315,7 @@ namespace Fans {
         //  IF (Fan(FanNum)%EMSMaxMassFlowOverrideOn) MassFlow   = Fan(FanNum)%EMSAirMassFlowValue
 
         // Determine the Fan Schedule for the Time step
-        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || fans.LocalTurnFansOn) && !fans.LocalTurnFansOff && MassFlow > 0.0) {
+        if ((GetCurrentScheduleValue(Fan(FanNum).AvailSchedPtrNum) > 0.0 || state.dataFans->LocalTurnFansOn) && !state.dataFans->LocalTurnFansOff && MassFlow > 0.0) {
             // Fan is operating - calculate fan pressure rise, component efficiencies and power, and also air enthalpy rise
 
             // Calculate fan static pressure rise using fan volumetric flow, std air density, air-handling system characteristics,

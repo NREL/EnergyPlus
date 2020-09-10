@@ -58,10 +58,8 @@
 
 namespace EnergyPlus {
 
-    // Forward Declarations
-    struct EnergyPlusData;
-    struct WindowManagerData;
-    struct ZoneTempPredictorCorrectorData;
+// Forward Declarations
+struct EnergyPlusData;
 
 namespace CoolingPanelSimple {
 

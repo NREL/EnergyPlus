@@ -121,7 +121,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Autosize)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ElectricChillerSpecs::getInput(*state.dataPlantChillers);
+    ElectricChillerSpecs::getInput(state);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";
@@ -248,7 +248,7 @@ TEST_F(EnergyPlusFixture, ChillerElectric_WaterCooled_Simulate)
         loopsidebranch.Comp.allocate(1);
     }
 
-    ElectricChillerSpecs::getInput(*state.dataPlantChillers);
+    ElectricChillerSpecs::getInput(state);
 
     DataPlant::PlantLoop(1).Name = "ChilledWaterLoop";
     DataPlant::PlantLoop(1).FluidName = "ChilledWater";

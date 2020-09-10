@@ -59,9 +59,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZonePlenumData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ZonePlenum {
 
@@ -169,17 +168,17 @@ namespace ZonePlenum {
 
     void GetZonePlenumInput(EnergyPlusData &state);
 
-    void InitAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void InitAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void InitAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
+    void InitAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstHVACIteration, bool const FirstCall);
 
-    void CalcAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void CalcAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void CalcAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool const FirstCall);
+    void CalcAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool const FirstCall);
 
-    void UpdateAirZoneReturnPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum);
+    void UpdateAirZoneReturnPlenum(EnergyPlusData &state, int const ZonePlenumNum);
 
-    void UpdateAirZoneSupplyPlenum(ZonePlenumData &dataZonePlenum, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
+    void UpdateAirZoneSupplyPlenum(EnergyPlusData &state, int const ZonePlenumNum, bool &PlenumInletChanged, bool const FirstCall);
 
     int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum);
 

@@ -57,9 +57,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZoneAirLoopEquipmentManagerData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace ZoneAirLoopEquipmentManager {
 
@@ -72,9 +71,9 @@ namespace ZoneAirLoopEquipmentManager {
                                     int &ControlledZoneNum,
                                     int &CompIndex);
 
-    void GetZoneAirLoopEquipment(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
+    void GetZoneAirLoopEquipment(EnergyPlusData &state);
 
-    void InitZoneAirLoopEquipment(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
+    void InitZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum, int const ControlledZoneNum, int const ActualZoneNum);
 
     void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
 

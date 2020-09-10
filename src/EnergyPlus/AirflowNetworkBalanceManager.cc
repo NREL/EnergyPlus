@@ -9573,7 +9573,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= NumOfNodes; ++i) {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
-            if (GetZoneDehumidifierNodeNumber(state, *state.dataZoneDehumidifier, i)) NodeFound(i) = true;
+            if (GetZoneDehumidifierNodeNumber(state, i)) NodeFound(i) = true;
 
             for (j = 1; j <= NumOfZones; ++j) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;

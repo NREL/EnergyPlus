@@ -69,7 +69,6 @@ namespace EnergyPlus {
     class InputOutputFile;
     class IOFiles;
     struct EnergyPlusData;
-    struct DataGlobal;
 
 namespace OutputProcessor {
 

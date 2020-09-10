@@ -303,7 +303,7 @@ namespace HeatBalanceSurfaceManager {
             }
         }
 
-        ManageThermalComfort(*state.dataZoneTempPredictorCorrector, state.files, false); // "Record keeping" for the zone
+        ManageThermalComfort(state, state.files, false); // "Record keeping" for the zone
 
         ReportSurfaceHeatBalance();
         if (ZoneSizingCalc) GatherComponentLoadsSurface();
@@ -528,7 +528,7 @@ namespace HeatBalanceSurfaceManager {
 
         // Need to be called each timestep in order to check if surface points to new construction (EMS) and if does then
         // complex fenestration needs to be initialized for additional states
-        TimestepInitComplexFenestration(*state.dataWindowComplexManager);
+        TimestepInitComplexFenestration(state);
 
         // Calculate exterior-surface multipliers that account for anisotropy of
         // sky radiance
@@ -542,7 +542,7 @@ namespace HeatBalanceSurfaceManager {
         // window construction (unshaded or shaded) to be used in heat balance calculation
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Window Shading");
 
-        WindowShadingManager(*state.dataWindowEquivalentLayer);
+        WindowShadingManager(state);
 
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
@@ -767,7 +767,7 @@ namespace HeatBalanceSurfaceManager {
             //    if (firstTime) CALL DisplayString('Reporting Surfaces')
             //    CALL ReportSurfaces
             if (InitSurfaceHeatBalancefirstTime) DisplayString("Gathering Information for Predefined Reporting");
-            GatherForPredefinedReport(*state.dataWindowManager);
+            GatherForPredefinedReport(state);
         }
 
         // Initialize the temperature history terms for conduction through the surfaces
@@ -895,7 +895,7 @@ namespace HeatBalanceSurfaceManager {
         InitSurfaceHeatBalancefirstTime = false;
     }
 
-    void GatherForPredefinedReport(WindowManagerData &dataWindowManager)
+    void GatherForPredefinedReport(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1058,7 +1058,7 @@ namespace HeatBalanceSurfaceManager {
                         } else {
                             // must calculate Summer SHGC
                             if (!dataConstruction.Construct(curCons).WindowTypeEQL) {
-                                CalcNominalWindowCond(dataWindowManager, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                                CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             }
                         }
                         PreDefTableEntry(pdchFenSHGC, surfName, SHGCSummer, 3);
@@ -1255,7 +1255,7 @@ namespace HeatBalanceSurfaceManager {
                         } else {
                             // must calculate Summer SHGC
                             if (!dataConstruction.Construct(curCons).WindowTypeEQL) {
-                                CalcNominalWindowCond(dataWindowManager, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
+                                CalcNominalWindowCond(state, curCons, 2, nomCond, SHGCSummer, TransSolNorm, TransVisNorm, errFlag);
                             }
                         }
                         PreDefTableEntry(pdchIntFenSHGC, surfName, SHGCSummer, 3);
@@ -2697,9 +2697,9 @@ namespace HeatBalanceSurfaceManager {
             if (CalcWindowRevealReflection) CalcBeamSolarOnWinRevealSurface();
 
             if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel() && state.dataWindowManager->winOpticalModel->isSimplifiedModel()) {
-                CalcInteriorSolarDistributionWCE(*state.dataWindowComplexManager, *state.dataWindowManager);
+                CalcInteriorSolarDistributionWCE(state);
             } else {
-                CalcInteriorSolarDistribution(*state.dataWindowEquivalentLayer);
+                CalcInteriorSolarDistribution(state);
             }
 
             for (int ZoneNum = 1; ZoneNum <= DataViewFactorInformation::NumOfSolarEnclosures; ++ZoneNum) {
@@ -3062,12 +3062,12 @@ namespace HeatBalanceSurfaceManager {
                                     QRadSWwinAbsTotEnergy(SurfNum) = QRadSWwinAbsTot(SurfNum) * TimeStepZoneSec;
                                 } else if (state.dataWindowManager->inExtWindowModel->isExternalLibraryModel()) {
                                     std::pair<Real64, Real64> incomingAngle =
-                                        getSunWCEAngles(*state.dataWindowComplexManager, SurfNum2, BSDFHemisphere::Incoming);
+                                        getSunWCEAngles(state, SurfNum2, BSDFHemisphere::Incoming);
                                     Real64 Theta = incomingAngle.first;
                                     Real64 Phi = incomingAngle.second;
 
                                     std::shared_ptr<CMultiLayerScattered> aLayer = CWindowConstructionsSimplified::instance().getEquivalentLayer(
-                                        *state.dataWindowManager, WavelengthRange::Solar, ConstrNum);
+                                        state, WavelengthRange::Solar, ConstrNum);
 
                                     size_t totLayers = aLayer->getNumOfLayers();
                                     for (size_t Lay = 1; Lay <= totLayers; ++Lay) {

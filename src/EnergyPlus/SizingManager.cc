@@ -364,7 +364,7 @@ namespace SizingManager {
                                 }
                             }
                             UpdateZoneSizing(state, BeginDay);
-                            UpdateFacilitySizing(*state.dataGlobal, BeginDay);
+                            UpdateFacilitySizing(state, BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -423,7 +423,7 @@ namespace SizingManager {
 
                         if (EndDayFlag) {
                             UpdateZoneSizing(state, EndDay);
-                            UpdateFacilitySizing(*state.dataGlobal, EndDay);
+                            UpdateFacilitySizing(state, EndDay);
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
@@ -439,7 +439,7 @@ namespace SizingManager {
 
                 if (NumSizingPeriodsPerformed > 0) {
                     UpdateZoneSizing(state, state.dataGlobal->EndZoneSizingCalc);
-                    UpdateFacilitySizing(*state.dataGlobal, state.dataGlobal->EndZoneSizingCalc);
+                    UpdateFacilitySizing(state, state.dataGlobal->EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -4788,7 +4788,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(DataGlobal const &dataGlobals, int const CallIndicator)
+    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
@@ -4900,7 +4900,7 @@ namespace SizingManager {
                 }
             }
 
-        } else if (CallIndicator == dataGlobals.EndZoneSizingCalc) {
+        } else if (CallIndicator == state.dataGlobal->EndZoneSizingCalc) {
             for (int DDNum = 1; DDNum <= DataEnvironment::TotDesDays + DataEnvironment::TotRunDesPersDays; ++DDNum) {
                 if (CalcFacilitySizing(DDNum).DesCoolLoad > CalcFinalFacilitySizing.DesCoolLoad) {
                     CalcFinalFacilitySizing.DesCoolLoad = CalcFacilitySizing(DDNum).DesCoolLoad;
