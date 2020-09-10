@@ -14,27 +14,15 @@ jobs:
       with:
         python-version: 3.7
 
-    - name: Check contents of workspace
-      working-directory: ${{runner.workspace}}
-      run: ls
-
-    - name: Check contents of workspace/EnergyPlus
-      working-directory: ${{runner.workspace}}/EnergyPlus
-      run: ls
-
     - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/doc/build
-
-    - name: Check contents of /doc
-      working-directory: ${{runner.workspace}}/doc
-      run: ls
+      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/doc/build
 
     - name: Configure CMake
-      working-directory: ${{runner.workspace}}/doc/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
       run: cmake ..
 
     - name: Build Docs
-      working-directory: ${{runner.workspace}}/doc/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/doc/build
       run: cmake --build .
 
 #    - name: Test
