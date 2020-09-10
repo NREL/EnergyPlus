@@ -1,3 +1,5 @@
+#!/bin/bash
+
 REPO_ROOT=$1
 
 EXIT_STATUS=0
