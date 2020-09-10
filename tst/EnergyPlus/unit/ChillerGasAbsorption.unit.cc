@@ -140,7 +140,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetGasAbsorberInput(state, state.dataChillerGasAbsorption);
+    GetGasAbsorberInput(state);
 
     EXPECT_EQ(1u, state.dataChillerGasAbsorption.GasAbsorber.size());
     EXPECT_EQ("BIG CHILLER", state.dataChillerGasAbsorption.GasAbsorber(1).Name);

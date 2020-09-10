@@ -120,7 +120,7 @@ struct CoilCoolingDX
     int supplyFanType = 0;
     std::string supplyFanName = "";
     bool doStandardRatingFlag = true;
-    int CoolingCoilType = 0; // Coolig coil type
+    bool SubcoolReheatFlag = false; // Subcool reheat coil control
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
@@ -148,10 +148,6 @@ struct CoilCoolingDX
     Real64 recoveredHeatEnergy = 0.0;
     Real64 recoveredHeatEnergyRate = 0.0;
 };
-
-extern int const coilNormalMode; // Normal operation mode
-extern int const coilEnhancedMode; // Enhanced operation mode
-extern int const coilSubcoolReheatMode; // SubcoolReheat operation mode
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool coilCoolingDXGetInputFlag;

@@ -574,7 +574,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerElectricEIR.getInputFlag) {
-                        ChillerElectricEIR::GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
+                        ChillerElectricEIR::GetElectricEIRChillerInput(state);
                         state.dataChillerElectricEIR.getInputFlag = false;
                     }
 
@@ -604,7 +604,7 @@ namespace FaultsManager {
 
                     // Read in chiller if not done yet
                     if (state.dataChillerReformulatedEIR.GetInputREIR) {
-                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state, state.dataChillerReformulatedEIR);
+                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
                         state.dataChillerReformulatedEIR.GetInputREIR = false;
                     }
 
@@ -788,7 +788,7 @@ namespace FaultsManager {
             // Boiler check and link
             {
                 if (state.dataBoilers.getBoilerInputFlag) {
-                    Boilers::GetBoilerInput(state, state.dataBoilers);
+                    Boilers::GetBoilerInput(state);
                     state.dataBoilers.getBoilerInputFlag = false;
                 }
                 // Check the boiler name and boiler type
@@ -1306,7 +1306,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:EIR")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerElectricEIR.getInputFlag) {
-                        ChillerElectricEIR::GetElectricEIRChillerInput(state, state.dataChillerElectricEIR);
+                        ChillerElectricEIR::GetElectricEIRChillerInput(state);
                         state.dataChillerElectricEIR.getInputFlag = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1325,7 +1325,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Electric:ReformulatedEIR")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerReformulatedEIR.GetInputREIR) {
-                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state, state.dataChillerReformulatedEIR);
+                        ChillerReformulatedEIR::GetElecReformEIRChillerInput(state);
                         state.dataChillerReformulatedEIR.GetInputREIR = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1402,7 +1402,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerAbsorbers.getInput) {
-                        ChillerAbsorption::GetBLASTAbsorberInput(state.dataChillerAbsorbers);
+                        ChillerAbsorption::GetBLASTAbsorberInput(state);
                         state.dataChillerAbsorbers.getInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other
@@ -1421,7 +1421,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "Chiller:Absorption:Indirect")) {
                     // Read in chiller if not done yet
                     if (state.dataChillerIndirectAbsorption.GetInput) {
-                        ChillerIndirectAbsorption::GetIndirectAbsorberInput(state, state.dataChillerIndirectAbsorption);
+                        ChillerIndirectAbsorption::GetIndirectAbsorberInput(state);
                         state.dataChillerIndirectAbsorption.GetInput = false;
                     }
                     // Check whether the chiller name and chiller type match each other

@@ -411,7 +411,7 @@ namespace GroundHeatExchangers {
 
     void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->initGLHESimVars(state.dataBranchInputManager);
+        this->initGLHESimVars(state);
     }
 
     //******************************************************************************
@@ -423,9 +423,9 @@ namespace GroundHeatExchangers {
     {
 
         if (DataGlobals::KickOffSimulation) {
-            this->initGLHESimVars(state.dataBranchInputManager);
+            this->initGLHESimVars(state);
         } else {
-            this->initGLHESimVars(state.dataBranchInputManager);
+            this->initGLHESimVars(state);
             this->calcGroundHeatExchanger(state.files);
             this->updateGHX();
         }
@@ -3284,7 +3284,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEVert::initGLHESimVars(BranchInputManagerData &dataBranchInputManager)
+    void GLHEVert::initGLHESimVars(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -3332,7 +3332,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager, name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
+            ScanPlantLoopsForObject(state, name, TypeOf_GrndHtExchgSystem, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }
@@ -3391,7 +3391,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHESlinky::initGLHESimVars(BranchInputManagerData &dataBranchInputManager)
+    void GLHESlinky::initGLHESimVars(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher
@@ -3441,7 +3441,7 @@ namespace GroundHeatExchangers {
         if (myFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager, name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
+            ScanPlantLoopsForObject(state, name, TypeOf_GrndHtExchgSlinky, loopNum, loopSideNum, branchNum, compNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("initGLHESimVars: Program terminated due to previous condition(s).");
             }

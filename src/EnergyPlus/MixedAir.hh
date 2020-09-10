@@ -489,7 +489,7 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(EnergyPlusData &EP_UNUSED(state), int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 
@@ -555,7 +555,7 @@ namespace MixedAir {
 
     int GetOASystemNumber(EnergyPlusData &state, std::string const &OASysName); // OA Sys Name
 
-    int FindOAMixerMatchForOASystem(int const OASysNumber); // Which OA System
+    int FindOAMixerMatchForOASystem(EnergyPlusData &state, int const OASysNumber); // Which OA System
 
     int GetOAMixerIndex(std::string const &OAMixerName); // Which Mixer
 
