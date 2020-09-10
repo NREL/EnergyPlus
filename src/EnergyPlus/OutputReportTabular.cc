@@ -5217,6 +5217,7 @@ namespace OutputReportTabular {
 
         static Array1D<Real64> ZoneEqHeat;
         static Array1D<Real64> ZoneEqCool;
+        static Array1D<Real64> ZoneEqHeatorCool;
         static Array1D<Real64> ATUDeltaHeat;
         static Array1D<Real64> ATUDeltaCool;
 
@@ -5243,6 +5244,7 @@ namespace OutputReportTabular {
 
             ZoneEqHeat.allocate(NumOfZones);
             ZoneEqCool.allocate(NumOfZones);
+            ZoneEqHeatorCool.allocate(NumOfZones);
             ATUDeltaHeat.allocate(NumOfZones);
             ATUDeltaCool.allocate(NumOfZones);
 
@@ -5265,6 +5267,21 @@ namespace OutputReportTabular {
         //--------------------
         //     ANNUAL
         //--------------------
+        // HVAC annual heating by ATU
+        // HVAC annual cooling by ATU
+        for (iunit = 1; iunit <= NumAirDistUnits; ++iunit) {
+            // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
+            curZone = AirDistUnit(iunit).ZoneNum;
+            if ((curZone > 0) && (curZone <= NumOfZones)) {
+                ZonePreDefRep(curZone).SHGSAnHvacATUHt += AirDistUnit(iunit).HeatGain;
+                ATUDeltaHeat(curZone) += AirDistUnit(iunit).HeatGain;
+                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= AirDistUnit(iunit).CoolGain;
+                ATUDeltaCool(curZone) -= AirDistUnit(iunit).CoolGain;
+                ATUHeat(curZone) = AirDistUnit(iunit).HeatRate;
+                ATUCool(curZone) = -AirDistUnit(iunit).CoolRate;
+            }
+        }
+
         timeStepRatio = TimeStepSys / TimeStepZone; // the fraction of the zone time step used by the system timestep
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
@@ -5274,17 +5291,23 @@ namespace OutputReportTabular {
             ZonePreDefRep(iZone).SHGSAnLiteAdd += ZnRpt(iZone).LtsTotGain * mult * timeStepRatio;
             // HVAC Input Sensible Air Heating
             // HVAC Input Sensible Air Cooling
-            if ((ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem) > 0.0) {
+            ZoneEqHeatorCool(iZone) =
+                ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour 
+                - ATUDeltaHeat(iZone) - ATUDeltaCool(iZone);
+            if (ZoneEqHeatorCool(iZone) > 0.0) {
+            // if ((ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem) > 0.0) {
                 // ZonePreDefRep(iZone).SHGSAnHvacHt +=
                    // ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                ZoneEqHeat(iZone) = ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                ZonePreDefRep(iZone).SHGSAnHvacHt += ZoneEqHeat(iZone);
+                // ZoneEqHeat(iZone) = ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
+                // ZonePreDefRep(iZone).SHGSAnHvacHt += ZoneEqHeat(iZone);
+                ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool(iZone);
             } else {
                 // ZonePreDefRep(iZone).SHGSAnHvacCl +=
                    // ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                ZoneEqCool(iZone) =
-                    ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                ZonePreDefRep(iZone).SHGSAnHvacCl += ZoneEqCool(iZone);
+                // ZoneEqCool(iZone) =
+                   // ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
+                // ZonePreDefRep(iZone).SHGSAnHvacCl += ZoneEqCool(iZone);
+                ZonePreDefRep(iZone).SHGSAnZoneEqCl += ZoneEqHeatorCool(iZone);
             }
             // Interzone Air Transfer Heat Addition
             // Interzone Air Transfer Heat Removal
@@ -5316,27 +5339,6 @@ namespace OutputReportTabular {
             } else {
                 ZonePreDefRep(iZone).SHGSAnEquipRem += eqpSens * mult;
             }
-        }
-        // HVAC annual heating by ATU
-        // HVAC annual cooling by ATU
-        for (iunit = 1; iunit <= NumAirDistUnits; ++iunit) {
-            // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
-            curZone = AirDistUnit(iunit).ZoneNum;
-            if ((curZone > 0) && (curZone <= NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnHvacATUHt += AirDistUnit(iunit).HeatGain;
-                ATUDeltaHeat(curZone) += AirDistUnit(iunit).HeatGain;
-                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= AirDistUnit(iunit).CoolGain;
-                ATUDeltaCool(curZone) -= AirDistUnit(iunit).CoolGain;
-                ATUHeat(curZone) = AirDistUnit(iunit).HeatRate;
-                ATUCool(curZone) = -AirDistUnit(iunit).CoolRate;
-            }
-        }
-
-        // Zone Equipment Heating Contribution
-        // Zone Equipment Cooling Contribution
-        for (iZone = 1; iZone <= NumOfZones; ++iZone) {
-            ZonePreDefRep(iZone).SHGSAnZoneEqHt += (ZoneEqHeat(iZone)-ATUDeltaHeat(iZone));
-            ZonePreDefRep(iZone).SHGSAnZoneEqCl += (ZoneEqCool(iZone)-ATUDeltaCool(iZone));
         }
 
         curZone = 0;
@@ -5384,8 +5386,14 @@ namespace OutputReportTabular {
         // Opaque Surface Conduction and Other Heat Removal
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             // ZonePreDefRep variables above already inlude zone list and group multipliers
-            total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnHvacHt +
-                    ZonePreDefRep(iZone).SHGSAnHvacCl + ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
+            //total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnHvacHt +
+            //        ZonePreDefRep(iZone).SHGSAnHvacCl + ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
+            //        ZonePreDefRep(iZone).SHGSAnWindAdd + ZonePreDefRep(iZone).SHGSAnWindRem + ZonePreDefRep(iZone).SHGSAnInfilAdd +
+            //        ZonePreDefRep(iZone).SHGSAnInfilRem + ZonePreDefRep(iZone).SHGSAnEquipAdd + ZonePreDefRep(iZone).SHGSAnEquipRem +
+            //        ZonePreDefRep(iZone).SHGSAnSurfHt + ZonePreDefRep(iZone).SHGSAnSurfCl;
+            total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnZoneEqHt +
+                    ZonePreDefRep(iZone).SHGSAnZoneEqCl + ZonePreDefRep(iZone).SHGSAnHvacATUHt + ZonePreDefRep(iZone).SHGSAnHvacATUCl + 
+                    ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
                     ZonePreDefRep(iZone).SHGSAnWindAdd + ZonePreDefRep(iZone).SHGSAnWindRem + ZonePreDefRep(iZone).SHGSAnInfilAdd +
                     ZonePreDefRep(iZone).SHGSAnInfilRem + ZonePreDefRep(iZone).SHGSAnEquipAdd + ZonePreDefRep(iZone).SHGSAnEquipRem +
                     ZonePreDefRep(iZone).SHGSAnSurfHt + ZonePreDefRep(iZone).SHGSAnSurfCl;
