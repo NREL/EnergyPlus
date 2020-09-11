@@ -1,0 +1,31 @@
+name: Windows 64-bit Testing
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+        architecture: 'x64' # x64 or x86 (defaults to x64)
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+
+    - name: Configure CMake
+      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DBUILD_TESTING=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
+
+    - name: Build EnergyPlus
+      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      run: cmake --build . -j 2 -C Release
+
+    - name: Run Tests
+      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      run: ctest -j 2 -C Release
