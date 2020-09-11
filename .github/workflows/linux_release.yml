@@ -52,17 +52,17 @@ jobs:
     - name: Upload Tarball
       uses: actions/upload-artifact@v2
       with:
-        name: LinuxReleaseTarball
+        name: LinuxReleaseTarball-${{ matrix.os }}
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.tar.gz
 
     - name: Upload Shell Installer
       uses: actions/upload-artifact@v2
       with:
-        name: LinuxReleaseShell
+        name: LinuxReleaseShell-${{ matrix.os }}
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.sh
 
     - name: Upload IFW Installer
       uses: actions/upload-artifact@v2
       with:
-        name: LinuxReleaseIFW
+        name: LinuxReleaseIFW-${{ matrix.os }}
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.run
