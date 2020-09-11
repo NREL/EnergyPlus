@@ -22,6 +22,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
+    - name: Install APT dependencies
+      run: sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0
+
     - name: Install IFW
       run: aqt tool linux tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
@@ -30,9 +33,6 @@ jobs:
 
     - name: Test BinaryCreator
       run: binarycreator --version
-
-    - name: Install LaTeX
-      run: sudo apt-get install texlive texlive-xetex texlive-science
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
