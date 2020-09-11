@@ -5214,7 +5214,6 @@ namespace OutputReportTabular {
         static Array1D<Real64> radiantCool;
         static Array1D<Real64> ATUHeat;
         static Array1D<Real64> ATUCool;
-
         static Array1D<Real64> ZoneEqHeatorCool;
         static Array1D<Real64> ATUDeltaHeat;
         static Array1D<Real64> ATUDeltaCool;
@@ -5239,11 +5238,9 @@ namespace OutputReportTabular {
             radiantCool.allocate(NumOfZones);
             ATUHeat.allocate(NumOfZones);
             ATUCool.allocate(NumOfZones);
-
             ZoneEqHeatorCool.allocate(NumOfZones);
             ATUDeltaHeat.allocate(NumOfZones);
             ATUDeltaCool.allocate(NumOfZones);
-
             GatherHeatGainReportfirstTime = false;
         }
         // clear the radiant surface accumulation variables
@@ -5257,7 +5254,6 @@ namespace OutputReportTabular {
         // clear the ATU Delta accumulation variables
         ATUDeltaHeat = 0.0; 
         ATUDeltaCool = 0.0;
-
         //--------------------
         //     ANNUAL
         //--------------------
@@ -6511,12 +6507,8 @@ namespace OutputReportTabular {
         Real64 consumptionTotal;
         Real64 convertJtoGJ;
         // sensible heat gain report totals
-//        static Real64 totalHvacHt(0.0);
-//        static Real64 totalHvacCl(0.0);
-
         static Real64 totalZoneEqHt(0.0);
         static Real64 totalZoneEqCl(0.0);
-
         static Real64 totalHvacATUHt(0.0);
         static Real64 totalHvacATUCl(0.0);
         static Real64 totalSurfHt(0.0);
@@ -15564,8 +15556,8 @@ namespace OutputReportTabular {
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             ZonePreDefRep(iZone).SHGSAnPeoplAdd = 0.;
             ZonePreDefRep(iZone).SHGSAnLiteAdd = 0.;
-            ZonePreDefRep(iZone).SHGSAnHvacHt = 0.;
-            ZonePreDefRep(iZone).SHGSAnHvacCl = 0.;
+            ZonePreDefRep(iZone).SHGSAnZoneEqHt = 0.;
+            ZonePreDefRep(iZone).SHGSAnZoneEqCl = 0.;
             ZonePreDefRep(iZone).SHGSAnIzaAdd = 0.;
             ZonePreDefRep(iZone).SHGSAnIzaRem = 0.;
             ZonePreDefRep(iZone).SHGSAnWindAdd = 0.;
