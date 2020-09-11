@@ -110,7 +110,8 @@ namespace ZoneContaminantPredictorCorrector {
     using ScheduleManager::GetCurrentScheduleValue;
     using ZoneTempPredictorCorrector::DownInterpolate4HistoryValues;
 
-    void ManageZoneContaminanUpdates(EnergyPlusData &state, int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneContaminanUpdates(EnergyPlusData &state,
+                                     int const UpdateType, // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                                      bool const ShortenTimeStepSys,
                                      bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                      Real64 const PriorTimeStep // the old value for timestep length is passed for possible use in interpolating
@@ -144,7 +145,7 @@ namespace ZoneContaminantPredictorCorrector {
                 InitZoneContSetPoints(state);
 
             } else if (SELECT_CASE_var == iPredictStep) {
-                PredictZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iCorrectStep) {
                 CorrectZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
@@ -1631,7 +1632,8 @@ namespace ZoneContaminantPredictorCorrector {
         }
     }
 
-    void PredictZoneContaminants(bool const ShortenTimeStepSys,
+    void PredictZoneContaminants(EnergyPlusData &state,
+                                 bool const ShortenTimeStepSys,
                                  bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
                                  Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
     )
@@ -1836,9 +1838,9 @@ namespace ZoneContaminantPredictorCorrector {
                         (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
                          AirflowNetwork::AirflowNetworkFanActivated)) {
                         // Multizone airflow calculated in AirflowNetwork
-                        B = CO2Gain + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHrCO +
-                            dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHrCO;
-                        A = dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHr + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHr;
+                        B = CO2Gain + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrCO +
+                            state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrCO;
+                        A = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr;
                     } else {
                         B = CO2Gain + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorCO2) +
                             MixingMassFlowCO2(ZoneNum) + MDotOA(ZoneNum) * OutdoorCO2;
@@ -1943,9 +1945,9 @@ namespace ZoneContaminantPredictorCorrector {
                         (AirflowNetwork::SimulateAirflowNetwork == AirflowNetwork::AirflowNetworkControlSimpleADS &&
                          AirflowNetwork::AirflowNetworkFanActivated)) {
                         // Multizone airflow calculated in AirflowNetwork
-                        B = GCGain + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHrGC +
-                            dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHrGC;
-                        A = dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHr + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHr;
+                        B = GCGain + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrGC +
+                            state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrGC;
+                        A = state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr;
                     } else {
                         B = GCGain + ((OAMFL(ZoneNum) + VAMFL(ZoneNum) + EAMFL(ZoneNum) + CTMFL(ZoneNum)) * OutdoorGC) + MixingMassFlowGC(ZoneNum) +
                             MDotOA(ZoneNum) * OutdoorGC;
@@ -2529,18 +2531,18 @@ namespace ZoneContaminantPredictorCorrector {
                      AirflowNetwork::AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
                     B = CO2Gain +
-                        (dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHrCO +
-                         dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHrCO) +
+                        (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrCO +
+                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrCO) +
                         CO2MassFlowRate;
-                    A = ZoneMassFlowRate + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHr +
-                        dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHr;
+                    A = ZoneMassFlowRate + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr +
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr;
                 }
                 C = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpCO2 / SysTimeStepInSeconds;
             }
 
             if (Contaminant.CO2Simulation) {
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
-                    B += dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).TotalCO2;
+                    B += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalCO2;
                 }
 
                 AZ(ZoneNum) = A;
@@ -2593,18 +2595,18 @@ namespace ZoneContaminantPredictorCorrector {
                      AirflowNetwork::AirflowNetworkFanActivated)) {
                     // Multizone airflow calculated in AirflowNetwork
                     B = GCGain +
-                        (dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHrGC +
-                         dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHrGC) +
+                        (state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHrGC +
+                         state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHrGC) +
                         GCMassFlowRate;
-                    A = ZoneMassFlowRate + dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMHr +
-                        dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).SumMMHr;
+                    A = ZoneMassFlowRate + state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMHr +
+                        state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).SumMMHr;
                 }
                 C = RhoAir * Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpGenContam / SysTimeStepInSeconds;
             }
 
             if (Contaminant.GenericContamSimulation) {
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
-                    B += dataAirflowNetworkBalanceManager.exchangeData(ZoneNum).TotalGC;
+                    B += state.dataAirflowNetworkBalanceManager->exchangeData(ZoneNum).TotalGC;
                 }
 
                 AZGC(ZoneNum) = A;

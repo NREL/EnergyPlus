@@ -254,7 +254,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_AddMDotOATest)
     DataContaminantBalance::ContaminantControlledZone(1).NumOfZones = 1;
     DataContaminantBalance::ZoneGCSetPoint(1) = 0.0025;
 
-    PredictZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(1.041692180, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(76.89754831, DataContaminantBalance::GCPredictedRate(1), 0.00001);
 
@@ -617,7 +617,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneCO2ControlT
     DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
     DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
 
-    PredictZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
     EXPECT_NEAR(1.0416921806, DataContaminantBalance::CO2PredictedRate(1), 0.00001);
     EXPECT_NEAR(1.0434496257, DataContaminantBalance::CO2PredictedRate(2), 0.00001);
     EXPECT_NEAR(1.0399406399, DataContaminantBalance::CO2PredictedRate(3), 0.00001);
@@ -827,7 +827,7 @@ TEST_F(EnergyPlusFixture, ZoneContaminantPredictorCorrector_MultiZoneGCControlTe
     DataContaminantBalance::ContaminantControlledZone(3).ActualZoneNum = 3;
     DataContaminantBalance::ContaminantControlledZone(3).NumOfZones = 1;
 
-    PredictZoneContaminants(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+    PredictZoneContaminants(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
     EXPECT_NEAR(19.549478386, DataContaminantBalance::GCPredictedRate(1), 0.00001);
     EXPECT_NEAR(20.887992514, DataContaminantBalance::GCPredictedRate(2), 0.00001);

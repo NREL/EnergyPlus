@@ -213,7 +213,7 @@ namespace ZoneTempPredictorCorrector {
     );
 
 
-    void CalcPredictedHumidityRatio(int const ZoneNum, Real64 RAFNFrac);
+    void CalcPredictedHumidityRatio(EnergyPlusData &state, int const ZoneNum, Real64 RAFNFrac);
 
     void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
                                         Real64 &TotalHumidLoad,
@@ -254,7 +254,8 @@ namespace ZoneTempPredictorCorrector {
                                        Real64 &newVal4  // unused 1208
     );
 
-    void InverseModelTemperature(int const ZoneNum,              // Zone number
+    void InverseModelTemperature(EnergyPlusData &state,
+                                 int const ZoneNum,              // Zone number
                                  Real64 &SumIntGain,             // Zone sum of convective internal gains
                                  Real64 &SumIntGainExceptPeople, // Zone sum of convective internal gains except for people
                                  Real64 &SumHA,                  // Zone sum of Hc*Area

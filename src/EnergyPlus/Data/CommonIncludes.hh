@@ -54,6 +54,7 @@
 // here in this one file.  Basically, when a header inclusion is removed from EnergyPlusData.hh, put it here.
 
 // these are needed so that we don't have incomplete types when we manage the EnergyPlusData instance
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/AirLoopHVACDOAS.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>

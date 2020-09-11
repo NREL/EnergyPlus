@@ -109,7 +109,7 @@ namespace AirflowNetworkBalanceManager {
 
     void GetAirflowNetworkInput(EnergyPlusData &state);
 
-    void AllocateAndInitData();
+    void AllocateAndInitData(EnergyPlusData &state);
 
     void CalcAirflowNetworkAirBalance(EnergyPlusData &state);
 
@@ -119,7 +119,8 @@ namespace AirflowNetworkBalanceManager {
                                     Real64 hIn   // User defined convection coefficient
     );
 
-    Real64 CalcDuctOutsideConvResist(Real64 Ts,      // Surface temperature
+    Real64 CalcDuctOutsideConvResist(EnergyPlusData &state,
+                                     Real64 Ts,      // Surface temperature
                                      Real64 Tamb,    // Free air temperature
                                      Real64 Wamb,    // Free air humidity ratio
                                      Real64 Pamb,    // Free air barometric pressure
@@ -139,17 +140,17 @@ namespace AirflowNetworkBalanceManager {
                             Real64 humRat        // Air node humidity ratio
     );
 
-    void CalcAirflowNetworkHeatBalance();
+    void CalcAirflowNetworkHeatBalance(EnergyPlusData &state);
 
-    void CalcAirflowNetworkMoisBalance();
+    void CalcAirflowNetworkMoisBalance(EnergyPlusData &state);
 
-    void CalcAirflowNetworkCO2Balance();
+    void CalcAirflowNetworkCO2Balance(EnergyPlusData &state);
 
-    void CalcAirflowNetworkGCBalance();
+    void CalcAirflowNetworkGCBalance(EnergyPlusData &state);
 
-    void MRXINV(int NORDER);
+    void MRXINV(EnergyPlusData &state, int NORDER);
 
-    void ReportAirflowNetwork();
+    void ReportAirflowNetwork(EnergyPlusData &state);
 
     void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration = _); // True when solution technique on first iteration
 
@@ -157,19 +158,19 @@ namespace AirflowNetworkBalanceManager {
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
-    void AssignFanAirLoopNum();
+    void AssignFanAirLoopNum(EnergyPlusData &state);
 
     void ValidateDistributionSystem(EnergyPlusData &state);
 
     void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 
-    void ValidateExhaustFanInput();
+    void ValidateExhaustFanInput(EnergyPlusData &state);
 
-    void HybridVentilationControl();
+    void HybridVentilationControl(EnergyPlusData &state);
 
-    void CalcSingleSidedCps(std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
+    void CalcSingleSidedCps(EnergyPlusData &state, std::vector<std::vector<Real64>> &valsByFacade, int numWindDirs = 36);
 
-    Real64 GetZoneInfilAirChangeRate(int ZoneNum); // hybrid ventilation system controlled zone number
+    Real64 GetZoneInfilAirChangeRate(EnergyPlusData &state, int ZoneNum); // hybrid ventilation system controlled zone number
 
     int GetAirLoopNumber(EnergyPlusData &state, int NodeNumber); // Get air loop number for each distribution node and linkage
 
@@ -369,8 +370,6 @@ namespace AirflowNetworkBalanceManager {
             solver.clear();
         }
     };
-
-    extern AirflowNetworkBalanceManagerData dataAirflowNetworkBalanceManager;
 
 } // namespace EnergyPlus
 

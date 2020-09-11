@@ -131,7 +131,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     NonAirSystemResponse(1) = 0.0;
     SysDepZoneLoadsLagged.allocate(1);
     SysDepZoneLoadsLagged(1) = 0.0;
-    dataAirflowNetworkBalanceManager.exchangeData.allocate(1);
+    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
     Node.allocate(1);
     TempTstatAir.allocate(1);
     LoadCorrectionFactor.allocate(1);
@@ -566,7 +566,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneAirTempTest)
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoadsLagged.deallocate();
-    dataAirflowNetworkBalanceManager.exchangeData.deallocate();
+    state.dataAirflowNetworkBalanceManager->exchangeData.deallocate();
     Node.deallocate();
     TempTstatAir.deallocate();
     LoadCorrectionFactor.deallocate();
@@ -638,7 +638,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     NonAirSystemResponse(1) = 0.0;
     SysDepZoneLoadsLagged.allocate(1);
     SysDepZoneLoadsLagged(1) = 0.0;
-    dataAirflowNetworkBalanceManager.exchangeData.allocate(1);
+    state.dataAirflowNetworkBalanceManager->exchangeData.allocate(1);
     Node.allocate(1);
     TempTstatAir.allocate(1);
     LoadCorrectionFactor.allocate(1);
@@ -898,7 +898,7 @@ TEST_F(EnergyPlusFixture, HybridModel_CorrectZoneContaminantsTest)
     ZoneAirHumRat.deallocate();
     NonAirSystemResponse.deallocate();
     SysDepZoneLoadsLagged.deallocate();
-    dataAirflowNetworkBalanceManager.exchangeData.deallocate();
+    state.dataAirflowNetworkBalanceManager->exchangeData.deallocate();
     Node.deallocate();
     TempTstatAir.deallocate();
     LoadCorrectionFactor.deallocate();
