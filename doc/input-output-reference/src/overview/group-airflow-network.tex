@@ -567,7 +567,7 @@ An interior heat transfer surface (\hyperref[buildingsurfacedetailed]{BuildingSu
 
 When a non-rectangular subsurface is used, the model will automatically convert it into a rectangular subsurface using equivalent width and height based on an entered choice from the Equivalent Rectangle Method field or a default choice.
 
-When an air boundary surface is used (\hyperref[constructionairboundary]{Construction:AirBoundary}), all types of leakage component are allowed except AirflowNetwork:MultiZone:Component:ZoneExhaustFan. Venting controls may not be used with an air boundary surface (it is always fully open).
+When an air boundary surface or subsurface is used (\hyperref[constructionairboundary]{Construction:AirBoundary}), all types of leakage component are allowed except AirflowNetwork:MultiZone:Component:ZoneExhaustFan. Venting controls may not be used with an air boundary surface (it is always fully open).
 
 \subsubsection{Field: Surface Name}\label{field-surface-name-000}
 
@@ -586,7 +586,7 @@ For a linkage associated with an interior (i.e., interzone) heat transfer surfac
 This heat transfer surface determines the height of the linkage, which is used in calculating buoyancy-related flow through the linkage.
 
 \item
-The surface may be an air boundary surface (\hyperref[constructionairboundary]{Construction:AirBoundary}).
+The surface may be an air boundary surface or subsurface (\hyperref[constructionairboundary]{Construction:AirBoundary}).
 \end{itemize}
 
 \textbf{Note:} It is possible to define an interzone surface twice in EnergyPlus, once in each of the zones that the surface separates. Previously this was a requirement of EnergyPlus (prior to version 2.0), but now it is optional and the user also has the option of only defining the surface once (EnergyPlus defines the second surface automatically within the program). For each interzone surface, use only one (of possible two) interzone surface names in the AirflowNetwork:MultiZone:Surface object for ``Surface Name.'' \textbf{Do not} enter two AirflowNetwork:MultiZone:Surface objects corresponding to the two possible interzone names. This would cause the air flow through the surface to be counted twice.
