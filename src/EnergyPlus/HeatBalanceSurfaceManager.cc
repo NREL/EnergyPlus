@@ -2841,9 +2841,61 @@ namespace HeatBalanceSurfaceManager {
             }
 
             for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-                int const firstSurf = Zone(zoneNum).SurfaceFirst;
-                int const lastSurf = Zone(zoneNum).SurfaceLast;
-                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+                int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
+                int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
+                for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
+                    if (Surface(SurfNum).HeatTransSurf) {
+                        int ConstrNum = Surface(SurfNum).Construction;
+                        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+                        if (Surface(SurfNum).ExtSolar) {
+                            // Exclude special shading surfaces which required QRadSWOut calculations above
+                            int RoughIndexMovInsul = 0; // Roughness index of movable insulation
+                            Real64 HMovInsul; // Resistance or "h" value of movable insulation (from EvalOutsideMovableInsulation, not used)
+                            Real64 AbsExt; // Absorptivity of outer most layer (or movable insulation if present)
+                            if (Surface(SurfNum).MaterialMovInsulExt > 0)
+                                EvalOutsideMovableInsulation(SurfNum, HMovInsul, RoughIndexMovInsul, AbsExt);
+
+                            if (RoughIndexMovInsul <= 0) { // No movable insulation present
+
+                                AbsExt = dataMaterial.Material(
+                                            dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+                            }
+                            // Opaque heat transfer surface
+                            SurfOpaqQRadSWOutAbs(SurfNum) =
+                                    AOSurf(SurfNum) * BeamSolarRad + AbsExt * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum));
+                            SurfOpaqSWOutAbsTotalReport(SurfNum) =
+                                    SurfOpaqQRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
+                            SurfOpaqSWOutAbsEnergyReport(SurfNum) =
+                                    SurfOpaqSWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
+                        }
+                        if (ConstrNum > 0) {
+                            int SurfSolIncPtr = SurfaceScheduledSolarInc(SurfNum, ConstrNum);
+                            if (SurfSolIncPtr == 0) {
+                                if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
+                                    int ShelfNum = Surface(SurfNum).Shelf; // Daylighting shelf object number
+                                    int InShelfSurf = 0; // Inside daylighting shelf surface number
+                                    if (ShelfNum > 0) {
+                                        InShelfSurf = Shelf(ShelfNum).InSurf; // Inside daylighting shelf present if > 0
+                                    }
+                                    SurfOpaqQRadSWInAbs(SurfNum) += AISurf(SurfNum) * BeamSolarRad;
+                                    if (InShelfSurf > 0) { // Inside daylighting shelf
+                                        // Shelf surface area is divided by 2 because only one side sees beam (Area was multiplied by 2 during init)
+                                        SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
+                                                AISurf(SurfNum) * BeamSolarRad * (0.5 * Surface(SurfNum).Area);
+                                    } else { // Regular surface
+                                        SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
+                                                AISurf(SurfNum) * BeamSolarRad * Surface(SurfNum).Area;
+                                    }
+                                }
+                            } else {
+                                SurfOpaqQRadSWInAbs(SurfNum) += AISurf(SurfNum);
+                            }
+                        }
+                    }
+                }
+                int const firstSurfWin = Zone(zoneNum).WindowSurfaceFirst;
+                int const lastSurfWin = Zone(zoneNum).WindowSurfaceLast;
+                for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
                     if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
                         if (Surface(SurfNum).HeatTransSurf) {
                             // Exclude special shading surfaces which required QRadSWOut calculations above
@@ -2860,11 +2912,13 @@ namespace HeatBalanceSurfaceManager {
                             }
                             if (RoughIndexMovInsul <= 0) { // No movable insulation present
 
-                                if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
+//                                if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
+//
+//                                    AbsExt = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
+//
+//                                } else
+                                { // Exterior window
 
-                                    AbsExt = dataMaterial.Material(dataConstruction.Construct(ConstrNum).LayerPoint(1)).AbsorpSolar;
-
-                                } else { // Exterior window
                                     Real64 CosInc = currCosInc(SurfNum); // Cosine of incidence angle of beam solar on glass
                                     Real64 BeamSolar = currBeamSolar(SurfNum); // Local variable for BeamSolarRad
                                     Real64 SkySolarInc = currSkySolarInc(SurfNum); // Sky diffuse solar incident on a surface
@@ -3367,51 +3421,9 @@ namespace HeatBalanceSurfaceManager {
                                 }
 
                             } // RoughIndexMovInsul <= 0, no movable insulation
-
-                            if (Surface(SurfNum).HeatTransSurf && dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) {
-                                // Opaque heat transfer surface
-                                SurfOpaqQRadSWOutAbs(SurfNum) =
-                                        AOSurf(SurfNum) * BeamSolarRad + AbsExt * (currSkySolarInc(SurfNum) + currGndSolarInc(SurfNum));
-                                SurfOpaqSWOutAbsTotalReport(SurfNum) =
-                                        SurfOpaqQRadSWOutAbs(SurfNum) * Surface(SurfNum).Area;
-                                SurfOpaqSWOutAbsEnergyReport(SurfNum) =
-                                        SurfOpaqSWOutAbsTotalReport(SurfNum) * TimeStepZoneSec;
-                            }
                         } // Surface(SurfNum)%HeatTransSurf
                     }
                 } // Surface(SurfNum)%ExtSolar
-                int const firstSurfOpaq = Zone(zoneNum).NonWindowSurfaceFirst;
-                int const lastSurfOpaq = Zone(zoneNum).NonWindowSurfaceLast;
-                for (int SurfNum = firstSurfOpaq; SurfNum <= lastSurfOpaq; ++SurfNum) {
-                    int ConstrNum = 0; // Index for the Construct derived type
-                    if (Surface(SurfNum).HeatTransSurf) {
-                        ConstrNum = Surface(SurfNum).Construction;
-                        if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
-                        if (ConstrNum > 0) {
-                            int SurfSolIncPtr = SurfaceScheduledSolarInc(SurfNum, ConstrNum);
-                            if (SurfSolIncPtr == 0) {
-                                if (dataConstruction.Construct(ConstrNum).TransDiff <= 0.0) { // Opaque surface
-                                    int ShelfNum = Surface(SurfNum).Shelf; // Daylighting shelf object number
-                                    int InShelfSurf = 0; // Inside daylighting shelf surface number
-                                    if (ShelfNum > 0) {
-                                        InShelfSurf = Shelf(ShelfNum).InSurf; // Inside daylighting shelf present if > 0
-                                    }
-                                    SurfOpaqQRadSWInAbs(SurfNum) += AISurf(SurfNum) * BeamSolarRad;
-                                    if (InShelfSurf > 0) { // Inside daylighting shelf
-                                        // Shelf surface area is divided by 2 because only one side sees beam (Area was multiplied by 2 during init)
-                                        SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
-                                                AISurf(SurfNum) * BeamSolarRad * (0.5 * Surface(SurfNum).Area);
-                                    } else { // Regular surface
-                                        SurfOpaqInsFaceBeamSolAbsorbed(SurfNum) =
-                                                AISurf(SurfNum) * BeamSolarRad * Surface(SurfNum).Area;
-                                    }
-                                }
-                            } else {
-                                SurfOpaqQRadSWInAbs(SurfNum) += AISurf(SurfNum);
-                            }
-                        }
-                    }
-                } // End of surface loop
             } // end of zone loop
         } // End of sun-up check
     }
