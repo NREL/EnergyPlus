@@ -7,6 +7,9 @@ jobs:
     runs-on: windows-2019
 
     steps:
+    - name: Check for gfortran 8
+      run: which gfortran-8
+
     - uses: actions/checkout@v2
 
     - name: Set up Python 3.7
