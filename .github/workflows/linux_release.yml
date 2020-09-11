@@ -33,7 +33,7 @@ jobs:
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
-      run: cmake --build --target package . -j 2
+      run: cmake --build . --target package -j 2
 
     - name: Inspect build for package names
       working-directory: ${{runner.workspace}}/EnergyPlus/build
