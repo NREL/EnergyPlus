@@ -914,57 +914,57 @@ struct ConvectionCoefficientsData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        GetUserSuppliedConvectionCoeffs = true;
-        CubeRootOfOverallBuildingVolume = 0.0;
-        RoofLongAxisOutwardAzimuth = 0.0;
+        this->GetUserSuppliedConvectionCoeffs = true;
+        this->CubeRootOfOverallBuildingVolume = 0.0;
+        this->RoofLongAxisOutwardAzimuth = 0.0;
 
         // error indices
-        BMMixedAssistedWallErrorIDX1 = 0;
-        BMMixedAssistedWallErrorIDX2 = 0;
-        BMMixedOpposingWallErrorIDX1 = 0;
-        BMMixedOpposingWallErrorIDX2 = 0;
-        BMMixedStableFloorErrorIDX1 = 0;
-        BMMixedStableFloorErrorIDX2 = 0;
-        BMMixedUnstableFloorErrorIDX1 = 0;
-        BMMixedUnstableFloorErrorIDX2 = 0;
-        BMMixedStableCeilingErrorIDX1 = 0;
-        BMMixedStableCeilingErrorIDX2 = 0;
-        BMMixedUnstableCeilingErrorIDX1 = 0;
-        BMMixedUnstableCeilingErrorIDX2 = 0;
-        AHUnstableHorizontalErrorIDX = 0;
-        AHStableHorizontalErrorIDX = 0;
-        AHVerticalWallErrorIDX = 0;
-        CalcFohannoPolidoriVerticalWallErrorIDX = 0;
-        CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
-        CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
-        CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
-        CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
-        CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
-        CalcSparrowWindwardErrorIDX = 0;
-        CalcSparrowLeewardErrorIDX = 0;
-        CalcEmmelVerticalErrorIDX = 0;
-        CalcEmmelRoofErrorIDX = 0;
-        CalcClearRoofErrorIDX = 0;
-        CalcMitchellErrorIDX = 0;
+        this->BMMixedAssistedWallErrorIDX1 = 0;
+        this->BMMixedAssistedWallErrorIDX2 = 0;
+        this->BMMixedOpposingWallErrorIDX1 = 0;
+        this->BMMixedOpposingWallErrorIDX2 = 0;
+        this->BMMixedStableFloorErrorIDX1 = 0;
+        this->BMMixedStableFloorErrorIDX2 = 0;
+        this->BMMixedUnstableFloorErrorIDX1 = 0;
+        this->BMMixedUnstableFloorErrorIDX2 = 0;
+        this->BMMixedStableCeilingErrorIDX1 = 0;
+        this->BMMixedStableCeilingErrorIDX2 = 0;
+        this->BMMixedUnstableCeilingErrorIDX1 = 0;
+        this->BMMixedUnstableCeilingErrorIDX2 = 0;
+        this->AHUnstableHorizontalErrorIDX = 0;
+        this->AHStableHorizontalErrorIDX = 0;
+        this->AHVerticalWallErrorIDX = 0;
+        this->CalcFohannoPolidoriVerticalWallErrorIDX = 0;
+        this->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
+        this->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
+        this->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
+        this->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
+        this->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
+        this->CalcSparrowWindwardErrorIDX = 0;
+        this->CalcSparrowLeewardErrorIDX = 0;
+        this->CalcEmmelVerticalErrorIDX = 0;
+        this->CalcEmmelRoofErrorIDX = 0;
+        this->CalcClearRoofErrorIDX = 0;
+        this->CalcMitchellErrorIDX = 0;
 
         // move random statics so they can be reset for unit tests
-        NodeCheck = true;
-        ActiveSurfaceCheck = true;
-        MyEnvirnFlag = true;
-        FirstRoofSurf = true;
-        ActiveWallCount = 0;
-        ActiveWallArea = 0.0;
-        ActiveCeilingCount = 0;
-        ActiveCeilingArea = 0.0;
-        ActiveFloorCount = 0;
-        ActiveFloorArea = 0.0;
+        this->NodeCheck = true;
+        this->ActiveSurfaceCheck = true;
+        this->MyEnvirnFlag = true;
+        this->FirstRoofSurf = true;
+        this->ActiveWallCount = 0;
+        this->ActiveWallArea = 0.0;
+        this->ActiveCeilingCount = 0;
+        this->ActiveCeilingArea = 0.0;
+        this->ActiveFloorCount = 0;
+        this->ActiveFloorArea = 0.0;
 
         // Object Data
-        InsideFaceAdaptiveConvectionAlgo = {}; // stores rules for Hc model equations
-        OutsideFaceAdaptiveConvectionAlgo = {};
-        HcInsideUserCurve.deallocate();
-        HcOutsideUserCurve.deallocate();
-        RoofGeo = {};
+        this->InsideFaceAdaptiveConvectionAlgo = {}; // stores rules for Hc model equations
+        this->OutsideFaceAdaptiveConvectionAlgo = {};
+        this->HcInsideUserCurve.deallocate();
+        this->HcOutsideUserCurve.deallocate();
+        this->RoofGeo = {};
     }
 };
 

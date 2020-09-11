@@ -183,13 +183,14 @@ namespace ZoneDehumidifier {
         bool MyOneTimeFlag = true;             // initialization flag
         bool ZoneEquipmentListChecked = false; // True after the Zone Equipment List has been checked for items
 
-        void clear_state() override {
-            NumDehumidifiers = 0;
-            GetInputFlag = true;
-            CheckEquipName.deallocate();
-            ZoneDehumid.deallocate();
-            MyOneTimeFlag = true;
-            ZoneEquipmentListChecked = false;
+        void clear_state() override
+        {
+            this->NumDehumidifiers = 0;
+            this->GetInputFlag = true;
+            this->CheckEquipName.deallocate();
+            this->ZoneDehumid.deallocate();
+            this->MyOneTimeFlag = true;
+            this->ZoneEquipmentListChecked = false;
         }
         // Default Constructor
         ZoneDehumidifierData() : NumDehumidifiers(0), GetInputFlag(true), ZoneDehumidUnit(1),

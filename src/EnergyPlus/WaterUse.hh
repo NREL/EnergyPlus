@@ -266,13 +266,13 @@ namespace WaterUse {
 
         void clear_state() override
         {
-            numWaterEquipment = 0;
-            numWaterConnections = 0;
-            getWaterUseInputFlag = true;
-            MyEnvrnFlagLocal = true;
-            CheckEquipName.deallocate();
-            WaterEquipment.deallocate();
-            WaterConnections.deallocate();
+            this->numWaterEquipment = 0;
+            this->numWaterConnections = 0;
+            this->getWaterUseInputFlag = true;
+            this->MyEnvrnFlagLocal = true;
+            this->CheckEquipName.deallocate();
+            this->WaterEquipment.deallocate();
+            this->WaterConnections.deallocate();
         }
 
         // Default Constructor

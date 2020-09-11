@@ -154,22 +154,20 @@ namespace BaseboardRadiator {
 
     struct BaseboardRadiatorData : BaseGlobalStruct {
 
-        int NumBaseboards;
-        bool getInputFlag;
-        bool ZoneEquipmentListChecked;
+        int NumBaseboards = 0;
+        bool getInputFlag = true;
+        bool ZoneEquipmentListChecked = false;
         Array1D<BaseboardRadiator::BaseboardParams> Baseboard;
         Array1D<BaseboardRadiator::BaseboardParamsNumericFieldData> BaseboardParamsNumericFields;
+
         void clear_state() override
         {
-            NumBaseboards = 0;
-            getInputFlag = true;
-            ZoneEquipmentListChecked = false;
-            Baseboard.deallocate();
-            BaseboardParamsNumericFields.deallocate();
+            this->NumBaseboards = 0;
+            this->getInputFlag = true;
+            this->ZoneEquipmentListChecked = false;
+            this->Baseboard.deallocate();
+            this->BaseboardParamsNumericFields.deallocate();
         }
-        // Default Constructor
-        BaseboardRadiatorData()
-            : NumBaseboards(0), getInputFlag(true), ZoneEquipmentListChecked(false) {}
     };
 
 } // namespace EnergyPlus

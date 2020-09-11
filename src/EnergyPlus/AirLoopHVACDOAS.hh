@@ -218,13 +218,13 @@ namespace AirLoopHVACDOAS {
 
         void clear_state() override
         {
-            GetInputOnceFlag = true;
-            getAirLoopMixerInputOnceFlag = true;
-            getAirLoopSplitterInputOnceFlag = true;
-            numAirLoopDOAS = 0;
-            airloopDOAS.clear();
-            airloopMixer.clear();
-            airloopSplitter.clear();
+            this->GetInputOnceFlag = true;
+            this->getAirLoopMixerInputOnceFlag = true;
+            this->getAirLoopSplitterInputOnceFlag = true;
+            this->numAirLoopDOAS = 0;
+            this->airloopDOAS.clear();
+            this->airloopMixer.clear();
+            this->airloopSplitter.clear();
         }
     };
 

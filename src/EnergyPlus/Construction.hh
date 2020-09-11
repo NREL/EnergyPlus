@@ -336,7 +336,7 @@ struct ConstructionData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        Construct.deallocate();
+        this->Construct.deallocate();
     }
 };
 

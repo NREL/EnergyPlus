@@ -231,16 +231,16 @@ namespace WindowAC {
 
         void clear_state() override
         {
-            NumWindAC = 0;
-            NumWindACCyc = 0;
-            GetWindowACInputFlag = true;
-            CoolingLoad = false;
-            MyOneTimeFlag = true;
-            ZoneEquipmentListChecked = false;
-            MySizeFlag.deallocate();
-            CheckEquipName.deallocate();
-            WindAC.deallocate();
-            WindACNumericFields.deallocate();
+            this->NumWindAC = 0;
+            this->NumWindACCyc = 0;
+            this->GetWindowACInputFlag = true;
+            this->CoolingLoad = false;
+            this->MyOneTimeFlag = true;
+            this->ZoneEquipmentListChecked = false;
+            this->MySizeFlag.deallocate();
+            this->CheckEquipName.deallocate();
+            this->WindAC.deallocate();
+            this->WindACNumericFields.deallocate();
         }
 
         // Default Constructor

@@ -116,21 +116,22 @@ namespace ZoneContaminantPredictorCorrector {
         bool MyDayFlag = true;
         bool MyConfigOneTimeFlag = true;
 
-        void clear_state() override {
-            GetZoneAirContamInputFlag = true;
-            TotGCGenConstant = 0;
-            TotGCGenPDriven = 0;
-            TotGCGenCutoff = 0;
-            TotGCGenDecay = 0;
-            TotGCBLDiff = 0;
-            TotGCDVS = 0;
-            TotGCDRS = 0;
+        void clear_state() override
+        {
+            this->GetZoneAirContamInputFlag = true;
+            this->TotGCGenConstant = 0;
+            this->TotGCGenPDriven = 0;
+            this->TotGCGenCutoff = 0;
+            this->TotGCGenDecay = 0;
+            this->TotGCBLDiff = 0;
+            this->TotGCDVS = 0;
+            this->TotGCDRS = 0;
             DataContaminantBalance::Contaminant.CO2Simulation = false;
             DataContaminantBalance::Contaminant.GenericContamSimulation = false;
-            MyOneTimeFlag = true;
-            MyEnvrnFlag = true;
-            MyDayFlag = true;
-            MyConfigOneTimeFlag = true;
+            this->MyOneTimeFlag = true;
+            this->MyEnvrnFlag = true;
+            this->MyDayFlag = true;
+            this->MyConfigOneTimeFlag = true;
         }
 
         // Default Constructor

@@ -94,12 +94,13 @@ namespace ZoneAirLoopEquipmentManager {
         Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
         int numADUInitialized;        // Count of ADUs that have been initialized
 
-        void clear_state() override {
-            GetAirDistUnitsFlag = true;
-            EachOnceFlag.deallocate();
-            MyOneTimeFlag = true;
-            InitAirDistUnitsFlag = true;
-            numADUInitialized = 0;
+        void clear_state() override
+        {
+            this->GetAirDistUnitsFlag = true;
+            this->EachOnceFlag.deallocate();
+            this->MyOneTimeFlag = true;
+            this->InitAirDistUnitsFlag = true;
+            this->numADUInitialized = 0;
         }
 
         // Default Constructor

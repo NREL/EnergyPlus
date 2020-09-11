@@ -293,18 +293,19 @@ struct DataAirLoopData : BaseGlobalStruct {
     Array1D<DataAirLoop::OutsideAirSysProps> OutsideAirSys;
     Array1D<DataAirLoop::AirLoopAFNData> AirLoopAFNInfo;
 
-    void clear_state() override {
-        NumOASystems = 0;
-        LoopDXCoilRTF = 0.0;
-        AirLoopInputsFilled = false;
-        AirLoopAFNInfo.deallocate();
-        AirToZoneNodeInfo.deallocate();
-        AirToOANodeInfo.deallocate();
-        PriAirSysAvailMgr.deallocate();
-        AirLoopZoneInfo.deallocate();
-        AirLoopControlInfo.deallocate();
-        AirLoopFlow.deallocate();
-        OutsideAirSys.deallocate();
+    void clear_state() override
+    {
+        this->NumOASystems = 0;
+        this->LoopDXCoilRTF = 0.0;
+        this->AirLoopInputsFilled = false;
+        this->AirLoopAFNInfo.deallocate();
+        this->AirToZoneNodeInfo.deallocate();
+        this->AirToOANodeInfo.deallocate();
+        this->PriAirSysAvailMgr.deallocate();
+        this->AirLoopZoneInfo.deallocate();
+        this->AirLoopControlInfo.deallocate();
+        this->AirLoopFlow.deallocate();
+        this->OutsideAirSys.deallocate();
     }
 };
 

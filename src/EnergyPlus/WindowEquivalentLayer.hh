@@ -786,8 +786,8 @@ namespace WindowEquivalentLayer {
         Array1D_bool EQLDiffPropFlag;
 
         void clear_state() {
-            CFSDiffAbsTrans.deallocate();
-            EQLDiffPropFlag.deallocate();
+            this->CFSDiffAbsTrans.deallocate();
+            this->EQLDiffPropFlag.deallocate();
         }
         // Default Constructor
         WindowEquivalentLayerData() : RadiansToDeg(180.0 / 3.141592653589793),

@@ -400,7 +400,16 @@ struct CurveManagerData : BaseGlobalStruct {
     bool CurveValueMyBeginTimeStepFlag;
     bool FrictionFactorErrorHasOccurred = false;
 
-    void clear_state() override;
+    void clear_state() override
+    {
+        this->NumCurves = 0;
+        this->GetCurvesInputFlag = true;
+        this->UniqueCurveNames.clear();
+        this->PerfCurve.deallocate();
+        this->btwxtManager.clear();
+        this->CurveValueMyBeginTimeStepFlag = true;
+        this->FrictionFactorErrorHasOccurred = false;
+    }
 };
 
 } // namespace EnergyPlus

@@ -175,15 +175,15 @@ namespace ZoneEquipmentManager {
 
         void clear_state() override
         {
-            SizeZoneEquipmentOneTimeFlag = true;
-            InitZoneEquipmentOneTimeFlag = true;
-            InitZoneEquipmentEnvrnFlag = true;
-            AvgData.deallocate();   // scratch array for storing averaged data
-            NumOfTimeStepInDay = 0; // number of zone time steps in a day
-            GetZoneEquipmentInputFlag = true;
-            PrioritySimOrder.deallocate();
-            FirstPassZoneEquipFlag = true;
-            reportDOASZoneSizingHeader = true;
+            this->SizeZoneEquipmentOneTimeFlag = true;
+            this->InitZoneEquipmentOneTimeFlag = true;
+            this->InitZoneEquipmentEnvrnFlag = true;
+            this->AvgData.deallocate();   // scratch array for storing averaged data
+            this->NumOfTimeStepInDay = 0; // number of zone time steps in a day
+            this->GetZoneEquipmentInputFlag = true;
+            this->PrioritySimOrder.deallocate();
+            this->FirstPassZoneEquipFlag = true;
+            this->reportDOASZoneSizingHeader = true;
         }
 
         // Default Constructor

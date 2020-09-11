@@ -564,19 +564,19 @@ struct WaterCoilsData : BaseGlobalStruct {
 
     void clear_state() override
     {
-        NumWaterCoils = 0;
-        InitWaterCoilOneTimeFlag = true;
-        MySizeFlag.deallocate();
-        MyUAAndFlowCalcFlag.deallocate();
-        MyCoilDesignFlag.deallocate();
-        CoilWarningOnceFlag.deallocate();
-        WaterTempCoolCoilErrs.deallocate();
-        PartWetCoolCoilErrs.deallocate();
-        GetWaterCoilsInputFlag = true;
-        CheckEquipName.deallocate();
-        WaterCoil.deallocate();
-        WaterCoilNumericFields.deallocate();
-        WaterCoilControllerCheckOneTimeFlag = true;
+        this->NumWaterCoils = 0;
+        this->InitWaterCoilOneTimeFlag = true;
+        this->MySizeFlag.deallocate();
+        this->MyUAAndFlowCalcFlag.deallocate();
+        this->MyCoilDesignFlag.deallocate();
+        this->CoilWarningOnceFlag.deallocate();
+        this->WaterTempCoolCoilErrs.deallocate();
+        this->PartWetCoolCoilErrs.deallocate();
+        this->GetWaterCoilsInputFlag = true;
+        this->CheckEquipName.deallocate();
+        this->WaterCoil.deallocate();
+        this->WaterCoilNumericFields.deallocate();
+        this->WaterCoilControllerCheckOneTimeFlag = true;
     }
 
     // Default Constructor

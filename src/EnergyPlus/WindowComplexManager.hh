@@ -267,13 +267,13 @@ namespace WindowComplexManager {
 
         void clear_state() //override
         {
-            NumComplexWind = 0;
-            BasisList.deallocate();
-            WindowList.deallocate();
-            WindowStateList.deallocate();
-            InitComplexWindowsOnce = true;
-            InitBSDFWindowsOnce = true;
-            resetAbunchOfStuff = true;
+            this->NumComplexWind = 0;
+            this->BasisList.deallocate();
+            this->WindowList.deallocate();
+            this->WindowStateList.deallocate();
+            this->InitComplexWindowsOnce = true;
+            this->InitBSDFWindowsOnce = true;
+            this->resetAbunchOfStuff = true;
         }
 
         // Default Constructor

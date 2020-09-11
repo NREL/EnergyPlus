@@ -168,9 +168,9 @@ namespace CTElectricGenerator {
 
         void clear_state() override
         {
-            NumCTGenerators = 0;
-            getCTInputFlag = true;
-            CTGenerator.deallocate();
+            this->NumCTGenerators = 0;
+            this->getCTInputFlag = true;
+            this->CTGenerator.deallocate();
         }
     };
 

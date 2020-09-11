@@ -178,10 +178,10 @@ namespace WindTurbine {
 
         void clear_state() override
         {
-            NumWindTurbines = 0;
-            GetInputFlag = true;
-            MyOneTimeFlag = true;
-            WindTurbineSys.deallocate();
+            this->NumWindTurbines = 0;
+            this->GetInputFlag = true;
+            this->MyOneTimeFlag = true;
+            this->WindTurbineSys.deallocate();
         }
 
         // Default Constructor

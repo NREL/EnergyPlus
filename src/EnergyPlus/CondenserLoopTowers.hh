@@ -478,11 +478,12 @@ struct CondenserLoopTowersData : BaseGlobalStruct {
     Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
     std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
-    void clear_state() override {
-        NumSimpleTowers = 0;
-        GetInput = true;
-        towers.deallocate();
-        UniqueSimpleTowerNames.clear();
+    void clear_state() override
+    {
+        this->NumSimpleTowers = 0;
+        this->GetInput = true;
+        this->towers.deallocate();
+        this->UniqueSimpleTowerNames.clear();
     }
 };
 

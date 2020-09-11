@@ -207,15 +207,15 @@ namespace ZonePlenum {
 
         void clear_state() override
         {
-            GetInputFlag = true;
-            InitAirZoneReturnPlenumEnvrnFlag = true;
-            InitAirZoneReturnPlenumOneTimeFlag = true;
-            NumZonePlenums = 0;
-            NumZoneReturnPlenums = 0;
-            NumZoneSupplyPlenums = 0;
-            ZoneRetPlenCond.deallocate();
-            ZoneSupPlenCond.deallocate();
-            MyEnvrnFlag = true;
+            this->GetInputFlag = true;
+            this->InitAirZoneReturnPlenumEnvrnFlag = true;
+            this->InitAirZoneReturnPlenumOneTimeFlag = true;
+            this->NumZonePlenums = 0;
+            this->NumZoneReturnPlenums = 0;
+            this->NumZoneSupplyPlenums = 0;
+            this->ZoneRetPlenCond.deallocate();
+            this->ZoneSupPlenCond.deallocate();
+            this->MyEnvrnFlag = true;
         }
 
         // Default Constructor

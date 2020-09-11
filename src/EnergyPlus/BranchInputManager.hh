@@ -363,25 +363,23 @@ struct BranchInputManagerData : BaseGlobalStruct
 
     void clear_state() override
     {
-        NumOfBranchLists = 0;
-        NumOfBranches = 0;
-        NumOfConnectorLists = 0;
-        NumSplitters = 0;
-        NumMixers = 0;
-
-        GetBranchInputFlag = true;
-        GetBranchListInputFlag = true;
-        GetSplitterInputFlag = true;
-        GetMixerInputFlag = true;
-        GetConnectorListInputFlag = true;
-        InvalidBranchDefinitions = false;
-        GetBranchInputOneTimeFlag = true;
-
-        BranchList.deallocate();
-        Branch.deallocate();
-        ConnectorLists.deallocate();
-        Splitters.deallocate();
-        Mixers.deallocate();
+        this->NumOfBranchLists = 0;
+        this->NumOfBranches = 0;
+        this->NumOfConnectorLists = 0;
+        this->NumSplitters = 0;
+        this->NumMixers = 0;
+        this->GetBranchInputFlag = true;
+        this->GetBranchListInputFlag = true;
+        this->GetSplitterInputFlag = true;
+        this->GetMixerInputFlag = true;
+        this->GetConnectorListInputFlag = true;
+        this->InvalidBranchDefinitions = false;
+        this->GetBranchInputOneTimeFlag = true;
+        this->BranchList.deallocate();
+        this->Branch.deallocate();
+        this->ConnectorLists.deallocate();
+        this->Splitters.deallocate();
+        this->Mixers.deallocate();
     }
 };
 
