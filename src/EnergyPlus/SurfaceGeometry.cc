@@ -11652,11 +11652,10 @@ namespace SurfaceGeometry {
             int ConstrNewSt = UtilityRoutines::FindItemInList(ConstrNameSt, dataConstruction.Construct, TotConstructs); // Number of unshaded storm window construction that is created
             // If necessary, create new material corresponding to the air layer between the storm winddow and the rest of the window
             int MatNewStAir = createAirMaterialFromDistance(StormWindow(StormWinNum).StormWinDistance, "AIR:STORMWIN:");
-            if (ConstrNewSt > 0) {
-                Surface(SurfNum).StormWinConstruction = ConstrNewSt;
-            } else {
+            if (ConstrNewSt == 0) {
                 ConstrNewSt = createConstructionWithStorm(ConstrNum, ConstrNameSt, StormWindow(StormWinNum).StormWinMaterialNum, MatNewStAir);
             }
+            Surface(SurfNum).StormWinConstruction = ConstrNewSt;
 
             // create shaded constructions with storm window
             Surface(SurfNum).shadedStormWinConstructionList.resize(Surface(SurfNum).shadedConstructionList.size(), 0);  // make the shaded storm window size the same size as the number of shaded constructions
