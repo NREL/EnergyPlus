@@ -55,8 +55,7 @@ jobs:
       if: ${{ github.ref != 'develop' }}
       shell: bash
       working-directory: ${{runner.workspace}}/clone_baseline/build
-      # -DBUILD_FORTRAN=ON
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_baseline
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_baseline
 
     - name: Build Baseline
       if: ${{ github.ref != 'develop' }}
@@ -77,8 +76,7 @@ jobs:
       if: ${{ github.ref != 'develop' }}
       shell: bash
       working-directory: ${{runner.workspace}}/clone_branch/build
-      # -DBUILD_FORTRAN=ON
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_branch
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_branch
 
     - name: Configure Branch with Regressions
       if: ${{ github.ref != 'develop' }}
