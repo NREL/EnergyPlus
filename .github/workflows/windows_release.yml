@@ -24,7 +24,7 @@ jobs:
         pip install aqtinstall
 
     - name: Install Chocolately Packages
-      run: choco install miktex mingw
+      run: choco install miktex && refreshenv
 
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
