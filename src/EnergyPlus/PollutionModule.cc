@@ -6027,7 +6027,7 @@ namespace PollutionModule {
                 }
 
             } else if (SELECT_CASE_var == "Steam") {
-                fuelSourceFactor = 0.3;
+                fuelSourceFactor = 0.3 / Pollution.SteamConvEffic;
 
             } else {
             }
