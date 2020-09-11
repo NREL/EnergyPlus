@@ -3,17 +3,13 @@ name: Windows 64-bit Release Build
 on: [push]
 
 env:
-  FC: C:/mingw64/bin/gfortran
+  FC: C:\ProgramData\Chocolatey\bin\gfortran.exe
 
 jobs:
   build:
     runs-on: windows-2019
 
     steps:
-    - name: List all chocolately bin contents
-      working-directory: C:\ProgramData\Chocolatey\bin
-      run: ls
-
     - uses: actions/checkout@v2
 
     - name: Set up Python 3.7
@@ -42,7 +38,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
