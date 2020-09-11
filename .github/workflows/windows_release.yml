@@ -2,14 +2,16 @@ name: Windows 64-bit Release Build
 
 on: [push]
 
+env:
+  FC: C:/mingw64/bin/gfortran
+
 jobs:
   build:
     runs-on: windows-2019
 
     steps:
     - name: Check mingw contents
-      shell: bash
-      working-directory: /mingw64/bin
+      working-directory: C:/mingw64/bin
       run: ls
 
     - uses: actions/checkout@v2
