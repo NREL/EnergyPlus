@@ -17,10 +17,22 @@ jobs:
       with:
         python-version: 3.7
 
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+
+    - name: Install IFW
+      run: aqt tool linux tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
+
+    - name: Add IFW to PATH
+      run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
+
+    - name: Test BinaryCreator
+      run: binarycreator --version
+
     - name: Install LaTeX
       run: sudo apt-get install texlive texlive-xetex texlive-science
-
-    # TODO: Install IFW from https://download.qt.io/official_releases/qt-installer-framework/3.2.2/
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
