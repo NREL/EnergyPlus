@@ -2741,94 +2741,26 @@ namespace HeatBalanceSurfaceManager {
 
                 }
             }
-            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
 
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
                 int const firstSurf = Zone(zoneNum).SurfaceFirst;
                 int const lastSurf = Zone(zoneNum).SurfaceLast;
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-
-                    if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
-                        int ConstrNum = 0; // Index for the Construct derived type
-                        if (Surface(SurfNum).HeatTransSurf) {
-                            ConstrNum = Surface(SurfNum).Construction;
-                            if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
-                        }
-                        int ShelfNum = Surface(SurfNum).Shelf; // Daylighting shelf object number
-                        int OutShelfSurf = 0; // Outside daylighting shelf surface number
-                        if (ShelfNum > 0) {
-                            OutShelfSurf = Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
-                        }
-
-                        int PipeNum; // TDD pipe object number
-                        int SurfNum2; // TDD: DOME object number
-
-                        if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
-                            PipeNum = SurfWinTDDPipeNum(SurfNum);
-                            SurfNum2 = TDDPipe(PipeNum).Dome;
-
-                            currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum2);
-
-                            // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
-                            // by dividing out diffuse solar transmittance of TDD:DIFFUSER
-                            currBeamSolar(SurfNum) = BeamSolarRad * TransTDD(PipeNum, currCosInc(SurfNum), SolarBeam) /
-                                                     dataConstruction.Construct(ConstrNum).TransDiff;
-
-                            currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum2) *
-                                                       TransTDD(PipeNum, currCosInc(SurfNum), SolarAniso) /
-                                                       dataConstruction.Construct(ConstrNum).TransDiff;
-
-                            currGndSolarInc(SurfNum) =
-                                    GndSolarRad * Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso /
-                                    dataConstruction.Construct(ConstrNum).TransDiff;
-
-                        } else if (OutShelfSurf > 0) { // Outside daylighting shelf
-                            SurfNum2 = SurfNum;
-
-                            currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
-
-                            currBeamSolar(SurfNum) = BeamSolarRad;
-                            currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
-                            // Shelf diffuse solar radiation
-                            Real64 ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) *
-                                                    CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
-                                                    DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
-                                                   Shelf(ShelfNum).OutReflectSol;
-
-                            // Add all reflected solar from the outside shelf to the ground solar
-                            // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
-                            currGndSolarInc(SurfNum) = GndSolarRad * Surface(SurfNum).ViewFactorGround +
-                                                       ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
-
-                        } else { // Regular surface
-                            SurfNum2 = SurfNum;
-                            currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
-                            currBeamSolar(SurfNum) = BeamSolarRad;
-                            currSkySolarInc(SurfNum) = SurfSkySolarInc(SurfNum);
-                            currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
-                        }
-                    }
-                }
-                for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
-
-                    if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
+                    if (Surface(SurfNum).ExtSolar) {
+                        // Regular surface
+                        currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                        currBeamSolar(SurfNum) = BeamSolarRad;
+                        currSkySolarInc(SurfNum) = SurfSkySolarInc(SurfNum);
+                        currGndSolarInc(SurfNum) = SurfGndSolarInc(SurfNum);
                         // Cosine of incidence angle and solar incident on outside of surface, for reporting
-
-                        int SurfNum2 = SurfNum;
-                        if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
-                            SurfNum2 = TDDPipe(SurfWinTDDPipeNum(SurfNum)).Dome;
-                        }
                         SurfCosIncidenceAngle(SurfNum) = currCosInc(SurfNum);
                         // Report variables for various incident solar quantities
                         // Incident direct (unreflected) beam
                         SurfQRadSWOutIncidentBeam(SurfNum) =
-                                currBeamSolar(SurfNum) * SunlitFrac(TimeStep, HourOfDay, SurfNum2) * currCosInc(SurfNum); // NOTE: SurfNum2
+                                currBeamSolar(SurfNum) * SunlitFrac(TimeStep, HourOfDay, SurfNum) * currCosInc(SurfNum);
 
                         // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
-                        if (SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
-                            SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = currSkySolarInc(SurfNum);
-                        } else {
-                            SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
-                        }
+                        SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
                         // Incident diffuse solar from sky diffuse reflected from ground plus beam reflected from ground
                         SurfQRadSWOutIncidentGndDiffuse(SurfNum) = currGndSolarInc(SurfNum);
                         // Incident diffuse solar from beam-to-diffuse reflection from ground
@@ -2861,6 +2793,56 @@ namespace HeatBalanceSurfaceManager {
                         }
                     }
                 }
+            }
+            for (int PipeNum = 1; PipeNum <= NumOfTDDPipes; ++PipeNum) {
+                int SurfNum = TDDPipe(PipeNum).Diffuser; // TDD: Diffuser object number
+                int SurfNum2 = TDDPipe(PipeNum).Dome; // TDD: DOME object number
+                int ConstrNum = Surface(SurfNum).Construction;
+                if (SurfWinStormWinFlag(SurfNum) == 1) ConstrNum = Surface(SurfNum).StormWinConstruction;
+
+                currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum2);
+
+                // Reconstruct the beam, sky, and ground radiation transmittance of just the TDD:DOME and TDD pipe
+                // by dividing out diffuse solar transmittance of TDD:DIFFUSER
+                currBeamSolar(SurfNum) = BeamSolarRad * TransTDD(PipeNum, currCosInc(SurfNum), SolarBeam) /
+                                         dataConstruction.Construct(ConstrNum).TransDiff;
+
+                currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum2) *
+                                           TransTDD(PipeNum, currCosInc(SurfNum), SolarAniso) /
+                                           dataConstruction.Construct(ConstrNum).TransDiff;
+
+                currGndSolarInc(SurfNum) =
+                        GndSolarRad * Surface(SurfNum2).ViewFactorGround * TDDPipe(PipeNum).TransSolIso /
+                        dataConstruction.Construct(ConstrNum).TransDiff;
+                // Incident direct (unreflected) beam
+                SurfQRadSWOutIncidentBeam(SurfNum) =
+                        currBeamSolar(SurfNum) * SunlitFrac(TimeStep, HourOfDay, SurfNum2) *
+                        currCosInc(SurfNum); // NOTE: SurfNum2
+
+                // Incident (unreflected) diffuse solar from sky -- TDD_Diffuser calculated differently
+                SurfQRadSWOutIncidentSkyDiffuse(SurfNum) = currSkySolarInc(SurfNum);
+            }
+            for (int ShelfNum = 1; ShelfNum <= NumOfShelf; ++ShelfNum) {
+                int SurfNum = Shelf(ShelfNum).Window; // Daylighting shelf object number
+                int OutShelfSurf = Shelf(ShelfNum).OutSurf; // Outside daylighting shelf present if > 0
+                currCosInc(SurfNum) = CosIncAng(TimeStep, HourOfDay, SurfNum);
+                currBeamSolar(SurfNum) = BeamSolarRad;
+                currSkySolarInc(SurfNum) = DifSolarRad * AnisoSkyMult(SurfNum);
+                // Shelf diffuse solar radiation
+                Real64 ShelfSolarRad = (BeamSolarRad * SunlitFrac(TimeStep, HourOfDay, OutShelfSurf) *
+                                        CosIncAng(TimeStep, HourOfDay, OutShelfSurf) +
+                                        DifSolarRad * AnisoSkyMult(OutShelfSurf)) *
+                                       Shelf(ShelfNum).OutReflectSol;
+
+                // Add all reflected solar from the outside shelf to the ground solar
+                // NOTE:  If the shelf blocks part of the view to the ground, the user must reduce the ground view factor!!
+                currGndSolarInc(SurfNum) = GndSolarRad * Surface(SurfNum).ViewFactorGround +
+                                           ShelfSolarRad * Shelf(ShelfNum).ViewFactor;
+            }
+
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                int const firstSurf = Zone(zoneNum).SurfaceFirst;
+                int const lastSurf = Zone(zoneNum).SurfaceLast;
                 for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
                     if (Surface(SurfNum).ExtSolar || SurfWinOriginalClass(SurfNum) == SurfaceClass_TDD_Diffuser) {
                         if (Surface(SurfNum).HeatTransSurf) {
