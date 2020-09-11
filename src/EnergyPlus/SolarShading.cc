@@ -9963,7 +9963,7 @@ namespace SolarShading {
  
                 // Window has shading control
                 // select the active window shading control and corresponding contructions
-                int indexWindowShadingControl = selectActiveWindowShadingControlIndex(ISurf);
+                size_t indexWindowShadingControl = selectActiveWindowShadingControlIndex(ISurf);
                 if (!Surface(ISurf).windowShadingControlList.empty() && indexWindowShadingControl <= Surface(ISurf).windowShadingControlList.size() - 1) {
                     Surface(ISurf).activeWindowShadingControl = Surface(ISurf).windowShadingControlList[indexWindowShadingControl];
                 }
@@ -10385,7 +10385,7 @@ namespace SolarShading {
         // For a given surface, determine based on the schedules which index to the window shading control list vector should be active
         int selected = 0; // presume it is the first shading control - even if it is not active it needs to be some shading control which is then turned off in the WindowShadingManager
         if (Surface(curSurface).windowShadingControlList.size() > 1) {
-            for (int listIndex = 0; listIndex < Surface(curSurface).windowShadingControlList.size(); ++listIndex) {
+            for (std::size_t listIndex = 0; listIndex < Surface(curSurface).windowShadingControlList.size(); ++listIndex) {
                 int wsc = Surface(curSurface).windowShadingControlList[listIndex];
                 //pick the first WindowShadingControl that has a non-zero schedule value
                 if (ScheduleManager::GetCurrentScheduleValue(WindowShadingControl(wsc).Schedule) != 0.0) {
