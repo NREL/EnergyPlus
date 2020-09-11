@@ -23,7 +23,7 @@ jobs:
         pip install aqtinstall
 
     - name: Install APT dependencies
-      run: sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
+      run: sudo apt-get update && sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
 
     - name: Install IFW
       run: aqt tool linux tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
