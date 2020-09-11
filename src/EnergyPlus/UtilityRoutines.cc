@@ -473,7 +473,8 @@ namespace UtilityRoutines {
 
     bool ValidateFuelType(std::string const &FuelTypeInput,
                           std::string &FuelTypeOutput,
-                          bool &FuelTypeErrorsFound)
+                          bool &FuelTypeErrorsFound,
+                          bool const &AllowSteamAndDistrict)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Dareum Nam
@@ -482,7 +483,7 @@ namespace UtilityRoutines {
         // PURPOSE OF THIS FUNCTION:
         // Validates fuel types and sets output strings
 
-        auto const SELECT_CASE_var(FuelTypeInput);
+        auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(FuelTypeInput));
 
         if (SELECT_CASE_var == "ELECTRICITY") {
             FuelTypeOutput = "Electricity";
@@ -515,43 +516,19 @@ namespace UtilityRoutines {
             FuelTypeOutput = "OtherFuel2";
 
         } else {
-            FuelTypeErrorsFound = true;
-        }
-
-        return FuelTypeErrorsFound;
-    }
-
-    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput,
-                                         int &FuelTypeNum,
-                                         bool &FuelTypeErrorsFound)
-    {
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Dareum Nam
-        //       DATE WRITTEN   May 2020
-
-        // PURPOSE OF THIS FUNCTION:
-        // Validates fuel types and sets output strings with fuel type number (DXCoils.cc and HVACVariableRefrigerantFlow.cc)
-
-        if (SameString(FuelTypeInput, "Electricity")) {
-            FuelTypeNum = 1; // FuelTypeElectricity
-        } else if (SameString(FuelTypeInput, "NaturalGas")) {
-            FuelTypeNum = 2; // FuelTypeNaturalGas
-        } else if (SameString(FuelTypeInput, "Propane")) {
-            FuelTypeNum = 3; // FuelTypePropaneGas
-        } else if (SameString(FuelTypeInput, "Diesel")) {
-            FuelTypeNum = 4; // FuelTypeDiesel
-        } else if (SameString(FuelTypeInput, "Gasoline")) {
-            FuelTypeNum = 5; // FuelTypeGasoline
-        } else if (SameString(FuelTypeInput, "FuelOilNo1")) {
-            FuelTypeNum = 6; // FuelTypeFuelOil1
-        } else if (SameString(FuelTypeInput, "FuelOilNo2")) {
-            FuelTypeNum = 7; // FuelTypeFuelOil2
-        } else if (SameString(FuelTypeInput, "OtherFuel1")) {
-            FuelTypeNum = 8; // FuelTypeOtherFuel1
-        } else if (SameString(FuelTypeInput, "OtherFuel2")) {
-            FuelTypeNum = 9; // FuelTypeOtherFuel2
-        } else {
-            FuelTypeErrorsFound = true;
+            if (AllowSteamAndDistrict) {
+                if (SELECT_CASE_var == "STEAM") {
+                    FuelTypeOutput = "Steam";
+                } else if (SELECT_CASE_var == "DISTRICTHEATING") {
+                    FuelTypeOutput = "DistrictHeating";
+                } else if (SELECT_CASE_var == "DISTRICTCOOLING") {
+                    FuelTypeOutput = "DistrictCooling";
+                } else {
+                    FuelTypeErrorsFound = true;
+                }
+            } else {
+                FuelTypeErrorsFound = true;
+            }
         }
 
         return FuelTypeErrorsFound;
