@@ -11,7 +11,8 @@ jobs:
 
     steps:
     - name: Check mingw contents
-      working-directory: C:\mingw64\bin
+      shell: bash
+      working-directory: /mingw64/bin
       run: ls
 
     - uses: actions/checkout@v2
