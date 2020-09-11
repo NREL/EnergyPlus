@@ -56,8 +56,10 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace InternalHeatGains {
 

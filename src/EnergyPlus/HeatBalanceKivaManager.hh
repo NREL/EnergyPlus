@@ -59,9 +59,10 @@
 #include <EnergyPlus/DataSurfaces.hh>
 
 namespace EnergyPlus {
-    class IOFiles;
-    struct EnergyPlusData;
-    struct ZoneTempPredictorCorrectorData;
+
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace HeatBalanceKivaManager {
 

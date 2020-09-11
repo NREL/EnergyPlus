@@ -57,9 +57,9 @@
 
 namespace EnergyPlus {
 
-// Forward Declarations
-struct EnergyPlusData;
+// Forward declarations
 class IOFiles;
+struct EnergyPlusData;
 
 namespace HeatBalanceManager {
 

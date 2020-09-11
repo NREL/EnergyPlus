@@ -58,8 +58,8 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace WaterToAirHeatPump {
 
@@ -280,7 +280,7 @@ namespace WaterToAirHeatPump {
         // Default Constructor
         WaterToAirHeatPumpData()
             : CompressorType_Reciprocating(1), CompressorType_Rotary(2), CompressorType_Scroll(3),
-              NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true), 
+              NumWatertoAirHPs(0), RefrigIndex(0), WaterIndex(0), GetCoilsInputFlag(true),
               MyOneTimeFlag(true), firstTime(true)
         {
         }

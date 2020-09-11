@@ -60,8 +60,8 @@
 
 namespace EnergyPlus {
 
-    //forward declaration
-    struct EnergyPlusData;
+//forward declaration
+struct EnergyPlusData;
 
 namespace WindowComplexManager {
 

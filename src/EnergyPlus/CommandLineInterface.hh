@@ -57,9 +57,9 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct EnergyPlusData;
 class IOFiles;
 class InputFile;
+struct EnergyPlusData;
 
 namespace CommandLineInterface {
 

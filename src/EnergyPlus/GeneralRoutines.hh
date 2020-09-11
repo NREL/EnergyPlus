@@ -57,11 +57,12 @@
 #include <EnergyPlus/ConvectionCoefficients.hh>
 
 namespace EnergyPlus {
-    // Forward declarations
-    struct EnergyPlusData;
-    class IOFiles;
 
-    void GeneralRoutines_clear_state();
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
+
+void GeneralRoutines_clear_state();
 
 void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component

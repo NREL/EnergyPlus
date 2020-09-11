@@ -65,7 +65,7 @@
 
 namespace EnergyPlus {
 
-// Forward Declarations
+// Forward declarations
 class IOFiles;
 struct EnergyPlusData;
 

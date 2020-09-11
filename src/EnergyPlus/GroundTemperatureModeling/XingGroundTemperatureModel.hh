@@ -58,8 +58,8 @@
 
 namespace EnergyPlus {
 
-    // forward declarations
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 class XingGroundTempsModel : public BaseGroundTempsModel
 {

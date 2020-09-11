@@ -58,8 +58,8 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct EnergyPlusData;
 class IOFiles;
+struct EnergyPlusData;
 
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {

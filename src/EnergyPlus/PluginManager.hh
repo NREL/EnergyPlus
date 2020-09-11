@@ -59,7 +59,8 @@ typedef void* PyObjectWrap;
 
 namespace EnergyPlus {
 
-    struct EnergyPlusData;
+// Forward declarations
+struct EnergyPlusData;
 
 namespace PluginManagement {
 
@@ -156,7 +157,7 @@ namespace PluginManagement {
         PyObjectWrap pAfterComponentInputReadIn = nullptr;
         PyObjectWrap pUserDefinedComponentModel = nullptr;
         PyObjectWrap pUnitarySystemSizing = nullptr;
-#endif        
+#endif
     };
 
     class PluginManager {

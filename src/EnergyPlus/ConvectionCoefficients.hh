@@ -62,8 +62,8 @@
 namespace EnergyPlus {
 
 // Forward declarations
-struct EnergyPlusData;
 class IOFiles;
+struct EnergyPlusData;
 
 namespace ConvectionCoefficients {
 

@@ -63,10 +63,9 @@
 
 namespace EnergyPlus {
 
-    // Forward declarations
-    struct EnergyPlusData;
-    struct ZoneTempPredictorCorrectorData;
-    class IOFiles;
+// Forward declarations
+class IOFiles;
+struct EnergyPlusData;
 
 namespace SurfaceGeometry {
 
