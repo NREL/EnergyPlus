@@ -9,6 +9,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Check for gfortran
+      run: which gfortran-9
+
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
       with:
@@ -20,7 +23,7 @@ jobs:
         pip install aqtinstall
 
     - name: Install Brew dependencies
-      run: brew cask install mactex  # any X server stuff?
+      run: brew cask install mactex gcc9 # any X server stuff?
 
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt

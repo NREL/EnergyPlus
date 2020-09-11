@@ -9,6 +9,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Check for gfortran
+      run: which gfortran-9
+
     - name: Set up Python 3.7
       uses: actions/setup-python@v2
       with:
