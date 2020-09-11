@@ -894,9 +894,9 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     DataEnvironment::OutBaroPress = 101325.0;
 
     // Air loop fan PLR
-    DataAirLoop::AirLoopFlow.allocate(AirLoopNum);
-    DataAirLoop::AirLoopControlInfo.allocate(AirLoopNum);
-    DataAirLoop::AirLoopFlow(1).FanPLR = 0.8;
+    state.dataAirLoop->AirLoopFlow.allocate(AirLoopNum);
+    state.dataAirLoop->AirLoopControlInfo.allocate(AirLoopNum);
+    state.dataAirLoop->AirLoopFlow(1).FanPLR = 0.8;
 
     // Evap cooler conditions
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;

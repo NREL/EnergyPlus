@@ -157,7 +157,6 @@ namespace FuelCellElectricGenerator {
     }
 
     void FCDataStruct::SimFuelCellGenerator(EnergyPlusData &state,
-                                            BranchInputManagerData &dataBranchInputManager,
                                             bool const RunFlag,  // simulate Generator when TRUE
                                             Real64 const MyLoad, // demand on electric generator
                                             bool const FirstHVACIteration)
@@ -171,7 +170,7 @@ namespace FuelCellElectricGenerator {
         // gets the input for the models, initializes simulation variables, call
         // the appropriate model and sets up reporting variables.
 
-        this->initialize(dataBranchInputManager);
+        this->initialize(state);
         this->CalcFuelCellGeneratorModel(state, RunFlag, MyLoad, FirstHVACIteration);
         this->CalcUpdateHeatRecovery(FirstHVACIteration);
         this->UpdateFuelCellGeneratorRecords();
@@ -3138,7 +3137,7 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    void FCDataStruct::initialize(BranchInputManagerData &dataBranchInputManager) // index to specific fuel cell generator
+    void FCDataStruct::initialize(EnergyPlusData &state) // index to specific fuel cell generator
     {
 
         // SUBROUTINE INFORMATION:
@@ -3158,7 +3157,7 @@ namespace FuelCellElectricGenerator {
         if (this->MyPlantScanFlag_Init && allocated(DataPlant::PlantLoop)) {
             bool errFlag = false;
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->NameExhaustHX,
                                                     DataPlant::TypeOf_Generator_FCExhaust,
                                                     this->CWLoopNum,

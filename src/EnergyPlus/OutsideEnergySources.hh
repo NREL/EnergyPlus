@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace OutsideEnergySources {
 
@@ -108,7 +107,7 @@ namespace OutsideEnergySources {
                                  Real64 &MinLoad,
                                  Real64 &OptLoad) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, Real64 curLoad);
+        void initialize(EnergyPlusData &state, Real64 curLoad);
 
         void calculate(bool runFlag, Real64 curLoad);
 

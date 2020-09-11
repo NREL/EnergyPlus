@@ -1224,7 +1224,7 @@ namespace DataPlant {
 
         // Now we know what the loop would "like" to run at, let's see the pump
         // operation range (min/max avail) to see whether it is possible this time around
-        Real64 ThisLoopSideFlow = this->DetermineLoopSideFlowRate(state, state.dataBranchInputManager, ThisSideInletNode, ThisLoopSideFlowRequest);
+        Real64 ThisLoopSideFlow = this->DetermineLoopSideFlowRate(state, ThisSideInletNode, ThisLoopSideFlowRequest);
 
         for (auto &branch : this->Branch) {
             branch.lastComponentSimulated = 0;
@@ -1744,9 +1744,9 @@ namespace DataPlant {
                     break;
                 case DataPlant::PumpOpSchemeType: //~ pump
                     if (this->BranchPumpsExist) {
-                        SimulateSinglePump(state, state.dataBranchInputManager, this_comp.location, branch.RequestedMassFlow);
+                        SimulateSinglePump(state, this_comp.location, branch.RequestedMassFlow);
                     } else {
-                        SimulateSinglePump(state, state.dataBranchInputManager, this_comp.location, FlowRequest);
+                        SimulateSinglePump(state, this_comp.location, FlowRequest);
                     }
                     break;
                 case DataPlant::CompSetPtBasedSchemeType:
@@ -1844,9 +1844,9 @@ namespace DataPlant {
                     PumpLocation.branchNum = BranchCounter;
                     PumpLocation.compNum = CompCounter;
                     if (this->BranchPumpsExist) {
-                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, branch.RequestedMassFlow);
+                        SimulateSinglePump(state, PumpLocation, branch.RequestedMassFlow);
                     } else {
-                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, FlowRequest);
+                        SimulateSinglePump(state, PumpLocation, FlowRequest);
                     }
                     break;
                 default:
@@ -1907,9 +1907,9 @@ namespace DataPlant {
                     PumpLocation.branchNum = BranchCounter;
                     PumpLocation.compNum = CompCounter;
                     if (this->BranchPumpsExist) {
-                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, branch.RequestedMassFlow);
+                        SimulateSinglePump(state, PumpLocation, branch.RequestedMassFlow);
                     } else {
-                        SimulateSinglePump(state, state.dataBranchInputManager, PumpLocation, FlowRequest);
+                        SimulateSinglePump(state, PumpLocation, FlowRequest);
                     }
                     break;
                 default:
@@ -2031,7 +2031,7 @@ namespace DataPlant {
         this->UpdatedDemandToLoopSetPoint = this->InitialDemandToLoopSetPoint - this->CurrentAlterationsToDemand;
     }
 
-    void HalfLoopData::SimulateSinglePump(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, PlantLocation const SpecificPumpLocation, Real64 &SpecificPumpFlowRate)
+    void HalfLoopData::SimulateSinglePump(EnergyPlusData &state, PlantLocation const SpecificPumpLocation, Real64 &SpecificPumpFlowRate)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2054,7 +2054,6 @@ namespace DataPlant {
         // Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
         bool DummyThisPumpRunning;
         Pumps::SimPumps(state,
-                        dataBranchInputManager,
                         pump.PumpName,
                         SpecificPumpLocation.loopNum,
                         SpecificPumpFlowRate,
@@ -2073,7 +2072,6 @@ namespace DataPlant {
     }
 
     void HalfLoopData::SimulateAllLoopSidePumps(EnergyPlusData &state,
-                                                BranchInputManagerData &dataBranchInputManager,
                                                 Optional<PlantLocation const> SpecificPumpLocation,
                                                 Optional<Real64 const> SpecificPumpFlowRate) {
 
@@ -2127,7 +2125,7 @@ namespace DataPlant {
 
             // Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
             bool DummyThisPumpRunning;
-            Pumps::SimPumps(state, dataBranchInputManager, pump.PumpName, PumpLoopNum, FlowToRequest, DummyThisPumpRunning,
+            Pumps::SimPumps(state, pump.PumpName, PumpLoopNum, FlowToRequest, DummyThisPumpRunning,
                             loop_side_branch(PumpBranchNum).PumpIndex, pump.PumpHeatToFluid);
 
             //~ Pull some state information from the pump outlet node
@@ -2145,7 +2143,7 @@ namespace DataPlant {
         }
     }
 
-    Real64 HalfLoopData::DetermineLoopSideFlowRate(EnergyPlusData &state, BranchInputManagerData &dataBranchInputManager, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest)
+    Real64 HalfLoopData::DetermineLoopSideFlowRate(EnergyPlusData &state, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest)
     {
         Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
         Real64 TotalPumpMinAvailFlow = 0.0;
@@ -2160,7 +2158,7 @@ namespace DataPlant {
             this->FlowLock = DataPlant::FlowPumpQuery;
 
             //~ Simulate pumps
-            this->SimulateAllLoopSidePumps(state, dataBranchInputManager);
+            this->SimulateAllLoopSidePumps(state);
 
             //~ Calculate totals
             for (auto const &e : this->Pumps) {

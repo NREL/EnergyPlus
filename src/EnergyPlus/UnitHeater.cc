@@ -792,7 +792,7 @@ namespace UnitHeater {
             if ((UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (UnitHeat(UnitHeatNum).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         UnitHeat(UnitHeatNum).HCoilName,
                                         UnitHeat(UnitHeatNum).HCoil_PlantTypeNum,
                                         UnitHeat(UnitHeatNum).HWLoopNum,

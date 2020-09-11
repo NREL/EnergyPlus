@@ -311,7 +311,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineSZHeatingSetPointManager // Derived type for the Single Zone Heating Setpoint Manager data
@@ -487,7 +487,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineColdestSetPointManager
@@ -511,7 +511,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefWarmestSetPtManagerTempFlow
@@ -541,7 +541,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefRABFlowSetPointManager
@@ -593,7 +593,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageHeatingSetPointManager // derived type for SetpointManager:Multizone:Heating:Average data
@@ -615,7 +615,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageMinHumSetPointManager // derived type for SetpointManager:MultiZone:MinimumHumidity:Average data
@@ -637,7 +637,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneAverageMaxHumSetPointManager // derived type for SetpointManager:MultiZone:MaximumHumidity:Average data
@@ -659,7 +659,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneMinHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Minimum data
@@ -681,7 +681,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefMultiZoneMaxHumSetPointManager // derived type for SetpointManager:MultiZone:Humidity:Maximum data
@@ -703,7 +703,7 @@ namespace SetPointManager {
         {
         }
 
-        void calculate();
+        void calculate(EnergyPlusData &state);
     };
 
     struct DefineFollowOATempSetPointManager
@@ -1046,11 +1046,11 @@ namespace SetPointManager {
 
     void VerifySetPointManagers(bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 
-    void InitSetPointManagers();
+    void InitSetPointManagers(EnergyPlusData &state);
 
     void SimSetPointManagers(EnergyPlusData &state);
 
-    void UpdateSetPointManagers();
+    void UpdateSetPointManagers(EnergyPlusData &state);
 
     void UpdateMixedAirSetPoints();
 
