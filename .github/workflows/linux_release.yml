@@ -23,7 +23,7 @@ jobs:
         pip install aqtinstall
 
     - name: Install APT dependencies
-      run: sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0
+      run: sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
 
     - name: Install IFW
       run: aqt tool linux tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
@@ -49,8 +49,20 @@ jobs:
       shell: bash
       run: ls
 
-#    - name: Upload Tarball
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: LinuxRelease
-#        path: ${{runner.workspace}}/EnergyPlus/build/*.tar.gz
+    - name: Upload Tarball
+      uses: actions/upload-artifact@v2
+      with:
+        name: LinuxReleaseTarball
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.tar.gz
+
+    - name: Upload Shell Installer
+      uses: actions/upload-artifact@v2
+      with:
+        name: LinuxReleaseShell
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.sh
+
+    - name: Upload IFW Installer
+        uses: actions/upload-artifact@v2
+        with:
+          name: LinuxReleaseIFW
+          path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.run
