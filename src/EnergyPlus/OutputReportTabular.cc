@@ -5217,7 +5217,6 @@ namespace OutputReportTabular {
         static Array1D<Real64> ZoneEqHeatorCool;
         static Array1D<Real64> ATUDeltaHeat;
         static Array1D<Real64> ATUDeltaCool;
-
         static int timestepTimeStamp(0);
         static Real64 bldgHtPk(0.0);
         static Real64 bldgClPk(0.0);
@@ -6688,6 +6687,8 @@ namespace OutputReportTabular {
 
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             // annual
+            // PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
+            // PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
             PreDefTableEntry(pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUHt * convertJtoGJ, 3);
@@ -6753,8 +6754,6 @@ namespace OutputReportTabular {
         }
         // totals for annual report
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
-            // totalHvacHt += ZonePreDefRep(iZone).SHGSAnHvacHt;
-            // totalHvacCl += ZonePreDefRep(iZone).SHGSAnHvacCl;
             totalZoneEqHt += ZonePreDefRep(iZone).SHGSAnZoneEqHt;
             totalZoneEqCl += ZonePreDefRep(iZone).SHGSAnZoneEqCl;
             totalHvacATUHt += ZonePreDefRep(iZone).SHGSAnHvacATUHt;
