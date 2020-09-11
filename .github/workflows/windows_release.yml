@@ -11,8 +11,7 @@ jobs:
 
     steps:
     - name: List all chocolately bin contents
-      shell: bash
-      working-directory: /c/ProgramData/Chocolatey/bin
+      working-directory: C:\ProgramData\Chocolatey\bin
       run: ls
 
     - uses: actions/checkout@v2
