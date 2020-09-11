@@ -2539,7 +2539,7 @@ namespace AirflowNetworkBalanceManager {
                 continue;
             }
             if (!Surface(MultizoneSurfaceData(i).SurfNum).HeatTransSurf &&
-                !dataConstruction.Construct(Surface(MultizoneSurfaceData(i).SurfNum).Construction).TypeIsAirBoundary) {
+                !Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) {
                 ShowSevereError(RoutineName + CurrentModuleObject + " object");
                 ShowContinueError("..The surface specified must be a heat transfer surface. Invalid " + cAlphaFields(1) + " = " +
                                   MultizoneSurfaceData(i).SurfName);
@@ -2869,9 +2869,9 @@ namespace AirflowNetworkBalanceManager {
                         "The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.");
                 }
                 // Venting controls are not allowed for an air boundary surface
-                if (dataConstruction.Construct(Surface(MultizoneSurfaceData(i).SurfNum).Construction).TypeIsAirBoundary &&
+                if ((Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) &&
                     (MultizoneSurfaceData(i).VentSurfCtrNum != VentControlType::Const)) {
-                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName + " is an air boundary surface.");
+                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName + "\" is an air boundary surface.");
                     ShowContinueError("Ventilation Control Mode = " + Alphas(4) + " is not valid. Resetting to Constant.");
                     MultizoneSurfaceData(i).VentSurfCtrNum = VentControlType::Const;
                     MultizoneSurfaceData(i).IndVentControl = true;
@@ -2882,9 +2882,9 @@ namespace AirflowNetworkBalanceManager {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName + "\", invalid schedule.");
                         ShowContinueError("Venting Schedule not found=\"" + MultizoneSurfaceData(i).VentingSchName + "\".");
                         ErrorsFound = true;
-                    } else if (dataConstruction.Construct(Surface(MultizoneSurfaceData(i).SurfNum).Construction).TypeIsAirBoundary) {
+                    } else if (Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) {
                         ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName +
-                                         " is an air boundary surface.");
+                                         "\" is an air boundary surface.");
                         ShowContinueError("Venting Availability Schedule will be ignored, venting is always available.");
                         MultizoneSurfaceData(i).VentingSchName = "";
                         MultizoneSurfaceData(i).VentingSchNum = 0;
@@ -4202,7 +4202,7 @@ namespace AirflowNetworkBalanceManager {
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
-                          dataConstruction.Construct(Surface(MultizoneSurfaceData(count).SurfNum).Construction).TypeIsAirBoundary)) {
+                          Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                         AirflowNetworkLinkageData(count).Name);
@@ -4232,7 +4232,7 @@ namespace AirflowNetworkBalanceManager {
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
-                          dataConstruction.Construct(Surface(MultizoneSurfaceData(count).SurfNum).Construction).TypeIsAirBoundary)) {
+                          Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                         AirflowNetworkLinkageData(count).Name);
@@ -4279,7 +4279,7 @@ namespace AirflowNetworkBalanceManager {
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
-                          dataConstruction.Construct(Surface(MultizoneSurfaceData(count).SurfNum).Construction).TypeIsAirBoundary)) {
+                          Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
                         ShowSevereError(RoutineName +
                                         "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                         AirflowNetworkLinkageData(count).Name);
