@@ -10,10 +10,9 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - name: Check mingw contents
+    - name: Find gcc, hopefully in mingw
       shell: bash
-      working-directory: /mingw64/bin
-      run: ls
+      run: which gcc
 
     - uses: actions/checkout@v2
 
