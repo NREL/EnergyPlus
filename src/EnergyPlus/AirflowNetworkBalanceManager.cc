@@ -99,6 +99,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
@@ -122,7 +123,6 @@ namespace AirflowNetworkBalanceManager {
     // Using/Aliasing
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
-    using DataAirLoop::AirToZoneNodeInfo;
     using DataContaminantBalance::CO2ZoneTimeMinus1;
     using DataContaminantBalance::Contaminant;
     using DataContaminantBalance::GCZoneTimeMinus1;
@@ -226,7 +226,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulation of air distribution system.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataAirSystems::PrimaryAirSystem;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
@@ -251,7 +250,7 @@ namespace AirflowNetworkBalanceManager {
             TurnFansOn = false; // The FAN should be off when BeginEnvrnFlag = .True.
         }
 
-        dataAirflowNetworkBalanceManager.initialize();
+        dataAirflowNetworkBalanceManager.initialize(state);
 
         NetworkNumOfNodes = NumOfNodesMultiZone;
         NetworkNumOfLinks = NumOfLinksMultiZone;
@@ -260,12 +259,12 @@ namespace AirflowNetworkBalanceManager {
 
         if (present(FirstHVACIteration) && SimulateAirflowNetwork >= AirflowNetworkControlSimpleADS) {
             if (FirstHVACIteration) {
-                if (allocated(AirLoopAFNInfo)) {
+                if (allocated(state.dataAirLoop->AirLoopAFNInfo)) {
                     for (i = 1; i <= dataAirflowNetworkBalanceManager.DisSysNumOfCVFs; i++) {
-                        AirLoopAFNInfo(i).AFNLoopHeatingCoilMaxRTF = 0.0;
-                        AirLoopAFNInfo(i).AFNLoopOnOffFanRTF = 0.0;
-                        AirLoopAFNInfo(i).AFNLoopDXCoilRTF = 0.0;
-                        AirLoopAFNInfo(i).LoopOnOffFanPartLoadRatio = 0.0;
+                        state.dataAirLoop->AirLoopAFNInfo(i).AFNLoopHeatingCoilMaxRTF = 0.0;
+                        state.dataAirLoop->AirLoopAFNInfo(i).AFNLoopOnOffFanRTF = 0.0;
+                        state.dataAirLoop->AirLoopAFNInfo(i).AFNLoopDXCoilRTF = 0.0;
+                        state.dataAirLoop->AirLoopAFNInfo(i).LoopOnOffFanPartLoadRatio = 0.0;
                     }
                 }
             }
@@ -281,8 +280,8 @@ namespace AirflowNetworkBalanceManager {
                     AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
                     break;
                 }
-                if (FanMassFlowRate > VerySmallMassFlow && AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
-                    AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
+                if (FanMassFlowRate > VerySmallMassFlow && state.dataAirLoop->AirLoopAFNInfo(i).LoopFanOperationMode == CycFanCycCoil &&
+                    state.dataAirLoop->AirLoopAFNInfo(i).LoopSystemOnMassFlowrate > 0.0) {
                     FanOperModeCyc = CycFanCycCoil;
                     AFNSupplyFanType = DisSysCompCVFData(i).FanTypeNum;
                     if (AFNSupplyFanType == FanType_SimpleOnOff) {
@@ -340,7 +339,7 @@ namespace AirflowNetworkBalanceManager {
                 dataAirflowNetworkBalanceManager.ValidateDistributionSystemFlag = false;
             }
         }
-        CalcAirflowNetworkAirBalance();
+        CalcAirflowNetworkAirBalance(state);
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
 
@@ -359,7 +358,7 @@ namespace AirflowNetworkBalanceManager {
             if (Contaminant.GenericContamSimulation) CalcAirflowNetworkGCBalance();
         }
 
-        UpdateAirflowNetwork(FirstHVACIteration);
+        UpdateAirflowNetwork(state, FirstHVACIteration);
     }
 
     static bool getAirflowElementInput(EnergyPlusData &state)
@@ -1702,7 +1701,7 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (!lAlphaBlanks(2)) {
                     dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveName = Alphas(2);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum = GetCurveIndex(Alphas(2)); // convert curve name to number
+                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum = GetCurveIndex(state, Alphas(2)); // convert curve name to number
                     if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum == 0) {
                         dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).MinTimeControlOnly = true;
                         ShowWarningError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(2) +
@@ -1711,7 +1710,7 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError(
                             "Thermal comfort will not be performed and minimum opening and closing times are checked only. Simulation continues.");
                     } else {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, // Curve index
                                                                     {1},                                                  // Valid dimensions
                                                                     RoutineName,                                          // Routine name
                                                                     CurrentModuleObject,                                  // Object Type
@@ -1721,9 +1720,10 @@ namespace AirflowNetworkBalanceManager {
                 }
                 if (!lAlphaBlanks(3)) {
                     dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveName = Alphas(3);
-                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(Alphas(3)); // convert curve name to number
+                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum = GetCurveIndex(state, Alphas(3)); // convert curve name to number
                     if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum > 0) {
-                        ErrorsFound |= CurveManager::CheckCurveDims(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
+                        ErrorsFound |= CurveManager::CheckCurveDims(state,
+                                                                    dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, // Curve index
                                                                     {1},                                                   // Valid dimensions
                                                                     RoutineName,                                           // Routine name
                                                                     CurrentModuleObject,                                   // Object Type
@@ -1748,8 +1748,8 @@ namespace AirflowNetworkBalanceManager {
                 }
                 // Check continuity of both curves at boundary point
                 if (dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum > 0 && dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum) {
-                    if (std::abs(CurveValue(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
-                                 CurveValue(dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
+                    if (std::abs(CurveValue(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortLowTempCurveNum, Numbers(3)) -
+                                 CurveValue(state, dataAirflowNetworkBalanceManager.OccupantVentilationControl(i).ComfortHighTempCurveNum, Numbers(3))) > 0.1) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " object: The difference of both curve values at boundary point > 0.1");
                         ShowContinueError("Both curve names are = " + cAlphaFields(2) + " and " + cAlphaFields(3));
                         ShowContinueError("The input value of " + cNumericFields(3) + " = " +
@@ -2275,7 +2275,7 @@ namespace AirflowNetworkBalanceManager {
                         ShowContinueError("The default value is assigned as " + RoundSigDigits(Numbers(1), 1));
                     }
                     MultizoneExternalNodeData(i).ExtNum = AirflowNetworkNumOfZones + i;          // External node number
-                    MultizoneExternalNodeData(i).curve = CurveManager::GetCurveIndex(Alphas(2)); // Wind pressure curve
+                    MultizoneExternalNodeData(i).curve = CurveManager::GetCurveIndex(state, Alphas(2)); // Wind pressure curve
                     if (MultizoneExternalNodeData(i).curve == 0) {
                         ShowSevereError(RoutineName + "Invalid " + cAlphaFields(2) + "=" + Alphas(2));
                         ShowContinueError("Entered in " + CurrentModuleObject + '=' + Alphas(1));
@@ -2317,7 +2317,7 @@ namespace AirflowNetworkBalanceManager {
                         // HACK: Need to verify name is unique between "OutdoorAir:Node" and "AirflowNetwork:MultiZone:ExternalNode"
 
                         if (NumAlphas > 5 && !lAlphaBlanks(6)) { // Wind pressure curve
-                            MultizoneExternalNodeData(i).curve = GetCurveIndex(Alphas(6));
+                            MultizoneExternalNodeData(i).curve = GetCurveIndex(state, Alphas(6));
                             if (MultizoneExternalNodeData(i).curve == 0) {
                                 ShowSevereError(RoutineName + "Invalid " + cAlphaFields(6) + "=" + Alphas(6));
                                 ShowContinueError("Entered in " + CurrentModuleObject + '=' + Alphas(1));
@@ -2993,7 +2993,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Calculate CP values
         if (UtilityRoutines::SameString(AirflowNetworkSimu.WPCCntr, "SurfaceAverageCalculation")) {
-            dataAirflowNetworkBalanceManager.calculateWindPressureCoeffs();
+            dataAirflowNetworkBalanceManager.calculateWindPressureCoeffs(state);
             // Ensure automatic generation is OK
             n = 0;
             for (j = 1; j <= 5; ++j) {
@@ -3081,12 +3081,12 @@ namespace AirflowNetworkBalanceManager {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
-            print(state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(index));
+            print(state.files.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(state, index));
 
             for (j = 0; j < numWinDirs; ++j) {
-                print(state.files.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
+                print(state.files.eio, "{:.2R},", CurveManager::CurveValue(state, index, j * angleDelta));
             }
-            print(state.files.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
+            print(state.files.eio, "{:.2R}\n", CurveManager::CurveValue(state, index, numWinDirs * angleDelta));
         }
 
         if (dataAirflowNetworkBalanceManager.AirflowNetworkNumOfSingleSideZones > 0) {
@@ -4737,7 +4737,7 @@ namespace AirflowNetworkBalanceManager {
 
 }
 
-    void AirflowNetworkBalanceManagerData::initialize()
+    void AirflowNetworkBalanceManagerData::initialize(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -4973,7 +4973,8 @@ namespace AirflowNetworkBalanceManager {
                     }
                     j = AirflowNetworkBalanceManager::MultizoneSurfaceData(i).SurfNum;
                     dataAirflowNetworkBalanceManager.OccupantVentilationControl(AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OccupantVentilationControlNum)
-                        .calc(AirflowNetworkBalanceManager::Surface(j).Zone,
+                        .calc(state,
+                              AirflowNetworkBalanceManager::Surface(j).Zone,
                               AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpenElapsedTime,
                               AirflowNetworkBalanceManager::MultizoneSurfaceData(i).CloseElapsedTime,
                               AirflowNetworkBalanceManager::MultizoneSurfaceData(i).OpeningStatus,
@@ -5639,7 +5640,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void CalcAirflowNetworkAirBalance()
+    void CalcAirflowNetworkAirBalance(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -5651,7 +5652,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine performs simulations of nodal pressures and linkage airflows.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataGlobals::AnyLocalEnvironmentsInModel;
         using DataHVACGlobals::TurnFansOn;
         using DataHVACGlobals::VerySmallMassFlow;
@@ -5714,7 +5714,8 @@ namespace AirflowNetworkBalanceManager {
                             LocalWindSpeed = WindSpeedAt(MultizoneExternalNodeData(i).height);
                             LocalDryBulb = OutDryBulbTempAt(AirflowNetworkNodeData(n).NodeHeight);
                             LocalAzimuth = MultizoneExternalNodeData(i).azimuth;
-                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(MultizoneExternalNodeData(i).curve,
+                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(state,
+                                                                            MultizoneExternalNodeData(i).curve,
                                                                             MultizoneExternalNodeData(i).symmetricCurve,
                                                                             MultizoneExternalNodeData(i).useRelativeAngle,
                                                                             LocalAzimuth,
@@ -5731,7 +5732,8 @@ namespace AirflowNetworkBalanceManager {
                             LocalHumRat = Node((NodeNum)).HumRat;
                             LocalDryBulb = Node((NodeNum)).OutAirDryBulb;
                             LocalAzimuth = MultizoneExternalNodeData(i).azimuth;
-                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(MultizoneExternalNodeData(i).curve,
+                            AirflowNetworkNodeSimu(n).PZ = CalcWindPressure(state,
+                                                                            MultizoneExternalNodeData(i).curve,
                                                                             MultizoneExternalNodeData(i).symmetricCurve,
                                                                             MultizoneExternalNodeData(i).useRelativeAngle,
                                                                             LocalAzimuth,
@@ -5865,16 +5867,16 @@ namespace AirflowNetworkBalanceManager {
         solver.initialize();
 
         if (!(PressureSetFlag > 0 && AirflowNetworkFanActivated)) {
-            solver.airmov();
+            solver.airmov(state);
         } else if (PressureSetFlag == PressureCtrlExhaust) {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinExhaustMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxExhaustMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                MaxExhaustMassFlowrate = MaxExhaustMassFlowrate / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ExhaustFanMassFlowRate = MinExhaustMassFlowrate;
-            solver.airmov();
+            solver.airmov(state);
             ZonePressure1 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
             if (ZonePressure1 <= PressureSet) {
                 // The highest pressure due to minimum flow rate could not reach Pressure set, bypass pressure set calculation
@@ -5896,7 +5898,7 @@ namespace AirflowNetworkBalanceManager {
                 }
             } else {
                 ExhaustFanMassFlowRate = MaxExhaustMassFlowrate;
-                solver.airmov();
+                solver.airmov(state);
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -5920,7 +5922,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     //	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
-                    SolveRoot(
+                    TempSolveRoot::SolveRoot(state,
                         ErrorToler, MaxIte, SolFla, ExhaustFanMassFlowRate, AFNPressureResidual, MinExhaustMassFlowrate, MaxExhaustMassFlowrate, Par);
                     if (SolFla == -1) {
                         if (!WarmupFlag) {
@@ -5947,12 +5949,12 @@ namespace AirflowNetworkBalanceManager {
             AirLoopNum = AirflowNetworkNodeData(PressureControllerData(1).AFNNodeNum).AirLoopNum;
             MinReliefMassFlowrate = 2.0 * VerySmallMassFlow;
             MaxReliefMassFlowrate = Node(PressureControllerData(1).OANodeNum).MassFlowRate;
-            if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
-                MaxReliefMassFlowrate = MaxReliefMassFlowrate / AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+            if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycComp && state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio > 0.0) {
+                MaxReliefMassFlowrate = MaxReliefMassFlowrate / state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
             }
             ReliefMassFlowRate = MinReliefMassFlowrate;
             solver.initialize();
-            solver.airmov();
+            solver.airmov(state);
             ZonePressure1 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
 
             if (ZonePressure1 <= PressureSet) {
@@ -5976,7 +5978,7 @@ namespace AirflowNetworkBalanceManager {
             } else {
                 ReliefMassFlowRate = MaxReliefMassFlowrate;
                 solver.initialize();
-                solver.airmov();
+                solver.airmov(state);
                 ZonePressure2 = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
                 if (ZonePressure2 >= PressureSet) {
                     // The lowest pressure due to maximum flow rate is still higher than Pressure set, bypass pressure set calculation
@@ -6000,7 +6002,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     //	if ( ZonePressure1 > PressureSet && ZonePressure2 < PressureSet ) {
                     Par(1) = PressureSet;
-                    SolveRoot(ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par);
+                    TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, ReliefMassFlowRate, AFNPressureResidual, MinReliefMassFlowrate, MaxReliefMassFlowrate, Par);
                     if (SolFla == -1) {
                         if (!WarmupFlag) {
                             if (ErrCountVar == 0) {
@@ -6025,7 +6027,8 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    Real64 AFNPressureResidual(Real64 const ControllerMassFlowRate, // Pressure setpoint
+    Real64 AFNPressureResidual(EnergyPlusData &state,
+                               Real64 const ControllerMassFlowRate, // Pressure setpoint
                                Array1D<Real64> const &Par           // par(1) = PressureSet
     )
     {
@@ -6059,7 +6062,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         solver.initialize();
-        solver.airmov();
+        solver.airmov(state);
 
         ZonePressure = AirflowNetworkNodeSimu(PressureControllerData(1).AFNNodeNum).PZ;
 
@@ -6071,36 +6074,36 @@ namespace AirflowNetworkBalanceManager {
         return AFNPressureResidual;
     }
 
-    static int makeTable(const std::string &name, const int gridIndex, const std::vector<Real64> &y)
+    static int makeTable(EnergyPlusData &state, const std::string &name, const int gridIndex, const std::vector<Real64> &y)
     {
         // Add a new table and performance curve
         std::string contextString = "CalcWindPressureCoeffs: Creating table \"" + name + "\"";
         Btwxt::setMessageCallback(CurveManager::BtwxtMessageCallback, &contextString);
 
-        int CurveNum = CurveManager::PerfCurve.size() + 1;
-        CurveManager::PerfCurve.push_back(CurveManager::PerfomanceCurveData());
+        int CurveNum = state.dataCurveManager->PerfCurve.size() + 1;
+        state.dataCurveManager->PerfCurve.push_back(CurveManager::PerformanceCurveData());
 
-        CurveManager::PerfCurve(CurveNum).Name = name;
-        CurveManager::PerfCurve(CurveNum).ObjectType = "Table:Lookup";
-        CurveManager::PerfCurve(CurveNum).NumDims = 1;
+        state.dataCurveManager->PerfCurve(CurveNum).Name = name;
+        state.dataCurveManager->PerfCurve(CurveNum).ObjectType = "Table:Lookup";
+        state.dataCurveManager->PerfCurve(CurveNum).NumDims = 1;
 
-        CurveManager::PerfCurve(CurveNum).InterpolationType = CurveManager::BtwxtMethod;
+        state.dataCurveManager->PerfCurve(CurveNum).InterpolationType = CurveManager::InterpTypeEnum::BtwxtMethod;
 
-        CurveManager::PerfCurve(CurveNum).Var1Min = 0.0;
-        CurveManager::PerfCurve(CurveNum).Var1MinPresent = true;
-        CurveManager::PerfCurve(CurveNum).Var1Max = 360.0;
-        CurveManager::PerfCurve(CurveNum).Var1MaxPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1Min = 0.0;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1MinPresent = true;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1Max = 360.0;
+        state.dataCurveManager->PerfCurve(CurveNum).Var1MaxPresent = true;
 
-        CurveManager::PerfCurve(CurveNum).TableIndex = gridIndex;
-        CurveManager::PerfCurve(CurveNum).GridValueIndex = CurveManager::btwxtManager.addOutputValues(gridIndex, y);
+        state.dataCurveManager->PerfCurve(CurveNum).TableIndex = gridIndex;
+        state.dataCurveManager->PerfCurve(CurveNum).GridValueIndex = state.dataCurveManager->btwxtManager.addOutputValues(gridIndex, y);
 
-        CurveManager::NumCurves += 1;
+        state.dataCurveManager->NumCurves += 1;
         return CurveNum;
     }
 
 }
 
-    void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs()
+    void AirflowNetworkBalanceManagerData::calculateWindPressureCoeffs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6246,7 +6249,7 @@ namespace AirflowNetworkBalanceManager {
         std::vector<Btwxt::GridAxis> dirs30Axes;
         dirs30Axes.emplace_back(dirs30, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-        auto dirs30GridIndex = CurveManager::btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
+        auto dirs30GridIndex = state.dataCurveManager->btwxtManager.addGrid("30 Degree Increments", Btwxt::GriddedData(dirs30Axes));
 
         if (AirflowNetworkNumOfSingleSideZones == 0) { // do the standard surface average coefficient calculation
             // Create the array of wind directions
@@ -6318,7 +6321,7 @@ namespace AirflowNetworkBalanceManager {
                 } // End of wind direction loop
                 // Add new table
                 vals[12] = vals[0]; // Enforce periodicity
-                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!WPCTABLE" + std::to_string(FacadeNum), dirs30GridIndex, vals);
+                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!WPCTABLE" + std::to_string(FacadeNum), dirs30GridIndex, vals);
             } // End of facade number loop
 
         } else { //-calculate the advanced single sided wind pressure coefficients
@@ -6392,18 +6395,18 @@ namespace AirflowNetworkBalanceManager {
             std::vector<Btwxt::GridAxis> dirs10Axes;
             dirs10Axes.emplace_back(dirs10, Btwxt::Method::LINEAR, Btwxt::Method::LINEAR, std::pair<double, double>{0.0, 360.0});
 
-            auto dirs10GridIndex = CurveManager::btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
+            auto dirs10GridIndex = state.dataCurveManager->btwxtManager.addGrid("10 Degree Increments", Btwxt::GriddedData(dirs10Axes));
 
             for (FacadeNum = 1; FacadeNum <= 4; ++FacadeNum) {
                 valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
+                curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs10GridIndex, valsByFacade[FacadeNum - 1]);
             }
             FacadeNum = 5;
             valsByFacade[FacadeNum - 1].push_back(valsByFacade[FacadeNum - 1][0]); // Enforce periodicity
-            curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
+            curveIndex[FacadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!SSWPCTABLEFACADE" + std::to_string(FacadeNum), dirs30GridIndex, valsByFacade[FacadeNum - 1]);
             for (unsigned facadeNum = 6; facadeNum <= valsByFacade.size(); ++facadeNum) {
                 valsByFacade[facadeNum - 1].push_back(valsByFacade[facadeNum - 1][0]); // Enforce periodicity
-                curveIndex[facadeNum - 1] = AirflowNetworkBalanceManager::makeTable("!SSWPCTABLE" + std::to_string(facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
+                curveIndex[facadeNum - 1] = AirflowNetworkBalanceManager::makeTable(state, "!SSWPCTABLE" + std::to_string(facadeNum), dirs10GridIndex, valsByFacade[facadeNum - 1]);
             }
         }
         // Connect the external nodes to the new curves
@@ -6414,7 +6417,8 @@ namespace AirflowNetworkBalanceManager {
 
 namespace AirflowNetworkBalanceManager {
 
-    Real64 CalcWindPressure(int const curve,           // Curve index, change this to pointer after curve refactor
+    Real64 CalcWindPressure(EnergyPlusData &state,
+                            int const curve,           // Curve index, change this to pointer after curve refactor
                             bool const symmetricCurve, // True if the curve is symmetric (0 to 180)
                             bool const relativeAngle,  // True if the Cp curve angle is measured relative to the surface
                             Real64 const azimuth,      // Azimuthal angle of surface
@@ -6460,7 +6464,7 @@ namespace AirflowNetworkBalanceManager {
                 angle = 360.0 - angle;
             }
         }
-        Cp = CurveManager::CurveValue(curve, angle);
+        Cp = CurveManager::CurveValue(state, curve, angle);
 
         return Cp * 0.5 * rho * windSpeed * windSpeed;
     }
@@ -8578,7 +8582,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void UpdateAirflowNetwork(Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
+    void UpdateAirflowNetwork(EnergyPlusData &state, Optional_bool_const FirstHVACIteration) // True when solution technique on first iteration
     {
 
         // SUBROUTINE INFORMATION:
@@ -8591,7 +8595,6 @@ namespace AirflowNetworkBalanceManager {
         // This subroutine update variables used in the AirflowNetwork model.
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopAFNInfo;
         using DataHVACGlobals::NumPrimaryAirSys;
         using DataHVACGlobals::TimeStepSys;
         using DataHVACGlobals::TurnFansOn;
@@ -8827,7 +8830,7 @@ namespace AirflowNetworkBalanceManager {
         Real64 OnOffFanRunTimeFraction = 0.0;
         dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction = 0.0;
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-            MaxPartLoadRatio = max(MaxPartLoadRatio, AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio);
+            MaxPartLoadRatio = max(MaxPartLoadRatio, state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio);
             dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction = max(dataAirflowNetworkBalanceManager.MaxOnOffFanRunTimeFraction, dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum));
         }
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
@@ -8841,18 +8844,18 @@ namespace AirflowNetworkBalanceManager {
             // Calculate the part load ratio, can't be greater than 1 for a simple ONOFF fan
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
                 Node(DisSysCompCVFData(FanNum).InletNode).MassFlowRate > VerySmallMassFlow &&
-                AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                 // Hard code here
-                PartLoadRatio = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
-                dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) = AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
-                OnOffFanRunTimeFraction = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
-                                              AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
-                                              AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
-                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) = max(AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
-                                                              AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
-                                                              AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
+                PartLoadRatio = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) = state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopOnOffFanPartLoadRatio;
+                OnOffFanRunTimeFraction = max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
+                                              state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
+                                              state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
+                dataAirflowNetworkBalanceManager.LoopOnOffFanRunTimeFraction(AirLoopNum) = max(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF,
+                                                              state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopOnOffFanRTF,
+                                                              state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopDXCoilRTF);
             }
-            AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
+            state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).AFNLoopHeatingCoilMaxRTF = 0.0;
 
             if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff && dataAirflowNetworkBalanceManager.LoopPartLoadRatio(AirLoopNum) < 1.0) {
                 for (std::size_t i = 0; i < dataAirflowNetworkBalanceManager.linkReport.size(); ++i) {
@@ -8882,19 +8885,19 @@ namespace AirflowNetworkBalanceManager {
                     if (DisSysCompCVFData(FanNum).AirLoopNum == AirLoopNum) break;
                 }
                 if (DisSysCompCVFData(FanNum).FanTypeNum == FanType_SimpleOnOff &&
-                    AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
+                    state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == ContFanCycCoil) {
                     OnOffRatio =
-                        std::abs((AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate - AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
-                                 AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate);
+                        std::abs((state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate - state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate) /
+                                 state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate);
                     if (OnOffRatio > 0.1) {
                         ShowWarningError("The absolute percent difference of supply air mass flow rate between HVAC operation and No HVAC operation "
                                          "is above 10% with fan operation mode = ContFanCycCoil.");
                         ShowContinueError("The added zone loads using the AirflowNetwork model may not be accurate because the zone loads are "
                                           "calculated based on the mass flow rate during HVAC operation.");
                         ShowContinueError(
-                            "The mass flow rate during HVAC operation = " + RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, 2) +
+                            "The mass flow rate during HVAC operation = " + RoundSigDigits(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOnMassFlowrate, 2) +
                             " The mass flow rate during no HVAC operation = " +
-                            RoundSigDigits(AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate, 2));
+                            RoundSigDigits(state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopSystemOffMassFlowrate, 2));
                         dataAirflowNetworkBalanceManager.UpdateAirflowNetworkMyOneTimeFlag = false;
                     }
                 }
@@ -9115,7 +9118,7 @@ namespace AirflowNetworkBalanceManager {
                         dataAirflowNetworkBalanceManager.exchangeData(i).SumMMHrGC *= OnOffFanRunTimeFraction;
                     }
                 }
-                if (AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
+                if (state.dataAirLoop->AirLoopAFNInfo(AirLoopNum).LoopFanOperationMode == CycFanCycCoil) {
                     for (i = 1; i <= NumOfZones; ++i) {
                         dataAirflowNetworkBalanceManager.exchangeData(i).SumMCp += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMCp * (1.0 - OnOffFanRunTimeFraction);
                         dataAirflowNetworkBalanceManager.exchangeData(i).SumMCpT += dataAirflowNetworkBalanceManager.multiExchangeData(i).SumMCpT * (1.0 - OnOffFanRunTimeFraction);
@@ -9448,7 +9451,6 @@ namespace AirflowNetworkBalanceManager {
 
         // Using/Aliasing
         using BranchNodeConnections::GetNodeConnectionType;
-        using DataAirLoop::AirToZoneNodeInfo;
         using DataAirSystems::PrimaryAirSystem;
         using DataZoneEquipment::ZoneEquipConfig;
         using MixedAir::GetNumOAMixers;
@@ -9571,7 +9573,7 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= NumOfNodes; ++i) {
             if (NodeFound(i)) continue;
             // Skip the inlet and outlet nodes of zone dehumidifiers
-            if (GetZoneDehumidifierNodeNumber(state.dataZoneDehumidifier, i)) NodeFound(i) = true;
+            if (GetZoneDehumidifierNodeNumber(state, state.dataZoneDehumidifier, i)) NodeFound(i) = true;
 
             for (j = 1; j <= NumOfZones; ++j) {
                 if (!ZoneEquipConfig(j).IsControlled) continue;
@@ -9946,10 +9948,10 @@ namespace AirflowNetworkBalanceManager {
             R1 = 0;
             R2 = 0;
             for (i = 1; i <= AirflowNetworkNumOfNodes; ++i) {
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).AirLoopSupplyNodeNum(1)) S1 = i;
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).ZoneEquipSupplyNodeNum(1)) S2 = i;
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).ZoneEquipReturnNodeNum(1)) R1 = i;
-                if (AirflowNetworkNodeData(i).EPlusNodeNum == AirToZoneNodeInfo(j).AirLoopReturnNodeNum(1)) R2 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirLoop->AirToZoneNodeInfo(j).AirLoopSupplyNodeNum(1)) S1 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirLoop->AirToZoneNodeInfo(j).ZoneEquipSupplyNodeNum(1)) S2 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirLoop->AirToZoneNodeInfo(j).ZoneEquipReturnNodeNum(1)) R1 = i;
+                if (AirflowNetworkNodeData(i).EPlusNodeNum == state.dataAirLoop->AirToZoneNodeInfo(j).AirLoopReturnNodeNum(1)) R2 = i;
             }
             for (i = 1; i <= AirflowNetworkNumOfLinks; ++i) {
                 if (AirflowNetworkLinkageData(i).NodeNums[0] == R1 && AirflowNetworkLinkageData(i).NodeNums[1] == R2) {
@@ -11132,17 +11134,17 @@ namespace AirflowNetworkBalanceManager {
             }
 
             // Check connection between supply and demand
-            for (OutNum = 1; OutNum <= AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
+            for (OutNum = 1; OutNum <= state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).NumSupplyNodes; ++OutNum) {
                 // AirLoop supply outlet node
-                if (AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(OutNum) == NodeNumber) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopSupplyNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
-                if (AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) == NodeNumber) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
                 // supply path
                 for (SupAirPath = 1; SupAirPath <= NumSupplyAirPaths; ++SupAirPath) {
-                    if (SupplyAirPath(SupAirPath).InletNodeNum == AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum)) {
+                    if (SupplyAirPath(SupAirPath).InletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipSupplyNodeNum(OutNum)) {
                         for (SupAirPathOutNodeNum = 1; SupAirPathOutNodeNum <= SupplyAirPath(SupAirPath).NumOutletNodes; ++SupAirPathOutNodeNum) {
                             if (SupplyAirPath(SupAirPath).OutletNode(SupAirPathOutNodeNum) == NodeNumber) {
                                 return AirLoopNum;
@@ -11171,14 +11173,14 @@ namespace AirflowNetworkBalanceManager {
                     }
                 }
                 // return path
-                if (AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(OutNum) == NodeNumber) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).AirLoopReturnNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
-                if (AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(OutNum) == NodeNumber) {
+                if (state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(OutNum) == NodeNumber) {
                     return AirLoopNum;
                 }
                 for (int retPathNum = 1; retPathNum <= NumReturnAirPaths; ++retPathNum) {
-                    if (ReturnAirPath(retPathNum).OutletNodeNum == AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(1)) {
+                    if (ReturnAirPath(retPathNum).OutletNodeNum == state.dataAirLoop->AirToZoneNodeInfo(AirLoopNum).ZoneEquipReturnNodeNum(1)) {
                         if (ReturnAirPath(retPathNum).OutletNodeNum == NodeNumber) {
                             return AirLoopNum;
                         }
@@ -11207,7 +11209,8 @@ namespace AirflowNetworkBalanceManager {
         return AirLoopNumber;
     }
 
-    void OccupantVentilationControlProp::calc(int const ZoneNum,
+    void OccupantVentilationControlProp::calc(EnergyPlusData &state,
+                                              int const ZoneNum,
                                               Real64 const TimeOpenDuration,
                                               Real64 const TimeCloseDuration,
                                               int &OpeningStatus,
@@ -11247,9 +11250,9 @@ namespace AirflowNetworkBalanceManager {
         }
 
         if (OutDryBulb < ComfortBouPoint) {
-            Tcomfort = CurveValue(ComfortLowTempCurveNum, OutDryBulb);
+            Tcomfort = CurveValue(state, ComfortLowTempCurveNum, OutDryBulb);
         } else {
-            Tcomfort = CurveValue(ComfortHighTempCurveNum, OutDryBulb);
+            Tcomfort = CurveValue(state, ComfortHighTempCurveNum, OutDryBulb);
         }
         ComfortBand = -0.0028 * (100 - MaxPPD) * (100 - MaxPPD) + 0.3419 * (100 - MaxPPD) - 6.6275;
         Toperative = 0.5 * (MAT(ZoneNum) + MRT(ZoneNum));

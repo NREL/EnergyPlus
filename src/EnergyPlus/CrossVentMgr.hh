@@ -55,24 +55,28 @@
 namespace EnergyPlus {
 
 // Forward declarations
+struct EnergyPlusData;
 struct ConvectionCoefficientsData;
 struct CrossVentMgrData;
 
 namespace CrossVentMgr {
 
-    void ManageUCSDCVModel(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void ManageUCSDCVModel(EnergyPlusData &state,
+                           ConvectionCoefficientsData &dataConvectionCoefficients,
                            CrossVentMgrData &dataCrossVentMgr,
                            int ZoneNum); // index number for the specified zone
 
     void InitUCSDCV(CrossVentMgrData &dataCrossVentMgr, int ZoneNum);
 
-    void HcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void HcUCSDCV(EnergyPlusData &state,
+                  ConvectionCoefficientsData &dataConvectionCoefficients,
                   CrossVentMgrData &dataCrossVentMgr,
                   int ZoneNum);
 
     void EvolveParaUCSDCV(int ZoneNum);
 
-    void CalcUCSDCV(ConvectionCoefficientsData &dataConvectionCoefficients,
+    void CalcUCSDCV(EnergyPlusData &state,
+                    ConvectionCoefficientsData &dataConvectionCoefficients,
                     CrossVentMgrData &dataCrossVentMgr,
                     int ZoneNum); // Which Zonenum
 

@@ -158,15 +158,15 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     HeatingCoils::HeatingCoil(CoilNum).MSParasiticElecLoad(1) = 0.0;
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilNum, 0.0, 0.0, 1, 2);
     Real64 HeatLoad00 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
-        (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) - 
+        (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
             HeatingCoils::HeatingCoil(CoilNum).InletAirEnthalpy);
     EXPECT_NEAR(HeatLoad00, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = 0.5 * OnMassFlowrate + (1.0 - 0.5) * OffMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 0.5, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilNum, 0.0, 0.5, 1, 2);
     Real64 HeatLoad05 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
               (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -
@@ -174,7 +174,7 @@ TEST_F(EnergyPlusFixture, HeatingCoils_OutletAirPropertiesTest)
     EXPECT_NEAR(HeatLoad05, HeatingCoils::HeatingCoil(CoilNum).HeatingCoilLoad, 0.0001);
 
     HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate = OnMassFlowrate;
-    HeatingCoils::CalcMultiStageGasHeatingCoil(CoilNum, 0.0, 1.0, 1, 2);
+    HeatingCoils::CalcMultiStageGasHeatingCoil(state, CoilNum, 0.0, 1.0, 1, 2);
     Real64 HeatLoad10 =
         HeatingCoils::HeatingCoil(CoilNum).InletAirMassFlowRate *
               (Psychrometrics::PsyHFnTdbW(HeatingCoils::HeatingCoil(CoilNum).OutletAirTemp, HeatingCoils::HeatingCoil(CoilNum).OutletAirHumRat) -

@@ -57,7 +57,6 @@
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
@@ -140,11 +139,11 @@ namespace PlantCentralGSHP {
         ChillerHeater.deallocate();
     }
 
-    PlantComponent *WrapperSpecs::factory(std::string const &objectName)
+    PlantComponent *WrapperSpecs::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (getWrapperInputFlag) {
-            GetWrapperInput();
+            GetWrapperInput(state);
             getWrapperInputFlag = false;
         }
 
@@ -162,7 +161,7 @@ namespace PlantCentralGSHP {
 
     void WrapperSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(state.dataBranchInputManager, 0.0, calledFromLocation.loopNum);
+        this->initialize(state, 0.0, calledFromLocation.loopNum);
         this->SizeWrapper();
     }
 
@@ -199,8 +198,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
     {
         if (calledFromLocation.loopNum != this->GLHELoopNum) {
 
-            this->initialize(state.dataBranchInputManager, CurLoad, calledFromLocation.loopNum);
-            this->CalcWrapperModel(CurLoad, calledFromLocation.loopNum);
+            this->initialize(state, CurLoad, calledFromLocation.loopNum);
+            this->CalcWrapperModel(state, CurLoad, calledFromLocation.loopNum);
 
         } else if (calledFromLocation.loopNum == this->GLHELoopNum) {
             PlantUtilities::UpdateChillerComponentCondenserSide(calledFromLocation.loopNum,
@@ -561,7 +560,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         }
     }
 
-    void GetWrapperInput()
+    void GetWrapperInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Yunzhi Huang and Daeho Kang, PNNL
@@ -740,7 +739,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             for (int WrapperNum = 1; WrapperNum <= numWrappers; ++WrapperNum) {
                 Wrapper(WrapperNum).ChillerHeater.allocate(Wrapper(WrapperNum).ChillerHeaterNums);
             }
-            GetChillerHeaterInput();
+            GetChillerHeaterInput(state);
         }
 
         for (int WrapperNum = 1; WrapperNum <= numWrappers; ++WrapperNum) {
@@ -1065,7 +1064,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         } // End of individual chiller heater output
     }
 
-    void GetChillerHeaterInput()
+    void GetChillerHeaterInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Kyung Tae Yun, Mississippi State University
@@ -1114,21 +1113,21 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             ChillerHeater(ChillerHeaterNum).CondModeCooling = DataIPShortCuts::cAlphaArgs(4);
 
             // Performance curves
-            ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(5));
+            ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(5));
             if (ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("Entered in " + DataIPShortCuts::cAlphaFieldNames(5) + '=' + DataIPShortCuts::cAlphaArgs(5));
                 CHErrorsFound = true;
             }
 
-            ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(6));
+            ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(6));
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("Entered in " + DataIPShortCuts::cAlphaFieldNames(6) + '=' + DataIPShortCuts::cAlphaArgs(6));
                 CHErrorsFound = true;
             }
 
-            ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(7));
+            ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(7));
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("Entered in " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
@@ -1138,21 +1137,21 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             ChillerHeater(ChillerHeaterNum).CondModeHeating = DataIPShortCuts::cAlphaArgs(8);
 
             // Performance curves
-            ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(9));
+            ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(9));
             if (ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("Entered in " + DataIPShortCuts::cAlphaFieldNames(9) + '=' + DataIPShortCuts::cAlphaArgs(9));
                 CHErrorsFound = true;
             }
 
-            ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(10));
+            ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(10));
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("Entered in " + DataIPShortCuts::cAlphaFieldNames(10) + '=' + DataIPShortCuts::cAlphaArgs(10));
                 CHErrorsFound = true;
             }
 
-            ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX = CurveManager::GetCurveIndex(DataIPShortCuts::cAlphaArgs(11));
+            ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX = CurveManager::GetCurveIndex(state, DataIPShortCuts::cAlphaArgs(11));
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX == 0) {
                 ShowSevereError("Invalid " + DataIPShortCuts::cCurrentModuleObject + '=' + DataIPShortCuts::cAlphaArgs(1));
                 ShowContinueError("Entered in " + DataIPShortCuts::cAlphaFieldNames(11) + '=' + DataIPShortCuts::cAlphaArgs(11));
@@ -1272,7 +1271,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
             // Check the CAP-FT, EIR-FT, and PLR curves and warn user if different from 1.0 by more than +-10%
             if (ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX,
+                Real64 CurveVal = CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerCapFTCoolingIDX,
                                                            ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
                                                            ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -1284,7 +1283,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             }
 
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX,
+                Real64 CurveVal = CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerEIRFTCoolingIDX,
                                                            ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling,
                                                            ChillerHeater(ChillerHeaterNum).TempRefCondInCooling);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -1296,7 +1295,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             }
 
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, 1.0);
+                Real64 CurveVal = CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError("Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
@@ -1310,7 +1309,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 FoundNegValue = false;
                 for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
                     Real64 CurveValTmp =
-                        CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, double(CurveCheck / 10.0));
+                        CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
@@ -1327,7 +1326,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             }
 
             if (ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX,
+                Real64 CurveVal = CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerCapFTHeatingIDX,
                                                            ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
                                                            ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -1339,7 +1338,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             }
 
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX,
+                Real64 CurveVal = CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerEIRFTHeatingIDX,
                                                            ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg,
                                                            ChillerHeater(ChillerHeaterNum).TempRefCondInClgHtg);
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
@@ -1351,7 +1350,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             }
 
             if (ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX > 0) {
-                Real64 CurveVal = CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, 1.0);
+                Real64 CurveVal = CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, 1.0);
 
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError("Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
@@ -1365,7 +1364,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 FoundNegValue = false;
                 for (int CurveCheck = 0; CurveCheck <= 10; ++CurveCheck) {
                     Real64 CurveValTmp =
-                        CurveManager::CurveValue(ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, double(CurveCheck / 10.0));
+                        CurveManager::CurveValue(state, ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX, double(CurveCheck / 10.0));
                     if (CurveValTmp < 0.0) FoundNegValue = true;
                     CurveValArray(CurveCheck + 1) = int(CurveValTmp * 100.0) / 100.0;
                 }
@@ -1383,11 +1382,11 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 }
             }
 
-            CurveManager::GetCurveMinMaxValues(ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX,
+            CurveManager::GetCurveMinMaxValues(state,ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRHeatingIDX,
                                                ChillerHeater(ChillerHeaterNum).MinPartLoadRatClgHtg,
                                                ChillerHeater(ChillerHeaterNum).MaxPartLoadRatClgHtg);
 
-            CurveManager::GetCurveMinMaxValues(ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX,
+            CurveManager::GetCurveMinMaxValues(state,ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRCoolingIDX,
                                                ChillerHeater(ChillerHeaterNum).MinPartLoadRatCooling,
                                                ChillerHeater(ChillerHeaterNum).MaxPartLoadRatCooling);
         }
@@ -1397,7 +1396,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         }
     }
 
-    void WrapperSpecs::initialize(BranchInputManagerData &dataBranchInputManager,
+    void WrapperSpecs::initialize(EnergyPlusData &state,
                                   Real64 MyLoad, // Demand Load
                                   int LoopNum    // Loop Number Index
     )
@@ -1424,7 +1423,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         if (this->MyWrapperFlag) {
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->CWLoopNum,
@@ -1438,7 +1437,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     this->CHWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->HWLoopNum,
@@ -1452,7 +1451,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                                     this->HWInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_CentralGroundSourceHeatPump,
                                                     this->GLHELoopNum,
@@ -1705,7 +1704,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                                              this->GLHECompNum);
     }
 
-    void WrapperSpecs::CalcChillerModel()
+    void WrapperSpecs::CalcChillerModel(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang, PNNL
@@ -1892,7 +1891,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 Real64 MinPartLoadRat; // Min allowed operating fraction of full load
                 Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
 
-                CurveManager::GetCurveMinMaxValues(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
+                CurveManager::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
 
                 // Chiller reference capacity
                 Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
@@ -1900,7 +1899,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                 Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
                 Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutCooling;
                 ChillerCapFT =
-                    CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
+                    CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
                 if (ChillerCapFT < 0) {
                     if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !DataGlobals::WarmupFlag) {
@@ -2038,8 +2037,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
 
                 // Determine chiller compressor power and transfer heat calculation
                 ChillerEIRFT =
-                    max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
-                ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
+                    max(0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
+                ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
 
                 if (ReferenceCOP <= 0.0) {
                     CHPower = 0.0;
@@ -2139,7 +2138,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         }
     }
 
-    void WrapperSpecs::CalcChillerHeaterModel()
+    void WrapperSpecs::CalcChillerHeaterModel(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang, PNNL
@@ -2389,14 +2388,14 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     Real64 MinPartLoadRat; // Min allowed operating fraction of full load
                     Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
 
-                    CurveManager::GetCurveMinMaxValues(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
+                    CurveManager::GetCurveMinMaxValues(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, MinPartLoadRat, MaxPartLoadRat);
                     Real64 ChillerRefCap = this->ChillerHeater(ChillerHeaterNum).RefCap;
                     Real64 ReferenceCOP = this->ChillerHeater(ChillerHeaterNum).RefCOP;
                     EvapOutletTemp = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
                     Real64 TempLowLimitEout = this->ChillerHeater(ChillerHeaterNum).TempLowLimitEvapOut;
                     Real64 EvapOutletTempSetPoint = this->ChillerHeater(ChillerHeaterNum).TempRefEvapOutClgHtg;
                     ChillerCapFT =
-                        CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
+                        CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerCapFTIDX, EvapOutletTempSetPoint, CondTempforCurve);
 
                     if (ChillerCapFT < 0) {
                         if (this->ChillerHeater(ChillerHeaterNum).ChillerCapFTError < 1 && !DataGlobals::WarmupFlag) {
@@ -2498,8 +2497,8 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
                     }
 
                     ChillerEIRFT =
-                        max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
-                    ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
+                        max(0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
+                    ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(state, this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
                     CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
 
                     if (CHPower <= 0.0) {
@@ -2627,7 +2626,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
         }
     }
 
-    void WrapperSpecs::CalcWrapperModel(Real64 &MyLoad, int const LoopNum)
+    void WrapperSpecs::CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int const LoopNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Daeho Kang, PNNL
@@ -2707,7 +2706,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             if (this->ControlMode == SmartMixing) {
                 if (CurCoolingLoad > 0.0 && CHWInletMassFlowRate > 0.0 && GLHEInletMassFlowRate > 0) {
 
-                    this->CalcChillerModel();
+                    this->CalcChillerModel(state);
                     this->UpdateChillerRecords();
 
                     // Initialize local variables only for calculating mass-weighed temperatures
@@ -2879,7 +2878,7 @@ void WrapperSpecs::getDesignCapacities(const PlantLocation &calledFromLocation, 
             if (this->ControlMode == SmartMixing) { // Chiller heater component
                 if (CurHeatingLoad > 0.0 && HWInletMassFlowRate > 0.0) {
 
-                    this->CalcChillerHeaterModel();
+                    this->CalcChillerHeaterModel(state);
                     this->UpdateChillerHeaterRecords();
 
                     // Calculate individual CH units's temperatures and mass flow rates

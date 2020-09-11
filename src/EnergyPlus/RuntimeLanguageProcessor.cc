@@ -217,7 +217,7 @@ namespace RuntimeLanguageProcessor {
         WriteTraceMyOneTimeFlag = false;
     }
 
-    void InitializeRuntimeLanguage(IOFiles &ioFiles)
+    void InitializeRuntimeLanguage(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -307,7 +307,7 @@ namespace RuntimeLanguageProcessor {
             ActualTimeNum = NewEMSVariable("ACTUALTIME", 0);
             WarmUpFlagNum = NewEMSVariable("WARMUPFLAG", 0);
 
-            GetRuntimeLanguageUserInput(ioFiles); // Load and parse all runtime language objects
+            GetRuntimeLanguageUserInput(state,ioFiles); // Load and parse all runtime language objects
 
             date_and_time(datestring, _, _, datevalues);
             if (datestring != "") {
@@ -888,7 +888,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    ErlValueType EvaluateStack(IOFiles &ioFiles, int const StackNum)
+    ErlValueType EvaluateStack(EnergyPlusData &state, IOFiles &ioFiles, int const StackNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -930,14 +930,14 @@ namespace RuntimeLanguageProcessor {
 
                 } else if (SELECT_CASE_var == KeywordReturn) {
                     if (ErlStack(StackNum).Instruction(InstructionNum).Argument1 > 0)
-                        ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
+                        ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument1, seriousErrorFound);
 
                     WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     break; // RETURN always terminates an instruction stack
 
                 } else if (SELECT_CASE_var == KeywordSet) {
 
-                    ReturnValue = EvaluateExpression(ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ErlStack(StackNum).Instruction(InstructionNum).Argument2, seriousErrorFound);
                     VariableNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     if ((!ErlVariable(VariableNum).ReadOnly) && (!ErlVariable(VariableNum).Value.TrendVariable)) {
                         ErlVariable(VariableNum).Value = ReturnValue;
@@ -952,14 +952,14 @@ namespace RuntimeLanguageProcessor {
                     ReturnValue.Type = ValueString;
                     ReturnValue.String = "";
                     WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
-                    ReturnValue = EvaluateStack(ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
+                    ReturnValue = EvaluateStack(state,ioFiles, ErlStack(StackNum).Instruction(InstructionNum).Argument1);
 
                 } else if ((SELECT_CASE_var == KeywordIf) || (SELECT_CASE_var == KeywordElse)) { // same???
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
 
                     if (ExpressionNum > 0) { // could be 0 if this was an ELSE
-                        ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
+                        ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                         WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                         if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                             // Eventually should handle strings and arrays too
@@ -992,7 +992,7 @@ namespace RuntimeLanguageProcessor {
                     // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                    ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound);
                     if (ReturnValue.Number == 0.0) { //  This is the FALSE case
                         // Eventually should handle strings and arrays too
@@ -1004,7 +1004,7 @@ namespace RuntimeLanguageProcessor {
                     // reevaluate expression at While and goto there if true, otherwise continue
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
-                    ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
+                    ReturnValue = EvaluateExpression(state, ExpressionNum, seriousErrorFound);
                     if ((ReturnValue.Number != 0.0) && (WhileLoopExitCounter <= MaxWhileLoopIterations)) { //  This is the True case
                         // Eventually should handle strings and arrays too
                         WriteTrace(ioFiles, StackNum, InstructionNum, ReturnValue, seriousErrorFound); // duplicative?
@@ -1813,7 +1813,7 @@ namespace RuntimeLanguageProcessor {
         return NumExpressions;
     }
 
-    ErlValueType EvaluateExpression(int const ExpressionNum, bool &seriousErrorFound)
+    ErlValueType EvaluateExpression(EnergyPlusData &state, int const ExpressionNum, bool &seriousErrorFound)
     {
 
         // FUNCTION INFORMATION:
@@ -1875,7 +1875,7 @@ namespace RuntimeLanguageProcessor {
             for (OperandNum = 1; OperandNum <= ErlExpression(ExpressionNum).NumOperands; ++OperandNum) {
                 Operand(OperandNum) = ErlExpression(ExpressionNum).Operand(OperandNum);
                 if (Operand(OperandNum).Type == ValueExpression) {
-                    Operand(OperandNum) = EvaluateExpression(Operand(OperandNum).Expression, seriousErrorFound); // recursive call
+                    Operand(OperandNum) = EvaluateExpression(state, Operand(OperandNum).Expression, seriousErrorFound); // recursive call
                     // check if recursive call found an error in nested expression, want to preserve error message from that
                     if (seriousErrorFound) {
                         ReturnValue.Type = ValueError;
@@ -2420,18 +2420,18 @@ namespace RuntimeLanguageProcessor {
                     } else if (SELECT_CASE_var == FuncCurveValue) {
                         if (Operand(3).Type == 0 && Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number), Operand(2).Number)); // curve index | X value | Y value,
                                                                                                                  // 2nd independent | Z Value, 3rd
                                                                                                                  // independent | 4th independent |
                                                                                                                  // 5th independent
                         } else if (Operand(4).Type == 0 && Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number)); // curve index | X value | Y value, 2nd independent | Z
                                                                                             // Value, 3rd independent | 4th independent | 5th
                                                                                             // independent
                         } else if (Operand(5).Type == 0 && Operand(6).Type == 0) {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number)); // curve index | X value | Y value, 2nd independent | Z
@@ -2439,14 +2439,14 @@ namespace RuntimeLanguageProcessor {
                                                                                             // independent
                         } else if (Operand(6).Type == 0) {
                             ReturnValue =
-                                SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                                SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                              Operand(2).Number,
                                                              Operand(3).Number,
                                                              Operand(4).Number,
                                                              Operand(5).Number)); // curve index | X value | Y value, 2nd independent | Z Value, 3rd
                                                                                   // independent | 4th independent | 5th independent
                         } else {
-                            ReturnValue = SetErlValueNumber(CurveValue(std::floor(Operand(1).Number),
+                            ReturnValue = SetErlValueNumber(CurveValue(state, std::floor(Operand(1).Number),
                                                                        Operand(2).Number,
                                                                        Operand(3).Number,
                                                                        Operand(4).Number,
@@ -2611,7 +2611,7 @@ namespace RuntimeLanguageProcessor {
         }
     }
 
-    void GetRuntimeLanguageUserInput(IOFiles &ioFiles)
+    void GetRuntimeLanguageUserInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2913,7 +2913,7 @@ namespace RuntimeLanguageProcessor {
                         }
                     }
 
-                    CurveIndexNum = GetCurveIndex(cAlphaArgs(2)); // curve name
+                    CurveIndexNum = GetCurveIndex(state, cAlphaArgs(2)); // curve name
                     if (CurveIndexNum == 0) {
                         if (lAlphaFieldBlanks(2)) {
                             ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + " blank field.");

@@ -61,7 +61,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace ICEngineElectricGenerator {
 
@@ -157,9 +156,9 @@ namespace ICEngineElectricGenerator {
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitICEngineGenerators(BranchInputManagerData &dataBranchInputManager, bool RunFlag, bool FirstHVACIteration);
+        void InitICEngineGenerators(EnergyPlusData &state, bool RunFlag, bool FirstHVACIteration);
 
-        void CalcICEngineGeneratorModel(bool RunFlag, Real64 MyLoad);
+        void CalcICEngineGeneratorModel(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void CalcICEngineGenHeatRecovery(Real64 EnergyRecovered, Real64 HeatRecMdot, Real64 &HRecRatio);
 
@@ -169,12 +168,12 @@ namespace ICEngineElectricGenerator {
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
     extern Array1D<ICEngineGeneratorSpecs> ICEngineGenerator; // dimension to number of machines
 
-    void GetICEngineGeneratorInput();
+    void GetICEngineGeneratorInput(EnergyPlusData &state);
 
 } // namespace ICEngineElectricGenerator
 

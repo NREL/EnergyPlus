@@ -201,7 +201,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
 
     Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetEvapInput();
+    EvaporativeCoolers::GetEvapInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
@@ -325,7 +325,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
 
     Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetEvapInput();
+    EvaporativeCoolers::GetEvapInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
@@ -454,7 +454,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
 
     Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetEvapInput();
+    EvaporativeCoolers::GetEvapInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);

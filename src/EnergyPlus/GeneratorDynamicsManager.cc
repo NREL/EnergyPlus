@@ -151,7 +151,8 @@ namespace GeneratorDynamicsManager {
         MicroCHPElectricGenerator::MicroCHP(GenNum).DynamicsControlID = GenNum;
     }
 
-    void ManageGeneratorControlState(int const GeneratorType,                     // type of Generator
+    void ManageGeneratorControlState(EnergyPlusData &state,
+                                     int const GeneratorType,                     // type of Generator
                                      std::string const &EP_UNUSED(GeneratorName), // user specified name of Generator
                                      int const GeneratorNum,                      // Generator number
                                      bool const RunFlagElectCenter,               // TRUE when Generator operating per electric load center request
@@ -318,7 +319,7 @@ namespace GeneratorDynamicsManager {
 
         // get data to check if sufficient flow available from Plant
         if (InternalFlowControl && (SchedVal > 0.0)) {
-            TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(GeneratorNum, Pel, TcwIn);
+            TrialMdotcw = FuncDetermineCWMdotForInternalFlowControl(state, GeneratorNum, Pel, TcwIn);
         } else {
             TrialMdotcw = Node(InletCWnode).MassFlowRate;
         }
@@ -830,7 +831,8 @@ namespace GeneratorDynamicsManager {
         FuelFlowProvided = MdotFuel;
     }
 
-    Real64 FuncDetermineCWMdotForInternalFlowControl(int const GeneratorNum, // ID of generator
+    Real64 FuncDetermineCWMdotForInternalFlowControl(EnergyPlusData &state,
+                                                     int const GeneratorNum, // ID of generator
                                                      Real64 const Pnetss,    // power net steady state
                                                      Real64 const TcwIn      // temperature of cooling water at inlet
     )
@@ -880,7 +882,7 @@ namespace GeneratorDynamicsManager {
         OutletNode = MicroCHPElectricGenerator::MicroCHP(GeneratorNum).PlantOutletNodeID;
 
         // first evaluate curve
-        MdotCW = CurveValue(MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
+        MdotCW = CurveValue(state, MicroCHPElectricGenerator::MicroCHP(GeneratorNum).A42Model.WaterFlowCurveID, Pnetss, TcwIn);
 
         // now apply constraints
         MdotCW = max(0.0, MdotCW);
