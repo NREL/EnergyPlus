@@ -2000,51 +2000,51 @@
     ,                        !- Circuit Length {m}
     ChangeoverSchedN;         !- Changeover delay schedule
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature, detailed;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,timestep;
 
-  Output:Variable,*,Zone Mean Air Temperature, detailed;
+  Output:Variable,*,Zone Mean Air Temperature,timestep;
 
-  Output:Variable,*,Zone Mean Radiant Temperature, detailed;
+  Output:Variable,*,Zone Mean Radiant Temperature,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Heating Energy, detailed;
+  Output:Variable,*,Zone Air System Sensible Heating Energy,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Cooling Energy, detailed;
+  Output:Variable,*,Zone Air System Sensible Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Cooling Rate, detailed;
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,timestep;
 
-  Output:Variable,*,Zone Air System Sensible Heating Rate, detailed;
+  Output:Variable,*,Zone Air System Sensible Heating Rate,timestep;
 
-  Output:Variable,*,Zone Air Temperature, detailed;
+  Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,*,Zone Air Humidity Ratio, detailed;
+  Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Plant Supply Side Cooling Demand Rate, detailed;
+  Output:Variable,*,Plant Supply Side Cooling Demand Rate,timestep;
 
-  Output:Variable,*,Plant Supply Side Heating Demand Rate, detailed;
+  Output:Variable,*,Plant Supply Side Heating Demand Rate,timestep;
 
-  Output:Variable,*,District Cooling Rate, detailed;
+  Output:Variable,*,District Cooling Rate,timestep;
 
-  Output:Variable,*,District Heating Rate, detailed;
+  Output:Variable,*,District Heating Rate,timestep;
 
-  Output:Variable,*,Zone Thermal Comfort Fanger Model PMV, detailed;
+  Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Heating Energy, detailed;
+  Output:Variable,*,Zone Radiant HVAC Heating Energy,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Cooling Energy, detailed;
+  Output:Variable,*,Zone Radiant HVAC Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Mass Flow Rate, detailed;
+  Output:Variable,*,Zone Radiant HVAC Mass Flow Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Inlet Temperature, detailed;
+  Output:Variable,*,Zone Radiant HVAC Inlet Temperature,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Outlet Temperature, detailed;
+  Output:Variable,*,Zone Radiant HVAC Outlet Temperature,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Operation Mode, detailed;
+  Output:Variable,*,Zone Radiant HVAC Operation Mode,timestep;
 
-  Output:Variable,*,Surface Internal Source Location Temperature, detailed;
+  Output:Variable,*,Surface Internal Source Location Temperature,timestep;
 
-  Output:Variable,*,HVAC System Solver Iteration Count, detailed;
+  Output:Variable,*,HVAC System Solver Iteration Count,timestep;
 
-  Output:Variable,HW Supply Inlet Node,System Node Mass Flow Rate,detailed;
+  Output:Variable,HW Supply Inlet Node,System Node Mass Flow Rate,timestep;
 
   Output:VariableDictionary,Regular;
 

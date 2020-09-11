@@ -2156,35 +2156,35 @@
     ,                        !- Number of Circuits
     ;                        !- Circuit Length {m}
 
-  Output:Variable,*,Zone Mean Air Temperature, detailed;
+  Output:Variable,*,Zone Mean Air Temperature,timestep;
 
-  Output:Variable,*,Zone Mean Radiant Temperature, detailed;
+  Output:Variable,*,Zone Mean Radiant Temperature,timestep;
 
-  Output:Variable,*,Zone Air Temperature, detailed;
+  Output:Variable,*,Zone Air Temperature,timestep;
 
-  Output:Variable,*,Zone Air Humidity Ratio, detailed;
+  Output:Variable,*,Zone Air Humidity Ratio,timestep;
 
-  Output:Variable,*,Zone Thermal Comfort Fanger Model PMV, detailed;
+  Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Heating Energy, detailed;
+  Output:Variable,*,Zone Radiant HVAC Heating Energy,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Cooling Energy, detailed;
+  Output:Variable,*,Zone Radiant HVAC Cooling Energy,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Mass Flow Rate, detailed;
+  Output:Variable,*,Zone Radiant HVAC Mass Flow Rate,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Inlet Temperature, detailed;
+  Output:Variable,*,Zone Radiant HVAC Inlet Temperature,timestep;
 
-  Output:Variable,*,Zone Radiant HVAC Outlet Temperature, detailed;
+  Output:Variable,*,Zone Radiant HVAC Outlet Temperature,timestep;
 
-  Output:Variable,*,Surface Internal Source Location Temperature, detailed;
+  Output:Variable,*,Surface Internal Source Location Temperature,timestep;
 
-  Output:Variable,Zn001:Flr001,Surface Inside Face Temperature, detailed;
+  Output:Variable,Zn001:Flr001,Surface Inside Face Temperature,timestep;
 
-  Output:Variable,Zn002:Flr001,Surface Inside Face Temperature, detailed;
+  Output:Variable,Zn002:Flr001,Surface Inside Face Temperature,timestep;
 
-  Output:Variable,Zn003:Flr001,Surface Inside Face Temperature, detailed;
+  Output:Variable,Zn003:Flr001,Surface Inside Face Temperature,timestep;
 
-  Output:Variable,HW Supply Inlet Node,System Node Mass Flow Rate,detailed;
+  Output:Variable,HW Supply Inlet Node,System Node Mass Flow Rate,timestep;
 
   Output:VariableDictionary,Regular;
 
