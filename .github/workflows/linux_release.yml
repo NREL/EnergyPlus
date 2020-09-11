@@ -62,7 +62,7 @@ jobs:
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.sh
 
     - name: Upload IFW Installer
-        uses: actions/upload-artifact@v2
-        with:
-          name: LinuxReleaseIFW
-          path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.run
+      uses: actions/upload-artifact@v2
+      with:
+        name: LinuxReleaseIFW
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.run
