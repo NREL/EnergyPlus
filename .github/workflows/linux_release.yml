@@ -28,7 +28,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="nonstopmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DCOMMIT_SHA=DUMMYSHA $GITHUB_WORKSPACE/EnergyPlus
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="nonstopmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DCOMMIT_SHA=DUMMYSHA ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build

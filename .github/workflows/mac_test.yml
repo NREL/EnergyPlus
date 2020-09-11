@@ -76,13 +76,13 @@ jobs:
       if: ${{ github.ref != 'develop' }}
       shell: bash
       working-directory: ${{runner.workspace}}/clone_branch/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_branch
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON ..
 
     - name: Configure Branch with Regressions
       if: ${{ github.ref != 'develop' }}
       shell: bash
       working-directory: ${{runner.workspace}}/clone_branch/build
-      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=${{runner.workspace}}/clone_baseline/build -DREGRESSION_SCRIPT_PATH:PATH=${{runner.workspace}}/clone_regressions/build -DREGRESSION_BASELINE_SHA:STRING=UNNKOWN_SHA -DCOMMIT_SHA=${{github.sha}} -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_branch
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=${{runner.workspace}}/clone_baseline/build -DREGRESSION_SCRIPT_PATH:PATH=${{runner.workspace}}/clone_regressions/build -DREGRESSION_BASELINE_SHA:STRING=UNNKOWN_SHA -DCOMMIT_SHA=${{github.sha}} -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON ..
 
     - name: Build Branch
       working-directory: ${{runner.workspace}}/clone_branch/build
