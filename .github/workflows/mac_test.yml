@@ -62,7 +62,7 @@ jobs:
       if: ${{ github.ref != 'develop' }}
       working-directory: ${{runner.workspace}}/clone_baseline/build
       shell: bash
-      run: cmake --build .
+      run: cmake --build . -j 2
 
     - name: Test Baseline
       if: ${{ github.ref != 'develop' }}
@@ -89,7 +89,7 @@ jobs:
     - name: Build Branch
       working-directory: ${{runner.workspace}}/clone_branch/build
       shell: bash
-      run: cmake --build .
+      run: cmake --build . -j 2
 
     - name: Test Branch
       working-directory: ${{runner.workspace}}/clone_branch/build
