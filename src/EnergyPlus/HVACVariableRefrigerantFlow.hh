@@ -103,20 +103,6 @@ namespace HVACVariableRefrigerantFlow {
     extern int const VRF_HeatPump;
     extern Array1D_string const cVRFTypes;
 
-    extern int const NumValidFuelTypes;
-    extern Array1D_string const cValidFuelTypes;
-
-    // Fuel Types
-    extern int const FuelTypeElectric;   // Fuel type for electricity
-    extern int const FuelTypeNaturalGas; // Fuel type for natural gas
-    extern int const FuelTypePropaneGas; // Fuel type for propane gas
-    extern int const FuelTypeDiesel;     // Fuel type for diesel
-    extern int const FuelTypeGasoline;   // Fuel type for gasoline
-    extern int const FuelTypeFuelOil1;   // Fuel type for fuel oil #1
-    extern int const FuelTypeFuelOil2;   // Fuel type for fuel oil #2
-    extern int const FuelTypeOtherFuel1; // Fuel type for other fuel #1
-    extern int const FuelTypeOtherFuel2; // Fuel type for other fuel #2
-
     extern bool GetVRFInputFlag;                 // Flag set to make sure you get input once
     extern bool MyOneTimeFlag;                   // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     extern bool MyOneTimeSizeFlag;               // One time flag used to allocate MyEnvrnFlag and MySizeFlag
@@ -270,7 +256,8 @@ namespace HVACVariableRefrigerantFlow {
         int HRMaxTempLimitIndex;               // Warning message recurring error index
         int CoolingMaxTempLimitIndex;          // Warning message recurring error index
         int HeatingMaxTempLimitIndex;          // Warning message recurring error index
-        int FuelType;                          // Fuel type
+        std::string FuelType;                  // Fuel type
+        int FuelTypeNum;                       // Fuel type number
         Real64 SUMultiplier;                   // exponential timer for mode changes
         Real64 TUCoolingLoad;                  // total TU cooling load for each VRF system
         Real64 TUHeatingLoad;                  // total TU heating load for each VRF system
@@ -417,7 +404,7 @@ namespace HVACVariableRefrigerantFlow {
               EvapCondEffectiveness(0.0), EvapCondAirVolFlowRate(0.0), EvapCondPumpPower(0.0), CoolCombRatioPTR(0), HeatCombRatioPTR(0),
               OperatingMode(0), ElecPower(0.0), ElecCoolingPower(0.0), ElecHeatingPower(0.0), CoolElecConsumption(0.0), HeatElecConsumption(0.0),
               CrankCaseHeaterPower(0.0), CrankCaseHeaterElecConsumption(0.0), EvapCondPumpElecPower(0.0), EvapCondPumpElecConsumption(0.0),
-              EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0), CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), FuelType(0),
+              EvapWaterConsumpRate(0.0), HRMaxTempLimitIndex(0), CoolingMaxTempLimitIndex(0), HeatingMaxTempLimitIndex(0), FuelTypeNum(0), 
               SUMultiplier(0.0), TUCoolingLoad(0.0), TUHeatingLoad(0.0), SwitchedMode(false), OperatingCOP(0.0), MinOATHeatRecovery(0.0),
               MaxOATHeatRecovery(0.0), HRCAPFTCool(0), HRCAPFTCoolConst(0.9), HRInitialCoolCapFrac(0.5), HRCoolCapTC(0.15), HREIRFTCool(0),
               HREIRFTCoolConst(1.1), HRInitialCoolEIRFrac(1.0), HRCoolEIRTC(0.0), HRCAPFTHeat(0), HRCAPFTHeatConst(1.1), HRInitialHeatCapFrac(1.0),
