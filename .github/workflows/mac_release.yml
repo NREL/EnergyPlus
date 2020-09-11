@@ -25,6 +25,10 @@ jobs:
     - name: Install Brew dependencies
       run: brew cask install mactex && eval "$(/usr/libexec/path_helper)"
 
+    - name: Check TeX binaries
+      working-directory: /Library/TeX/texbin
+      run: ls
+
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
