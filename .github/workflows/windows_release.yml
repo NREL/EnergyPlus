@@ -8,7 +8,7 @@ jobs:
 
     steps:
     - name: Check mingw contents
-      working-directory: /c/mingw64/bin
+      working-directory: /c/  #/mingw64/bin
       run: ls
 
     - uses: actions/checkout@v2
