@@ -7,8 +7,9 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - name: Check for gfortran 8
-      run: which gfortran-8
+    - name: Check mingw contents
+      working-directory: /mingw64/bin
+      run: ls
 
     - uses: actions/checkout@v2
 
