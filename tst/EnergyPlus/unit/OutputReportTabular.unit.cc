@@ -84,6 +84,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -8282,17 +8283,13 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
 TEST_F(EnergyPlusFixture, OutputReportTabularTest_ConfirmConversionFactors)
 {
 
-    GetInputFuelAndPollutionFactors();
+    Real64 curSourceFactor;
+    bool fuelFactorUsed;
+    bool fFScheduleUsed;
+    int ffScheduleIndex;
 
-    EXPECT_EQ(sourceFactorElectric, 3.167);
-    EXPECT_EQ(sourceFactorNaturalGas, 1.084);
-    EXPECT_EQ(sourceFactorSteam, 1.21);
-    EXPECT_EQ(sourceFactorGasoline, 1.05);
-    EXPECT_EQ(sourceFactorDiesel, 1.05);
-    EXPECT_EQ(sourceFactorCoal, 1.05);
-    EXPECT_EQ(sourceFactorFuelOil1, 1.05);
-    EXPECT_EQ(sourceFactorFuelOil2, 1.05);
-    EXPECT_EQ(sourceFactorPropane, 1.05);
-    EXPECT_EQ(sourceFactorOtherFuel1, 1.0);
-    EXPECT_EQ(sourceFactorOtherFuel2, 1.0);
+    PollutionModule::GetFuelFactorInfo("Steam", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+
+    EXPECT_EQ(curSourceFactor, 1.2);
+
 }
