@@ -3,6 +3,7 @@
 import json
 import re
 import os
+import sys
 
 IDD_PATH = os.path.abspath('idd/Energy+.idd.in')
 
@@ -30,22 +31,22 @@ def check_for_stray_fields(idd_path):
                'autocalculatable',
                'retaincase']
 
-    offending_lines = []
+    _offending_lines = []
     for i, line in enumerate(lines):
         m = re_field.match(line)
         if m:
             field = m.groups()[0]
             if field not in exclude:
-                offending_lines.append({'tool': 'check_stray_fields_in_idd',
-                                        'filename': idd_path,
-                                        'file': idd_path,
-                                        'line': i + 1,
-                                        'messagetype': 'error',
-                                        'message': ('Stray field '
-                                                    r'\{}'.format(field))
-                                        })
+                _offending_lines.append({'tool': 'check_stray_fields_in_idd',
+                                         'filename': idd_path,
+                                         'file': idd_path,
+                                         'line': i + 1,
+                                         'messagetype': 'error',
+                                         'message': ('Stray field '
+                                                     r'\{}'.format(field))
+                                         })
 
-    return offending_lines
+    return _offending_lines
 
 
 if __name__ == '__main__':
@@ -53,3 +54,5 @@ if __name__ == '__main__':
     offending_lines = check_for_stray_fields(idd_path=IDD_PATH)
     for offending_line in offending_lines:
         print(json.dumps(offending_line))
+    if len(offending_lines) > 0:
+        sys.exit(1)
