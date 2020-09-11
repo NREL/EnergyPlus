@@ -5215,8 +5215,6 @@ namespace OutputReportTabular {
         static Array1D<Real64> ATUHeat;
         static Array1D<Real64> ATUCool;
 
-        static Array1D<Real64> ZoneEqHeat;
-        static Array1D<Real64> ZoneEqCool;
         static Array1D<Real64> ZoneEqHeatorCool;
         static Array1D<Real64> ATUDeltaHeat;
         static Array1D<Real64> ATUDeltaCool;
@@ -5242,8 +5240,6 @@ namespace OutputReportTabular {
             ATUHeat.allocate(NumOfZones);
             ATUCool.allocate(NumOfZones);
 
-            ZoneEqHeat.allocate(NumOfZones);
-            ZoneEqCool.allocate(NumOfZones);
             ZoneEqHeatorCool.allocate(NumOfZones);
             ATUDeltaHeat.allocate(NumOfZones);
             ATUDeltaCool.allocate(NumOfZones);
@@ -5256,10 +5252,8 @@ namespace OutputReportTabular {
         // clear the ATU accumulation variables
         ATUHeat = 0.0;
         ATUCool = 0.0;
-        
         // clear the Zone Eq accumulatoin variables
-        ZoneEqHeat = 0.0;
-        ZoneEqCool = 0.0;
+        ZoneEqHeatorCool = 0.0;
         // clear the ATU Delta accumulation variables
         ATUDeltaHeat = 0.0; 
         ATUDeltaCool = 0.0;
@@ -5281,7 +5275,6 @@ namespace OutputReportTabular {
                 ATUCool(curZone) = -AirDistUnit(iunit).CoolRate;
             }
         }
-
         timeStepRatio = TimeStepSys / TimeStepZone; // the fraction of the zone time step used by the system timestep
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             mult = Zone(iZone).Multiplier * Zone(iZone).ListMultiplier;
@@ -5295,18 +5288,8 @@ namespace OutputReportTabular {
                 ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour 
                 - ATUDeltaHeat(iZone) - ATUDeltaCool(iZone);
             if (ZoneEqHeatorCool(iZone) > 0.0) {
-            // if ((ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem) > 0.0) {
-                // ZonePreDefRep(iZone).SHGSAnHvacHt +=
-                   // ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                // ZoneEqHeat(iZone) = ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                // ZonePreDefRep(iZone).SHGSAnHvacHt += ZoneEqHeat(iZone);
                 ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool(iZone);
             } else {
-                // ZonePreDefRep(iZone).SHGSAnHvacCl +=
-                   // ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                // ZoneEqCool(iZone) =
-                   // ZnAirRpt(iZone).SumMCpDTsystem * TimeStepSys * SecInHour + ZnAirRpt(iZone).SumNonAirSystem * mult * TimeStepSys * SecInHour;
-                // ZonePreDefRep(iZone).SHGSAnHvacCl += ZoneEqCool(iZone);
                 ZonePreDefRep(iZone).SHGSAnZoneEqCl += ZoneEqHeatorCool(iZone);
             }
             // Interzone Air Transfer Heat Addition
@@ -5340,7 +5323,6 @@ namespace OutputReportTabular {
                 ZonePreDefRep(iZone).SHGSAnEquipRem += eqpSens * mult;
             }
         }
-
         curZone = 0;
         // HVAC Input Heated Surface Heating
         // HVAC Input Cooled Surface Cooling
@@ -5386,11 +5368,6 @@ namespace OutputReportTabular {
         // Opaque Surface Conduction and Other Heat Removal
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             // ZonePreDefRep variables above already inlude zone list and group multipliers
-            //total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnHvacHt +
-            //        ZonePreDefRep(iZone).SHGSAnHvacCl + ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
-            //        ZonePreDefRep(iZone).SHGSAnWindAdd + ZonePreDefRep(iZone).SHGSAnWindRem + ZonePreDefRep(iZone).SHGSAnInfilAdd +
-            //        ZonePreDefRep(iZone).SHGSAnInfilRem + ZonePreDefRep(iZone).SHGSAnEquipAdd + ZonePreDefRep(iZone).SHGSAnEquipRem +
-            //        ZonePreDefRep(iZone).SHGSAnSurfHt + ZonePreDefRep(iZone).SHGSAnSurfCl;
             total = ZonePreDefRep(iZone).SHGSAnPeoplAdd + ZonePreDefRep(iZone).SHGSAnLiteAdd + ZonePreDefRep(iZone).SHGSAnZoneEqHt +
                     ZonePreDefRep(iZone).SHGSAnZoneEqCl + ZonePreDefRep(iZone).SHGSAnHvacATUHt + ZonePreDefRep(iZone).SHGSAnHvacATUCl + 
                     ZonePreDefRep(iZone).SHGSAnIzaAdd + ZonePreDefRep(iZone).SHGSAnIzaRem +
@@ -6534,8 +6511,8 @@ namespace OutputReportTabular {
         Real64 consumptionTotal;
         Real64 convertJtoGJ;
         // sensible heat gain report totals
-        static Real64 totalHvacHt(0.0);
-        static Real64 totalHvacCl(0.0);
+//        static Real64 totalHvacHt(0.0);
+//        static Real64 totalHvacCl(0.0);
 
         static Real64 totalZoneEqHt(0.0);
         static Real64 totalZoneEqCl(0.0);
@@ -6719,16 +6696,8 @@ namespace OutputReportTabular {
 
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             // annual
-            // PreDefTableEntry( pdchSHGSAnHvacHt, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacHt * convertJtoGJ, 3 );
-            // PreDefTableEntry( pdchSHGSAnHvacCl, Zone( iZone ).Name, ZonePreDefRep( iZone ).SHGSAnHvacCl * convertJtoGJ, 3 );
-            // PreDefTableEntry(
-               // pdchSHGSAnHvacHt, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSAnHvacHt - ZonePreDefRep(iZone).SHGSAnHvacATUHt) * convertJtoGJ, 3);
-            PreDefTableEntry(
-                pdchSHGSAnHvacHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * convertJtoGJ, 3);
-            // PreDefTableEntry(
-               // pdchSHGSAnHvacCl, Zone(iZone).Name, (ZonePreDefRep(iZone).SHGSAnHvacCl - ZonePreDefRep(iZone).SHGSAnHvacATUCl) * convertJtoGJ, 3);
-            PreDefTableEntry(
-                pdchSHGSAnHvacCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * convertJtoGJ, 3);
+            PreDefTableEntry(pdchSHGSAnZoneEqHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqHt * convertJtoGJ, 3);
+            PreDefTableEntry(pdchSHGSAnZoneEqCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnZoneEqCl * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnHvacATUHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUHt * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnHvacATUCl, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnHvacATUCl * convertJtoGJ, 3);
             PreDefTableEntry(pdchSHGSAnSurfHt, Zone(iZone).Name, ZonePreDefRep(iZone).SHGSAnSurfHt * convertJtoGJ, 3);
@@ -6792,12 +6761,10 @@ namespace OutputReportTabular {
         }
         // totals for annual report
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
-            totalHvacHt += ZonePreDefRep(iZone).SHGSAnHvacHt;
-            totalHvacCl += ZonePreDefRep(iZone).SHGSAnHvacCl;
-
+            // totalHvacHt += ZonePreDefRep(iZone).SHGSAnHvacHt;
+            // totalHvacCl += ZonePreDefRep(iZone).SHGSAnHvacCl;
             totalZoneEqHt += ZonePreDefRep(iZone).SHGSAnZoneEqHt;
             totalZoneEqCl += ZonePreDefRep(iZone).SHGSAnZoneEqCl;
-
             totalHvacATUHt += ZonePreDefRep(iZone).SHGSAnHvacATUHt;
             totalHvacATUCl += ZonePreDefRep(iZone).SHGSAnHvacATUCl;
             totalSurfHt += ZonePreDefRep(iZone).SHGSAnSurfHt;
@@ -6817,12 +6784,8 @@ namespace OutputReportTabular {
         }
         // PreDefTableEntry( pdchSHGSAnHvacHt, "Total Facility", totalHvacHt * convertJtoGJ, 3 );
         // PreDefTableEntry( pdchSHGSAnHvacCl, "Total Facility", totalHvacCl * convertJtoGJ, 3 );
-        // PreDefTableEntry(pdchSHGSAnHvacHt, "Total Facility", (totalHvacHt - totalHvacATUHt) * convertJtoGJ, 3);
-        // PreDefTableEntry(pdchSHGSAnHvacCl, "Total Facility", (totalHvacCl - totalHvacATUCl) * convertJtoGJ, 3);
-
-        PreDefTableEntry(pdchSHGSAnHvacHt, "Total Facility", totalZoneEqHt * convertJtoGJ, 3);
-        PreDefTableEntry(pdchSHGSAnHvacCl, "Total Facility", totalZoneEqCl * convertJtoGJ, 3);
-
+        PreDefTableEntry(pdchSHGSAnZoneEqHt, "Total Facility", totalZoneEqHt * convertJtoGJ, 3);
+        PreDefTableEntry(pdchSHGSAnZoneEqCl, "Total Facility", totalZoneEqCl * convertJtoGJ, 3);
         PreDefTableEntry(pdchSHGSAnHvacATUHt, "Total Facility", totalHvacATUHt * convertJtoGJ, 3);
         PreDefTableEntry(pdchSHGSAnHvacATUCl, "Total Facility", totalHvacATUCl * convertJtoGJ, 3);
         PreDefTableEntry(pdchSHGSAnSurfHt, "Total Facility", totalSurfHt * convertJtoGJ, 3);
