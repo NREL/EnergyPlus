@@ -228,7 +228,7 @@ namespace AirflowNetworkBalanceManager {
 
         Array1D<AirflowNetworkBalanceManager::OccupantVentilationControlProp> OccupantVentilationControl;
         Array1D_int SplitterNodeNumbers;
-        int AirflowNetworkNumOfExtSurfaces;
+        int AirflowNetworkNumOfExtSurfaces = 0;
         // Inverse matrix
         Array1D<Real64> MA;
         Array1D<Real64> MV;

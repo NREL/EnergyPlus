@@ -472,19 +472,19 @@ namespace CondenserLoopTowers {
 
 } // namespace CondenserLoopTowers
 
-struct CondenserLoopTowersData : BaseGlobalStruct {
-    int NumSimpleTowers = 0; // Number of similar towers
-    bool GetInput = true;
-    Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
-    std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
+    struct CondenserLoopTowersData : BaseGlobalStruct {
+        int NumSimpleTowers = 0; // Number of similar towers
+        bool GetInput = true;
+        Array1D<CondenserLoopTowers::CoolingTower> towers; // dimension to number of machines
+        std::unordered_map<std::string, std::string> UniqueSimpleTowerNames;
 
-    void clear_state() override
-    {
-        this->NumSimpleTowers = 0;
-        this->GetInput = true;
-        this->towers.deallocate();
-        this->UniqueSimpleTowerNames.clear();
-    }
+        void clear_state() override
+        {
+            this->NumSimpleTowers = 0;
+            this->GetInput = true;
+            this->towers.deallocate();
+            this->UniqueSimpleTowerNames.clear();
+        }
 };
 
 } // namespace EnergyPlus

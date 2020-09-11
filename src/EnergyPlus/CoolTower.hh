@@ -148,19 +148,19 @@ namespace CoolTower {
 
 } // namespace CoolTower
 
-struct CoolTowerData : BaseGlobalStruct {
+    struct CoolTowerData : BaseGlobalStruct {
 
-    bool GetInputFlag = true;
-    int NumCoolTowers = 0;
-    Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
+        bool GetInputFlag = true;
+        int NumCoolTowers = 0;
+        Array1D<CoolTower::CoolTowerParams> CoolTowerSys;
 
-    void clear_state() override
-    {
-        this->GetInputFlag = true;
-        this->NumCoolTowers = 0;
-        this->CoolTowerSys.deallocate();
-    }
-};
+        void clear_state() override
+        {
+            this->GetInputFlag = true;
+            this->NumCoolTowers = 0;
+            this->CoolTowerSys.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

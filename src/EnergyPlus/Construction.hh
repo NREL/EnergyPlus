@@ -331,14 +331,14 @@ namespace Construction {
     };
 }   // namespace Construction
 
-struct ConstructionData : BaseGlobalStruct {
-    Array1D<Construction::ConstructionProps> Construct;
+    struct ConstructionData : BaseGlobalStruct {
+        Array1D<Construction::ConstructionProps> Construct;
 
-    void clear_state() override
-    {
-        this->Construct.deallocate();
-    }
-};
+        void clear_state() override
+        {
+            this->Construct.deallocate();
+        }
+    };
 
 extern ConstructionData dataConstruction;
 

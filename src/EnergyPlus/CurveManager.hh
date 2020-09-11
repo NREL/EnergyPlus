@@ -391,26 +391,25 @@ namespace CurveManager {
 
 } // namespace CurveManager
 
-struct CurveManagerData : BaseGlobalStruct {
-    int NumCurves = 0;
-    bool GetCurvesInputFlag = true;
-    Array1D<CurveManager::PerformanceCurveData> PerfCurve;
-    CurveManager::BtwxtManager btwxtManager;
-    std::unordered_map<std::string, std::string> UniqueCurveNames;
-    bool CurveValueMyBeginTimeStepFlag;
-    bool FrictionFactorErrorHasOccurred = false;
+    struct CurveManagerData : BaseGlobalStruct {
+        int NumCurves;
+        bool GetCurvesInputFlag;
+        Array1D<CurveManager::PerformanceCurveData> PerfCurve;
+        CurveManager::BtwxtManager btwxtManager;
+        std::unordered_map<std::string, std::string> UniqueCurveNames;
+        bool CurveValueMyBeginTimeStepFlag;
+        bool FrictionFactorErrorHasOccurred;
 
-    void clear_state() override
-    {
-        this->NumCurves = 0;
-        this->GetCurvesInputFlag = true;
-        this->UniqueCurveNames.clear();
-        this->PerfCurve.deallocate();
-        this->btwxtManager.clear();
-        this->CurveValueMyBeginTimeStepFlag = true;
-        this->FrictionFactorErrorHasOccurred = false;
-    }
-};
+        CurveManagerData()
+            : NumCurves(0), GetCurvesInputFlag(true), CurveValueMyBeginTimeStepFlag(false), FrictionFactorErrorHasOccurred(false)
+        {
+        }
+
+        void clear_state() override
+        {
+            *this = CurveManagerData();
+        }
+    };
 
 } // namespace EnergyPlus
 

@@ -339,49 +339,49 @@ namespace BranchInputManager {
 
 } // namespace BranchInputManager
 
-struct BranchInputManagerData : BaseGlobalStruct
-{
-    int NumOfBranchLists = 0;                                   // Number of Branch Lists found in IDF
-    int NumOfBranches = 0;                                      // Number of Branches found in IDF
-    int NumOfConnectorLists = 0;                                // Number of Connector Lists found in IDF
-    int NumSplitters = 0;                                       // Number of Splitters found in IDF
-    int NumMixers = 0;                                          // Number of Mixers found in IDF
-
-    bool GetBranchInputFlag = true;                             // Flag used to retrieve Input
-    bool GetBranchListInputFlag = true;                         // Flag used to retrieve Input
-    bool GetSplitterInputFlag = true;                           // Flag used to retrieve Input
-    bool GetMixerInputFlag = true;                              // Flag used to retrieve Input
-    bool GetConnectorListInputFlag = true;                      // Flag used to retrieve Input
-    bool InvalidBranchDefinitions = false;
-    bool GetBranchInputOneTimeFlag = true;
-
-    Array1D<BranchInputManager::BranchListData> BranchList;     // Branch List data for each Branch List
-    Array1D<BranchInputManager::BranchData> Branch;             // Branch Data for each Branch
-    Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
-    Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
-    Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
-
-    void clear_state() override
+    struct BranchInputManagerData : BaseGlobalStruct
     {
-        this->NumOfBranchLists = 0;
-        this->NumOfBranches = 0;
-        this->NumOfConnectorLists = 0;
-        this->NumSplitters = 0;
-        this->NumMixers = 0;
-        this->GetBranchInputFlag = true;
-        this->GetBranchListInputFlag = true;
-        this->GetSplitterInputFlag = true;
-        this->GetMixerInputFlag = true;
-        this->GetConnectorListInputFlag = true;
-        this->InvalidBranchDefinitions = false;
-        this->GetBranchInputOneTimeFlag = true;
-        this->BranchList.deallocate();
-        this->Branch.deallocate();
-        this->ConnectorLists.deallocate();
-        this->Splitters.deallocate();
-        this->Mixers.deallocate();
-    }
-};
+        int NumOfBranchLists = 0;                                   // Number of Branch Lists found in IDF
+        int NumOfBranches = 0;                                      // Number of Branches found in IDF
+        int NumOfConnectorLists = 0;                                // Number of Connector Lists found in IDF
+        int NumSplitters = 0;                                       // Number of Splitters found in IDF
+        int NumMixers = 0;                                          // Number of Mixers found in IDF
+
+        bool GetBranchInputFlag = true;                             // Flag used to retrieve Input
+        bool GetBranchListInputFlag = true;                         // Flag used to retrieve Input
+        bool GetSplitterInputFlag = true;                           // Flag used to retrieve Input
+        bool GetMixerInputFlag = true;                              // Flag used to retrieve Input
+        bool GetConnectorListInputFlag = true;                      // Flag used to retrieve Input
+        bool InvalidBranchDefinitions = false;
+        bool GetBranchInputOneTimeFlag = true;
+
+        Array1D<BranchInputManager::BranchListData> BranchList;     // Branch List data for each Branch List
+        Array1D<BranchInputManager::BranchData> Branch;             // Branch Data for each Branch
+        Array1D<BranchInputManager::ConnectorData> ConnectorLists;  // Connector List data for each Connector List
+        Array1D<BranchInputManager::SplitterData> Splitters;        // Splitter Data for each Splitter
+        Array1D<BranchInputManager::MixerData> Mixers;              // Mixer Data for each Mixer
+
+        void clear_state() override
+        {
+            this->NumOfBranchLists = 0;
+            this->NumOfBranches = 0;
+            this->NumOfConnectorLists = 0;
+            this->NumSplitters = 0;
+            this->NumMixers = 0;
+            this->GetBranchInputFlag = true;
+            this->GetBranchListInputFlag = true;
+            this->GetSplitterInputFlag = true;
+            this->GetMixerInputFlag = true;
+            this->GetConnectorListInputFlag = true;
+            this->InvalidBranchDefinitions = false;
+            this->GetBranchInputOneTimeFlag = true;
+            this->BranchList.deallocate();
+            this->Branch.deallocate();
+            this->ConnectorLists.deallocate();
+            this->Splitters.deallocate();
+            this->Mixers.deallocate();
+        }
+    };
 
 } // namespace EnergyPlus
 

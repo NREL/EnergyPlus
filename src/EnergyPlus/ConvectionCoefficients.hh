@@ -859,114 +859,114 @@ namespace ConvectionCoefficients {
 
 } // namespace ConvectionCoefficients
 
-struct ConvectionCoefficientsData : BaseGlobalStruct {
+    struct ConvectionCoefficientsData : BaseGlobalStruct {
 
-    bool GetUserSuppliedConvectionCoeffs = true;    // Get user input first call for Init
-    Real64 CubeRootOfOverallBuildingVolume = 0.0;   // building meta data. cube root of the volume of all the zones
-    Real64 RoofLongAxisOutwardAzimuth = 0.0;        // roof surfaces meta data. outward normal azimuth for longest roof edge
+        bool GetUserSuppliedConvectionCoeffs = true;    // Get user input first call for Init
+        Real64 CubeRootOfOverallBuildingVolume = 0.0;   // building meta data. cube root of the volume of all the zones
+        Real64 RoofLongAxisOutwardAzimuth = 0.0;        // roof surfaces meta data. outward normal azimuth for longest roof edge
 
-    int BMMixedAssistedWallErrorIDX1 = 0;
-    int BMMixedAssistedWallErrorIDX2 = 0;
-    int BMMixedOpposingWallErrorIDX1 = 0;
-    int BMMixedOpposingWallErrorIDX2 = 0;
-    int BMMixedStableFloorErrorIDX1 = 0;
-    int BMMixedStableFloorErrorIDX2 = 0;
-    int BMMixedUnstableFloorErrorIDX1 = 0;
-    int BMMixedUnstableFloorErrorIDX2 = 0;
-    int BMMixedStableCeilingErrorIDX1 = 0;
-    int BMMixedStableCeilingErrorIDX2 = 0;
-    int BMMixedUnstableCeilingErrorIDX1 = 0;
-    int BMMixedUnstableCeilingErrorIDX2 = 0;
-    int AHUnstableHorizontalErrorIDX = 0;
-    int AHStableHorizontalErrorIDX = 0;
-    int AHVerticalWallErrorIDX = 0;
-    int CalcFohannoPolidoriVerticalWallErrorIDX = 0;
-    int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
-    int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
-    int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
-    int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
-    int CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
-    int CalcSparrowWindwardErrorIDX = 0;
-    int CalcSparrowLeewardErrorIDX = 0;
-    int CalcEmmelVerticalErrorIDX = 0;
-    int CalcEmmelRoofErrorIDX = 0;
-    int CalcClearRoofErrorIDX = 0;
-    int CalcMitchellErrorIDX = 0;
-
-    // move random statics so they can be reset for unit tests
-    bool NodeCheck = true;
-    bool ActiveSurfaceCheck = true;
-    bool MyEnvirnFlag = true;
-    bool FirstRoofSurf = true;
-    int ActiveWallCount = 0;
-    Real64 ActiveWallArea = 0.0;
-    int ActiveCeilingCount = 0;
-    Real64 ActiveCeilingArea = 0.0;
-    int ActiveFloorCount = 0;
-    Real64 ActiveFloorArea = 0.0;
-
-    // Object Data
-    ConvectionCoefficients::InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
-    ConvectionCoefficients::OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
-    Array1D<ConvectionCoefficients::HcInsideFaceUserCurveStruct> HcInsideUserCurve;
-    Array1D<ConvectionCoefficients::HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
-    ConvectionCoefficients::RoofGeoCharactisticsStruct RoofGeo;
-
-    void clear_state() override
-    {
-        this->GetUserSuppliedConvectionCoeffs = true;
-        this->CubeRootOfOverallBuildingVolume = 0.0;
-        this->RoofLongAxisOutwardAzimuth = 0.0;
-
-        // error indices
-        this->BMMixedAssistedWallErrorIDX1 = 0;
-        this->BMMixedAssistedWallErrorIDX2 = 0;
-        this->BMMixedOpposingWallErrorIDX1 = 0;
-        this->BMMixedOpposingWallErrorIDX2 = 0;
-        this->BMMixedStableFloorErrorIDX1 = 0;
-        this->BMMixedStableFloorErrorIDX2 = 0;
-        this->BMMixedUnstableFloorErrorIDX1 = 0;
-        this->BMMixedUnstableFloorErrorIDX2 = 0;
-        this->BMMixedStableCeilingErrorIDX1 = 0;
-        this->BMMixedStableCeilingErrorIDX2 = 0;
-        this->BMMixedUnstableCeilingErrorIDX1 = 0;
-        this->BMMixedUnstableCeilingErrorIDX2 = 0;
-        this->AHUnstableHorizontalErrorIDX = 0;
-        this->AHStableHorizontalErrorIDX = 0;
-        this->AHVerticalWallErrorIDX = 0;
-        this->CalcFohannoPolidoriVerticalWallErrorIDX = 0;
-        this->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
-        this->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
-        this->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
-        this->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
-        this->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
-        this->CalcSparrowWindwardErrorIDX = 0;
-        this->CalcSparrowLeewardErrorIDX = 0;
-        this->CalcEmmelVerticalErrorIDX = 0;
-        this->CalcEmmelRoofErrorIDX = 0;
-        this->CalcClearRoofErrorIDX = 0;
-        this->CalcMitchellErrorIDX = 0;
+        int BMMixedAssistedWallErrorIDX1 = 0;
+        int BMMixedAssistedWallErrorIDX2 = 0;
+        int BMMixedOpposingWallErrorIDX1 = 0;
+        int BMMixedOpposingWallErrorIDX2 = 0;
+        int BMMixedStableFloorErrorIDX1 = 0;
+        int BMMixedStableFloorErrorIDX2 = 0;
+        int BMMixedUnstableFloorErrorIDX1 = 0;
+        int BMMixedUnstableFloorErrorIDX2 = 0;
+        int BMMixedStableCeilingErrorIDX1 = 0;
+        int BMMixedStableCeilingErrorIDX2 = 0;
+        int BMMixedUnstableCeilingErrorIDX1 = 0;
+        int BMMixedUnstableCeilingErrorIDX2 = 0;
+        int AHUnstableHorizontalErrorIDX = 0;
+        int AHStableHorizontalErrorIDX = 0;
+        int AHVerticalWallErrorIDX = 0;
+        int CalcFohannoPolidoriVerticalWallErrorIDX = 0;
+        int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
+        int CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
+        int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
+        int CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
+        int CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
+        int CalcSparrowWindwardErrorIDX = 0;
+        int CalcSparrowLeewardErrorIDX = 0;
+        int CalcEmmelVerticalErrorIDX = 0;
+        int CalcEmmelRoofErrorIDX = 0;
+        int CalcClearRoofErrorIDX = 0;
+        int CalcMitchellErrorIDX = 0;
 
         // move random statics so they can be reset for unit tests
-        this->NodeCheck = true;
-        this->ActiveSurfaceCheck = true;
-        this->MyEnvirnFlag = true;
-        this->FirstRoofSurf = true;
-        this->ActiveWallCount = 0;
-        this->ActiveWallArea = 0.0;
-        this->ActiveCeilingCount = 0;
-        this->ActiveCeilingArea = 0.0;
-        this->ActiveFloorCount = 0;
-        this->ActiveFloorArea = 0.0;
+        bool NodeCheck = true;
+        bool ActiveSurfaceCheck = true;
+        bool MyEnvirnFlag = true;
+        bool FirstRoofSurf = true;
+        int ActiveWallCount = 0;
+        Real64 ActiveWallArea = 0.0;
+        int ActiveCeilingCount = 0;
+        Real64 ActiveCeilingArea = 0.0;
+        int ActiveFloorCount = 0;
+        Real64 ActiveFloorArea = 0.0;
 
         // Object Data
-        this->InsideFaceAdaptiveConvectionAlgo = {}; // stores rules for Hc model equations
-        this->OutsideFaceAdaptiveConvectionAlgo = {};
-        this->HcInsideUserCurve.deallocate();
-        this->HcOutsideUserCurve.deallocate();
-        this->RoofGeo = {};
-    }
-};
+        ConvectionCoefficients::InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
+        ConvectionCoefficients::OutsideFaceAdpativeConvAlgoStruct OutsideFaceAdaptiveConvectionAlgo;
+        Array1D<ConvectionCoefficients::HcInsideFaceUserCurveStruct> HcInsideUserCurve;
+        Array1D<ConvectionCoefficients::HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
+        ConvectionCoefficients::RoofGeoCharactisticsStruct RoofGeo;
+
+        void clear_state() override
+        {
+            this->GetUserSuppliedConvectionCoeffs = true;
+            this->CubeRootOfOverallBuildingVolume = 0.0;
+            this->RoofLongAxisOutwardAzimuth = 0.0;
+
+            // error indices
+            this->BMMixedAssistedWallErrorIDX1 = 0;
+            this->BMMixedAssistedWallErrorIDX2 = 0;
+            this->BMMixedOpposingWallErrorIDX1 = 0;
+            this->BMMixedOpposingWallErrorIDX2 = 0;
+            this->BMMixedStableFloorErrorIDX1 = 0;
+            this->BMMixedStableFloorErrorIDX2 = 0;
+            this->BMMixedUnstableFloorErrorIDX1 = 0;
+            this->BMMixedUnstableFloorErrorIDX2 = 0;
+            this->BMMixedStableCeilingErrorIDX1 = 0;
+            this->BMMixedStableCeilingErrorIDX2 = 0;
+            this->BMMixedUnstableCeilingErrorIDX1 = 0;
+            this->BMMixedUnstableCeilingErrorIDX2 = 0;
+            this->AHUnstableHorizontalErrorIDX = 0;
+            this->AHStableHorizontalErrorIDX = 0;
+            this->AHVerticalWallErrorIDX = 0;
+            this->CalcFohannoPolidoriVerticalWallErrorIDX = 0;
+            this->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX1 = 0;
+            this->CalcGoldsteinNovoselacCeilingDiffuserWindowErrorIDX2 = 0;
+            this->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX1 = 0;
+            this->CalcGoldsteinNovoselacCeilingDiffuserWallErrorIDX2 = 0;
+            this->CalcGoldsteinNovoselacCeilingDiffuserFloorErrorIDX = 0;
+            this->CalcSparrowWindwardErrorIDX = 0;
+            this->CalcSparrowLeewardErrorIDX = 0;
+            this->CalcEmmelVerticalErrorIDX = 0;
+            this->CalcEmmelRoofErrorIDX = 0;
+            this->CalcClearRoofErrorIDX = 0;
+            this->CalcMitchellErrorIDX = 0;
+
+            // move random statics so they can be reset for unit tests
+            this->NodeCheck = true;
+            this->ActiveSurfaceCheck = true;
+            this->MyEnvirnFlag = true;
+            this->FirstRoofSurf = true;
+            this->ActiveWallCount = 0;
+            this->ActiveWallArea = 0.0;
+            this->ActiveCeilingCount = 0;
+            this->ActiveCeilingArea = 0.0;
+            this->ActiveFloorCount = 0;
+            this->ActiveFloorArea = 0.0;
+
+            // Object Data
+            this->InsideFaceAdaptiveConvectionAlgo = {}; // stores rules for Hc model equations
+            this->OutsideFaceAdaptiveConvectionAlgo = {};
+            this->HcInsideUserCurve.deallocate();
+            this->HcOutsideUserCurve.deallocate();
+            this->RoofGeo = {};
+        }
+    };
 
 } // namespace EnergyPlus
 
