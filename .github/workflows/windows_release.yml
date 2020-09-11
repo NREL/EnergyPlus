@@ -10,9 +10,10 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - name: Find gcc, hopefully in mingw
+    - name: List all chocolately bin contents
       shell: bash
-      run: which gcc
+      working-directory: /c/ProgramData/Chocolatey/bin
+      run: ls
 
     - uses: actions/checkout@v2
 
