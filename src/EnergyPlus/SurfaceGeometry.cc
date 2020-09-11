@@ -407,6 +407,7 @@ namespace SurfaceGeometry {
         std::string String3;
         int Count; // To count wall surfaces for ceiling height calculation
         Array1D_bool ZoneCeilingHeightEntered;
+        Array1D<Real64> ZoneCeilingArea;
         static int ErrCount(0);
         Real64 NominalUwithConvCoeffs;
         std::string cNominalU;
@@ -432,6 +433,7 @@ namespace SurfaceGeometry {
         SinZoneRelNorth.allocate(NumOfZones);
 
         ZoneCeilingHeightEntered.dimension(NumOfZones, false);
+        ZoneCeilingArea.dimension(NumOfZones, 0.0);
 
         for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
 
@@ -500,13 +502,14 @@ namespace SurfaceGeometry {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows...
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip shadowing (sub)surfaces
+            if (!Surface(SurfNum).HeatTransSurf && !Surface(SurfNum).IsAirBoundarySurf) continue; // Skip shadowing (sub)surfaces
             ZoneNum = Surface(SurfNum).Zone;
             Zone(ZoneNum).TotalSurfArea += Surface(SurfNum).Area;
             if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                 Zone(ZoneNum).TotalSurfArea += SurfWinFrameArea(SurfNum);
                 Zone(ZoneNum).HasWindow = true;
             }
+            if (Surface(SurfNum).Class == SurfaceClass_Roof) ZoneCeilingArea(ZoneNum) += Surface(SurfNum).Area;
             if (!dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) {
                 if (Surface(SurfNum).ExtBoundCond == ExternalEnvironment || Surface(SurfNum).ExtBoundCond == OtherSideCondModeledExt) {
                     Zone(ZoneNum).ExteriorTotalSurfArea += Surface(SurfNum).GrossArea;
@@ -589,7 +592,7 @@ namespace SurfaceGeometry {
                     Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
                     Z2 = maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
                     //        ZCeilAvg=ZCeilAvg+(Z1+Z2)/2.d0
-                    ZCeilAvg += ((Z1 + Z2) / 2.0) * (Surface(SurfNum).Area / Zone(ZoneNum).CeilingArea);
+                    ZCeilAvg += ((Z1 + Z2) / 2.0) * (Surface(SurfNum).Area / ZoneCeilingArea(ZoneNum));
                 }
                 if (Surface(SurfNum).Class == SurfaceClass_Floor) {
                     // Use Average Z for surface, more important for roofs than floors...
@@ -689,6 +692,7 @@ namespace SurfaceGeometry {
         }
 
         ZoneCeilingHeightEntered.deallocate();
+        ZoneCeilingArea.deallocate();
 
         AdjacentZoneToSurface.dimension(TotSurfaces, 0);
         // note -- adiabatic surfaces will show same zone as surface
