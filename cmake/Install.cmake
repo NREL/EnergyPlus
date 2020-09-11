@@ -45,16 +45,16 @@ if (UNIX)
     set(CPACK_BINARY_TZ  OFF CACHE BOOL "Recommended OFF")
   endif()
 
-  # TODO: the "FORCE" is temporary to avoid people having an existing build directory miss the fact that the recommended method changed
-  # TODO: remove after next release
-  if (UNIX AND NOT APPLE)
-    if(NOT CPACK_BINARY_IFW)
-      set(CPACK_BINARY_STGZ  OFF CACHE BOOL "This was the legacy method on Linux, superseded by IFW" FORCE)
-      set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
-      message("Switching from STGZ to IFW as the supported generator has changed on Linux")
-    endif()
-  endif()
-  # END TODO
+#  # TODO: the "FORCE" is temporary to avoid people having an existing build directory miss the fact that the recommended method changed
+#  # TODO: remove after next release
+#  if (UNIX AND NOT APPLE)
+#    if(NOT CPACK_BINARY_IFW)
+#      set(CPACK_BINARY_STGZ  OFF CACHE BOOL "This was the legacy method on Linux, superseded by IFW" FORCE)
+#      set(CPACK_BINARY_IFW    ON CACHE BOOL "Enable to build IFW package, which is the recommend method" FORCE)
+#      message("Switching from STGZ to IFW as the supported generator has changed on Linux")
+#    endif()
+#  endif()
+#  # END TODO
 
   # Tar.gz for inclusion in other programs for eg
   set(CPACK_BINARY_TGZ    ON CACHE BOOL "Enable to build a tar.gz package, recommended for an official release")
