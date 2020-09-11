@@ -1,0 +1,61 @@
+name: Windows 64-bit Release Build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+        architecture: 'x64' # x64 or x86 (defaults to x64)
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install aqtinstall
+
+    # Windows apparently already has Visual Studio, gfortran, just need LaTeX, which we'll install with Chocolatey
+    - name: Install MikTeX
+      run: choco install miktex
+
+    - name: Install IFW
+      run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
+
+    - name: Add IFW to PATH
+      run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      run: cmake -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
+
+    - name: Build Package
+      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      shell: bash
+      run: cmake --build . --target package -j 2
+
+    - name: Inspect build for package names
+      working-directory: ${{runner.workspace}}/EnergyPlus/build
+      shell: bash
+      run: ls
+
+    - name: Upload Zip Archive
+      uses: actions/upload-artifact@v2
+      with:
+        name: LinuxReleaseTarball
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.zip
+
+    - name: Upload IFW Installer
+      uses: actions/upload-artifact@v2
+      with:
+        name: LinuxReleaseIFW
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.exe
