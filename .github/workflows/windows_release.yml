@@ -26,6 +26,13 @@ jobs:
     - name: Install Chocolately Packages
       run: choco install miktex && refreshenv
 
+    - name: Look for LaTeX binaries
+      working-directory: "/C/Program Files/MikTeX"
+      run: ls
+
+    - name: Add MikTeX binary folder to path
+      run: echo "::add-path::/C/Program Files/MikTeX"
+
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
@@ -54,10 +61,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: LinuxReleaseTarball
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.zip
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.zip
 
     - name: Upload IFW Installer
       uses: actions/upload-artifact@v2
       with:
         name: LinuxReleaseIFW
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.exe
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.exe
