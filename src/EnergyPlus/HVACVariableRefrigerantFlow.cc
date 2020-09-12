@@ -63,6 +63,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -7666,7 +7667,7 @@ namespace HVACVariableRefrigerantFlow {
 
         if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
             bool ErrorsFound = false;
-            WaterCoils::SetCoilDesFlow(state, 
+            WaterCoils::SetCoilDesFlow(state,
                 VRFTU(VRFTUNum).SuppHeatCoilType, VRFTU(VRFTUNum).SuppHeatCoilName, VRFTU(VRFTUNum).MaxHeatAirVolFlow, ErrorsFound);
         }
 
