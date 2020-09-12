@@ -2,21 +2,11 @@ name: Windows 64-bit Release Build
 
 on: [push]
 
-#env:
-#  FC: C:/msys64/mingw64/bin/gfortran.exe
-
 jobs:
   build:
     runs-on: windows-2019
 
     steps:
-
-    - name: Look for MinGW binaries
-      working-directory: "C:/msys64/mingw64/bin"
-      run: dir
-
-    - name: Test GFortran
-      run: which gfortran
 
     - uses: actions/checkout@v2
 
@@ -38,11 +28,11 @@ jobs:
       working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
       run: dir
 
-    - name: Add MikTeX binary folder to path
-      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
+#    - name: Add MikTeX binary folder to path
+#      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
 
-    - name: Test LaTeX
-      run: which xelatex
+#    - name: Test LaTeX
+#      run: which xelatex
 
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
@@ -50,11 +40,8 @@ jobs:
     - name: Add IFW to PATH
       run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
 
-    - name: Also add mingw bin directory to path
-      run: echo "::add-path::/C/msys64/mingw64/bin"
-
-    - name: Also add choco bin dir to path
-      run: echo "::add-path::/C/ProgramData/Chocolatey/bin"
+#    - name: Also add choco bin dir to path
+#      run: echo "::add-path::/C/ProgramData/Chocolatey/bin"
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
@@ -62,7 +49,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DCMAKE_Fortran_COMPILER="/c/ProgramData/Chocolatey/bin/gfortran" -DMIKTEX_BINARY_PATH="/C/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
