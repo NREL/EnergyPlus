@@ -60,10 +60,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: LinuxReleaseTarball
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.tar.gz
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.tar.gz
 
     - name: Upload IFW Installer
       uses: actions/upload-artifact@v2
       with:
         name: LinuxReleaseIFW
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.dmg
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.dmg
