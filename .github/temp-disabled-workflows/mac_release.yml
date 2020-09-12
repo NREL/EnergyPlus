@@ -4,7 +4,7 @@ on: [push]
 
 env:
   FC: /usr/local/bin/gfortran-9
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:

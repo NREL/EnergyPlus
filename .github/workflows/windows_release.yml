@@ -4,7 +4,6 @@ on: [push]
 
 env:
   FC: C:\ProgramData\Chocolatey\bin\gfortran.exe
-  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
 jobs:
   build:
