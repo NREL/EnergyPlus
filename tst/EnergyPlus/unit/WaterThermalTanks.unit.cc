@@ -799,6 +799,12 @@ TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 
     const Real64 ErrorBound = HeatFromCoil * 0.0001; // Within 0.01% of each other
     EXPECT_NEAR(HeatFromCoil, TankEnergySum, ErrorBound);
+
+    // ValidateFuelType tests for WaterHeater:Stratified 
+    WaterThermalTanks::getWaterHeaterStratifiedInput();
+    EXPECT_EQ(Tank.FuelType, "Electricity");
+    EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
+    EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
 }
 
 TEST_F(EnergyPlusFixture, HPWHSizing)
@@ -1518,6 +1524,12 @@ TEST_F(EnergyPlusFixture, HPWHTestSPControl)
     EXPECT_EQ(WaterThermalTanks::floatMode, HeatPump.Mode); // expect HP to switch to floating mode since HP set point temperature was reduced
     EXPECT_NEAR(56.0, Tank.TankTempAvg, 0.0000001);         // average tank temp over time step
     EXPECT_NEAR(56.0, Tank.SourceOutletTemp, 0.0000001);    // source outlet = average tank temp
+
+    // ValidateFuelType tests for WaterHeater:Mixed
+    WaterThermalTanks::getWaterHeaterMixedInputs(state);
+    EXPECT_EQ(Tank.FuelType, "Electricity");
+    EXPECT_EQ(Tank.OffCycParaFuelType, "Electricity");
+    EXPECT_EQ(Tank.OnCycParaFuelType, "Electricity");
 }
 
 TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
@@ -3824,14 +3836,14 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         "  ,                        !- Heater Minimum Capacity {W}",
         "  0,                       !- Heater Ignition Minimum Flow Rate {m3/s}",
         "  0,                       !- Heater Ignition Delay {s}",
-        "  NaturalGas,              !- Heater Fuel Type",
+        "  Steam,              !- Heater Fuel Type",
         "  0.8,                     !- Heater Thermal Efficiency",
         "  ,                        !- Part Load Factor Curve Name",
         "  20,                      !- Off Cycle Parasitic Fuel Consumption Rate {W}",
-        "  NaturalGas,              !- Off Cycle Parasitic Fuel Type",
+        "  Steam,              !- Off Cycle Parasitic Fuel Type",
         "  0.8,                     !- Off Cycle Parasitic Heat Fraction to Tank",
         "  0,                       !- On Cycle Parasitic Fuel Consumption Rate {W}",
-        "  NaturalGas,              !- On Cycle Parasitic Fuel Type",
+        "  Steam,              !- On Cycle Parasitic Fuel Type",
         "  0,                       !- On Cycle Parasitic Heat Fraction to Tank",
         "  Zone,                    !- Ambient Temperature Indicator",
         "  ,                        !- Ambient Temperature Schedule Name",
@@ -4226,6 +4238,12 @@ TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
         EXPECT_EQ(HPWH.CondWaterOutletNode, HPWHTank.SourceInletNode);
         EXPECT_EQ(HPWH.DXCoilName, "HPWHPUMPED DXCOIL");
         EXPECT_EQ(HPWH.FanName, "HPWHPUMPED FANSYSTEMMODEL");
+        
+        // ValidateFuelType tests for WaterHeater:Mixed
+        WaterThermalTanks::getWaterHeaterMixedInputs(state);
+        EXPECT_EQ(HPWHTank.FuelType, "Steam");
+        EXPECT_EQ(HPWHTank.OffCycParaFuelType, "Steam");
+        EXPECT_EQ(HPWHTank.OnCycParaFuelType, "Steam");
     }
 
     ++HPWaterHeaterNum;

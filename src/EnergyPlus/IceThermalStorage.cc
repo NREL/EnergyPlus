@@ -236,7 +236,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitSimpleIceStorage(state.dataBranchInputManager);
+        this->InitSimpleIceStorage(state);
 
         //------------------------------------------------------------------------
         // FIRST PROCESS (MyLoad = 0.0 as IN)
@@ -334,7 +334,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitDetailedIceStorage(state.dataBranchInputManager); // Initialize detailed ice storage
+        this->InitDetailedIceStorage(state); // Initialize detailed ice storage
 
         this->SimDetailedIceStorage(state); // Simulate detailed ice storage
 
@@ -1297,7 +1297,7 @@ namespace IceThermalStorage {
                             "System");
     }
 
-    void DetailedIceStorageData::InitDetailedIceStorage(BranchInputManagerData &dataBranchInputManager)
+    void DetailedIceStorageData::InitDetailedIceStorage(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1316,7 +1316,7 @@ namespace IceThermalStorage {
 
         if (this->MyPlantScanFlag) {
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_TS_IceDetailed,
                                                     this->PlantLoopNum,
@@ -1386,7 +1386,7 @@ namespace IceThermalStorage {
         this->ParasiticElecEnergy = 0.0;
     }
 
-    void SimpleIceStorageData::InitSimpleIceStorage(BranchInputManagerData &dataBranchInputManager)
+    void SimpleIceStorageData::InitSimpleIceStorage(EnergyPlusData &state)
     {
 
         bool errFlag;
@@ -1394,7 +1394,7 @@ namespace IceThermalStorage {
         if (this->MyPlantScanFlag) {
             // Locate the storage on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, DataPlant::TypeOf_TS_IceSimple, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
             if (errFlag) {
                 ShowFatalError("InitSimpleIceStorage: Program terminated due to previous condition(s).");
