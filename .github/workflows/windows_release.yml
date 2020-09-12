@@ -27,7 +27,7 @@ jobs:
       run: choco install miktex && refreshenv
 
     - name: Look for LaTeX binaries
-      working-directory: "C:\Program Files\MikTeX"
+      working-directory: "C:/Program Files/MikTeX"
       run: dir
 
     - name: Add MikTeX binary folder to path
