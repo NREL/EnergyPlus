@@ -42,6 +42,9 @@ jobs:
     - name: Also add assumed mingw bin directory to path
       run: echo "::add-path::/C/mingw64/bin"
 
+    - name: Also add choco bin dir to path
+      run: echo "::add-path::/C/ProgramData/Chocolatey/bin"
+
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
 
