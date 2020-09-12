@@ -2,8 +2,8 @@ name: Windows 64-bit Release Build
 
 on: [push]
 
-env:
-  FC: C:\msys64\mingw64\bin\gfortran.exe
+#env:
+#  FC: C:/msys64/mingw64/bin/gfortran.exe
 
 jobs:
   build:
@@ -59,8 +59,8 @@ jobs:
     - name: Add IFW to PATH
       run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
 
-    - name: Also add assumed mingw bin directory to path
-      run: echo "::add-path::/C/mingw64/bin"
+    - name: Also add mingw bin directory to path
+      run: echo "::add-path::/C/msys64/mingw64/bin"
 
     - name: Also add choco bin dir to path
       run: echo "::add-path::/C/ProgramData/Chocolatey/bin"
