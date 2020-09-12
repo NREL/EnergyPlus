@@ -11,9 +11,12 @@ jobs:
 
     steps:
 
-#    - name: Look for MinGW binaries
-#      working-directory: "C:/msys64/mingw64/bin"
-#      run: dir
+    - name: Look for MinGW binaries
+      working-directory: "C:/msys64/mingw64/bin"
+      run: dir
+
+    - name: Test GFortran
+      run: which gfortran
 
     - uses: actions/checkout@v2
 
@@ -31,12 +34,15 @@ jobs:
     - name: Install Chocolately Packages
       run: choco install miktex && refreshenv
 
-#    - name: Look for LaTeX binaries
-#      working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
-#      run: dir
+    - name: Look for LaTeX binaries
+      working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
+      run: dir
 
     - name: Add MikTeX binary folder to path
       run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
+
+    - name: Test LaTeX
+      run: which xelatex
 
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
