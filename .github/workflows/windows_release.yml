@@ -4,12 +4,25 @@ on: [push]
 
 env:
   FC: C:\ProgramData\Chocolatey\bin\gfortran.exe
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
     runs-on: windows-2019
 
     steps:
+    - name: Look for MinGW binaries 1
+      working-directory: "C:/Program Files/MinGW"
+      run: dir
+
+    - name: Look for MinGW binaries 2
+      working-directory: "C:/MinGW"
+      run: dir
+
+    - name: Look for MinGW binaries 2
+      working-directory: "C:/"
+      run: dir
+
     - uses: actions/checkout@v2
 
     - name: Set up Python 3.7
@@ -27,11 +40,11 @@ jobs:
       run: choco install miktex && refreshenv
 
     - name: Look for LaTeX binaries
-      working-directory: "C:/Program Files/MikTeX"
+      working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
       run: dir
 
     - name: Add MikTeX binary folder to path
-      run: echo "::add-path::/C/Program Files/MikTeX"
+      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
 
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
@@ -66,11 +79,11 @@ jobs:
     - name: Upload Zip Archive
       uses: actions/upload-artifact@v2
       with:
-        name: LinuxReleaseTarball
+        name: Windows64ReleaseTarball
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.zip
 
     - name: Upload IFW Installer
       uses: actions/upload-artifact@v2
       with:
-        name: LinuxReleaseIFW
+        name: Windows64ReleaseIFW
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.exe

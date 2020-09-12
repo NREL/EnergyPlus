@@ -4,6 +4,7 @@ on: [push]
 
 env:
   FC: /usr/local/bin/gfortran-9
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
@@ -59,11 +60,11 @@ jobs:
     - name: Upload Tarball
       uses: actions/upload-artifact@v2
       with:
-        name: LinuxReleaseTarball
+        name: MacReleaseTarball
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.tar.gz
 
     - name: Upload IFW Installer
       uses: actions/upload-artifact@v2
       with:
-        name: LinuxReleaseIFW
+        name: MacReleaseIFW
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.dmg
