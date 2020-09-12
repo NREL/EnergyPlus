@@ -18,6 +18,10 @@ jobs:
       working-directory: "C:/msys64"
       run: dir
 
+    - name: Dummy stop command
+      working-directory: "C:/msyadadss64"
+      run: dir
+
     - uses: actions/checkout@v2
 
     - name: Set up Python 3.7
