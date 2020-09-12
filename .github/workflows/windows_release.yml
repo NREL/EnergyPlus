@@ -10,12 +10,7 @@ jobs:
   build:
     runs-on: windows-2019
 
-    steps:
     - name: Look for MinGW binaries 1
-      working-directory: "C:/Program Files/MinGW"
-      run: dir
-
-    - name: Look for MinGW binaries 2
       working-directory: "C:/MinGW"
       run: dir
 
