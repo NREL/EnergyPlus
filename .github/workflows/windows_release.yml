@@ -15,7 +15,7 @@ jobs:
       run: dir
 
     - name: Look for MinGW binaries
-      working-directory: "C:/MinGW64"
+      working-directory: "C:/msys64"
       run: dir
 
     - uses: actions/checkout@v2
