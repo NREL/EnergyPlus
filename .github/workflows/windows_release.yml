@@ -39,6 +39,9 @@ jobs:
     - name: Add IFW to PATH
       run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
 
+    - name: Also add assumed mingw bin directory to path
+      run: echo "::add-path::/C/mingw64/bin"
+
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
 
