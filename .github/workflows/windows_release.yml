@@ -28,6 +28,14 @@ jobs:
       working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
       run: dir
 
+    - name: Look at Chocolatey binaries
+      working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
+      run: dir
+
+    - name: Look at MinGW binaries
+      working-directory: "/c/msys64/mingw64/bin"
+      run: dir
+
 #    - name: Add MikTeX binary folder to path
 #      run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
 
@@ -40,16 +48,15 @@ jobs:
     - name: Add IFW to PATH
       run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
 
-#    - name: Also add choco bin dir to path
-#      run: echo "::add-path::/C/ProgramData/Chocolatey/bin"
-
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+
+# gfortran is available at /c/ProgramData/Chocolatey/bin/gfortran and /c/msys64/mingw64/bin/gfortran
 
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DCMAKE_Fortran_COMPILER="/c/ProgramData/Chocolatey/bin/gfortran" -DMIKTEX_BINARY_PATH="/C/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DCMAKE_Fortran_COMPILER="/c/msys64/mingw64/bin/gfortran.exe" -DMIKTEX_BINARY_PATH="/C/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
