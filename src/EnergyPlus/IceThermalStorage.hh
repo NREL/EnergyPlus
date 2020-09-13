@@ -336,7 +336,7 @@ namespace IceThermalStorage {
                       Real64 &CurLoad,
                       bool RunFlag) override;
 
-        void InitSimplePcmStorage(BranchInputManagerData &dataBranchInputManager);
+        void InitSimplePcmStorage(EnergyPlusData &state);
 
         void CalcPcmStorageDormant();
 
