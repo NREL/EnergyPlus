@@ -4,7 +4,6 @@ on: [push]
 
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
-  # MIKTEX_BINARY_PATH: "/C/Program Files/MikTeX/miktex/bin/x64"
 
 jobs:
   build:
@@ -28,23 +27,8 @@ jobs:
     - name: Install Chocolately Packages
       run: choco install miktex && refreshenv
 
-#    - name: Look for LaTeX binaries
-#      working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
-#      run: dir
-#
-#    - name: Look at Chocolatey binaries
-#      working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
-#      run: dir
-
-#    - name: Look at MinGW binaries
-#      working-directory: "C:/msys64/mingw64/bin"
-#      run: dir
-
     - name: Add MikTeX binary folder to path
       run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
-
-#    - name: Test LaTeX
-#      run: which xelatex
 
     - name: Install IFW
       run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
@@ -64,6 +48,13 @@ jobs:
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
       run: cmake --build . --target package -j 2
+      continue-on-error: true
+
+    - name: Upload IFWOutput
+      uses: action/upload-artifact@v2
+      with:
+        name: IFWLog
+        path: "D:/a/EnergyPlus/EnergyPlus/build/_CPack_Packages/win64/IFW/IFWOutput.log"
 
     - name: Inspect build for package names
       working-directory: ${{runner.workspace}}/EnergyPlus/build
