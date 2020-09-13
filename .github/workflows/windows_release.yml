@@ -4,7 +4,7 @@ on: [push]
 
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
-  MIKTEX_BINARY_PATH: "/C/Program Files/MikTeX/miktex/bin/x64"
+  # MIKTEX_BINARY_PATH: "/C/Program Files/MikTeX/miktex/bin/x64"
 
 jobs:
   build:
@@ -58,7 +58,7 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
