@@ -21,8 +21,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-   # - name: Install Chocolately Packages
-   #   run: choco install miktex && refreshenv
+    - name: Install Chocolately Packages
+      run: choco install miktex && refreshenv
 
     - name: Look for LaTeX binaries
       working-directory: "C:/Program Files/MikTeX/miktex/bin/x64"
