@@ -31,7 +31,7 @@ jobs:
       run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
 
     - name: Install IFW
-      run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
+      run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
     - name: Add IFW to PATH
       run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
@@ -48,13 +48,6 @@ jobs:
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
       run: cmake --build . --target package -j 2
-      continue-on-error: true
-
-    - name: Upload IFWOutput
-      uses: actions/upload-artifact@v2
-      with:
-        name: IFWLog
-        path: "D:/a/EnergyPlus/EnergyPlus/build/_CPack_Packages/win64/IFW/IFWOutput.log"
 
     - name: Inspect build for package names
       working-directory: ${{runner.workspace}}/EnergyPlus/build
