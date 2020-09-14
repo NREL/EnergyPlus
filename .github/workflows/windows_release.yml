@@ -60,3 +60,13 @@ jobs:
       with:
         name: Windows64ReleaseWithPythonIFW
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.exe
+
+#    - name: Upload binaries to release
+#      uses: svenstaro/upload-release-action@v2
+#      with:
+#        repo_token: ${{ secrets.GITHUB_TOKEN }}
+#        # file: EnergyPlus-9.4.0-fae65e9f14-Windows-x86_64.exe and EnergyPlus-9.4.0-fae65e9f14-Windows-x86_64.zip
+#        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.zip
+#        tag: ${{ github.ref }}
+#        overwrite: true
+#        file_glob: true
