@@ -5788,7 +5788,7 @@ namespace AirflowNetworkBalanceManager {
             if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = MultizoneSurfaceData(i).SurfNum;
             if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
-                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor) {
+                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor || Surface(j).IsAirBoundarySurf) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FreeOperation) {
                         if (MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::ForceChange) {
