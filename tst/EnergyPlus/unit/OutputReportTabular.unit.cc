@@ -8302,8 +8302,10 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
     EnergyPlus::DataDefineEquip::AirDistUnit.allocate(1);
     EnergyPlus::DataDefineEquip::AirDistUnit(1).ZoneNum = 1;
-    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatGain = 3.0;
-    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolGain = 4.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatGain = 1000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolGain = 2000.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatRate = 3.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolRate = 4.0;
 
     EnergyPlus::DataGlobals::NumOfZones = 1;
     EnergyPlus::DataHeatBalance::Zone.allocate(NumOfZones);
@@ -8320,8 +8322,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
 
     GatherHeatGainReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
-    EXPECT_EQ(1.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
-    EXPECT_EQ(0.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
-    EXPECT_EQ(3.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
-    EXPECT_EQ(-4.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
+    EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(1000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
+    EXPECT_EQ(-2000.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
 }
