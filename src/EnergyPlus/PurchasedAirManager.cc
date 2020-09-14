@@ -2200,7 +2200,7 @@ namespace PurchasedAirManager {
                 // Supply mass flow is greatest of these, but limit to cooling max flow rate, if applicable
                 SupplyMassFlowRate = max(0.0, OAMassFlowRate, SupplyMassFlowRateForCool, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid);
                 // EMS override point  Purch air massflow rate..... but only if unit is on, i.e. SupplyMassFlowRate>0.0
-                if ((PurchAir(PurchAirNum).EMSOverrideMdotOn) && (SupplyMassFlowRate > 0.0)) {
+                if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
                     SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
                     OAMassFlowRate = min(OAMassFlowRate, SupplyMassFlowRate);
                 }
@@ -2451,7 +2451,7 @@ namespace PurchasedAirManager {
                 // Supply mass flow is greatest of these, but limit to heating max flow rate, if applicable
                 SupplyMassFlowRate = max(0.0, OAMassFlowRate, SupplyMassFlowRateForHeat, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid);
                 // EMS override point  Purch air massflow rate..... but only if unit is on, i.e. SupplyMassFlowRate>0.0
-                if ((PurchAir(PurchAirNum).EMSOverrideMdotOn) && (SupplyMassFlowRate > 0.0)) {
+                if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
                     SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
                     OAMassFlowRate = min(OAMassFlowRate, SupplyMassFlowRate);
                 }
