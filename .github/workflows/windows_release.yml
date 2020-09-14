@@ -1,4 +1,4 @@
-name: Windows 64-bit Release Build
+name: Windows 64-bit Release With Python Build
 
 on: [push]
 
@@ -42,26 +42,21 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/EnergyPlus/build
-      run: cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
+      run: cmake -G "Visual Studio 16 2019" -A x64 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
 
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
-      run: cmake --build . --target package -j 2
-
-    - name: Inspect build for package names
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
-      shell: bash
-      run: ls
+      run: cmake --build . --target package -j 2 -C Release
 
     - name: Upload Zip Archive
       uses: actions/upload-artifact@v2
       with:
-        name: Windows64ReleaseTarball
+        name: Windows64ReleaseWithPythonTarball
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.zip
 
     - name: Upload IFW Installer
       uses: actions/upload-artifact@v2
       with:
-        name: Windows64ReleaseIFW
+        name: Windows64ReleaseWithPythonIFW
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.exe
