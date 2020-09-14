@@ -8286,7 +8286,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::OutputReportTabular::clear_state();
     EnergyPlus::DataGlobals::DoWeathSim = true;
     
-    // if (!reportName(pdrSensibleGain).show) return; // don't gather data if report isn't requested
     EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
     EnergyPlus::OutputReportPredefined::reportName.allocate(1);
     EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true; 
@@ -8296,8 +8295,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     // do a clear_state above might be a workaround to set this right (the first line)
     // EnergyPlus::OutputReportTabular::GatherHeatGainReportfirstTime = true;
 
-    DataHVACGlobals::TimeStepSys = 10.0;
-    DataGlobals::TimeStepZone = 20.0;
+    EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
+    EnergyPlus::DataGlobals::TimeStepZone = 20.0;
     EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
 
     EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
