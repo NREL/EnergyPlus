@@ -1,15 +1,14 @@
-name: Mac Release Build
+name: Linux Releases
 
 on: [push]
 
-env:
-  FC: /usr/local/bin/gfortran-9
-  # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
-  build:
-    runs-on: macos-10.15
-
+  linux_release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+    
     steps:
     - uses: actions/checkout@v2
 
@@ -23,21 +22,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install aqtinstall
 
-    - name: Install Brew dependencies
-      run: brew cask install mactex
-
-    - name: Check TeX binaries
-      working-directory: /Library/TeX/texbin
-      run: ls
+    - name: Install APT dependencies
+      run: sudo apt-get update && sudo apt-get install texlive texlive-xetex texlive-science libxkbcommon-x11-0 xorg-dev libgl1-mesa-dev
 
     - name: Install IFW
-      run: aqt tool mac tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
+      run: aqt tool linux tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
 
     - name: Add IFW to PATH
       run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
-
-    - name: Add TeX to PATH
-      run: echo "::add-path::/Library/TeX/texbin"
 
     - name: Create Build Directory
       run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
@@ -60,11 +52,17 @@ jobs:
     - name: Upload Tarball
       uses: actions/upload-artifact@v2
       with:
-        name: MacReleaseTarball
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.tar.gz
+        name: LinuxReleaseTarball-${{ matrix.os }}
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.tar.gz
+
+    - name: Upload Shell Installer
+      uses: actions/upload-artifact@v2
+      with:
+        name: LinuxReleaseShell-${{ matrix.os }}
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.sh
 
     - name: Upload IFW Installer
       uses: actions/upload-artifact@v2
       with:
-        name: MacReleaseIFW
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.dmg
+        name: LinuxReleaseIFW-${{ matrix.os }}
+        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.run

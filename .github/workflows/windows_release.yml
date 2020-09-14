@@ -1,12 +1,17 @@
-name: Windows 64-bit Release With Python Build
+name: Windows Releases
 
 on: [push]
+
+#on:
+#  push:
+#    tags:
+#      - '*'
 
 env:
   CMAKE_Fortran_COMPILER: "/c/msys64/mingw64/bin/x86_64-w64-mingw32-gfortran.exe"
 
 jobs:
-  build:
+  windows_release_64:
     runs-on: windows-2019
 
     steps:
@@ -17,7 +22,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.7
-        architecture: 'x64' # x64 or x86 (defaults to x64)
+        architecture: 'x64'
 
     - name: Install Python dependencies
       run: |
@@ -49,7 +54,10 @@ jobs:
       shell: bash
       run: cmake --build . --target package -j 2 --config Release
 
-    # at this point we should have a script or some method to get the specific
+    # at this point we should have a script or some method to get the specific file names and set them here
+    # echo "::set-env name=PACKAGE_NAME_ZIP::ProbablySomethingFromCatFileBlah"
+    # echo "::set-env name=PACKAGE_NAME_IFW::ProbablySomethingFromCatFileBlah"
+    # then the below steps would have explicit filenames and wouldn't try to zip things up -- nice.
 
     - name: Upload Zip Archive
       uses: actions/upload-artifact@v2
@@ -63,12 +71,100 @@ jobs:
         name: Windows64ReleaseWithPythonIFW
         path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.exe
 
-#    - name: Upload binaries to release
+    # then we need to upload this directly to the release that created it
+#    - name: Upload Zip to release
 #      uses: svenstaro/upload-release-action@v2
 #      with:
 #        repo_token: ${{ secrets.GITHUB_TOKEN }}
-#        # file: EnergyPlus-9.4.0-fae65e9f14-Windows-x86_64.exe and EnergyPlus-9.4.0-fae65e9f14-Windows-x86_64.zip
-#        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.zip
+#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
+#        tag: ${{ github.ref }}
+#        overwrite: true
+#        file_glob: true
+
+#    - name: Upload IFW to release
+#      uses: svenstaro/upload-release-action@v2
+#      with:
+#        repo_token: ${{ secrets.GITHUB_TOKEN }}
+#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
+#        tag: ${{ github.ref }}
+#        overwrite: true
+#        file_glob: true
+
+  windows_release_32:
+    runs-on: windows-2019
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+          architecture: 'x86'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install aqtinstall
+
+      - name: Install Chocolately Packages
+        run: choco install miktex && refreshenv
+
+      - name: Add MikTeX binary folder to path
+        run: echo "::add-path::/C/Program Files/MikTeX/miktex/bin/x64"
+
+      - name: Install IFW
+        run: aqt tool windows tools_ifw 3.2.2 qt.tools.ifw.32 --outputdir=${{runner.workspace}}/Qt
+
+      - name: Add IFW to PATH
+        run: echo "::add-path::${{runner.workspace}}/Qt/Tools/QtInstallerFramework/3.2/bin"
+
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{runner.workspace}}/EnergyPlus/build
+        run: cmake -G "Visual Studio 16 2019" -A Win32 -DLINK_WITH_PYTHON=ON -DTEX_INTERACTION="batchmode" -DBUILD_FORTRAN=ON -DDOCUMENTATION_BUILD="BuildWithAll" -DMIKTEX_BINARY_PATH="C:/Program Files/MikTeX/miktex/bin/x64" -DBUILD_PACKAGE:BOOL=ON ..
+
+      - name: Build Package
+        working-directory: ${{runner.workspace}}/EnergyPlus/build
+        shell: bash
+        run: cmake --build . --target package -j 2 --config Release
+
+      # at this point we should have a script or some method to get the specific file names and set them here
+      # echo "::set-env name=PACKAGE_NAME_ZIP::ProbablySomethingFromCatFileBlah"
+      # echo "::set-env name=PACKAGE_NAME_IFW::ProbablySomethingFromCatFileBlah"
+      # then the below steps would have explicit filenames and wouldn't try to zip things up -- nice.
+
+      - name: Upload Zip Archive
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows64ReleaseWithPythonTarball
+          path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.zip
+
+      - name: Upload IFW Installer
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows64ReleaseWithPythonIFW
+          path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.exe
+
+    # then we need to upload this directly to the release that created it
+#    - name: Upload Zip to release
+#      uses: svenstaro/upload-release-action@v2
+#      with:
+#        repo_token: ${{ secrets.GITHUB_TOKEN }}
+#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
+#        tag: ${{ github.ref }}
+#        overwrite: true
+#        file_glob: true
+
+#    - name: Upload IFW to release
+#      uses: svenstaro/upload-release-action@v2
+#      with:
+#        repo_token: ${{ secrets.GITHUB_TOKEN }}
+#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
 #        tag: ${{ github.ref }}
 #        overwrite: true
 #        file_glob: true
