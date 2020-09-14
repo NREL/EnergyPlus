@@ -141,13 +141,13 @@ jobs:
       - name: Upload Zip Archive
         uses: actions/upload-artifact@v2
         with:
-          name: Windows64ReleaseWithPythonTarball
+          name: Windows32ReleaseWithPythonTarball
           path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.zip
 
       - name: Upload IFW Installer
         uses: actions/upload-artifact@v2
         with:
-          name: Windows64ReleaseWithPythonIFW
+          name: Windows32ReleaseWithPythonIFW
           path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.exe
 
     # then we need to upload this directly to the release that created it
