@@ -47,7 +47,9 @@ jobs:
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
-      run: cmake --build . --target package -j 2 -C Release
+      run: cmake --build . --target package -j 2 --config Release
+
+    # at this point we should have a script or some method to get the specific
 
     - name: Upload Zip Archive
       uses: actions/upload-artifact@v2
