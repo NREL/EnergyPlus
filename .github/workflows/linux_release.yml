@@ -1,6 +1,9 @@
 name: Linux Releases
 
-on: [push]
+on:
+  push:
+    tags:
+      - '*'
 
 jobs:
   linux_release:

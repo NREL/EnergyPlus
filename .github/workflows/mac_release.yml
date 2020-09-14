@@ -1,6 +1,9 @@
 name: Mac Releases
 
-on: [push]
+on:
+  push:
+    tags:
+      - '*'
 
 env:
   FC: /usr/local/bin/gfortran-9
