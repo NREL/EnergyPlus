@@ -74,8 +74,14 @@ if __name__ == '__main__':
             for filename in fnmatch.filter(filenames, '*.i[d|m]f'):
                 test_files.append(os.path.join(root, filename))
 
+    overall_success = True
     for test_file in test_files:
         success = check_file_encoding(test_file)
-        if DO_FIX and not success:
-            # Fix encoding
-            fix_encoding(test_file)
+        if not success:
+            overall_success = False
+            if DO_FIX:
+                # Fix encoding
+                fix_encoding(test_file)
+
+    if not overall_success:
+        sys.exit(1)
