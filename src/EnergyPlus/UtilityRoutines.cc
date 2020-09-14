@@ -810,12 +810,10 @@ namespace UtilityRoutines {
         CloseReportIllumMaps(ioFiles);
         CloseDFSFile(ioFiles);
 
-        if (ioFiles.debug.good()) {
-            if (DebugOutput || ioFiles.debug.position() > 0) {
-                ioFiles.debug.close();
-            } else {
-                ioFiles.debug.del();
-            }
+        if (DebugOutput || (ioFiles.debug.good() && ioFiles.debug.position() > 0)) {
+            ioFiles.debug.close();
+        } else {
+            ioFiles.debug.del();
         }
     }
 
