@@ -64,6 +64,7 @@
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -91,6 +92,7 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
@@ -8277,4 +8279,50 @@ TEST_F(EnergyPlusFixture, OutputReportTabularTest_GetDelaySequencesSurfaceOrder_
     EXPECT_EQ(powerGenDelaySeqCool1, powerGenDelaySeqCool2);
     EXPECT_EQ(lightDelaySeqCool1, lightDelaySeqCool2);
     EXPECT_EQ(feneSolarDelaySeqCool1, feneSolarDelaySeqCool2);
+}
+
+TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
+{
+    EnergyPlus::OutputReportTabular::clear_state();
+    EnergyPlus::DataGlobals::DoWeathSim = true;
+    
+    // if (!reportName(pdrSensibleGain).show) return; // don't gather data if report isn't requested
+    EnergyPlus::OutputReportPredefined::pdrSensibleGain = 1;
+    EnergyPlus::OutputReportPredefined::reportName.allocate(1);
+    EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true; 
+
+    // Need direct operation on this GatherHeatGainReportfirstTime variable
+    // However, this was a specially declared as an unnamed name space, how to refer to it
+    // do a clear_state above might be a workaround to set this right (the first line)
+    // EnergyPlus::OutputReportTabular::GatherHeatGainReportfirstTime = true;
+
+    DataHVACGlobals::TimeStepSys = 10.0;
+    DataGlobals::TimeStepZone = 20.0;
+    EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
+
+    EnergyPlus::DataHeatBalance::ZonePreDefRep.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit.allocate(1);
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).ZoneNum = 1;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).HeatGain = 3.0;
+    EnergyPlus::DataDefineEquip::AirDistUnit(1).CoolGain = 4.0;
+
+    EnergyPlus::DataGlobals::NumOfZones = 1;
+    EnergyPlus::DataHeatBalance::Zone.allocate(NumOfZones);
+    EnergyPlus::DataHeatBalance::Zone(1).Multiplier = 1;
+    EnergyPlus::DataHeatBalance::Zone(1).ListMultiplier = 1;
+
+    EnergyPlus::DataHeatBalance::ZnRpt.allocate(1);
+    EnergyPlus::DataHeatBalance::ZnAirRpt.allocate(1);
+
+    EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
+    EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
+    
+    // EnergyPlus::VentilatedSlab::NumOfVentSlabs = 0;
+
+    GatherHeatGainReport(OutputProcessor::TimeStepType::TimeStepSystem);
+
+    EXPECT_EQ(1.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);
+    EXPECT_EQ(0.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqCl);
+    EXPECT_EQ(3.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUHt);
+    EXPECT_EQ(-4.0, DataHeatBalance::ZonePreDefRep(1).SHGSAnHvacATUCl);
 }
