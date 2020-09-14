@@ -5215,8 +5215,6 @@ namespace OutputReportTabular {
         static Array1D<Real64> ATUHeat;
         static Array1D<Real64> ATUCool;
         static Real64 ZoneEqHeatorCool(0.0);
-        // static Array1D<Real64> ATUDeltaHeat;
-        // static Array1D<Real64> ATUDeltaCool;
         static int timestepTimeStamp(0);
         static Real64 bldgHtPk(0.0);
         static Real64 bldgClPk(0.0);
@@ -5237,9 +5235,6 @@ namespace OutputReportTabular {
             radiantCool.allocate(NumOfZones);
             ATUHeat.allocate(NumOfZones);
             ATUCool.allocate(NumOfZones);
-            // ZoneEqHeatorCool.allocate(NumOfZones);
-            // ATUDeltaHeat.allocate(NumOfZones);
-            // ATUDeltaCool.allocate(NumOfZones);
             GatherHeatGainReportfirstTime = false;
         }
         // clear the radiant surface accumulation variables
@@ -5248,11 +5243,8 @@ namespace OutputReportTabular {
         // clear the ATU accumulation variables
         ATUHeat = 0.0;
         ATUCool = 0.0;
-        // clear the Zone Eq accumulatoin variables
+        // clear the temporary Zone Eq accumulatoin variable
         ZoneEqHeatorCool = 0.0;
-        // // clear the ATU Delta accumulation variables
-        // ATUDeltaHeat = 0.0; 
-        // ATUDeltaCool = 0.0;
         //--------------------
         //     ANNUAL
         //--------------------
@@ -5263,9 +5255,7 @@ namespace OutputReportTabular {
             curZone = AirDistUnit(iunit).ZoneNum;
             if ((curZone > 0) && (curZone <= NumOfZones)) {
                 ZonePreDefRep(curZone).SHGSAnHvacATUHt += AirDistUnit(iunit).HeatGain;
-                // ATUDeltaHeat(curZone) += AirDistUnit(iunit).HeatGain;
                 ZonePreDefRep(curZone).SHGSAnHvacATUCl -= AirDistUnit(iunit).CoolGain;
-                // ATUDeltaCool(curZone) -= AirDistUnit(iunit).CoolGain;
                 ATUHeat(curZone) += AirDistUnit(iunit).HeatRate;
                 ATUCool(curZone) -= AirDistUnit(iunit).CoolRate;
             }
