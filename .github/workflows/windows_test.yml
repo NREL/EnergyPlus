@@ -29,7 +29,7 @@ jobs:
     - name: Build Package
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
-      run: cmake --build . --target package -j 2 --config Release
+      run: cmake --build . -j 2 --config Release
 
     - name: Run Tests
       working-directory: ${{runner.workspace}}/EnergyPlus/build
