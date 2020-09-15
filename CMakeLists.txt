@@ -248,7 +248,9 @@ set_target_properties(Windows-CalcEngine PROPERTIES FOLDER ThirdParty/Windows-Ca
 
 set(skip_tools 1)
 set(skip_tests 1)
+set(skip_api 1)
 ADD_SUBDIRECTORY(third_party/ssc)
+unset(skip_api)
 unset(skip_tools)
 unset(skip_tests)
 set_target_properties(ssc PROPERTIES FOLDER ThirdParty/ssc)
