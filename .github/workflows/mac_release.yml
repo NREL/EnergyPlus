@@ -54,14 +54,26 @@ jobs:
       shell: bash
       run: cmake --build . --target package -j 2
 
-    - name: Upload Tarball
-      uses: actions/upload-artifact@v2
-      with:
-        name: MacReleaseTarball
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.tar.gz
+    - name: Set Environment Variable Name of Mac Tarball Package
+      run: echo ::set-env name=PACKAGE_NAME_TAR::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build mac_tar)
 
-    - name: Upload IFW Installer
-      uses: actions/upload-artifact@v2
+    - name: Upload Tarball to release
+      uses: svenstaro/upload-release-action@v2
       with:
-        name: MacReleaseIFW
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.dmg
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_TAR}}
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
+
+    - name: Set Environment Variable Name of Mac Installer Package
+      run: echo ::set-env name=PACKAGE_NAME_DMG::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build mac_dmg)
+
+    - name: Upload DMG to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_DMG}}
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true

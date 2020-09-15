@@ -52,41 +52,29 @@ jobs:
       shell: bash
       run: cmake --build . --target package -j 2 --config Release
 
-    # at this point we should have a script or some method to get the specific file names and set them here
-    # echo "::set-env name=PACKAGE_NAME_ZIP::ProbablySomethingFromCatFileBlah"
-    # echo "::set-env name=PACKAGE_NAME_IFW::ProbablySomethingFromCatFileBlah"
-    # then the below steps would have explicit filenames and wouldn't try to zip things up -- nice.
+    - name: Set Environment Variable Name of Windows 64 ZIP Package
+      run: echo ::set-env name=PACKAGE_NAME_ZIP::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build win64_zip)
 
-    - name: Upload Zip Archive
-      uses: actions/upload-artifact@v2
+    - name: Upload Zip to release
+      uses: svenstaro/upload-release-action@v2
       with:
-        name: Windows64ReleaseWithPythonTarball
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.zip
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
 
-    - name: Upload IFW Installer
-      uses: actions/upload-artifact@v2
+    - name: Set Environment Variable Name of Windows 64 EXE Package
+      run: echo ::set-env name=PACKAGE_NAME_IFW::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build win64_exe)
+
+    - name: Upload IFW to release
+      uses: svenstaro/upload-release-action@v2
       with:
-        name: Windows64ReleaseWithPythonIFW
-        path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-x86_64.exe
-
-    # then we need to upload this directly to the release that created it
-#    - name: Upload Zip to release
-#      uses: svenstaro/upload-release-action@v2
-#      with:
-#        repo_token: ${{ secrets.GITHUB_TOKEN }}
-#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
-#        tag: ${{ github.ref }}
-#        overwrite: true
-#        file_glob: true
-
-#    - name: Upload IFW to release
-#      uses: svenstaro/upload-release-action@v2
-#      with:
-#        repo_token: ${{ secrets.GITHUB_TOKEN }}
-#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
-#        tag: ${{ github.ref }}
-#        overwrite: true
-#        file_glob: true
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
 
   windows_release_32:
     runs-on: windows-2019
@@ -131,38 +119,26 @@ jobs:
         shell: bash
         run: cmake --build . --target package -j 2 --config Release
 
-      # at this point we should have a script or some method to get the specific file names and set them here
-      # echo "::set-env name=PACKAGE_NAME_ZIP::ProbablySomethingFromCatFileBlah"
-      # echo "::set-env name=PACKAGE_NAME_IFW::ProbablySomethingFromCatFileBlah"
-      # then the below steps would have explicit filenames and wouldn't try to zip things up -- nice.
+      - name: Set Environment Variable Name of Windows 32 ZIP Package
+        run: echo ::set-env name=PACKAGE_NAME_ZIP::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build win32_zip)
 
-      - name: Upload Zip Archive
-        uses: actions/upload-artifact@v2
+      - name: Upload Zip to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          name: Windows32ReleaseWithPythonTarball
-          path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
 
-      - name: Upload IFW Installer
-        uses: actions/upload-artifact@v2
+      - name: Set Environment Variable Name of Windows 32 EXE Package
+        run: echo ::set-env name=PACKAGE_NAME_IFW::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build win32_exe)
+
+      - name: Upload IFW to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          name: Windows32ReleaseWithPythonIFW
-          path: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Windows-i386.exe
-
-    # then we need to upload this directly to the release that created it
-#    - name: Upload Zip to release
-#      uses: svenstaro/upload-release-action@v2
-#      with:
-#        repo_token: ${{ secrets.GITHUB_TOKEN }}
-#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
-#        tag: ${{ github.ref }}
-#        overwrite: true
-#        file_glob: true
-
-#    - name: Upload IFW to release
-#      uses: svenstaro/upload-release-action@v2
-#      with:
-#        repo_token: ${{ secrets.GITHUB_TOKEN }}
-#        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
-#        tag: ${{ github.ref }}
-#        overwrite: true
-#        file_glob: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
