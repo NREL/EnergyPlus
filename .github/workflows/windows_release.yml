@@ -59,7 +59,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
+        file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_ZIP
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -71,7 +71,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
+        file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_IFW
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -126,7 +126,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_ZIP}}
+          file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_ZIP
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
@@ -138,7 +138,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_IFW}}
+          file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_IFW
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true

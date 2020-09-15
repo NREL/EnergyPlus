@@ -57,7 +57,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build//${{ matrix.os }}_${{PACKAGE_NAME_TAR}}  # take the matrix_os off when package naming is improved
+        file: ${{runner.workspace}}/EnergyPlus/build//${{ matrix.os }}_$PACKAGE_NAME_TAR  # take the matrix_os off when package naming is improved
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -72,7 +72,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_${{PACKAGE_NAME_IFW}}
+        file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_IFW
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -87,7 +87,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_${{PACKAGE_NAME_SH}}
+        file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_SH
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true

@@ -61,7 +61,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_TAR}}
+        file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_TAR
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -73,7 +73,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{PACKAGE_NAME_DMG}}
+        file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_DMG
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
