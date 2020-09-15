@@ -49,47 +49,47 @@ jobs:
 
     - name: Create Baseline Build Directory
       if: ${{ env.DO_REGRESSIONS == 'true' }}
-      run: cmake -E make_directory ${{runner.workspace}}/clone_baseline/build
+      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/clone_baseline/build
 
     - name: Configure Baseline
       if: ${{ env.DO_REGRESSIONS == 'true' }}
       shell: bash
-      working-directory: ${{runner.workspace}}/clone_baseline/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/clone_baseline/build
       run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON $GITHUB_WORKSPACE/clone_baseline
 
     - name: Build Baseline
       if: ${{ env.DO_REGRESSIONS == 'true' }}
-      working-directory: ${{runner.workspace}}/clone_baseline/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/clone_baseline/build
       shell: bash
       run: cmake --build . -j 2
 
     - name: Test Baseline
       if: ${{ env.DO_REGRESSIONS == 'true' }}
-      working-directory: ${{runner.workspace}}/clone_baseline/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/clone_baseline/build
       shell: bash
       run: ctest -R 1ZoneUncontrolled
 
     - name: Create Branch Build Directory
-      run: cmake -E make_directory ${{runner.workspace}}/clone_branch/build
+      run: cmake -E make_directory ${{runner.workspace}}/EnergyPlus/clone_branch/build
 
     - name: Configure Branch without Regressions
       if: ${{ env.DO_REGRESSIONS != 'true' }}
       shell: bash
-      working-directory: ${{runner.workspace}}/clone_branch/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/clone_branch/build
       run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON ..
 
     - name: Configure Branch with Regressions
       if: ${{ env.DO_REGRESSIONS == 'true' }}
       shell: bash
-      working-directory: ${{runner.workspace}}/clone_branch/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/clone_branch/build
       run: cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=${{runner.workspace}}/clone_baseline/build -DREGRESSION_SCRIPT_PATH:PATH=${{runner.workspace}}/clone_regressions/build -DREGRESSION_BASELINE_SHA:STRING=UNNKOWN_SHA -DCOMMIT_SHA=${{github.sha}} -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON ..
 
     - name: Build Branch
-      working-directory: ${{runner.workspace}}/clone_branch/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/clone_branch/build
       shell: bash
       run: cmake --build . -j 2
 
     - name: Test Branch
-      working-directory: ${{runner.workspace}}/clone_branch/build
+      working-directory: ${{runner.workspace}}/EnergyPlus/clone_branch/build
       shell: bash
       run: ctest -R 1ZoneUncontrolled
