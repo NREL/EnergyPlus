@@ -59,6 +59,7 @@ namespace EnergyPlus {
         this->dataBaseboardRadiator = std::unique_ptr<BaseboardRadiatorData>(new BaseboardRadiatorData);
         this->dataBaseboardElectric =  std::unique_ptr<BaseboardElectricData>(new BaseboardElectricData);
         this->dataCurveManager = std::unique_ptr<CurveManagerData>(new CurveManagerData);
+        this->dataAirLoop = std::unique_ptr<DataAirLoopData>(new DataAirLoopData);
     }
 
     void EnergyPlusData::clear_state() {
@@ -66,6 +67,8 @@ namespace EnergyPlus {
         this->dataBaseboardElectric->clear_state();
         this->dataBaseboardRadiator->clear_state();
         this->dataCurveManager->clear_state();
+        this->dataAirLoop->clear_state();
+
         dataBoilers.clear_state();
         dataBranchInputManager.clear_state();
         dataSteamBoilers.clear_state();

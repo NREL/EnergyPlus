@@ -189,7 +189,6 @@ namespace Pumps {
     }
 
     void SimPumps(EnergyPlusData &state,
-                  BranchInputManagerData &dataBranchInputManager,
                   std::string const &PumpName, // Name of pump to be managed
                   int const LoopNum,           // Plant loop number
                   Real64 const FlowRequest,    // requested flow from adjacent demand side
@@ -254,7 +253,7 @@ namespace Pumps {
         }
 
         // Perform one-time and begin-environment initialization
-        InitializePumps(dataBranchInputManager, PumpNum);
+        InitializePumps(state, PumpNum);
 
         // If all we need is to set outlet min/max avail, then just do it and get out.  Also, we only do min/max avail on flow query
         if (PlantLoop(LoopNum).LoopSide(PumpEquip(PumpNum).LoopSideNum).FlowLock == FlowPumpQuery) {
@@ -1269,7 +1268,7 @@ namespace Pumps {
 
     //*************************************************************************!
 
-    void InitializePumps(BranchInputManagerData &dataBranchInputManager, int const PumpNum)
+    void InitializePumps(EnergyPlusData &state, int const PumpNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1330,7 +1329,7 @@ namespace Pumps {
         if (PumpEquip(PumpNum).PumpOneTimeFlag) {
 
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                                     PumpEquip(PumpNum).Name,
                                     PumpEquip(PumpNum).TypeOf_Num,
                                     PumpEquip(PumpNum).LoopNum,

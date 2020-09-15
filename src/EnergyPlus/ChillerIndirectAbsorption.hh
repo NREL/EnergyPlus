@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
-struct ChillerIndirectAbsoprtionData;
 
 namespace ChillerIndirectAbsorption {
 
@@ -226,7 +224,7 @@ namespace ChillerIndirectAbsorption {
 
         void onInitLoopEquip(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation) override;
 
-        void initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad);
+        void initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad);
 
         void setupOutputVars();
 
@@ -237,7 +235,7 @@ namespace ChillerIndirectAbsorption {
         void calculate(EnergyPlusData &state, Real64 MyLoad, bool RunFlag);
     };
 
-    void GetIndirectAbsorberInput(EnergyPlusData &state, ChillerIndirectAbsoprtionData &chillers);
+    void GetIndirectAbsorberInput(EnergyPlusData &state);
 
 } // namespace ChillerIndirectAbsorption
 

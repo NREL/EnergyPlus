@@ -103,6 +103,7 @@ namespace EnergyPlus {
     struct BaseboardRadiatorData;
     struct BaseboardElectricData;
     struct CurveManagerData;
+    struct DataAirLoopData;
 
     struct EnergyPlusData : BaseGlobalStruct {
         // module globals
@@ -111,6 +112,7 @@ namespace EnergyPlus {
         std::unique_ptr<BaseboardRadiatorData> dataBaseboardRadiator;
         std::unique_ptr<BaseboardElectricData> dataBaseboardElectric;
         std::unique_ptr<CurveManagerData> dataCurveManager;
+        std::unique_ptr<DataAirLoopData> dataAirLoop;
         BoilersData dataBoilers;
         BoilerSteamData dataSteamBoilers;
         BranchInputManagerData dataBranchInputManager;

@@ -115,7 +115,7 @@ namespace ChillerIndirectAbsorption {
     {
         // Process the input data
         if (state.dataChillerIndirectAbsorption.GetInput) {
-            GetIndirectAbsorberInput(state, state.dataChillerIndirectAbsorption);
+            GetIndirectAbsorberInput(state);
             state.dataChillerIndirectAbsorption.GetInput = false;
         }
         // Now look for this particular object
@@ -134,7 +134,7 @@ namespace ChillerIndirectAbsorption {
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
 
-            this->initialize(state.dataBranchInputManager, RunFlag, CurLoad);
+            this->initialize(state, RunFlag, CurLoad);
             this->calculate(state, CurLoad, RunFlag);
             this->updateRecords(CurLoad, RunFlag);
 
@@ -194,14 +194,14 @@ namespace ChillerIndirectAbsorption {
         bool runFlag = true;
         Real64 myLoad = 0.0;
 
-        this->initialize(state.dataBranchInputManager, runFlag, myLoad);
+        this->initialize(state, runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->sizeChiller(state); // only size when called from chilled water loop
         }
     }
 
-    void GetIndirectAbsorberInput(EnergyPlusData &state, ChillerIndirectAbsoprtionData &chillers)
+    void GetIndirectAbsorberInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          R. Raustad (FSEC)
@@ -223,20 +223,20 @@ namespace ChillerIndirectAbsorption {
         bool ErrorsFound(false);
 
         DataIPShortCuts::cCurrentModuleObject = "Chiller:Absorption:Indirect";
-        chillers.NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
+        state.dataChillerIndirectAbsorption.NumIndirectAbsorbers = inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject);
 
-        if (chillers.NumIndirectAbsorbers <= 0) {
+        if (state.dataChillerIndirectAbsorption.NumIndirectAbsorbers <= 0) {
             ShowSevereError("No " + DataIPShortCuts::cCurrentModuleObject + " equipment specified in input file");
             // See if load distribution manager has already gotten the input
             ErrorsFound = true;
         }
 
-        if (allocated(chillers.IndirectAbsorber)) return;
+        if (allocated(state.dataChillerIndirectAbsorption.IndirectAbsorber)) return;
 
-        chillers.IndirectAbsorber.allocate(chillers.NumIndirectAbsorbers);
+        state.dataChillerIndirectAbsorption.IndirectAbsorber.allocate(state.dataChillerIndirectAbsorption.NumIndirectAbsorbers);
 
         // LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
-        for (AbsorberNum = 1; AbsorberNum <= chillers.NumIndirectAbsorbers; ++AbsorberNum) {
+        for (AbsorberNum = 1; AbsorberNum <= state.dataChillerIndirectAbsorption.NumIndirectAbsorbers; ++AbsorberNum) {
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                           AbsorberNum,
                                           DataIPShortCuts::cAlphaArgs,
@@ -254,7 +254,7 @@ namespace ChillerIndirectAbsorption {
             GlobalNames::VerifyUniqueChillerName(
                 DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs(1), ErrorsFound, DataIPShortCuts::cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.IndirectAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerIndirectAbsorption.IndirectAbsorber(AbsorberNum);
             thisChiller.Name = DataIPShortCuts::cAlphaArgs(1);
             thisChiller.NomCap = DataIPShortCuts::rNumericArgs(1);
             if (thisChiller.NomCap == DataSizing::AutoSize) {
@@ -674,7 +674,7 @@ namespace ChillerIndirectAbsorption {
         }
     }
 
-    void IndirectAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager, bool RunFlag, Real64 MyLoad)
+    void IndirectAbsorberSpecs::initialize(EnergyPlusData &state, bool RunFlag, Real64 MyLoad)
     {
 
         // SUBROUTINE INFORMATION:
@@ -698,7 +698,7 @@ namespace ChillerIndirectAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                     this->CWLoopNum,
@@ -712,7 +712,7 @@ namespace ChillerIndirectAbsorption {
                                                     this->EvapInletNodeNum,
                                                     _);
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                     this->CDLoopNum,
@@ -729,7 +729,7 @@ namespace ChillerIndirectAbsorption {
                 this->CWLoopNum, this->CWLoopSideNum, this->CDLoopNum, this->CDLoopSideNum, DataPlant::TypeOf_Chiller_Indirect_Absorption, true);
 
             if (this->GeneratorInletNodeNum > 0) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_Indirect_Absorption,
                                                         this->GenLoopNum,

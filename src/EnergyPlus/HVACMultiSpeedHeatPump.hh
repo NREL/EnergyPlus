@@ -382,7 +382,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void UpdateMSHeatPump(int const MSHeatPumpNum); // Engine driven heat pump number
+    void UpdateMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum); // Engine driven heat pump number
 
     //******************************************************************************
 

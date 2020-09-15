@@ -416,7 +416,7 @@ namespace EIRPlantLoopHeatPumps {
 
             // find this component on the plant
             bool thisErrFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->name,
                                                     this->plantTypeOfNum,
                                                     this->loadSideLocation.loopNum,
@@ -444,7 +444,7 @@ namespace EIRPlantLoopHeatPumps {
 
             thisErrFlag = false;
             if (this->waterSource) {
-                PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->name,
                                                         this->plantTypeOfNum,
                                                         this->sourceSideLocation.loopNum,
