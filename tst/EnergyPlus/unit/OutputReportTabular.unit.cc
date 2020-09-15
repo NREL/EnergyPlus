@@ -92,7 +92,6 @@
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
@@ -8290,11 +8289,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::OutputReportPredefined::reportName.allocate(1);
     EnergyPlus::OutputReportPredefined::reportName(pdrSensibleGain).show = true; 
 
-    // Need direct operation on this GatherHeatGainReportfirstTime variable
-    // However, this was a specially declared as an unnamed name space, how to refer to it
-    // do a clear_state above might be a workaround to set this right (the first line)
-    // EnergyPlus::OutputReportTabular::GatherHeatGainReportfirstTime = true;
-
     EnergyPlus::DataHVACGlobals::TimeStepSys = 10.0;
     EnergyPlus::DataGlobals::TimeStepZone = 20.0;
     EnergyPlus::DataDefineEquip::NumAirDistUnits = 1;
@@ -8318,8 +8312,6 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_GatherHeatGainReport)
     EnergyPlus::DataHeatBalance::ZoneWinHeatGainRepEnergy.allocate(1);
     EnergyPlus::DataHeatBalance::ZoneWinHeatLossRepEnergy.allocate(1);
     
-    // EnergyPlus::VentilatedSlab::NumOfVentSlabs = 0;
-
     GatherHeatGainReport(OutputProcessor::TimeStepType::TimeStepSystem);
 
     EXPECT_EQ(1.0*(EnergyPlus::DataHVACGlobals::TimeStepSys)*SecInHour, DataHeatBalance::ZonePreDefRep(1).SHGSAnZoneEqHt);

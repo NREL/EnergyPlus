@@ -5214,7 +5214,6 @@ namespace OutputReportTabular {
         static Array1D<Real64> radiantCool;
         static Array1D<Real64> ATUHeat;
         static Array1D<Real64> ATUCool;
-        static Real64 ZoneEqHeatorCool(0.0);
         static int timestepTimeStamp(0);
         static Real64 bldgHtPk(0.0);
         static Real64 bldgClPk(0.0);
@@ -5243,8 +5242,6 @@ namespace OutputReportTabular {
         // clear the ATU accumulation variables
         ATUHeat = 0.0;
         ATUCool = 0.0;
-        // clear the temporary Zone Eq accumulatoin variable
-        ZoneEqHeatorCool = 0.0;
         //--------------------
         //     ANNUAL
         //--------------------
@@ -5269,7 +5266,7 @@ namespace OutputReportTabular {
             ZonePreDefRep(iZone).SHGSAnLiteAdd += ZnRpt(iZone).LtsTotGain * mult * timeStepRatio;
             // HVAC Input Sensible Air Heating
             // HVAC Input Sensible Air Cooling
-            ZoneEqHeatorCool =
+            Real64 ZoneEqHeatorCool = 
                 ZnAirRpt(iZone).SumMCpDTsystem + ZnAirRpt(iZone).SumNonAirSystem * mult - ATUHeat(iZone) - ATUCool(iZone);
             if (ZoneEqHeatorCool > 0.0) {
                 ZonePreDefRep(iZone).SHGSAnZoneEqHt += ZoneEqHeatorCool * TimeStepSys * SecInHour;
