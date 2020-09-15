@@ -102,6 +102,10 @@ public: // Methods
 
     Real64 pvWattsDCCapacity();
 
+    Real64 pvWattsInverterEfficiency();
+
+    Real64 pvWattsDCtoACSizeRatio();
+
     Real64 thermLossRate() const;
 
     Real64 getLossRateForOutputPower(EnergyPlusData &state, Real64 const powerOutOfInverter);

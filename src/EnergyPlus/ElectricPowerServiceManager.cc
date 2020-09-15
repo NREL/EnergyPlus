@@ -942,6 +942,10 @@ ElectPowerLoadCenter::ElectPowerLoadCenter(EnergyPlusData &state, int const obje
                 } else {
                     PVWatts::PVWattsGenerator &pvwGen = PVWatts::GetOrCreatePVWattsGenerator(generatorController->name);
                     totalDCCapacity += pvwGen.getDCSystemCapacity();
+
+                    // Pass the inverter properties to the PVWatts generator class
+                    pvwGen.setDCtoACRatio(inverterObj->pvWattsDCtoACSizeRatio());
+                    pvwGen.setInverterEfficiency(inverterObj->pvWattsInverterEfficiency());
                 }
             }
             if (!errorsFound) {
@@ -2496,6 +2500,16 @@ void DCtoACInverter::setPVWattsDCCapacity(const Real64 dcCapacity)
 Real64 DCtoACInverter::pvWattsDCCapacity()
 {
     return ratedPower_ * pvWattsDCtoACSizeRatio_;
+}
+
+Real64 DCtoACInverter::pvWattsInverterEfficiency()
+{
+    return pvWattsInverterEfficiency_;
+}
+
+Real64 DCtoACInverter::pvWattsDCtoACSizeRatio()
+{
+    return pvWattsDCtoACSizeRatio_;
 }
 
 Real64 DCtoACInverter::thermLossRate() const
