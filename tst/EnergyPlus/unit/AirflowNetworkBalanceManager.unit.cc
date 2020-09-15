@@ -20015,9 +20015,6 @@ std::string const idf_objects = delimited_string({
 }
 TEST_F(EnergyPlusFixture, AirflowNetwork_TestZoneVentingAirBoundary)
 {
-
-    // Unit test for #5021
-
     Zone.allocate(1);
     Zone(1).Name = "SALA DE AULA";
 
