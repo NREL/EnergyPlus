@@ -26,7 +26,7 @@ jobs:
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       run: cmake -G "Visual Studio 16 2019" -A x64 -DLINK_WITH_PYTHON=ON -DBUILD_TESTING=ON -DBUILD_FORTRAN=ON ..
 
-    - name: Build Package
+    - name: Build EnergyPlus
       working-directory: ${{runner.workspace}}/EnergyPlus/build
       shell: bash
       run: cmake --build . -j 2 --config Release

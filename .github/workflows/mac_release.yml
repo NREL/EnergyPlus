@@ -54,11 +54,6 @@ jobs:
       shell: bash
       run: cmake --build . --target package -j 2
 
-    - name: Inspect build for package names
-      working-directory: ${{runner.workspace}}/EnergyPlus/build
-      shell: bash
-      run: ls
-
     - name: Upload Tarball
       uses: actions/upload-artifact@v2
       with:
