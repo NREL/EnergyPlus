@@ -39,7 +39,7 @@ Big Ladder also produces html based documentation [online](http://bigladdersoftw
 
 ## API Documentation
 
-[![Read the Docs](https://img.shields.io/readthedocs/eplus?label=Python%20API%20Latest%20%28beta%29)](https://eplus.readthedocs.io/en/stable/)
+[![Read the Docs](https://img.shields.io/readthedocs/eplus?label=Python%20API%20Latest%20%28beta%29)](https://eplus.readthedocs.io/en/latest/)
 
 An API is being developed to allow access to internal EnergyPlus functionality and open up the possibility for many new workflow opportunities around EnergyPlus.
 A C API is developed to expose the C++ functions, then Python bindings are built on top of that to maximize the accessibility.
