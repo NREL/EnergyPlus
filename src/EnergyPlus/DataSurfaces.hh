@@ -527,7 +527,6 @@ namespace DataSurfaces {
     extern Array1D<int> SurfWinStormWinFlagPrevDay;                // Previous time step value of StormWinFlag
     extern Array1D<Real64> SurfWinFracTimeShadingDeviceOn;         // For a single time step, = 0.0 if no shading device or shading device is off = 1.0 if shading device is on; For time intervals longer than a time step, = fraction of time that shading device is on.
     extern Array1D<int> SurfWinExtIntShadePrevTS;                  // 1 if exterior or interior blind or shade in place previous time step;0 otherwise
-    extern Array1D<int> SurfWinShadedConstruction;                 // For windows with shading, the construction with shading
     extern Array1D<bool> SurfWinHasShadeOrBlindLayer;              // mark as true if the window construction has a shade or a blind layer
     extern Array1D<bool> SurfWinSurfDayLightInit;                  // surface has been initialized for following 5 arrays
     extern Array1D<int> SurfWinDaylFacPoint;                       // Pointer to daylight factors for the window
