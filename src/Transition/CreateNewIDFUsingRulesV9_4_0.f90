@@ -126,7 +126,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutputDiagnosticsName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputDiagnosticsNames
   LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
-  INTEGER :: n
+  INTEGER :: nE, nEC, nG, nNG, nFO, nFON
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -1193,9 +1193,22 @@ END SUBROUTINE CreateNewIDFUsingRules
 SUBROUTINE ReplaceFuelNameWithEndUseSubcategory(InOutArg, NoDiffArg)
   CHARACTER(*), INTENT(INOUT) :: InOutArg
   LOGICAL, INTENT(INOUT) :: NoDiffArg
-  n=INDEX(InOutArg,':Gas')
-  IF (n > 0) THEN
-    InOutArg = InOutArg(:n-1) // ':NaturalGas'(:11) // InOutArg(n+4:)
+  nE=INDEX(InOutArg,'Electric')
+  nEC=INDEX(InOutArg,'Electricity')
+  nG=INDEX(InOutArg,'Gas')
+  nNG=INDEX(InOutArg,'NaturalGas')
+  nFO=INDEX(InOutArg,'FuelOil#')
+  nFON=INDEX(InOutArg,'FuelOilNo')
+  IF (nE > 0 .AND. nEC == 0) THEN
+    InOutArg = InOutArg(:nE-1) // 'Electricity'(:11) // InOutArg(nE+8:)
+    NoDiffArg=.false.
+  END IF
+  IF (nG > 0 .AND. nNG == 0) THEN
+    InOutArg = InOutArg(:nG-1) // 'NaturalGas'(:10) // InOutArg(nG+3:)
+    NoDiffArg=.false.
+  END IF
+  IF (nFO > 0 .AND. nFON== 0) THEN
+    InOutArg = InOutArg(:nFO-1) // 'FuelOilNo'(:9) // InOutArg(nFO+8:)
     NoDiffArg=.false.
   END IF
 END SUBROUTINE
