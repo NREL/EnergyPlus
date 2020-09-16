@@ -202,7 +202,8 @@ namespace DataSystemVariables {
     void CheckForActualFileName(IOFiles &ioFiles,
                                 std::string const &originalInputFileName, // name as input for object
                                 bool &FileFound,                          // Set to true if file found and is in CheckedFileName
-                                std::string &CheckedFileName              // Blank if not found.
+                                std::string &CheckedFileName,             // Blank if not found.
+                                std::vector<std::string> *pathsChecked
     )
     {
 
@@ -267,6 +268,7 @@ namespace DataSystemVariables {
             print(ioFiles.audit, "{}={}\n", "found (user input)", getAbsolutePath(CheckedFileName));
             return;
         } else {
+            pathsChecked->push_back(getAbsolutePath(InputFileName));
             print(ioFiles.audit, "{}={}\n", "not found (user input)", getAbsolutePath(InputFileName));
         }
 
@@ -277,6 +279,9 @@ namespace DataSystemVariables {
             print(ioFiles.audit, "{}={}\n", "found (input file)", getAbsolutePath(CheckedFileName));
             return;
         } else {
+            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName)) == pathsChecked->end()){
+                pathsChecked->push_back(getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
+            }
             print(ioFiles.audit, "{}={}\n", "not found (input file)", getAbsolutePath(DataStringGlobals::inputDirPathName + InputFileName));
         }
 
@@ -287,6 +292,9 @@ namespace DataSystemVariables {
             print(ioFiles.audit, "{}={}\n", "found (epin)", getAbsolutePath(CheckedFileName));
             return;
         } else {
+            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(envinputpath1 + InputFileName)) == pathsChecked->end()){
+                pathsChecked->push_back(getAbsolutePath(envinputpath1 + InputFileName));
+            }
             print(ioFiles.audit, "{}={}\n", "not found (epin)", getAbsolutePath(envinputpath1 + InputFileName));
         }
 
@@ -297,6 +305,9 @@ namespace DataSystemVariables {
             print(ioFiles.audit, "{}={}\n", "found (input_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
+            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(envinputpath2 + InputFileName)) == pathsChecked->end()){
+                pathsChecked->push_back(getAbsolutePath(envinputpath2 + InputFileName));
+            }
             print(ioFiles.audit, "{}={}\n", "not found (input_path)", getAbsolutePath(envinputpath2 + InputFileName));
         }
 
@@ -307,6 +318,9 @@ namespace DataSystemVariables {
             print(ioFiles.audit, "{}={}\n", "found (program_path)", getAbsolutePath(CheckedFileName));
             return;
         } else {
+            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(envprogrampath + InputFileName)) == pathsChecked->end()){
+                pathsChecked->push_back(getAbsolutePath(envprogrampath + InputFileName));
+            }
             print(ioFiles.audit, "{}={}\n", "not found (program_path)", getAbsolutePath(envprogrampath + InputFileName));
         }
 
@@ -319,6 +333,9 @@ namespace DataSystemVariables {
             print(ioFiles.audit, "{}={}\n", "found (CWF)", getAbsolutePath(CheckedFileName));
             return;
         } else {
+            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(CurrentWorkingFolder + InputFileName)) == pathsChecked->end()){
+                pathsChecked->push_back(getAbsolutePath(CurrentWorkingFolder + InputFileName));
+            }
             print(ioFiles.audit, "{}={}\n", "not found (CWF)", getAbsolutePath(CurrentWorkingFolder + InputFileName));
         }
 
@@ -329,6 +346,9 @@ namespace DataSystemVariables {
             print(ioFiles.audit, "{}={}\n", "found (program path - ini)", getAbsolutePath(CheckedFileName));
             return;
         } else {
+            if (std::find(pathsChecked->begin(), pathsChecked->end(), getAbsolutePath(ProgramPath + InputFileName)) == pathsChecked->end()){
+                pathsChecked->push_back(getAbsolutePath(ProgramPath + InputFileName));
+            }
             print(ioFiles.audit, "{}={}\n", "not found (program path - ini)", getAbsolutePath(ProgramPath + InputFileName));
         }
     }
