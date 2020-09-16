@@ -142,30 +142,32 @@ target_architecture(TARGET_ARCH)
 
 # Debug
 
-cmake_host_system_information(RESULT _OS_NAME QUERY OS_NAME)
-message("-- OS_NAME variable is set to: " ${_OS_NAME})
+#cmake_host_system_information(RESULT _OS_NAME QUERY OS_NAME)
+#message("-- OS_NAME variable is set to: " ${_OS_NAME})
 
-cmake_host_system_information(RESULT _OS_RELEASE QUERY OS_RELEASE)
-message("-- OS_RELEASE variable is set to: " ${_OS_RELEASE})
+#cmake_host_system_information(RESULT _OS_RELEASE QUERY OS_RELEASE)
+#message("-- OS_RELEASE variable is set to: " ${_OS_RELEASE})
 
-cmake_host_system_information(RESULT _OS_VERSION QUERY OS_VERSION)
-message("-- OS_VERSION variable is set to: " ${_OS_VERSION})
+#cmake_host_system_information(RESULT _OS_VERSION QUERY OS_VERSION)
+#message("-- OS_VERSION variable is set to: " ${_OS_VERSION})
 
-cmake_host_system_information(RESULT _OS_PLATFORM QUERY OS_PLATFORM)
-message("-- OS_PLATFORM variable is set to: " ${_OS_PLATFORM})
+#cmake_host_system_information(RESULT _OS_PLATFORM QUERY OS_PLATFORM)
+#message("-- OS_PLATFORM variable is set to: " ${_OS_PLATFORM})
 
-message("CMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}")
-message("CMAKE_SYSTEM_NAME =${CMAKE_SYSTEM_NAME}")
-if(MSVC)
-  message("CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION=${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
-  message("MSVC_VERSION =${MSVC_VERSION}")
-endif()
+#message("CMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}")
+#message("CMAKE_SYSTEM_NAME =${CMAKE_SYSTEM_NAME}")
+#if(MSVC)
+  #message("CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION=${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")
+  #message("MSVC_VERSION =${MSVC_VERSION}")
+#endif()
 
 # Mac
 #-- OS_NAME variable is set to: Mac OS X
 #-- OS_RELEASE variable is set to: 10.14.6
 #-- OS_VERSION variable is set to: 18G2022
 #-- OS_PLATFORM variable is set to: x86_64
+# CMAKE_SYSTEM_VERSION=18.7.0
+# CMAKE_SYSTEM_NAME =Darwin
 
 # Ubuntu
 #-- OS_NAME variable is set to: Linux
@@ -192,9 +194,13 @@ if(APPLE)
   # Looking at cmake source code OS_RELEASE is already set to the output of `sw_vers -productVersion` which is what we want
   cmake_host_system_information(RESULT OSX_VERSION QUERY OS_RELEASE)
   message("-- OS_RELEASE variable is set to: " ${OSX_VERSION})
+  if(NOT CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
+    message("Using CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    set(OSX_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+  endif()
 
-  # The output is like 10.12.6, let's strip the end component
-  string(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\..*" "\\1" OSX_VERSION_MAJOR_MINOR ${OSX_VERSION})
+  # The output is like 10.12.6 or 10.13, let's strip the end component if any
+  string(REGEX REPLACE "^([0-9]+\\.[0-9]+)\\.?.*" "\\1" OSX_VERSION_MAJOR_MINOR ${OSX_VERSION})
 
   set(SYSTEM_VERSION "-macOS${OSX_VERSION_MAJOR_MINOR}")
 
