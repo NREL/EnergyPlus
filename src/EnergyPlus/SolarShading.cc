@@ -10388,7 +10388,7 @@ namespace SolarShading {
             for (std::size_t listIndex = 0; listIndex < Surface(curSurface).windowShadingControlList.size(); ++listIndex) {
                 int wsc = Surface(curSurface).windowShadingControlList[listIndex];
                 //pick the first WindowShadingControl that has a non-zero schedule value
-                if (ScheduleManager::GetCurrentScheduleValue(WindowShadingControl(wsc).Schedule) != 0.0) {
+                if (ScheduleManager::GetCurrentScheduleValue(WindowShadingControl(wsc).Schedule) > 0.0) {
                     selected = listIndex;
                     break;
                 }
