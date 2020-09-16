@@ -1,0 +1,22 @@
+compilers:
+  - name: Visual Studio
+    version: 16
+    architecture: i386
+    release_only: true
+    build_package_generator:
+     - IFW
+     - ZIP
+    release_build_cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DTEX_INTERACTION="nonstopmode"
+    cmake_extra_flags: -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=%COMMIT_SHA% -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
+    skip_regression: true
+
+  - name: Visual Studio
+    version: 16
+    architecture: Win64
+    build_package_generator:
+     - IFW
+     - ZIP
+    release_build_cmake_extra_flags: -DBUILD_DOCS:BOOL=ON -DTEX_INTERACTION="nonstopmode"
+    cmake_extra_flags: -DBUILD_FORTRAN:BOOL=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DCOMMIT_SHA=%COMMIT_SHA% -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF -DLINK_WITH_PYTHON=ON
+    skip_regression: true
+
