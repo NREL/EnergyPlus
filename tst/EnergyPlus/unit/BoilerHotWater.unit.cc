@@ -181,7 +181,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BlankDesignWaterFlowRate)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetBoilerInput(state.dataBoilers);
+    GetBoilerInput(state);
 
     EXPECT_EQ(1, state.dataBoilers.numBoilers);
     EXPECT_EQ(AutoSize, state.dataBoilers.Boiler(1).VolFlowRate);
@@ -247,7 +247,7 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
         loopsidebranch.Comp.allocate(1);
     }
 
-    GetBoilerInput(state.dataBoilers);
+    GetBoilerInput(state);
     auto &thisBoiler = state.dataBoilers.Boiler(1);
 
     DataPlant::PlantLoop(1).Name = "HotWaterLoop";
@@ -268,13 +268,13 @@ TEST_F(EnergyPlusFixture, Boiler_HotWater_BoilerEfficiency)
     DataPlant::PlantFirstSizesOkayToReport = true;
     DataPlant::PlantFinalSizesOkayToReport = true;
 
-    thisBoiler.InitBoiler(state.dataBranchInputManager);
+    thisBoiler.InitBoiler(state);
     thisBoiler.SizeBoiler();
 
     // run through init again after sizing is complete to set mass flow rate and run calc function
     DataGlobals::BeginEnvrnFlag = true;
-    thisBoiler.InitBoiler(state.dataBranchInputManager);
-    thisBoiler.CalcBoilerModel(MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
+    thisBoiler.InitBoiler(state);
+    thisBoiler.CalcBoilerModel(state, MyLoad, RunFlag, DataBranchAirLoopPlant::ControlType_SeriesActive);
 
     // check boiler part load ratio and the resultant boiler efficiency
     EXPECT_NEAR(thisBoiler.BoilerPLR, 0.24, 0.01);

@@ -283,9 +283,9 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     DataAirSystems::PrimaryAirSystem.allocate(DataHVACGlobals::NumPrimaryAirSys);
     DataAirSystems::PrimaryAirSystem(1).Name = "System 1";
     DataAirSystems::PrimaryAirSystem(2).Name = "System 2";
-        DataAirLoop::AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
-    auto &thisAirLoopFlow1(DataAirLoop::AirLoopFlow(1));
-    auto &thisAirLoopFlow2(DataAirLoop::AirLoopFlow(2));
+        state.dataAirLoop->AirLoopFlow.allocate(DataHVACGlobals::NumPrimaryAirSys);
+    auto &thisAirLoopFlow1(state.dataAirLoop->AirLoopFlow(1));
+    auto &thisAirLoopFlow2(state.dataAirLoop->AirLoopFlow(2));
 
     // Case 1 - No flow - no error
     thisAirLoopFlow1.SupFlow = 0.0;
@@ -296,7 +296,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 0.0;
     thisAirLoopFlow2.OAFlow = 0.0;
 
-    HVACManager::CheckAirLoopFlowBalance();
+    HVACManager::CheckAirLoopFlowBalance(state);
     EXPECT_FALSE(has_err_output(true));
 
     //Case 2 - Both loops are balanced
@@ -308,7 +308,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 3.0;
     thisAirLoopFlow2.OAFlow = 0.0;
 
-    HVACManager::CheckAirLoopFlowBalance();
+    HVACManager::CheckAirLoopFlowBalance(state);
     EXPECT_FALSE(has_err_output(true));
 
     //Case 3 - Loop 1 is unbalanced
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 3.0;
     thisAirLoopFlow2.OAFlow = 0.0;
 
-    HVACManager::CheckAirLoopFlowBalance();
+    HVACManager::CheckAirLoopFlowBalance(state);
     EXPECT_TRUE(has_err_output(false));
     std::string error_string = delimited_string({
         "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 1 is unbalanced. Supply is > return plus outdoor air.",
@@ -339,7 +339,7 @@ TEST_F(EnergyPlusFixture, AirloopFlowBalanceTest)
     thisAirLoopFlow2.SysRetFlow = 2.0;
     thisAirLoopFlow2.OAFlow = 0.99;
 
-    HVACManager::CheckAirLoopFlowBalance();
+    HVACManager::CheckAirLoopFlowBalance(state);
     EXPECT_TRUE(has_err_output(false));
     error_string = delimited_string({
         "   ** Severe  ** CheckAirLoopFlowBalance: AirLoopHVAC System 2 is unbalanced. Supply is > return plus outdoor air.",

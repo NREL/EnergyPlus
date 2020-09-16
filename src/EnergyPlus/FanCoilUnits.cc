@@ -771,7 +771,8 @@ namespace FanCoilUnits {
             }
 
             // check for inlet side air mixer
-            GetATMixer(state.dataZoneAirLoopEquipmentManager, FanCoil(FanCoilNum).Name,
+            GetATMixer(state,
+                       state.dataZoneAirLoopEquipmentManager, FanCoil(FanCoilNum).Name,
                        ATMixerName,
                        ATMixerNum,
                        ATMixerType,
@@ -1156,7 +1157,7 @@ namespace FanCoilUnits {
         if (MyPlantScanFlag(FanCoilNum) && allocated(PlantLoop)) {
             errFlag = false;
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         FanCoil(FanCoilNum).HCoilName,
                                         FanCoil(FanCoilNum).HCoilPlantTypeOfNum,
                                         FanCoil(FanCoilNum).HeatCoilLoopNum,
@@ -1189,7 +1190,7 @@ namespace FanCoilUnits {
 
             if ((FanCoil(FanCoilNum).CCoilPlantTypeOfNum == TypeOf_CoilWaterCooling) ||
                 (FanCoil(FanCoilNum).CCoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling)) {
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         FanCoil(FanCoilNum).CCoilPlantName,
                                         FanCoil(FanCoilNum).CCoilPlantTypeOfNum,
                                         FanCoil(FanCoilNum).CoolCoilLoopNum,
@@ -3107,7 +3108,7 @@ namespace FanCoilUnits {
                 } else if ((CoolingLoad && QUnitOutMax > QZnReq && QZnReq < 0.0) || (HeatingLoad && QUnitOutMax < QZnReq && QZnReq > 0.0)) {
                     // load is larger than capacity, thus run the fancoil unit at full capacity
                     PLR = 1.0;
-                } 
+                }
                 Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
                 PowerMet = QUnitOut;
                 AirMassFlow = Node(InletNode).MassFlowRate;
@@ -3483,7 +3484,7 @@ namespace FanCoilUnits {
                           bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                           Real64 &LoadMet,               // load met by unit (watts)
                           Optional<Real64> PLR,          // Part Load Ratio, fraction of time step fancoil is on
-                          Real64 eHeatCoilCyclingR       // electric heating coil cycling ratio  used with MultiSpeedFan capacity control 
+                          Real64 eHeatCoilCyclingR       // electric heating coil cycling ratio  used with MultiSpeedFan capacity control
     )
     {
 
@@ -3575,7 +3576,7 @@ namespace FanCoilUnits {
                     min(Node(FanCoil(FanCoilNum).ATMixerPriNode).MassFlowRateMaxAvail, Node(InletNode).MassFlowRate);
                 // now calculate the the mixer outlet conditions (and the secondary air inlet flow rate)
                 // the mixer outlet flow rate has already been set above (it is the "inlet" node flow rate)
-                SimATMixer(FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
+                SimATMixer(state, FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
             }
             AirMassFlow = Node(InletNode).MassFlowRate;
         } else {
@@ -3689,7 +3690,7 @@ namespace FanCoilUnits {
                 if (FanCoil(FanCoilNum).FanOpMode == ContFanCycCoil) {
                     QZnReq = FanCoil(FanCoilNum).DesignHeatingCapacity * FanFlowRatio * eHeatCoilCyclingR * ElecHeaterControl;
                 } else {
-                    // proportionally reduce the full flow capacity based on fan flow fraction 
+                    // proportionally reduce the full flow capacity based on fan flow fraction
                     QZnReq = FanCoil(FanCoilNum).DesignHeatingCapacity * FanFlowRatio * PartLoad * eHeatCoilCyclingR * ElecHeaterControl;
                 }
                 SimulateHeatingCoilComponents(state,
@@ -3745,7 +3746,7 @@ namespace FanCoilUnits {
         if (FanCoil(FanCoilNum).ATMixerExists) {
             if (FanCoil(FanCoilNum).ATMixerType == ATMixer_SupplySide) {
                 // Now calculate the ATM mixer if it is on the supply side of the zone unit
-                SimATMixer(FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
+                SimATMixer(state, FanCoil(FanCoilNum).ATMixerName, FirstHVACIteration, FanCoil(FanCoilNum).ATMixerIndex);
             }
         }
 
@@ -5053,8 +5054,8 @@ namespace FanCoilUnits {
     )
     {
         // PURPOSE OF THIS SUBROUTINE:
-        // Calculate electric heating coil cycling ratio of FanCoilUnit with MultiSpeedFan 
-        // capacity control method when running with at lowest speed for a continuous fan 
+        // Calculate electric heating coil cycling ratio of FanCoilUnit with MultiSpeedFan
+        // capacity control method when running with at lowest speed for a continuous fan
         // fan operating mode.
 
         // METHODOLOGY EMPLOYED:
@@ -5084,7 +5085,7 @@ namespace FanCoilUnits {
         WaterControlNode = int(Par(5));
         PLR = 1.0;
 
-        // electric heating coil cycling ratio at minimum air flow for constant fan operating mode 
+        // electric heating coil cycling ratio at minimum air flow for constant fan operating mode
         Calc4PipeFanCoil(state, FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOut, PLR, CyclingR);
 
         // Calculate residual based on output magnitude

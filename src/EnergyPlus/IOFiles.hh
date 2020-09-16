@@ -97,7 +97,7 @@ public:
     std::istream::iostate rdstate() const noexcept;
 
     std::string fileName;
-    void open(bool = true);
+    void open(bool = false, bool = true);
     std::fstream::pos_type position() const noexcept;
 
     void rewind() noexcept { if (is) { is->seekg(0); } }
@@ -165,7 +165,7 @@ template <typename FileType> struct IOFileName
     FileType try_open(bool output_to_file = true)
     {
         FileType file{fileName};
-        file.open(output_to_file);
+        file.open(false, output_to_file);
         return file;
     }
 };
@@ -243,7 +243,7 @@ public:
         void getInput();
 
         bool csv = false;
-        bool mtr = false;
+        bool mtr = true;
         bool eso = true;
         bool eio = true;
         bool audit = true;

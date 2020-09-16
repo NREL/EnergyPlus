@@ -2,6 +2,7 @@
 
 import json
 import os
+import sys
 
 
 def usage():
@@ -59,3 +60,4 @@ if len(need_to_add_to_cmake) > 0:
             'messagetype': 'error',
             'message': 'File missing from testfiles/CMakeLists.txt'
         }))
+    sys.exit(1)

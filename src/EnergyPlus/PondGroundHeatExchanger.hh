@@ -125,7 +125,7 @@ namespace PondGroundHeatExchanger {
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void InitPondGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager, bool FirstHVACIteration);
+        void InitPondGroundHeatExchanger(EnergyPlusData &state, bool FirstHVACIteration);
 
         void setupOutputVars();
 

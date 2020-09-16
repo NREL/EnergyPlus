@@ -117,7 +117,8 @@ namespace PlantPressureSystem {
         InitPressureDropOneTimeInit = true;
     }
 
-    void SimPressureDropSystem(int const LoopNum,              // Plant Loop to update pressure information
+    void SimPressureDropSystem(EnergyPlusData &state,
+                               int const LoopNum,              // Plant Loop to update pressure information
                                bool const FirstHVACIteration,  // System flag
                                int const CallType,             // Enumerated call type
                                Optional_int_const LoopSideNum, // Loop side num for specific branch simulation
@@ -155,7 +156,7 @@ namespace PlantPressureSystem {
             if (SELECT_CASE_var == PressureCall_Init) {
                 InitPressureDrop(LoopNum, FirstHVACIteration);
             } else if (SELECT_CASE_var == PressureCall_Calc) {
-                BranchPressureDrop(LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
+                BranchPressureDrop(state, LoopNum, LoopSideNum, BranchNum); // Autodesk:OPTIONAL LoopSideNum, BranchNum used without PRESENT check
             } else if (SELECT_CASE_var == PressureCall_Update) {
                 UpdatePressureDrop(LoopNum);
             } else {
@@ -373,7 +374,8 @@ namespace PlantPressureSystem {
         }
     }
 
-    void BranchPressureDrop(int const LoopNum,     // Plant Loop Index
+    void BranchPressureDrop(EnergyPlusData &state,
+                            int const LoopNum,     // Plant Loop Index
                             int const LoopSideNum, // LoopSide Index (1=Demand, 2=Supply) on Plant Loop LoopNum
                             int const BranchNum    // Branch Index on LoopSide LoopSideNum
     )
@@ -438,12 +440,12 @@ namespace PlantPressureSystem {
             auto const SELECT_CASE_var(PressureCurveType);
             if (SELECT_CASE_var == PressureCurve_Pressure) {
                 // DeltaP = [f*(L/D) + K] * (rho * V^2) / 2
-                BranchDeltaPress = PressureCurveValue(PressureCurveIndex, NodeMassFlow, NodeDensity, NodeViscosity);
+                BranchDeltaPress = PressureCurveValue(state, PressureCurveIndex, NodeMassFlow, NodeDensity, NodeViscosity);
 
             } else if (SELECT_CASE_var == PressureCurve_Generic) {
                 // DeltaP = func(mdot)
                 // Generic curve, only pass V1=mass flow rate
-                BranchDeltaPress = CurveValue(PressureCurveIndex, NodeMassFlow);
+                BranchDeltaPress = CurveValue(state, PressureCurveIndex, NodeMassFlow);
 
             } else {
                 // Shouldn't end up here, but just in case
@@ -832,7 +834,8 @@ namespace PlantPressureSystem {
         Node(SupplyOutletNodeNum).Press = Node(DemandInletNodeNum).Press;
     }
 
-    Real64 ResolveLoopFlowVsPressure(int const LoopNum,            // - Index of which plant/condenser loop is being simulated
+    Real64 ResolveLoopFlowVsPressure(EnergyPlusData &state,
+                                     int const LoopNum,            // - Index of which plant/condenser loop is being simulated
                                      Real64 const SystemMassFlow,  // - Initial "guess" at system mass flow rate [kg/s]
                                      int const PumpCurveNum,       // - Pump curve to use when calling the curve manager for psi = f(phi)
                                      Real64 const PumpSpeed,       // - Pump rotational speed, [rps] (revs per second)
@@ -950,7 +953,7 @@ namespace PlantPressureSystem {
             PhiPump = min(PhiPump, MaxPhi);
 
             // Get the pump curve value from the curve manager
-            PsiPump = CurveValue(PumpCurveNum, PhiPump);
+            PsiPump = CurveValue(state, PumpCurveNum, PhiPump);
 
             // Calcuate Pump Pressure rise
             PumpPressureRise = PsiPump * NodeDensity * pow_2(PumpSpeed) * pow_2(PumpImpellerDia);

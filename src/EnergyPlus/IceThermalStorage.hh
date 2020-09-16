@@ -152,11 +152,11 @@ namespace IceThermalStorage {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitSimpleIceStorage(BranchInputManagerData &dataBranchInputManager);
+        void InitSimpleIceStorage(EnergyPlusData &state);
 
         void CalcIceStorageDormant();
 
@@ -251,13 +251,13 @@ namespace IceThermalStorage {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void simulate(EnergyPlusData &EP_UNUSED(state), const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void InitDetailedIceStorage(BranchInputManagerData &dataBranchInputManager);
+        void InitDetailedIceStorage(EnergyPlusData &state);
 
-        void SimDetailedIceStorage();
+        void SimDetailedIceStorage(EnergyPlusData &state);
 
         void UpdateDetailedIceStorage();
 
@@ -273,14 +273,15 @@ namespace IceThermalStorage {
     // Static Functions
     void clear_state();
 
-    void GetIceStorageInput();
+    void GetIceStorageInput(EnergyPlusData &state);
 
     Real64 CalcDetIceStorLMTDstar(Real64 Tin,  // ice storage unit inlet temperature
                                   Real64 Tout, // ice storage unit outlet (setpoint) temperature
                                   Real64 Tfr   // freezing temperature
     );
 
-    Real64 CalcQstar(int CurveIndex,      // curve index
+    Real64 CalcQstar(EnergyPlusData &state,
+                     int CurveIndex,      // curve index
                      enum CurveVars CurveIndVarType, // independent variable type for ice storage
                      Real64 FracCharged,  // fraction charged for ice storage unit
                      Real64 LMTDstar,     // normalized log mean temperature difference across the ice storage unit

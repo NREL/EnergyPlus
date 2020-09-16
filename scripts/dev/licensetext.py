@@ -131,7 +131,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
                  message=error):
     '''Check for a few of the usual issues with the license'''
     if possible == correct:
-        return
+        return True
     try:
         possibleYear = possible[offset+31:offset+35]
         correctYear = correct[offset+31:offset+35]
@@ -142,7 +142,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
                  'line':1,
                  'messagetype':'error',
                  'message':'License text cannot be matched, check entire license'})
-        return
+        return False
     try:
         int(possibleYear)
         if possibleYear != correctYear:
@@ -154,7 +154,7 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
                      'message':'License year is incorrect'})
             corrected = possible[:offset+31]+correctYear+possible[offset+35:]
             if corrected == correct:
-                return
+                return False
     except:
         message({'tool':toolname,
                  'filename':filename,
@@ -162,13 +162,14 @@ def checkLicense(filename,possible,correct,offset=0,toolname='unspecified',
                  'line':1,
                  'messagetype':'error',
                  'message':'License text cannot be matched, check entire license'})
-        return
+        return False
     message({'tool':toolname,
              'filename':filename,
              'file':filename,
              'line':1,
              'messagetype':'error',
              'message':'Non-year differences in license text, check entire license'})
+    return False
 
 
 def mergeParagraphs(text):
@@ -207,9 +208,13 @@ class FileVisitor:
         pass
 
     def visit(self, path):
+        overall_success = True
         for file in self.files(path):
-            self.visit_file(file)
+            file_success = self.visit_file(file)
+            if not file_success:
+                overall_success = False
             self.visited_files.append(file)
+        return overall_success
 
     def readtext(self, filepath):
         fp = open(filepath, 'r', encoding='utf-8')
@@ -249,13 +254,17 @@ class Checker(FileVisitor):
             if n == 0:
                 lines = txt.splitlines()[:self.n]
                 shortened = '\n'.join(lines)+'\n'
-                checkLicense(filepath,shortened,self.text,offset=3,
+                success = checkLicense(filepath,shortened,self.text,offset=3,
                              toolname=self.toolname,message=error)
+                return success
             else:
                 if n > 1:
                     self.error(filepath, 1, 'Multiple instances of license text')
+                    return False
                 if not txt.startswith(self.text):
                     self.error(filepath, 1, 'License text is not at top of file')
+                    return False
+        return True
 
 
 class Replacer(FileVisitor):
