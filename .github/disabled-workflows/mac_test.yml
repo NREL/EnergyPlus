@@ -92,4 +92,4 @@ jobs:
     - name: Test Branch
       working-directory: ${{runner.workspace}}/EnergyPlus/clone_branch/build
       shell: bash
-      run: ctest -R 1ZoneUncontrolled
+      run: ctest -j 2
