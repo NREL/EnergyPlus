@@ -114,7 +114,7 @@ TEST_F(CoilCoolingDXTest, CoilCoolingDXCurveFitOperatingMode_Sizing) {
     });
     idf_objects += this->getSpeedObjectString("Coil Cooling DX Curve Fit Speed 1");
     EXPECT_TRUE(process_idf( idf_objects, false ));
-    CoilCoolingDXCurveFitOperatingMode thisMode("Coil Cooling DX Curve Fit Operating Mode 1");
+    CoilCoolingDXCurveFitOperatingMode thisMode(state, "Coil Cooling DX Curve Fit Operating Mode 1");
     EXPECT_EQ(CoilCoolingDXCurveFitOperatingMode::CondenserType::EVAPCOOLED, thisMode.condenserType);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedEvapAirFlowRate);
     EXPECT_EQ(DataSizing::AutoSize, thisMode.ratedGrossTotalCap);
