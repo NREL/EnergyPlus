@@ -60,7 +60,6 @@ jobs:
         file: ${{runner.workspace}}/EnergyPlus/build//${{ matrix.os }}_$PACKAGE_NAME_TAR  # take the matrix_os off when package naming is improved
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true
 
     - name: Set Environment Variable Name of Linux IFW Installer Package
       run: echo ::set-env name=PACKAGE_NAME_IFW::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_run)
@@ -75,7 +74,6 @@ jobs:
         file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_IFW
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true
 
     - name: Set Environment Variable Name of Linux Shell Installer Package
       run: echo ::set-env name=PACKAGE_NAME_SH::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_sh)
@@ -90,4 +88,3 @@ jobs:
         file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_SH
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true

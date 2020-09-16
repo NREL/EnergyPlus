@@ -64,7 +64,6 @@ jobs:
         file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_TAR
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true
 
     - name: Set Environment Variable Name of Mac Installer Package
       run: echo ::set-env name=PACKAGE_NAME_DMG::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build mac_dmg)
@@ -76,4 +75,3 @@ jobs:
         file: ${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_DMG
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true
