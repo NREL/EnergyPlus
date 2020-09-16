@@ -5005,6 +5005,7 @@ namespace LowTempRadiantSystem {
                 this->OperatingMode = HeatingMode;
 
                 HeatFrac = this->calculateOperationalFraction(OffTemp, ControlTemp, this->ThrottlRange);
+                if (HeatFrac > 1.0) HeatFrac = 1.0;
 
                 // Set the heat source for the low temperature electric radiant system
                 for (RadSurfNum = 1; RadSurfNum <= this->NumOfSurfaces; ++RadSurfNum) {
@@ -5324,8 +5325,7 @@ namespace LowTempRadiantSystem {
         } else if (throttlingRange < 0.001) {
             return 1.0; // Throttling range is essentially zero and there is a temperature difference--turn it full on
         } else {
-            // Temperature difference is non-zero and less than the throttling range--calculate the operation fraction, but limit to a maximum of 1.0
-            return min(temperatureDifference/throttlingRange, 1.0);
+            return temperatureDifference/throttlingRange;   // Temperature difference is non-zero and less than the throttling range--calculate the operation fraction
         }
     }
 
