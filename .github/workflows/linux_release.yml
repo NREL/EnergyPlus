@@ -47,44 +47,50 @@ jobs:
       shell: bash
       run: cmake --build . --target package -j 2
 
-    - name: Set Environment Variable Name of Linux Tarball Package
-      run: echo ::set-env name=PACKAGE_NAME_TAR::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_tar)
-
-    - name: Temporary workaround to rename TAR package
-      run: cp "${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_TAR" "${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_TAR"
+#    - name: Set Environment Variable Name of Linux Tarball Package
+#      run: echo ::set-env name=PACKAGE_NAME_TAR::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_tar)
+#
+#    - name: Temporary workaround to rename TAR package
+#      run: cp "${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_TAR" "${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_TAR"
 
     - name: Upload Tarball to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build//${{ matrix.os }}_$PACKAGE_NAME_TAR  # take the matrix_os off when package naming is improved
+        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
+        file_glob: true
+        asset_name: ${{ matrix.os }}_LinuxTarball
 
-    - name: Set Environment Variable Name of Linux IFW Installer Package
-      run: echo ::set-env name=PACKAGE_NAME_IFW::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_run)
-
-    - name: Temporary workaround to rename IFW package
-      run: cp "${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_IFW" "${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_IFW"
+#    - name: Set Environment Variable Name of Linux IFW Installer Package
+#      run: echo ::set-env name=PACKAGE_NAME_IFW::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_run)
+#
+#    - name: Temporary workaround to rename IFW package
+#      run: cp "${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_IFW" "${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_IFW"
 
     - name: Upload IFW to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_IFW
+        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.run
         tag: ${{ github.ref }}
         overwrite: true
+        file_glob: true
+        asset_name: ${{ matrix.os }}_LinuxIFWInstaller
 
-    - name: Set Environment Variable Name of Linux Shell Installer Package
-      run: echo ::set-env name=PACKAGE_NAME_SH::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_sh)
-
-    - name: Temporary workaround to rename SH package
-      run: cp "${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_SH" "${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_SH"
+#    - name: Set Environment Variable Name of Linux Shell Installer Package
+#      run: echo ::set-env name=PACKAGE_NAME_SH::$(python3 ${{runner.workspace}}/EnergyPlus/scripts/dev/get_package_names.py ${{runner.workspace}}/EnergyPlus/build ubuntu18_sh)
+#
+#    - name: Temporary workaround to rename SH package
+#      run: cp "${{runner.workspace}}/EnergyPlus/build/$PACKAGE_NAME_SH" "${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_SH"
 
     - name: Upload SH to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/${{ matrix.os }}_$PACKAGE_NAME_SH
+        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Linux-x86_64.sh
         tag: ${{ github.ref }}
         overwrite: true
+        file_glob: true
+        asset_name: ${{ matrix.os }}_LinuxShellInstaller
