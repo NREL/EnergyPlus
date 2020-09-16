@@ -158,7 +158,7 @@ namespace HVACFan {
                                  Optional<Real64 const> pressureRise2 // Pressure difference to use for operating mode 2
         );
 
-        void update() const;
+        void update(EnergyPlusData &state) const;
 
         void report();
 

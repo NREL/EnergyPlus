@@ -105,20 +105,6 @@ namespace DXCoils {
     extern int const WaterSupplyFromMains;
     extern int const WaterSupplyFromTank;
 
-    extern int const NumValidOutputFuelTypes;
-    extern Array1D_string const cValidOutputFuelTypes;
-
-    // Fuel Types
-    extern int const FuelTypeElectricity; // Fuel type for electricity
-    extern int const FuelTypeNaturalGas;  // Fuel type for natural gas
-    extern int const FuelTypePropaneGas;  // Fuel type for propane gas
-    extern int const FuelTypeDiesel;      // Fuel type for diesel
-    extern int const FuelTypeGasoline;    // Fuel type for gasoline
-    extern int const FuelTypeFuelOil1;    // Fuel type for fuel oil #1
-    extern int const FuelTypeFuelOil2;    // Fuel type for fuel oil #2
-    extern int const FuelTypeOtherFuel1;  // Fuel type for other fuel #1
-    extern int const FuelTypeOtherFuel2;  // Fuel type for other fuel #2
-
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
@@ -409,7 +395,8 @@ namespace DXCoils {
         Real64 CurrentEndTimeLast; // end time of time step for last simulation time step
         Real64 TimeStepSysLast;    // last system time step (used to check for downshifting)
         // for multispeed DX coil type
-        int FuelType;                               // Fuel type
+        std::string FuelType;                       // Fuel type string
+        int FuelTypeNum;                            // Fuel type number
         int NumOfSpeeds;                            // Number of speeds
         bool PLRImpact;                             // Part load fraction applied to Speed Number > 1
         bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
@@ -549,7 +536,7 @@ namespace DXCoils {
               ErrIndex4(0), LowAmbErrIndex(0), HighAmbErrIndex(0), PLFErrIndex(0), PLRErrIndex(0), PrintLowAmbMessage(false),
               PrintHighAmbMessage(false), EvapWaterSupplyMode(WaterSupplyFromMains), EvapWaterSupTankID(0), EvapWaterTankDemandARRID(0),
               CondensateCollectMode(CondensateDiscarded), CondensateTankID(0), CondensateTankSupplyARRID(0), CondensateVdot(0.0), CondensateVol(0.0),
-              CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelType(0), NumOfSpeeds(0), PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0),
+              CurrentEndTimeLast(0.0), TimeStepSysLast(0.0), FuelTypeNum(0), NumOfSpeeds(0), PLRImpact(false), LatentImpact(false), MSFuelWasteHeat(0.0),
               MSHPHeatRecActive(false), MSHPDesignSpecIndex(0), CoolingCoilPresent(true), HeatingCoilPresent(true), ISHundredPercentDOASDXCoil(false),
               SHRFTemp(MaxModes, 0), SHRFTempErrorIndex(0), SHRFFlow(MaxModes, 0), SHRFFlowErrorIndex(0), SHRFTemp2(0), SHRFFlow2(0),
               UserSHRCurveExists(false), ASHRAE127StdRprt(false), SecZonePtr(0), SecCoilSHRFT(0), SecCoilSHRFF(0), SecCoilAirFlow(0.0),
@@ -755,7 +742,7 @@ namespace DXCoils {
 
     void UpdateDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void ReportDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
+    void ReportDXCoil(EnergyPlusData &state, int const DXCoilNum); // number of the current fan coil unit being simulated
 
     void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, int const DXCoilNum);
 

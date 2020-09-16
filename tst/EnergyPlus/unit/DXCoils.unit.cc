@@ -283,7 +283,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     SysSizingRunDone = true;
     FinalSysSizing.allocate(1);
     PrimaryAirSystem.allocate(1);
-    AirLoopControlInfo.allocate(1);
+    state.dataAirLoop->AirLoopControlInfo.allocate(1);
     CurSysNum = 1;
     NumDXCoils = 2;
     DXCoilNum = 2;
@@ -383,7 +383,7 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     UnitarySysEqSizing.deallocate();
     FinalSysSizing.deallocate();
     PrimaryAirSystem.deallocate();
-    AirLoopControlInfo.deallocate();
+    state.dataAirLoop->AirLoopControlInfo.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
@@ -453,7 +453,8 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = FuelTypeElectricity;
+    Coil.FuelType = "Electricity";
+    Coil.FuelTypeNum = DataGlobalConstants::iRT_Electricity;
     Coil.RegionNum = 4;
     Coil.MSRatedTotCap(1) = 2202.5268975202675;
     Coil.MSRatedCOP(1) = 4.200635910578916;
@@ -808,7 +809,8 @@ TEST_F(EnergyPlusFixture, TestSingleSpeedDefrostCOP)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = FuelTypeElectricity;
+    Coil.FuelType = "Electricity";
+    Coil.FuelTypeNum = DataGlobalConstants::iRT_Electricity;
     Coil.RegionNum = 4;
 
     state.dataCurveManager->NumCurves = 5;
@@ -1301,13 +1303,15 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedWasteHeat)
     // Case 1 test
     GetDXCoils(state);
 
-    EXPECT_EQ(FuelTypeElectricity, DXCoil(1).FuelType); // it also covers a test for fuel type input
+    EXPECT_EQ("Electricity", DXCoil(1).FuelType); // it also covers a test for fuel type input
+    EXPECT_EQ(DataGlobalConstants::iRT_Electricity, DXCoil(1).FuelTypeNum);
     EXPECT_EQ(0, DXCoil(1).MSWasteHeat(2));
 
     // Test calculations of the waste heat function #5162
 
     // Case 2 test waste heat is zero when the parent has not heat recovery inputs
-    DXCoil(1).FuelType = FuelTypeNaturalGas;
+    DXCoil(1).FuelType = "NaturalGas";
+    DXCoil(1).FuelTypeNum = DataGlobalConstants::iRT_Natural_Gas;
     DXCoil(1).MSHPHeatRecActive = false;
 
     OutDryBulbTemp = 35;
@@ -1690,7 +1694,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     // Case 1 test
     GetDXCoils(state);
 
-    EnergyPlus::DataAirLoop::AirLoopInputsFilled = true;
+    state.dataAirLoop->AirLoopInputsFilled = true;
 
     DataGlobals::SysSizingCalc = true;
 
@@ -1702,7 +1706,7 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCrankcaseOutput)
     EXPECT_EQ("Cooling Coil Crankcase Heater Electricity Energy", OutputProcessor::DDVariableTypes(11).VarNameOnly);
 
     DataGlobals::SysSizingCalc = false;
-    EnergyPlus::DataAirLoop::AirLoopInputsFilled = false;
+    state.dataAirLoop->AirLoopInputsFilled = false;
 }
 
 TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)

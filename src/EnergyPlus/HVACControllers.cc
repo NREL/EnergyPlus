@@ -306,7 +306,6 @@ namespace HVACControllers {
 
         // Using/Aliasing
         using namespace DataSystemVariables;
-        using DataAirLoop::AirLoopControlInfo;
         using DataPlant::FlowLocked;
         using DataPlant::PlantLoop;
         using General::TrimSigDigits;
@@ -475,7 +474,7 @@ namespace HVACControllers {
         // To enable generating an individual, detailed trace file for each controller on each air loop,
         // define the environment variable TRACE_CONTROLLER=YES or TRACE_CONTROLLER=Y
         if (TraceHVACControllerEnvFlag) {
-            TraceIndividualController(ControlNum, FirstHVACIteration, AirLoopControlInfo(AirLoopNum).AirLoopPass, Operation, IsConvergedFlag);
+            TraceIndividualController(ControlNum, FirstHVACIteration, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopPass, Operation, IsConvergedFlag);
         }
     }
 
