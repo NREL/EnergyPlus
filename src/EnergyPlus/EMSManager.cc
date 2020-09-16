@@ -302,7 +302,7 @@ namespace EMSManager {
             PluginManagement::onBeginEnvironment();
         }
 
-        InitEMS(state.files, iCalledFrom);
+        InitEMS(state, state.files, iCalledFrom);
 
         // also call plugins and callbacks here for convenience
         bool anyPluginsOrCallbacksRan = false;
@@ -325,7 +325,7 @@ namespace EMSManager {
 
                 if (EMSProgramCallManager(ProgramManagerNum).CallingPoint == iCalledFrom) {
                     for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerNum).NumErlPrograms; ++ErlProgramNum) {
-                        EvaluateStack(state.files, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
+                        EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerNum).ErlProgramARR(ErlProgramNum));
                         anyProgramRan = true;
                     }
                 }
@@ -333,7 +333,7 @@ namespace EMSManager {
         } else { // call specific program manager
             if (present(ProgramManagerToRun)) {
                 for (ErlProgramNum = 1; ErlProgramNum <= EMSProgramCallManager(ProgramManagerToRun).NumErlPrograms; ++ErlProgramNum) {
-                    EvaluateStack(state.files, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
+                    EvaluateStack(state, state.files, EMSProgramCallManager(ProgramManagerToRun).ErlProgramARR(ErlProgramNum));
                     anyProgramRan = true;
                 }
             }
@@ -389,7 +389,7 @@ namespace EMSManager {
         ReportEMS();
     }
 
-    void InitEMS(IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
+    void InitEMS(EnergyPlusData &state, IOFiles &ioFiles, int const iCalledFrom) // indicates where subroutine was called from, parameters in DataGlobals.
     {
 
         // SUBROUTINE INFORMATION:
@@ -446,7 +446,7 @@ namespace EMSManager {
             SetupSurfaceConstructionActuators();
             SetupSurfaceOutdoorBoundaryConditionActuators();
             SetupZoneOutdoorBoundaryConditionActuators();
-            GetEMSInput(ioFiles);
+            GetEMSInput(state, ioFiles);
             GetEMSUserInput = false;
         }
 
@@ -458,14 +458,14 @@ namespace EMSManager {
         // need to delay setup of HVAC actuator until after the systems input has been processed (if present)
         if (FinishProcessingUserInput && !DoingSizing && !KickOffSimulation) {
             SetupNodeSetPointsAsActuators();
-            SetupPrimaryAirSystemAvailMgrAsActuators();
+            SetupPrimaryAirSystemAvailMgrAsActuators(state);
             //    CALL SetupWindowShadingControlActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupThermostatActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupSurfaceConvectionActuators !this is too late for including in sizing, moved to GetEMSUserInput
             FinishProcessingUserInput = false;
         }
 
-        InitializeRuntimeLanguage(ioFiles);
+        InitializeRuntimeLanguage(state, ioFiles);
 
         if ((BeginEnvrnFlag) || (iCalledFrom == emsCallFromZoneSizing) || (iCalledFrom == emsCallFromSystemSizing) ||
             (iCalledFrom == emsCallFromUserDefinedComponentModel)) {
@@ -542,7 +542,7 @@ namespace EMSManager {
         ReportRuntimeLanguage();
     }
 
-    void GetEMSInput(IOFiles &ioFiles)
+    void GetEMSInput(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -587,16 +587,12 @@ namespace EMSManager {
         int SensorNum;
         int ActuatorNum;
         int ActuatorVariableNum;
-        //  INTEGER                     :: ProgramNum
         int VariableNum; // local do loop index
         int NumAlphas;   // Number of elements in the alpha array
         int NumNums;     // Number of elements in the numeric array
         int AlphaNum;
         int IOStat; // IO Status when calling get input subroutine
-        //  CHARACTER(len=MaxNameLength), DIMENSION(99) :: AlphArray  ! Character string data  ! 99 should really be some kind of constant
-        //  REAL(r64), DIMENSION(1)          :: NumArray  ! Numeric data
         static bool ErrorsFound(false);
-        //  CHARACTER(len=MaxNameLength)   :: objNameMsg = ' '
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
         Array1D_bool lNumericFieldBlanks;
@@ -872,8 +868,19 @@ namespace EMSManager {
                 }
 
                 if (FoundActuatorName) {
+                    // SetupNodeSetPointAsActuators has NOT been called yet at this point
                     EMSActuatorUsed(ActuatorNum).ActuatorVariableNum = ActuatorVariableNum;
                     EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
+
+                    int nHandle = EMSActuatorAvailable(ActuatorVariableNum).handleCount;
+                    if (nHandle > 0) {
+                        EnergyPlus::ShowWarningError("Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
+                        EnergyPlus::ShowContinueError("Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
+                                + "', controlType='" + EMSActuatorUsed(ActuatorNum).ControlTypeName
+                                + "', uniqueKey='" + EMSActuatorUsed(ActuatorNum).UniqueIDName + "'.");
+                        EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
+                    }
+                    ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
                 }
             } // ActuatorNum
         }
@@ -934,7 +941,7 @@ namespace EMSManager {
             }
         }
 
-        InitializeRuntimeLanguage(ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
+        InitializeRuntimeLanguage(state, ioFiles); // Loads built-in globals and functions, then performs GetInput for runtime language objects
 
         if (NumProgramCallManagers > 0) {
             cCurrentModuleObject = "EnergyManagementSystem:ProgramCallingManager";
@@ -1237,6 +1244,15 @@ namespace EMSManager {
             } else {
                 EMSActuatorUsed(ActuatorNum).ActuatorVariableNum = ActuatorVariableNum;
                 EMSActuatorUsed(ActuatorNum).CheckedOkay = true;
+                int nHandle = EMSActuatorAvailable(ActuatorVariableNum).handleCount;
+                if (nHandle > 0) {
+                    EnergyPlus::ShowWarningError("Seems like you already tried to get a Handle on this Actuator " + std::to_string(nHandle) + "times.");
+                    EnergyPlus::ShowContinueError("Occurred for componentType='" +  EMSActuatorUsed(ActuatorNum).ComponentTypeName
+                            + "', controlType='" + EMSActuatorUsed(ActuatorNum).ControlTypeName
+                            + "', uniqueKey='" + EMSActuatorUsed(ActuatorNum).UniqueIDName + "'.");
+                    EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
+                }
+                ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
             }
         } // ActuatorNum
 
@@ -1587,7 +1603,8 @@ namespace EMSManager {
                                  Node(NodeNum).EMSOverrideOutAirWindDir,
                                  Node(NodeNum).EMSValueForOutAirWindDir);
                 for (int ActuatorUsedLoop = 1; ActuatorUsedLoop <= numActuatorsUsed; ActuatorUsedLoop++) {
-                    if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") && UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
+                    if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).ComponentTypeName, "Outdoor Air System Node") &&
+                        UtilityRoutines::SameString(EMSActuatorUsed(ActuatorUsedLoop).UniqueIDName,NodeID(NodeNum))) {
                         Node(NodeNum).IsLocalNode = true;
                         break;
                     }
@@ -1656,7 +1673,86 @@ namespace EMSManager {
         }
     }
 
-    void CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
+    std::string controlTypeName(int const SetPointType) {
+        std::string cControlTypeName;
+
+        auto const SELECT_CASE_var(SetPointType);
+
+        if (SELECT_CASE_var == iTemperatureSetPoint) {
+            cControlTypeName = "Temperature Setpoint";
+        } else if (SELECT_CASE_var == iTemperatureMinSetPoint) {
+            cControlTypeName = "Temperature Minimum Setpoint";
+        } else if (SELECT_CASE_var == iTemperatureMaxSetPoint) {
+            cControlTypeName = "Temperature Maximum Setpoint";
+        } else if (SELECT_CASE_var == iHumidityRatioSetPoint) {
+            cControlTypeName = "Humidity Ratio Setpoint";
+        } else if (SELECT_CASE_var == iHumidityRatioMinSetPoint) {
+            cControlTypeName = "Humidity Ratio Minimum Setpoint";
+        } else if (SELECT_CASE_var == iHumidityRatioMaxSetPoint) {
+            cControlTypeName = "Humidity Ratio Maximum Setpoint";
+        } else if (SELECT_CASE_var == iMassFlowRateSetPoint) {
+            cControlTypeName = "Mass Flow Rate Setpoint";
+        } else if (SELECT_CASE_var == iMassFlowRateMinSetPoint) {
+            cControlTypeName = "Mass Flow Rate Minimum Available Setpoint";
+        } else if (SELECT_CASE_var == iMassFlowRateMaxSetPoint) {
+            cControlTypeName = "Mass Flow Rate Maximum Available Setpoint";
+        }
+
+        return cControlTypeName;
+
+    }
+
+    bool CheckIfNodeSetPointManaged(int const NodeNum, int const SetPointType, bool byHandle) {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brent Griffith
+        //       DATE WRITTEN   May 2009
+        //       MODIFIED       July 2020, Julien Marrec of EffiBEM: added option to check by handle (for API)
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // Provide method to verify that a specific node is (probably) managed by EMS
+
+        // Using/Aliasing
+        using DataLoopNode::NodeID;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        bool FoundControl(false);
+
+        std::string cNodeName = NodeID(NodeNum);
+        std::string cComponentTypeName = "System Node Setpoint";
+        std::string cControlTypeName = controlTypeName(SetPointType);
+
+
+        if (byHandle) {
+            for (int Loop = 1; Loop <= numEMSActuatorsAvailable; ++Loop) {
+                if ((EMSActuatorAvailable(Loop).handleCount > 0) &&
+                    (UtilityRoutines::SameString(EMSActuatorAvailable(Loop).ComponentTypeName, cComponentTypeName)) &&
+                    (UtilityRoutines::SameString(EMSActuatorAvailable(Loop).UniqueIDName, cNodeName)) &&
+                    (UtilityRoutines::SameString(EMSActuatorAvailable(Loop).ControlTypeName, cControlTypeName)))
+                {
+                    FoundControl = true;
+                    break;
+                }
+            }
+            if (!FoundControl) {
+                ShowWarningError("Missing '" + controlTypeName(SetPointType) + "' for node named named '" + NodeID(NodeNum) + "'.");
+            }
+        } else {
+            for (int Loop = 1; Loop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++Loop) {
+                if ((UtilityRoutines::SameString(EMSActuatorUsed(Loop).ComponentTypeName, cComponentTypeName)) &&
+                        (UtilityRoutines::SameString(EMSActuatorUsed(Loop).UniqueIDName, cNodeName)) &&
+                        (UtilityRoutines::SameString(EMSActuatorUsed(Loop).ControlTypeName, cControlTypeName))) {
+                    FoundControl = true;
+                    break;
+                }
+            }
+        }
+
+        return FoundControl;
+    }
+
+    bool CheckIfNodeSetPointManagedByEMS(int const NodeNum, // index of node being checked.
                                          int const SetPointType,
                                          bool &ErrorFlag)
     {
@@ -1674,48 +1770,110 @@ namespace EMSManager {
         using DataLoopNode::NodeID;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static int Loop(0); // local do loop index
         std::string cControlTypeName;
         std::string cComponentTypeName;
         std::string cNodeName;
-        bool FoundControl(false);
+        bool FoundControl = CheckIfNodeSetPointManaged(NodeNum, SetPointType, false);
 
-        cNodeName = NodeID(NodeNum);
-        cComponentTypeName = "System Node Setpoint";
-        {
-            auto const SELECT_CASE_var(SetPointType);
+        if ((!ErrorFlag) && (!FoundControl)) {
+            int numPythonPlugins = inputProcessor->getNumObjectsFound("PythonPlugin:Instance");
+            int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks(); // EnergyPlus::DataGlobals::eplusRunningViaAPI;
+            if ((numPythonPlugins + numActiveCallbacks) == 0) {
+                ErrorFlag = true;
+            } else {
+                // We'll defer to checking at the end whether a Plugin / API called getActuatorHandle on it
+                auto &nodeSetpointCheck = DataLoopNode::NodeSetpointCheck(NodeNum);
+                nodeSetpointCheck.needsSetpointChecking = true;
 
-            if (SELECT_CASE_var == iTemperatureSetPoint) {
-                cControlTypeName = "Temperature Setpoint";
-            } else if (SELECT_CASE_var == iTemperatureMinSetPoint) {
-                cControlTypeName = "Temperature Minimum Setpoint";
-            } else if (SELECT_CASE_var == iTemperatureMaxSetPoint) {
-                cControlTypeName = "Temperature Maximum Setpoint";
-            } else if (SELECT_CASE_var == iHumidityRatioSetPoint) {
-                cControlTypeName = "Humidity Ratio Setpoint";
-            } else if (SELECT_CASE_var == iHumidityRatioMinSetPoint) {
-                cControlTypeName = "Humidity Ratio Minimum Setpoint";
-            } else if (SELECT_CASE_var == iHumidityRatioMaxSetPoint) {
-                cControlTypeName = "Humidity Ratio Maximum Setpoint";
-            } else if (SELECT_CASE_var == iMassFlowRateSetPoint) {
-                cControlTypeName = "Mass Flow Rate Setpoint";
-            } else if (SELECT_CASE_var == iMassFlowRateMinSetPoint) {
-                cControlTypeName = "Mass Flow Rate Minimum Available Setpoint";
-            } else if (SELECT_CASE_var == iMassFlowRateMaxSetPoint) {
-                cControlTypeName = "Mass Flow Rate Maximum Available Setpoint";
+                auto const SELECT_CASE_var(SetPointType);
+                if (SELECT_CASE_var == iTemperatureSetPoint) {
+                    nodeSetpointCheck.checkTemperatureSetPoint = true;
+                } else if (SELECT_CASE_var == iTemperatureMinSetPoint) {
+                    nodeSetpointCheck.checkTemperatureMinSetPoint = true;
+                } else if (SELECT_CASE_var == iTemperatureMaxSetPoint) {
+                    nodeSetpointCheck.checkTemperatureMaxSetPoint = true;
+                } else if (SELECT_CASE_var == iHumidityRatioSetPoint) {
+                    nodeSetpointCheck.checkHumidityRatioSetPoint = true;
+                } else if (SELECT_CASE_var == iHumidityRatioMinSetPoint) {
+                    nodeSetpointCheck.checkHumidityRatioMinSetPoint = true;
+                } else if (SELECT_CASE_var == iHumidityRatioMaxSetPoint) {
+                    nodeSetpointCheck.checkHumidityRatioMaxSetPoint = true;
+                } else if (SELECT_CASE_var == iMassFlowRateSetPoint) {
+                    nodeSetpointCheck.checkMassFlowRateSetPoint = true;
+                } else if (SELECT_CASE_var == iMassFlowRateMinSetPoint) {
+                    nodeSetpointCheck.checkMassFlowRateMinSetPoint = true;
+                } else if (SELECT_CASE_var == iMassFlowRateMaxSetPoint) {
+                    nodeSetpointCheck.checkMassFlowRateMaxSetPoint = true;
+                }
+
             }
         }
 
-        for (Loop = 1; Loop <= numActuatorsUsed + NumExternalInterfaceActuatorsUsed; ++Loop) {
-            if ((UtilityRoutines::SameString(EMSActuatorUsed(Loop).ComponentTypeName, cComponentTypeName)) &&
-                (UtilityRoutines::SameString(EMSActuatorUsed(Loop).UniqueIDName, cNodeName)) &&
-                (UtilityRoutines::SameString(EMSActuatorUsed(Loop).ControlTypeName, cControlTypeName))) {
-                FoundControl = true;
-            }
-        }
-
-        if ((!ErrorFlag) && (!FoundControl)) ErrorFlag = true;
+        return FoundControl;
     }
+
+    void checkSetpointNodesAtEnd()
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Julien Marrec of EffiBEM
+        //       DATE WRITTEN   July 2020
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine checks any nodes where we couldn't find a Setpoint in EMS, after the PythonPlugin / API have been called
+        // so we can check if getActuatorHandle was ever actually called for that node.
+
+        bool FatalErrorFlag = false;
+
+        for (int NodeNum = 1; NodeNum <= DataLoopNode::NumOfNodes; ++NodeNum) {
+            auto & nodeSetpointCheck = DataLoopNode::NodeSetpointCheck(NodeNum);
+
+            if (nodeSetpointCheck.needsSetpointChecking) {
+                // Start by setting it to false (assume matched)
+                nodeSetpointCheck.needsSetpointChecking = false;
+
+                if (nodeSetpointCheck.checkTemperatureSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkTemperatureMinSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMinSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkTemperatureMaxSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iTemperatureMaxSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkHumidityRatioSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkHumidityRatioMinSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMinSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkHumidityRatioMaxSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iHumidityRatioMaxSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkMassFlowRateSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkMassFlowRateMinSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMinSetPoint, true);
+                }
+                if (nodeSetpointCheck.checkMassFlowRateMaxSetPoint) {
+                    nodeSetpointCheck.needsSetpointChecking |= !CheckIfNodeSetPointManaged(NodeNum, EMSManager::iMassFlowRateMaxSetPoint, true);
+                }
+
+                if (nodeSetpointCheck.needsSetpointChecking) {
+                    FatalErrorFlag = true;
+                }
+            }
+        }
+
+        if (FatalErrorFlag) {
+            ShowFatalError("checkSetpointNodesAtEnd: At least one node does not have a setpoint attached, "
+                           "neither via a SetpointManager, EMS:Actuator, or API");
+        }
+    }
+
 
     bool CheckIfNodeMoreInfoSensedByEMS(int const nodeNum, // index of node being checked.
                                         std::string const &varName)
@@ -1732,7 +1890,7 @@ namespace EMSManager {
         return returnValue;
     }
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators()
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1751,7 +1909,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::PriAirSysAvailMgr;
         using DataAirSystems::PrimaryAirSystem;
 
         // Locals
@@ -1774,11 +1931,11 @@ namespace EMSManager {
 
         lDummy = false;
 
-        if (allocated(PriAirSysAvailMgr)) {
-            numAirLoops = isize(PriAirSysAvailMgr);
+        if (allocated(state.dataAirLoop->PriAirSysAvailMgr)) {
+            numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {

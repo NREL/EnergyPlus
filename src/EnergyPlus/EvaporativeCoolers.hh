@@ -335,12 +335,12 @@ namespace EvaporativeCoolers {
 
     // Functions
 
-    void SimEvapCooler(std::string const &CompName, int &CompIndex, Real64 const PartLoadRatio = 1.0);
+    void SimEvapCooler(EnergyPlusData &state, std::string const &CompName, int &CompIndex, Real64 const PartLoadRatio = 1.0);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetEvapInput();
+    void GetEvapInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -364,9 +364,10 @@ namespace EvaporativeCoolers {
 
     void CalcWetIndirectEvapCooler(int &EvapCoolNum, Real64 const PartLoadRatio);
 
-    void CalcResearchSpecialPartLoad(int &EvapCoolNum);
+    void CalcResearchSpecialPartLoad(EnergyPlusData &state, int &EvapCoolNum);
 
-    void CalcIndirectResearchSpecialEvapCoolerAdvanced(int const EvapCoolNum,
+    void CalcIndirectResearchSpecialEvapCoolerAdvanced(EnergyPlusData &state,
+                                                       int const EvapCoolNum,
                                                        Real64 const InletDryBulbTempSec,
                                                        Real64 const InletWetBulbTempSec,
                                                        Real64 const InletDewPointTempSec,
@@ -387,25 +388,28 @@ namespace EvaporativeCoolers {
                                          Real64 const QHXTotal,
                                          Real64 &QHXLatent);
 
-    void CalcIndirectRDDEvapCoolerOutletTemp(int const EvapCoolNum,
+    void CalcIndirectRDDEvapCoolerOutletTemp(EnergyPlusData &state,
+                                             int const EvapCoolNum,
                                              int const DryOrWetOperatingMode,
                                              Real64 const AirMassFlowSec,
                                              Real64 const EDBTSec,
                                              Real64 const EWBTSec,
                                              Real64 const EHumRatSec);
 
-    Real64 CalcEvapCoolRDDSecFlowResidual(Real64 const AirMassFlowSec,
+    Real64 CalcEvapCoolRDDSecFlowResidual(EnergyPlusData &state,
+                                          Real64 const AirMassFlowSec,
                                           Array1D<Real64> const &Par // Par( 6 ) is desired temperature C
     );
 
-    Real64 IndEvapCoolerPower(int const EvapCoolIndex, // Unit index
+    Real64 IndEvapCoolerPower(EnergyPlusData &state,
+                              int const EvapCoolIndex, // Unit index
                               int const DryWetMode,    // dry or wet operating mode of evaporator cooler
                               Real64 const FlowRatio   // secondary air flow fraction
     );
 
-    void CalcIndirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR = 1.0);
+    void CalcIndirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCoolNum, Real64 const FanPLR = 1.0);
 
-    void CalcDirectResearchSpecialEvapCooler(int const EvapCoolNum, Real64 const FanPLR = 1.0);
+    void CalcDirectResearchSpecialEvapCooler(EnergyPlusData &state, int const EvapCoolNum, Real64 const FanPLR = 1.0);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -480,11 +484,11 @@ namespace EvaporativeCoolers {
     // Used to clear global data between Unit Tests, should not be normally called
     void clear_state();
 
-    int GetInletNodeNum(std::string const &EvapCondName,
+    int GetInletNodeNum(EnergyPlusData &state, std::string const &EvapCondName,
         bool &ErrorsFound
     );
 
-    int GetOutletNodeNum(std::string const &EvapCondName,
+    int GetOutletNodeNum(EnergyPlusData &state, std::string const &EvapCondName,
         bool &ErrorsFound
     );
 

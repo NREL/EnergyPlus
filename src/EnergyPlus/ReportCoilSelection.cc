@@ -47,10 +47,8 @@
 
 // C++ Headers
 #include <string>
-#include <vector>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BoilerSteam.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -438,7 +436,7 @@ void ReportCoilSelection::setCoilFinalSizes(std::string const &coilName,    // u
     }
 }
 
-void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
+void ReportCoilSelection::doAirLoopSetup(EnergyPlusData &state, int const coilVecIndex)
 {
     // this routine sets up some things for central air systems, needs to follow setting of an airloop num
     auto &c(coilSelectionDataObjs[coilVecIndex]);
@@ -454,21 +452,21 @@ void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
         }
         // fill list of zones connected to this air loop
         // this could be reworked to use different structure which is available now since std 62.1 changes
-        if (allocated(DataAirLoop::AirToZoneNodeInfo)) {
-            if (DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled > 0) {
-                int zoneCount = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled;
+        if (allocated(state.dataAirLoop->AirToZoneNodeInfo)) {
+            if (state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesCooled > 0) {
+                int zoneCount = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesCooled;
                 c->zoneNum.resize(zoneCount);
                 c->zoneName.resize(zoneCount);
-                for (int loopZone = 1; loopZone <= DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesCooled; ++loopZone) {
-                    c->zoneNum[loopZone - 1] = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).CoolCtrlZoneNums(loopZone);
+                for (int loopZone = 1; loopZone <= state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesCooled; ++loopZone) {
+                    c->zoneNum[loopZone - 1] = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).CoolCtrlZoneNums(loopZone);
                     c->zoneName[loopZone - 1] = DataHeatBalance::Zone(c->zoneNum[loopZone - 1]).Name;
                 }
             }
 
-            if (DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesHeated > 0) {
-                int zoneCount = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).NumZonesHeated;
+            if (state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesHeated > 0) {
+                int zoneCount = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).NumZonesHeated;
                 for (int loopZone = 1; loopZone <= zoneCount; ++loopZone) {
-                    int zoneIndex = DataAirLoop::AirToZoneNodeInfo(c->airloopNum).HeatCtrlZoneNums(loopZone);
+                    int zoneIndex = state.dataAirLoop->AirToZoneNodeInfo(c->airloopNum).HeatCtrlZoneNums(loopZone);
                     // see if this zone is new or already in list
                     bool found = false;
                     for (auto &z : c->zoneNum) {
@@ -1047,7 +1045,8 @@ void ReportCoilSelection::setCoilWaterFlowPltSizNum(std::string const &coilName,
     }
 }
 
-void ReportCoilSelection::setCoilEntAirTemp(std::string const &coilName,    // user-defined name of the coil
+void ReportCoilSelection::setCoilEntAirTemp(EnergyPlusData &state,
+                                            std::string const &coilName,    // user-defined name of the coil
                                             std::string const &coilType,    // idf input object class name of coil
                                             Real64 const entAirDryBulbTemp, // degree C air entering coil
                                             int const curSysNum,            // airloop system number index, if non zero
@@ -1058,7 +1057,7 @@ void ReportCoilSelection::setCoilEntAirTemp(std::string const &coilName,    // u
     auto &c(coilSelectionDataObjs[index]);
     c->coilDesEntTemp = entAirDryBulbTemp;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
 }
 
@@ -1123,6 +1122,7 @@ void ReportCoilSelection::setCoilLvgAirHumRat(std::string const &coilName, // us
 }
 
 void ReportCoilSelection::setCoilCoolingCapacity(
+    EnergyPlusData &state,
     std::string const &coilName,       // user-defined name of the coil
     std::string const &coilType,       // idf input object class name of coil
     Real64 const TotalCoolingCap,      // {W} coil cooling capacity, sizing result
@@ -1147,7 +1147,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 
     c->fanHeatGainIdealPeak = fanCoolLoad;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
     //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     c->oASysNum = curOASysNum;
@@ -1395,6 +1395,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
 }
 
 void ReportCoilSelection::setCoilHeatingCapacity(
+    EnergyPlusData &state,
     std::string const &coilName,       // user-defined name of the coil
     std::string const &coilType,       // idf input object class name of coil
     Real64 const totalHeatingCap,      // {W} coil Heating capacity
@@ -1418,7 +1419,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
 
     c->fanHeatGainIdealPeak = fanHeatGain;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
     //	if ( c->zoneEqNum > 0 ) doZoneEqSetup( index );
     if (curSysNum > 0 && c->zoneEqNum == 0 && allocated(DataSizing::FinalSysSizing)) {
@@ -1772,7 +1773,8 @@ void ReportCoilSelection::setCoilWaterHeaterCapacityPltSizNum(std::string const 
     c->waterLoopNum = dataWaterLoopNum;
 }
 
-void ReportCoilSelection::setCoilUA(std::string const &coilName,            // user-defined name of the coil
+void ReportCoilSelection::setCoilUA(EnergyPlusData &state,
+                                    std::string const &coilName,            // user-defined name of the coil
                                     std::string const &coilType,            // idf input object class name of coil
                                     Real64 const UAvalue,                   // [W/k] UA value for coil,
                                     Real64 const dataCapacityUsedForSizing, // [W] sizing global
@@ -1787,7 +1789,7 @@ void ReportCoilSelection::setCoilUA(std::string const &coilName,            // u
     c->coilTotCapAtPeak = dataCapacityUsedForSizing;
     c->capIsAutosized = isAutoSize;
     c->airloopNum = curSysNum;
-    doAirLoopSetup(index);
+    doAirLoopSetup(state, index);
     c->zoneEqNum = curZoneEqNum;
 }
 

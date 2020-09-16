@@ -315,7 +315,7 @@ namespace SingleDuct {
         }
 
         // Report the current Sys
-        thisATU.ReportSys();
+        thisATU.ReportSys(state);
 
         TermUnitSingDuct = false;
     }
@@ -2063,7 +2063,7 @@ namespace SingleDuct {
                 (this->ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
                 // setup plant topology indices for plant fed heating coils
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         this->ReheatName,
                                         this->ReheatComp_PlantType,
                                         this->HWLoopNum,
@@ -2237,7 +2237,7 @@ namespace SingleDuct {
                 Real64 airLoopOAFrac(0.0);
                 airLoopNum = this->AirLoopNum;
                 if (airLoopNum > 0) {
-                    airLoopOAFrac = DataAirLoop::AirLoopFlow(airLoopNum).OAFrac;
+                    airLoopOAFrac = state.dataAirLoop->AirLoopFlow(airLoopNum).OAFrac;
                     bool UseOccSchFlag = false;
                     if (this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
                     if (airLoopOAFrac > 0.0) {
@@ -3306,7 +3306,7 @@ namespace SingleDuct {
             }
 
             // calculate supply air flow rate based on user specified OA requirement
-            this->CalcOAMassFlow(MassFlowBasedOnOA, AirLoopOAFrac);
+            this->CalcOAMassFlow(state, MassFlowBasedOnOA, AirLoopOAFrac);
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
 
             // used for normal acting damper
@@ -3343,7 +3343,7 @@ namespace SingleDuct {
             }
 
             // calculate supply air flow rate based on user specified OA requirement
-            this->CalcOAMassFlow(MassFlowBasedOnOA, AirLoopOAFrac);
+            this->CalcOAMassFlow(state, MassFlowBasedOnOA, AirLoopOAFrac);
             MassFlow = max(MassFlow, MassFlowBasedOnOA);
 
             // Check to see if the flow is < the Min or > the Max air Fraction to the zone; then set to min or max
@@ -3681,8 +3681,9 @@ namespace SingleDuct {
         this->MassFlow1 = MassFlow;
     }
 
-    void SingleDuctAirTerminal::CalcOAMassFlow(Real64 &SAMassFlow,   // outside air based on optional user input
-                        Real64 &AirLoopOAFrac // outside air based on optional user input
+    void SingleDuctAirTerminal::CalcOAMassFlow(EnergyPlusData &state,
+                                               Real64 &SAMassFlow,   // outside air based on optional user input
+                                               Real64 &AirLoopOAFrac // outside air based on optional user input
     )
     {
 
@@ -3702,8 +3703,6 @@ namespace SingleDuct {
         // REFERENCES:
 
         // Using/Aliasing
-        using DataAirLoop::AirLoopControlInfo;
-        using DataAirLoop::AirLoopFlow;
         using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
         using DataZoneEquipment::ZoneEquipConfig;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -3734,13 +3733,13 @@ namespace SingleDuct {
 
         // Calculate the amount of OA based on optional user inputs
         if (AirLoopNum > 0) {
-            AirLoopOAFrac = AirLoopFlow(AirLoopNum).OAFrac;
+            AirLoopOAFrac = state.dataAirLoop->AirLoopFlow(AirLoopNum).OAFrac;
             // If no additional input from user, RETURN from subroutine
             if (this->NoOAFlowInputFromUser) return;
             // Calculate outdoor air flow rate, zone multipliers are applied in GetInput
             if (AirLoopOAFrac > 0.0) {
                 OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir(
-                    this->OARequirementsPtr, this->ActualZoneNum, AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag, UseMinOASchFlag);
+                    this->OARequirementsPtr, this->ActualZoneNum, state.dataAirLoop->AirLoopControlInfo(AirLoopNum).AirLoopDCVFlag, UseMinOASchFlag);
                 OAMassFlow = OAVolumeFlowRate * StdRhoAir;
 
                 // convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -5274,7 +5273,7 @@ namespace SingleDuct {
     // Beginning of Reporting subroutines for the Sys Module
     // *****************************************************************************
 
-    void SingleDuctAirTerminal::ReportSys() // unused1208
+    void SingleDuctAirTerminal::ReportSys(EnergyPlusData &state) // unused1208
     {
 
         // SUBROUTINE INFORMATION:
@@ -5312,7 +5311,7 @@ namespace SingleDuct {
         // Still needs to report the Sys power from this component
 
         // set zone OA volume flow rate
-        this->CalcOutdoorAirVolumeFlowRate();
+        this->CalcOutdoorAirVolumeFlowRate(state);
     }
 
     void GetHVACSingleDuctSysIndex(EnergyPlusData &state, std::string const &SDSName,
@@ -5360,7 +5359,7 @@ namespace SingleDuct {
         }
     }
 
-    void SimATMixer(std::string const &SysName, bool const FirstHVACIteration, int &SysIndex)
+    void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const FirstHVACIteration, int &SysIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5389,14 +5388,14 @@ namespace SingleDuct {
             SysNum = SysIndex;
         }
 
-        SysATMixer(SysNum).InitATMixer(FirstHVACIteration);
+        SysATMixer(SysNum).InitATMixer(state, FirstHVACIteration);
 
         CalcATMixer(SysNum);
 
         UpdateATMixer(SysNum);
     }
 
-    void GetATMixers(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
+    void GetATMixers(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5450,7 +5449,7 @@ namespace SingleDuct {
         SysATMixer.allocate(NumATMixers);
 
         // Need air distribution units first
-        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(dataZoneAirLoopEquipmentManager);
+        ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment(state, dataZoneAirLoopEquipmentManager);
 
         for (ATMixerNum = 1; ATMixerNum <= NumATMixers; ++ATMixerNum) {
             inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -5679,7 +5678,7 @@ namespace SingleDuct {
         }
     }
 
-    void AirTerminalMixerData::InitATMixer(bool const FirstHVACIteration)
+    void AirTerminalMixerData::InitATMixer(EnergyPlusData &state, bool const FirstHVACIteration)
     {
         // Purpose: Initialize the AirTerminalMixers data structure with node data
         if (this->OneTimeInitFlag) {
@@ -5736,7 +5735,7 @@ namespace SingleDuct {
             bool UseOccSchFlag = false;
             if (this->OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
             if (this->AirLoopNum > 0) {
-                airLoopOAFrac = DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+                airLoopOAFrac = state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
                 if (airLoopOAFrac > 0.0) {
                     vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(this->OARequirementsPtr, this->ZoneNum, UseOccSchFlag, true);
                     mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
@@ -5918,7 +5917,8 @@ namespace SingleDuct {
         DataDefineEquip::AirDistUnit(aduNum).MassFlowRateSup = Node(PriInNode).MassFlowRate;
     }
 
-    void GetATMixer(ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
+    void GetATMixer(EnergyPlusData &state,
+                    ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager, std::string const &ZoneEquipName, // zone unit name name
                     std::string &ATMixerName,         // air terminal mixer name
                     int &ATMixerNum,                  // air terminal mixer index
                     int &ATMixerType,                 // air teminal mixer type
@@ -5944,7 +5944,7 @@ namespace SingleDuct {
 
         if (GetATMixerFlag) {
             // CALL GetZoneAirLoopEquipment
-            GetATMixers(dataZoneAirLoopEquipmentManager);
+            GetATMixers(state, dataZoneAirLoopEquipmentManager);
             GetATMixerFlag = false;
         }
 
@@ -5971,7 +5971,7 @@ namespace SingleDuct {
             } else {
                 SysATMixer(ATMixerIndex).ZoneInletNode = ATMixerOutNode;
             }
-            SysATMixer(ATMixerNum).InitATMixer(false);
+            SysATMixer(ATMixerNum).InitATMixer(state, false);
         } else {
             ATMixerNum = 0;
             ATMixerName = "";
@@ -6194,11 +6194,11 @@ namespace SingleDuct {
         }
     }
 
-    void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate()
+    void SingleDuctAirTerminal::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (this->sd_airterminalOutlet.AirMassFlowRate / StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }
