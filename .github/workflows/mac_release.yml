@@ -58,7 +58,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.tar.gz
+        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-x86_64.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
@@ -68,7 +68,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-Darwin-x86_64.dmg
+        file: ${{runner.workspace}}/EnergyPlus/build/EnergyPlus-*-x86_64.dmg
         tag: ${{ github.ref }}
         overwrite: true
         file_glob: true
