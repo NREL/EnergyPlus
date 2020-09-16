@@ -118,9 +118,9 @@ HeatExchanger:AirToAir:FlatPlate,
 \item
   HVAC,Sum,Heat Exchanger Total Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Heat Exchanger Electric Power{[}W{]}
+  HVAC,Average,Heat Exchanger Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heat Exchanger Electric Energy {[}J{]}
+  HVAC,Sum,Heat Exchanger Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Heat Exchanger Sensible Heating Rate {[}W{]}}\label{heat-exchanger-sensible-heating-rate-w}
@@ -171,11 +171,11 @@ This output is the total cooling rate of the supply air by the heat exchanger in
 
 This output is the total cooling energy added to the supply air by the heat exchanger in Joules over the timestep being reported. This output is also added to a meter with ResouceType = EnergyTransfer, EndUseKey = HeatRecoveryforCooling, GroupKey = System (ref. Output:Meter objects).
 
-\paragraph{Heat Exchanger Electric Power {[}W{]}}\label{heat-exchanger-electric-power-w}
+\paragraph{Heat Exchanger Electricity Rate {[}W{]}}\label{heat-exchanger-electric-power-w}
 
 This output is the electric consumption rate of the unit in Watts. This rate is applicable whenever the unit operates (i.e., whenever the unit is scheduled to be available and supply and exhaust air flows exist).
 
-\paragraph{Heat Exchanger Electric Energy {[}J{]}}\label{heat-exchanger-electric-energy-j}
+\paragraph{Heat Exchanger Electricity Energy {[}J{]}}\label{heat-exchanger-electric-energy-j}
 
 This output is the electric consumption of the unit in Joules for the timestep being reported. This ouput is also added to a meter with ResourceType = Electricity, EndUseKey = HeatRecovery, GroupKey = System (ref. Output:Meter objects).
 
@@ -446,9 +446,9 @@ HeatExchanger:AirToAir:SensibleAndLatent,
 \item
   HVAC,Sum,Heat Exchanger Total Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Heat Exchanger Electric Power{[}W{]}
+  HVAC,Average,Heat Exchanger Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heat Exchanger Electric Energy {[}J{]}
+  HVAC,Sum,Heat Exchanger Electricity Energy {[}J{]}
 \item
   HVAC,Average,Heat Exchanger Sensible Effectiveness{[]}
 \item
@@ -507,11 +507,11 @@ This output is the total cooling rate of the supply air by the heat exchanger in
 
 This output is the total cooling energy added to the supply air by the heat exchanger in Joules over the timestep being reported. This output is also added to a meter with ResouceType = EnergyTransfer, EndUseKey = HeatRecoveryforCooling, GroupKey = System (ref. Output:Meter objects).
 
-\paragraph{Heat Exchanger Electric Power {[}W{]}}\label{heat-exchanger-electric-power-w-1}
+\paragraph{Heat Exchanger Electricity Rate {[}W{]}}\label{heat-exchanger-electric-power-w-1}
 
 This output is the electric consumption rate of the unit in Watts. This rate is applicable whenever the unit operates (i.e., whenever the unit is scheduled to be available and supply and exhaust air flows exist).
 
-\paragraph{Heat Exchanger Electric Energy {[}J{]}}\label{heat-exchanger-electric-energy-j-1}
+\paragraph{Heat Exchanger Electricity Energy {[}J{]}}\label{heat-exchanger-electric-energy-j-1}
 
 This output is the electric consumption of the unit in Joules for the timestep being reported. This ouput is also added to a meter with ResourceType = Electricity, EndUseKey = HeatRecovery, GroupKey = System (ref. Output:Meter objects).
 
@@ -632,9 +632,9 @@ HeatExchanger:Desiccant:BalancedFlow,
 \item
   HVAC,Sum,Heat Exchanger Total Cooling Energy {[}J{]}
 \item
-  HVAC,Average,Heat Exchanger Electric Power{[}W{]}
+  HVAC,Average,Heat Exchanger Electricity Rate {[}W{]}
 \item
-  HVAC,Sum,Heat Exchanger Electric Energy {[}J{]}
+  HVAC,Sum,Heat Exchanger Electricity Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Heat Exchanger Sensible Heating Rate {[}W{]}}\label{heat-exchanger-sensible-heating-rate-w-2}
@@ -685,11 +685,11 @@ This output is the total cooling rate of the process air by the heat exchanger i
 
 This output is the total cooling energy added to the process air by the heat exchanger in Joules over the timestep being reported. This output is also added to a meter with ResouceType = EnergyTransfer, EndUseKey = HeatRecoveryforCooling, GroupKey = System (ref. Output:Meter objects).
 
-\paragraph{Heat Exchanger Electric Power {[}W{]}}\label{heat-exchanger-electric-power-w-2}
+\paragraph{Heat Exchanger Electricity Rate {[}W{]}}\label{heat-exchanger-electric-power-w-2}
 
 This output is the average electric consumption rate of the unit in Watts. This average rate includes portions of the simulation timestep when the heat exchanger may be cycled off (i.e., average of on and off periods, as appropriate).
 
-\paragraph{Heat Exchanger Electric Energy {[}J{]}}\label{heat-exchanger-electric-energy-j-2}
+\paragraph{Heat Exchanger Electricity Energy {[}J{]}}\label{heat-exchanger-electric-energy-j-2}
 
 This output is the electric consumption of the unit in Joules for the timestep being reported. This ouput is also added to a meter with ResourceType = Electricity, EndUseKey = HeatRecovery, GroupKey = System (ref. Output:Meter objects).
 
