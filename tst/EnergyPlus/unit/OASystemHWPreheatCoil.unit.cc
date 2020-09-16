@@ -1044,15 +1044,15 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(state);
 
-    EXPECT_EQ(1, NumOASystems);
-    EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);
-    EXPECT_EQ(2, OutsideAirSys(OASysNum).NumComponents);                       // there are two components in OA system
-    EXPECT_EQ("OA PREHEAT HW COIL", OutsideAirSys(OASysNum).ComponentName(1)); // pre heat hot water coil
-    EXPECT_EQ(WaterCoil(1).Name, OutsideAirSys(OASysNum).ComponentName(1));    // pre heat hot water coil
-    EXPECT_EQ("OA MIXING BOX", OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
+    EXPECT_EQ(1, state.dataAirLoop->NumOASystems);
+    EXPECT_EQ("OA SYS 1", state.dataAirLoop->OutsideAirSys(OASysNum).Name);
+    EXPECT_EQ(2, state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents);                       // there are two components in OA system
+    EXPECT_EQ("OA PREHEAT HW COIL", state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(1)); // pre heat hot water coil
+    EXPECT_EQ(WaterCoil(1).Name, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(1));    // pre heat hot water coil
+    EXPECT_EQ("OA MIXING BOX", state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
 
     // simulate the outdoor air system
-    ManageOutsideAirSystem(state, OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
+    ManageOutsideAirSystem(state, state.dataAirLoop->OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
 
     // Hot water coil is scheduled off, inlet and outlet conditions are the same
     EXPECT_DOUBLE_EQ(WaterCoil(1).InletAirTemp, -17.3);          // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
@@ -2022,15 +2022,15 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     // OutputProcessor::TimeValue.allocate(2);
     SimulationManager::ManageSimulation(state);
 
-    EXPECT_EQ(1, NumOASystems);
-    EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);
-    EXPECT_EQ(2, OutsideAirSys(OASysNum).NumComponents);                       // there are two components in OA system
-    EXPECT_EQ("OA PREHEAT HW COIL", OutsideAirSys(OASysNum).ComponentName(1)); // pre heat hot water coil
-    EXPECT_EQ(WaterCoil(1).Name, OutsideAirSys(OASysNum).ComponentName(1));    // pre heat hot water coil
-    EXPECT_EQ("OA MIXING BOX", OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
+    EXPECT_EQ(1, state.dataAirLoop->NumOASystems);
+    EXPECT_EQ("OA SYS 1", state.dataAirLoop->OutsideAirSys(OASysNum).Name);
+    EXPECT_EQ(2, state.dataAirLoop->OutsideAirSys(OASysNum).NumComponents);                       // there are two components in OA system
+    EXPECT_EQ("OA PREHEAT HW COIL", state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(1)); // pre heat hot water coil
+    EXPECT_EQ(WaterCoil(1).Name, state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(1));    // pre heat hot water coil
+    EXPECT_EQ("OA MIXING BOX", state.dataAirLoop->OutsideAirSys(OASysNum).ComponentName(2));      // OA mixer
 
     // simulate the outdoor air system
-    ManageOutsideAirSystem(state, OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
+    ManageOutsideAirSystem(state, state.dataAirLoop->OutsideAirSys(OASysNum).Name, false, AirLoopNum, OASysNum);
 
     EXPECT_DOUBLE_EQ(WaterCoil(1).InletAirTemp, -17.3); // preheat Hot Water coil air inlet temp is the heating design day outdoor air temp
 

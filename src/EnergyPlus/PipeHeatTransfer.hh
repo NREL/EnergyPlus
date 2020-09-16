@@ -66,7 +66,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace PipeHeatTransfer {
 
@@ -247,7 +246,7 @@ namespace PipeHeatTransfer {
 
         void PushInnerTimeStepArrays();
 
-        void InitPipesHeatTransfer(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // component number
+        void InitPipesHeatTransfer(EnergyPlusData &state, bool const FirstHVACIteration // component number
         );
 
         Real64 TBND(Real64 const z,       // Current Depth

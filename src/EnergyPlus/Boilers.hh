@@ -62,8 +62,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BoilersData;
-struct BranchInputManagerData;
 
 namespace Boilers {
 
@@ -161,7 +159,7 @@ namespace Boilers {
 
         void SetupOutputVars();
 
-        void InitBoiler(BranchInputManagerData &dataBranchInputManager); // number of the current boiler being simulated
+        void InitBoiler(EnergyPlusData &state); // number of the current boiler being simulated
 
         void SizeBoiler();
 
@@ -178,7 +176,7 @@ namespace Boilers {
         static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
     };
 
-    void GetBoilerInput(EnergyPlusData &state, BoilersData &boilers);
+    void GetBoilerInput(EnergyPlusData &state);
 
 } // namespace Boilers
 

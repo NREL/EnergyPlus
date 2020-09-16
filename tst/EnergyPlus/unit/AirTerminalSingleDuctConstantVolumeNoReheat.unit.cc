@@ -543,8 +543,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     FirstHVACIteration = false;
     // Needs an airloop, assume 100% OA
     sd_airterminal(SysNum).AirLoopNum = 1;
-    DataAirLoop::AirLoopFlow.allocate(1);
-    DataAirLoop::AirLoopFlow(sd_airterminal(SysNum).AirLoopNum).OAFrac = 1.0;
+    state.dataAirLoop->AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow(sd_airterminal(SysNum).AirLoopNum).OAFrac = 1.0;
     Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
     EXPECT_EQ(3.0, MassFlowRateMaxAvail);
 
@@ -842,13 +842,13 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OAVolumeFlowRateReport
     DataEnvironment::StdRhoAir = 1.0;
     DataEnvironment::OutBaroPress = 101325.0;
 
-    DataAirLoop::AirLoopFlow.allocate(1);
+    state.dataAirLoop->AirLoopFlow.allocate(1);
     int const SysNum(1);
     auto &thisAirTerminal = SingleDuct::sd_airterminal(SysNum);
     auto &thisAirTerminalInlet = thisAirTerminal.sd_airterminalInlet;
     auto &thisAirTerminalOutlet = thisAirTerminal.sd_airterminalOutlet;
     auto &thisAirDisUnit = AirDistUnit(1);
-    auto &thisAirLoop = DataAirLoop::AirLoopFlow(1);
+    auto &thisAirLoop = state.dataAirLoop->AirLoopFlow(1);
 
     int const InletNode = thisAirTerminal.InletNodeNum;
     int const ZonePtr = thisAirTerminal.ActualZoneNum;

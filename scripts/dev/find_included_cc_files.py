@@ -3,11 +3,14 @@
 import json
 import os
 import io  # For Python 2 compat
+import sys
 
 dirs_to_search = [os.path.join('src', 'EnergyPlus'), os.path.join('tst', 'EnergyPlus', 'unit')]
 current_script_dir = os.path.dirname(os.path.realpath(__file__))
 repo_root = os.path.abspath(os.path.join(current_script_dir, '..', '..'))
 full_path_dirs_to_search = [os.path.join(repo_root, d) for d in dirs_to_search]
+
+num_issues_found = 0
 
 for this_root in full_path_dirs_to_search:
     for root, dirs, filenames in os.walk(this_root):
@@ -36,6 +39,10 @@ for this_root in full_path_dirs_to_search:
                                           'message': ("Found included CC file: '{}'".format(line))
                                           }
                                 print(json.dumps(ci_msg))
+                                num_issues_found += 1
             except Exception:
                 # don't do anything, there are reasons this is ok to fail
                 print("XCE")
+
+if num_issues_found > 0:
+    sys.exit(1)

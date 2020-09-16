@@ -184,7 +184,7 @@ namespace EnergyPlus {
             auto &thisDomain(domains[this->ParentDomainIndex]);
 
             // Do any initialization here
-            thisDomain.InitPipingSystems(state.dataBranchInputManager, this);
+            thisDomain.InitPipingSystems(state, this);
 
             // Update the temperature field
             thisDomain.PerformIterationLoop(this);
@@ -2107,7 +2107,7 @@ namespace EnergyPlus {
             }
         }
 
-        void Domain::InitPipingSystems(BranchInputManagerData &dataBranchInputManager, Circuit * thisCircuit) {
+        void Domain::InitPipingSystems(EnergyPlusData &state, Circuit * thisCircuit) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -2129,7 +2129,7 @@ namespace EnergyPlus {
                 }
 
                 bool errFlag = false;
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         thisCircuit->Name,
                                                         TypeToLookFor,
                                                         thisCircuit->LoopNum,

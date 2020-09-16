@@ -1474,7 +1474,7 @@ namespace VentilatedSlab {
             if ((VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) ||
                 (VentSlab(Item).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         VentSlab(Item).HCoilName,
                                         VentSlab(Item).HCoil_PlantTypeNum,
                                         VentSlab(Item).HWLoopNum,
@@ -1501,7 +1501,7 @@ namespace VentilatedSlab {
             if ((VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling) ||
                 (VentSlab(Item).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 errFlag = false;
-                ScanPlantLoopsForObject(state.dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         VentSlab(Item).CCoilPlantName,
                                         VentSlab(Item).CCoil_PlantTypeNum,
                                         VentSlab(Item).CWLoopNum,

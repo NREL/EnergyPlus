@@ -60,7 +60,6 @@ namespace EnergyPlus {
 
 // Forward declarations
 struct EnergyPlusData;
-struct BranchInputManagerData;
 
 namespace HeatPumpWaterToWaterSimple {
 
@@ -208,7 +207,7 @@ namespace HeatPumpWaterToWaterSimple {
 
         void getSizingFactor(Real64 &sizingFactor) override;
 
-        void InitWatertoWaterHP(BranchInputManagerData &dataBranchInputManager,
+        void InitWatertoWaterHP(EnergyPlusData &state,
                                 int const GSHPTypeNum,       // Type of GSHP
                                 std::string const &GSHPName, // User Specified Name of GSHP
                                 bool const FirstHVACIteration,

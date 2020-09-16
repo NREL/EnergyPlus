@@ -1585,7 +1585,7 @@ CoilSHR calculation procedure
 
 1. Get full system sensible and latent outputs in normal mode as SenSysOutput and LatSysOutput.
 
-2. Since system outputs are proportional to part load ratio (PLR), sensible (SenPLR) and latent (LatPLR)part load ratios can be calculated below
+2. Since system outputs are proportional to part load ratio (PLR), sensible (SenPLR) and latent (LatPLR) part load ratios can be calculated below
 
 	SenPLR = SenLoad / SenSysOutput
 
@@ -1593,15 +1593,15 @@ CoilSHR calculation procedure
 
 3. At the same time, coil sensible and latent outputs across the coil are obtained in Step 2 as SenCoilOutput and LatCoilOutput.
 
-4. If coil sensible and latent outputs are aslo propotional to the part load ratios, sensible (SenCoil) and latent (LatcOIL) coil load at given part load ratios are calculated as
+4. If coil sensible and latent outputs are also propotional to the part load ratios, sensible (SenCoil) and latent (LatCoil) coil load at given part load ratios are calculated as
 
 	SenCoil = SenPLR * SenCoilOutput
 
 	LatCoil = LatPLR * LatCoilOutput
 
-It should be pointed out that coil outputs at PLR = 0 are zero.
+It should be pointed out that coil outputs at PLR = 0 are zero.  In other words, both linear functions has zero value of the constant term.
 
-5. Coil sensible heat ratio (CoilSHR) can be calculated at
+5. Coil sensible heat ratio (CoilSHR) can be calculated as
 
 	CoilSHR = SenCoil / (SenCoil + LatCoil)
 
@@ -1611,13 +1611,13 @@ Simulation logic
 
 1. No latent control
 
-   Perform normal operation with SHR\(_{Normal}\)
+   Perform normal operation with SHR\(_{Normal}\) (See Coil:Cooling:DX:SingleSpeed object)
 
 2. Latent control
 
 a.  If CoilSHR >= SHR\(_{Normal}\)
 
-   Perform normal operation to meet sensible load, adjusted by PLR for a single capacity equipmentl
+   Perform normal operation to meet sensible load, adjusted by PLR for a single capacity equipment
 
 	SenLoad = SenOut * PLR
 

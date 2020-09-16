@@ -112,7 +112,7 @@ TEST_F(EnergyPlusFixture, SingleSpeedHeatingCoilCurveTest)
     Coil.DefrostTime = 0.058333;
     Coil.DefrostCapacity = 1000;
     Coil.PLRImpact = false;
-    Coil.FuelType = FuelTypeElectricity;
+    Coil.FuelType = "Electricity";
     Coil.RegionNum = 4;
     Coil.OATempCompressorOn = -5.0;
     Coil.OATempCompressorOnOffBlank = "true";

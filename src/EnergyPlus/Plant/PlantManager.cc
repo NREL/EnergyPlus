@@ -655,14 +655,14 @@ namespace EnergyPlus {
                     ErrorsFound = true;
                 }
 
-                if (GetFirstBranchInletNodeName(state, state.dataBranchInputManager, this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
+                if (GetFirstBranchInletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameIn) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError("The inlet node of the first branch in the " + cAlphaFieldNames(12) + '=' +
                                       Alpha(12));                                                          //"Plant Demand Side Branch List"
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(10) + '=' +
                                       Alpha(10)); // "Plant Demand Side Inlet Node Name"
                     ShowContinueError("Branch List Inlet Node Name=" +
-                                      GetFirstBranchInletNodeName(state, state.dataBranchInputManager, this_demand_side.BranchList)); // TODO rename point
+                                      GetFirstBranchInletNodeName(state, this_demand_side.BranchList)); // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch."); // TODO
                     // rename
@@ -670,7 +670,7 @@ namespace EnergyPlus {
                     ErrorsFound = true;
                 }
 
-                if (GetLastBranchOutletNodeName(state, state.dataBranchInputManager, this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
+                if (GetLastBranchOutletNodeName(state, this_demand_side.BranchList) != this_demand_side.NodeNameOut) {
                     //"Plant Demand Side Branch List"
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
@@ -678,14 +678,14 @@ namespace EnergyPlus {
                     //"Plant Demand Side Outlet Node Name"
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(11) + '=' + Alpha(11));
                     ShowContinueError("Branch List Outlet Node Name=" +
-                                      GetLastBranchOutletNodeName(state, state.dataBranchInputManager, this_demand_side.BranchList)); // TODO rename point
+                                      GetLastBranchOutletNodeName(state, this_demand_side.BranchList)); // TODO rename point
                     // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
                     ErrorsFound = true;
                 }
 
-                if (GetFirstBranchInletNodeName(state, state.dataBranchInputManager, this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
+                if (GetFirstBranchInletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameIn) {
                     //"Plant Supply Side Branch List"
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
@@ -693,14 +693,14 @@ namespace EnergyPlus {
                     //"Plant Supply Side Inlet Node Name
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(6) + '=' + Alpha(6));
                     ShowContinueError("Branch List Inlet Node Name=" +
-                                      GetFirstBranchInletNodeName(state, state.dataBranchInputManager, this_supply_side.BranchList)); // TODO rename point
+                                      GetFirstBranchInletNodeName(state, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
                     ErrorsFound = true;
                 }
 
-                if (GetLastBranchOutletNodeName(state, state.dataBranchInputManager, this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
+                if (GetLastBranchOutletNodeName(state, this_supply_side.BranchList) != this_supply_side.NodeNameOut) {
                     //"Plant Supply Side Branch List"
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alpha(1) + "\", Invalid condition.");
                     ShowContinueError(
@@ -708,7 +708,7 @@ namespace EnergyPlus {
                     //"Plant Supply Side Outlet Node Name"
                     ShowContinueError("is not the same as the " + cAlphaFieldNames(7) + '=' + Alpha(7));
                     ShowContinueError("Branch List Outlet Node Name=" +
-                                      GetLastBranchOutletNodeName(state, state.dataBranchInputManager, this_supply_side.BranchList)); // TODO rename point
+                                      GetLastBranchOutletNodeName(state, this_supply_side.BranchList)); // TODO rename point
                     // TODO rename point
                     ShowContinueError(
                             "Branches in a BRANCH LIST must be listed in flow order: inlet branch, then parallel branches, then outlet branch.");
@@ -822,17 +822,17 @@ namespace EnergyPlus {
                     }
 
                     // Get the branch list and size the Branch portion of the Loop derived type
-                    loopSide.TotalBranches = NumBranchesInBranchList(state, state.dataBranchInputManager, loopSide.BranchList);
+                    loopSide.TotalBranches = NumBranchesInBranchList(state, loopSide.BranchList);
                     BranchNames.allocate(loopSide.TotalBranches);
                     BranchNames = "";
-                    GetBranchList(state, state.dataBranchInputManager, plantLoop.Name, loopSide.BranchList, loopSide.TotalBranches, BranchNames, LoopIdentifier);
+                    GetBranchList(state, plantLoop.Name, loopSide.BranchList, loopSide.TotalBranches, BranchNames, LoopIdentifier);
                     loopSide.Branch.allocate(loopSide.TotalBranches);
 
                     // Cycle through all of the branches and set up the node data
                     for (BranchNum = 1; BranchNum <= loopSide.TotalBranches; ++BranchNum) {
                         auto &branch = loopSide.Branch(BranchNum);
                         branch.Name = BranchNames(BranchNum);
-                        branch.TotalComponents = NumCompsInBranch(state, state.dataBranchInputManager, BranchNames(BranchNum));
+                        branch.TotalComponents = NumCompsInBranch(state, BranchNames(BranchNum));
                         branch.IsBypass = false;
 
                         CompTypes.allocate(branch.TotalComponents);
@@ -844,7 +844,6 @@ namespace EnergyPlus {
                         OutletNodeNumbers.dimension(branch.TotalComponents, 0);
 
                         GetBranchData(state,
-                                      state.dataBranchInputManager,
                                       plantLoop.Name,
                                       BranchNames(BranchNum),
                                       branch.PressureCurveType,
@@ -1087,7 +1086,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Steam;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                                this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(state.dataSteamBoilers, CompNames(CompNum));
+                                this_comp.compPtr = BoilerSteam::BoilerSpecs::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption:Indirect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Indirect_Absorption;
                                 if (LoopSideNum == DemandSide) {
@@ -1103,7 +1102,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(state.dataChillerAbsorbers, CompNames(CompNum));
+                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
@@ -1442,7 +1441,7 @@ namespace EnergyPlus {
                         NumofMixers = 0;
                     } else {
                         errFlag = false;
-                        GetNumSplitterMixerInConntrList(state, state.dataBranchInputManager, plantLoop.Name, loopSide.ConnectList, NumofSplitters, NumofMixers, errFlag);
+                        GetNumSplitterMixerInConntrList(state, plantLoop.Name, loopSide.ConnectList, NumofSplitters, NumofMixers, errFlag);
                         if (errFlag) {
                             ErrorsFound = true;
                         }
@@ -1468,7 +1467,6 @@ namespace EnergyPlus {
                         OutletNodeNames.allocate(MaxNumAlphas);
                         OutletNodeNumbers.allocate(MaxNumAlphas);
                         GetLoopSplitter(state,
-                                        state.dataBranchInputManager,
                                         plantLoop.Name,
                                         loopSide.ConnectList,
                                         loopSide.Splitter.Name,
@@ -1552,7 +1550,6 @@ namespace EnergyPlus {
                         InletNodeNames.allocate(MaxNumAlphas);
                         InletNodeNumbers.allocate(MaxNumAlphas);
                         GetLoopMixer(state,
-                                     state.dataBranchInputManager,
                                      plantLoop.Name,
                                      loopSide.ConnectList,
                                      loopSide.Mixer.Name,
@@ -2250,7 +2247,7 @@ namespace EnergyPlus {
                         SizePlantLoop(state, LoopNum, FinishSizingFlag);
                     }
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state,state.dataBranchInputManager);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state);
                     for (BranchNum = 1;
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
@@ -2312,7 +2309,7 @@ namespace EnergyPlus {
                         } //-CompNum
                     }     //-BranchNum
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state,state.dataBranchInputManager);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps(state);
                 }
 
                 PlantReSizingCompleted = true;

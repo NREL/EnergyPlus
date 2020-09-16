@@ -133,7 +133,7 @@ namespace PondGroundHeatExchanger {
                                                Real64 &EP_UNUSED(CurLoad),
                                                bool const EP_UNUSED(RunFlag))
     {
-        this->InitPondGroundHeatExchanger(state.dataBranchInputManager, FirstHVACIteration);
+        this->InitPondGroundHeatExchanger(state, FirstHVACIteration);
         this->CalcPondGroundHeatExchanger();
         this->UpdatePondGroundHeatExchanger();
     }
@@ -157,7 +157,7 @@ namespace PondGroundHeatExchanger {
 
     void PondGroundHeatExchangerData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitPondGroundHeatExchanger(state.dataBranchInputManager, true);
+        this->InitPondGroundHeatExchanger(state, true);
     }
 
     void PondGroundHeatExchangerData::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
@@ -365,7 +365,7 @@ namespace PondGroundHeatExchanger {
         SetupOutputVariable("Pond Heat Exchanger Bulk Temperature", OutputProcessor::Unit::C, this->PondTemp, "Plant", "Average", this->Name);
     }
 
-    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager, bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+    void PondGroundHeatExchangerData::InitPondGroundHeatExchanger(EnergyPlusData &state, bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
 
@@ -410,7 +410,7 @@ namespace PondGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             bool errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_GrndHtExchgPond,
                                                     this->LoopNum,

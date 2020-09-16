@@ -27,6 +27,7 @@ import os
 import re
 import json
 import glob as gb
+import sys
 import warnings
 
 
@@ -802,3 +803,5 @@ if __name__ == '__main__':
     source_files = gb.glob(os.path.join(SRC_DIR, '*.cc'))
     all_errors = get_all_errors(source_files)
     output_errors_to_console(all_errors)
+    if len(all_errors) > 0:
+        sys.exit(1)

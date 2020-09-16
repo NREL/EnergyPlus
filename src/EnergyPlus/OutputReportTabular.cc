@@ -3335,7 +3335,7 @@ namespace OutputReportTabular {
         // set the default factors for source energy - they will be overwritten if the user sets any values
         sourceFactorElectric = 3.167;
         sourceFactorNaturalGas = 1.084;
-        sourceFactorSteam = 0.3;
+        sourceFactorSteam = 1.20;
         sourceFactorGasoline = 1.05;
         sourceFactorDiesel = 1.05;
         sourceFactorCoal = 1.05;
@@ -5012,7 +5012,7 @@ namespace OutputReportTabular {
                     SysTotalHVACRejectHeatLoss += DXCoil(iCoil).EvapCondPumpElecConsumption + DXCoil(iCoil).BasinHeaterConsumption +
                                                   DXCoil(iCoil).EvapWaterConsump * RhoWater * H2OHtOfVap_HVAC;
                 }
-                if (DXCoil(iCoil).FuelType != DXCoils::FuelTypeElectricity) {
+                if (DXCoil(iCoil).FuelTypeNum != DataGlobalConstants::iRT_Electricity) {
                     SysTotalHVACRejectHeatLoss += DXCoil(iCoil).MSFuelWasteHeat * TimeStepSysSec;
                 }
             } else if (DXCoil(iCoil).DXCoilType_Num == DataHVACGlobals::CoilDX_HeatingEmpirical ||
@@ -5753,7 +5753,7 @@ namespace OutputReportTabular {
             WriteCompCostTable(state.dataCostEstimateManager);
             WriteAdaptiveComfortTable(state.dataCostEstimateManager);
             WriteEioTables(state.dataCostEstimateManager, state.files);
-            WriteLoadComponentSummaryTables(state.dataCostEstimateManager);
+            WriteLoadComponentSummaryTables(state, state.dataCostEstimateManager);
             WriteHeatEmissionTable(state.dataCostEstimateManager);
 
             if (displayThermalResilienceSummary) WriteThermalResilienceTables();
@@ -8055,7 +8055,7 @@ namespace OutputReportTabular {
 
             tableBody(1, 3) = RealToStr(sourceFactorElectric / efficiencyDistrictCooling, 3); // District Cooling
 
-            tableBody(1, 4) = RealToStr(sourceFactorNaturalGas / efficiencyDistrictHeating, 3); // Disctrict Heating
+            tableBody(1, 4) = RealToStr(sourceFactorNaturalGas / efficiencyDistrictHeating, 3); // District Heating
 
             tableBody(1, 5) = RealToStr(sourceFactorSteam, 3); // Steam
 
@@ -12765,7 +12765,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void WriteLoadComponentSummaryTables(CostEstimateManagerData &dataCostEstimateManager)
+    void WriteLoadComponentSummaryTables(EnergyPlusData &state, CostEstimateManagerData &dataCostEstimateManager)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -12814,14 +12814,13 @@ namespace OutputReportTabular {
         //
         // METHODOLOGY EMPLOYED:
         //   For each step of sequence from each design day, compute the
-        //   contributations from previous timesteps multiplied by the decay
+        //   contributions from previous timesteps multiplied by the decay
         //   curve. Rather than store every internal load's radiant contribution
         //   to each surface, the TMULT and ITABSF sequences were also stored
         //   which allocates the total radiant to each surface in the zone. The
         //   formula used is:
         //       QRadThermInAbs(SurfNum) = QL(NZ) * TMULT(NZ) * ITABSF(SurfNum)
 
-        using DataAirLoop::AirToZoneNodeInfo;
         using DataGlobals::CompLoadReportIsReq;
         using DataGlobals::NumOfTimeStepInHour;
         using DataHVACGlobals::NumPrimaryAirSys;
@@ -13112,9 +13111,9 @@ namespace OutputReportTabular {
                     timeHeatMax = 0;
                 }
 
-                int NumZonesCooled = AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
+                int NumZonesCooled = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesCooled;
                 for (int ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) { // loop over cooled zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).CoolCtrlZoneNums(ZonesCooledNum);
                     zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
@@ -13122,9 +13121,9 @@ namespace OutputReportTabular {
                     AirLoopZonesHeatCompLoadTables(CtrlZoneNum).desDayNum = heatDesSelected;
                     AirLoopZonesHeatCompLoadTables(CtrlZoneNum).timeStepMax = timeHeatMax;
                 }
-                int NumZonesHeated = AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
+                int NumZonesHeated = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).NumZonesHeated;
                 for (int ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesHeated; ++ZonesHeatedNum) { // loop over heated zones
-                    int CtrlZoneNum = AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
+                    int CtrlZoneNum = state.dataAirLoop->AirToZoneNodeInfo(iAirLoop).HeatCtrlZoneNums(ZonesHeatedNum);
                     zoneToAirLoopCool(CtrlZoneNum) = iAirLoop;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).desDayNum = coolDesSelected;
                     AirLoopZonesCoolCompLoadTables(CtrlZoneNum).timeStepMax = timeCoolMax;
