@@ -584,7 +584,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    Written, &
                    .false.)
                 IF (DelThis) CYCLE
-             
+
               CASE ('OUTPUT:METER','OUTPUT:METER:METERFILEONLY','OUTPUT:METER:CUMULATIVE','OUTPUT:METER:CUMULATIVE:METERFILEONLY')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
@@ -601,7 +601,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    .false., & !TimeBinVar
                    CurArgs, &
                    Written, &
-                   .false.)               
+                   .false.)
                 IF (DelThis) CYCLE
                 IF (CurArgs .GE. 1) THEN
                   CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(1), NoDiff)
