@@ -166,9 +166,9 @@ void TestReturnAirPathIntegrity(EnergyPlusData &state, IOFiles &ioFiles, bool &E
 
 void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
                                        Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
-                                       Real64 const dW2,       // humidity ratio at state 2
+                                       Real64 const W2,        // humidity ratio at state 2
                                        Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
-                                       Real64 const dW1,       // humidity ratio at state 1
+                                       Real64 const W1,        // humidity ratio at state 1
                                        Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
                                        Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
                                        Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
@@ -176,9 +176,9 @@ void CalcComponentSensibleLatentOutput(Real64 const MassFlow,  // air mass flow 
 
 void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
                                   Real64 const TDBEquip,  // dry-bulb temperature at equipment outlet {C}
-                                  Real64 const dWEquip,   // humidity ratio at equipment outlet
+                                  Real64 const WEquip,    // humidity ratio at equipment outlet
                                   Real64 const TDBZone,   // dry-bulb temperature at zone air node {C}
-                                  Real64 const dWZone,    // humidity ratio at zone air node
+                                  Real64 const WZone,     // humidity ratio at zone air node
                                   Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
                                   Real64 &LatentOutput,   // latent output rate (state 2 -> State 1), {W}
                                   Real64 &TotalOutput     // total = sensible + latent putput rate (state 2 -> State 1), {W}
@@ -187,7 +187,7 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
 void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
                             Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
                             Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
-                            Real64 const dWZone,   // humidity ratio at zone air node
+                            Real64 const WZone,    // humidity ratio at zone air node
                             Real64 &SensibleOutput // sensible output rate (state 2 -> State 1), {W}
 );
 
