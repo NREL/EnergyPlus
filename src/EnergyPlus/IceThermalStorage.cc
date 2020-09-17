@@ -2110,7 +2110,7 @@ namespace IceThermalStorage {
             this->MyEnvrnFlag = true;
         }
 
-        this->InitSimplePcmStorage(state.dataBranchInputManager);
+        this->InitSimplePcmStorage(state);
 
         //------------------------------------------------------------------------
         // FIRST PROCESS (MyLoad = 0.0 as IN)
@@ -2194,7 +2194,7 @@ namespace IceThermalStorage {
         this->RecordOutput(MyLoad2, RunFlag);
     }
 
-    void SimplePcmStorageData::InitSimplePcmStorage(BranchInputManagerData &dataBranchInputManager)
+    void SimplePcmStorageData::InitSimplePcmStorage(EnergyPlusData &state)
     {
 
         bool errFlag;
@@ -2202,7 +2202,7 @@ namespace IceThermalStorage {
         if (this->MyPlantScanFlag) {
             // Locate the storage on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_TS_PcmSimple,
                                                     this->LoopNum,
