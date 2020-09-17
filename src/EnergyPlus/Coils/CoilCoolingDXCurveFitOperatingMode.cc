@@ -68,10 +68,12 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(EnergyPlusData
     this->name = input_data.name;
     this->ratedGrossTotalCap = input_data.gross_rated_total_cooling_capacity;
     this->ratedEvapAirFlowRate = input_data.rated_evaporator_air_flow_rate;
+    this->ratedCondAirFlowRate = input_data.rated_condenser_air_flow_rate;
     this->maxCyclingRate = input_data.maximum_cycling_rate;
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
     this->timeForCondensateRemoval = input_data.nominal_time_for_condensate_removal_to_begin;
+    // TODO: UNUSED apply_latent_degradation_to_speeds_greater_than_1
     this->nominalEvaporativePumpPower = input_data.nominal_evap_condenser_pump_power;
 
     // Must all be greater than zero to use the latent capacity degradation model
@@ -158,7 +160,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     bool PrintFlag = true;
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-    std::string SizingString = "Rated Evaporator Air Flow Rate";
+    std::string SizingString = "Rated Evaporator Air Flow Rate [m3/s]";
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
     ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = TempSize;
@@ -168,7 +170,7 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
             DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-    SizingString = "Rated Gross Total Cooling Capacity";
+    SizingString = "Rated Gross Total Cooling Capacity [W]";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -178,10 +180,22 @@ void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
     // Auto size condenser air flow to Total Capacity * 0.000114 m3/s/w (850 cfm/ton)
     DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
     DataSizing::DataFractionUsedForSizing = 0.000114;
-    SizingString = "Rated Condenser Air Flow Rate";
+    SizingString = "Rated Condenser Air Flow Rate [m3/s]";
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
     ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = TempSize;
+
+
+    if (this->condenserType != AIRCOOLED) {
+        // Auto size Nominal Evaporative Condenser Pump Power to Total Capacity * 0.004266 w/w (15 W/ton)
+        SizingMethod = DataHVACGlobals::AutoCalculateSizing;
+        DataSizing::DataConstantUsedForSizing = this->ratedGrossTotalCap;
+        DataSizing::DataFractionUsedForSizing = 0.004266;
+        SizingString = "Nominal Evaporative Condenser Pump Power [W]";
+        TempSize = this->original_input_specs.nominal_evap_condenser_pump_power;
+        ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+        this->nominalEvaporativePumpPower = TempSize;
+    }
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
