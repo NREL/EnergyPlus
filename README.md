@@ -1,7 +1,8 @@
-EnergyPlus [![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg?colorB=FF7300)]()
-===================================================================================================
+EnergyPlus [![](https://img.shields.io/github/release/NREL/energyplus.svg)](https://github.com/NREL/EnergyPlus/releases/latest)
+==========
 
-
+![](https://img.shields.io/github/downloads/NREL/EnergyPlus/latest/total?color=5AC451)
+![](https://img.shields.io/github/downloads/nrel/energyplus/total.svg?color=5AC451&label=downloads_since_v8.1)
 
 This is the EnergyPlus Development Repository.  EnergyPlus™ is a whole building energy simulation program that engineers, architects, and researchers use to model both energy consumption and water use in buildings.
 
@@ -22,7 +23,7 @@ Since 2014, most of the testing has been performed by our bots ([Tik-Tok](https:
 We are now adapting our efforts to use the Github Actions system to handle more of our testing processes.
 In the meantime, while Decent CI is still handling the regression and bulkier testing, results from Decent CI are still available on the testing [dashboard](http://nrel.github.io/EnergyPlusBuildResults/).
 
-## Releases [![](https://img.shields.io/github/release/NREL/energyplus.svg?colorB=FF7300)](https://github.com/NREL/EnergyPlus/releases/latest)
+## Releases
 
 ![](https://github.com/NREL/EnergyPlus/workflows/Windows%20Releases/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Mac%20Releases/badge.svg) ![](https://github.com/NREL/EnergyPlus/workflows/Linux%20Releases/badge.svg)
 
@@ -39,7 +40,7 @@ Big Ladder also produces html based documentation [online](http://bigladdersoftw
 
 ## API Documentation
 
-[![Read the Docs](https://img.shields.io/readthedocs/eplus?label=Python%20API%20Latest%20%28beta%29)](https://eplus.readthedocs.io/en/latest/)
+[![Read the Docs](https://img.shields.io/readthedocs/eplus?label=Python%20API%20Latest%20%28beta%29&color=5AC451)](https://eplus.readthedocs.io/en/latest/)
 
 An API is being developed to allow access to internal EnergyPlus functionality and open up the possibility for many new workflow opportunities around EnergyPlus.
 A C API is developed to expose the C++ functions, then Python bindings are built on top of that to maximize the accessibility.
@@ -47,7 +48,9 @@ Temporary API documentation is available [here](https://nrel.github.io/EnergyPlu
 Currently the Python documentation is being built there, for the latest develop snapshot.
 Many improvements to come in this area. 
 
-## License & Contributing Development [![](https://img.shields.io/badge/license-BSD--3--like-FF7300.svg)](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt)
+## License & Contributing Development
+
+[![](https://img.shields.io/badge/license-BSD--3--like-5AC451.svg)](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt)
 
 EnergyPlus is available under a BSD-3-like license.
 For more information, check out the [license file](https://github.com/NREL/EnergyPlus/blob/develop/LICENSE.txt).
