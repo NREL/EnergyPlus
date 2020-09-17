@@ -197,6 +197,7 @@ namespace SimAirServingZones {
     int const Fan_System_Object(28);
     int const UnitarySystemModel(29);
     int const ZoneVRFasAirLoopEquip(30);
+    int const WaterCoil_DehumLiqDesiccant(31);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -1198,7 +1199,8 @@ namespace SimAirServingZones {
                                     CompType = PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf;
                                     if (UtilityRoutines::SameString(CompType, "Coil:Cooling:Water:DetailedGeometry") ||
                                         UtilityRoutines::SameString(CompType, "Coil:Heating:Water") ||
-                                        UtilityRoutines::SameString(CompType, "Coil:Cooling:Water")) {
+                                        UtilityRoutines::SameString(CompType, "Coil:Cooling:Water") ||
+                                        UtilityRoutines::SameString(CompType, "Coil:Dehumidification:LiquidDesiccant")) {
                                         WaterCoilNodeNum = GetCoilWaterInletNode(
                                             CompType, PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name, ErrorsFound);
                                         if (WaterCoilNodeNum == ActuatorNodeNum) {
@@ -1291,6 +1293,8 @@ namespace SimAirServingZones {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = WaterCoil_DetailedCool;
                         } else if (componentType == "COIL:COOLING:WATER") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = WaterCoil_Cooling;
+                        } else if (componentType == "COIL:DEHUMIDIFICATION:LIQUIDDESICCANT") {
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = WaterCoil_DehumLiqDesiccant;
                         } else if (componentType == "COIL:HEATING:ELECTRIC") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = Coil_ElectricHeat;
                         } else if (componentType == "COIL:HEATING:FUEL") {
@@ -3604,6 +3608,11 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == WaterCoil_Cooling) { // 'Coil:Cooling:Water'
+                SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex, QActual);
+                if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
+                
+                // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
+            } else if (SELECT_CASE_var == WaterCoil_DehumLiqDesiccant) { // 'Coil:Dehumidification:LiquidDesiccant'
                 SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex, QActual);
                 if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
