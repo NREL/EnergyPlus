@@ -796,8 +796,8 @@ namespace HeatBalanceSurfaceManager {
                     auto l11(TH.index(1, 2, SurfNum));
                     auto l12(TH.index(2, 2, SurfNum));
                     auto const s3(TH.size3());
-                    for (int Term = 1; Term <=
-                                   construct.NumCTFTerms; ++Term, l11 += s3, l12 += s3) { // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
+                    for (int Term = 1; Term <= construct.NumCTFTerms; ++Term, l11 += s3, l12 += s3) {
+                        // [ l11 ] == ( 1, Term + 1, SurfNum ), [ l12 ] == ( 1, Term + 1, SurfNum )
 
                         // Sign convention for the various terms in the following two equations
                         // is based on the form of the Conduction Transfer Function equation
@@ -2325,6 +2325,12 @@ namespace HeatBalanceSurfaceManager {
         // REFERENCES:
         // (I)BLAST legacy routine QSUN
 
+        // TODO: InterpSlatAng (XL)
+        // TODO: Duplicated AbsDiffWin? (XL)
+        // TODO: ENUM surface class
+        // TODO: Shading Surface List
+        // TODO: EXT SOLAR INDEX LIST
+
         // Using/Aliasing
         using SolarShading::CalcInteriorSolarDistribution;
         using namespace HeatBalanceMovableInsulation;
@@ -2943,7 +2949,7 @@ namespace HeatBalanceSurfaceManager {
 
                                         if (ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn ||
                                             ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn) { // Shade/screen on
-                                            // TODO: Duplicating? (XL)
+                                            // TODO: Duplicated AbsDiffWin? (XL)
                                             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
                                                 AbsDiffWin(Lay) = dataConstruction.Construct(ConstrNumSh).AbsDiff(Lay);
                                             }
@@ -2955,7 +2961,7 @@ namespace HeatBalanceSurfaceManager {
                                         if (ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ||
                                             ShadeFlag == BGBlindOn) { // Blind on
                                             for (int Lay = 1; Lay <= TotGlassLay; ++Lay) {
-                                                // TODO: InterpSlatAng
+
 
                                                 AbsDiffWin(Lay) = InterpSlatAng(SurfWinSlatAngThisTS(SurfNum),
                                                                                 SurfWinMovableSlats(SurfNum),
@@ -3480,6 +3486,8 @@ namespace HeatBalanceSurfaceManager {
 
         // DERIVED TYPE DEFINITIONS:
         // na
+        // TODO: Reduce local variable scope (XL)
+        // TODO: dataConstruction.Construct(ConstrNum).TransDiff check
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 AbsExt;          // Solar absorptance of outermost layer (or movable insulation if present)
@@ -4108,7 +4116,7 @@ namespace HeatBalanceSurfaceManager {
         // REFERENCES:
         // BLAST Routine - CIVAF - Compute Surface Absorption Factors For Short Wave Radiation
         //                         From Zone Lights And Diffuse Solar.
-
+        // TODO: Reduce local variable scope (XL)
         // Using/Aliasing
         using namespace HeatBalanceMovableInsulation;
         using General::InterpSlatAng;

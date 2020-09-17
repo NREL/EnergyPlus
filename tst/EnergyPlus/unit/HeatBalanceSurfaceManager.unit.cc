@@ -3114,4 +3114,83 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestInitHBInterzoneWindow)
     InitIntSolarDistribution();
     EXPECT_NEAR(1.666667, DataHeatBalance::SurfIntBmIncInsSurfIntensRep(1), 0.00001);
 }
+
+TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestCompilerOpt)
+{
+    using namespace std::chrono;
+
+    std::vector<int> ZoneRandomSurfaceList1 = {1, 5, 9, 13, 17, 21, 25, 29};
+    std::vector<int> ZoneExtSolarSurfaceList1 = {1, 2, 3, 4, 21, 22, 23, 24};
+    int SurfNum = 32;
+    int const TOTAL_ITER = 10000;
+    DataSurfaces::Surface.allocate(SurfNum);
+    DataHeatBalSurface::QdotRadOutRep.allocate(SurfNum);
+    DataHeatBalSurface::QdotRadOutRepPerArea.allocate(SurfNum);
+    DataHeatBalSurface::QRadOutReport.allocate(SurfNum);
+    DataHeatBalSurface::QAirExtReport.allocate(SurfNum);
+
+    DataHeatBalSurface::SurfOpaqQRadSWOutAbs.allocate(SurfNum);
+    DataHeatBalSurface::SurfQRadSWOutMvIns.allocate(SurfNum);
+    DataHeatBalSurface::SurfQRadLWOutSrdSurfs.allocate(SurfNum);
+    DataHeatBalSurface::SurfQAdditionalHeatSourceOutside.allocate(SurfNum);
+
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    for (int iter = 0; iter < TOTAL_ITER; iter++) {
+        int const firstSurf = 1;
+        int const lastSurf = 4;
+        for (int SurfNum = firstSurf; SurfNum <= lastSurf; ++SurfNum) {
+            for (int iter = 0; iter < TOTAL_ITER; iter++) {
+                DataHeatBalSurface::QdotRadOutRep(SurfNum) = iter;
+                DataHeatBalSurface::QdotRadOutRepPerArea(SurfNum) = iter;
+                DataHeatBalSurface::QRadOutReport(SurfNum) = iter;
+                DataHeatBalSurface::QAirExtReport(SurfNum) = iter;
+            }
+        } // end of ZoneSurf
+        int const firstSurfWin = 21;
+        int const lastSurfWin = 24;
+        for (int SurfNum = firstSurfWin; SurfNum <= lastSurfWin; ++SurfNum) {
+            for (int iter = 0; iter < TOTAL_ITER; iter++) {
+                DataHeatBalSurface::QdotRadOutRep(SurfNum) = iter;
+                DataHeatBalSurface::QdotRadOutRepPerArea(SurfNum) = iter;
+                DataHeatBalSurface::QRadOutReport(SurfNum) = iter;
+                DataHeatBalSurface::QAirExtReport(SurfNum) = iter;
+            }
+        } // end of ZoneSurf
+    }
+
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+    double timer_1 = time_span.count();
+    t1 = high_resolution_clock::now();
+    for (int iter = 0; iter < TOTAL_ITER; iter++) {
+        for (int SurfNum : ZoneExtSolarSurfaceList1) {
+            for (int iter = 0; iter < TOTAL_ITER; iter++) {
+                DataHeatBalSurface::QdotRadOutRep(SurfNum) = iter;
+                DataHeatBalSurface::QdotRadOutRepPerArea(SurfNum) = iter;
+                DataHeatBalSurface::QRadOutReport(SurfNum) = iter;
+                DataHeatBalSurface::QAirExtReport(SurfNum) = iter;
+            }
+        } // end of ZoneSurf
+    }
+    t2 = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t2 - t1);
+    double timer_2 = time_span.count();
+
+    t1 = high_resolution_clock::now();
+    for (int iter = 0; iter < TOTAL_ITER; iter++) {
+        for (int SurfNum = 1; SurfNum <= 24; ++SurfNum) {
+            for (int iter = 0; iter < TOTAL_ITER; iter++) {
+                if (SurfNum > 4 && SurfNum < 21) continue;
+                DataHeatBalSurface::SurfOpaqQRadSWOutAbs(SurfNum) = iter;
+                DataHeatBalSurface::SurfQRadSWOutMvIns(SurfNum) = iter;
+                DataHeatBalSurface::SurfQRadLWOutSrdSurfs(SurfNum) = iter;
+                DataHeatBalSurface::SurfQAdditionalHeatSourceOutside(SurfNum) = iter;
+            }
+        } // end of ZoneSurf
+    }
+    t2 = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t2 - t1);
+    double timer_3 = time_span.count();
+//    EXPECT_EQ(timer_1, timer_3);
+}
 } // namespace EnergyPlus
