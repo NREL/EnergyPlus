@@ -255,18 +255,13 @@ unset(skip_tools)
 unset(skip_tests)
 set_target_properties(ssc PROPERTIES FOLDER ThirdParty/ssc)
 IF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  ) # g++/Clang
-  target_compile_options(
-    ssc
-    PUBLIC
-    -Wno-error
-    -w
-  )
-  target_compile_options(
-    shared
-    PUBLIC
-    -Wno-error
-    -w
-  )
+  target_compile_options(splinter PUBLIC -Wno-error -w)
+  target_compile_options(shared PUBLIC -Wno-error -w)
+  target_compile_options(nlopt PUBLIC -Wno-error -w)
+  target_compile_options(lpsolve PUBLIC -Wno-error -w)
+  target_compile_options(solarpilot PUBLIC -Wno-error -w)
+  target_compile_options(tcs PUBLIC -Wno-error -w)
+  target_compile_options(ssc PUBLIC -Wno-error -w)
 ENDIF()
 
 # Btwxt

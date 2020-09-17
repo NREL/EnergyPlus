@@ -206,7 +206,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_Calc)
     pvwb.getResults(generatorPower, generatorEnergy, thermalPower, thermalEnergy);
     EXPECT_DOUBLE_EQ(thermalPower, 0.0);
     EXPECT_DOUBLE_EQ(thermalEnergy, 0.0);
-    EXPECT_NEAR(generatorPower, 1621.100, 0.5);
+    EXPECT_NEAR(generatorPower, 1609.812, 0.5);
     EXPECT_NEAR(generatorEnergy, generatorPower * 60 * 60, 1);
 
     PVWattsGenerator pvwc("PVWattsArrayC", 1000.0, ModuleType::THIN_FILM, ArrayType::FIXED_OPEN_RACK, 0.1, GeometryType::TILT_AZIMUTH, 30.0, 140.);

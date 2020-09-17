@@ -93,7 +93,9 @@ namespace PVWatts {
           m_geometryType(geometryType),
           m_DCtoACRatio(1.1),
           m_inverterEfficiency(0.96),
-          m_outputDCPower(1000.0)
+          m_outputDCPower(1000.0),
+          m_cellTemperature(-9999),
+          m_planeOfArrayIrradiance(-9999)
 
     {
         using General::RoundSigDigits;
@@ -392,6 +394,10 @@ namespace PVWatts {
         ssc_data_set_number(pvwattsData, "tilt", m_tilt);
         ssc_data_set_number(pvwattsData, "azimuth", m_azimuth);
         ssc_data_set_number(pvwattsData, "gcr", m_groundCoverageRatio);
+
+        // In/Out Properties
+        ssc_data_set_number(pvwattsData, "tcell", m_cellTemperature);
+        ssc_data_set_number(pvwattsData, "poa", m_planeOfArrayIrradiance);
 
 
         // TODO: Get the shad_beam from the geometry again.
