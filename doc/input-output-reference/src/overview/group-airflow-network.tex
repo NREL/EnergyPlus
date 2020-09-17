@@ -567,7 +567,7 @@ An interior heat transfer surface (\hyperref[buildingsurfacedetailed]{BuildingSu
 
 When a non-rectangular subsurface is used, the model will automatically convert it into a rectangular subsurface using equivalent width and height based on an entered choice from the Equivalent Rectangle Method field or a default choice.
 
-When an air boundary surface or subsurface is used (\hyperref[constructionairboundary]{Construction:AirBoundary}), all types of leakage component are allowed except AirflowNetwork:MultiZone:Component:ZoneExhaustFan. Venting controls may not be used with an air boundary surface (it is always fully open).
+When an air boundary surface or subsurface is used (\hyperref[constructionairboundary]{Construction:AirBoundary}), all types of leakage component are allowed except AirflowNetwork:MultiZone:Component:ZoneExhaustFan. The only allowed venting control type for an air boundary surface is Constant, and the venting schedule is ignored (which means the opening is always fully open at the specified Window/Door Opening Factor, or Crack Factor). EnergyManagementSystem:Actuator ``AirFlow Network Window/Door Opening'' is available for special applications where control of the air boundary opening is required.
 
 \subsubsection{Field: Surface Name}\label{field-surface-name-000}
 
@@ -663,7 +663,7 @@ Venting Availability Schedule (see below) allows venting.
 opened if $H_{zone} > H_{out}$ \textbf{and} $T_{zone} > T_{set}$ \textbf{and}
 Venting Availability Schedule allows venting.
 
-\textbf{Constant}: Whenever this object's Venting Availability Schedule allows venting, the openable window or door associated with this surface is open, independent of indoor or outdoor conditions. Note that ``Constant'' here means that the size of this opening is fixed while venting; the air flow through this opening can, of course, vary from timestep to timestep. If the surface is an air boundary (\hyperref[constructionairboundary]{Construction:AirBoundary}) then Constant is the only valid option.
+\textbf{Constant}: Whenever this object's Venting Availability Schedule allows venting, the openable window or door associated with this surface is open, independent of indoor or outdoor conditions. Note that ``Constant'' here means that the size of this opening is fixed while venting; the air flow through this opening can, of course, vary from timestep to timestep. If the surface is an air boundary (\hyperref[constructionairboundary]{Construction:AirBoundary}) then Constant is the only valid option (other options will throw a warning and be reset to Constant).
 
 \textbf{ASHRAE55Adaptive}: The openable window or door associated with this surface is opened if the operative temperature is greater than the comfort temperature (central line) calculated from the ASHRAE Standard 55-2010 adaptive comfort model \textbf{and} Venting Availability Schedule allows venting.
 

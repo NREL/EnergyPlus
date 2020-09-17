@@ -2535,8 +2535,7 @@ namespace AirflowNetworkBalanceManager {
             if (MultizoneSurfaceData(i).SurfNum == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields(1) +
                                 " given = " + MultizoneSurfaceData(i).SurfName);
-                ErrorsFound = true;
-                continue;
+                ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
             }
             if (!Surface(MultizoneSurfaceData(i).SurfNum).HeatTransSurf &&
                 !Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) {
@@ -2795,7 +2794,6 @@ namespace AirflowNetworkBalanceManager {
 
         // Validate adjacent temperature and Enthalpy control for an interior surface only
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
-            if (MultizoneSurfaceData(i).SurfNum == 0) continue;
             if (MultizoneSurfaceData(i).VentSurfCtrNum == VentControlType::AdjTemp) {
                 if (!(Surface(MultizoneSurfaceData(i).SurfNum).ExtBoundCond >= 1)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " object, " + cAlphaFields(1) + " = " + MultizoneSurfaceData(i).SurfName);
@@ -3045,7 +3043,6 @@ namespace AirflowNetworkBalanceManager {
             UtilityRoutines::SameString(AirflowNetworkSimu.HeightOption, "OpeningHeight")) {
             for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
                 for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
-                    if (MultizoneSurfaceData(j).SurfNum == 0) continue;
                     if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment ||
                         (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
                          Surface(MultizoneSurfaceData(j).SurfNum).ExtWind)) {
@@ -3061,7 +3058,6 @@ namespace AirflowNetworkBalanceManager {
         // Assign external node azimuth, should consider combining this with the above to avoid the repeated search
         for (int i = 1; i <= dataAirflowNetworkBalanceManager.AirflowNetworkNumOfExtNode; ++i) {
             for (j = 1; j <= AirflowNetworkNumOfSurfaces; ++j) {
-                if (MultizoneSurfaceData(j).SurfNum == 0) continue;
                 if (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == ExternalEnvironment ||
                     (Surface(MultizoneSurfaceData(j).SurfNum).ExtBoundCond == OtherSideCoefNoCalcExt &&
                      Surface(MultizoneSurfaceData(j).SurfNum).ExtWind)) {
