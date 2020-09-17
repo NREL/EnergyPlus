@@ -6,6 +6,7 @@
 import codecs
 import json
 import os
+import sys
 
 
 # There are some missing units in a large number of fields.
@@ -41,6 +42,7 @@ idd_lines = codecs.open(idd_file, encoding='utf-8', errors='ignore').readlines()
 original_units = []
 reading_mode = ReadingMode.FindTranslatedUnits
 line_num = 0
+num_issues_found = 0
 for line in idd_lines:
     line = line.strip()
     line_num += 1
@@ -71,6 +73,7 @@ for line in idd_lines:
                     'messagetype': 'warning',
                     'message': "Unexpected number of unit specifications"
                 }))
+                num_issues_found += 1
             elif real_tokens[1] not in original_units and real_tokens[1] not in ignore_list:
                 print(json.dumps({
                     'tool': 'validate_idd_units.py',
@@ -80,3 +83,7 @@ for line in idd_lines:
                     'messagetype': 'warning',
                     'message': "Unexpected unit type found: " + real_tokens[1]
                 }))
+                num_issues_found += 1
+
+if num_issues_found > 0:
+    sys.exit(1)

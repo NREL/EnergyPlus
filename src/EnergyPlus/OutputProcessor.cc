@@ -1944,10 +1944,10 @@ namespace OutputProcessor {
         {
             auto const meterType(UserInputResourceType);
 
-            if (meterType == "ELECTRICITY" || meterType == "ELECTRIC" || meterType == "ELEC") {
+            if (meterType == "ELECTRICITY") {
                 OutResourceType = "Electricity";
 
-            } else if (meterType == "GAS" || meterType == "NATURALGAS") {
+            } else if (meterType == "NATURALGAS") {
                 OutResourceType = "NaturalGas";
 
             } else if (meterType == "GASOLINE") {
@@ -1965,7 +1965,7 @@ namespace OutputProcessor {
             } else if (meterType == "FUELOILNO2") {
                 OutResourceType = "FuelOilNo2";
 
-            } else if (meterType == "PROPANE" || meterType == "PROPANEGAS") {
+            } else if (meterType == "PROPANE") {
                 OutResourceType = "Propane";
 
             } else if (meterType == "WATER" || meterType == "H2O") {
