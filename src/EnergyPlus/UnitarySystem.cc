@@ -11456,8 +11456,13 @@ namespace UnitarySystems {
                             Par[1] = double(this->m_CoolingCoilIndex);
                             Par[2] = DesOutTemp;
                             Par[5] = double(FanOpMode);
-                            TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->DOE2DXCoilResidual, 0.0, 1.0, Par);
-                            this->m_CompPartLoadRatio = PartLoadFrac;
+                            if (CycRatio == 0.0) {
+                                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, CycRatio, this->DOE2DXCoilResidual, 0.0, 1.0, Par);
+                                this->m_CompPartLoadRatio = CycRatio;
+                            } else {
+                                TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, this->DOE2DXCoilResidual, 0.0, 1.0, Par);
+                                this->m_CompPartLoadRatio = PartLoadFrac;
+                            }
 
                         } else if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
                                    (CoilType_Num == DataHVACGlobals::CoilWater_CoolingHXAssisted)) {
