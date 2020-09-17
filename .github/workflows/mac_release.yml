@@ -11,7 +11,7 @@ env:
 jobs:
   mac_release:
     runs-on: macos-10.15
-
+    # TODO: use strategy with CMAKE_OSX_DEPLOYMENT_TARGET as 10.13 and 10.15
     steps:
     - uses: actions/checkout@v2
 
