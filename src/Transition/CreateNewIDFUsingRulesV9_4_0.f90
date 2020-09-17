@@ -991,7 +991,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
     !!!   Changes for other objects that reference meter names -- update names
               CASE('DEMANDMANAGERASSIGNMENTLIST',  &
-                   'UtilityCost:Tariff')
+                   'UTILITYCOST:TARIFF')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 nodiff=.true.

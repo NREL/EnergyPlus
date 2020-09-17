@@ -2616,6 +2616,8 @@ namespace SolarShading {
         //                                    correspond to how CHKBKS is called
         //                      Jan 2002, FW: change error message
         //       RE-ENGINEERED  Lawrie, Oct 2000
+        //       Sep 2020: Revised the vector computation method to reliabily produce CVec,
+        //                 and simplified the warning messages.
 
         // PURPOSE OF THIS SUBROUTINE:
         // Determines whether a any vertices of the back surface are in front of the receiving surface;
@@ -2630,49 +2632,37 @@ namespace SolarShading {
         // Using/Aliasing
         using namespace Vectors;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int N;                // Loop Control (vertex counter)
         int NVRS;             // Number of vertices of the receiving surface
         int NVBS;             // Number of vertices of the back surface
         Real64 DOTP;          // Dot product of C and D
 
         // Object Data
-        Vector AVec; // Vector from vertex 2 to vertex 1, both same surface
-        Vector BVec; // Vector from vertex 2 to vertex 3, both same surface
-        Vector CVec; // Vector perpendicular to surface at vertex 2
-        Vector DVec; // Vector from vertex 2 of first surface to vertex 'n' of second surface
+        Vector CVec(0.0); // Vector perpendicular to surface at vertex 1
+        Vector DVec(0.0); // Vector from vertex 1 of first surface to vertex 'n' of second surface
 
         NVRS = Surface(NRS).Sides;
         NVBS = Surface(NBS).Sides;
 
         // SEE IF ANY VERTICES OF THE back surface ARE IN FRONT OF THE receiving surface
 
-        AVec = Surface(NRS).Vertex(1) - Surface(NRS).Vertex(2);
-        BVec = Surface(NRS).Vertex(3) - Surface(NRS).Vertex(2);
-
-        CVec = cross(BVec, AVec);
+        for (N = 2; N < NVRS; N++) {
+            CVec += cross(Surface(NRS).Vertex(N) - Surface(NRS).Vertex(1), 
+                Surface(NRS).Vertex((N + 1)) - Surface(NRS).Vertex(1));
+        }
+        CVec /= (NVRS>=3 ? NVRS : 3);
 
         for (N = 1; N <= NVBS; ++N) {
-            DVec = Surface(NBS).Vertex(N) - Surface(NRS).Vertex(2);
+            DVec = Surface(NBS).Vertex(N) - Surface(NRS).Vertex(1);
             DOTP = dot(CVec, DVec);
             if (DOTP > 0.0009) {
                 ShowSevereError("Problem in interior solar distribution calculation (CHKBKS)");
                 ShowContinueError("   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface(NRS).ZoneName);
-                ShowContinueError("   because vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
-                                  " is in front of receiving surface=" + Surface(NRS).Name);
+                ShowContinueError("   because one or more of vertices, such as Vertex " + std::to_string(N) + " of back surface=" + Surface(NBS).Name +
+                                  ", is in front of receiving surface=" + Surface(NRS).Name);
                 ShowContinueError(format("   (Dot Product indicator={:20.4F})", DOTP));
-                ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead.");
+                ShowContinueError("   Check surface geometry; if OK, use Solar Distribution = FullExterior instead. Use Output:Diagnostics, DisplayExtraWarnings; for more details.");
+                if (!EnergyPlus::DataGlobals::DisplayExtraWarnings) break;
             }
         }
     }
