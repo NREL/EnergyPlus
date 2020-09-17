@@ -49,14 +49,14 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include "../Fixtures/EnergyPlusFixture.hh"
+#include "../Fixtures/SQLiteFixture.hh"
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
-class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture {
+class CoilCoolingDXTest : public EnergyPlus::SQLiteFixture {
 public:
 protected:
   void SetUp() override {
-    EnergyPlus::EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+    EnergyPlus::SQLiteFixture::SetUp(); // Sets up the base fixture first.
   }
 
   std::string getSpeedObjectString(const std::string &speedObjectName) {
@@ -222,7 +222,7 @@ protected:
   }
 
   void TearDown() override {
-    EnergyPlus::EnergyPlusFixture::TearDown(); // Remember to tear down the base
+    EnergyPlus::SQLiteFixture::TearDown(); // Remember to tear down the base
                                                // fixture after cleaning up
                                                // derived fixture!
   }
