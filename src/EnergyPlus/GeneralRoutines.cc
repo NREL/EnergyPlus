@@ -2198,7 +2198,7 @@ void CalcZoneSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate,
     if (MassFlow > 0.0) {
         TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDBEquip, WEquip) -
                                   Psychrometrics::PsyHFnTdbW(TDBZone, WZone)); // total addition/removal rate, {W};
-        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
         LatentOutput = TotalOutput - SensibleOutput;                                                          // latent addition/removal rate, {W}
     }
 }
@@ -2223,7 +2223,7 @@ void CalcZoneSensibleOutput(Real64 const MassFlow, // air mass flow rate, {kg/s}
 
     SensibleOutput = 0.0;
     if (MassFlow > 0.0) {
-        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdbEquipTdbWZone(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
+        SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2Tdb1W(TDBEquip, TDBZone, WZone); // sensible addition/removal rate, {W};
     }
 }
 } // namespace EnergyPlus

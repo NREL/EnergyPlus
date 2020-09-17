@@ -1291,21 +1291,29 @@ namespace Psychrometrics {
         return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2(TB) + 8.4791863e-06 * pow_3(TB);
     }
 
-    inline Real64 PsyDeltaHSenFnTdbEquipTdbWZone(Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
-                                                 Real64 const TDBZone,  // dry-bulb temperature at zone air node {C}
-                                                 Real64 const WZone     // humidity ratio at zone air node
+    inline Real64 PsyDeltaHSenFnTdb2Tdb1W(Real64 const TDB2, // dry-bulb temperature at state 1 {C}
+                                          Real64 const TDB1, // dry-bulb temperature at state 2 {C}
+                                          Real64 const W     // humidity ratio (at zone air node or Wmin)
     )
     {
-        // returns sensible enthalpy difference between equipment supply air and zone air evaluated
-        // using the humidity ratio at zone air node. This enthalpy difference multiplied by supply
+        // When called for zone equipment flow entering a zone (from CalcZoneSensibleLatentOutput or CalcZoneSensibleOutput):
+        // returns sensible enthalpy difference between equipment supply air (TDB2) and zone air (TDB1) evaluated
+        // using the zone air node humidity ratio. This enthalpy difference multiplied by supply
         // air mass flow rate yields the sensible heat transfer rate in Watts.
+        // postive value is heating, negative value is cooling
+
+        // When called across a component (from PsyDeltaHSenFnTdb2W2Tdb1W1 by CalcComponentSensibleLatentOutput):
+        // returns sensible enthalpy difference between state 1 (TDB1) and state 2 (TDB2)
+        // using the minimum humidity ratio from states 1 and 2. This enthalpy difference multiplied by supply
+        // air mass flow rate yields the sensible heat transfer rate in Watts.
+        // postive value is heating, negative value is cooling
 
         // the following two functions for calculating enthalpy difference are equivalent:
         // PsyDeltaHSenFnTdbEquipTdbWZone() = PsyHFnTdbW(TDB2, WZone) - PsyHFnTdbW(TDB1, WZone)
         // PsyDeltaHSenFnTdbEquipTdbWZone() function was derived by simplyfying the expression above
         // The constant coefficients come from the equation for moist air enthalpy, PsyHFnTdbW()
 
-        return (1.00484e3 + max(1.0e-5, WZone) * 1.85895e3) * (TDBEquip - TDBZone);
+        return (1.00484e3 + max(1.0e-5, W) * 1.85895e3) * (TDB2 - TDB1);
     }
 
     inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
@@ -1317,6 +1325,7 @@ namespace Psychrometrics {
         // returns sensible enthalpy difference of moist air going from state 1 to state 2 (e.g across coils)
         // using the minimum humidity ratio state points 1 and 2. This enthalpy difference multiplied by
         // supply air mass flow rate yields sensible heat transfer rate across coils in Watts
+        // postive value is heating, negative value is cooling
 
         // the following two functions for calculating enthalpy difference are equivalent:
         // PsyDeltaHSenFnTdb2W2Tdb1W1() = PsyHFnTdbW(TDB2, min(W1, W2)) - PsyHFnTdbW(TDB1, min(W1,W2))
@@ -1325,7 +1334,7 @@ namespace Psychrometrics {
 
         Real64 const Wmin = min(W1, W2);
         // return (1.00484e3 + max(1.0e-5, Wmin) * 1.85895e3) * (TDB2 - TDB1);
-        return PsyDeltaHSenFnTdbEquipTdbWZone(TDB2, TDB1, Wmin);
+        return PsyDeltaHSenFnTdb2Tdb1W(TDB2, TDB1, Wmin);
     }
 
 } // namespace Psychrometrics
