@@ -153,20 +153,41 @@ namespace DataSurfaces {
     // (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
-    int const SurfaceClass_Wall(1);
-    int const SurfaceClass_Floor(2);
-    int const SurfaceClass_Roof(3);
-    int const SurfaceClass_IntMass(5);
-    int const SurfaceClass_Detached_B(6);
-    int const SurfaceClass_Detached_F(7);
-    int const SurfaceClass_Window(11);
-    int const SurfaceClass_Door(13);
-    int const SurfaceClass_GlassDoor(12);
-    int const SurfaceClass_Shading(14);
-    int const SurfaceClass_Overhang(15);
-    int const SurfaceClass_Fin(16);
-    int const SurfaceClass_TDD_Dome(17);
-    int const SurfaceClass_TDD_Diffuser(18);
+//    enum class SurfaceClass {
+//        SurfaceClass_None,
+//        SurfaceClass_Wall,
+//        SurfaceClass_Floor,
+//        SurfaceClass_Roof,
+//        SurfaceClass_PH0,
+//        SurfaceClass_IntMass,
+//        SurfaceClass_Detached_B,
+//        SurfaceClass_Detached_F,
+//        SurfaceClass_PH1,
+//        SurfaceClass_PH2,
+//        SurfaceClass_PH3,
+//        SurfaceClass_Window,
+//        SurfaceClass_GlassDoor,
+//        SurfaceClass_Door,
+//        SurfaceClass_Shading,
+//        SurfaceClass_Overhang,
+//        SurfaceClass_Fin,
+//        SurfaceClass::SurfaceClass_TDD_Dome,
+//        SurfaceClass::SurfaceClass_TDD_Diffuser,
+//    };
+//    int const SurfaceClass::SurfaceClass_Wall(1);
+//    int const SurfaceClass::SurfaceClass_Floor(2);
+//    int const SurfaceClass::SurfaceClass_Roof(3);
+//    int const SurfaceClass::SurfaceClass_IntMass(5);
+//    int const SurfaceClass::SurfaceClass_Detached_B(6);
+//    int const SurfaceClass::SurfaceClass_Detached_F(7);
+//    int const SurfaceClass::SurfaceClass_Window(11);
+//    int const SurfaceClass::SurfaceClass_Door(13);
+//    int const SurfaceClass::SurfaceClass_GlassDoor(12);
+//    int const SurfaceClass::SurfaceClass_Shading(14);
+//    int const SurfaceClass::SurfaceClass_Overhang(15);
+//    int const SurfaceClass::SurfaceClass_Fin(16);
+//    int const SurfaceClass::SurfaceClass_TDD_Dome(17);
+//    int const SurfaceClass::SurfaceClass_TDD_Diffuser(18);
 
     Array1D_string const HeatTransferModelNames(10,
                                                 {"CTF - ConductionTransferFunction",
@@ -412,6 +433,7 @@ namespace DataSurfaces {
     // from obstructions (W/m2)/(W/m2)
     Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
 
+    Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
     Array2D<Real64> AWinSurf; // Time step value of factor for beam
     // absorbed in window glass layers
 
@@ -582,7 +604,7 @@ namespace DataSurfaces {
     Array1D<Real64> SurfWinGlazedFrac;                      // (Glazed area)/(Glazed area + divider area)
     Array1D<Real64> SurfWinCenterGlArea;                    // Center of glass area (m2); area of glass where 1-D conduction dominates
     Array1D<Real64> SurfWinEdgeGlCorrFac;                   // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging effects near frame and divider
-    Array1D<int> SurfWinOriginalClass;                      // 0 or if entered originally as:
+    Array1D<SurfaceClass> SurfWinOriginalClass;                      // 0 or if entered originally as:
     Array1D<Real64> SurfWinShadeAbsFacFace1;                // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is apportioned to the two faces
     Array1D<Real64> SurfWinShadeAbsFacFace2;                // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is apportioned to the two faces
     Array1D<Real64> SurfWinConvCoeffWithShade;              // Convection coefficient from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
@@ -1235,6 +1257,7 @@ namespace DataSurfaces {
         BmToBmReflFacObs.deallocate();
         BmToDiffReflFacObs.deallocate();
         BmToDiffReflFacGnd.deallocate();
+        SkyDiffReflFacGnd.deallocate();
         AWinSurf.deallocate();
         AWinSurfDiffFront.deallocate();
         AWinSurfDiffBack.deallocate();
@@ -1496,7 +1519,7 @@ namespace DataSurfaces {
         }
     }
 
-    std::string cSurfaceClass(int const ClassNo)
+    std::string cSurfaceClass(SurfaceClass const ClassNo)
     {
 
         // FUNCTION INFORMATION:
@@ -1537,40 +1560,40 @@ namespace DataSurfaces {
 
         {
             auto const SELECT_CASE_var(ClassNo);
-            if (SELECT_CASE_var == SurfaceClass_Wall) {
+            if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Wall) {
                 ClassName = "Wall";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Floor) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Floor) {
                 ClassName = "Floor";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Roof) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Roof) {
                 ClassName = "Roof";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Window) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Window) {
                 ClassName = "Window";
 
-            } else if (SELECT_CASE_var == SurfaceClass_GlassDoor) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_GlassDoor) {
                 ClassName = "Glass Door";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Door) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Door) {
                 ClassName = "Door";
 
-            } else if (SELECT_CASE_var == SurfaceClass_TDD_Dome) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_TDD_Dome) {
                 ClassName = "TubularDaylightDome";
 
-            } else if (SELECT_CASE_var == SurfaceClass_TDD_Diffuser) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_TDD_Diffuser) {
                 ClassName = "TubularDaylightDiffuser";
 
-            } else if (SELECT_CASE_var == SurfaceClass_IntMass) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_IntMass) {
                 ClassName = "Internal Mass";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Shading) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Shading) {
                 ClassName = "Shading";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Detached_B) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Detached_B) {
                 ClassName = "Detached Shading:Building";
 
-            } else if (SELECT_CASE_var == SurfaceClass_Detached_F) {
+            } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Detached_F) {
                 ClassName = "Detached Shading:Fixed";
 
             } else {

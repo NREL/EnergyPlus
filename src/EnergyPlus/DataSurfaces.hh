@@ -101,6 +101,28 @@ namespace DataSurfaces {
         Polygonal
     };
 
+    enum class SurfaceClass : int {
+        SurfaceClass_None = 0,
+        SurfaceClass_Wall,
+        SurfaceClass_Floor,
+        SurfaceClass_Roof,
+        SurfaceClass_Moved,
+        SurfaceClass_IntMass,
+        SurfaceClass_Detached_B,
+        SurfaceClass_Detached_F,
+        SurfaceClass_PH1,
+        SurfaceClass_PH2,
+        SurfaceClass_PH3,
+        SurfaceClass_Window,
+        SurfaceClass_GlassDoor,
+        SurfaceClass_Door,
+        SurfaceClass_Shading,
+        SurfaceClass_Overhang,
+        SurfaceClass_Fin,
+        SurfaceClass_TDD_Dome,
+        SurfaceClass_TDD_Diffuser
+    };
+
     // Parameters to indicate exterior boundary conditions for use with
     // the Surface derived type (see below):
     // Note:  Positive values correspond to an interzone adjacent surface
@@ -144,20 +166,21 @@ namespace DataSurfaces {
     // (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
     // in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
     // why aren't these sequential (LKL - 13 Aug 2007)
-    extern int const SurfaceClass_Wall;
-    extern int const SurfaceClass_Floor;
-    extern int const SurfaceClass_Roof;
-    extern int const SurfaceClass_IntMass;
-    extern int const SurfaceClass_Detached_B;
-    extern int const SurfaceClass_Detached_F;
-    extern int const SurfaceClass_Window;
-    extern int const SurfaceClass_Door;
-    extern int const SurfaceClass_GlassDoor;
-    extern int const SurfaceClass_Shading;
-    extern int const SurfaceClass_Overhang;
-    extern int const SurfaceClass_Fin;
-    extern int const SurfaceClass_TDD_Dome;
-    extern int const SurfaceClass_TDD_Diffuser;
+
+//    extern int const SurfaceClass::SurfaceClass_Wall;
+//    extern int const SurfaceClass::SurfaceClass_Floor;
+//    extern int const SurfaceClass::SurfaceClass_Roof;
+//    extern int const SurfaceClass::SurfaceClass_IntMass;
+//    extern int const SurfaceClass::SurfaceClass_Detached_B;
+//    extern int const SurfaceClass::SurfaceClass_Detached_F;
+//    extern int const SurfaceClass::SurfaceClass_Window;
+//    extern int const SurfaceClass::SurfaceClass_Door;
+//    extern int const SurfaceClass::SurfaceClass_GlassDoor;
+//    extern int const SurfaceClass::SurfaceClass_Shading;
+//    extern int const SurfaceClass::SurfaceClass_Overhang;
+//    extern int const SurfaceClass::SurfaceClass_Fin;
+//    extern int const SurfaceClass::SurfaceClass_TDD_Dome;
+//    extern int const SurfaceClass::SurfaceClass_TDD_Diffuser;
 
     // Parameters to indicate heat transfer model to use for surface
     extern Array1D_string const HeatTransferModelNames;
@@ -392,6 +415,8 @@ namespace DataSurfaces {
     // from obstructions (W/m2)/(W/m2)
     extern Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
 
+    extern Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
+
     extern Array2D<Real64> AWinSurf; // Time step value of factor for beam
     // absorbed in window glass layers
 
@@ -567,7 +592,7 @@ namespace DataSurfaces {
     extern Array1D<Real64> SurfWinGlazedFrac;                      // (Glazed area)/(Glazed area + divider area)
     extern Array1D<Real64> SurfWinCenterGlArea;                    // Center of glass area (m2); area of glass where 1-D conduction dominates
     extern Array1D<Real64> SurfWinEdgeGlCorrFac;                   // Correction factor to center-of-glass conductance to account for 2-D glass conduction thermal bridging effects near frame and divider
-    extern Array1D<int> SurfWinOriginalClass;                      // 0 or if entered originally as:
+    extern Array1D<SurfaceClass> SurfWinOriginalClass;                      // 0 or if entered originally as:
     extern Array1D<Real64> SurfWinShadeAbsFacFace1;                // Fraction of short-wave radiation incident that is absorbed by face 1 when total absorbed radiation is apportioned to the two faces
     extern Array1D<Real64> SurfWinShadeAbsFacFace2;                // Fraction of short-wave radiation incident that is absorbed by face 2 when total absorbed radiation is apportioned to the two faces
     extern Array1D<Real64> SurfWinConvCoeffWithShade;              // Convection coefficient from glass or shade to gap air when interior or exterior shade is present (W/m2-K)
@@ -718,7 +743,7 @@ namespace DataSurfaces {
         bool EMSConstructionOverrideON;   // if true, EMS is calling to override the construction value
         int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
         int ConstructionStoredInputValue; // holds the original value for Construction per surface input
-        int Class;
+        SurfaceClass Class;
         // Geometry related parameters
         SurfaceShape Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
         //                Rectangular Window/Door=4,Rectangular Overhang=5,
@@ -917,7 +942,7 @@ namespace DataSurfaces {
 
         // Default Constructor
         SurfaceData()
-            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0), Class(0),
+            : Construction(0), EMSConstructionOverrideON(false), EMSConstructionOverrideValue(0), ConstructionStoredInputValue(0), Class(SurfaceClass::SurfaceClass_None),
               Shape(SurfaceShape::None), Sides(0), Area(0.0), GrossArea(0.0), NetAreaShadowCalc(0.0), Perimeter(0.0), Azimuth(0.0), Height(0.0),
               Reveal(0.0), Tilt(0.0), Width(0.0), HeatTransSurf(false), OutsideHeatSourceTermSchedule(0), InsideHeatSourceTermSchedule(0),
               HeatTransferAlgorithm(HeatTransferModel_NotSet), BaseSurf(0), NumSubSurfaces(0), Zone(0), ExtBoundCond(0), LowTempErrCount(0),
@@ -1461,7 +1486,7 @@ namespace DataSurfaces {
 
     Real64 AbsBackSide(int SurfNum);
 
-    std::string cSurfaceClass(int const ClassNo);
+    std::string cSurfaceClass(SurfaceClass const ClassNo);
 
 } // namespace DataSurfaces
 

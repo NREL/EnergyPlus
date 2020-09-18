@@ -5622,7 +5622,7 @@ namespace LowTempRadiantSystem {
 
             Real64 Area = Surface(surfNum).Area;
 
-            if (Surface(surfNum).Class == SurfaceClass_Window) {
+            if (Surface(surfNum).Class == SurfaceClass::SurfaceClass_Window) {
                 if (SurfWinShadingFlag(surfNum) == IntShadeOn || SurfWinShadingFlag(surfNum) == IntBlindOn) {
                     // The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
                     Area += SurfWinDividerArea(surfNum);

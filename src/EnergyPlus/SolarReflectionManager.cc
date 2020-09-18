@@ -476,14 +476,14 @@ namespace SolarReflectionManager {
                         PierceSurface(ObsSurfNum, RecPt, RayVec, HitPt, hit);
                         if (hit) {
                             // added TH 3/29/2010 to set ObsSurfNumToSkip
-                            if (Surface(ObsSurfNum).Class == SurfaceClass_Window) {
+                            if (Surface(ObsSurfNum).Class == SurfaceClass::SurfaceClass_Window) {
                                 ObsSurfNumToSkip = Surface(ObsSurfNum).BaseSurf;
                             }
 
                             // If obstruction is a window and its base surface is the nearest obstruction hit so far,
                             // set NearestHitSurfNum to this window. Note that in this case NearestHitDistance has already
                             // been calculated, so does not have to be recalculated.
-                            if (Surface(ObsSurfNum).Class == SurfaceClass_Window && Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum) {
+                            if (Surface(ObsSurfNum).Class == SurfaceClass::SurfaceClass_Window && Surface(ObsSurfNum).BaseSurf == NearestHitSurfNum) {
                                 NearestHitSurfNum = ObsSurfNum;
                             } else {
                                 ++TotObstructionsHit;
@@ -708,7 +708,7 @@ namespace SolarReflectionManager {
                         // If hit point's surface is a window or glass door go to next ray since it is assumed for now
                         // that windows have only beam-to-beam, not beam-to-diffuse, reflection
                         // TH 3/29/2010. Code modified and moved
-                        if (Surface(HitPtSurfNum).Class == SurfaceClass_Window || Surface(HitPtSurfNum).Class == SurfaceClass_GlassDoor) continue;
+                        if (Surface(HitPtSurfNum).Class == SurfaceClass::SurfaceClass_Window || Surface(HitPtSurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) continue;
 
                         // Skip rays that hit non-sunlit surface. Assume first time step of the hour.
                         SunLitFract = SunlitFrac(1, iHour, HitPtSurfNum);
@@ -972,10 +972,10 @@ namespace SolarReflectionManager {
                 for (int loop = 1, loop_end = SolReflRecSurf(RecSurfNum).NumPossibleObs; loop <= loop_end; ++loop) {
                     int const ReflSurfNum = SolReflRecSurf(RecSurfNum).PossibleObsSurfNums(loop); // Reflecting surface number
                     // Keep windows; keep shading surfaces with specular reflectance
-                    if ((Surface(ReflSurfNum).Class == SurfaceClass_Window && Surface(ReflSurfNum).ExtSolar) ||
+                    if ((Surface(ReflSurfNum).Class == SurfaceClass::SurfaceClass_Window && Surface(ReflSurfNum).ExtSolar) ||
                         (Surface(ReflSurfNum).ShadowSurfGlazingFrac > 0.0 && Surface(ReflSurfNum).ShadowingSurf)) {
                         // Skip if window and not sunlit
-                        if (Surface(ReflSurfNum).Class == SurfaceClass_Window && SunlitFrac(1, iHour, ReflSurfNum) < 0.01) continue;
+                        if (Surface(ReflSurfNum).Class == SurfaceClass::SurfaceClass_Window && SunlitFrac(1, iHour, ReflSurfNum) < 0.01) continue;
                         // Check if sun is in front of this reflecting surface.
                         ReflNorm = Surface(ReflSurfNum).OutNormVec;
                         CosIncAngRefl = dot(SunVec, ReflNorm);
@@ -1010,7 +1010,7 @@ namespace SolarReflectionManager {
                                 // There is no obstruction for this ray between rec. pt. and hit point on reflecting surface.
                                 // See if ray from hit pt. on reflecting surface to original (unmirrored) sun position is obstructed
                                 hitObs = false;
-                                if (Surface(ReflSurfNum).Class == SurfaceClass_Window) { // Reflecting surface is a window
+                                if (Surface(ReflSurfNum).Class == SurfaceClass::SurfaceClass_Window) { // Reflecting surface is a window
                                     // Receiving surface number for this window
                                     int const ReflSurfRecNum =
                                         Surface(ReflSurfNum)
@@ -1044,7 +1044,7 @@ namespace SolarReflectionManager {
 
                                 // No obstructions. Calculate reflected beam irradiance at receiving pt. from this reflecting surface.
                                 SpecReflectance = 0.0;
-                                if (Surface(ReflSurfNum).Class == SurfaceClass_Window) {
+                                if (Surface(ReflSurfNum).Class == SurfaceClass::SurfaceClass_Window) {
                                     ConstrNumRefl = Surface(ReflSurfNum).Construction;
                                     SpecReflectance = POLYF(std::abs(CosIncAngRefl), dataConstruction.Construct(ConstrNumRefl).ReflSolBeamFrontCoef);
                                 }

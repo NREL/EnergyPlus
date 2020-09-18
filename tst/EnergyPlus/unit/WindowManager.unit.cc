@@ -210,7 +210,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     int winNum;
 
     for (size_t i = 1; i <= DataSurfaces::Surface.size(); ++i) {
-        if (DataSurfaces::Surface(i).Class == DataSurfaces::SurfaceClass_Window) {
+        if (DataSurfaces::Surface(i).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) {
             winNum = i;
         }
     }

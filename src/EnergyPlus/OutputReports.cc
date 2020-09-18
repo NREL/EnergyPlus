@@ -264,7 +264,7 @@ void LinesOut(IOFiles &ioFiles, std::string const &option)
 
     if (option != "IDF") {
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
-            if (Surface(surf).Class == SurfaceClass_IntMass) continue;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             print(slnfile, "{}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
             for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
@@ -295,7 +295,7 @@ void LinesOut(IOFiles &ioFiles, std::string const &option)
         print(slnfile, "{}\n", " Building North Axis = 0");
         print(slnfile, "{}\n", "GlobalGeometryRules,UpperLeftCorner,CounterClockwise,WorldCoordinates;");
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
-            if (Surface(surf).Class == SurfaceClass_IntMass) continue;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_IntMass) continue;
             if (Surface(surf).Sides == 0) continue;
             // process heat transfer surfaces
             print(slnfile, " Surface={}, Name={}, Azimuth={:.1R}\n", cSurfaceClass(Surface(surf).Class), Surface(surf).Name, Surface(surf).Azimuth);
@@ -374,7 +374,7 @@ static void WriteDXFCommon(InputOutputFile &of, const std::string &ColorScheme)
     Real64 minx = 99999.0;
     Real64 miny = 99999.0;
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
-        if (Surface(surf).Class == SurfaceClass_IntMass) continue;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_IntMass) continue;
         for (int vert = 1; vert <= Surface(surf).Sides; ++vert) {
             minx = min(minx, Surface(surf).Vertex(vert).x);
             miny = min(miny, Surface(surf).Vertex(vert).y);
@@ -602,15 +602,15 @@ void DXFOut(IOFiles &ioFiles,
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
-        if (Surface(surf).Class == SurfaceClass_Shading) continue;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) colorindex = ColorNo_ShdDetFix;
-        if (Surface(surf).Class == SurfaceClass_Detached_B) colorindex = ColorNo_ShdDetBldg;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) colorindex = ColorNo_ShdDetFix;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) colorindex = ColorNo_ShdDetBldg;
         if (Surface(surf).IsPV) colorindex = ColorNo_PV;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) {
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
             print(dxffile, Format_710, "Fixed Shading:" + Surface(surf).Name);
-        } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
+        } else if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
             print(dxffile, Format_710, "Building Shading:" + Surface(surf).Name);
         }
@@ -677,16 +677,16 @@ void DXFOut(IOFiles &ioFiles,
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != zones) continue;
             if (Surface(surf).Sides == 0) continue;
-            if (Surface(surf).Class == SurfaceClass_IntMass) continue;
-            if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
-            if (Surface(surf).Class == SurfaceClass_Roof) colorindex = ColorNo_Roof;
-            if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
-            if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
-            if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_IntMass) continue;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Wall) colorindex = ColorNo_Wall;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Roof) colorindex = ColorNo_Roof;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Floor) colorindex = ColorNo_Floor;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Door) colorindex = ColorNo_Door;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Window) {
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
 
@@ -754,7 +754,7 @@ void DXFOut(IOFiles &ioFiles,
         // still have to do shading surfaces for zone
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
-            if (Surface(surf).Class != SurfaceClass_Shading) continue;
+            if (Surface(surf).Class != SurfaceClass::SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
             if (Surface(surf).Sides == 0) continue;
             colorindex = ColorNo_ShdAtt;
@@ -797,7 +797,7 @@ void DXFOut(IOFiles &ioFiles,
                                            Surface(surf).Azimuth,
                                            Surface(surf).Tilt,
                                            Surface(surf).Name,
-                                           SurfaceClass_Overhang);
+                                           SurfaceClass::SurfaceClass_Overhang);
                     } else {
                         ntri = Triangulate(ioFiles,
                                            Surface(surf).Sides,
@@ -806,7 +806,7 @@ void DXFOut(IOFiles &ioFiles,
                                            Surface(surf).Azimuth,
                                            Surface(surf).Tilt,
                                            Surface(surf).Name,
-                                           SurfaceClass_Fin);
+                                           SurfaceClass::SurfaceClass_Fin);
                     }
                     for (int svert = 1; svert <= ntri; ++svert) {
                         const auto vv0 = mytriangles(svert).vv0;
@@ -942,14 +942,14 @@ void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
         std::string ShadeType;
         if (Surface(surf).HeatTransSurf) continue;
-        if (Surface(surf).Class == SurfaceClass_Shading) continue;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) colorindex = ColorNo_ShdDetFix;
-        if (Surface(surf).Class == SurfaceClass_Detached_B) colorindex = ColorNo_ShdDetBldg;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Shading) continue;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) colorindex = ColorNo_ShdDetFix;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) colorindex = ColorNo_ShdDetBldg;
         if (Surface(surf).IsPV) colorindex = ColorNo_PV;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) {
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
             print(dxffile, Format_710, "Fixed Shading:" + Surface(surf).Name);
-        } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
+        } else if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
             print(dxffile, Format_710, "Building Shading:" + Surface(surf).Name);
         }
@@ -986,16 +986,16 @@ void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
         surfcount = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != zones) continue;
-            if (Surface(surf).Class == SurfaceClass_IntMass) continue;
-            if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
-            if (Surface(surf).Class == SurfaceClass_Roof) colorindex = ColorNo_Roof;
-            if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
-            if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
-            if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_IntMass) continue;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Wall) colorindex = ColorNo_Wall;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Roof) colorindex = ColorNo_Roof;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Floor) colorindex = ColorNo_Floor;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Door) colorindex = ColorNo_Door;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Window) {
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1037,7 +1037,7 @@ void DXFOutLines(IOFiles &ioFiles, std::string const &ColorScheme)
         surfcount = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
-            if (Surface(surf).Class != SurfaceClass_Shading) continue;
+            if (Surface(surf).Class != SurfaceClass::SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
@@ -1155,14 +1155,14 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
         std::string ShadeType;
 
         if (Surface(surf).HeatTransSurf) continue;
-        if (Surface(surf).Class == SurfaceClass_Shading) continue;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) colorindex = ColorNo_ShdDetFix;
-        if (Surface(surf).Class == SurfaceClass_Detached_B) colorindex = ColorNo_ShdDetBldg;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Shading) continue;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) colorindex = ColorNo_ShdDetFix;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) colorindex = ColorNo_ShdDetBldg;
         if (Surface(surf).IsPV) colorindex = ColorNo_PV;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) {
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
             print(dxffile, Format_710, "Fixed Shading:" + Surface(surf).Name);
-        } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
+        } else if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
             print(dxffile, Format_710, "Building Shading:" + Surface(surf).Name);
         }
@@ -1187,16 +1187,16 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
         surfcount = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             if (Surface(surf).Zone != zones) continue;
-            if (Surface(surf).Class == SurfaceClass_IntMass) continue;
-            if (Surface(surf).Class == SurfaceClass_Wall) colorindex = ColorNo_Wall;
-            if (Surface(surf).Class == SurfaceClass_Roof) colorindex = ColorNo_Roof;
-            if (Surface(surf).Class == SurfaceClass_Floor) colorindex = ColorNo_Floor;
-            if (Surface(surf).Class == SurfaceClass_Door) colorindex = ColorNo_Door;
-            if (Surface(surf).Class == SurfaceClass_Window) {
-                if (SurfWinOriginalClass(surf) == SurfaceClass_Window) colorindex = ColorNo_Window;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
-                if (SurfWinOriginalClass(surf) == SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_IntMass) continue;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Wall) colorindex = ColorNo_Wall;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Roof) colorindex = ColorNo_Roof;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Floor) colorindex = ColorNo_Floor;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Door) colorindex = ColorNo_Door;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Window) {
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_Window) colorindex = ColorNo_Window;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_GlassDoor) colorindex = ColorNo_GlassDoor;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_TDD_Dome) colorindex = ColorNo_TDDDome;
+                if (SurfWinOriginalClass(surf) == SurfaceClass::SurfaceClass_TDD_Diffuser) colorindex = ColorNo_TDDDiffuser;
             }
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
             ++surfcount;
@@ -1218,7 +1218,7 @@ void DXFOutWireFrame(IOFiles &ioFiles, std::string const &ColorScheme)
         surfcount = 0;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             // if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
-            if (Surface(surf).Class != SurfaceClass_Shading) continue;
+            if (Surface(surf).Class != SurfaceClass::SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zones).Name) continue;
             colorindex = ColorNo_ShdAtt;
             if (Surface(surf).IsPV) colorindex = ColorNo_PV;
@@ -1483,7 +1483,7 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                     ConstructionName = dataConstruction.Construct(Surface(surf).Construction).Name;
                     {
                         auto const SELECT_CASE_var(Surface(surf).Class);
-                        if (SELECT_CASE_var == SurfaceClass_Wall) {
+                        if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Wall) {
                             // Interior:  vertical, still air, Rcin = 0.68 ft2-F-hr/BTU
                             // Exterior:  vertical, exterior wind exposure, Rcout = 0.17 ft2-F-hr/BTU
                             if (NominalU(Surface(surf).Construction) > 0.0) {
@@ -1491,7 +1491,7 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                             } else {
                                 cNominalUwithConvCoeffs = "[invalid]";
                             }
-                        } else if (SELECT_CASE_var == SurfaceClass_Floor) {
+                        } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Floor) {
                             // Interior:  horizontal, still air, heat flow downward, Rcin = 0.92 ft2-F-hr/BTU
                             // Exterior:  horizontal, semi-exterior (crawlspace), Rcout = 0.46 ft2-F-hr/BTU
                             if (NominalU(Surface(surf).Construction) > 0.0) {
@@ -1499,7 +1499,7 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                             } else {
                                 cNominalUwithConvCoeffs = "[invalid]";
                             }
-                        } else if (SELECT_CASE_var == SurfaceClass_Roof) {
+                        } else if (SELECT_CASE_var == SurfaceClass::SurfaceClass_Roof) {
                             // Interior:  horizontal, still air, heat flow upward, Rcin = 0.61 ft2-F-hr/BTU
                             // Exterior:  horizontal, semi-exterior (attic), Rcout = 0.46 ft2-F-hr/BTU
                             if (NominalU(Surface(surf).Construction) > 0.0) {
@@ -1520,8 +1520,8 @@ void DetailsForSurfaces(IOFiles &ioFiles, int const RptType) // (1=Vertices only
                     } else {
                         cNominalUwithConvCoeffs = "[invalid]";
                     }
-                    if ((Surface(surf).Class == SurfaceClass_Window) || (Surface(surf).Class == SurfaceClass_TDD_Dome)) {
-                        // SurfaceClass_Window also covers glass doors and TDD:Diffusers
+                    if ((Surface(surf).Class == SurfaceClass::SurfaceClass_Window) || (Surface(surf).Class == SurfaceClass::SurfaceClass_TDD_Dome)) {
+                        // SurfaceClass::SurfaceClass_Window also covers glass doors and TDD:Diffusers
                         cNominalU = "N/A";
                         if (SurfWinSolarDiffusing(surf)) {
                             SolarDiffusing = "Yes";
@@ -1801,7 +1801,7 @@ void CostInfoOut(IOFiles &ioFiles)
     print(scifile, "{}\n", " Number, Name, Construction, class, area, grossarea");
 
     for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
-        // if (surface(surf)%class .eq. SurfaceClass_IntMass) CYCLE
+        // if (surface(surf)%class .eq. SurfaceClass::SurfaceClass_IntMass) CYCLE
         if (!uniqueSurf(surf)) continue;
         // why the heck are constructions == 0 ?
         if (Surface(surf).Construction != 0) {
@@ -1933,14 +1933,14 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
         if (Surface(surf).Construction > 0) {
             if (dataConstruction.Construct(Surface(surf).Construction).TypeIsAirBoundary) continue;
         }
-        if (Surface(surf).Class == SurfaceClass_Shading) continue;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Shading) continue;
         if (Surface(surf).Sides == 0) continue;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) colorindex = 3;
-        if (Surface(surf).Class == SurfaceClass_Detached_B) colorindex = 7;
-        if (Surface(surf).Class == SurfaceClass_Detached_F) {
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) colorindex = 3;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) colorindex = 7;
+        if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_F) {
             ShadeType = "Fixed Shading";
             print(wrlfile, "# Fixed Shading:{}\n", Surface(surf).Name);
-        } else if (Surface(surf).Class == SurfaceClass_Detached_B) {
+        } else if (Surface(surf).Class == SurfaceClass::SurfaceClass_Detached_B) {
             ShadeType = "Building Shading";
             print(wrlfile, "# Building Shading:{}", Surface(surf).Name);
         }
@@ -1982,13 +1982,13 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
             ++oldSurfNum;
             if (Surface(surf).Zone != zoneNum) continue;
             if (Surface(surf).Sides == 0) continue;
-            if (Surface(surf).Class == SurfaceClass_IntMass) continue;
-            if (Surface(surf).Class == SurfaceClass_Wall) colorindex = 1;
-            if (Surface(surf).Class == SurfaceClass_Roof) colorindex = 5;
-            if (Surface(surf).Class == SurfaceClass_TDD_Dome) colorindex = 2;
-            if (Surface(surf).Class == SurfaceClass_Floor) colorindex = 6;
-            if (Surface(surf).Class == SurfaceClass_Window) colorindex = 2;
-            if (Surface(surf).Class == SurfaceClass_Door) colorindex = 2;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_IntMass) continue;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Wall) colorindex = 1;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Roof) colorindex = 5;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_TDD_Dome) colorindex = 2;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Floor) colorindex = 6;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Window) colorindex = 2;
+            if (Surface(surf).Class == SurfaceClass::SurfaceClass_Door) colorindex = 2;
 
             print(wrlfile, "# {}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);
             print(wrlfile, Format_801, colorstring(colorindex), "Surf", oldSurfNum);
@@ -2026,7 +2026,7 @@ void VRMLOut(IOFiles &ioFiles, const std::string &PolygonAction, const std::stri
         colorindex = 4;
         for (int surf : DataSurfaces::AllSurfaceListReportOrder) {
             //      !if (surface(surf)%heattranssurf) CYCLE ! Shading with a construction is allowed to be HT surf for daylighting shelves
-            if (Surface(surf).Class != SurfaceClass_Shading) continue;
+            if (Surface(surf).Class != SurfaceClass::SurfaceClass_Shading) continue;
             if (Surface(surf).ZoneName != Zone(zoneNum).Name) continue;
             if (Surface(surf).Sides == 0) continue;
             print(wrlfile, "# {}:{}\n", Surface(surf).ZoneName, Surface(surf).Name);

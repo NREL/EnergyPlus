@@ -410,7 +410,7 @@ namespace ConvectionCoefficients {
 
         if (!Surface(SurfNum).ExtWind) {
             SurfWindSpeed = 0.0; // No wind exposure
-        } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
+        } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
             SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
         } else {
             SurfWindSpeed = Surface(SurfNum).WindSpeed;
@@ -467,7 +467,7 @@ namespace ConvectionCoefficients {
                 // approximation calculation
 
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
                         auto &fnd = SurfaceGeometry::kivaManager.surfaceMap[SurfNum].get_instance(0).first->foundation;
                         const double length = fnd.netPerimeter;
                         const double height = fnd.wall.heightAboveGrade;
@@ -514,7 +514,7 @@ namespace ConvectionCoefficients {
 
             } else if (SELECT_CASE_var1 == MoWiTTHcOutside) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
                         SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
                             // Average windward and leeward since all walls use same algorithm
                             double windwardHf = CalcMoWITTForcedWindward(windSpeed);
@@ -542,7 +542,7 @@ namespace ConvectionCoefficients {
 
             } else if (SELECT_CASE_var1 == DOE2HcOutside) {
                 if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
-                    if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
                         SurfaceGeometry::kivaManager.surfaceConvMap[SurfNum].f = [=](double, double, double, double windSpeed) -> double {
                             // Average windward and leeward since all walls use same algorithm
                             double windwardHf = CalcMoWITTForcedWindward(windSpeed);
@@ -1967,7 +1967,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                    if (Surface(SurfNum).Class != SurfaceClass_Wall) continue;
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2012,7 +2012,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                    if (Surface(SurfNum).Class != SurfaceClass_Roof) continue;
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Roof) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2057,7 +2057,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond > 0) continue; // Interior surfaces
-                    if (Surface(SurfNum).Class != SurfaceClass_Floor) continue;
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Floor) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2191,7 +2191,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                    if (Surface(SurfNum).Class != SurfaceClass_Wall) continue;
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2236,7 +2236,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                    if (Surface(SurfNum).Class != SurfaceClass_Roof) continue;
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Roof) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2281,7 +2281,7 @@ namespace ConvectionCoefficients {
                 for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
                     if (!Surface(SurfNum).HeatTransSurf) continue;
                     if (Surface(SurfNum).ExtBoundCond <= 0) continue; // Exterior surfaces
-                    if (Surface(SurfNum).Class != SurfaceClass_Floor) continue;
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Floor) continue;
                     SurfacesOfType = true;
                     if (ConvectionType == "OUTSIDE") {
                         if (Surface(SurfNum).OSCPtr > 0) continue;
@@ -2933,7 +2933,7 @@ namespace ConvectionCoefficients {
 
         // determine major width and minor width
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (Surface(SurfNum).Class != SurfaceClass_Wall) continue;
+            if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall) continue;
 
             if (Surface(SurfNum).Width > majorW) {
                 majorW = Surface(SurfNum).Width;
@@ -2946,7 +2946,7 @@ namespace ConvectionCoefficients {
 
         // assign major surfaces
         for (SurfNum = Zone(ZoneNum).SurfaceFirst; SurfNum <= Zone(ZoneNum).SurfaceLast; ++SurfNum) {
-            if (Surface(SurfNum).Class != SurfaceClass_Wall) continue;
+            if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Wall) continue;
 
             if (Surface(SurfNum).Width == majorW) {
                 if (Surf1 == 0) {
@@ -3508,12 +3508,12 @@ namespace ConvectionCoefficients {
             // first pass thru this zones surfaces to gather data
             for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                 // first catch exterior walls and do summations
-                if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass_Wall)) {
+                if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Wall)) {
                     PerimExtLengthSum += Surface(SurfLoop).Width;
                     ++ExtWallCount;
                 }
                 if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) &&
-                    ((Surface(SurfLoop).Class == SurfaceClass_Window) || (Surface(SurfLoop).Class == SurfaceClass_GlassDoor))) {
+                    ((Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_GlassDoor))) {
                     ++ExtWindowCount;
                 }
             }
@@ -3531,7 +3531,7 @@ namespace ConvectionCoefficients {
             if ((ExtWindowCount > 0) && (ExtWallCount > 0)) {
                 for (int SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                     if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) &&
-                        ((Surface(SurfLoop).Class == SurfaceClass_Window) || (Surface(SurfLoop).Class == SurfaceClass_GlassDoor))) {
+                        ((Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_GlassDoor))) {
                         if (Surface(SurfLoop).IntConvWindowWallRatio < 0.5) {
                             if (Surface(SurfLoop).Centroid.z < Zone(ZoneLoop).Centroid.z) {
                                 Surface(SurfLoop).IntConvWindowLocation = InConvWinLoc_LowerPartOfExteriorWall;
@@ -3542,7 +3542,7 @@ namespace ConvectionCoefficients {
                             Surface(SurfLoop).IntConvWindowLocation = InConvWinLoc_LargePartOfExteriorWall;
                         }
                         if ((Surface(Surface(SurfLoop).BaseSurf).ExtBoundCond == ExternalEnvironment) &&
-                            (Surface(Surface(SurfLoop).BaseSurf).Class == SurfaceClass_Wall)) {
+                            (Surface(Surface(SurfLoop).BaseSurf).Class == SurfaceClass::SurfaceClass_Wall)) {
                             if (Surface(Surface(SurfLoop).BaseSurf).Centroid.z < Surface(SurfLoop).Centroid.z) {
                                 Surface(Surface(SurfLoop).BaseSurf).IntConvWindowLocation = InConvWinLoc_WindowAboveThis;
                             } else {
@@ -3550,7 +3550,7 @@ namespace ConvectionCoefficients {
                             }
                         }
                     }
-                    if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass_Wall) &&
+                    if ((Surface(SurfLoop).ExtBoundCond == ExternalEnvironment) && (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Wall) &&
                         (Surface(SurfLoop).IntConvWindowLocation == InConvWinLoc_NotSet)) {
                         if (Surface(SurfLoop).Centroid.z < Zone(ZoneLoop).Centroid.z) {
                             Surface(SurfLoop).IntConvWindowLocation = InConvWinLoc_WindowAboveThis;
@@ -4192,13 +4192,13 @@ namespace ConvectionCoefficients {
 
             for (SurfLoop = Zone(ZoneLoop).SurfaceFirst; SurfLoop <= Zone(ZoneLoop).SurfaceLast; ++SurfLoop) {
                 if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
-                if (Surface(SurfLoop).Class == SurfaceClass_Wall || Surface(SurfLoop).Class == SurfaceClass_Door) {
+                if (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Door) {
                     ++dataConvectionCoefficients.ActiveWallCount;
                     dataConvectionCoefficients.ActiveWallArea += Surface(SurfLoop).Area;
-                } else if (Surface(SurfLoop).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Roof) {
                     ++dataConvectionCoefficients.ActiveCeilingCount;
                     dataConvectionCoefficients.ActiveCeilingArea += Surface(SurfLoop).Area;
-                } else if (Surface(SurfLoop).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Floor) {
                     ++dataConvectionCoefficients.ActiveFloorCount;
                     dataConvectionCoefficients.ActiveFloorArea += Surface(SurfLoop).Area;
                 }
@@ -4728,7 +4728,7 @@ namespace ConvectionCoefficients {
 
             if (!Surface(SurfNum).ExtWind) {
                 SurfWindSpeed = 0.0; // No wind exposure
-            } else if (Surface(SurfNum).Class == SurfaceClass_Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
+            } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window && SurfWinShadingFlag(SurfNum) == ExtShadeOn) {
                 SurfWindSpeed = 0.0; // Assume zero wind speed at outside glass surface of window with exterior shade
             } else {
                 SurfWindSpeed = Surface(SurfNum).WindSpeed;
@@ -4751,7 +4751,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == HcExt_SparrowWindward) {
                 Hf = CalcSparrowWindward(dataConvectionCoefficients, Roughness, Surface(SurfNum).OutConvFacePerimeter, Surface(SurfNum).OutConvFaceArea, SurfWindSpeed, SurfNum);
 
-                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) { // used for exterior grade
                     // Assume very large area for grade (relative to perimeter).
                     const double area = 9999999.;
                     const double perim = 1.;
@@ -4776,7 +4776,7 @@ namespace ConvectionCoefficients {
                 HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
             } else if (SELECT_CASE_var == HcExt_SparrowLeeward) {
                 Hf = CalcSparrowLeeward(dataConvectionCoefficients, Roughness, Surface(SurfNum).OutConvFacePerimeter, Surface(SurfNum).OutConvFaceArea, SurfWindSpeed, SurfNum);
-                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) { // used for exterior grade
                     // Assume very large area for grade (relative to perimeter).
                     const double area = 9999999.;
                     const double perim = 1.;
@@ -4801,7 +4801,7 @@ namespace ConvectionCoefficients {
                 HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
             } else if (SELECT_CASE_var == HcExt_MoWiTTWindward) {
                 Hf = CalcMoWITTWindward(TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp, SurfWindSpeed);
-                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) { // used for exterior grade
                     HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
                 } else {
                     HfTermFn = [=](double, double, double, double windSpeed) -> double {
@@ -4814,7 +4814,7 @@ namespace ConvectionCoefficients {
                 HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
             } else if (SELECT_CASE_var == HcExt_MoWiTTLeeward) {
                 Hf = CalcMoWITTLeeward((TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp), SurfWindSpeed);
-                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) { // used for exterior grade
                     HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedLeeward(windSpeed); };
                 } else {
                     HfTermFn = [=](double, double, double, double windSpeed) -> double {
@@ -4827,7 +4827,7 @@ namespace ConvectionCoefficients {
                 HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
             } else if (SELECT_CASE_var == HcExt_DOE2Windward) {
                 Hf = CalcDOE2Windward(TH(1, 1, SurfNum), Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) { // used for exterior grade
                     HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
                 } else {
                     HfTermFn = [=](double, double, double, double windSpeed) -> double {
@@ -4840,7 +4840,7 @@ namespace ConvectionCoefficients {
                 HfFn = [](double, double, double HfTerm, double, double) -> double { return HfTerm; };
             } else if (SELECT_CASE_var == HcExt_DOE2Leeward) {
                 Hf = CalcDOE2Leeward(TH(1, 1, SurfNum), Surface(SurfNum).OutDryBulbTemp, Surface(SurfNum).CosTilt, SurfWindSpeed, Roughness);
-                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) { // used for exterior grade
                     HfTermFn = [=](double, double, double, double windSpeed) -> double { return CalcMoWITTForcedWindward(windSpeed); };
                 } else {
                     HfTermFn = [=](double, double, double, double windSpeed) -> double {
@@ -4878,7 +4878,7 @@ namespace ConvectionCoefficients {
                                    Surface(SurfNum).OutConvFaceArea,
                                    Surface(SurfNum).OutConvFacePerimeter);
                 HfTermFn = [=](double, double, double, double windSpeed) -> double { return windSpeed; };
-                if (Surface(SurfNum).Class == SurfaceClass_Floor) { // used for exterior grade
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) { // used for exterior grade
                     // Assume very large area for grade (relative to perimeter).
                     const double area = 9999999.;
                     const double perim = 1.;
@@ -4955,8 +4955,8 @@ namespace ConvectionCoefficients {
 
         surfWindDir = Surface(SurfNum).WindDir;
 
-        if (Surface(SurfNum).Class == SurfaceClass_Roof ||
-            (Surface(SurfNum).Class == SurfaceClass_Floor &&
+        if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof ||
+            (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor &&
              Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) // Applies to exterior grade
         ) {
             if (Surface(SurfNum).ExtBoundCond == DataSurfaces::KivaFoundation) {
@@ -5182,7 +5182,7 @@ namespace ConvectionCoefficients {
                             if (ZoneEquipConfig(ZoneNum).InFloorActiveElement) {
                                 for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
-                                    if (Surface(SurfLoop).Class == SurfaceClass_Floor) {
+                                    if (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Floor) {
                                         DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
                                         if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with floor
                                             // system ON is not enough because floor surfaces can continue to heat because of thermal capacity
@@ -5201,7 +5201,7 @@ namespace ConvectionCoefficients {
                             if (ZoneEquipConfig(ZoneNum).InCeilingActiveElement) {
                                 for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
-                                    if (Surface(SurfLoop).Class == SurfaceClass_Roof) {
+                                    if (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Roof) {
                                         DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
                                         if (DeltaTemp < ActiveDelTempThreshold) { // assume cooling with ceiling
                                             // system ON is not enough because  surfaces can continue to cool because of thermal capacity
@@ -5220,7 +5220,7 @@ namespace ConvectionCoefficients {
                             if (ZoneEquipConfig(ZoneNum).InWallActiveElement) {
                                 for (SurfLoop = Zone(ZoneNum).SurfaceFirst; SurfLoop <= Zone(ZoneNum).SurfaceLast; ++SurfLoop) {
                                     if (!Surface(SurfLoop).IntConvSurfHasActiveInIt) continue;
-                                    if (Surface(SurfLoop).Class == SurfaceClass_Wall || Surface(SurfLoop).Class == SurfaceClass_Door) {
+                                    if (Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfLoop).Class == SurfaceClass::SurfaceClass_Door) {
                                         DeltaTemp = TH(2, 1, SurfLoop) - MAT(ZoneNum);
                                         if (DeltaTemp > ActiveDelTempThreshold) { // assume heating with wall panel
                                             // system ON is not enough because  surfaces can continue to heat because of thermal capacity
@@ -5310,7 +5310,7 @@ namespace ConvectionCoefficients {
 
             if (SELECT_CASE_var == InConvFlowRegime_A1) {
                 DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
-                if (Surface(SurfNum).Class == SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass_Door) {
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
                         Surface(SurfNum).IntConvClassification = InConvClass_A1_VertWalls;
@@ -5328,7 +5328,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
                     if (Surface(SurfNum).IntConvSurfHasActiveInIt) {
                         Surface(SurfNum).IntConvClassification = InConvClass_A1_ChilledCeil;
                     } else if (Surface(SurfNum).Tilt < 5.0) {
@@ -5353,7 +5353,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                     if (Surface(SurfNum).IntConvSurfHasActiveInIt) {
                         Surface(SurfNum).IntConvClassification = InConvClass_A1_HeatedFloor;
                     } else if (Surface(SurfNum).Tilt > 175.0) { // floor
@@ -5369,10 +5369,10 @@ namespace ConvectionCoefficients {
                             Surface(SurfNum).IntConvClassification = InConvClass_A1_StableTilted;
                         }
                     }
-                } else if ((Surface(SurfNum).Class == SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass_GlassDoor) ||
-                           (Surface(SurfNum).Class == SurfaceClass_TDD_Diffuser)) {
+                } else if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) ||
+                           (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)) {
                     Surface(SurfNum).IntConvClassification = InConvClass_A1_Windows;
-                } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                     // assume horizontal upwards.
                     if (DeltaTemp > 0.0) {
                         Surface(SurfNum).IntConvClassification = InConvClass_A1_UnstableHoriz;
@@ -5387,7 +5387,7 @@ namespace ConvectionCoefficients {
 
             } else if (SELECT_CASE_var == InConvFlowRegime_A2) {
                 DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
-                if (Surface(SurfNum).Class == SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass_Door) {
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
 
                     if (Surface(SurfNum).IntConvSurfHasActiveInIt) {
                         Surface(SurfNum).IntConvClassification = InConvClass_A2_HeatedVerticalWall;
@@ -5407,7 +5407,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
                     if (Surface(SurfNum).Tilt < 5.0) {
                         if (DeltaTemp < 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_A2_UnstableHoriz;
@@ -5430,7 +5430,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                     if (Surface(SurfNum).Tilt > 175.0) {
                         if (DeltaTemp > 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_A2_UnstableHoriz;
@@ -5444,10 +5444,10 @@ namespace ConvectionCoefficients {
                             Surface(SurfNum).IntConvClassification = InConvClass_A2_StableTilted;
                         }
                     }
-                } else if ((Surface(SurfNum).Class == SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass_GlassDoor) ||
-                           (Surface(SurfNum).Class == SurfaceClass_TDD_Diffuser)) {
+                } else if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) ||
+                           (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)) {
                     Surface(SurfNum).IntConvClassification = InConvClass_A2_Windows;
-                } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                     // assume horizontal upwards.
                     if (DeltaTemp > 0.0) {
                         Surface(SurfNum).IntConvClassification = InConvClass_A2_UnstableHoriz;
@@ -5461,7 +5461,7 @@ namespace ConvectionCoefficients {
                 }
             } else if (SELECT_CASE_var == InConvFlowRegime_A3) {
                 DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
-                if (Surface(SurfNum).Class == SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass_Door) {
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
                         Surface(SurfNum).IntConvClassification = InConvClass_A3_VertWalls;
@@ -5479,7 +5479,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
                     if (Surface(SurfNum).Tilt < 5.0) {
                         if (DeltaTemp < 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_A3_UnstableHoriz;
@@ -5502,7 +5502,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                     if (Surface(SurfNum).Tilt > 175.0) {
                         if (DeltaTemp > 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_A3_UnstableHoriz;
@@ -5516,10 +5516,10 @@ namespace ConvectionCoefficients {
                             Surface(SurfNum).IntConvClassification = InConvClass_A3_StableTilted;
                         }
                     }
-                } else if ((Surface(SurfNum).Class == SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass_GlassDoor) ||
-                           (Surface(SurfNum).Class == SurfaceClass_TDD_Diffuser)) {
+                } else if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) ||
+                           (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)) {
                     Surface(SurfNum).IntConvClassification = InConvClass_A3_Windows;
-                } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                     // assume horizontal upwards.
                     if (DeltaTemp >= 0.0) {
                         Surface(SurfNum).IntConvClassification = InConvClass_A3_UnstableHoriz;
@@ -5533,7 +5533,7 @@ namespace ConvectionCoefficients {
                 }
             } else if (SELECT_CASE_var == InConvFlowRegime_B) {
                 DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
-                if (Surface(SurfNum).Class == SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass_Door) {
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
                         if (Surface(SurfNum).IntConvSurfGetsRadiantHeat) {
@@ -5556,7 +5556,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
                     if (Surface(SurfNum).Tilt < 5.0) {
                         if (DeltaTemp < 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_B_UnstableHoriz;
@@ -5583,7 +5583,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                     if (Surface(SurfNum).Tilt > 175.0) {
                         if (DeltaTemp > 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_B_UnstableHoriz;
@@ -5597,10 +5597,10 @@ namespace ConvectionCoefficients {
                             Surface(SurfNum).IntConvClassification = InConvClass_B_StableTilted;
                         }
                     }
-                } else if ((Surface(SurfNum).Class == SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass_GlassDoor) ||
-                           (Surface(SurfNum).Class == SurfaceClass_TDD_Diffuser)) {
+                } else if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) ||
+                           (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)) {
                     Surface(SurfNum).IntConvClassification = InConvClass_B_Windows;
-                } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                     // assume horizontal upwards.
                     if (DeltaTemp > 0.0) {
                         Surface(SurfNum).IntConvClassification = InConvClass_B_UnstableHoriz;
@@ -5613,16 +5613,16 @@ namespace ConvectionCoefficients {
                     ShowSevereError("DynamicIntConvSurfaceClassification: failed to resolve Hc model for B surface named" + Surface(SurfNum).Name);
                 }
             } else if (SELECT_CASE_var == InConvFlowRegime_C) {
-                if (Surface(SurfNum).Class == SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass_Door) {
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
                     Surface(SurfNum).IntConvClassification = InConvClass_C_Walls;
-                } else if (Surface(SurfNum).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
                     Surface(SurfNum).IntConvClassification = InConvClass_C_Ceiling;
-                } else if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                     Surface(SurfNum).IntConvClassification = InConvClass_C_Floor;
-                } else if ((Surface(SurfNum).Class == SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass_GlassDoor) ||
-                           (Surface(SurfNum).Class == SurfaceClass_TDD_Diffuser)) {
+                } else if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) ||
+                           (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)) {
                     Surface(SurfNum).IntConvClassification = InConvClass_C_Windows;
-                } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                     Surface(SurfNum).IntConvClassification = InConvClass_C_Floor;
                 }
                 if (Surface(SurfNum).IntConvClassification == 0) {
@@ -5632,7 +5632,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == InConvFlowRegime_D) {
 
                 DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
-                if (Surface(SurfNum).Class == SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass_Door) {
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
 
                     if ((Surface(SurfNum).Tilt > 85.0) && (Surface(SurfNum).Tilt < 95.0)) { // vertical wall
 
@@ -5652,7 +5652,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
                     if (Surface(SurfNum).Tilt < 5.0) {
                         if (DeltaTemp < 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_D_UnstableHoriz;
@@ -5677,7 +5677,7 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                     if (Surface(SurfNum).Tilt > 175.0) { // floor
                         if (DeltaTemp > 0.0) {
                             Surface(SurfNum).IntConvClassification = InConvClass_D_UnstableHoriz;
@@ -5691,10 +5691,10 @@ namespace ConvectionCoefficients {
                             Surface(SurfNum).IntConvClassification = InConvClass_D_StableTilted;
                         }
                     }
-                } else if ((Surface(SurfNum).Class == SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass_GlassDoor) ||
-                           (Surface(SurfNum).Class == SurfaceClass_TDD_Diffuser)) {
+                } else if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) ||
+                           (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)) {
                     Surface(SurfNum).IntConvClassification = InConvClass_D_Windows;
-                } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                     // assume horizontal upwards.
                     if (DeltaTemp > 0.0) {
                         Surface(SurfNum).IntConvClassification = InConvClass_D_UnstableHoriz;
@@ -5710,7 +5710,7 @@ namespace ConvectionCoefficients {
             } else if (SELECT_CASE_var == InConvFlowRegime_E) {
 
                 DeltaTemp = TH(2, 1, SurfNum) - MAT(ZoneNum);
-                if (Surface(SurfNum).Class == SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass_Door) {
+                if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall || Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
 
                     // mixed regime, but need to know what regime it was before it was mixed
                     {
@@ -5733,22 +5733,22 @@ namespace ConvectionCoefficients {
                         }
                     }
 
-                } else if (Surface(SurfNum).Class == SurfaceClass_Roof) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Roof) {
                     if (DeltaTemp > 0.0) { // surface is hotter so stable
                         Surface(SurfNum).IntConvClassification = InConvClass_E_StableCeiling;
                     } else {
                         Surface(SurfNum).IntConvClassification = InConvClass_E_UnstableCieling;
                     }
-                } else if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                     if (DeltaTemp > 0.0) { // surface is hotter so unstable
                         Surface(SurfNum).IntConvClassification = InConvClass_E_UnstableFloor;
                     } else {
                         Surface(SurfNum).IntConvClassification = InConvClass_E_StableFloor;
                     }
-                } else if ((Surface(SurfNum).Class == SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass_GlassDoor) ||
-                           (Surface(SurfNum).Class == SurfaceClass_TDD_Diffuser)) {
+                } else if ((Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) || (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_GlassDoor) ||
+                           (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_TDD_Diffuser)) {
                     Surface(SurfNum).IntConvClassification = InConvClass_E_Windows;
-                } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                     if (DeltaTemp > 0.0) {
                         Surface(SurfNum).IntConvClassification = InConvClass_E_UnstableFloor;
                     } else {

@@ -1973,9 +1973,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_UpdateWindowFaceTempsNonBSDFWin)
     DataHeatBalance::TotConstructs = 3;
     dataConstruction.Construct.allocate( DataHeatBalance::TotConstructs);
 
-    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass_Wall;
-    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass_Window;
-    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass_Window;
+    DataSurfaces::Surface(1).Class = DataSurfaces::SurfaceClass::SurfaceClass_Wall;
+    DataSurfaces::Surface(2).Class = DataSurfaces::SurfaceClass::SurfaceClass_Window;
+    DataSurfaces::Surface(3).Class = DataSurfaces::SurfaceClass::SurfaceClass_Window;
     DataSurfaces::Surface(1).Construction = 1;
     DataSurfaces::Surface(2).Construction = 2;
     DataSurfaces::Surface(3).Construction = 3;

@@ -140,7 +140,6 @@ namespace HeatBalFiniteDiffManager {
     using DataSurfaces::Ground;
     using DataSurfaces::HeatTransferModel_CondFD;
     using DataSurfaces::Surface;
-    using DataSurfaces::SurfaceClass_Window;
     using DataSurfaces::TotSurfaces;
     // Fan system Source/Sink heat value, and source/sink location temp from CondFD
     using DataHeatBalFanSys::QPVSysSource;
@@ -876,7 +875,7 @@ namespace HeatBalFiniteDiffManager {
 
         for (Surf = 1; Surf <= TotSurfaces; ++Surf) {
             if (!Surface(Surf).HeatTransSurf) continue;
-            if (Surface(Surf).Class == SurfaceClass_Window) continue;
+            if (Surface(Surf).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) continue;
             if (Surface(Surf).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
             ConstrNum = Surface(Surf).Construction;
             TotNodes = ConstructFD(ConstrNum).TotNodes;
@@ -936,7 +935,7 @@ namespace HeatBalFiniteDiffManager {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             if (!Surface(SurfNum).HeatTransSurf) continue;
-            if (Surface(SurfNum).Class == SurfaceClass_Window) continue;
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Window) continue;
             if (Surface(SurfNum).HeatTransferAlgorithm != HeatTransferModel_CondFD) continue;
 
             SetupOutputVariable("CondFD Inner Solver Loop Iteration Count",

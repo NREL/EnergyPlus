@@ -752,7 +752,7 @@ TEST_F(EnergyPlusFixture, SurfacesGeometry_CalcSurfaceCentroid_NonconvexRealisti
     TotSurfaces = 10;
     Surface.allocate(TotSurfaces);
 
-    Surface(1).Class = SurfaceClass_Roof;
+    Surface(1).Class = DataSurfaces::SurfaceClass::SurfaceClass_Roof;
     Surface(1).GrossArea = 1000.;
     Surface(1).Sides = 4;
     Surface(1).Vertex.allocate(4);
@@ -1270,31 +1270,31 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areSurfaceHorizAndVert_test)
     DataVectorTypes::Polyhedron zonePoly;
 
     Surface.allocate(9);
-    Surface(1).Class = SurfaceClass_Floor;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Floor;
     Surface(1).Tilt = 180.;
 
-    Surface(2).Class = SurfaceClass_Floor;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Floor;
     Surface(2).Tilt = 179.5;
 
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(3).Tilt = 89.1;
 
-    Surface(4).Class = SurfaceClass_Wall;
+    Surface(4).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(4).Tilt = 90.;
 
-    Surface(5).Class = SurfaceClass_Wall;
+    Surface(5).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(5).Tilt = 90.;
 
-    Surface(6).Class = SurfaceClass_Wall;
+    Surface(6).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(6).Tilt = 90.9;
 
-    Surface(7).Class = SurfaceClass_Roof;
+    Surface(7).Class = SurfaceClass::SurfaceClass_Roof;
     Surface(7).Tilt = -0.9;
 
-    Surface(8).Class = SurfaceClass_Roof;
+    Surface(8).Class = SurfaceClass::SurfaceClass_Roof;
     Surface(8).Tilt = 0.;
 
-    Surface(9).Class = SurfaceClass_Roof;
+    Surface(9).Class = SurfaceClass::SurfaceClass_Roof;
     Surface(9).Tilt = 0.9;
 
     zonePoly.NumSurfaceFaces = 9;
@@ -1395,9 +1395,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areWallHeightSame_test)
     std::vector<int> results;
 
     Surface.allocate(3);
-    Surface(1).Class = SurfaceClass_Wall;
-    Surface(2).Class = SurfaceClass_Wall;
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
 
     zonePoly.NumSurfaceFaces = 3;
     zonePoly.SurfaceFace.allocate(3);
@@ -1592,19 +1592,19 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areOppositeWallsSame_test)
 
     Surface.allocate(4);
     Surface(1).Azimuth = 0.;
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(1).Area = 30.;
 
     Surface(2).Azimuth = 90.;
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(2).Area = 24.;
 
     Surface(3).Azimuth = 180.;
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(3).Area = 30.;
 
     Surface(4).Azimuth = 270.;
-    Surface(4).Class = SurfaceClass_Wall;
+    Surface(4).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(4).Area = 24.;
 
     zonePoly.NumSurfaceFaces = 4;
@@ -1723,9 +1723,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometryUnitTests_areFloorAndCeilingSame_test)
     DataVectorTypes::Polyhedron zonePoly;
 
     Surface.allocate(2);
-    Surface(1).Class = SurfaceClass_Floor;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Floor;
 
-    Surface(2).Class = SurfaceClass_Roof;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Roof;
 
     zonePoly.NumSurfaceFaces = 2;
     zonePoly.SurfaceFace.allocate(2);
@@ -2505,7 +2505,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(1).Tilt = 90.;
     Surface(1).Vertex(1) = Vector(0., 0., 3.);
     Surface(1).Vertex(2) = Vector(0., 0., 0.);
@@ -2514,7 +2514,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 
     Surface(2).Sides = 4;
     Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(2).Tilt = 90.;
     Surface(2).Vertex(1) = Vector(0., 8., 3.);
     Surface(2).Vertex(2) = Vector(0., 8., 0.);
@@ -2523,7 +2523,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 
     Surface(3).Sides = 4;
     Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(3).Tilt = 90.;
     Surface(3).Vertex(1) = Vector(10., 8., 3.);
     Surface(3).Vertex(2) = Vector(10., 8., 0.);
@@ -2532,7 +2532,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 
     Surface(4).Sides = 4;
     Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
+    Surface(4).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(4).Tilt = 90.;
     Surface(4).Vertex(1) = Vector(10., 0., 3.);
     Surface(4).Vertex(2) = Vector(10., 0., 0.);
@@ -2541,7 +2541,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 
     Surface(5).Sides = 4;
     Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Floor;
+    Surface(5).Class = SurfaceClass::SurfaceClass_Floor;
     Surface(5).Tilt = 180.;
     Surface(5).Vertex(1) = Vector(0., 0., 0.);
     Surface(5).Vertex(2) = Vector(0., 8, 0.);
@@ -2550,7 +2550,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 
     Surface(6).Sides = 4;
     Surface(6).Vertex.dimension(4);
-    Surface(6).Class = SurfaceClass_Roof;
+    Surface(6).Class = SurfaceClass::SurfaceClass_Roof;
     Surface(6).Tilt = 0.;
     Surface(6).Vertex(1) = Vector(0., 8., 3.);
     Surface(6).Vertex(2) = Vector(0., 0., 3.);
@@ -2577,7 +2577,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(1).Tilt = 90.;
     Surface(1).Vertex(1) = Vector(0., 0., 3.);
     Surface(1).Vertex(2) = Vector(0., 0., 0.);
@@ -2586,7 +2586,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 
     Surface(2).Sides = 4;
     Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(2).Tilt = 90.;
     Surface(2).Vertex(1) = Vector(0., 8., 3.);
     Surface(2).Vertex(2) = Vector(0., 8., 0.);
@@ -2595,7 +2595,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 
     Surface(3).Sides = 4;
     Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(3).Tilt = 90.;
     Surface(3).Vertex(1) = Vector(10., 8., 3.);
     Surface(3).Vertex(2) = Vector(10., 8., 0.);
@@ -2604,7 +2604,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 
     Surface(4).Sides = 4;
     Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Floor;
+    Surface(4).Class = SurfaceClass::SurfaceClass_Floor;
     Surface(4).Tilt = 180.;
     Surface(4).Vertex(1) = Vector(0., 0., 0.);
     Surface(4).Vertex(2) = Vector(0., 8, 0.);
@@ -2613,7 +2613,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 
     Surface(5).Sides = 4;
     Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Roof;
+    Surface(5).Class = SurfaceClass::SurfaceClass_Roof;
     Surface(5).Tilt = 0.;
     Surface(5).Vertex(1) = Vector(0., 8., 3.);
     Surface(5).Vertex(2) = Vector(0., 0., 3.);
@@ -2643,7 +2643,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(1).Tilt = 90.;
     Surface(1).Vertex(1) = Vector(0., 0., 3.);
     Surface(1).Vertex(2) = Vector(0., 0., 0.);
@@ -2652,7 +2652,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 
     Surface(2).Sides = 4;
     Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(2).Tilt = 90.;
     Surface(2).Vertex(1) = Vector(0., 8., 3.);
     Surface(2).Vertex(2) = Vector(0., 8., 0.);
@@ -2661,7 +2661,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 
     Surface(3).Sides = 4;
     Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(3).Tilt = 90.;
     Surface(3).Vertex(1) = Vector(10., 8., 3.);
     Surface(3).Vertex(2) = Vector(10., 8., 0.);
@@ -2670,7 +2670,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 
     Surface(4).Sides = 4;
     Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
+    Surface(4).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(4).Tilt = 90.;
     Surface(4).Vertex(1) = Vector(10., 0., 3.);
     Surface(4).Vertex(2) = Vector(10., 0., 0.);
@@ -2679,7 +2679,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 
     Surface(5).Sides = 4;
     Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Floor;
+    Surface(5).Class = SurfaceClass::SurfaceClass_Floor;
     Surface(5).Tilt = 180.;
     Surface(5).Vertex(1) = Vector(0., 0., 0.);
     Surface(5).Vertex(2) = Vector(0., 8, 0.);
@@ -2709,7 +2709,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(1).Tilt = 90.;
     Surface(1).Vertex(1) = Vector(0., 0., 3.);
     Surface(1).Vertex(2) = Vector(0., 0., 0.);
@@ -2718,7 +2718,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 
     Surface(2).Sides = 4;
     Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(2).Tilt = 90.;
     Surface(2).Vertex(1) = Vector(0., 8., 3.);
     Surface(2).Vertex(2) = Vector(0., 8., 0.);
@@ -2727,7 +2727,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 
     Surface(3).Sides = 4;
     Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(3).Tilt = 90.;
     Surface(3).Vertex(1) = Vector(10., 8., 3.);
     Surface(3).Vertex(2) = Vector(10., 8., 0.);
@@ -2736,7 +2736,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 
     Surface(4).Sides = 4;
     Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
+    Surface(4).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(4).Tilt = 90.;
     Surface(4).Vertex(1) = Vector(10., 0., 3.);
     Surface(4).Vertex(2) = Vector(10., 0., 0.);
@@ -2745,7 +2745,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 
     Surface(5).Sides = 4;
     Surface(5).Vertex.dimension(4);
-    Surface(5).Class = SurfaceClass_Roof;
+    Surface(5).Class = SurfaceClass::SurfaceClass_Roof;
     Surface(5).Tilt = 0.;
     Surface(5).Vertex(1) = Vector(0., 8., 3.);
     Surface(5).Vertex(2) = Vector(0., 0., 3.);
@@ -2774,7 +2774,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 
     Surface(1).Sides = 4;
     Surface(1).Vertex.dimension(4);
-    Surface(1).Class = SurfaceClass_Wall;
+    Surface(1).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(1).Tilt = 90.;
     Surface(1).Azimuth = 180.;
     Surface(1).Area = 30.;
@@ -2785,7 +2785,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 
     Surface(2).Sides = 4;
     Surface(2).Vertex.dimension(4);
-    Surface(2).Class = SurfaceClass_Wall;
+    Surface(2).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(2).Tilt = 90.;
     Surface(2).Azimuth = 270.;
     Surface(2).Area = 24.;
@@ -2796,7 +2796,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 
     Surface(3).Sides = 4;
     Surface(3).Vertex.dimension(4);
-    Surface(3).Class = SurfaceClass_Wall;
+    Surface(3).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(3).Tilt = 90.;
     Surface(3).Azimuth = 0.;
     Surface(3).Area = 30.;
@@ -2807,7 +2807,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 
     Surface(4).Sides = 4;
     Surface(4).Vertex.dimension(4);
-    Surface(4).Class = SurfaceClass_Wall;
+    Surface(4).Class = SurfaceClass::SurfaceClass_Wall;
     Surface(4).Tilt = 90.;
     Surface(4).Azimuth = 90.;
     Surface(4).Area = 24.;
@@ -2825,7 +2825,7 @@ TEST_F(EnergyPlusFixture, MakeRectangularVertices)
     int surfNum = 1;
     int zoneNum = 1;
     SurfaceTmp.allocate(surfNum);
-    SurfaceTmp(surfNum).Class = SurfaceClass_Wall;
+    SurfaceTmp(surfNum).Class = SurfaceClass::SurfaceClass_Wall;
     SurfaceTmp(surfNum).Zone = zoneNum;
     SurfaceTmp(surfNum).Azimuth = 0.;
     SurfaceTmp(surfNum).Tilt = 90.;
@@ -2994,7 +2994,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     int SurfNum = 0;
     int TotHTSurfs = 2;
     Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
-    Array1D_int const BaseSurfIDs(3, {1, 2, 3});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(3, {DataSurfaces::SurfaceClass::SurfaceClass_Wall,
+                                                              DataSurfaces::SurfaceClass::SurfaceClass_Floor,
+                                                              DataSurfaces::SurfaceClass::SurfaceClass_Roof});
     int NeedToAddSurfaces;
 
     GetGeometryParameters(state.files, ErrorsFound);
@@ -3682,7 +3684,9 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     int SurfNum = 0;
     int TotHTSurfs = 1;
     Array1D_string const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
-    Array1D_int const BaseSurfIDs(3, {1, 2, 3});
+    Array1D<DataSurfaces::SurfaceClass> const BaseSurfIDs(3, {DataSurfaces::SurfaceClass::SurfaceClass_Wall,
+                                                              DataSurfaces::SurfaceClass::SurfaceClass_Floor,
+                                                              DataSurfaces::SurfaceClass::SurfaceClass_Roof});
     int NeedToAddSurfaces;
 
     GetGeometryParameters(state.files, ErrorsFound);

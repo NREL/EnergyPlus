@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include "DataSurfaces.hh"
 
 namespace EnergyPlus {
     class IOFiles;
@@ -85,7 +86,7 @@ namespace DXFEarClipping {
                     Real64 const surfazimuth,    // surface azimuth angle (outward facing normal)
                     Real64 const surftilt,       // surface tilt angle
                     std::string const &surfname, // surface name (for error messages)
-                    int const surfclass          // surface class
+                    DataSurfaces::SurfaceClass surfclass          // surface class
     );
 
     Real64 angle_2dvector(Real64 const xa, // vertex coordinate

@@ -846,8 +846,6 @@ namespace RoomAirModelUserTempPattern {
         using DataErrorTracking::TotalRoomAirPatternTooLow;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_Floor;
-        using DataSurfaces::SurfaceClass_Wall;
         using DataVectorTypes::Vector;
         using General::RoundSigDigits;
 
@@ -895,14 +893,14 @@ namespace RoomAirModelUserTempPattern {
         ZMin = 0.0;
         Count = 0;
         for (SurfNum = Zone(thisZone).SurfaceFirst; SurfNum <= Zone(thisZone).SurfaceLast; ++SurfNum) {
-            if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Floor) {
                 // Use Average Z for surface, more important for roofs than floors...
                 ++FloorCount;
                 Z1 = minval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
                 Z2 = maxval(Surface(SurfNum).Vertex({1, Surface(SurfNum).Sides}), &Vector::z);
                 ZFlrAvg += (Z1 + Z2) / 2.0;
             }
-            if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+            if (Surface(SurfNum).Class == DataSurfaces::SurfaceClass::SurfaceClass_Wall) {
                 // Use Wall calculation in case no floor in zone
                 ++Count;
                 if (Count == 1) {

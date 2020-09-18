@@ -182,10 +182,7 @@ namespace DaylightingDevices {
     using DataSurfaces::ExternalEnvironment;
     using DataSurfaces::ShadingTransmittanceVaries;
     using DataSurfaces::Surface;
-    using DataSurfaces::SurfaceClass_Shading;
-    using DataSurfaces::SurfaceClass_TDD_Diffuser;
-    using DataSurfaces::SurfaceClass_TDD_Dome;
-    using DataSurfaces::SurfaceClass_Window;
+    using DataSurfaces::SurfaceClass;
     using DataSurfaces::TotSurfaces;
     using namespace DataDaylightingDevices;
 
@@ -544,7 +541,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (Surface(SurfNum).Class != SurfaceClass_TDD_Dome) {
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_TDD_Dome) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Dome " + cAlphaArgs(2) +
                                         " is not of surface type TubularDaylightDome.");
                         ErrorsFound = true;
@@ -597,7 +594,7 @@ namespace DaylightingDevices {
                         ErrorsFound = true;
                     }
 
-                    if (DataSurfaces::SurfWinOriginalClass(SurfNum) != SurfaceClass_TDD_Diffuser) {
+                    if (DataSurfaces::SurfWinOriginalClass(SurfNum) != SurfaceClass::SurfaceClass_TDD_Diffuser) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Diffuser " + cAlphaArgs(3) +
                                         " is not of surface type TubularDaylightDiffuser.");
                         ErrorsFound = true;
@@ -802,7 +799,7 @@ namespace DaylightingDevices {
                     ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) + " not found.");
                     ErrorsFound = true;
                 } else {
-                    if (Surface(SurfNum).Class != SurfaceClass_Window) {
+                    if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Window) {
                         ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Window " + cAlphaArgs(2) +
                                         " is not of surface type WINDOW.");
                         ErrorsFound = true;
@@ -876,7 +873,7 @@ namespace DaylightingDevices {
                     } else {
                         // No error if shelf belongs to more than one window, e.g. concave corners
 
-                        if (Surface(SurfNum).Class != SurfaceClass_Shading) {
+                        if (Surface(SurfNum).Class != SurfaceClass::SurfaceClass_Shading) {
                             ShowSevereError(cCurrentModuleObject + " = " + cAlphaArgs(1) + ":  Outside shelf " + cAlphaArgs(4) +
                                             " is not a Shading:Zone:Detailed object.");
                             ErrorsFound = true;

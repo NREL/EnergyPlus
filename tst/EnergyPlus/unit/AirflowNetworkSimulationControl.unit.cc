@@ -83,6 +83,7 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
 {
+    using namespace EnergyPlus::DataSurfaces;
 
     Zone.allocate(1);
     Zone(1).Name = "SOFF";
@@ -106,8 +107,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_DefaultSolver)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
+    SurfWinOriginalClass(1) = SurfaceClass::SurfaceClass_Window;
+    SurfWinOriginalClass(2) = SurfaceClass::SurfaceClass_Window;
     NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements
@@ -200,8 +201,8 @@ TEST_F(EnergyPlusFixture, AirflowNetworkSimulationControl_SetSolver)
     Surface(2).Sides = 4;
 
     SurfaceGeometry::AllocateSurfaceWindows(2);
-    SurfWinOriginalClass(1) = 11;
-    SurfWinOriginalClass(2) = 11;
+    SurfWinOriginalClass(1) = DataSurfaces::SurfaceClass::SurfaceClass_Window;;
+    SurfWinOriginalClass(2) = DataSurfaces::SurfaceClass::SurfaceClass_Window;;
     NumOfZones = 1;
 
     TotPeople = 1; // Total number of people statements

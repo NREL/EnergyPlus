@@ -324,7 +324,6 @@ namespace RoomAirModelManager {
         using DataErrorTracking::TotalWarningErrors;
         using DataHeatBalance::Zone;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_IntMass;
         using DataZoneEquipment::EquipConfiguration;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::RoundSigDigits;
@@ -432,7 +431,7 @@ namespace RoomAirModelManager {
             //   Fill in what we know for nested structure for surfaces
             for (thisSurfinZone = 1; thisSurfinZone <= AirPatternZoneInfo(ZoneNum).totNumSurfs; ++thisSurfinZone) {
                 thisHBsurfID = Zone(ZoneNum).SurfaceFirst + thisSurfinZone - 1;
-                if (Surface(thisHBsurfID).Class == SurfaceClass_IntMass) {
+                if (Surface(thisHBsurfID).Class == DataSurfaces::SurfaceClass::SurfaceClass_IntMass) {
                     AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).SurfID = thisHBsurfID;
                     AirPatternZoneInfo(ZoneNum).Surf(thisSurfinZone).Zeta = 0.5;
                     continue;
@@ -1396,7 +1395,6 @@ namespace RoomAirModelManager {
         using DataHVACGlobals::NumZoneHVACTerminalTypes;
         using DataHVACGlobals::ZoneHVACTerminalTypes;
         using DataSurfaces::Surface;
-        using DataSurfaces::SurfaceClass_IntMass;
         using General::RoundSigDigits;
         using InternalHeatGains::GetInternalGainDeviceIndex;
         using ScheduleManager::GetScheduleIndex;
@@ -2006,7 +2004,7 @@ namespace RoomAirModelManager {
 
                 // cycle in this zone for all the surfaces
                 for (SurfNum = Zone(ZNum).SurfaceFirst; SurfNum <= Zone(ZNum).SurfaceLast; ++SurfNum) {
-                    if (Surface(SurfNum).Class != SurfaceClass_IntMass) {
+                    if (Surface(SurfNum).Class != DataSurfaces::SurfaceClass::SurfaceClass_IntMass) {
                         // Recalculate lowest and highest height for the zone
                         Z1Zone = std::numeric_limits<Real64>::max();
                         Z2Zone = std::numeric_limits<Real64>::lowest();
@@ -2035,19 +2033,19 @@ namespace RoomAirModelManager {
                     Z2Zone = Z2ZoneAux;
 
                     // Put the reference to this surface in the appropriate array
-                    if (Surface(SurfNum).Class == SurfaceClass_Floor) {
+                    if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Floor) {
                         ++contFloor;
                         APos_Floor(contFloor) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_Wall) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Wall) {
                         ++contWall;
                         APos_Wall(contWall) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_Window) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Window) {
                         ++contWindow;
                         APos_Window(contWindow) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_IntMass) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_IntMass) {
                         ++contInternal;
                         APos_Internal(contInternal) = SurfNum;
-                    } else if (Surface(SurfNum).Class == SurfaceClass_Door) {
+                    } else if (Surface(SurfNum).Class == SurfaceClass::SurfaceClass_Door) {
                         ++contDoor;
                         APos_Door(contDoor) = SurfNum;
                     } else {
