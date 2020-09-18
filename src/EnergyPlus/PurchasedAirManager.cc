@@ -2696,7 +2696,7 @@ namespace PurchasedAirManager {
                     Node(InNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
                 }
                 if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
-                    PurchAir(PurchAirNum).EMSValueMassFlowRate = 0.0;
+                    SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
                     OAMassFlowRate = 0.0;
                 }
                 if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
@@ -2727,7 +2727,7 @@ namespace PurchasedAirManager {
             }
 
             if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
-                PurchAir(PurchAirNum).EMSValueMassFlowRate = 0.0;
+                SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
             }
             if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
                 SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
