@@ -1,4 +1,4 @@
-name: Verify that the PR has a valid label
+name: Verify Pull Request Labeling
 
 on:
   pull_request:
