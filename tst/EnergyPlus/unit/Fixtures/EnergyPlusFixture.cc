@@ -71,6 +71,7 @@
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <regex>
 
 using json = nlohmann::json;
 
@@ -288,6 +289,20 @@ bool EnergyPlusFixture::has_dfs_output(bool reset_stream)
     auto const has_output = !state.files.dfs.get_output().empty();
     if (reset_stream) state.files.dfs.open_as_stringstream();
     return has_output;
+}
+
+bool EnergyPlusFixture::match_err_stream(std::string const &expected_match, bool use_regex, bool reset_stream)
+{
+    auto const stream_str = this->err_stream->str();
+    bool match_found;
+    if (use_regex) {
+        match_found = std::regex_match(stream_str,std::regex(expected_match));
+    } else {
+        match_found = stream_str.find(expected_match) != std::string::npos;
+    }
+    EXPECT_TRUE(match_found);
+    if (reset_stream) this->err_stream->str(std::string());
+    return match_found;
 }
 
 bool EnergyPlusFixture::process_idf(std::string const &idf_snippet, bool use_assertions)
