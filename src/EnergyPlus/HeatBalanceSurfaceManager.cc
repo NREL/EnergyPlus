@@ -2343,12 +2343,11 @@ namespace HeatBalanceSurfaceManager {
         static Array1D<Real64> AbsDiffWin(CFSMAXNL);    // Diffuse solar absorptance of glass layers //Tuned Made static
         static Array1D<Real64> AbsDiffWinGnd(CFSMAXNL); // Ground diffuse solar absorptance of glass layers //Tuned Made static
         static Array1D<Real64> AbsDiffWinSky(CFSMAXNL); // Sky diffuse solar absorptance of glass layers //Tuned Made static
-        static Array1D<Real64> SkyDiffReflFacGnd(TotSurfaces); // sky diffuse reflection view factors from ground
 
-        static Array1D<Real64> currCosInc(TotSurfaces); // Cosine of incidence angle of beam solar on glass
-        static Array1D<Real64> currBeamSolar(TotSurfaces); // Local variable for BeamSolarRad
-        static Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
-        static Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
+        Array1D<Real64> currCosInc(TotSurfaces); // Cosine of incidence angle of beam solar on glass
+        Array1D<Real64> currBeamSolar(TotSurfaces); // Local variable for BeamSolarRad
+        Array1D<Real64> currSkySolarInc(TotSurfaces); // Sky diffuse solar incident on a surface
+        Array1D<Real64> currGndSolarInc(TotSurfaces); // Ground diffuse solar incident on a surface
         // Always initialize the shortwave quantities
         for (int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
 
@@ -2586,6 +2585,7 @@ namespace HeatBalanceSurfaceManager {
                     int SurfDome = e.Dome;
                     SurfWinTransSolar(SurfDome) = 0.0;
                     SurfQRadSWOutIncident(SurfDome) = 0.0;
+                    SurfWinQRadSWwinAbsTot(SurfDome) = 0.0;
                     for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
                         SurfWinQRadSWwinAbs(Lay, SurfDome) = 0.0;
                     }

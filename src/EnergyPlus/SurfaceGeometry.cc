@@ -929,6 +929,7 @@ namespace SurfaceGeometry {
         BmToBmReflFacObs.dimension(TotSurfaces, 0.0);
         BmToDiffReflFacObs.dimension(TotSurfaces, 0.0);
         BmToDiffReflFacGnd.dimension(TotSurfaces, 0.0);
+        SkyDiffReflFacGnd.dimension(TotSurfaces, 0.0);
         AWinSurf.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
         AWinSurfDiffFront.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
         AWinSurfDiffBack.dimension(CFSMAXNL + 1, TotSurfaces, 0.0);
