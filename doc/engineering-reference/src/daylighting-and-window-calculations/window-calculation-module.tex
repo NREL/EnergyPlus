@@ -288,7 +288,7 @@ The visible light reflectance for the front surface is calculated using:
 
 \subsubsection{Step 7. Determine Angular Performance}\label{step-7.-determine-angular-performance}
 
-The angular properties of windows are important because during energy modeling, the solar incidence angles are usually fairly high.~ Angles of incidence are defined as angles from the normal direction extending out from the window.~ The simple glazing system model includes a range of correlations that are selected based on the values for U and SHGC.~ These were chosen to match the types of windows likely to have such performance levels.~ The matrix of possible combinations of U and SHGC values have been mapped to set of 28 bins shown in the Figure \ref{fig:diagram-of-transmittance-and}.
+The angular properties of windows are important because during energy modeling, the solar incidence angles are usually fairly high.~ Angles of incidence are defined as angles from the normal direction extending out from the window.~ The simple glazing system model includes a range of correlations that are selected based on the values for U and SHGC.~ These were chosen to match the types of windows likely to have such performance levels.~ The matrix of possible combinations of U and SHGC values have been mapped to a set of 28 bins shown in the Figure \ref{fig:diagram-of-transmittance-and}.
 
 \begin{figure}[hbtp] % fig 74
 \centering
@@ -296,7 +296,7 @@ The angular properties of windows are important because during energy modeling, 
 \caption{Diagram of Transmittance and Reflectance Correlations Used based on U and SHGC \label{fig:diagram-of-transmittance-and}}
 \end{figure}
 
-There are ten different correlations, A thru J, for both transmission and reflectance.~ The correlations are used in various weighting and interpolation schemes according the figure above.~ The correlations are normalized against the performance at normal incidence.~ EnergyPlus uses these correlations to store the glazing system's angular performance at 10 degree increments and interpolates between them during simulations.~ The model equations use the cosine of the incidence angle, \(\cos (\phi )\), as the independent variable.~ The correlations for transmittance has the form:
+There are ten different correlations, A thru J, for both transmission and reflectance.~ The correlations are used in various weighting and interpolation schemes according the figure above.~ The correlations are normalized against the performance at normal incidence.~ EnergyPlus uses these correlations to store the glazing system's angular performance at 10 degree increments and interpolates between them during simulations.~ The model equations use the cosine of the incidence angle, \(\cos (\phi )\), as the independent variable.~ The correlations for transmittance have the form:
 
 \begin{equation}
   T(\phi) = T(0) \tau (\phi )
@@ -367,16 +367,16 @@ The updated coefficient values for a, b, c, d, and e are listed for transmittanc
   \begin{tabular}{llllll}
   \hline
   Curve                                 & a    & b     & c     & d      & e    \\ \hline
-  A - Single: 3mm clear                 & 1.00 & -0.70 & 2.57  & -3.20  & 1.34 \\
-  B - Single: 3mm bronze                & 1.00 & -1.87 & 6.51  & -7.86  & 3.23 \\
-  C - Single: 6mm bronze                & 1.00 & -2.53 & 8.40  & -9.86  & 3.99 \\
-  D - Single: 3mm coated                & 1.00 & -1.86 & 6.40  & -7.64  & 3.10 \\
-  E - Double: 3mm clear, clear          & 1.00 & -1.57 & 5.60  & -6.83  & 2.80 \\
-  F - Double: 3mm coated, clear         & 1.00 & -3.14 & 10.97 & -13.14 & 5.32 \\
-  G - Double: 3mm tinted, clear         & 1.00 & -3.26 & 11.32 & -13.54 & 5.49 \\
-  H - Double: 6mm coated, clear         & 1.00 & -3.39 & 11.69 & -13.94 & 5.64 \\
-  I - Double: 6mm tinted, clear         & 1.00 & -4.07 & 13.55 & -15.74 & 6.27 \\
-  J - Triple: 3mm coated, clear, coated & 1.00 & -4.35 & 14.27 & -16.31 & 6.40 \\ \hline
+  A - Single: 3mm clear                 & 1.00 & -0.70 & 2.57  & -3.20  & 1.33 \\
+  B - Single: 3mm bronze                & 1.00 & -1.87 & 6.50  & -7.86  & 3.23 \\
+  C - Single: 6mm bronze                & 1.00 & -2.52 & 8.40  & -9.86  & 3.99 \\
+  D - Single: 3mm coated                & 1.00 & -1.85 & 6.40  & -7.64  & 3.11 \\
+  E - Double: 3mm clear, clear          & 1.00 & -1.57 & 5.60  & -6.82  & 2.80 \\
+  F - Double: 3mm coated, clear         & 1.00 & -3.15 & 10.98 & -13.14 & 5.32 \\
+  G - Double: 3mm tinted, clear         & 1.00 & -3.25 & 11.32 & -13.54 & 5.49 \\
+  H - Double: 6mm coated, clear         & 1.00 & -3.39 & 11.70 & -13.94 & 5.64 \\
+  I - Double: 6mm tinted, clear         & 1.00 & -4.06 & 13.55 & -15.74 & 6.27 \\
+  J - Triple: 3mm coated, clear, coated & 1.00 & -4.35 & 14.27 & -16.32 & 6.39 \\ \hline
   \end{tabular}
 \end{table}
 
