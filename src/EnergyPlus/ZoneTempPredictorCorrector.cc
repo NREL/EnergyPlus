@@ -132,7 +132,6 @@ namespace ZoneTempPredictorCorrector {
     using DataEnvironment::OutHumRat;
     using DataZoneEnergyDemands::CurDeadBandOrSetback;
     using DataZoneEnergyDemands::DeadBandOrSetback;
-    using DataZoneEnergyDemands::Setback;
     using DataZoneEnergyDemands::ZoneSysEnergyDemand;
     using DataZoneEnergyDemands::ZoneSysMoistureDemand;
     using namespace Psychrometrics;
@@ -2584,7 +2583,6 @@ namespace ZoneTempPredictorCorrector {
                 ZoneComfortControlsFanger.allocate(NumOfZones);
             }
             dataZoneTempPredictorCorrector.ZoneSetPointLast.dimension(NumOfZones, 0.0);
-            Setback.dimension(NumOfZones, false);
             DeadBandOrSetback.dimension(NumOfZones, false);
             CurDeadBandOrSetback.dimension(NumOfZones, false);
             SNLoadHeatEnergy.dimension(NumOfZones, 0.0);
@@ -4232,12 +4230,6 @@ namespace ZoneTempPredictorCorrector {
         // If the ZoneNodeNum has been set for a Controlled Zone, then the zone setpoint is placed on the node.
         if (Zone(ZoneNum).SystemZoneNodeNumber > 0) {
             Node(Zone(ZoneNum).SystemZoneNodeNumber).TempSetPoint = ZoneSetPoint;
-        }
-
-        if (ZoneSetPoint > dataZoneTempPredictorCorrector.ZoneSetPointLast(ZoneNum)) {
-            Setback(ZoneNum) = true;
-        } else {
-            Setback(ZoneNum) = false;
         }
 
         dataZoneTempPredictorCorrector.ZoneSetPointLast(ZoneNum) = ZoneSetPoint;

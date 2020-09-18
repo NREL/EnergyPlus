@@ -72,8 +72,6 @@ namespace DataZoneEnergyDemands {
 
     Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
     // before any heating / cooling done
-    Array1D_bool Setback; // true if zone temperature has increased
-    // from previous setting
     Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
     // in a zone is simulated
 
@@ -84,7 +82,6 @@ namespace DataZoneEnergyDemands {
     void clear_state()
     {
         DeadBandOrSetback.deallocate();
-        Setback.deallocate();
         CurDeadBandOrSetback.deallocate();
         ZoneSysEnergyDemand.deallocate();
         ZoneSysMoistureDemand.deallocate();
