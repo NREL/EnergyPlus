@@ -1253,6 +1253,18 @@ namespace EMSManager {
                     EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
                 }
                 ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
+
+                // Warn if actuator applied to an air boundary surface
+                if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorNum).ComponentTypeName, "AIRFLOW NETWORK WINDOW/DOOR OPENING")) {
+                    int actuatedSurfNum = UtilityRoutines::FindItemInList(EMSActuatorUsed(ActuatorNum).UniqueIDName, DataSurfaces::Surface);
+                    if (actuatedSurfNum > 0) {
+                        if (DataSurfaces::Surface(actuatedSurfNum).IsAirBoundarySurf) {
+                            ShowWarningError(
+                                "GetEMSInput: EnergyManagementSystem:Actuator=" + EMSActuatorUsed(ActuatorNum).Name +
+                                " actuates an opening attached to an air boundary surface.");
+                        }
+                    }
+                }
             }
         } // ActuatorNum
 
