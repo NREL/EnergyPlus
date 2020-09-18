@@ -2535,10 +2535,10 @@ namespace AirflowNetworkBalanceManager {
             if (MultizoneSurfaceData(i).SurfNum == 0) {
                 ShowSevereError(RoutineName + CurrentModuleObject + " object, Invalid " + cAlphaFields(1) +
                                 " given = " + MultizoneSurfaceData(i).SurfName);
-                ErrorsFound = true;
-                continue;
+                ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
             }
-            if (!Surface(MultizoneSurfaceData(i).SurfNum).HeatTransSurf) {
+            if (!Surface(MultizoneSurfaceData(i).SurfNum).HeatTransSurf &&
+                !Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) {
                 ShowSevereError(RoutineName + CurrentModuleObject + " object");
                 ShowContinueError("..The surface specified must be a heat transfer surface. Invalid " + cAlphaFields(1) + " = " +
                                   MultizoneSurfaceData(i).SurfName);
@@ -2852,19 +2852,27 @@ namespace AirflowNetworkBalanceManager {
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";
         for (int i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             if (MultizoneSurfaceData(i).SurfNum == 0) continue;
-            bool has_DOP_or_SOP{false};
+            bool has_Opening{false};
             // This is terrible, should not do it this way
             auto afe = solver.elements.find(MultizoneSurfaceData(i).OpeningName);
             if (afe != solver.elements.end()) {
                 auto type = afe->second->type();
-                has_DOP_or_SOP = (type == ComponentType::DOP) || (type == ComponentType::SOP);
+                has_Opening = (type == ComponentType::DOP) || (type == ComponentType::SOP) || (type == ComponentType::HOP);
             }
             // Obtain schedule number and check surface shape
-            if (has_DOP_or_SOP) {
+            if (has_Opening) {
                 if (Surface(MultizoneSurfaceData(i).SurfNum).Sides == 3) {
                     ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName + "\".");
                     ShowContinueError(
                         "The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.");
+                }
+                // Venting controls are not allowed for an air boundary surface
+                if ((Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) &&
+                    (MultizoneSurfaceData(i).VentSurfCtrNum != VentControlType::Const)) {
+                    ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName + "\" is an air boundary surface.");
+                    ShowContinueError("Ventilation Control Mode = " + Alphas(4) + " is not valid. Resetting to Constant.");
+                    MultizoneSurfaceData(i).VentSurfCtrNum = VentControlType::Const;
+                    MultizoneSurfaceData(i).IndVentControl = true;
                 }
                 if (!MultizoneSurfaceData(i).VentingSchName.empty()) {
                     MultizoneSurfaceData(i).VentingSchNum = GetScheduleIndex(MultizoneSurfaceData(i).VentingSchName);
@@ -2872,6 +2880,12 @@ namespace AirflowNetworkBalanceManager {
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName + "\", invalid schedule.");
                         ShowContinueError("Venting Schedule not found=\"" + MultizoneSurfaceData(i).VentingSchName + "\".");
                         ErrorsFound = true;
+                    } else if (Surface(MultizoneSurfaceData(i).SurfNum).IsAirBoundarySurf) {
+                        ShowWarningError(RoutineName + CurrentModuleObject + "=\"" + MultizoneSurfaceData(i).SurfName +
+                                         "\" is an air boundary surface.");
+                        ShowContinueError("Venting Availability Schedule will be ignored, venting is always available.");
+                        MultizoneSurfaceData(i).VentingSchName = "";
+                        MultizoneSurfaceData(i).VentingSchNum = 0;
                     }
                 } else {
                     MultizoneSurfaceData(i).VentingSchName = "";
@@ -3580,12 +3594,12 @@ namespace AirflowNetworkBalanceManager {
 
                 // Surface exposure fraction
                 if (Numbers(2) > 1) {
-                    ShowContinueError("Duct surface exposure fraction greater than 1. Check input in: " + CurrentModuleObject + " " +
+                    ShowWarningError("Duct surface exposure fraction greater than 1. Check input in: " + CurrentModuleObject + " " +
                                       this_VF_object.LinkageName);
                     ShowContinueError("Using value of 1 for surface exposure fraction");
                     this_VF_object.DuctExposureFraction = 1;
                 } else if (Numbers(2) < 0) {
-                    ShowContinueError("Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " +
+                    ShowWarningError("Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " +
                                       this_VF_object.LinkageName);
                     ShowContinueError("Using value of 0 for surface exposure fraction");
                     this_VF_object.DuctExposureFraction = 0;
@@ -3595,12 +3609,12 @@ namespace AirflowNetworkBalanceManager {
 
                 // Duct surface emittance
                 if (Numbers(2) > 1) {
-                    ShowContinueError("Duct surface emittance greater than 1. Check input in: " + CurrentModuleObject + " " +
+                    ShowWarningError("Duct surface emittance greater than 1. Check input in: " + CurrentModuleObject + " " +
                                       this_VF_object.LinkageName);
                     ShowContinueError("Using value of 1 for surface emittance");
                     this_VF_object.DuctEmittance = 1;
                 } else if (Numbers(2) < 0) {
-                    ShowContinueError("Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " +
+                    ShowWarningError("Surface exposure fraction less than 0. Check input in: " + CurrentModuleObject + " " +
                                       this_VF_object.LinkageName);
                     ShowContinueError("Using value of 0 for surface exposure fraction");
                     this_VF_object.DuctEmittance = 0;
@@ -3624,13 +3638,18 @@ namespace AirflowNetworkBalanceManager {
                     }
 
                     // Surface view factor
-                    if (Numbers(surfNum + 2) > 1) {
-                        ShowContinueError("View factor for surface " + Alphas(surfNum + 1) +
+                    if (!Surface(this_VF_object.LinkageSurfaceData(surfNum).SurfaceNum).HeatTransSurf) {
+                        ShowWarningError("Surface=" + Alphas(surfNum + 1) +
+                            " is not a heat transfer surface. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName);
+                        ShowContinueError("Using value of 0 for view factor");
+                        this_VF_object.LinkageSurfaceData(surfNum).ViewFactor = 0;
+                    } else if (Numbers(surfNum + 2) > 1) {
+                        ShowWarningError("View factor for surface " + Alphas(surfNum + 1) +
                                           " greater than 1. Check input in: " + CurrentModuleObject + " " + this_VF_object.LinkageName);
                         ShowContinueError("Using value of 1 for view factor");
                         this_VF_object.LinkageSurfaceData(surfNum).ViewFactor = 1;
                     } else if (Numbers(surfNum + 2) < 0) {
-                        ShowContinueError("View factor for surface " + Alphas(surfNum + 1) + " less than 0. Check input in: " + CurrentModuleObject +
+                        ShowWarningError("View factor for surface " + Alphas(surfNum + 1) + " less than 0. Check input in: " + CurrentModuleObject +
                                           " " + this_VF_object.LinkageName);
                         ShowContinueError("Using value of 0 for view factor");
                         this_VF_object.LinkageSurfaceData(surfNum).ViewFactor = 0;
@@ -4178,8 +4197,10 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door)) {
-                        ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                          Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
+                        ShowSevereError(RoutineName +
+                                        "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
@@ -4206,8 +4227,10 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door)) {
-                        ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                          Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
+                        ShowSevereError(RoutineName +
+                                        "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
@@ -4251,8 +4274,10 @@ namespace AirflowNetworkBalanceManager {
                     }
                     if (!(SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Window ||
                           SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_GlassDoor ||
-                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door)) {
-                        ShowSevereError(RoutineName + "AirflowNetworkComponent: The opening must be assigned to a window, door or glassdoor at " +
+                          SurfWinOriginalClass(MultizoneSurfaceData(count).SurfNum) == SurfaceClass_Door ||
+                          Surface(MultizoneSurfaceData(count).SurfNum).IsAirBoundarySurf)) {
+                        ShowSevereError(RoutineName +
+                                        "AirflowNetworkComponent: The opening must be assigned to a window, door, glassdoor or air boundary at " +
                                         AirflowNetworkLinkageData(count).Name);
                         ErrorsFound = true;
                     }
@@ -5759,7 +5784,7 @@ namespace AirflowNetworkBalanceManager {
             if (MultizoneSurfaceData(i).OccupantVentilationControlNum == 0) MultizoneSurfaceData(i).OpenFactor = 0.0;
             j = MultizoneSurfaceData(i).SurfNum;
             if (SurfWinOriginalClass(j) == SurfaceClass_Window || SurfWinOriginalClass(j) == SurfaceClass_Door ||
-                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor) {
+                SurfWinOriginalClass(j) == SurfaceClass_GlassDoor || Surface(j).IsAirBoundarySurf) {
                 if (MultizoneSurfaceData(i).OccupantVentilationControlNum > 0) {
                     if (MultizoneSurfaceData(i).OpeningStatus == OpenStatus::FreeOperation) {
                         if (MultizoneSurfaceData(i).OpeningProbStatus == ProbabilityCheck::ForceChange) {
