@@ -38,6 +38,7 @@ set(PYTHON_WRAPPER_PATH "${BASE_PATH}/${WRAPPER_FILE_NAME}")
 # message("PYTHON WRAPPER PATH: ${PYTHON_WRAPPER_PATH}")
 
 # now just fix up the pieces we need to fix up
+execute_process(COMMAND "chmod" "+w" "${LOCAL_PYTHON_LIBRARY}")
 execute_process(COMMAND "install_name_tool" -id "@executable_path/${PYTHON_LIB_FILENAME}" "${LOCAL_PYTHON_LIBRARY}")
 execute_process(COMMAND "install_name_tool" -id "@executable_path/${WRAPPER_FILE_NAME}" "${PYTHON_WRAPPER_PATH}")
 
