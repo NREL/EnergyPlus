@@ -3335,7 +3335,7 @@ namespace OutputReportTabular {
         // set the default factors for source energy - they will be overwritten if the user sets any values
         sourceFactorElectric = 3.167;
         sourceFactorNaturalGas = 1.084;
-        sourceFactorSteam = 0.3;
+        sourceFactorSteam = 1.20;
         sourceFactorGasoline = 1.05;
         sourceFactorDiesel = 1.05;
         sourceFactorCoal = 1.05;
@@ -8054,7 +8054,7 @@ namespace OutputReportTabular {
 
             tableBody(1, 3) = RealToStr(sourceFactorElectric / efficiencyDistrictCooling, 3); // District Cooling
 
-            tableBody(1, 4) = RealToStr(sourceFactorNaturalGas / efficiencyDistrictHeating, 3); // Disctrict Heating
+            tableBody(1, 4) = RealToStr(sourceFactorNaturalGas / efficiencyDistrictHeating, 3); // District Heating
 
             tableBody(1, 5) = RealToStr(sourceFactorSteam, 3); // Steam
 
