@@ -504,7 +504,7 @@ namespace SurfaceGeometry {
 
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) { // Loop through all surfaces to find windows...
 
-            if (!Surface(SurfNum).HeatTransSurf) continue; // Skip shadowing (sub)surfaces
+            if (!Surface(SurfNum).HeatTransSurf && !Surface(SurfNum).IsAirBoundarySurf) continue; // Skip shadowing (sub)surfaces
             ZoneNum = Surface(SurfNum).Zone;
             Zone(ZoneNum).TotalSurfArea += Surface(SurfNum).Area;
             if (dataConstruction.Construct(Surface(SurfNum).Construction).TypeIsWindow) {
@@ -12881,6 +12881,7 @@ namespace SurfaceGeometry {
                 if (surf.Construction == 0) continue;
                 auto &constr(dataConstruction.Construct(surf.Construction));
                 if (!constr.TypeIsAirBoundary) continue;
+                surf.IsAirBoundarySurf = true;
 
                 // Check for invalid air boundary surfaces - valid only on non-adiabatic interzone surfaces
                 // Only check this once during radiant setup, skip for solar setup
