@@ -59,10 +59,8 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -131,7 +129,6 @@ namespace DesiccantDehumidifiers {
     // USE STATEMENTS:
     // Use statements for data only modules
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataLoopNode;
     using DataEnvironment::OutBaroPress;
@@ -330,7 +327,6 @@ namespace DesiccantDehumidifiers {
         using SteamCoils::GetTypeOfCoil;
         using SteamCoils::SetSteamCoilData;
         using WaterCoils::SetWaterCoilData;
-        using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetDesiccantDehumidifierInput: "); // include trailing blank space
@@ -612,42 +608,42 @@ namespace DesiccantDehumidifiers {
 
             if (UtilityRoutines::SameString(Alphas(12), "UserCurves")) {
                 DesicDehum(DesicDehumNum).PerformanceModel_Num = PM_UserCurves;
-                DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW = GetCurveIndex(Alphas(13));
+                DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW = GetCurveIndex(state, Alphas(13));
                 if (DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(13) + " not found.");
                     ErrorsFound2 = true;
                 }
-                DesicDehum(DesicDehumNum).ProcDryBulbCurvefV = GetCurveIndex(Alphas(14));
+                DesicDehum(DesicDehumNum).ProcDryBulbCurvefV = GetCurveIndex(state, Alphas(14));
                 if (DesicDehum(DesicDehumNum).ProcDryBulbCurvefV == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(14) + " not found.");
                     ErrorsFound2 = true;
                 }
-                DesicDehum(DesicDehumNum).ProcHumRatCurvefTW = GetCurveIndex(Alphas(15));
+                DesicDehum(DesicDehumNum).ProcHumRatCurvefTW = GetCurveIndex(state, Alphas(15));
                 if (DesicDehum(DesicDehumNum).ProcHumRatCurvefTW == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(15) + " not found.");
                     ErrorsFound2 = true;
                 }
-                DesicDehum(DesicDehumNum).ProcHumRatCurvefV = GetCurveIndex(Alphas(16));
+                DesicDehum(DesicDehumNum).ProcHumRatCurvefV = GetCurveIndex(state, Alphas(16));
                 if (DesicDehum(DesicDehumNum).ProcHumRatCurvefV == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(16) + " not found.");
                     ErrorsFound2 = true;
                 }
-                DesicDehum(DesicDehumNum).RegenEnergyCurvefTW = GetCurveIndex(Alphas(17));
+                DesicDehum(DesicDehumNum).RegenEnergyCurvefTW = GetCurveIndex(state, Alphas(17));
                 if (DesicDehum(DesicDehumNum).RegenEnergyCurvefTW == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(17) + " not found.");
                     ErrorsFound2 = true;
                 }
-                DesicDehum(DesicDehumNum).RegenEnergyCurvefV = GetCurveIndex(Alphas(18));
+                DesicDehum(DesicDehumNum).RegenEnergyCurvefV = GetCurveIndex(state, Alphas(18));
                 if (DesicDehum(DesicDehumNum).RegenEnergyCurvefV == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(18) + " not found.");
                     ErrorsFound2 = true;
                 }
-                DesicDehum(DesicDehumNum).RegenVelCurvefTW = GetCurveIndex(Alphas(19));
+                DesicDehum(DesicDehumNum).RegenVelCurvefTW = GetCurveIndex(state, Alphas(19));
                 if (DesicDehum(DesicDehumNum).RegenVelCurvefTW == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(19) + " not found.");
                     ErrorsFound2 = true;
                 }
-                DesicDehum(DesicDehumNum).RegenVelCurvefV = GetCurveIndex(Alphas(20));
+                DesicDehum(DesicDehumNum).RegenVelCurvefV = GetCurveIndex(state, Alphas(20));
                 if (DesicDehum(DesicDehumNum).RegenVelCurvefV == 0) {
                     ShowSevereError(RoutineName + "Curve object=" + Alphas(20) + " not found.");
                     ErrorsFound2 = true;
@@ -1346,16 +1342,16 @@ namespace DesiccantDehumidifiers {
                                           "\"");
                 } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     ErrorsFound2 = false;
-                    DesicDehum(DesicDehumNum).CoolingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(
+                    DesicDehum(DesicDehumNum).CoolingCoilOutletNode = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(state,
                         DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
                     ErrorsFound2 = false;
-                    DesicDehum(DesicDehumNum).CompanionCoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
+                    DesicDehum(DesicDehumNum).CompanionCoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(state,
                         DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
                     if (ErrorsFound2)
                         ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).CoolingCoilName +
                                           "\"");
                     ErrorsFound2 = false;
-                    DesicDehum(DesicDehumNum).DXCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed(
+                    DesicDehum(DesicDehumNum).DXCoilIndex = VariableSpeedCoils::GetCoilIndexVariableSpeed(state,
                         DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
                     if (ErrorsFound2)
                         ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).CoolingCoilName +
@@ -1419,7 +1415,7 @@ namespace DesiccantDehumidifiers {
                 } else if (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     ErrorsFound2 = false;
                     DesicDehum(DesicDehumNum).CondenserInletNode =
-                        VariableSpeedCoils::GetVSCoilCondenserInletNode(DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
+                        VariableSpeedCoils::GetVSCoilCondenserInletNode(state, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
                 }
                 if (DesicDehum(DesicDehumNum).CondenserInletNode == 0 && DesicDehum(DesicDehumNum).Preheat == Yes) {
                     DesicDehum(DesicDehumNum).CondenserInletNode =
@@ -1520,10 +1516,11 @@ namespace DesiccantDehumidifiers {
             // Exhaust Fan input
             DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate = Numbers(2);
             DesicDehum(DesicDehumNum).ExhaustFanMaxPower = Numbers(3);
-            DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(Alphas(15));
+            DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(state, Alphas(15));
 
             if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                ErrorsFoundGeneric |= CurveManager::CheckCurveDims(DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
+                ErrorsFoundGeneric |= CurveManager::CheckCurveDims(state,
+                                                                   DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
                                                                    {1},                                            // Valid dimensions
                                                                    RoutineName,                                    // Routine name
                                                                    CurrentModuleObject,                            // Object Type
@@ -1575,13 +1572,13 @@ namespace DesiccantDehumidifiers {
                                 "System",
                                 "Average",
                                 DesicDehum(DesicDehumNum).Name);
-            SetupOutputVariable("Dehumidifier Electric Power",
+            SetupOutputVariable("Dehumidifier Electricity Rate",
                                 OutputProcessor::Unit::W,
                                 DesicDehum(DesicDehumNum).ElecUseRate,
                                 "System",
                                 "Average",
                                 DesicDehum(DesicDehumNum).Name);
-            SetupOutputVariable("Dehumidifier Electric Energy",
+            SetupOutputVariable("Dehumidifier Electricity Energy",
                                 OutputProcessor::Unit::J,
                                 DesicDehum(DesicDehumNum).ElecUseEnergy,
                                 "System",
@@ -1651,13 +1648,13 @@ namespace DesiccantDehumidifiers {
                                 "Average",
                                 DesicDehum(DesicDehumNum).Name);
             if (DesicDehum(DesicDehumNum).ExhaustFanMaxVolFlowRate > 0) {
-                SetupOutputVariable("Dehumidifier Exhaust Fan Electric Power",
+                SetupOutputVariable("Dehumidifier Exhaust Fan Electricity Rate",
                                     OutputProcessor::Unit::W,
                                     DesicDehum(DesicDehumNum).ExhaustFanPower,
                                     "System",
                                     "Average",
                                     DesicDehum(DesicDehumNum).Name);
-                SetupOutputVariable("Dehumidifier Exhaust Fan Electric Energy",
+                SetupOutputVariable("Dehumidifier Exhaust Fan Electricity Energy",
                                     OutputProcessor::Unit::J,
                                     DesicDehum(DesicDehumNum).ExhaustFanElecConsumption,
                                     "System",
@@ -1768,7 +1765,7 @@ namespace DesiccantDehumidifiers {
                 (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam)) {
                 if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingWater) {
                     ErrorFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             DesicDehum(DesicDehumNum).RegenCoilName,
                                             TypeOf_CoilWaterSimpleHeating,
                                             DesicDehum(DesicDehumNum).LoopNum,
@@ -1799,7 +1796,7 @@ namespace DesiccantDehumidifiers {
                 } else if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam) {
 
                     ErrorFlag = false;
-                    ScanPlantLoopsForObject(state.dataBranchInputManager,
+                    ScanPlantLoopsForObject(state,
                                             DesicDehum(DesicDehumNum).RegenCoilName,
                                             TypeOf_CoilSteamAirHeating,
                                             DesicDehum(DesicDehumNum).LoopNum,
@@ -2327,8 +2324,8 @@ namespace DesiccantDehumidifiers {
 
                 } else if (SELECT_CASE_var == PM_UserCurves) {
 
-                    MinProcAirOutHumRat = CurveValue(DesicDehum(DesicDehumNum).ProcHumRatCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                          CurveValue(DesicDehum(DesicDehumNum).ProcHumRatCurvefV, ProcAirVel);
+                    MinProcAirOutHumRat = CurveValue(state, DesicDehum(DesicDehumNum).ProcHumRatCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                          CurveValue(state, DesicDehum(DesicDehumNum).ProcHumRatCurvefV, ProcAirVel);
 
                 } else {
 
@@ -2435,14 +2432,14 @@ namespace DesiccantDehumidifiers {
 
                 } else if (SELECT_CASE_var == PM_UserCurves) {
 
-                    ProcAirOutTemp = CurveValue(DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                     CurveValue(DesicDehum(DesicDehumNum).ProcDryBulbCurvefV, ProcAirVel);
+                    ProcAirOutTemp = CurveValue(state, DesicDehum(DesicDehumNum).ProcDryBulbCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                     CurveValue(state, DesicDehum(DesicDehumNum).ProcDryBulbCurvefV, ProcAirVel);
 
-                    SpecRegenEnergy = CurveValue(DesicDehum(DesicDehumNum).RegenEnergyCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                      CurveValue(DesicDehum(DesicDehumNum).RegenEnergyCurvefV, ProcAirVel);
+                    SpecRegenEnergy = CurveValue(state, DesicDehum(DesicDehumNum).RegenEnergyCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                      CurveValue(state, DesicDehum(DesicDehumNum).RegenEnergyCurvefV, ProcAirVel);
 
-                    RegenAirVel = CurveValue(DesicDehum(DesicDehumNum).RegenVelCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
-                                  CurveValue(DesicDehum(DesicDehumNum).RegenVelCurvefV, ProcAirVel);
+                    RegenAirVel = CurveValue(state, DesicDehum(DesicDehumNum).RegenVelCurvefTW, ProcAirInTemp, ProcAirInHumRat) *
+                                  CurveValue(state, DesicDehum(DesicDehumNum).RegenVelCurvefV, ProcAirVel);
 
                 } else {
 
@@ -2825,7 +2822,7 @@ namespace DesiccantDehumidifiers {
 
                     //       find exhaust fan power multiplier using exhaust fan part-load ratio
                     if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                        ExhaustFanPowerMod = min(1.0, max(0.0, CurveValue(DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, ExhaustFanPLR)));
+                        ExhaustFanPowerMod = min(1.0, max(0.0, CurveValue(state, DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, ExhaustFanPLR)));
                     } else {
                         ExhaustFanPowerMod = 1.0;
                     }

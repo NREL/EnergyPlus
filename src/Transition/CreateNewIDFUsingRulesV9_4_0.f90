@@ -126,6 +126,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=MaxNameLength) :: OutputDiagnosticsName
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputDiagnosticsNames
   LOGICAL :: alreadyProcessedOneOutputDiagnostic=.false.
+  INTEGER :: nE, nEC, nG, nNG, nFO, nFON
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                            E N D    O F    I N S E R T    L O C A L    V A R I A B L E S    H E R E                              !
@@ -422,22 +423,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with H, insert the rules here
 
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
-                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.false.
-                  OutArgs(1:7)=InArgs(1:7)
-                  OutArgs(8) = 'HalfFlowPower'
-                  OutArgs(9:CurArgs+1)=InArgs(8:CurArgs)
-                  CurArgs = CurArgs + 1
-
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC')
-                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.false.
-                  OutArgs(1:9)=InArgs(1:9)
-                  OutArgs(10) = 'HalfFlowPower'
-                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
-                  CurArgs = CurArgs + 1
-
               ! If your original object starts with I, insert the rules here
 
               ! If your original object starts with L, insert the rules here
@@ -514,6 +499,42 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with Z, insert the rules here
 
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  OutArgs(5)='ConvectionOnly'
+                  OutArgs(6)=InArgs(5)
+                  OutArgs(7)='0.016'
+                  OutArgs(8)=InArgs(6)
+                  OutArgs(9)='0.35'
+                  OutArgs(10)=InArgs(7)
+                  OutArgs(11) = 'HalfFlowPower'
+                  OutArgs(12:CurArgs+4)=InArgs(8:CurArgs)
+                  CurArgs = CurArgs + 4
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:9)=InArgs(1:9)
+                  OutArgs(10) = 'HalfFlowPower'
+                  OutArgs(11:CurArgs+1)=InArgs(10:CurArgs)
+                  CurArgs = CurArgs + 1
+
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW')
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  OutArgs(1:4)=InArgs(1:4)
+                  OutArgs(5)='ConvectionOnly'
+                  OutArgs(6)=InArgs(5)
+                  OutArgs(7)='0.016'
+                  OutArgs(8)=InArgs(6)
+                  OutArgs(9)='0.35'
+                  OutArgs(10)=InArgs(7)
+                  OutArgs(11) = '0.8'
+                  OutArgs(12:CurArgs+4)=InArgs(8:CurArgs)
+                  CurArgs = CurArgs + 4
+
               CASE('ZONEHVAC:HYBRIDUNITARYHVAC')
                 ObjectName = "ZoneHVAC:HybridUnitaryHVAC"
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -538,8 +559,6 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                   Changes for report variables, meters, tables -- update names                                   !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! TODO: not sure if need to keep all of this...
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -584,6 +603,9 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    Written, &
                    .false.)
                 IF (DelThis) CYCLE
+                IF (CurArgs .GE. 1) THEN
+                  CALL ReplaceFuelNameWithEndUseSubcategory(OutArgs(1), NoDiff)
+                END IF
 
               CASE('OUTPUT:TABLE:TIMEBINS')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -971,6 +993,63 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                   ENDIF
                 ENDDO
 
+    !!!   Changes for other objects that reference meter names -- update names
+              CASE('DEMANDMANAGERASSIGNMENTLIST',  &
+                   'UTILITYCOST:TARIFF')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+                CALL ScanOutputVariablesForReplacement(  &
+                   2,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+              CASE('ELECTRICLOADCENTER:DISTRIBUTION')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                nodiff=.true.
+
+               ! Field 6  A5,  \field Generator Track Meter Scheme Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   6,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+               ! Field 12    A11, \field Storage Control Track Meter Name
+                CALL ScanOutputVariablesForReplacement(  &
+                   12,  &
+                   DelThis,  &
+                   checkrvi,  &
+                   nodiff,  &
+                   ObjectName,  &
+                   DifLfn,      &
+                   .false.,  & !OutVar
+                   .true., & !MtrVar
+                   .false., & !TimeBinVar
+                   CurArgs, &
+                   Written, &
+                   .false.)
+
+
               ! ANY OTHER OBJECT
               CASE DEFAULT
                   IF (FindItemInList(ObjectName,NotInNew,SIZE(NotInNew)) /= 0) THEN
@@ -1110,3 +1189,26 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
+
+SUBROUTINE ReplaceFuelNameWithEndUseSubcategory(InOutArg, NoDiffArg)
+  CHARACTER(*), INTENT(INOUT) :: InOutArg
+  LOGICAL, INTENT(INOUT) :: NoDiffArg
+  nE=INDEX(InOutArg,'Electric')
+  nEC=INDEX(InOutArg,'Electricity')
+  nG=INDEX(InOutArg,'Gas')
+  nNG=INDEX(InOutArg,'NaturalGas')
+  nFO=INDEX(InOutArg,'FuelOil#')
+  nFON=INDEX(InOutArg,'FuelOilNo')
+  IF (nE > 0 .AND. nEC == 0) THEN
+    InOutArg = InOutArg(:nE-1) // 'Electricity'(:11) // InOutArg(nE+8:)
+    NoDiffArg=.false.
+  END IF
+  IF (nG > 0 .AND. nNG == 0) THEN
+    InOutArg = InOutArg(:nG-1) // 'NaturalGas'(:10) // InOutArg(nG+3:)
+    NoDiffArg=.false.
+  END IF
+  IF (nFO > 0 .AND. nFON== 0) THEN
+    InOutArg = InOutArg(:nFO-1) // 'FuelOilNo'(:9) // InOutArg(nFO+8:)
+    NoDiffArg=.false.
+  END IF
+END SUBROUTINE

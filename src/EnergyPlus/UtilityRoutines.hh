@@ -570,13 +570,9 @@ namespace UtilityRoutines {
         bool operator()(const std::string& a, const std::string& b) const noexcept;
     };
 
-    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+    void appendPerfLog(IOFiles &ioFiles, std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
-    inline bool exists(const std::string& filename);
-
-    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound);
-
-    bool ValidateFuelTypeWithFuelTypeNum(std::string const &FuelTypeInput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
+    bool ValidateFuelType(std::string const &FuelTypeInput, std::string &FuelTypeOutput, bool &FuelTypeErrorsFound, bool const &AllowSteamAndDistrict = false);
 
     bool ValidateFuelTypeWithAssignResourceTypeNum(std::string const &FuelTypeInput, std::string &FuelTypeOutput, int &FuelTypeNum, bool &FuelTypeErrorsFound);
 

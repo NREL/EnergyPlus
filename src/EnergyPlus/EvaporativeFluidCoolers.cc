@@ -928,16 +928,16 @@ namespace EvaporativeFluidCoolers {
 
         SetupOutputVariable("Cooling Tower Heat Transfer Rate", OutputProcessor::Unit::W, this->Qactual, "System", "Average", this->Name);
 
-        SetupOutputVariable("Cooling Tower Fan Electric Power", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
+        SetupOutputVariable("Cooling Tower Fan Electricity Rate", OutputProcessor::Unit::W, this->FanPower, "System", "Average", this->Name);
 
-        SetupOutputVariable("Cooling Tower Fan Electric Energy",
+        SetupOutputVariable("Cooling Tower Fan Electricity Energy",
                             OutputProcessor::Unit::J,
                             this->FanEnergy,
                             "System",
                             "Sum",
                             this->Name,
                             _,
-                            "Electric",
+                            "Electricity",
                             "HeatRejection",
                             _,
                             "Plant");
@@ -965,7 +965,7 @@ namespace EvaporativeFluidCoolers {
 
     void EvapFluidCoolerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
-        this->InitEvapFluidCooler(state.dataBranchInputManager);
+        this->InitEvapFluidCooler(state);
         this->SizeEvapFluidCooler();
     }
 
@@ -1009,7 +1009,7 @@ namespace EvaporativeFluidCoolers {
 
         this->AirFlowRateRatio = 0.0; // Ratio of air flow rate through VS Evaporative fluid cooler to design air flow rate
 
-        this->InitEvapFluidCooler(state.dataBranchInputManager);
+        this->InitEvapFluidCooler(state);
 
         if (this->TypeOf_Num == DataPlant::TypeOf_EvapFluidCooler_SingleSpd) {
             this->CalcSingleSpeedEvapFluidCooler();
@@ -1024,7 +1024,7 @@ namespace EvaporativeFluidCoolers {
         this->ReportEvapFluidCooler(RunFlag);
     }
 
-    void EvapFluidCoolerSpecs::InitEvapFluidCooler(BranchInputManagerData &dataBranchInputManager)
+    void EvapFluidCoolerSpecs::InitEvapFluidCooler(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1069,7 +1069,7 @@ namespace EvaporativeFluidCoolers {
 
         if (this->OneTimeFlagForEachEvapFluidCooler) {
             // Locate the tower on the plant loops for later usage
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                 this->Name, this->TypeOf_Num, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, ErrorsFound, _, _, _, _, _);
 
             if (ErrorsFound) {

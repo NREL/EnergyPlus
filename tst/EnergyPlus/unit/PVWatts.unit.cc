@@ -128,7 +128,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputs)
                                                  "175,",
                                                  ",",
                                                  "0.5;",
-                                                 "Output:Variable,*,Generator Produced DC Electric Power,timestep;"});
+                                                 "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     process_idf(idfTxt);
     EXPECT_FALSE(has_err_output());
     PVWattsGenerator &pvw1 = GetOrCreatePVWattsGenerator("PVWattsArray1");
@@ -150,7 +150,7 @@ TEST_F(EnergyPlusFixture, PVWattsGenerator_GetInputsFailure)
     const std::string idfTxt = delimited_string({"Generator:PVWatts,", "PVWattsArray1,", "5,", "4000,",
                                                  "Primo,",          // misspelled
                                                  "FixedRoofMount,", // misspelled
-                                                 ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electric Power,timestep;"});
+                                                 ",", "asdf,", ",", ";", "Output:Variable,*,Generator Produced DC Electricity Rate,timestep;"});
     EXPECT_FALSE(process_idf(idfTxt, false));
     ASSERT_THROW(GetOrCreatePVWattsGenerator("PVWattsArray1"), std::runtime_error);
     std::string const error_string = delimited_string(
@@ -291,10 +291,10 @@ TEST_F(EnergyPlusFixture, PVWattsInverter_Constructor)
                                                  ",",
                                                  ";"});
     ASSERT_TRUE(process_idf(idfTxt));
-    auto eplc(ElectPowerLoadCenter(state.files, 1));
+    auto eplc(ElectPowerLoadCenter(state,  1));
     ASSERT_TRUE(eplc.inverterPresent);
     EXPECT_DOUBLE_EQ(eplc.inverterObj->pvWattsDCCapacity(), 4000.0);
     DataHVACGlobals::TimeStepSys = 1.0;
-    eplc.inverterObj->simulate(884.018);
+    eplc.inverterObj->simulate(state, 884.018);
     EXPECT_NEAR(eplc.inverterObj->aCPowerOut(), 842.527, 0.001);
 }

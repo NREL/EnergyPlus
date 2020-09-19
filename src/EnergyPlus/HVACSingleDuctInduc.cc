@@ -227,7 +227,7 @@ namespace HVACSingleDuctInduc {
 
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(IndUnit(IUNum).ADUNum).TermUnitSizingNum;
         // initialize the unit
-        InitIndUnit(state.dataBranchInputManager, IUNum, FirstHVACIteration);
+        InitIndUnit(state, IUNum, FirstHVACIteration);
 
         TermUnitIU = true;
 
@@ -254,7 +254,7 @@ namespace HVACSingleDuctInduc {
         // CALL UpdateIndUnit(IUNum);
 
         // Fill the report variables. There are no report variables
-        IndUnit(IUNum).ReportIndUnit();
+        IndUnit(IUNum).ReportIndUnit(state);
     }
 
     void GetIndUnits()
@@ -496,7 +496,7 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void InitIndUnit(BranchInputManagerData &dataBranchInputManager,
+    void InitIndUnit(EnergyPlusData &state,
                      int const IUNum,              // number of the current induction unit being simulated
                      bool const FirstHVACIteration // TRUE if first air loop solution this HVAC step
     )
@@ -564,7 +564,7 @@ namespace HVACSingleDuctInduc {
         if (MyPlantScanFlag(IUNum) && allocated(PlantLoop)) {
             if (IndUnit(IUNum).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         IndUnit(IUNum).HCoil,
                                         IndUnit(IUNum).HCoil_PlantTypeNum,
                                         IndUnit(IUNum).HWLoopNum,
@@ -584,7 +584,7 @@ namespace HVACSingleDuctInduc {
             if (IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ||
                 IndUnit(IUNum).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling) {
                 errFlag = false;
-                ScanPlantLoopsForObject(dataBranchInputManager,
+                ScanPlantLoopsForObject(state,
                                         IndUnit(IUNum).CCoil,
                                         IndUnit(IUNum).CCoil_PlantTypeNum,
                                         IndUnit(IUNum).CWLoopNum,
@@ -1600,19 +1600,19 @@ namespace HVACSingleDuctInduc {
         return YesNo;
     }
 
-    void IndUnitData::ReportIndUnit()
+    void IndUnitData::ReportIndUnit(EnergyPlusData &state)
     {
         // Purpose: this subroutine for reporting
 
         // set zone OA volume flow rate
-        this->CalcOutdoorAirVolumeFlowRate();
+        this->CalcOutdoorAirVolumeFlowRate(state);
     }
 
-    void IndUnitData::CalcOutdoorAirVolumeFlowRate()
+    void IndUnitData::CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state)
     {
         // calculates zone outdoor air volume flow rate using the supply air flow rate and OA fraction
         if (this->AirLoopNum > 0) {
-            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * DataAirLoop::AirLoopFlow(this->AirLoopNum).OAFrac;
+            this->OutdoorAirFlowRate = (DataLoopNode::Node(this->PriAirInNode).MassFlowRate / DataEnvironment::StdRhoAir) * state.dataAirLoop->AirLoopFlow(this->AirLoopNum).OAFrac;
         } else {
             this->OutdoorAirFlowRate = 0.0;
         }

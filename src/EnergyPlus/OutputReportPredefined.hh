@@ -198,6 +198,16 @@ namespace OutputReportPredefined {
     extern int pdchOpAzimuth;
     extern int pdchOpTilt;
     extern int pdchOpDir;
+    extern int pdstIntOpaque;
+    extern int pdchIntOpCons;
+    extern int pdchIntOpRefl;
+    extern int pdchIntOpUfactFilm;
+    extern int pdchIntOpUfactNoFilm;
+    extern int pdchIntOpGrArea;
+    extern int pdchIntOpNetArea;
+    extern int pdchIntOpAzimuth;
+    extern int pdchIntOpTilt;
+    extern int pdchIntOpDir;
     extern int pdstFen;
     extern int pdchFenCons;
     extern int pdchFenAreaOf1;
@@ -221,6 +231,12 @@ namespace OutputReportPredefined {
     extern int pdchDrUfactNoFilm;
     extern int pdchDrGrArea;
     extern int pdchDrParent;
+    extern int pdstIntDoor;
+    extern int pdchIntDrCons;
+    extern int pdchIntDrUfactFilm;
+    extern int pdchIntDrUfactNoFilm;
+    extern int pdchIntDrGrArea;
+    extern int pdchIntDrParent;
     extern int pdstIntFen;
     extern int pdchIntFenCons;
     extern int pdchIntFenAreaOf1;
@@ -606,8 +622,8 @@ namespace OutputReportPredefined {
     extern int pdrSensibleGain;
     // annual
     extern int pdstSHGSannual;
-    extern int pdchSHGSAnHvacHt;
-    extern int pdchSHGSAnHvacCl;
+    extern int pdchSHGSAnZoneEqHt;
+    extern int pdchSHGSAnZoneEqCl;
     extern int pdchSHGSAnHvacATUHt;
     extern int pdchSHGSAnHvacATUCl;
     extern int pdchSHGSAnSurfHt;
@@ -856,6 +872,69 @@ namespace OutputReportPredefined {
     extern int pdchLeedSchStPt11amWedCnt;
     extern int pdchLeedSchStPt11pmWednesday;
     extern int pdchLeedSchStPt11pmWedCnt;
+
+    extern int pdrThermalResilience;
+    extern int pdstHIHours;
+    extern int pdchHIHourSafe;
+    extern int pdchHIHourCaution;
+    extern int pdchHIHourExtremeCaution;
+    extern int pdchHIHourDanger;
+    extern int pdchHIHourExtremeDanger;
+
+    extern int pdstHIOccuHours;
+    extern int pdchHIOccuHourSafe;
+    extern int pdchHIOccuHourCaution;
+    extern int pdchHIOccuHourExtremeCaution;
+    extern int pdchHIOccuHourDanger;
+    extern int pdchHIOccuHourExtremeDanger;
+
+    extern int pdstHumidexHours;
+    extern int pdchHumidexHourLittle;
+    extern int pdchHumidexHourSome;
+    extern int pdchHumidexHourGreat;
+    extern int pdchHumidexHourDanger;
+    extern int pdchHumidexHourStroke;
+
+    extern int pdstHumidexOccuHours;
+    extern int pdchHumidexOccuHourLittle;
+    extern int pdchHumidexOccuHourSome;
+    extern int pdchHumidexOccuHourGreat;
+    extern int pdchHumidexOccuHourDanger;
+    extern int pdchHumidexOccuHourStroke;
+
+    extern int pdstHeatingSETHours;
+    extern int pdchHeatingSETHours;
+    extern int pdchHeatingSETOccuHours;
+    extern int pdchHeatingSETUnmetDuration;
+    extern int pdchHeatingSETUnmetTime;
+    extern int pdstCoolingSETHours;
+    extern int pdchCoolingSETHours;
+    extern int pdchCoolingSETOccuHours;
+    extern int pdchCoolingSETUnmetDuration;
+    extern int pdchCoolingSETUnmetTime;
+
+    extern int pdrCO2Resilience;
+    extern int pdstCO2Hours;
+    extern int pdchCO2HourSafe;
+    extern int pdchCO2HourCaution;
+    extern int pdchCO2HourHazard;
+    extern int pdstCO2OccuHours;
+    extern int pdchCO2OccuHourSafe;
+    extern int pdchCO2OccuHourCaution;
+    extern int pdchCO2OccuHourHazard;
+
+    extern int pdrVisualResilience;
+    extern int pdstIllumHours;
+    extern int pdchIllumHourDark;
+    extern int pdchIllumHourDim;
+    extern int pdchIllumHourAdequate;
+    extern int pdchIllumHourBright;
+    extern int pdstIllumOccuHours;
+    extern int pdchIllumOccuHourDark;
+    extern int pdchIllumOccuHourDim;
+    extern int pdchIllumOccuHourAdequate;
+    extern int pdchIllumOccuHourBright;
+
 
     // Internal data structures to store information provided by calls
 

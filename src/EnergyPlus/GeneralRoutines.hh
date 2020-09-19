@@ -118,7 +118,8 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
                        std::string const &CallString   // Context of this pair -- for error message
 );
 
-void CalcPassiveExteriorBaffleGap(ConvectionCoefficientsData &dataConvectionCoefficients,
+void CalcPassiveExteriorBaffleGap(EnergyPlusData &state,
+                                  ConvectionCoefficientsData &dataConvectionCoefficients,
                                   IOFiles &ioFiles,
                                   const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]

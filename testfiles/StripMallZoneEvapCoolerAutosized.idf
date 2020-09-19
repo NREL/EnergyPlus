@@ -5276,15 +5276,15 @@
 
   Output:Variable,*,Evaporative Cooler Wet Bulb Effectiveness,hourly;
 
-  Output:Variable,*,Evaporative Cooler Electric Energy,hourly;
+  Output:Variable,*,Evaporative Cooler Electricity Energy,hourly;
 
-  Output:Variable,*,Evaporative Cooler Electric Power,hourly;
+  Output:Variable,*,Evaporative Cooler Electricity Rate,hourly;
 
   Output:Variable,*,Evaporative Cooler Water Volume,hourly;
 
   Output:Variable,*,Evaporative Cooler Mains Water Volume,hourly;
 
-  Output:Variable,*,Fan Electric Power,hourly;
+  Output:Variable,*,Fan Electricity Rate,hourly;
 
   Output:Variable,*,Fan Rise in Air Temperature,hourly;
 
@@ -5310,7 +5310,7 @@
 
   Output:Variable,*,Zone Air Temperature,hourly;
 
-  Output:Variable,*,Baseboard Electric Power,hourly;
+  Output:Variable,*,Baseboard Electricity Rate,hourly;
 
   Output:Diagnostics,
     DisplayUnusedSchedules;  !- Key 1

@@ -45,77 +45,47 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef ResultsFrameworkFixture_hh_INCLUDED
+#define ResultsFrameworkFixture_hh_INCLUDED
+
+// Google test headers
+#include <gtest/gtest.h>
+
 // EnergyPlus Headers
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include "EnergyPlusFixture.hh"
+#include <EnergyPlus/ResultsFramework.hh>
 
 namespace EnergyPlus {
 
-namespace DataAirLoop {
+class ResultsFrameworkFixture : public EnergyPlusFixture
+{
+protected:
+    using json = nlohmann::json;
 
-    // MODULE INFORMATION:
-    //       AUTHOR         Fred Buhl
-    //       DATE WRITTEN   November 2003
-    //       MODIFIED       L. Gu, Jan. 24, 2007. Add more variables to get information on OnOff fan operation
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS MODULE:
-    // This data-only module contains type definitions and variables
-    // associated with HVAC air loops (AirLoopHVAC objects).
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
-
-    // Data
-    // -only module should be available to other modules and routines.
-    // Thus, all variables in this module must be PUBLIC.
-
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int NumOASystems(0);                   // Number of Outdoor Air Systems
-    Real64 LoopDXCoilRTF(0.0); // OnOff fan run time fraction in an HVAC Air Loop
-    bool AirLoopInputsFilled(false);       // Set to TRUE after first pass through air loop
-
-    // Object Data
-    Array1D<AirLoopZoneEquipConnectData> AirToZoneNodeInfo;
-    Array1D<AirLoopOutsideAirConnectData> AirToOANodeInfo;
-    Array1D<DefinePriAirSysAvailMgrs> PriAirSysAvailMgr;
-    Array1D<AirLooptoZoneData> AirLoopZoneInfo;
-    Array1D<AirLoopControlData> AirLoopControlInfo;
-    Array1D<AirLoopFlowData> AirLoopFlow;
-    Array1D<OutsideAirSysProps> OutsideAirSys;
-    Array1D<AirLoopAFNData> AirLoopAFNInfo;
-
-    // Clears the global data in DataAirLoop.
-    // Needed for unit tests, should not be normally called.
-    void clear_state()
+    static void SetUpTestCase()
     {
-        NumOASystems = 0;
-        LoopDXCoilRTF = 0.0;
-        AirLoopInputsFilled = false;
-        AirLoopAFNInfo.deallocate();
-        AirToZoneNodeInfo.deallocate();
-        AirToOANodeInfo.deallocate();
-        PriAirSysAvailMgr.deallocate();
-        AirLoopZoneInfo.deallocate();
-        AirLoopControlInfo.deallocate();
-        AirLoopFlow.deallocate();
-        OutsideAirSys.deallocate();
+        EnergyPlusFixture::SetUpTestCase(); // Sets up the base fixture
+    }
+    static void TearDownTestCase()
+    {
     }
 
-} // namespace DataAirLoop
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp(); // Sets up individual test cases.
+    }
+
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+    }
+
+    std::string & convertToMonth(std::string &datetime)
+    {
+        return ResultsFramework::CSVWriter::convertToMonth(datetime);
+    }
+};
 
 } // namespace EnergyPlus
+
+#endif

@@ -395,7 +395,7 @@ namespace PlantCentralGSHP {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void getSizingFactor(Real64 &SizFac) override;
 
@@ -403,7 +403,7 @@ namespace PlantCentralGSHP {
 
         void setupOutputVars();
 
-        void initialize(BranchInputManagerData &dataBranchInputManager,
+        void initialize(EnergyPlusData &state,
                         Real64 MyLoad, // Demand Load
                         int LoopNum    // Loop Number Index
         );
@@ -412,11 +412,11 @@ namespace PlantCentralGSHP {
 
         void SizeWrapper();
 
-        void CalcWrapperModel(Real64 &MyLoad, int LoopNum);
+        void CalcWrapperModel(EnergyPlusData &state, Real64 &MyLoad, int LoopNum);
 
-        void CalcChillerModel();
+        void CalcChillerModel(EnergyPlusData &state);
 
-        void CalcChillerHeaterModel();
+        void CalcChillerHeaterModel(EnergyPlusData &state);
 
         void UpdateChillerHeaterRecords();
 
@@ -431,9 +431,9 @@ namespace PlantCentralGSHP {
 
     void clear_state();
 
-    void GetWrapperInput();
+    void GetWrapperInput(EnergyPlusData &state);
 
-    void GetChillerHeaterInput();
+    void GetChillerHeaterInput(EnergyPlusData &state);
 
 } // namespace PlantCentralGSHP
 

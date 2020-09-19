@@ -440,7 +440,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -457,7 +457,7 @@ TEST_F(ConvectionCoefficientsFixture, DynamicIntConvSurfaceClassification)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -634,7 +634,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
-    EvaluateIntHcModels(state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -645,7 +645,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
-    EvaluateIntHcModels(state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -656,7 +656,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = CalcASHRAETARPNatural(DataHeatBalSurface::TH(2, 1, 1), DataHeatBalFanSys::MAT(1), -DataSurfaces::Surface( SurfNum ).CosTilt);
 
-    EvaluateIntHcModels(state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, state.dataConvectionCoefficients, SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -673,7 +673,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = 4.122;
 
-    EvaluateIntHcModels(state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -684,7 +684,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = 9.476;
 
-    EvaluateIntHcModels(state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 
@@ -695,7 +695,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateIntHcModelsFisherPedersen)
 
     HcExpectedValue = 3.212;
 
-    EvaluateIntHcModels(state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
+    EvaluateIntHcModels(state, state.dataConvectionCoefficients,  SurfNum, ConvModelEquationNum, Hc );
     EXPECT_EQ( DataSurfaces::Surface(SurfNum).TAirRef, DataSurfaces::ZoneMeanAirTemp );
     EXPECT_NEAR( Hc, HcExpectedValue, 0.1 );
 }
@@ -736,7 +736,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     DataSurfaces::Surface(SurfNum).CosTilt = 1.0;
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
-    CalcDetailedHcInForDVModel(state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn);
+    CalcDetailedHcInForDVModel(state, state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn);
     Hn = HcIn(1);
     EXPECT_NEAR(Hn, 1.520, 0.001);
 
@@ -748,7 +748,7 @@ TEST_F(ConvectionCoefficientsFixture, EvaluateHnModels)
     SurfTemp(1) = 0.0;
     HcIn(1) = 0.0;
     Vhc(1) = 1.0;
-    CalcDetailedHcInForDVModel(state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn, Vhc);
+    CalcDetailedHcInForDVModel(state, state.dataConvectionCoefficients, SurfNum, SurfTemp, HcIn, Vhc);
     Hn = HcIn(1);
     EXPECT_NEAR(Hn, 4.347, 0.001);
 
@@ -851,13 +851,13 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     humRat = 0.08;
     height = 1.0;
     isWindow = false;
-    ExpectedHconv = 5.6497;
+    ExpectedHconv = 2.16942;
     CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
     // Test 5: Non-window, all ceiling diffuser correlation
     Hforced = 10.0;
-    ACH = 1.0;
+    ACH = 3.0;
     Tsurf = 23.0;
     Tair = 18.0;
     cosTilt = 1.0;
@@ -866,6 +866,75 @@ TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserNatConv)
     isWindow = false;
     ExpectedHconv = 10.0;
     CalculatedHconv = CalcFisherPedersenCeilDiffuserNatConv(Hforced,ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+
+}
+
+TEST_F(ConvectionCoefficientsFixture, TestCalcFisherPedersenCeilDiffuserCorrelations)
+{
+
+    Real64 ACH;
+    Real64 Tsurf;
+    Real64 Tair;
+    Real64 cosTilt;
+    Real64 humRat;
+    Real64 height;
+    bool isWindow;
+    Real64 ExpectedHconv;
+    Real64 CalculatedHconv;
+
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    // Test 1: Forced Convection All Correlations (Floor, Ceiling, Wall)
+    ACH = 3.3;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 4.13721502661183;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 9.70692167003631;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 3.28943537910741;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+
+    // Test 2: Natural Convection All Correlations (Floor, Ceiling, Wall)--note, all should give same answer because of how variables are set
+    ACH = 0.25;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 1.2994;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    
+    // Test 3: Mixed Covection All Correlations (Floor, Ceiling, Wall)
+    ACH = 1.75;
+    Tsurf = 23.0;
+    Tair = 18.0;
+    cosTilt = 1.0;
+    humRat = 0.08;
+    height = 1.0;
+    isWindow = false;
+    ExpectedHconv = 2.70653;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserFloor(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 5.32826;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserCeiling(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
+    EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
+    ExpectedHconv = 2.23620;
+    CalculatedHconv = CalcFisherPedersenCeilDiffuserWalls(ACH,Tsurf,Tair,cosTilt,humRat,height,isWindow);
     EXPECT_NEAR(ExpectedHconv, CalculatedHconv, 0.0001);
 
 }
@@ -915,7 +984,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -932,7 +1001,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -972,7 +1041,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -989,7 +1058,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1029,7 +1098,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1046,7 +1115,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1086,7 +1155,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1103,7 +1172,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1143,7 +1212,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1160,7 +1229,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1200,7 +1269,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(state, state.dataWindowEquivalentLayer, state.files, errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -1217,7 +1286,7 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     DataZoneEquipment::GetZoneEquipmentData1(state);
 
-    BaseboardElectric::GetBaseboardInput(state.dataBaseboardElectric);
+    BaseboardElectric::GetBaseboardInput(state);
 
     DataGlobals::ZoneSizingCalc = true;
 
@@ -1532,7 +1601,7 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_Implicit)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
 
     int algorithm_identifier;
 
@@ -1772,8 +1841,8 @@ TEST_F(EnergyPlusFixture, AdaptiveModelSelections_ExplicitSelection)
     DataHeatBalSurface::TempSurfInTmp(4) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(5) = 25.0;
     DataHeatBalSurface::TempSurfInTmp(6) = 25.0;
-    ConvectionCoefficients::InitInteriorConvectionCoeffs(state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
-    ConvectionCoefficients::GetUserConvectionCoefficients(state.dataConvectionCoefficients, state.files);
+    ConvectionCoefficients::InitInteriorConvectionCoeffs(state, state.dataConvectionCoefficients, state.files, DataHeatBalSurface::TempSurfInTmp);
+    ConvectionCoefficients::GetUserConvectionCoefficients(state, state.dataConvectionCoefficients, state.files);
 
     int algorithm_identifier;
 

@@ -54,11 +54,13 @@
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include "Fixtures/EnergyPlusFixture.hh"
+
 using namespace EnergyPlus;
 using namespace EnergyPlus::DataVectorTypes;
 using namespace ObjexxFCL;
 
-TEST(VectorTest, Basic)
+TEST_F(EnergyPlusFixture, VectorTest_Basic)
 {
     ShowMessage("Begin Test: VectorTest, Basic");
     {

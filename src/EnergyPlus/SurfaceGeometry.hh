@@ -129,6 +129,8 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays();
 
+    void AllocateSurfaceWindows(int NumSurfaces);
+
     void GetSurfaceData(ZoneTempPredictorCorrectorData &dataZoneTempPredictorCorrector, IOFiles &ioFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)

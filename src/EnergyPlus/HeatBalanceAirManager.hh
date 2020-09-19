@@ -103,6 +103,8 @@ namespace HeatBalanceAirManager {
 
     void InitSimpleMixingConvectiveHeatGains();
 
+    void initializeForExternalHVACManager(EnergyPlusData &state);
+
     // END Initialization Section of the Module
     //******************************************************************************
 

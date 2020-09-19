@@ -74,7 +74,8 @@ namespace GeneratorDynamicsManager {
 
     void SetupGeneratorControlStateManager(int const GenNum); // index of generator to setup
 
-    void ManageGeneratorControlState(int const GeneratorType,           // type of Generator
+    void ManageGeneratorControlState(EnergyPlusData &state,
+                                     int const GeneratorType,           // type of Generator
                                      std::string const &GeneratorName,  // user specified name of Generator
                                      int const GeneratorNum,            // Generator number
                                      bool const RunFlagElectCenter,     // TRUE when Generator operating per electric load center request
@@ -98,7 +99,8 @@ namespace GeneratorDynamicsManager {
                                  bool &ConstrainedDecreasingMdot   // true if request was altered because of fuel rate of change down
     );
 
-    Real64 FuncDetermineCWMdotForInternalFlowControl(int const GeneratorNum, // ID of generator
+    Real64 FuncDetermineCWMdotForInternalFlowControl(EnergyPlusData &state,
+                                                     int const GeneratorNum, // ID of generator
                                                      Real64 const Pnetss,    // power net steady state
                                                      Real64 const TcwIn      // temperature of cooling water at inlet
     );

@@ -207,7 +207,7 @@ namespace HybridEvapCoolingModel {
         else
             return false;
     }
-    Real64 CMode::CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType)
+    Real64 CMode::CalculateCurveVal(EnergyPlusData &state, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
@@ -242,7 +242,7 @@ namespace HybridEvapCoolingModel {
         switch (curveType) {
         case TEMP_CURVE:
             if (ValidPointer(Tsa_curve_pointer)) {
-                Y_val = CurveValue(Tsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = CurveValue(state, Tsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = Tra; // return air temp
             }
@@ -250,7 +250,7 @@ namespace HybridEvapCoolingModel {
 
         case W_CURVE:
             if (ValidPointer(HRsa_curve_pointer)) {
-                Y_val = CurveValue(HRsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = CurveValue(state, HRsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
                 Y_val = max(min(Y_val,1.0),0.0);
             } else {
                 Y_val = Wra; // return HR
@@ -260,7 +260,7 @@ namespace HybridEvapCoolingModel {
         // The ModelScalingFactor factor for the Power, Fan Power, Water, and Fuel Use curves is equal to the Parent Model's Scaling Factor
         case POWER_CURVE:
             if (ValidPointer(Psa_curve_pointer)) {
-                Y_val = ModelScalingFactor * CurveValue(Psa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(state, Psa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
             }
@@ -269,7 +269,7 @@ namespace HybridEvapCoolingModel {
 
         case SUPPLY_FAN_POWER:
             if (ValidPointer(SFPsa_curve_pointer)) {
-                Y_val = ModelScalingFactor * CurveValue(SFPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(state, SFPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
             }
@@ -277,7 +277,7 @@ namespace HybridEvapCoolingModel {
 
         case EXTERNAL_STATIC_PRESSURE:
             if (ValidPointer(ESPsa_curve_pointer)) {
-                Y_val = CurveValue(ESPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = CurveValue(state, ESPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -285,7 +285,7 @@ namespace HybridEvapCoolingModel {
 
         case SECOND_FUEL_USE:
             if (ValidPointer(SFUsa_curve_pointer)) {
-                Y_val = ModelScalingFactor * CurveValue(SFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(state, SFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -293,7 +293,7 @@ namespace HybridEvapCoolingModel {
 
         case THIRD_FUEL_USE:
             if (ValidPointer(TFUsa_curve_pointer)) {
-                Y_val = ModelScalingFactor * CurveValue(TFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(state, TFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -301,7 +301,7 @@ namespace HybridEvapCoolingModel {
 
         case WATER_USE:
             if (ValidPointer(WUsa_curve_pointer)) {
-                Y_val = ModelScalingFactor * CurveValue(WUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(state, WUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -405,7 +405,8 @@ namespace HybridEvapCoolingModel {
         }
     }
 
-    bool Model::ParseMode(Array1D_string Alphas,
+    bool Model::ParseMode(EnergyPlusData &state,
+                          Array1D_string Alphas,
                           Array1D_string cAlphaFields,
                           Array1D<Real64> Numbers,
                           Array1D_string cNumericFields,
@@ -413,7 +414,8 @@ namespace HybridEvapCoolingModel {
                           std::string cCurrentModuleObject)
     {
         CMode newMode;
-        bool error = newMode.ParseMode(ModeCounter,
+        bool error = newMode.ParseMode(state,
+                                       ModeCounter,
                                        &OperatingModes,
                                        ScalingFactor,
                                        Alphas,
@@ -426,7 +428,8 @@ namespace HybridEvapCoolingModel {
         return error;
     }
 
-    bool CMode::ParseMode(int ModeCounter,
+    bool CMode::ParseMode(EnergyPlusData &state,
+                          int ModeCounter,
                           std::vector<CMode> *OperatingModes,
                           Real64 ScalingFactor,
                           Array1D_string Alphas,
@@ -480,7 +483,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(TEMP_CURVE, curveID); // as this is invalid curve id CalculateCurveVal will return a default when called
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -498,7 +501,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(W_CURVE, curveID); // as this is invalid curve id CalculateCurveVal will return a default  when called
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -514,7 +517,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(POWER_CURVE, curveID); // as this is invalid curve id CalculateCurveVal will return a default
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -530,7 +533,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(SUPPLY_FAN_POWER, curveID); // as this is invalid curve id CalculateCurveVal will return a default
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -546,7 +549,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(EXTERNAL_STATIC_PRESSURE, curveID); // as this is invalid curve id CalculateCurveVal will return a default
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -563,7 +566,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(SECOND_FUEL_USE, curveID); // as this is invalid curve id CalculateCurveVal will return a default
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -579,7 +582,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(THIRD_FUEL_USE, curveID); // as this is invalid curve id CalculateCurveVal will return a default
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -595,7 +598,7 @@ namespace HybridEvapCoolingModel {
         if (lAlphaBlanks(inter_Alpha)) {
             InitializeCurve(WATER_USE, curveID); // as this is invalid curve id CalculateCurveVal will return a default
         } else {
-            curveID = GetCurveIndex(Alphas(inter_Alpha));
+            curveID = GetCurveIndex(state, Alphas(inter_Alpha));
             if (curveID == 0) {
                 ShowSevereError("Invalid " + cAlphaFields(inter_Alpha) + '=' + Alphas(inter_Alpha));
                 ShowContinueError("Entered in " + cCurrentModuleObject);
@@ -947,7 +950,7 @@ namespace HybridEvapCoolingModel {
         }
         return T;
     }
-    bool Model::SetStandByMode(CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra)
+    bool Model::SetStandByMode(EnergyPlusData &state, CMode Mode0, Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
@@ -975,7 +978,7 @@ namespace HybridEvapCoolingModel {
             oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate = oStandBy.ScaledSupply_Air_Mass_Flow_Rate / ScalingFactor;
             oStandBy.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
             oStandBy.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
-            oStandBy.ElectricalPower = Mode0.CalculateCurveVal(Tosa, Wosa, Tra, Wra, oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate, OSAF, POWER_CURVE);
+            oStandBy.ElectricalPower = Mode0.CalculateCurveVal(state, Tosa, Wosa, Tra, Wra, oStandBy.Unscaled_Supply_Air_Mass_Flow_Rate, OSAF, POWER_CURVE);
             oStandBy.Outdoor_Air_Fraction = OSAF;
             oStandBy.SupplyAirTemperature = Tra;
             oStandBy.SupplyAirW = Wra;
@@ -1189,7 +1192,7 @@ namespace HybridEvapCoolingModel {
         return PartRuntimeFraction;
     }
 
-    int Model::SetOperatingSetting(CStepInputs StepIns)
+    int Model::SetOperatingSetting(EnergyPlusData &state, CStepInputs StepIns)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Dutton
@@ -1338,7 +1341,7 @@ namespace HybridEvapCoolingModel {
                             // reset outside air temp and return air temp before calculating curve values for each mode
                             StepIns.Tosa = SecInletTemp;
                             StepIns.Tra = InletTemp;
-                            Real64 FanPower = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER) * ScalingFactor;
+                            Real64 FanPower = Mode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER) * ScalingFactor;
 
                             // calculate power loss to air if in mixed air stream and divide fan heat between outside air stream and return air stream
                             if (FanHeatGain && FanHeatGainLocation == "MIXEDAIRSTREAM") {
@@ -1354,9 +1357,9 @@ namespace HybridEvapCoolingModel {
                             }
 
                             // Calculate prospective supply air temperature
-                            Tsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
+                            Tsa = Mode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, TEMP_CURVE);
                             // Calculate prospective supply air Humidity Ratio
-                            Wsa = Mode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
+                            Wsa = Mode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, W_CURVE);
 
                             // calculate power loss to supply air stream from fan power determined by curve value and fraction of fan heat in air stream
                             if (FanHeatGain && FanHeatGainLocation == "SUPPLYAIRSTREAM") {
@@ -1502,17 +1505,17 @@ namespace HybridEvapCoolingModel {
             }
 
             thisSetting.ElectricalPower =
-                thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE); // [Kw] calculations for fuel in Kw
+                thisSetting.oMode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE); // [Kw] calculations for fuel in Kw
             thisSetting.SupplyFanElectricPower =
-                thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER);
+                thisSetting.oMode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER);
             thisSetting.ExternalStaticPressure =
-                thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, EXTERNAL_STATIC_PRESSURE);
+                thisSetting.oMode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, EXTERNAL_STATIC_PRESSURE);
             thisSetting.SecondaryFuelConsumptionRate =
-                thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SECOND_FUEL_USE);
+                thisSetting.oMode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SECOND_FUEL_USE);
             thisSetting.ThirdFuelConsumptionRate =
-                thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, THIRD_FUEL_USE);
+                thisSetting.oMode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, THIRD_FUEL_USE);
             thisSetting.WaterConsumptionRate =
-                thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, WATER_USE);
+                thisSetting.oMode.CalculateCurveVal(state, StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, WATER_USE);
 
             // Calculate partload fraction required to meet all requirements
             Real64 PartRuntimeFraction = 0;
@@ -1754,7 +1757,8 @@ namespace HybridEvapCoolingModel {
 
     // doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful in
     // unit testing
-    void Model::doStep(Real64 RequestedCoolingLoad,       // in joules, cooling load as negitive
+    void Model::doStep(EnergyPlusData &state,
+                       Real64 RequestedCoolingLoad,       // in joules, cooling load as negitive
                        Real64 RequestedHeatingLoad,       // in joules, heating load as positive
                        Real64 OutputRequiredToHumidify,   // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
                        Real64 OutputRequiredToDehumidify, // Load required to meet dehumidifying setpoint (<0 = a dehumidify load)  [kgWater/s]
@@ -1822,7 +1826,7 @@ namespace HybridEvapCoolingModel {
         // to determine performance metrics for the standby mode including energy use and other outputs
 
         CMode Mode = *(OperatingModes.begin());
-        if (SetStandByMode(Mode, StepIns.Tosa, Wosa, StepIns.Tra, Wra)) {
+        if (SetStandByMode(state, Mode, StepIns.Tosa, Wosa, StepIns.Tra, Wra)) {
             std::string ObjectID = Name.c_str();
             ShowSevereError("Standby mode not defined correctly, as the mode is defined there are zero combinations of acceptible outside air "
                             "fractions and supply air mass flow rate, called in object " +
@@ -1848,7 +1852,7 @@ namespace HybridEvapCoolingModel {
             PrimaryModeRuntimeFraction = 0;
         } else {
             // set the operating conditions and respective part load fractions.
-            ErrorCode = SetOperatingSetting(StepIns);
+            ErrorCode = SetOperatingSetting(state, StepIns);
         }
 
         Real64 QTotZoneOut = 0;

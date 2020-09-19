@@ -1892,7 +1892,7 @@ namespace PlantCondLoopOperation {
                             auto &this_equip(this_equip_list.Comp(EquipNum));
                             ThisTypeOfNum = UtilityRoutines::FindItem(this_equip.TypeOf, SimPlantEquipTypes, NumSimPlantEquipTypes);
                             errFlag1 = false;
-                            PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+                            PlantUtilities::ScanPlantLoopsForObject(state,
                                                                     this_equip.Name,
                                                                     ThisTypeOfNum,
                                                                     DummyLoopNum,
@@ -2076,7 +2076,7 @@ namespace PlantCondLoopOperation {
                                 bool anyEMSRan;
                                 ManageEMS(state, emsCallFromUserDefinedComponentModel, anyEMSRan, this_op_scheme.ErlInitProgramMngr);
                             } else if (this_op_scheme.initPluginLocation > -1) {
-                                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(this_op_scheme.initPluginLocation);
+                                EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, this_op_scheme.initPluginLocation);
                             }
                             this_op_scheme.MyEnvrnFlag = false;
                         }
@@ -3085,7 +3085,7 @@ namespace PlantCondLoopOperation {
             bool anyEMSRan;
             ManageEMS(state, emsCallFromUserDefinedComponentModel, anyEMSRan, PlantLoop(LoopNum).OpScheme(CurSchemePtr).ErlSimProgramMngr);
         } else if (PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation > -1) {
-            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
+            EnergyPlus::PluginManagement::pluginManager->runSingleUserDefinedPlugin(state, PlantLoop(LoopNum).OpScheme(CurSchemePtr).simPluginLocation);
         }
 
         // move actuated value to MyLoad
