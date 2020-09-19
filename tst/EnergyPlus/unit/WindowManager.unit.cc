@@ -308,24 +308,46 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
 TEST_F(EnergyPlusFixture, WindowManager_TransAndReflAtPhi)
 {
 
-    Real64 const cs = 0.86603; // Cosine of incidence angle
-    Real64 const tf0 = 0.8980; // Transmittance at zero incidence angle
-    Real64 const rf0 = 0.0810; // Front reflectance at zero incidence angle
-    Real64 const rb0 = 0.0810; // Back reflectance at zero incidence angle
+    Real64 cs = 0.86603; // Cosine of incidence angle
+    Real64 tf0 = 0.8980; // Transmittance at zero incidence angle
+    Real64 rf0 = 0.0810; // Front reflectance at zero incidence angle
+    Real64 rb0 = 0.0810; // Back reflectance at zero incidence angle
 
     Real64 tfp = 0.; // Transmittance at cs
     Real64 rfp = 0.; // Front reflectance at cs
     Real64 rbp = 0.; // Back reflectance at cs
 
-    bool const SimpleGlazingSystem = false; // .TRUE. if simple block model being used
-    Real64 const SimpleGlazingSHGC = 0.;    // SHGC value to use in alternate model for simple glazing system
-    Real64 const SimpleGlazingU = 0.;       // U-factor value to use in alternate model for simple glazing system
+    bool SimpleGlazingSystem = false; // .TRUE. if simple block model being used
+    Real64 SimpleGlazingSHGC = 0.;    // SHGC value to use in alternate model for simple glazing system
+    Real64 SimpleGlazingU = 0.;       // U-factor value to use in alternate model for simple glazing system
 
     TransAndReflAtPhi(cs, tf0, rf0, rb0, tfp, rfp, rbp, SimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
 
     EXPECT_NEAR(tfp, 0.89455, 0.0001);
     EXPECT_NEAR(rfp, 0.08323, 0.0001);
     EXPECT_NEAR(rbp, 0.08323, 0.0001);
+
+    tf0 = 0.25; // Transmittance at zero incidence angle
+    rf0 = 0.55; // Front reflectance at zero incidence angle
+    rb0 = 0.55; // Back reflectance at zero incidence angle
+
+    tfp = 0.; // Transmittance at cs
+    rfp = 0.; // Front reflectance at cs
+    rbp = 0.; // Back reflectance at cs
+
+    SimpleGlazingSystem = true; // .TRUE. if simple block model being used
+    SimpleGlazingSHGC = 0.335;    // SHGC value to use in alternate model for simple glazing system
+    SimpleGlazingU = 1.704;       // U-factor value to use in alternate model for simple glazing system
+
+    for (Real64 theta = 0.0; theta <= DataGlobals::PiOvr2; theta += DataGlobals::PiOvr2/10.0) {
+        cs = std::cos(theta); // Cosine of incidence angle
+        TransAndReflAtPhi(cs, tf0, rf0, rb0, tfp, rfp, rbp, SimpleGlazingSystem, SimpleGlazingSHGC, SimpleGlazingU);
+        Real64 afp = 1. - tfp - rfp;
+
+        EXPECT_GE(afp, 0.00);
+    }
+
+
 }
 
 TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
