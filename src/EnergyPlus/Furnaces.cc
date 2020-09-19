@@ -8020,9 +8020,6 @@ namespace Furnaces {
         HumControl = false;
 
         //*********INITIAL CALCULATIONS****************
-        // Calculate the Cp Air of zone 
-        Real64 cpair = PsyCpAirFnW(Node(ControlZoneNode).HumRat);
-
         // set the fan part load fraction
         // Note: OnOffFanPartLoadFraction is passed to the
         //       fan module by DataHVACGlobals.  It should be
