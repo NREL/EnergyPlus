@@ -2597,6 +2597,7 @@ namespace HeatBalanceSurfaceManager {
                     int SurfDome = e.Dome;
                     SurfWinTransSolar(SurfDome) = 0.0;
                     SurfQRadSWOutIncident(SurfDome) = 0.0;
+                    SurfWinQRadSWwinAbsTot(SurfDome) = 0.0;
                     for (int Lay = 1; Lay <= DataWindowEquivalentLayer::CFSMAXNL + 1; Lay++) {
                         SurfWinQRadSWwinAbs(Lay, SurfDome) = 0.0;
                     }

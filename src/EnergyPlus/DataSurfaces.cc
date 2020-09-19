@@ -432,6 +432,7 @@ namespace DataSurfaces {
     Array1D<Real64> BmToDiffReflFacObs; // Factor for incident solar from diffuse beam refl
     // from obstructions (W/m2)/(W/m2)
     Array1D<Real64> BmToDiffReflFacGnd; // Factor for incident solar from diffuse beam refl from ground
+    Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
 
     Array1D<Real64> SkyDiffReflFacGnd; // sky diffuse reflection view factors from ground
     Array2D<Real64> AWinSurf; // Time step value of factor for beam
