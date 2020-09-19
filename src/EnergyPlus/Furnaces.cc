@@ -5275,12 +5275,26 @@ namespace Furnaces {
                 MassFlowRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate;
                 DeltaMassRate = 0.0;
             }
-            Real64 TotalOutput(0.0);     // total output rate, {W} 
-            Real64 SensibleOutputDelta(0.0);  // delta sensible output rate, {W}
-            Real64 LatentOutputDelta(0.0);    // delta latent output rate, {W}
-            Real64 TotalOutputDelta(0.0);     // delta total output rate, {W} 
-            CalcZoneSensibleLatentOutput(MassFlowRate, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, Furnace(FurnaceNum).SenLoadLoss, Furnace(FurnaceNum).LatLoadLoss, TotalOutput);
-            CalcZoneSensibleLatentOutput(DeltaMassRate, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, SensibleOutputDelta, LatentOutputDelta, TotalOutputDelta);
+            Real64 TotalOutput(0.0);         // total output rate, {W}
+            Real64 SensibleOutputDelta(0.0); // delta sensible output rate, {W}
+            Real64 LatentOutputDelta(0.0);   // delta latent output rate, {W}
+            Real64 TotalOutputDelta(0.0);    // delta total output rate, {W}
+            CalcZoneSensibleLatentOutput(MassFlowRate,
+                                         Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp,
+                                         Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat,
+                                         Node(ZoneInNode).Temp,
+                                         Node(ZoneInNode).HumRat,
+                                         Furnace(FurnaceNum).SenLoadLoss,
+                                         Furnace(FurnaceNum).LatLoadLoss,
+                                         TotalOutput);
+            CalcZoneSensibleLatentOutput(DeltaMassRate,
+                                         Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp,
+                                         Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat,
+                                         Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp,
+                                         Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat,
+                                         SensibleOutputDelta,
+                                         LatentOutputDelta,
+                                         TotalOutputDelta);
             Furnace(FurnaceNum).SenLoadLoss = Furnace(FurnaceNum).SenLoadLoss + SensibleOutputDelta;
             if (std::abs(Furnace(FurnaceNum).SensibleLoadMet) > 0.0) {
                 if (std::abs(Furnace(FurnaceNum).SenLoadLoss / Furnace(FurnaceNum).SensibleLoadMet) < 0.001) Furnace(FurnaceNum).SenLoadLoss = 0.0;
@@ -6388,7 +6402,6 @@ namespace Furnaces {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 cpair;
         static Real64 Error(1.0);
         Real64 SystemSensibleLoad;   // Sensible load to be met by furnace (W)
         Real64 FullSensibleOutput;   // Full sensible output of furnace (W)
@@ -6412,13 +6425,14 @@ namespace Furnaces {
         // Retrieve the load on the controlled zone
         FurnaceOutletNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
         FurnaceInletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int ControlZoneNode = Furnace(FurnaceNum).NodeNumOfControlledZone;
         OpMode = Furnace(FurnaceNum).OpMode;
         Furnace(FurnaceNum).MdotFurnace = Furnace(FurnaceNum).DesignMassFlowRate;
         Furnace(FurnaceNum).CoolPartLoadRatio = 0.0;
         //  OnOffAirFlowRatio = 1.0
 
-        // Calculate the Cp Air
-        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
+        // Calculate the Cp Air of zone 
+        Real64 cpair = PsyCpAirFnW(Node(ControlZoneNode).HumRat);
 
         if (FirstHVACIteration) {
             HeatCoilLoad = ZoneLoad;
@@ -6677,7 +6691,6 @@ namespace Furnaces {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 SystemMoistureLoad;        // Total latent load to be removed by furnace/unitary system
-        Real64 cpair;                     // Heat capacity of air
         Real64 deltaT;                    // Temperature rise across heating coil (C)
         Real64 TempOutHeatingCoil;        // Temperature leaving heating coil (C)
         Real64 FullSensibleOutput;        // Full sensible output of AC (W)
@@ -6716,10 +6729,11 @@ namespace Furnaces {
         // Set local variables
         FurnaceOutletNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
         FurnaceInletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int ControlZoneNode = Furnace(FurnaceNum).NodeNumOfControlledZone;
         OpMode = Furnace(FurnaceNum).OpMode;
         HumControl = false;
-        // Calculate the Cp Air for all conditions
-        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
+        // Calculate the Cp Air of zone 
+        Real64 cpair = PsyCpAirFnW(Node(ControlZoneNode).HumRat);
         NoHeatOutput = 0.0;
         SystemSensibleLoad = 0.0;
         ReheatCoilLoad = 0.0;
@@ -7021,15 +7035,14 @@ namespace Furnaces {
                                 TempOutHeatingCoil = Node(FurnaceOutletNode).Temp;
                             }
                         }
-                        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
-                        // TempOutHeatingCoil = Node(FurnaceOutletNode)%Temp + HeatCoilLoad/(cpair*Furnace(FurnaceNum)%MdotFurnace)
                         if ((TempOutHeatingCoil > Furnace(FurnaceNum).DesignMaxOutletTemp) && (HeatCoilLoad > 0.0)) {
                             // deltaT = Furnace(FurnaceNum)%DesignMaxOutletTemp - Node(FurnaceOutletNode)%Temp
                             // BG 10/22/2008 above made no sense if DX heat is off and its all supplemental,
                             //  because Node(FurnaceOutletNode)%Temp will have been calc'd with full DX heat in last faux call to CalcFurnaceOutput
 
+                            Real64 cpairSupply = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
                             deltaT = (Furnace(FurnaceNum).DesignMaxOutletTemp - TempOutHeatingCoil);
-                            HeatCoilLoad += (Node(FurnaceInletNode).MassFlowRate * cpair * deltaT);
+                            HeatCoilLoad += (Node(FurnaceInletNode).MassFlowRate * cpairSupply * deltaT);
                             HeatCoilLoad = max(0.0, HeatCoilLoad);
                         }
                     } else {
@@ -7966,7 +7979,6 @@ namespace Furnaces {
         // to be removed by furnace/unitary system
         static Real64 TotalZoneSensLoad; // Total ZONE heating load (not including outside air)
         // to be removed by furnace/unitary system
-        Real64 cpair;                       // Heat capacity of air
         Real64 ZoneSensLoadMet;             // Actual zone sensible load met by heat pump (W)
         Real64 ZoneLatLoadMet;              // Actual zone latent load met by heat pump (W)
         Real64 ZoneSensLoadMetFanONCompON;  // Max Zone sensible load heat pump can meet (W)
@@ -7998,6 +8010,7 @@ namespace Furnaces {
         OnOffAirFlowRatio = 1.0;
         FurnaceOutletNode = Furnace(FurnaceNum).FurnaceOutletNodeNum;
         FurnaceInletNode = Furnace(FurnaceNum).FurnaceInletNodeNum;
+        int ControlZoneNode = Furnace(FurnaceNum).NodeNumOfControlledZone;
         if (state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysExists) {
             OASysOutletNode = state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysOutletNodeNum;
             OASysInletNode = state.dataAirLoop->AirToOANodeInfo(AirLoopNum).OASysInletNodeNum;
@@ -8007,8 +8020,8 @@ namespace Furnaces {
         HumControl = false;
 
         //*********INITIAL CALCULATIONS****************
-        // Calculate the Cp Air for all conditions
-        cpair = PsyCpAirFnW(Node(FurnaceInletNode).HumRat);
+        // Calculate the Cp Air of zone 
+        Real64 cpair = PsyCpAirFnW(Node(ControlZoneNode).HumRat);
 
         // set the fan part load fraction
         // Note: OnOffFanPartLoadFraction is passed to the
@@ -8885,10 +8898,17 @@ namespace Furnaces {
         // If the fan runs continually do not allow coils to set OnOffFanPartLoadRatio.
         if (FanOpMode == ContFanCycCoil) OnOffFanPartLoadFraction = 1.0;
 
-        Real64 SensibleOutput(0.0);  // sensible output rate, {W}
-        Real64 LatentOutput(0.0);    // latent output rate, {W}
-        Real64 TotalOutput(0.0);     // total output rate, {W}
-        CalcZoneSensibleLatentOutput(AirMassFlow, Node(FurnaceOutletNode).Temp, Node(FurnaceOutletNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, SensibleOutput, LatentOutput, TotalOutput);
+        Real64 SensibleOutput(0.0); // sensible output rate, {W}
+        Real64 LatentOutput(0.0);   // latent output rate, {W}
+        Real64 TotalOutput(0.0);    // total output rate, {W}
+        CalcZoneSensibleLatentOutput(AirMassFlow,
+                                     Node(FurnaceOutletNode).Temp,
+                                     Node(FurnaceOutletNode).HumRat,
+                                     Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp,
+                                     Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat,
+                                     SensibleOutput,
+                                     LatentOutput,
+                                     TotalOutput);
         SensibleLoadMet = SensibleOutput - Furnace(FurnaceNum).SenLoadLoss;
         Furnace(FurnaceNum).SensibleLoadMet = SensibleLoadMet;
 
@@ -10113,7 +10133,6 @@ namespace Furnaces {
         Real64 ErrorToler;         // error tolerance
         int SolFla;                // Flag of RegulaFalsi solver
         Array1D<Real64> Par(10);   // Parameters passed to RegulaFalsi
-        Real64 CpAir;              // air specific heat
         Real64 QCoilActual;        // coil load actually delivered returned to calling component
         int i;                     // Speed index
         static int ErrCountCyc(0); // Counter used to minimize the occurrence of output warnings
@@ -10448,7 +10467,7 @@ namespace Furnaces {
             //   use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
             //   of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
             if (Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp < Furnace(FurnaceNum).DesignMaxOutletTemp) {
-                CpAir = PsyCpAirFnW(Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat);
+                Real64 CpAir = PsyCpAirFnW(Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat);
                 SupHeaterLoad = Node(Furnace(FurnaceNum).FurnaceInletNodeNum).MassFlowRate * CpAir *
                                 (Furnace(FurnaceNum).DesignMaxOutletTemp - Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp);
 

@@ -536,7 +536,14 @@ void CoilCoolingDX::simulate(EnergyPlusData &state, int useAlternateMode, Real64
     this->outletAirDryBulbTemp = evapOutletNode.Temp;
     this->outletAirHumRat = evapOutletNode.HumRat;
 
-    CalcComponentSensibleLatentOutput(evapOutletNode.MassFlowRate, evapInletNode.Temp, evapInletNode.HumRat, evapOutletNode.Temp, evapOutletNode.HumRat, this->sensCoolingEnergyRate, this->latCoolingEnergyRate, this->totalCoolingEnergyRate);
+    CalcComponentSensibleLatentOutput(evapOutletNode.MassFlowRate,
+                                      evapInletNode.Temp,
+                                      evapInletNode.HumRat,
+                                      evapOutletNode.Temp,
+                                      evapOutletNode.HumRat,
+                                      this->sensCoolingEnergyRate,
+                                      this->latCoolingEnergyRate,
+                                      this->totalCoolingEnergyRate);
     this->totalCoolingEnergy = this->totalCoolingEnergyRate * reportingConstant;
     this->sensCoolingEnergy = this->sensCoolingEnergyRate * reportingConstant;
     this->latCoolingEnergy = this->latCoolingEnergyRate * reportingConstant;

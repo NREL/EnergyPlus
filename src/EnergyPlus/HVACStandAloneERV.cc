@@ -1694,7 +1694,14 @@ namespace HVACStandAloneERV {
         }
 
         AirMassFlow = Node(SupOutletNode).MassFlowRate;
-        CalcZoneSensibleLatentOutput(AirMassFlow, Node(SupOutletNode).Temp, Node(SupOutletNode).HumRat, Node(ExhaustInletNode).Temp, Node(ExhaustInletNode).HumRat, SensLoadMet, LatLoadMet, TotLoadMet);
+        CalcZoneSensibleLatentOutput(AirMassFlow,
+                                     Node(SupOutletNode).Temp,
+                                     Node(SupOutletNode).HumRat,
+                                     Node(ExhaustInletNode).Temp,
+                                     Node(ExhaustInletNode).HumRat,
+                                     SensLoadMet,
+                                     LatLoadMet,
+                                     TotLoadMet);
         LatentMassLoadMet = AirMassFlow * (Node(SupOutletNode).HumRat - Node(ExhaustInletNode).HumRat); // kg/s, dehumidification = negative
 
         if (SensLoadMet < 0.0) {

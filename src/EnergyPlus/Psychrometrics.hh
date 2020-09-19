@@ -1291,35 +1291,51 @@ namespace Psychrometrics {
         return 1000.1207 + 8.3215874e-04 * TB - 4.929976e-03 * pow_2(TB) + 8.4791863e-06 * pow_3(TB);
     }
 
+    inline Real64 PsyDeltaHSenFnTdb2Tdb1W(Real64 const TDB2, // dry-bulb temperature at state 1 {C}
+                                          Real64 const TDB1, // dry-bulb temperature at state 2 {C}
+                                          Real64 const W     // humidity ratio (at zone air node or Wmin)
+    )
+    {
+        // When called for zone equipment flow entering a zone (from CalcZoneSensibleLatentOutput or CalcZoneSensibleOutput):
+        // returns sensible enthalpy difference between equipment supply air (TDB2) and zone air (TDB1) evaluated
+        // using the zone air node humidity ratio. This enthalpy difference multiplied by supply
+        // air mass flow rate yields the sensible heat transfer rate in Watts.
+        // postive value is heating, negative value is cooling
+
+        // When called across a component (from PsyDeltaHSenFnTdb2W2Tdb1W1 by CalcComponentSensibleLatentOutput):
+        // returns sensible enthalpy difference between state 1 (TDB1) and state 2 (TDB2) using the minimum 
+        // humidity ratio from states 1 and 2. This enthalpy difference multiplied by supply air mass flow 
+        // rate yields the sensible heat transfer rate in Watts.
+        // postive value is heating, negative value is cooling
+
+        // the following two functions for calculating enthalpy difference are equivalent:
+        // PsyDeltaHSenFnTdb2Tdb1W() = PsyHFnTdbW(TDB2, W) - PsyHFnTdbW(TDB1, W)
+        // PsyDeltaHSenFnTdb2Tdb1W() function was derived by simplifying the expression above
+        // The constant coefficients come from the equation for moist air enthalpy, PsyHFnTdbW()
+
+        return (1.00484e3 + max(1.0e-5, W) * 1.85895e3) * (TDB2 - TDB1);
+    }
+
     inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
-                                             Real64 const dW2,  // humidity ratio at state 2
+                                             Real64 const W2,   // humidity ratio at state 2
                                              Real64 const TDB1, // dry-bulb temperature at state 1 {C}
-                                             Real64 const dW1   // humidity ratio at state 1
+                                             Real64 const W1    // humidity ratio at state 1
     )
     {
-        // returns sensible enthalpy difference of moist air going from state 1 to state 2
-        //Real64 dWavg = 0.5 * (max(dW2, 1.0e-5) + max(dW1, 1.0e-5));
-        Real64 dWmin = min(dW1, dW2);
+        // returns sensible enthalpy difference of moist air going from state 1 to state 2 (e.g across coils)
+        // using the minimum humidity ratio state points 1 and 2. This enthalpy difference multiplied by
+        // supply air mass flow rate yields sensible heat transfer rate across coils in Watts
+        // postive value is heating, negative value is cooling
 
-        return (1.00484e3 +  max(1.0e-5, dWmin) * 1.85895e3) * (TDB2 - TDB1);
+        // the following two functions for calculating enthalpy difference are equivalent:
+        // PsyDeltaHSenFnTdb2W2Tdb1W1() = PsyHFnTdbW(TDB2, min(W1, W2)) - PsyHFnTdbW(TDB1, min(W1,W2))
+        // PsyDeltaHSenFnTdb2W2Tdb1W1() function was derived by simplifying the above expression
+        // The constant coefficients came from the equation for moist air enthalpy, PsyHFnTdbW()
+
+        Real64 const Wmin = min(W1, W2);
+        return PsyDeltaHSenFnTdb2Tdb1W(TDB2, TDB1, Wmin);
     }
 
-    inline Real64 PsyDeltaHSenFnTdbEquipTdbWZone(Real64 const TDBEquip, // dry-bulb temperature at equipment outlet {C}
-        Real64 const TDBZone, // dry-bulb temperature at zone air node {C}
-        Real64 const dWZone   // humidity ratio at zone air node
-    )
-    {
-        // returns sensible enthalpy difference between equipment outlet to zone air node
-        return (1.00484e3 +  max(1.0e-5, dWZone) * 1.85895e3) * (TDBEquip - TDBZone);
-    }
-
-    inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
-                                      Real64 const TDB1  // dry-bulb temperature at  at state 1 {C}
-    )
-    {
-        // calculate average latent heat of vaporization of water vapor in moist air
-        return (2.50094e6 + 0.5 * (TDB2 + TDB1) * 1.85895e3);
-    }
 } // namespace Psychrometrics
 
 } // namespace EnergyPlus
