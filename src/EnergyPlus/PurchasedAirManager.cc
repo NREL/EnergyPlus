@@ -2579,10 +2579,10 @@ namespace PurchasedAirManager {
             } // Cooling or heating required
 
             // EMS override point  Purch air supply temp and humidty ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
-            if ((PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) && (SupplyMassFlowRate > 0.0)) {
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
                 SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
             }
-            if ((PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) && (SupplyMassFlowRate > 0.0)) {
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
                 SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
             }
 
@@ -2695,13 +2695,6 @@ namespace PurchasedAirManager {
                 if (Contaminant.GenericContamSimulation) {
                     Node(InNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
                 }
-                if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
-                    SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
-                    OAMassFlowRate = 0.0;
-                }
-                if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
-                    SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
-                }
             }
 
             Node(InNodeNum).Temp = SupplyTemp;
@@ -2724,13 +2717,6 @@ namespace PurchasedAirManager {
             }
             if (Contaminant.GenericContamSimulation) {
                 Node(InNodeNum).GenContam = Node(ZoneNodeNum).GenContam;
-            }
-
-            if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
-                SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
-            }
-            if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
-                SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
             }
 
             Node(InNodeNum).MassFlowRate = 0.0;
