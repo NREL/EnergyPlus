@@ -1142,7 +1142,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_EQ(LowTempRadiantSystem::HydronicSystem, RadSysTypes(RadSysNum).SystemType);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+    PlantUtilities::ScanPlantLoopsForObject(state,
                                             HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).HWLoopNum,
@@ -1158,7 +1158,7 @@ TEST_F(LowTempRadiantSystemTest, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager,
+    PlantUtilities::ScanPlantLoopsForObject(state,
                                             HydrRadSys(RadSysNum).Name,
                                             TypeOf_LowTempRadiant_VarFlow,
                                             HydrRadSys(RadSysNum).CWLoopNum,
@@ -2193,23 +2193,7 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
-    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but less than temperature difference
-    offTemperature = 16.0;
-    controlTemperature = 15.0;
-    throttlingRange = 0.5;
-    expectedResult = 2.0;
-    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
-    EXPECT_NEAR(expectedResult, functionResult, 0.001);
-
-    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but less than temperature difference
-    offTemperature = 16.0;
-    controlTemperature = 15.0;
-    throttlingRange = 0.5;
-    expectedResult = 2.0;
-    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
-    EXPECT_NEAR(expectedResult, functionResult, 0.001);
-
-    // Test 4a: Temperature Difference is not zero and positive, throttling range is non-zero but greater than temperature difference
+    // Test 3a: Temperature Difference is not zero and positive, throttling range is non-zero but greater than temperature difference
     offTemperature = 16.0;
     controlTemperature = 15.0;
     throttlingRange = 2.0;
@@ -2217,12 +2201,54 @@ TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionTest)
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
-    // Test 4b: Temperature Difference is not zero and negative, throttling range is non-zero but greater than temperature difference
+    // Test 3b: Temperature Difference is not zero and negative, throttling range is non-zero but greater than temperature difference
     offTemperature = 14.0;
     controlTemperature = 15.0;
     throttlingRange = 2.0;
     expectedResult = 0.5;
     functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+}
+
+TEST_F(LowTempRadiantSystemTest, calculateOperationalFractionMaxLimitTest)
+{
+    Real64 offTemperature;
+    Real64 controlTemperature;
+    Real64 throttlingRange;
+    Real64 functionResult;
+    Real64 expectedResult;
+
+    HydrRadSys.allocate(1);
+    auto &thisRadSys (HydrRadSys(1));
+    ElecRadSys.allocate(1);
+    auto &thisElecRadSys (ElecRadSys(1));
+    
+    // Test A: Hydronic variable flow system, temperature Difference is not zero and positive,
+    //         throttling range is non-zero but less than temperature difference, limit to 1.0 max
+    offTemperature = 22.0;
+    controlTemperature = 21.0;
+    throttlingRange = 0.5;
+    expectedResult = 1.0;   // delta T/throttlingRange = 2.0 but this needs to be limited to 1.0
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+
+    // Test B: Hydronic variable flow system, temperature Difference is not zero and negative,
+    //         throttling range is non-zero but less than temperature difference, limit to 1.0 max
+    offTemperature = 24.0;
+    controlTemperature = 25.0;
+    throttlingRange = 0.5;
+    expectedResult = 1.0;   // delta T/throttlingRange = 2.0 but this needs to be limited to 1.0
+    functionResult = thisRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
+    EXPECT_NEAR(expectedResult, functionResult, 0.001);
+    
+    // Test C: Electric system, temperature Difference is not zero and positive, throttling range
+    //         is non-zero but less than temperature difference, limit to 1.0 max
+    offTemperature = 23.0;
+    controlTemperature = 20.0;
+    throttlingRange = 1.0;
+    expectedResult = 1.0;   // delta T/throttlingRange = 3.0 but this needs to be limited to 1.0
+    functionResult = thisElecRadSys.calculateOperationalFraction(offTemperature, controlTemperature, throttlingRange);
     EXPECT_NEAR(expectedResult, functionResult, 0.001);
 
 }

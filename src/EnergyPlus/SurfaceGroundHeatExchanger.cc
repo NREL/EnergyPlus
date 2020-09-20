@@ -226,7 +226,7 @@ namespace SurfaceGroundHeatExchanger {
                                                   Real64 &EP_UNUSED(CurLoad),
                                                   bool const EP_UNUSED(RunFlag))
     {
-        this->InitSurfaceGroundHeatExchanger(state.dataBranchInputManager);
+        this->InitSurfaceGroundHeatExchanger(state);
         this->CalcSurfaceGroundHeatExchanger(FirstHVACIteration);
         this->UpdateSurfaceGroundHeatExchngr();
         this->ReportSurfaceGroundHeatExchngr();
@@ -466,7 +466,7 @@ namespace SurfaceGroundHeatExchanger {
         }
     }
 
-    void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger(BranchInputManagerData &dataBranchInputManager)
+    void SurfaceGroundHeatExchangerData::InitSurfaceGroundHeatExchanger(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -515,7 +515,7 @@ namespace SurfaceGroundHeatExchanger {
         if (this->MyFlag) {
             // Locate the hx on the plant loops for later usage
             errFlag = false;
-            ScanPlantLoopsForObject(dataBranchInputManager,
+            ScanPlantLoopsForObject(state,
                 this->Name, TypeOf_GrndHtExchgSurface, this->LoopNum, this->LoopSideNum, this->BranchNum, this->CompNum, errFlag, _, _, _, _, _);
 
             if (errFlag) {

@@ -4649,7 +4649,7 @@ namespace HeatBalanceSurfaceManager {
         UpdateBBRadSourceValAvg(HWBaseboardSysOn);
         UpdateBBSteamRadSourceValAvg(SteamBaseboardSysOn);
         UpdateBBElecRadSourceValAvg(ElecBaseboardSysOn);
-        UpdateCoolingPanelSourceValAvg(state.dataChilledCeilingPanelSimple, CoolingPanelSysOn);
+        UpdateCoolingPanelSourceValAvg(state, CoolingPanelSysOn);
         UpdatePoolSourceValAvg(SwimmingPoolOn);
 
         if (LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn ||

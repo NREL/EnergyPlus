@@ -261,7 +261,7 @@ namespace SingleDuct {
 
         void SimVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
-        void CalcOAMassFlow(Real64 &SAMassFlow, Real64 &AirLoopOAFrac);
+        void CalcOAMassFlow(EnergyPlusData &state, Real64 &SAMassFlow, Real64 &AirLoopOAFrac);
 
         void SimCBVAV(EnergyPlusData &state, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum);
 
@@ -281,11 +281,11 @@ namespace SingleDuct {
 
         void SimConstVolNoReheat();
 
-        void CalcOutdoorAirVolumeFlowRate();
+        void CalcOutdoorAirVolumeFlowRate(EnergyPlusData &state);
 
         void UpdateSys();
 
-        void ReportSys();
+        void ReportSys(EnergyPlusData &state);
 
     };
 
@@ -341,7 +341,7 @@ namespace SingleDuct {
         {
         }
 
-        void InitATMixer(bool const FirstHVACIteration);
+        void InitATMixer(EnergyPlusData &state, bool const FirstHVACIteration);
     };
 
     // Object Data
@@ -369,7 +369,7 @@ namespace SingleDuct {
                                    Optional_int DamperOutletNode = _ // Damper outlet node number
     );
 
-    void SimATMixer(std::string const &SysName, bool const FirstHVACIteration, int &SysIndex);
+    void SimATMixer(EnergyPlusData &state, std::string const &SysName, bool const FirstHVACIteration, int &SysIndex);
 
     void GetATMixers(EnergyPlusData &state, ZoneAirLoopEquipmentManagerData &dataZoneAirLoopEquipmentManager);
 

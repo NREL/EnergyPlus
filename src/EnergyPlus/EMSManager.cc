@@ -458,7 +458,7 @@ namespace EMSManager {
         // need to delay setup of HVAC actuator until after the systems input has been processed (if present)
         if (FinishProcessingUserInput && !DoingSizing && !KickOffSimulation) {
             SetupNodeSetPointsAsActuators();
-            SetupPrimaryAirSystemAvailMgrAsActuators();
+            SetupPrimaryAirSystemAvailMgrAsActuators(state);
             //    CALL SetupWindowShadingControlActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupThermostatActuators !this is too late for including in sizing, moved to GetEMSUserInput
             //    CALL SetupSurfaceConvectionActuators !this is too late for including in sizing, moved to GetEMSUserInput
@@ -1253,6 +1253,18 @@ namespace EMSManager {
                     EnergyPlus::ShowContinueError("You should take note that there is a risk of overwritting.");
                 }
                 ++EMSActuatorAvailable(ActuatorVariableNum).handleCount;
+
+                // Warn if actuator applied to an air boundary surface
+                if (UtilityRoutines::SameString(EMSActuatorUsed(ActuatorNum).ComponentTypeName, "AIRFLOW NETWORK WINDOW/DOOR OPENING")) {
+                    int actuatedSurfNum = UtilityRoutines::FindItemInList(EMSActuatorUsed(ActuatorNum).UniqueIDName, DataSurfaces::Surface);
+                    if (actuatedSurfNum > 0) {
+                        if (DataSurfaces::Surface(actuatedSurfNum).IsAirBoundarySurf) {
+                            ShowWarningError(
+                                "GetEMSInput: EnergyManagementSystem:Actuator=" + EMSActuatorUsed(ActuatorNum).Name +
+                                " actuates an opening attached to an air boundary surface.");
+                        }
+                    }
+                }
             }
         } // ActuatorNum
 
@@ -1890,7 +1902,7 @@ namespace EMSManager {
         return returnValue;
     }
 
-    void SetupPrimaryAirSystemAvailMgrAsActuators()
+    void SetupPrimaryAirSystemAvailMgrAsActuators(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1909,7 +1921,6 @@ namespace EMSManager {
         // na
 
         // Using/Aliasing
-        using DataAirLoop::PriAirSysAvailMgr;
         using DataAirSystems::PrimaryAirSystem;
 
         // Locals
@@ -1932,11 +1943,11 @@ namespace EMSManager {
 
         lDummy = false;
 
-        if (allocated(PriAirSysAvailMgr)) {
-            numAirLoops = isize(PriAirSysAvailMgr);
+        if (allocated(state.dataAirLoop->PriAirSysAvailMgr)) {
+            numAirLoops = isize(state.dataAirLoop->PriAirSysAvailMgr);
             for (Loop = 1; Loop <= numAirLoops; ++Loop) {
                 SetupEMSActuator(
-                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, PriAirSysAvailMgr(Loop).AvailStatus);
+                    "AirLoopHVAC", PrimaryAirSystem(Loop).Name, "Availability Status", "[ ]", lDummy, state.dataAirLoop->PriAirSysAvailMgr(Loop).AvailStatus);
             }
 
         } else {

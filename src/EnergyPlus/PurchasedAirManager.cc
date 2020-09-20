@@ -204,7 +204,8 @@ namespace PurchasedAirManager {
 
     } // namespace
 
-    void SimPurchasedAir(EnergyPlusData &state, std::string const &PurchAirName,
+    void SimPurchasedAir(EnergyPlusData &state,
+                         std::string const &PurchAirName,
                          Real64 &SysOutputProvided,
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                          bool const FirstHVACIteration,
@@ -1087,7 +1088,8 @@ namespace PurchasedAirManager {
         }
     }
 
-    void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
+    void InitPurchasedAir(EnergyPlusData &state,
+                          int const PurchAirNum,
                           bool const EP_UNUSED(FirstHVACIteration), // unused1208
                           int const ControlledZoneNum,
                           int const ActualZoneNum)
@@ -1461,7 +1463,8 @@ namespace PurchasedAirManager {
                                 HeatingAirVolFlowDes = TempSize;
                             } else {
                                 if (ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow > 0.0) {
-                                    RequestSizing(state, CompType,
+                                    RequestSizing(state,
+                                                  CompType,
                                                   CompName,
                                                   SizingMethod,
                                                   SizingString,
@@ -1603,7 +1606,8 @@ namespace PurchasedAirManager {
                                 CoolingAirVolFlowDes = TempSize;
                             } else {
                                 if (ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow > 0.0) {
-                                    RequestSizing(state, CompType,
+                                    RequestSizing(state,
+                                                  CompType,
                                                   CompName,
                                                   SizingMethod,
                                                   SizingString,
@@ -1744,8 +1748,8 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxHeatVolFlowRate > 0.0) {
-                        RequestSizing(state,
-                            CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxHeatVolFlowRate, PrintFlag, RoutineName);
+                        RequestSizing(
+                            state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxHeatVolFlowRate, PrintFlag, RoutineName);
                     }
                     MaxHeatVolFlowRateDes = 0.0;
                 } else {
@@ -1767,7 +1771,8 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxHeatSensCap > 0.0) {
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxHeatSensCap, PrintFlag, RoutineName);
+                        RequestSizing(
+                            state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxHeatSensCap, PrintFlag, RoutineName);
                     }
                 } else {
                     TempSize = PurchAir(PurchAirNum).MaxHeatSensCap;
@@ -1831,8 +1836,8 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxCoolVolFlowRate > 0.0) {
-                        RequestSizing(state,
-                            CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolVolFlowRate, PrintFlag, RoutineName);
+                        RequestSizing(
+                            state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolVolFlowRate, PrintFlag, RoutineName);
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;
@@ -1853,7 +1858,8 @@ namespace PurchasedAirManager {
                 }
                 if (!IsAutoSize && !ZoneSizingRunDone) { // Simulation continue
                     if (PurchAir(PurchAirNum).MaxCoolTotCap > 0.0) {
-                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolTotCap, PrintFlag, RoutineName);
+                        RequestSizing(
+                            state, CompType, CompName, SizingMethod, SizingString, PurchAir(PurchAirNum).MaxCoolTotCap, PrintFlag, RoutineName);
                     }
                 } else {
                     ZoneCoolingOnlyFan = true;
@@ -2194,7 +2200,7 @@ namespace PurchasedAirManager {
                 // Supply mass flow is greatest of these, but limit to cooling max flow rate, if applicable
                 SupplyMassFlowRate = max(0.0, OAMassFlowRate, SupplyMassFlowRateForCool, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid);
                 // EMS override point  Purch air massflow rate..... but only if unit is on, i.e. SupplyMassFlowRate>0.0
-                if ((PurchAir(PurchAirNum).EMSOverrideMdotOn) && (SupplyMassFlowRate > 0.0)) {
+                if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
                     SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
                     OAMassFlowRate = min(OAMassFlowRate, SupplyMassFlowRate);
                 }
@@ -2445,7 +2451,7 @@ namespace PurchasedAirManager {
                 // Supply mass flow is greatest of these, but limit to heating max flow rate, if applicable
                 SupplyMassFlowRate = max(0.0, OAMassFlowRate, SupplyMassFlowRateForHeat, SupplyMassFlowRateForDehum, SupplyMassFlowRateForHumid);
                 // EMS override point  Purch air massflow rate..... but only if unit is on, i.e. SupplyMassFlowRate>0.0
-                if ((PurchAir(PurchAirNum).EMSOverrideMdotOn) && (SupplyMassFlowRate > 0.0)) {
+                if (PurchAir(PurchAirNum).EMSOverrideMdotOn) {
                     SupplyMassFlowRate = PurchAir(PurchAirNum).EMSValueMassFlowRate;
                     OAMassFlowRate = min(OAMassFlowRate, SupplyMassFlowRate);
                 }
@@ -2573,10 +2579,10 @@ namespace PurchasedAirManager {
             } // Cooling or heating required
 
             // EMS override point  Purch air supply temp and humidty ratio ..... but only if unit is on, SupplyMassFlowRate>0.0
-            if ((PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) && (SupplyMassFlowRate > 0.0)) {
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyTempOn) {
                 SupplyTemp = PurchAir(PurchAirNum).EMSValueSupplyTemp;
             }
-            if ((PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) && (SupplyMassFlowRate > 0.0)) {
+            if (PurchAir(PurchAirNum).EMSOverrideSupplyHumRatOn) {
                 SupplyHumRat = PurchAir(PurchAirNum).EMSValueSupplyHumRat;
             }
 
@@ -2969,7 +2975,8 @@ namespace PurchasedAirManager {
 
             // if all ideal loads air systems connected to the same plenum have been simulated, simulate the zone air plenum
             if (all(PurchAirPlenumArrays(PurchAir(PurchAirNum).ReturnPlenumIndex).IsSimulated)) {
-                SimAirZonePlenum(state, PurchAir(PurchAirNum).ReturnPlenumName,
+                SimAirZonePlenum(state,
+                                 PurchAir(PurchAirNum).ReturnPlenumName,
                                  DataZoneEquipment::ZoneReturnPlenum_Type,
                                  PurchAir(PurchAirNum).ReturnPlenumIndex,
                                  FirstHVACIteration,

@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include "CoilCoolingDXFixture.hh"
 
@@ -61,7 +62,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput )
     CoilCoolingDXCurveFitPerformance thisPerf(state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode, coilNormalMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilNormalMode);
 }
 
 TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode )
@@ -71,5 +72,5 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode )
     CoilCoolingDXCurveFitPerformance thisPerf(state, "coilPerformance");
     EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
     EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
-    EXPECT_EQ(thisPerf.hasAlternateMode,coilEnhancedMode);
+    EXPECT_EQ(thisPerf.hasAlternateMode, DataHVACGlobals::coilEnhancedMode);
 }

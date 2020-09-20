@@ -117,7 +117,7 @@ namespace ChillerGasAbsorption {
     {
         // Process the input data if it hasn't been done already
         if (state.dataChillerGasAbsorption.getGasAbsorberInputs) {
-            GetGasAbsorberInput(state, state.dataChillerGasAbsorption);
+            GetGasAbsorberInput(state);
             state.dataChillerGasAbsorption.getGasAbsorberInputs = false;
         }
         // Now look for this particular pipe in the list
@@ -144,14 +144,14 @@ namespace ChillerGasAbsorption {
             // Calculate Node Values
             // Calculate Equipment and Update Variables
             this->InCoolingMode = RunFlag != 0;
-            this->initialize(state.dataBranchInputManager);
+            this->initialize(state);
             this->calculateChiller(state, CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             // Calculate Node Values
             // Calculate Equipment and Update Variables
             this->InHeatingMode = RunFlag != 0;
-            this->initialize(state.dataBranchInputManager);
+            this->initialize(state);
             this->calculateHeater(state, CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
@@ -207,7 +207,7 @@ namespace ChillerGasAbsorption {
 
     void GasAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
@@ -232,7 +232,7 @@ namespace ChillerGasAbsorption {
         TempCondInDesign = this->TempDesCondReturn;
     }
 
-    void GetGasAbsorberInput(EnergyPlusData &state, ChillerGasAbsorptionData &chillers)
+    void GetGasAbsorberInput(EnergyPlusData &state)
     {
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
@@ -265,10 +265,10 @@ namespace ChillerGasAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(chillers.GasAbsorber)) return;
+        if (allocated(state.dataChillerGasAbsorption.GasAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        chillers.GasAbsorber.allocate(NumGasAbsorbers);
+        state.dataChillerGasAbsorption.GasAbsorber.allocate(NumGasAbsorbers);
 
         // LOAD ARRAYS
 
@@ -289,7 +289,7 @@ namespace ChillerGasAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.GasAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerGasAbsorption.GasAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
             ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
@@ -617,7 +617,7 @@ namespace ChillerGasAbsorption {
             "Chiller Heater Runtime Fraction", OutputProcessor::Unit::None, this->FractionOfPeriodRunning, "System", "Average", ChillerName);
     }
 
-    void GasAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager)
+    void GasAbsorberSpecs::initialize(EnergyPlusData &state)
     {
         //       AUTHOR         Fred Buhl
         //       DATE WRITTEN   June 2003
@@ -647,7 +647,7 @@ namespace ChillerGasAbsorption {
 
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_DFAbsorption,
                                                     this->CWLoopNum,
@@ -664,7 +664,7 @@ namespace ChillerGasAbsorption {
                 ShowFatalError("InitGasAbsorber: Program terminated due to previous condition(s).");
             }
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_DFAbsorption,
                                                     this->HWLoopNum,
@@ -682,7 +682,7 @@ namespace ChillerGasAbsorption {
             }
 
             if (this->isWaterCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_DFAbsorption,
                                                         this->CDLoopNum,

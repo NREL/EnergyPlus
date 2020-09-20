@@ -117,7 +117,7 @@ namespace ChillerExhaustAbsorption {
     {
         // Process the input data if it hasn't been done already
         if (state.dataChillerExhaustAbsorption.Sim_GetInput) {
-            GetExhaustAbsorberInput(state, state.dataChillerExhaustAbsorption);
+            GetExhaustAbsorberInput(state);
             state.dataChillerExhaustAbsorption.Sim_GetInput = false;
         }
         // Now look for this particular pipe in the list
@@ -142,12 +142,12 @@ namespace ChillerExhaustAbsorption {
         // Match inlet node name of calling branch to determine if this call is for heating or cooling
         if (BranchInletNodeNum == this->ChillReturnNodeNum) { // Operate as chiller
             this->InCoolingMode = RunFlag != 0;
-            this->initialize(state.dataBranchInputManager);
+            this->initialize(state);
             this->calcChiller(state, CurLoad);
             this->updateCoolRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->HeatReturnNodeNum) { // Operate as heater
             this->InHeatingMode = RunFlag != 0;
-            this->initialize(state.dataBranchInputManager);
+            this->initialize(state);
             this->calcHeater(state, CurLoad, RunFlag);
             this->updateHeatRecords(CurLoad, RunFlag);
         } else if (BranchInletNodeNum == this->CondReturnNodeNum) { // called from condenser loop
@@ -206,7 +206,7 @@ namespace ChillerExhaustAbsorption {
 
     void ExhaustAbsorberSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
-        this->initialize(state.dataBranchInputManager);
+        this->initialize(state);
 
         // kind of a hacky way to find the location of this, but it's what plantloopequip was doing
         int BranchInletNodeNum =
@@ -225,12 +225,12 @@ namespace ChillerExhaustAbsorption {
         TempDesCondIn = this->TempDesCondReturn;
     }
 
-    void GetExhaustAbsorberInput(EnergyPlusData &state, ChillerExhaustAbsorptionData &chillers)
+    void GetExhaustAbsorberInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Jason Glazer
         //       DATE WRITTEN:    March 2001
-        //       MODIFIED         Mahabir Bhandari, ORNL, Aug 2011, modified to accomodate Exhaust Fired Double Effect Absorption Chiller
+        //       MODIFIED         Mahabir Bhandari, ORNL, Aug 2011, modified to accommodate Exhaust Fired Double Effect Absorption Chiller
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -267,10 +267,10 @@ namespace ChillerExhaustAbsorption {
             Get_ErrorsFound = true;
         }
 
-        if (allocated(chillers.ExhaustAbsorber)) return;
+        if (allocated(state.dataChillerExhaustAbsorption.ExhaustAbsorber)) return;
 
         // ALLOCATE ARRAYS
-        chillers.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
+        state.dataChillerExhaustAbsorption.ExhaustAbsorber.allocate(NumExhaustAbsorbers);
 
         // LOAD ARRAYS
 
@@ -291,7 +291,7 @@ namespace ChillerExhaustAbsorption {
             // Get_ErrorsFound will be set to True if problem was found, left untouched otherwise
             VerifyUniqueChillerName(cCurrentModuleObject, cAlphaArgs(1), Get_ErrorsFound, cCurrentModuleObject + " Name");
 
-            auto &thisChiller = chillers.ExhaustAbsorber(AbsorberNum);
+            auto &thisChiller = state.dataChillerExhaustAbsorption.ExhaustAbsorber(AbsorberNum);
             thisChiller.Name = cAlphaArgs(1);
             ChillerName = cCurrentModuleObject + " Named " + thisChiller.Name;
 
@@ -616,7 +616,7 @@ namespace ChillerExhaustAbsorption {
                             ChillerName);
     }
 
-    void ExhaustAbsorberSpecs::initialize(BranchInputManagerData &dataBranchInputManager)
+    void ExhaustAbsorberSpecs::initialize(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -653,7 +653,7 @@ namespace ChillerExhaustAbsorption {
         if (this->plantScanInit) {
             // Locate the chillers on the plant loops for later usage
             errFlag = false;
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                     this->CWLoopNum,
@@ -670,7 +670,7 @@ namespace ChillerExhaustAbsorption {
                 ShowFatalError("InitExhaustAbsorber: Program terminated due to previous condition(s).");
             }
 
-            PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+            PlantUtilities::ScanPlantLoopsForObject(state,
                                                     this->Name,
                                                     DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                     this->HWLoopNum,
@@ -688,7 +688,7 @@ namespace ChillerExhaustAbsorption {
             }
 
             if (this->isWaterCooled) {
-                PlantUtilities::ScanPlantLoopsForObject(dataBranchInputManager,
+                PlantUtilities::ScanPlantLoopsForObject(state,
                                                         this->Name,
                                                         DataPlant::TypeOf_Chiller_ExhFiredAbsorption,
                                                         this->CDLoopNum,

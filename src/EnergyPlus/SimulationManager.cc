@@ -354,7 +354,7 @@ namespace SimulationManager {
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
 
-        ManageBranchInput(state, state.dataBranchInputManager); // just gets input and returns.
+        ManageBranchInput(state); // just gets input and returns.
 
         // Create a new plugin manager which starts up the Python interpreter
         // Note this cannot be done if we are running within the library environment, nor would you really to do so
@@ -395,7 +395,7 @@ namespace SimulationManager {
         SizingManager::ManageSystemSizingAdjustments(state);
 
         DisplayString("Adjusting Standard 62.1 Ventilation Sizing");
-        SizingManager::ManageSystemVentilationAdjustments();
+        SizingManager::ManageSystemVentilationAdjustments(state);
 
         DisplayString("Initializing Simulation");
         KickOffSimulation = true;
@@ -431,7 +431,7 @@ namespace SimulationManager {
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations(state.files);
             InitDemandManagers(state);
-            TestBranchIntegrity(state.dataBranchInputManager, state.files, ErrFound);
+            TestBranchIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, state.files, ErrFound);
             if (ErrFound) TerminalError = true;
@@ -445,8 +445,8 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
-                ReportLoopConnections(state.files);
-                ReportAirLoopConnections(state.files);
+                ReportLoopConnections(state, state.files);
+                ReportAirLoopConnections(state, state.files);
                 ReportNodeConnections(state.files);
                 // Debug reports
                 //      CALL ReportCompSetMeterVariables
@@ -2305,7 +2305,7 @@ namespace SimulationManager {
         NonConnectedNodes.deallocate();
     }
 
-    void ReportLoopConnections(IOFiles &ioFiles)
+    void ReportLoopConnections(EnergyPlusData &state, IOFiles &ioFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2813,7 +2813,7 @@ namespace SimulationManager {
         }
 
         // Report Dual Duct Dampers to BND File
-        ReportDualDuctConnections(ioFiles);
+        ReportDualDuctConnections(state, ioFiles);
 
         if (NumNodeConnectionErrors == 0) {
             ShowMessage("No node connection errors were found.");

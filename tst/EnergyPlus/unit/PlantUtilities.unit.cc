@@ -457,7 +457,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
     bool errorFlag = false;
 
     // test simple searching first
-    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager, "comp_name", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+    PlantUtilities::ScanPlantLoopsForObject(state, "comp_name", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_EQ(1, loopNum);
     EXPECT_EQ(1, loopSideNum);
     EXPECT_EQ(1, branchNum);
@@ -465,7 +465,7 @@ TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {
     EXPECT_FALSE(errorFlag);
 
     // then test to make sure errorFlag is passed by reference
-    PlantUtilities::ScanPlantLoopsForObject(state.dataBranchInputManager, "comp_name_not_here", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
+    PlantUtilities::ScanPlantLoopsForObject(state, "comp_name_not_here", DataPlant::TypeOf_Boiler_Simple, loopNum, loopSideNum, branchNum, compNum, errorFlag);
     EXPECT_TRUE(errorFlag);
 
 }

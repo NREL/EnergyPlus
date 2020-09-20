@@ -301,7 +301,7 @@ namespace Fans {
     // Beginning of Reporting subroutines for the Fan Module
     // *****************************************************************************
 
-    void ReportFan(int const FanNum);
+    void ReportFan(EnergyPlusData &state, int const FanNum);
 
     //        End of Reporting subroutines for the Fan Module
     // *****************************************************************************
