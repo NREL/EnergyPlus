@@ -802,13 +802,13 @@ TEST_F(AutoSizingFixture, HeatingCapacitySizingGauntlet)
     DataSizing::OASysEqSizing(1).HeatingAirFlow = false;
     DataAirLoop::OutsideAirSys.allocate(1);
     DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingMassFlow = 1.1;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].HeatOutTemp = 5.0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].PreheatTemp = 11.0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].m_FanIndex = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].FanBlowTroughFlag = true;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].m_FanTypeNum = SimAirServingZones::Fan_System_Object;
+    state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 1.1;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].HeatOutTemp = 5.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].PreheatTemp = 11.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::Fan_System_Object;
 
     // start with an autosized value
     inputValue = DataSizing::AutoSize;

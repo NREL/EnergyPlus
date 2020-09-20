@@ -111,7 +111,7 @@ void BaseSizer::initializeWithinEP(EnergyPlusData &state,
     this->plantSizData = DataSizing::PlantSizData;
     this->primaryAirSystem = DataAirSystems::PrimaryAirSystem;
 
-    this->airloopDOAS = state.dataAirLoopHVACDOAS.airloopDOAS;
+    this->airloopDOAS = state.dataAirLoopHVACDOAS->airloopDOAS;
     if (EnergyPlus::BaseSizer::isValidCoilType(this->compType)) { // coil reports fail if compType is not one of DataHVACGlobals::cAllCoilTypes
         this->isCoilReportObject = true;
     }

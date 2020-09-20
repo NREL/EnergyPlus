@@ -489,15 +489,15 @@ TEST_F(AutoSizingFixture, CoolingCapacitySizingGauntlet)
     DataSizing::OASysEqSizing(1).CoolingCapacity = false;
     DataAirLoop::OutsideAirSys.allocate(1);
     DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingMassFlow = 0.2;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingCoolOATemp = 32.0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].m_FanIndex = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].FanBlowTroughFlag = true;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].m_FanTypeNum = SimAirServingZones::Fan_System_Object;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingCoolOAHumRat = 0.009;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].PrecoolTemp = 12.0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].PrecoolHumRat = 0.006;
+    state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 0.2;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 32.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].m_FanIndex = 0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].FanBlowTroughFlag = true;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].m_FanTypeNum = SimAirServingZones::Fan_System_Object;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOAHumRat = 0.009;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolTemp = 12.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].PrecoolHumRat = 0.006;
 
     // start with an autosized value
     inputValue = DataSizing::AutoSize;

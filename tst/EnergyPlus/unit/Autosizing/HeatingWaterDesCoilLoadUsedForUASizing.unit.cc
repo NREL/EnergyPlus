@@ -403,9 +403,9 @@ TEST_F(AutoSizingFixture, HeatingWaterDesCoilLoadUsedForUASizingGauntlet)
 
     // Test 18 - Outdoor Air System Equipment with DOAS system
     DataAirLoop::OutsideAirSys(DataSizing::CurOASysNum).AirLoopDOASNum = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].HeatOutTemp = 8.0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].PreheatTemp = 15.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].HeatOutTemp = 8.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].PreheatTemp = 15.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 

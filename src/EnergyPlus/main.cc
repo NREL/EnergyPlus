@@ -47,6 +47,7 @@
 
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
+#include <EnergyPlus/Data/CommonIncludes.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using EnergyPlus::CommandLineInterface::ProcessArgs;

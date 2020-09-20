@@ -377,8 +377,8 @@ TEST_F(AutoSizingFixture, CoolingWaterDesAirInletTempSizingGauntlet)
     // Test 17 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingCoolOATemp = 27.44;
+    state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingCoolOATemp = 27.44;
 
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;

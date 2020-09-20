@@ -425,8 +425,8 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 18 - Outdoor Air System Equipment with DOAS system
     EnergyPlus::DataSizing::FinalSysSizing(1).DesOutAirVolFlow = 0.0;
     EnergyPlus::DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingMassFlow = 5.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 5.0;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
 
@@ -445,7 +445,7 @@ TEST_F(AutoSizingFixture, HeatingAirflowUASizingGauntlet)
     // Test 19 - Outdoor Air System Equipment with DOAS system, hard-sized air flow rate
     // start with an auto-sized value as the user input
     inputValue = 5.0;
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingMassFlow = 3.0;
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 3.0;
 
     // do sizing
     sizer.wasAutoSized = false;

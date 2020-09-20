@@ -805,8 +805,8 @@ TEST_F(AutoSizingFixture, CoolingAirFlowSizingGauntlet)
     // Test 48 - Outdoor Air System
     EnergyPlus::DataSizing::OASysEqSizing(1).CoolingAirFlow = false;
     DataAirLoop::OutsideAirSys(1).AirLoopDOASNum = 0;
-    state.dataAirLoopHVACDOAS.airloopDOAS.emplace_back();
-    state.dataAirLoopHVACDOAS.airloopDOAS[0].SizingMassFlow = 4.8;
+    state.dataAirLoopHVACDOAS->airloopDOAS.emplace_back();
+    state.dataAirLoopHVACDOAS->airloopDOAS[0].SizingMassFlow = 4.8;
     // start with an auto-sized value as the user input
     inputValue = EnergyPlus::DataSizing::AutoSize;
     // do sizing
