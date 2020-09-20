@@ -102,7 +102,7 @@
 
   Version,9.4;
 
-  Timestep,12;
+  Timestep,60;
 
   ConvergenceLimits,
     5,                       !- Minimum System Timestep {minutes}
@@ -1322,24 +1322,30 @@
     Determine_Purch_Air_State,  !- Program Name 1
     Set_Purch_Air;           !- Program Name 2
 
-  ! State representation:  1.0 is heating, 2.0 is cooling
+  ! State representation:  0.0 is off, 1.0 is heating, 2.0 is cooling
 
   EnergyManagementSystem:Program,
     Determine_Purch_Air_State,  !- Name
-    IF (Sensible_Load_Zone_1 <= 0.0),  !- Program Line 1
+    IF (Sensible_Load_Zone_1 < 0.0),  !- Program Line 1
     SET Zone_1_State = 2.0,  !- Program Line 2
     ELSEIF (Sensible_Load_Zone_1 > 0.0),  !- <none>
     SET Zone_1_State = 1.0,  !- <none>
+    ELSE,
+    SET Zone_1_State = 0.0,  !- <none>
     ENDIF,                   !- <none>
-    IF (Sensible_Load_Zone_2 <= 0.0),  !- <none>
+    IF (Sensible_Load_Zone_2 < 0.0),  !- <none>
     SET Zone_2_State = 2.0,  !- <none>
     ELSEIF (Sensible_Load_Zone_2 > 0.0),  !- <none>
     SET Zone_2_State = 1.0,  !- <none>
+    ELSE,
+    SET Zone_2_State = 0.0,  !- <none>
     ENDIF,                   !- <none>
-    IF (Sensible_Load_Zone_3 <= 0.0),  !- <none>
+    IF (Sensible_Load_Zone_3 < 0.0),  !- <none>
     SET Zone_3_State = 2.0,  !- <none>
     ELSEIF (Sensible_Load_Zone_3 > 0.0),  !- <none>
     SET Zone_3_State = 1.0,  !- <none>
+    ELSE,
+    SET Zone_3_State = 0.0,  !- <none>
     ENDIF;                   !- <none>
 
   EnergyManagementSystem:Program,
@@ -1352,6 +1358,8 @@
     SET ZONE_1_AIR_Mdot = 0.1,  !- <none>
     SET ZONE_1_AIR_SupplyT = 50.0,  !- <none>
     SET ZONE_1_AIR_SupplyHumRat = 0.015,  !- <none>
+    ELSE,
+    SET ZONE_1_AIR_Mdot = 0.0,  !- <none>
     ENDIF,                   !- <none>
     IF (    Zone_2_State == 2.0),  !- <none>
     SET ZONE_2_AIR_Mdot = 0.3,  !- <none>
@@ -1361,6 +1369,8 @@
     SET ZONE_2_AIR_Mdot = 0.1,  !- <none>
     SET ZONE_2_AIR_SupplyT = 50.0,  !- <none>
     SET ZONE_2_AIR_SupplyHumRat = 0.015,  !- <none>
+    ELSE,
+    SET ZONE_2_AIR_Mdot = 0.0,  !- <none>
     ENDIF,                   !- <none>
     IF (    Zone_3_State == 2.0),  !- <none>
     SET ZONE_3_AIR_Mdot = 0.4,  !- <none>
@@ -1370,6 +1380,8 @@
     SET ZONE_3_AIR_Mdot = 0.15,  !- <none>
     SET ZONE_3_AIR_SupplyT = 50.0,  !- <none>
     SET ZONE_3_AIR_SupplyHumRat = 0.015,  !- <none>
+    ELSE,
+    SET ZONE_3_AIR_Mdot = 0.0,  !- <none>
     ENDIF;                   !- <none>
 
   EnergyManagementSystem:GlobalVariable,
