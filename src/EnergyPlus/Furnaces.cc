@@ -10153,6 +10153,7 @@ namespace Furnaces {
         using IntegratedHeatPump::GetMaxSpeedNumIHP;
         using IntegratedHeatPump::IHPOperationMode;
         using IntegratedHeatPump::IntegratedHeatPumps;
+        using IntegratedHeatPump::GetGridLoadCtrlModeIHP;
         using Psychrometrics::PsyCpAirFnW;
         using TempSolveRoot::SolveRoot;
         using VariableSpeedCoils::GetGridLoadCtrlMode;
@@ -10259,7 +10260,7 @@ namespace Furnaces {
                              SupHeaterLoad);
 
         if (Furnace(FurnaceNum).bIsIHP) {
-
+            GridResponseMode = GetGridLoadCtrlModeIHP(Furnace(FurnaceNum).CoolingCoilIndex);
         } else {
             GridResponseMode = GetGridLoadCtrlMode(Furnace(FurnaceNum).CoolingCoilIndex);
         }
@@ -10461,7 +10462,12 @@ namespace Furnaces {
         if ((QLatReq < -SmallLoad && QLatReq < LatOutput) && (GridResponseMode != VariableSpeedCoils::GRID_SENSIBLE)) {
             PartLoadFrac = 1.0;
             SpeedRatio = 1.0;
-            for (i = SpeedNum; i <= Furnace(FurnaceNum).NumOfSpeedCooling; ++i) {
+
+            if (!Furnace(FurnaceNum).bIsIHP) {
+                MaxSpeedNum = Furnace(FurnaceNum).NumOfSpeedCooling;
+            }
+
+            for (i = SpeedNum; i <= MaxSpeedNum; ++i) {
                 CalcVarSpeedHeatPump(state, FurnaceNum,
                                      FirstHVACIteration,
                                      CompOp,
@@ -10473,7 +10479,8 @@ namespace Furnaces {
                                      QZnReq,
                                      QLatReq,
                                      OnOffAirFlowRatio,
-                                     SupHeaterLoad);
+                                     SupHeaterLoad,
+                                     true);
 
                 if (QLatReq > LatOutput) {
                     SpeedNum = i;
@@ -10596,7 +10603,8 @@ namespace Furnaces {
                               Real64 const QZnReq,           // Zone load (W)
                               Real64 const QLatReq,          // Zone latent load []
                               Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
-                              Real64 &SupHeaterLoad          // supplemental heater load (W)
+                              Real64 &SupHeaterLoad,          // supplemental heater load (W)
+                              bool const bEnhancedDehum       // whether it requires enhanced dehumidification
     )
     {
         // SUBROUTINE INFORMATION:
@@ -10609,6 +10617,7 @@ namespace Furnaces {
         // Using/Aliasing
         using Fans::SimulateFanComponents;
         using IntegratedHeatPump::SimIHP;
+        using IntegratedHeatPump::IntegratedHeatPumps; 
         using VariableSpeedCoils::CompareGridSpeed;
         using VariableSpeedCoils::SimVariableSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
@@ -10648,12 +10657,23 @@ namespace Furnaces {
         ErrorToler = 0.001;
 
         if (Furnace(FurnaceNum).bIsIHP) {
-
+            if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) { // cooling or dehumidification
+                FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).GridSCCoilIndex, 
+                    SpeedNum);
+                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
+            } else {                                    // heating
+                FanSpeed = CompareGridSpeed(IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).SHCoilIndex, 
+                    SpeedNum);
+                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
+            }
         } else {
-            FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum);
-            if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
-            FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, FanSpeed);
-            if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed
+            if ((QZnReq < (-1.0 * SmallLoad) || (QLatReq < (-1.0 * SmallLoad)))) {//cooling or dehumidification
+                FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).CoolingCoilIndex, SpeedNum);
+                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed            
+            } else {//heating
+                FanSpeed = CompareGridSpeed(Furnace(FurnaceNum).HeatingCoilIndex, SpeedNum);
+                if (FanSpeed == 0) FanSpeed = SpeedNum; // compressor off, allow maximum fan flow speed            
+            }
         }
 
         // Set inlet air mass flow rate based on PLR and compressor on/off air flow rates
@@ -10701,7 +10721,7 @@ namespace Furnaces {
                            QLatReq,
                            false,
                            false,
-                           OnOffAirFlowRatio);
+                           OnOffAirFlowRatio, bEnhancedDehum);
                 } else {
                     SimVariableSpeedCoils(state, BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
@@ -10738,7 +10758,7 @@ namespace Furnaces {
                            QLatReq,
                            false,
                            false,
-                           OnOffAirFlowRatio);
+                           OnOffAirFlowRatio, bEnhancedDehum);
                 } else {
                     SimVariableSpeedCoils(state, BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
@@ -10773,7 +10793,7 @@ namespace Furnaces {
                                QLatReq,
                                false,
                                false,
-                               OnOffAirFlowRatio);
+                               OnOffAirFlowRatio, bEnhancedDehum);
                     } else {
                         SimVariableSpeedCoils(state, BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
@@ -10810,7 +10830,7 @@ namespace Furnaces {
                                QLatReq,
                                false,
                                false,
-                               OnOffAirFlowRatio);
+                               OnOffAirFlowRatio, bEnhancedDehum);
                     } else {
                         SimVariableSpeedCoils(state, BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
@@ -10859,7 +10879,7 @@ namespace Furnaces {
                            QLatReq,
                            false,
                            false,
-                           OnOffAirFlowRatio);
+                           OnOffAirFlowRatio, bEnhancedDehum);
                 } else {
                     SimVariableSpeedCoils(state, BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
@@ -10896,7 +10916,7 @@ namespace Furnaces {
                            QLatReq,
                            false,
                            false,
-                           OnOffAirFlowRatio);
+                           OnOffAirFlowRatio, bEnhancedDehum);
                 } else {
                     SimVariableSpeedCoils(state, BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
@@ -10931,7 +10951,7 @@ namespace Furnaces {
                                QLatReq,
                                false,
                                false,
-                               OnOffAirFlowRatio);
+                               OnOffAirFlowRatio, bEnhancedDehum);
                     } else {
                         SimVariableSpeedCoils(state, BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
@@ -10967,7 +10987,7 @@ namespace Furnaces {
                                QLatReq,
                                false,
                                false,
-                               OnOffAirFlowRatio);
+                               OnOffAirFlowRatio, bEnhancedDehum);
                     } else {
                         SimVariableSpeedCoils(state, BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
@@ -11020,7 +11040,7 @@ namespace Furnaces {
                            QLatReq,
                            false,
                            false,
-                           OnOffAirFlowRatio);
+                           OnOffAirFlowRatio, bEnhancedDehum);
                 } else {
                     SimVariableSpeedCoils(state, BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
@@ -11057,7 +11077,7 @@ namespace Furnaces {
                            QLatReq,
                            false,
                            false,
-                           OnOffAirFlowRatio);
+                           OnOffAirFlowRatio, bEnhancedDehum);
                 } else {
                     SimVariableSpeedCoils(state, BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
@@ -11093,7 +11113,7 @@ namespace Furnaces {
                                QLatReq,
                                false,
                                false,
-                               OnOffAirFlowRatio);
+                               OnOffAirFlowRatio, bEnhancedDehum);
                     } else {
                         SimVariableSpeedCoils(state, BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,
@@ -11129,7 +11149,7 @@ namespace Furnaces {
                                QLatReq,
                                false,
                                false,
-                               OnOffAirFlowRatio);
+                               OnOffAirFlowRatio, bEnhancedDehum);
                     } else {
                         SimVariableSpeedCoils(state, BlankString,
                                               Furnace(FurnaceNum).HeatingCoilIndex,

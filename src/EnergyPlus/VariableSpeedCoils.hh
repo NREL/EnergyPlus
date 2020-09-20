@@ -586,6 +586,8 @@ namespace VariableSpeedCoils {
 
     void setVarSpeedFanInfo(int const dXCoilNum, std::string const fanName, int const fanIndex, int const fanTypeNum);
 
+    bool IsGridResponsiveMode(int const dXCoilNum); //check whether it is grid responsive period or not
+
 } // namespace VariableSpeedCoils
 
 } // namespace EnergyPlus

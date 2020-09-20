@@ -88,6 +88,14 @@ namespace IntegratedHeatPump {
         std::string SCCoilName;
         int SCCoilIndex; // Index to SC coil
 
+        std::string EnDehumCoilType; // Numeric Equivalent for enhanced dehumidification Coil Type
+        std::string EnDehumCoilName;
+        int EnDehumCoilIndex; // Index to enhanced dehumidification coil
+
+        std::string GridSCCoilType; // Numeric Equivalent for enhanced dehumidification Coil Type
+        std::string GridSCCoilName;
+        int GridSCCoilIndex; // Index to enhanced dehumidification coil
+
         std::string SHCoilType; // Numeric Equivalent for SH Coil Type
         std::string SHCoilName;
         int SHCoilIndex; // Index to SH coil
@@ -133,6 +141,18 @@ namespace IntegratedHeatPump {
         Real64 TambientOverCoolAllow;  //- [C], ambient temperature above which indoor overcooling is allowed
         Real64 TindoorWHHighPriority;  //- [C], indoor temperature above which water heating has the higher priority
         Real64 TambientWHHighPriority; // ambient temperature above which water heating has the higher priority
+        
+        Real64 EnDehumCoilSize; //sizing factor
+        Real64 GridCoilSize; // sizing factor
+        Real64 SCWHCoilSize;    // sizing factor
+        Real64 SHCoilSize; // sizing factor
+        Real64 DWHCoilSize; // sizing factor
+        Real64 SCDWHCoolCoilSize;   // sizing factor
+        Real64 SCDWHWHCoilSize; // sizing factor
+        Real64 SHDWHHeatCoilSize; // sizing factor
+        Real64 SHDWHWHCoilSize;     // sizing factor
+
+        bool bIsEnhanchedDumLastMoment; //whether the last moment dehumidification
 
         Real64 WaterVolSCDWH;
         // limit of water volume before switching from SCDWH to SCWH
@@ -208,7 +228,7 @@ namespace IntegratedHeatPump {
 
         // Default Constructor
         IntegratedHeatPumpData()
-            : SCCoilIndex(0), SHCoilIndex(0), SCWHCoilIndex(0), DWHCoilIndex(0), SCDWHCoolCoilIndex(0), SCDWHWHCoilIndex(0), SHDWHHeatCoilIndex(0),
+            : SCCoilIndex(0), EnDehumCoilIndex(0), SHCoilIndex(0), SCWHCoilIndex(0), DWHCoilIndex(0), SCDWHCoolCoilIndex(0), SCDWHWHCoilIndex(0), SHDWHHeatCoilIndex(0),
               SHDWHWHCoilIndex(0), AirCoolInletNodeNum(0), AirHeatInletNodeNum(0), AirOutletNodeNum(0), WaterInletNodeNum(0), WaterOutletNodeNum(0),
               WaterTankoutNod(0), ModeMatchSCWH(0), MinSpedSCWH(1), MinSpedSCDWH(1), MinSpedSHDWH(1), TindoorOverCoolAllow(0.0),
               TambientOverCoolAllow(0.0), TindoorWHHighPriority(0.0), TambientWHHighPriority(0.0), WaterVolSCDWH(0.0), TimeLimitSHDWH(0.0),
@@ -230,7 +250,17 @@ namespace IntegratedHeatPump {
               EnergyLoadTotalWaterHeating(0.0), // total heating energy [J]
               EnergyLatent(0.0),                // total latent energy [J]
               EnergySource(0.0),                // total source energy
-              TotalCOP(0.0)                     // total COP
+              TotalCOP(0.0),                     // total COP
+              bIsEnhanchedDumLastMoment(false),   //whether the last moment dehumidification
+              SHCoilSize(1.0), 
+              DWHCoilSize(1.0),    
+              SCWHCoilSize(1.0),
+              SCDWHCoolCoilSize(1.0),
+              SCDWHWHCoilSize(0.13),  
+              SHDWHHeatCoilSize(0.9),
+              SHDWHWHCoilSize(0.1),
+              EnDehumCoilSize(0.95),
+              GridCoilSize(1.0)
         {
         }
     };
@@ -255,7 +285,8 @@ namespace IntegratedHeatPump {
                 Real64 const LatentLoad,                   // Latent demand load [W]
                 bool const IsCallbyWH,                     // whether the call from the water heating loop or air loop, true = from water heating loop
                 bool const FirstHVACIteration,             // TRUE if First iteration of simulation
-                Optional<Real64 const> OnOffAirFlowRat = _ // ratio of comp on to comp off air flow rate
+                Optional<Real64 const> OnOffAirFlowRat = _, // ratio of comp on to comp off air flow rate
+                bool const bEnhancedDehum = false           // whether it requires enhanced dehumidification
     );
 
     void GetIHPInput(EnergyPlusData &state);
@@ -332,6 +363,9 @@ namespace IntegratedHeatPump {
                              std::string const &CoilName, // must match coil names for the coil type
                              IHPOperationMode const Mode, // mode coil type
                              bool &ErrorsFound            // set to true if problem
+    );
+
+    int GetGridLoadCtrlModeIHP(const int DXCoilNum // coil index No
     );
 
     void ClearCoils(EnergyPlusData &state, int const DXCoilNum // coil ID

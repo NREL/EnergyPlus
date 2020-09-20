@@ -496,7 +496,8 @@ namespace Furnaces {
                               Real64 const QZnReq,           // Zone load (W)
                               Real64 const QLatReq,          // Zone latent load []
                               Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
-                              Real64 &SupHeaterLoad          // supplemental heater load (W)
+                              Real64 &SupHeaterLoad,          // supplemental heater load (W)
+                              bool const bEnhancedDehum = false//whether it requires enhanced dehumidification
     );
 
     //******************************************************************************

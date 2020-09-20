@@ -7978,6 +7978,23 @@ namespace VariableSpeedCoils {
         return VarSpeedCoil(DXCoilNum).PartLoadRatio;
     }
 
+    bool IsGridResponsiveMode(int const DXCoilNum)
+    {
+        bool bIsGridResponse = false; 
+
+        if (DXCoilNum > 0) {
+            if (VarSpeedCoil(DXCoilNum).GridScheduleIndex > 0) {
+                const double dGridSignal = GetCurrentScheduleValue(VarSpeedCoil(DXCoilNum).GridScheduleIndex);
+
+                if ((dGridSignal >= VarSpeedCoil(DXCoilNum).GridLowBound) && (dGridSignal <= VarSpeedCoil(DXCoilNum).GridHighBound)) {
+                    bIsGridResponse = true; 
+                }
+            }
+        }
+
+        return (bIsGridResponse);
+    }
+
 } // namespace VariableSpeedCoils
 
 } // namespace EnergyPlus
